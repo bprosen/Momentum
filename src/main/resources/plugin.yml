@@ -1,0 +1,7 @@
+name: ${project.name}
+description: "${project.description}"
+main: ${mainClass}
+version: ${project.version}
+author: CrazySeanPC
+
+depend: [TitleAPI, Vault]
