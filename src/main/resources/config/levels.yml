@@ -1,0 +1,8 @@
+# Level data yaml
+#level_name:
+#  title: "&dCool Level" # The title is what the players will see for the level
+#  reward: 25 # Reward by default will be 0
+#  start_location: level_name-spawn # Name of the location where the level will start; Default is spawn
+#  respawn_location: level_name-respawn # Where the player will go after level completion(if unset, they will be sent to Spawn location); Default is unset
+#  message: "&1You've completed &5%level_title%&d!" # Message sent to player after level completion(if unset, the default will be usedd); Default is unset
+#  max_completions: 2 # How many completions are allowed for the level(If unset there are unlimited completions); Default is unset

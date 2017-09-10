@@ -4,7 +4,7 @@
 
     <properties>
         <mainClass>com.parkourcraft.Parkour.Parkour</mainClass>
-        <spigotVersion>1.8.8-R0.1-SNAPSHOT</spigotVersion>
+        <spigotVersion>1.12.1-R0.1-SNAPSHOT</spigotVersion>
     </properties>
 
     <groupId>com.parkourcraft</groupId>

@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour;
 
+import com.parkourcraft.Parkour.storage.local.FileLoader;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,8 @@ public class Parkour extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         logger = getLogger();
+
+        FileLoader.startUp();
 
         registerEvents();
         registerCommands();
