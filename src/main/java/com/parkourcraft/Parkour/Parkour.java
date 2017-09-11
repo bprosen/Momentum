@@ -1,6 +1,8 @@
 package com.parkourcraft.Parkour;
 
+import com.parkourcraft.Parkour.commands.Level_CMD;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
+import com.parkourcraft.Parkour.utils.storage.Levels_YAML;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,7 +45,7 @@ public class Parkour extends JavaPlugin {
     }
 
     private void registerCommands() {
-        //getCommand("arena").setExecutor(new ArenaCMD());
+        getCommand("level").setExecutor(new Level_CMD());
     }
 
 }

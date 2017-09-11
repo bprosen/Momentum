@@ -1,1 +1,4 @@
 # Settings yaml
+
+levels:
+  completion_message: "Rewarded %level_reward% coins for beating %level_title% (#%level_completions%)"

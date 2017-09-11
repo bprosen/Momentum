@@ -5,3 +5,8 @@ version: ${project.version}
 author: CrazySeanPC
 
 depend: [TitleAPI, Vault]
+
+commands:
+  level:
+    description: "Level creation command"
+    aliases: [lvl, levels]
