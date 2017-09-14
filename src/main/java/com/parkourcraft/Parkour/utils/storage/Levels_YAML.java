@@ -45,15 +45,17 @@ public class Levels_YAML {
         FileManager.save("levels");
     }
 
-    public static void setStartLocation(String levelName, String locationName) {
+    public static void setStartLocationName(String levelName, String locationName) {
         if (levels.isSet(levelName))
             levels.set(levelName + ".start_location", locationName);
 
         FileManager.save("levels");
     }
 
-    public static void setRespawnLocation(String levelName, String locationName) {
-        if (levels.isSet(levelName))
+    public static void setRespawnLocationName(String levelName, String locationName) {
+        if (locationName.equalsIgnoreCase("default"))
+            levels.set(levelName, null);
+        else if (levels.isSet(levelName))
             levels.set(levelName + ".respawn_location", locationName);
 
         FileManager.save("levels");

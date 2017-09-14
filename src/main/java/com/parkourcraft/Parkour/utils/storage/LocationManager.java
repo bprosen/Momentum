@@ -11,34 +11,42 @@ import com.parkourcraft.Parkour.storage.local.FileManager;
 
 public class LocationManager {
 
+    private static FileConfiguration locations = FileManager.getFileConfig("locations");
+
     public static void teleport(Player player, String positionName) {
         if (exists(positionName))
             player.teleport(LocationManager.get(positionName));
     }
 
+    public static void deletePosition(String positionName) {
+        if (exists(positionName))
+            locations.set(positionName, null);
+    }
+
     public static void savePosition(String positionName, Location location) {
         String worldName = location.getWorld().getName();
+
         double x = location.getX();
         double y = location.getY();
         double z = location.getZ();
         double yaw = location.getYaw();
         double pitch = location.getPitch();
-        LocationManager.savePosition(positionName, worldName, x, y, z, yaw, pitch);
+
+        savePosition(positionName, worldName, x, y, z, yaw, pitch);
     }
 
     public static void savePosition(String positionName, String worldName, double x, double y, double z, double yaw, double pitch) {
-        FileConfiguration locations = FileManager.getFileConfig("locations");
         locations.set("location." + positionName + ".world", worldName);
         locations.set("location." + positionName + ".x", x);
         locations.set("location." + positionName + ".y", y);
         locations.set("location." + positionName + ".z", z);
         locations.set("location." + positionName + ".yaw", yaw);
         locations.set("location." + positionName + ".pitch", pitch);
+
         SaveManager.addChange("locations");
     }
 
     public static Location get(String positionName) {
-        FileConfiguration locations = FileManager.getFileConfig("locations");
         if (locations.isSet("location." + positionName)) {
             World world = Bukkit.getServer().getWorld(locations.getString("location." + positionName + ".world"));
             double x = locations.getDouble("location." + positionName + ".x");
