@@ -53,6 +53,11 @@
             <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
 
+        <repository>
+            <id>sk89q-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -82,6 +87,12 @@
             <version>1.7.4</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/TitleAPI-1.7.4.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>6.1</version>
         </dependency>
 
     </dependencies>

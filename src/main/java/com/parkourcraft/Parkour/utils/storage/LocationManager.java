@@ -24,6 +24,8 @@ public class LocationManager {
     public static void deletePosition(String positionName) {
         if (exists(positionName))
             locations.set(positionName, null);
+
+        FileManager.save("locations");
     }
 
     public static List<String> getPositionNames() {
@@ -45,24 +47,24 @@ public class LocationManager {
     }
 
     public static void savePosition(String positionName, String worldName, double x, double y, double z, double yaw, double pitch) {
-        locations.set("location." + positionName + ".world", worldName);
-        locations.set("location." + positionName + ".x", x);
-        locations.set("location." + positionName + ".y", y);
-        locations.set("location." + positionName + ".z", z);
-        locations.set("location." + positionName + ".yaw", yaw);
-        locations.set("location." + positionName + ".pitch", pitch);
+        locations.set(positionName + ".world", worldName);
+        locations.set(positionName + ".x", x);
+        locations.set(positionName + ".y", y);
+        locations.set(positionName + ".z", z);
+        locations.set(positionName + ".yaw", yaw);
+        locations.set(positionName + ".pitch", pitch);
 
-        SaveManager.addChange("locations");
+        FileManager.save("locations");
     }
 
     public static Location get(String positionName) {
-        if (locations.isSet("location." + positionName)) {
-            World world = Bukkit.getServer().getWorld(locations.getString("location." + positionName + ".world"));
-            double x = locations.getDouble("location." + positionName + ".x");
-            double y = locations.getDouble("location." + positionName + ".y");
-            double z = locations.getDouble("location." + positionName + ".z");
-            float yaw = (float) locations.getDouble("location." + positionName + ".yaw");
-            float pitch = (float) locations.getDouble("location." + positionName + ".pitch");
+        if (locations.isSet(positionName)) {
+            World world = Bukkit.getServer().getWorld(locations.getString(positionName + ".world"));
+            double x = locations.getDouble(positionName + ".x");
+            double y = locations.getDouble(positionName + ".y");
+            double z = locations.getDouble(positionName + ".z");
+            float yaw = (float) locations.getDouble(positionName + ".yaw");
+            float pitch = (float) locations.getDouble(positionName + ".pitch");
             Location location = new Location(world, x, y, z, yaw, pitch);
             return location;
         } else
@@ -70,7 +72,7 @@ public class LocationManager {
     }
 
     public static boolean exists(String positionName) {
-        return FileManager.getFileConfig("locations").isSet("location." + positionName);
+        return locations.isSet(positionName);
     }
 
 }

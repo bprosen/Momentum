@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.utils.storage;
 
 
-import com.parkourcraft.Parkour.storage.SaveManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.configuration.file.FileConfiguration;
 

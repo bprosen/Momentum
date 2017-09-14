@@ -91,7 +91,7 @@ public class Level_CMD implements CommandExecutor {
                 LevelManager.loadLevels();
                 sender.sendMessage(ChatColor.GRAY + "Loaded levels from " + ChatColor.GREEN + "levels.yml");
             } else if (a[0].equalsIgnoreCase("set")) { // subcommand: set
-                if (a.length < 4) {
+                if (a.length < 3) {
                     sender.sendMessage(ChatColor.RED + "Incorrect parameters");
                     sender.sendMessage(getHelp("set"));
                 } else {

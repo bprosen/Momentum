@@ -4,7 +4,7 @@ main: ${mainClass}
 version: ${project.version}
 author: CrazySeanPC
 
-depend: [TitleAPI, Vault]
+depend: [TitleAPI, Vault, WorldGuard]
 
 commands:
   level:
