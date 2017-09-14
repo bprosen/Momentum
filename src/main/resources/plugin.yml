@@ -10,3 +10,6 @@ commands:
   level:
     description: "Level creation command"
     aliases: [lvl, levels]
+  location:
+    description: "Locations management"
+    aliases: [loc, locations]

@@ -9,6 +9,9 @@ import org.bukkit.entity.Player;
 import com.parkourcraft.Parkour.storage.SaveManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LocationManager {
 
     private static FileConfiguration locations = FileManager.getFileConfig("locations");
@@ -21,6 +24,12 @@ public class LocationManager {
     public static void deletePosition(String positionName) {
         if (exists(positionName))
             locations.set(positionName, null);
+    }
+
+    public static List<String> getPositionNames() {
+        List<String> positionNames = new ArrayList<String>(locations.getKeys(false));
+
+        return positionNames;
     }
 
     public static void savePosition(String positionName, Location location) {

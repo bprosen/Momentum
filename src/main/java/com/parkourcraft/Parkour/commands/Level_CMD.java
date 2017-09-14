@@ -38,9 +38,9 @@ public class Level_CMD implements CommandExecutor {
                         )
                 );
             } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
-                String levelName = a[1];
-
                 if (a.length == 2) {
+                    String levelName = a[1];
+
                     if (Levels_YAML.levelExists(levelName))
                         sender.sendMessage(
                                 ChatColor.GRAY + "Level "
@@ -60,9 +60,9 @@ public class Level_CMD implements CommandExecutor {
                     sender.sendMessage(getHelp("create"));
                 }
             } else if (a[0].equalsIgnoreCase("delete")) { // subcommand: delete
-                String levelName = a[1];
-
                 if (a.length == 2) {
+                    String levelName = a[1];
+
                     if (!Levels_YAML.levelExists(levelName))
                         sender.sendMessage(
                                 ChatColor.GRAY + "Level "
@@ -79,7 +79,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "Incorrect parameters");
-                    sender.sendMessage(getHelp("create"));
+                    sender.sendMessage(getHelp("delete"));
                 }
             } else if (a[0].equalsIgnoreCase("load")) { // subcommand: load
                 FileManager.load("levels");
