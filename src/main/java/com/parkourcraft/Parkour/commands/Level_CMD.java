@@ -38,18 +38,43 @@ public class Level_CMD implements CommandExecutor {
                         )
                 );
             } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
+                String levelName = a[1];
+
                 if (a.length == 2) {
-                    if (Levels_YAML.levelExists(a[1]))
+                    if (Levels_YAML.levelExists(levelName))
                         sender.sendMessage(
                                 ChatColor.GRAY + "Level "
-                                + ChatColor.GREEN + a[1]
+                                + ChatColor.GREEN + levelName
                                 + ChatColor.GRAY + " already exists"
                         );
                     else {
-                        Levels_YAML.create(a[1]);
+                        Levels_YAML.create(levelName);
+
                         sender.sendMessage(
                                 ChatColor.GRAY + "Created level "
-                                        + ChatColor.GREEN + a[1]
+                                        + ChatColor.GREEN + levelName
+                        );
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("create"));
+                }
+            } else if (a[0].equalsIgnoreCase("delete")) { // subcommand: delete
+                String levelName = a[1];
+
+                if (a.length == 2) {
+                    if (!Levels_YAML.levelExists(levelName))
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                    else {
+                        Levels_YAML.delete(levelName);
+
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Deleted level "
+                                        + ChatColor.GREEN + levelName
                         );
                     }
                 } else {
@@ -218,22 +243,26 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("load"));
         sender.sendMessage(getHelp("show"));
         sender.sendMessage(getHelp("create"));
+        sender.sendMessage(getHelp("delete"));
         sender.sendMessage(getHelp("set"));
     }
 
     private static String getHelp(String cmd) {
         if (cmd.equalsIgnoreCase("show"))
             return ChatColor.GREEN + "/level show <level>" +
-                    ChatColor.GRAY + " Show level information";
+                    ChatColor.GRAY + " Shows level information";
         else if (cmd.equalsIgnoreCase("list"))
             return ChatColor.GREEN + "/level list" +
-                    ChatColor.GRAY + " List the configured levels";
+                    ChatColor.GRAY + " Lists the configured levels";
         else if (cmd.equalsIgnoreCase("create"))
             return ChatColor.GREEN + "/level create <level>" +
-                    ChatColor.GRAY + " Create a level";
+                    ChatColor.GRAY + " Creates a level";
         else if (cmd.equalsIgnoreCase("load"))
             return ChatColor.GREEN + "/level load" +
                     ChatColor.GRAY + " Loads levels.yml, then levels";
+        else if (cmd.equalsIgnoreCase("delete"))
+            return ChatColor.GREEN + "/level delete <level>" +
+                    ChatColor.GRAY + " Deletes a level";
         else if (cmd.equalsIgnoreCase("set"))
             return ChatColor.GREEN + "/level set "
                     + ChatColor.translateAlternateColorCodes(

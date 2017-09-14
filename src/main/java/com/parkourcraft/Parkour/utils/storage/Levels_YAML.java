@@ -19,6 +19,11 @@ public class Levels_YAML {
         FileManager.save("levels");
     }
 
+    public static void delete(String levelName) {
+        if (levelExists(levelName))
+            levels.set(levelName, null);
+    }
+
     public static boolean levelExists(String levelName) {
         if (levels.isSet(levelName))
             return true;
