@@ -1,4 +1,5 @@
 # Settings yaml
 
 levels:
+  completion_sign_chars: "Click Here"
   completion_message: "Rewarded %level_reward% coins for beating %level_title% (#%level_completions%)"

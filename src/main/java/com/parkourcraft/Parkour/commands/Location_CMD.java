@@ -17,9 +17,9 @@ public class Location_CMD implements CommandExecutor {
         else {
             if (a[0].equalsIgnoreCase("list")) { //subcommand: list
                 sender.sendMessage(
-                        ChatColor.GREEN + "Locations "
-                        + ChatColor.GRAY + String.join(
-                            ChatColor.DARK_GRAY + ", " + ChatColor.GRAY,
+                        ChatColor.GRAY + "Locations: "
+                        + ChatColor.GREEN + String.join(
+                            ChatColor.GRAY + ", " + ChatColor.GREEN,
                             LocationManager.getPositionNames()
                         )
                 );

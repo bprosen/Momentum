@@ -11,16 +11,22 @@ public class Levels_YAML {
 
     private static FileConfiguration levels = FileManager.getFileConfig("levels");
 
+    public static void save() {
+        FileManager.save("levels");
+    }
+
     public static void create(String levelName) {
         if (!levels.isSet(levelName))
             levels.set(levelName + ".reward", 0);
 
-        FileManager.save("levels");
+        save();
     }
 
     public static void delete(String levelName) {
         if (levelExists(levelName))
             levels.set(levelName, null);
+
+        save();
     }
 
     public static boolean levelExists(String levelName) {
@@ -39,21 +45,33 @@ public class Levels_YAML {
         if (levels.isSet(levelName))
             levels.set(levelName + ".title", title);
 
-        FileManager.save("levels");
+        save();
+    }
+
+    public static String getTitle(String levelName) {
+        if (levels.isSet(levelName + ".title"))
+            return levels.getString(levelName + ".title");
+        return "";
     }
 
     public static void setReward(String levelName, int reward) {
         if (levels.isSet(levelName))
             levels.set(levelName + ".reward", reward);
 
-        FileManager.save("levels");
+        save();
+    }
+
+    public static int getReward(String levelName) {
+        if (levels.isSet(levelName + ".reward"))
+            return levels.getInt(levelName + ".reward");
+        return 0;
     }
 
     public static void setStartLocationName(String levelName, String locationName) {
         if (levels.isSet(levelName))
             levels.set(levelName + ".start_location", locationName);
 
-        FileManager.save("levels");
+        save();
     }
 
     public static void setRespawnLocationName(String levelName, String locationName) {
@@ -62,14 +80,20 @@ public class Levels_YAML {
         else if (levels.isSet(levelName))
             levels.set(levelName + ".respawn_location", locationName);
 
-        FileManager.save("levels");
+        save();
     }
 
     public static void setMessage(String levelName, String message) {
         if (levels.isSet(levelName))
             levels.set(levelName + ".message", message);
 
-        FileManager.save("levels");
+        save();
+    }
+
+    public static String getMessage(String levelName) {
+        if (levels.isSet(levelName + ".message"))
+            return levels.getString(levelName + ".message");
+        return "";
     }
 
     public static void setMaxCompletions(String levelName, int maxCompletions) {
@@ -80,7 +104,13 @@ public class Levels_YAML {
                 levels.set(levelName + ".max_completions", maxCompletions);
         }
 
-        FileManager.save("levels");
+        save();
+    }
+
+    public static int getMaxCompletions(String levelName) {
+        if (levels.isSet(levelName + ".max_completions"))
+            return levels.getInt(levelName + ".max_completions");
+        return 0;
     }
 
 }

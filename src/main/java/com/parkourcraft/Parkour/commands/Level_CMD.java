@@ -31,9 +31,9 @@ public class Level_CMD implements CommandExecutor {
                 }
             } else if (a[0].equalsIgnoreCase("list")) { // subcommand: list
                 sender.sendMessage(
-                        ChatColor.GREEN + "Levels "
-                        + ChatColor.GRAY + String.join(
-                                ChatColor.DARK_GRAY + ", " + ChatColor.GRAY,
+                        ChatColor.GRAY + "Levels loaded in: "
+                        + ChatColor.GREEN + String.join(
+                                ChatColor.GRAY + ", " + ChatColor.GREEN,
                                 LevelManager.getLevelNames()
                         )
                 );
@@ -90,131 +90,34 @@ public class Level_CMD implements CommandExecutor {
 
                 LevelManager.loadLevels();
                 sender.sendMessage(ChatColor.GRAY + "Loaded levels from " + ChatColor.GREEN + "levels.yml");
-            } else if (a[0].equalsIgnoreCase("set")) { // subcommand: set
-                if (a.length < 3) {
-                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
-                    sender.sendMessage(getHelp("set"));
-                } else {
-                    String levelName = a[2];
+            } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
+                if (a.length > 1) {
+                    String levelName = a[1];
 
                     if (Levels_YAML.levelExists(levelName)) {
-                        if (a[1].equalsIgnoreCase("title")) {
+                        if (a.length > 2) {
                             String title = "";
-                            for (int i = 3; i < a.length; i++)
+                            for (int i = 2; i < a.length; i++)
                                 title = title + " " + a[i];
                             title = title.trim();
 
                             Levels_YAML.setTitle(levelName, title);
                             sender.sendMessage(
                                     ChatColor.GRAY + "Set "
-                                    + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s title to "
-                                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', title)
+                                            + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s title to "
+                                            + ChatColor.RESET + ChatColor.translateAlternateColorCodes(
+                                                    '&',
+                                                    title
+                                    )
                             );
-                        } else if (a[1].equalsIgnoreCase("reward")) {
-                           if (CheckInteger.check(a[3])) {
-                                Levels_YAML.setReward(levelName, Integer.parseInt(a[3]));
-                               sender.sendMessage(
-                                       ChatColor.GRAY + "Set "
-                                        + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s reward to "
-                                        + ChatColor.GOLD + a[3]
-                               );
-                           } else {
-                               sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
-                               sender.sendMessage(getHelp("set"));
-                           }
-                        } else if (a[1].equalsIgnoreCase("startloc")) {
-                            if (sender instanceof Player) {
-                                Player player = ((Player) sender).getPlayer();
-
-                                Location playerLocation = player.getLocation();
-                                String spawnPositionName = levelName + "-spawn";
-
-                                LocationManager.savePosition(spawnPositionName, playerLocation);
-                                Levels_YAML.setStartLocationName(levelName, spawnPositionName);
-
-                                sender.sendMessage(
-                                        ChatColor.GRAY + "Location saved as "
-                                        + ChatColor.GREEN + spawnPositionName
-                                        + ChatColor.GRAY + " for "
-                                        + ChatColor.GREEN + levelName
-                                );
-                            } else
-                                sender.sendMessage(ChatColor.DARK_RED + "This command can only be run in-game");
-                        } else if (a[1].equalsIgnoreCase("respawnloc")) {
-                            if (a.length > 3) {
-                                if (a[3].equalsIgnoreCase("default")) {
-                                    String respawnPositionName = levelName + "-respawn";
-
-                                    LocationManager.deletePosition(respawnPositionName);
-                                    Levels_YAML.setRespawnLocationName(levelName, "default");
-
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "The respawn location for "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " has been reset"
-                                    );
-                                } else {
-                                    sender.sendMessage(
-                                            ChatColor.RED + "The only parameter that can be used is "
-                                            + ChatColor.DARK_RED + "default"
-                                    );
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "In order to reset the respawn location use "
-                                            + ChatColor.GREEN + "/levels set respawnloc "
-                                            + levelName + " default"
-                                    );
-                                }
-                            } else {
-                                if (sender instanceof Player) {
-                                    Player player = ((Player) sender).getPlayer();
-
-                                    Location playerLocation = player.getLocation();
-                                    String respawnPositionName = levelName + "-respawn";
-
-                                    LocationManager.savePosition(respawnPositionName, playerLocation);
-                                    Levels_YAML.setStartLocationName(levelName, respawnPositionName);
-
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Location saved as "
-                                                    + ChatColor.GREEN + respawnPositionName
-                                                    + ChatColor.GRAY + " for "
-                                                    + ChatColor.GREEN + levelName
-                                    );
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "In order to reset the respawn location use "
-                                                    + ChatColor.GREEN + "/levels set respawnloc "
-                                                    + levelName + " default"
-                                    );
-                                } else
-                                    sender.sendMessage(ChatColor.DARK_RED + "This command can only be run in-game");
-                            }
-                        } else if (a[1].equalsIgnoreCase("message")) {
-                            String message = "";
-                            for (int i = 3; i < a.length; i++)
-                                message = message + " " + a[i];
-                            message = message.trim();
-
-                            Levels_YAML.setMessage(levelName, message);
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Set "
-                                            + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s completion message to "
-                                            + ChatColor.RESET
-                                            + ChatColor.translateAlternateColorCodes('&', message)
-                            );
-                        } else if (a[1].equalsIgnoreCase("completions")) {
-                            if (CheckInteger.check(a[3])) {
-                                Levels_YAML.setMaxCompletions(levelName, Integer.parseInt(a[3]));
-                                sender.sendMessage(
-                                        ChatColor.GRAY + "Set "
-                                        + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s max completions to "
-                                        + ChatColor.GREEN + a[3]
-                                );
-                            } else {
-                                sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
-                                sender.sendMessage(getHelp("set"));
-                            }
                         } else {
-                            sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                            sender.sendMessage(
+                                    ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current title: "
+                                    + ChatColor.translateAlternateColorCodes(
+                                            '&',
+                                            Levels_YAML.getTitle(levelName)
+                                    )
+                            );
                             sender.sendMessage(getHelp("set"));
                         }
                     } else
@@ -223,6 +126,211 @@ public class Level_CMD implements CommandExecutor {
                                         + ChatColor.GREEN + levelName
                                         + ChatColor.GRAY + " does not exist"
                         );
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("title"));
+                }
+            } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
+                if (a.length > 1) {
+                    String levelName = a[1];
+
+                    if (Levels_YAML.levelExists(levelName)) {
+                        if (a.length == 3) {
+                            if (CheckInteger.check(a[2])) {
+                                Levels_YAML.setReward(levelName, Integer.parseInt(a[2]));
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Set "
+                                                + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s reward to "
+                                                + ChatColor.GOLD + a[2]
+                                );
+                            } else {
+                                sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
+                                sender.sendMessage(getHelp("reward"));
+                            }
+                        } else {
+                            sender.sendMessage(
+                                    ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current reward: "
+                                    + ChatColor.GOLD  + Levels_YAML.getReward(levelName)
+                            );
+                            sender.sendMessage(getHelp("reward"));
+                        }
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("reward"));
+                }
+            } else if (a[0].equalsIgnoreCase("startloc")) { //subcommand: startloc
+                if (a.length < 2) {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("startloc"));
+                } else {
+                    String levelName = a[1];
+
+                    if (Levels_YAML.levelExists(levelName)) {
+                        if (sender instanceof Player) {
+                            Player player = ((Player) sender).getPlayer();
+
+                            Location playerLocation = player.getLocation();
+                            String spawnPositionName = levelName + "-spawn";
+
+                            LocationManager.savePosition(spawnPositionName, playerLocation);
+                            Levels_YAML.setStartLocationName(levelName, spawnPositionName);
+
+                            sender.sendMessage(
+                                    ChatColor.GRAY + "Location saved as "
+                                            + ChatColor.GREEN + spawnPositionName
+                                            + ChatColor.GRAY + " for "
+                                            + ChatColor.GREEN + levelName
+                            );
+                        } else
+                            sender.sendMessage(ChatColor.DARK_RED + "This command can only be run in-game");
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                }
+            } else if (a[0].equalsIgnoreCase("respawnloc")) { //subcommand: respawnloc
+                if (a.length < 2) {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("respawnloc"));
+                } else {
+                    String levelName = a[1];
+
+                    if (Levels_YAML.levelExists(levelName)) {
+                        if (a.length > 2) {
+                            if (a[2].equalsIgnoreCase("default")) {
+                                String respawnPositionName = levelName + "-respawn";
+
+                                LocationManager.deletePosition(respawnPositionName);
+                                Levels_YAML.setRespawnLocationName(levelName, "default");
+
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "The respawn location for "
+                                                + ChatColor.GREEN + levelName
+                                                + ChatColor.GRAY + " has been reset to default"
+                                );
+                            } else {
+                                sender.sendMessage(
+                                        ChatColor.RED + "The only parameter that can be used is "
+                                                + ChatColor.DARK_RED + "default"
+                                );
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "In order to reset the respawn location use "
+                                                + ChatColor.GREEN + "/levels respawnloc "
+                                                + levelName + " default"
+                                );
+                            }
+                        } else {
+                            if (sender instanceof Player) {
+                                Player player = ((Player) sender).getPlayer();
+
+                                Location playerLocation = player.getLocation();
+                                String respawnPositionName = levelName + "-respawn";
+
+                                LocationManager.savePosition(respawnPositionName, playerLocation);
+                                Levels_YAML.setStartLocationName(levelName, respawnPositionName);
+
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Location saved as "
+                                                + ChatColor.GREEN + respawnPositionName
+                                                + ChatColor.GRAY + " for "
+                                                + ChatColor.GREEN + levelName
+                                );
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "In order to reset the respawn location use "
+                                                + ChatColor.GREEN + "/levels respawnloc "
+                                                + levelName + " default"
+                                );
+                            } else
+                                sender.sendMessage(ChatColor.DARK_RED + "This command can only be run in-game");
+                        }
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                }
+            } else if (a[0].equalsIgnoreCase("message")) { //subcommand: message
+                if (a.length > 1) {
+                    String levelName = a[1];
+
+                    if (Levels_YAML.levelExists(levelName)) {
+                        if (a.length > 2) {
+                            String message = "";
+                            for (int i = 2; i < a.length; i++)
+                                message = message + " " + a[i];
+                            message = message.trim();
+
+                            Levels_YAML.setMessage(levelName, message);
+                            sender.sendMessage(
+                                    ChatColor.GRAY + "Set "
+                                            + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s completion message to "
+                                            + ChatColor.RESET + ChatColor.translateAlternateColorCodes(
+                                                    '&',
+                                                    message
+                                            )
+                            );
+                        } else {
+                            sender.sendMessage(
+                                    ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current message: "
+                                            + ChatColor.translateAlternateColorCodes(
+                                            '&',
+                                            Levels_YAML.getMessage(levelName)
+                                    )
+                            );
+                            sender.sendMessage(getHelp("message"));
+                        }
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("message"));
+                }
+            } else if (a[0].equalsIgnoreCase("completions")) { //subcommand: completions
+                if (a.length > 1) {
+                    String levelName = a[1];
+
+                    if (Levels_YAML.levelExists(levelName)) {
+                        if (a.length == 3) {
+                            if (CheckInteger.check(a[2])) {
+                                Levels_YAML.setMaxCompletions(levelName, Integer.parseInt(a[2]));
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Set "
+                                                + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s max completions to "
+                                                + ChatColor.GREEN + a[2]
+                                );
+                            } else {
+                                sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
+                                sender.sendMessage(getHelp("completions"));
+                            }
+                        } else {
+                            sender.sendMessage(
+                                    ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current max completions: "
+                                            + ChatColor.GREEN  + Levels_YAML.getMaxCompletions(levelName)
+                            );
+                            sender.sendMessage(getHelp("completions"));
+                        }
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("completions"));
                 }
             } else { // subcommand: unknown
                 sender.sendMessage(
@@ -244,7 +352,12 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("show"));
         sender.sendMessage(getHelp("create"));
         sender.sendMessage(getHelp("delete"));
-        sender.sendMessage(getHelp("set"));
+        sender.sendMessage(getHelp("title"));
+        sender.sendMessage(getHelp("reward"));
+        sender.sendMessage(getHelp("startloc"));
+        sender.sendMessage(getHelp("respawnloc"));
+        sender.sendMessage(getHelp("message"));
+        sender.sendMessage(getHelp("completions"));
     }
 
     private static String getHelp(String cmd) {
@@ -263,14 +376,24 @@ public class Level_CMD implements CommandExecutor {
         else if (cmd.equalsIgnoreCase("delete"))
             return ChatColor.GREEN + "/level delete <level>" +
                     ChatColor.GRAY + " Deletes a level";
-        else if (cmd.equalsIgnoreCase("set"))
-            return ChatColor.GREEN + "/level set "
-                    + ChatColor.translateAlternateColorCodes(
-                            '&',
-                    "<title &2/ &areward &2/ &astartloc &2/ &arespawnloc &2/ &amessage &2/ &acompletions>"
-                            + " <level> [value]"
-            )
-                    + ChatColor.GRAY + " Set level values";
+        else if (cmd.equalsIgnoreCase("title"))
+            return ChatColor.GREEN + "/level title <level> [title]" +
+                    ChatColor.GRAY + " View or set a level's title";
+        else if (cmd.equalsIgnoreCase("reward"))
+            return ChatColor.GREEN + "/level reward <level> [reward]" +
+                    ChatColor.GRAY + " View or set a level's reward";
+        else if (cmd.equalsIgnoreCase("startloc"))
+            return ChatColor.GREEN + "/level startloc <level>" +
+                    ChatColor.GRAY + " Sets the level's spawn to your location";
+        else if (cmd.equalsIgnoreCase("respawnloc"))
+            return ChatColor.GREEN + "/level respawnloc <level> [default]" +
+                    ChatColor.GRAY + " Sets the level's respawn to your location";
+        else if (cmd.equalsIgnoreCase("message"))
+            return ChatColor.GREEN + "/level message <level> [message]" +
+                    ChatColor.GRAY + " View or set a level's completion mesage";
+        else if (cmd.equalsIgnoreCase("completions"))
+            return ChatColor.GREEN + "/level completions <level> [completions]" +
+                    ChatColor.GRAY + " View or set a level's max completions";
         return "";
     }
 }

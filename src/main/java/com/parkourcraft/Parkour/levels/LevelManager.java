@@ -25,4 +25,22 @@ public class LevelManager {
         return levelNames;
     }
 
+    public static Map<String, String> getLevelNamesLower() {
+        List<String> levelNames = LevelManager.getLevelNames();
+        Map<String, String> levelNamesLower = new HashMap<>();
+
+        for (String levelName : levelNames)
+            levelNamesLower.put(levelName.toLowerCase(), levelName);
+
+        return levelNamesLower;
+    }
+
+    public static LevelObject getLevel(String levelName) {
+        return levels.get(levelName);
+    }
+
+    public static boolean levelConfigured(String levelName) {
+        return levels.containsKey(levelName);
+    }
+
 }
