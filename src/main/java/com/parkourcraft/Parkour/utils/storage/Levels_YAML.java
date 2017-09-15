@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.utils.storage;
 
 
+import com.parkourcraft.Parkour.levels.LevelManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -11,22 +12,24 @@ public class Levels_YAML {
 
     private static FileConfiguration levels = FileManager.getFileConfig("levels");
 
-    public static void save() {
+    public static void commitChange(String levelName) {
         FileManager.save("levels");
+        LevelManager.loadLevel(levelName);
     }
 
     public static void create(String levelName) {
         if (!levels.isSet(levelName))
             levels.set(levelName + ".reward", 0);
 
-        save();
+        commitChange(levelName);
     }
 
     public static void delete(String levelName) {
         if (levelExists(levelName))
             levels.set(levelName, null);
 
-        save();
+        commitChange(levelName);
+
     }
 
     public static boolean levelExists(String levelName) {
@@ -45,7 +48,7 @@ public class Levels_YAML {
         if (levels.isSet(levelName))
             levels.set(levelName + ".title", title);
 
-        save();
+        commitChange(levelName);
     }
 
     public static String getTitle(String levelName) {
@@ -58,7 +61,7 @@ public class Levels_YAML {
         if (levels.isSet(levelName))
             levels.set(levelName + ".reward", reward);
 
-        save();
+        commitChange(levelName);
     }
 
     public static int getReward(String levelName) {
@@ -71,7 +74,7 @@ public class Levels_YAML {
         if (levels.isSet(levelName))
             levels.set(levelName + ".start_location", locationName);
 
-        save();
+        commitChange(levelName);
     }
 
     public static void setRespawnLocationName(String levelName, String locationName) {
@@ -80,14 +83,14 @@ public class Levels_YAML {
         else if (levels.isSet(levelName))
             levels.set(levelName + ".respawn_location", locationName);
 
-        save();
+        commitChange(levelName);
     }
 
     public static void setMessage(String levelName, String message) {
         if (levels.isSet(levelName))
             levels.set(levelName + ".message", message);
 
-        save();
+        commitChange(levelName);
     }
 
     public static String getMessage(String levelName) {
@@ -104,7 +107,7 @@ public class Levels_YAML {
                 levels.set(levelName + ".max_completions", maxCompletions);
         }
 
-        save();
+        commitChange(levelName);
     }
 
     public static int getMaxCompletions(String levelName) {

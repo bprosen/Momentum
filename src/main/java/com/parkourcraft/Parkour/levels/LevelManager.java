@@ -19,6 +19,16 @@ public class LevelManager {
             levels.put(levelName, new LevelObject(levelName));
     }
 
+    public static void loadLevel(String levelName) {
+        if (Levels_YAML.levelExists(levelName))
+            levels.put(levelName, new LevelObject(levelName));
+    }
+
+    public static void unloadLevel(String levelName) {
+        if (levels.containsKey(levelName))
+            levels.remove(levelName);
+    }
+
     public static List<String> getLevelNames(){
         List<String> levelNames = new ArrayList<>(levels.keySet());
 
