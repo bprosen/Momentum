@@ -36,10 +36,11 @@ public class Parkour extends JavaPlugin {
         registerEvents();
         registerCommands();
 
-        LevelManager.loadLevels();
-
         DatabaseConnection.open();
         TableManager.setUp();
+
+        LevelManager.loadLevels();
+        LevelManager.loadLevelIDs();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
@@ -74,7 +75,7 @@ public class Parkour extends JavaPlugin {
     private void runScheduler() {
         BukkitScheduler scheduler = getServer().getScheduler();
 
-        // update online player's data into database (every 10 seconds)
+        // sync player and level data from database (every 10 seconds)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
                 //StatsManager.updateOnlinePlayersInDatabase();
@@ -84,16 +85,17 @@ public class Parkour extends JavaPlugin {
         // runs the queries in the cache (every .2 seconds (5 times per second))
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
-                //DatabaseManager.runCaches();
+                LevelManager.syncLevelIDs();
+                DatabaseManager.runCaches();
             }
         }, 0L, 4L);
 
-        // keeps connection to the database alive (Every 1.5 minutes)
+        // keeps connection to the database alive (Every 2 minutes)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
                 DatabaseManager.addUpdateQuery("SELECT * FROM players WHERE uuid='s'");
             }
-        }, 1800L, 90L * 20L);
+        }, 1800L, 120L * 20L);
     }
 
     private void registerEvents() { // Register all of the listeners

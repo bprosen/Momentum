@@ -11,28 +11,43 @@ public class TableManager {
     public static void setUp() {
         List<String> tableNames = getTables();
 
-        if (!tableNames.contains("completions"))
-            createCompletions();
-
         if (!tableNames.contains("players"))
             createPlayers();
+
+        if (!tableNames.contains("levels"))
+            createLevels();
+
+        if (!tableNames.contains("completions"))
+            createCompletions();
     }
 
-    private static void createCompletions() {
-        String sqlQuery = "CREATE TABLE completions(" +
+    private static void createPlayers() {
+        String sqlQuery = "CREATE TABLE players(" +
+                "player_id INT NOT NULL AUTO_INCREMENT, " +
                 "uuid CHAR(36) NOT NULL, " +
-                "level_name VARCHAR(25) NOT NULL, " +
-                "completion_time MEDIUMINT NOT NULL, " +
-                "date TIMESTAMP NOT NULL" +
+                "player_name VARCHAR(16) NOT NULL, " +
+                "PRIMARY KEY (player_id)" +
                 ")";
 
         DatabaseManager.addUpdateQuery(sqlQuery);
     }
 
-    private static void createPlayers() {
-        String sqlQuery = "CREATE TABLE players(" +
-                "uuid CHAR(36) NOT NULL, " +
-                "player_name VARCHAR(25) NOT NULL" +
+    private static void createLevels() {
+        String sqlQuery = "CREATE TABLE levels(" +
+                "level_id INT NOT NULL AUTO_INCREMENT, " +
+                "level_name VARCHAR(30) NOT NULL, " +
+                "PRIMARY KEY (level_id)" +
+                ")";
+
+        DatabaseManager.addUpdateQuery(sqlQuery);
+    }
+
+    private static void createCompletions() {
+        String sqlQuery = "CREATE TABLE completions(" +
+                "player_id INT NOT NULL, " +
+                "level_id INT NOT NULL, " +
+                "time_taken MEDIUMINT DEFAULT 0, " +
+                "completion_date TIMESTAMP NOT NULL" +
                 ")";
 
         DatabaseManager.addUpdateQuery(sqlQuery);

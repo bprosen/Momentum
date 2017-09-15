@@ -104,15 +104,14 @@ public class DatabaseManager {
             updatePlayersCache.add(UUID);
     }
 
-
-    /* LoadPlayersCache
+    /* DatabaseQueriesCache
     This cache is responsible for running all queries
     */
     public static void addUpdateQuery(String sql) {
         databaseQuriesCache.add(sql);
     }
 
-    private static void runQuery(String sql) {
+    public static void runQuery(String sql) {
         try {
             PreparedStatement statement = DatabaseConnection.get().prepareStatement(sql);
             statement.execute();
