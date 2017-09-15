@@ -1,5 +1,12 @@
 # Settings yaml
 
+database:
+  host: ""
+  port:
+  database: "parkourcraft_parkour_stats_new"
+  username: ""
+  password: ""
+
 levels:
   completion_sign_chars: "Click Here"
-  completion_message: "Rewarded %level_reward% coins for beating %level_title% (#%level_completions%)"
+  completion_message: "Rewarded %level_reward% coins for beating %level_title% (#%completions%)"

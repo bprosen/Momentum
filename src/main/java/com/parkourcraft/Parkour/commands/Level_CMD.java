@@ -196,23 +196,23 @@ public class Level_CMD implements CommandExecutor {
                                         + ChatColor.GRAY + " does not exist"
                         );
                 }
-            } else if (a[0].equalsIgnoreCase("respawnloc")) { //subcommand: respawnloc
+            } else if (a[0].equalsIgnoreCase("completionloc")) { //subcommand: completionloc
                 if (a.length < 2) {
                     sender.sendMessage(ChatColor.RED + "Incorrect parameters");
-                    sender.sendMessage(getHelp("respawnloc"));
+                    sender.sendMessage(getHelp("completionloc"));
                 } else {
                     String levelName = a[1];
 
                     if (Levels_YAML.levelExists(levelName)) {
                         if (a.length > 2) {
                             if (a[2].equalsIgnoreCase("default")) {
-                                String respawnPositionName = levelName + "-respawn";
+                                String completionLocationName = levelName + "-completion";
 
-                                LocationManager.deletePosition(respawnPositionName);
-                                Levels_YAML.setRespawnLocationName(levelName, "default");
+                                LocationManager.deletePosition(completionLocationName);
+                                Levels_YAML.setCompletionLocationName(levelName, "default");
 
                                 sender.sendMessage(
-                                        ChatColor.GRAY + "The respawn location for "
+                                        ChatColor.GRAY + "The completion location for "
                                                 + ChatColor.GREEN + levelName
                                                 + ChatColor.GRAY + " has been reset to default"
                                 );
@@ -222,8 +222,8 @@ public class Level_CMD implements CommandExecutor {
                                                 + ChatColor.DARK_RED + "default"
                                 );
                                 sender.sendMessage(
-                                        ChatColor.GRAY + "In order to reset the respawn location use "
-                                                + ChatColor.GREEN + "/levels respawnloc "
+                                        ChatColor.GRAY + "In order to reset the completion location use "
+                                                + ChatColor.GREEN + "/levels completionloc "
                                                 + levelName + " default"
                                 );
                             }
@@ -232,20 +232,20 @@ public class Level_CMD implements CommandExecutor {
                                 Player player = ((Player) sender).getPlayer();
 
                                 Location playerLocation = player.getLocation();
-                                String respawnPositionName = levelName + "-respawn";
+                                String completionLocationName = levelName + "-completion";
 
-                                LocationManager.savePosition(respawnPositionName, playerLocation);
-                                Levels_YAML.setStartLocationName(levelName, respawnPositionName);
+                                LocationManager.savePosition(completionLocationName, playerLocation);
+                                Levels_YAML.setStartLocationName(levelName, completionLocationName);
 
                                 sender.sendMessage(
                                         ChatColor.GRAY + "Location saved as "
-                                                + ChatColor.GREEN + respawnPositionName
+                                                + ChatColor.GREEN + completionLocationName
                                                 + ChatColor.GRAY + " for "
                                                 + ChatColor.GREEN + levelName
                                 );
                                 sender.sendMessage(
-                                        ChatColor.GRAY + "In order to reset the respawn location use "
-                                                + ChatColor.GREEN + "/levels respawnloc "
+                                        ChatColor.GRAY + "In order to reset the completion location use "
+                                                + ChatColor.GREEN + "/levels completionloc "
                                                 + levelName + " default"
                                 );
                             } else
@@ -355,7 +355,7 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("title"));
         sender.sendMessage(getHelp("reward"));
         sender.sendMessage(getHelp("startloc"));
-        sender.sendMessage(getHelp("respawnloc"));
+        sender.sendMessage(getHelp("completionloc"));
         sender.sendMessage(getHelp("message"));
         sender.sendMessage(getHelp("completions"));
     }
@@ -385,8 +385,8 @@ public class Level_CMD implements CommandExecutor {
         else if (cmd.equalsIgnoreCase("startloc"))
             return ChatColor.GREEN + "/level startloc <level>" +
                     ChatColor.GRAY + " Sets the level's spawn to your location";
-        else if (cmd.equalsIgnoreCase("respawnloc"))
-            return ChatColor.GREEN + "/level respawnloc <level> [default]" +
+        else if (cmd.equalsIgnoreCase("completionloc"))
+            return ChatColor.GREEN + "/level completionloc <level> [default]" +
                     ChatColor.GRAY + " Sets the level's respawn to your location";
         else if (cmd.equalsIgnoreCase("message"))
             return ChatColor.GREEN + "/level message <level> [message]" +

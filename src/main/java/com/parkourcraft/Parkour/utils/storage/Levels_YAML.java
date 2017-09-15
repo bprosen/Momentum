@@ -77,11 +77,11 @@ public class Levels_YAML {
         commitChange(levelName);
     }
 
-    public static void setRespawnLocationName(String levelName, String locationName) {
+    public static void setCompletionLocationName(String levelName, String locationName) {
         if (locationName.equalsIgnoreCase("default"))
             levels.set(levelName, null);
         else if (levels.isSet(levelName))
-            levels.set(levelName + ".respawn_location", locationName);
+            levels.set(levelName + ".completion_location", locationName);
 
         commitChange(levelName);
     }
