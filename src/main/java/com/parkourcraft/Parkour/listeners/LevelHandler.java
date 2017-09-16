@@ -25,14 +25,14 @@ public class LevelHandler {
             Location respawnLocation = level.getRespawnLocation();
 
             if (respawnLocation != null) {
-                respawnPlayerToLobby(player);
-
                 playerStats.levelCompletion(
                         levelName,
                         System.currentTimeMillis(),
                         (System.currentTimeMillis() - playerStats.getLevelStartTime()),
                         false
                 );
+
+                respawnPlayerToLobby(player);
 
                 Parkour.economy.depositPlayer(player, level.getReward());
 

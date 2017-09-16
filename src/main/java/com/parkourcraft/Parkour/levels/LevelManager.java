@@ -23,7 +23,11 @@ public class LevelManager {
     }
 
     public static void loadLevelIDs() {
-        List<Map<String, String>> levelsResults = DatabaseQueries.getResults("levels", "");
+        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                "levels",
+                "*",
+                ""
+        );
 
         if (levelsResults.size() > 0) {
             levelIDMap = new HashMap<>();

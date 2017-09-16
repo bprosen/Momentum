@@ -72,6 +72,7 @@ public class PlayerStats {
     public void loadFromDatabase() {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
+                "*",
                 " WHERE uuid='" + UUID + "'"
         );
 
@@ -89,6 +90,7 @@ public class PlayerStats {
 
             List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                     "completions",
+                    "*",
                     "WHERE player_id=" + playerID + ""
             );
 

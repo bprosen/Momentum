@@ -34,12 +34,12 @@ public class DatabaseQueries {
         return null;
     }
 
-    public static List<Map<String, String>> getResults(String tableName, String whereSQL) {
+    public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL) {
         List<Map<String, String>> finalResults = new ArrayList<>();
 
-        String query = "SELECT * FROM " + tableName;
-        if (!whereSQL.equals(""))
-            query = query + " " + whereSQL;
+        String query = "SELECT " + selection + " FROM " + tableName;
+        if (!trailingSQL.equals(""))
+            query = query + " " + trailingSQL;
 
         try {
             Statement statement = DatabaseConnection.get().createStatement();
@@ -49,7 +49,7 @@ public class DatabaseQueries {
                 finalResults.add(resultSetToMap(results));
         } catch (SQLException exception) {
             Parkour.getPluginLogger().severe(
-                    "ERROR: Occurred within DatabaseQueries.getResults(" + tableName + ", " + whereSQL + ")"
+                    "ERROR: Occurred within DatabaseQueries.getResults(" + tableName + ", " + trailingSQL + ")"
             );
             Parkour.getPluginLogger().severe("ERROR:  query='" + query + "'");
             Parkour.getPluginLogger().severe("ERROR:   exception=" + exception.getLocalizedMessage());
