@@ -13,3 +13,5 @@ commands:
   location:
     description: "Locations management"
     aliases: [loc, locations]
+  stats:
+    description: "Display stats"

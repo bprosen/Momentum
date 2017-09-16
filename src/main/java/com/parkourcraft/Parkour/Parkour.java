@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.Level_CMD;
 import com.parkourcraft.Parkour.commands.Location_CMD;
+import com.parkourcraft.Parkour.commands.Stats_CMD;
 import com.parkourcraft.Parkour.levels.LevelManager;
 import com.parkourcraft.Parkour.listeners.JoinLeaveHandler;
 import com.parkourcraft.Parkour.listeners.LevelListener;
@@ -78,7 +79,7 @@ public class Parkour extends JavaPlugin {
         // sync player and level data from database (every 10 seconds)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
-                //StatsManager.updateOnlinePlayersInDatabase();
+                StatsManager.updateOnlinePlayersInDatabase();
             }
         }, 0L, 10L * 20L);
 
@@ -108,6 +109,7 @@ public class Parkour extends JavaPlugin {
     private void registerCommands() {
         getCommand("level").setExecutor(new Level_CMD());
         getCommand("location").setExecutor(new Location_CMD());
+        getCommand("stats").setExecutor(new Stats_CMD());
     }
 
 }

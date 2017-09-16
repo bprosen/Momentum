@@ -31,4 +31,12 @@ public class LevelStats {
         return levelCompletions;
     }
 
+    public Map<Long, LevelCompletion> getLevelCompletionsMap() {
+        return levelCompletionsMap;
+    }
+
+    public int getCompletionsCount() {
+        return levelCompletionsMap.size();
+    }
+
 }

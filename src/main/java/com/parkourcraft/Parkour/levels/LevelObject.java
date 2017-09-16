@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.levels;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.utils.storage.LocationManager;
 import org.bukkit.ChatColor;
@@ -11,7 +12,7 @@ public class LevelObject {
     private String levelName;
     private String title;
     private int reward = 0;
-    private String startLocation;
+    private String startLocation = "spawn";
     private String respawnLocation = "spawn";
     private String message;
     private int maxCompletions = -1;
@@ -30,6 +31,8 @@ public class LevelObject {
 
             if (levels.isSet(levelName + ".title"))
                 title = levels.getString(levelName + ".title");
+            else
+                title = levelName;
 
             if (levels.isSet(levelName + ".reward"))
                 reward = levels.getInt(levelName + ".reward");
@@ -91,12 +94,13 @@ public class LevelObject {
         return message;
     }
 
-    public String getMessageFormatted() {
+    public String getMessageFormatted(int completionsCount) {
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
 
-            message = message.replace("%title%", title);
+            message = message.replace("%title%", ChatColor.translateAlternateColorCodes('&', title));
             message = message.replace("%reward%", Integer.toString(reward));
+            message = message.replace("%completions%", Integer.toString(completionsCount));
 
             return message;
         }
@@ -107,6 +111,5 @@ public class LevelObject {
     public int getMaxCompletions() {
         return maxCompletions;
     }
-
 
 }

@@ -8,5 +8,11 @@ database:
   password: ""
 
 levels:
-  completion_sign_chars: "Click Here"
-  completion_message: "Rewarded %level_reward% coins for beating %level_title% (#%completions%)"
+  completion_message: "&aRewarded &6%reward% &acoins for beating %title% &2(&a#%completions%&2)"
+
+# It will check if that line contains 'Click Here', or whatever is defined
+signs:
+  first_line: "Click Here"
+  second_line:
+    completion: "To redeem"
+    spawn: "To return to"

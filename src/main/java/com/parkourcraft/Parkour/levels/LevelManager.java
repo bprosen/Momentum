@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.levels;
 
 
-import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.Parkour.utils.storage.Levels_YAML;
@@ -91,6 +90,19 @@ public class LevelManager {
             levelNamesLower.put(levelName.toLowerCase(), levelName);
 
         return levelNamesLower;
+    }
+
+    public static String getLevelNameFromID(int levelID) {
+        for (Map.Entry<String, Integer> entry : levelIDMap.entrySet()) {
+            if (entry.getValue() == levelID)
+                return entry.getKey();
+        }
+
+        return "";
+    }
+
+    public static int getLevelID(String levelName) {
+        return levelIDMap.get(levelName);
     }
 
     public static LevelObject getLevel(String levelName) {

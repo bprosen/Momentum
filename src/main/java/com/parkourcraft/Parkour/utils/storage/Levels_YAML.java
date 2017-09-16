@@ -28,8 +28,8 @@ public class Levels_YAML {
         if (levelExists(levelName))
             levels.set(levelName, null);
 
-        commitChange(levelName);
-
+        LevelManager.unloadLevel(levelName);
+        FileManager.save("levels");
     }
 
     public static boolean levelExists(String levelName) {

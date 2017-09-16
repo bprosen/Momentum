@@ -1,12 +1,25 @@
 package com.parkourcraft.Parkour.listeners;
 
 
+import com.parkourcraft.Parkour.Parkour;
+import com.parkourcraft.Parkour.stats.StatsManager;
+import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
+import com.parkourcraft.Parkour.utils.storage.LocationManager;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Sign;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class LevelListener implements Listener {
 
@@ -24,6 +37,56 @@ public class LevelListener implements Listener {
                     LevelHandler.respawnPlayerToStart(player, levelName);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSignClick(PlayerInteractEvent event) {
+        if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK)
+                        || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
+                && event.getClickedBlock().getType().equals(Material.WALL_SIGN)) {
+            Sign sign = (Sign) event.getClickedBlock().getState();
+            String[] signLines = sign.getLines();
+
+            FileConfiguration settings = FileManager.getFileConfig("settings");
+            String firstLine = settings.getString("signs.first_line");
+
+            if (ChatColor.stripColor(signLines[0]).contains(firstLine)) {
+                Player player = event.getPlayer();
+                String secondLineCompletion = settings.getString("signs.second_line.completion");
+                String secondLineSpawn = settings.getString("signs.second_line.spawn");
+
+                if (ChatColor.stripColor(signLines[1]).contains(secondLineCompletion)) {
+                    String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+                    if (levelName != null)
+                        LevelHandler.levelCompletion(player, levelName);
+                } else if (ChatColor.stripColor(signLines[1]).contains(secondLineSpawn))
+                    LevelHandler.respawnPlayerToLobby(player);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onStepOnPressurePlate(PlayerInteractEvent event) {
+        if (event.getAction().equals(Action.PHYSICAL)
+                && event.getClickedBlock().getType().equals(Material.STONE_PLATE)) {
+            Player player = event.getPlayer();
+            String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+
+            if (levelName != null) {
+                PlayerStats playerStats = StatsManager.getPlayerStats(event.getPlayer());
+
+                if (playerStats != null)
+                    playerStats.startedLevel();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        PlayerStats playerStats = StatsManager.getPlayerStats(event.getPlayer());
+
+        if (playerStats != null)
+            playerStats.disableLevelStartTime();
     }
 
 }

@@ -118,7 +118,7 @@ public class Level_CMD implements CommandExecutor {
                                             Levels_YAML.getTitle(levelName)
                                     )
                             );
-                            sender.sendMessage(getHelp("set"));
+                            sender.sendMessage(getHelp("title"));
                         }
                     } else
                         sender.sendMessage(

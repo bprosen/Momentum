@@ -9,7 +9,10 @@ public class LevelCompletion {
 
     public LevelCompletion(long timeOfCompletion, long completionTimeElapsed, boolean inDatabase) {
         this.timeOfCompletion = timeOfCompletion;
-        this.completionTimeElapsed = completionTimeElapsed;
+        if (completionTimeElapsed < 72000000L)
+            this.completionTimeElapsed = completionTimeElapsed;
+        else
+            this.completionTimeElapsed = 0L;
         this.inDatabase = inDatabase;
     }
 
