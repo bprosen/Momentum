@@ -1,0 +1,35 @@
+# Official Material List https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+# Item type check level->teleport->open
+
+ore_levels:
+  settings:
+    title: "&a&l&oOre Parkour"
+    page_count: 1
+    updating: true # Whether or not the menu refreshses, default false
+    select_item:
+      material: EMERALD
+      type: 0 # Default is 0 if type isn't set
+  1:
+    row_count: 4
+    0:
+      teleport: coal
+      item:
+        title: "&0&l&oCoal &7&oLevels"
+        material: COAL_BLOCK
+        lore:
+          - "&7Click to go to &0Coal &7levels"
+          - "    &3&oVery Easy"
+    1:
+      level: coal-1
+      item:
+        material: COAL
+    2:
+      level: coal-2
+      item:
+        material: COAL
+        size: 2
+    3:
+      level: coal-3
+      item:
+        material: COAL
+        size: 3

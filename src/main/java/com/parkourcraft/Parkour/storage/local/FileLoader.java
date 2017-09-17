@@ -9,6 +9,7 @@ public class FileLoader {
         add("settings");
         add("levels");
         add("locations");
+        add("menus");
     }};
 
     public static void startUp() {

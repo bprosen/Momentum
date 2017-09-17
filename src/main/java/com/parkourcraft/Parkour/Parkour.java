@@ -2,10 +2,12 @@ package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.Level_CMD;
 import com.parkourcraft.Parkour.commands.Location_CMD;
+import com.parkourcraft.Parkour.commands.Menu_CMD;
 import com.parkourcraft.Parkour.commands.Stats_CMD;
 import com.parkourcraft.Parkour.levels.LevelManager;
 import com.parkourcraft.Parkour.listeners.JoinLeaveHandler;
 import com.parkourcraft.Parkour.listeners.LevelListener;
+import com.parkourcraft.Parkour.menus.MenuManager;
 import com.parkourcraft.Parkour.stats.StatsManager;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
@@ -42,6 +44,8 @@ public class Parkour extends JavaPlugin {
 
         LevelManager.loadLevels();
         LevelManager.loadLevelIDs();
+
+        MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
@@ -110,6 +114,7 @@ public class Parkour extends JavaPlugin {
         getCommand("level").setExecutor(new Level_CMD());
         getCommand("location").setExecutor(new Location_CMD());
         getCommand("stats").setExecutor(new Stats_CMD());
+        getCommand("menu").setExecutor(new Menu_CMD());
     }
 
 }

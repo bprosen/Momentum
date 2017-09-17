@@ -64,6 +64,10 @@ public class LevelObject {
         return title;
     }
 
+    public String getTitleFormatted() {
+        return ChatColor.translateAlternateColorCodes('&', title);
+    }
+
     public int getReward() {
         return reward;
     }
@@ -98,7 +102,7 @@ public class LevelObject {
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
 
-            message = message.replace("%title%", ChatColor.translateAlternateColorCodes('&', title));
+            message = message.replace("%title%", getTitleFormatted());
             message = message.replace("%reward%", Integer.toString(reward));
             message = message.replace("%completions%", Integer.toString(completionsCount));
 

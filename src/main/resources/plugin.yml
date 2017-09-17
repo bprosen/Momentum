@@ -15,3 +15,6 @@ commands:
     aliases: [loc, locations]
   stats:
     description: "Display stats"
+  menu:
+    description: "Parkour menu management"
+    aliases: [menus]
