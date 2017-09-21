@@ -44,6 +44,22 @@ public class Levels_YAML {
         return levelNames;
     }
 
+    public void setBroadcastSetting(String levelName, boolean setting) {
+        if (levelExists(levelName)) {
+            if (!setting)
+                levels.set(levelName + ".broadcast_completion", null);
+            levels.set(levelName + ".broadcast_completion", setting);
+        }
+
+        commitChange(levelName);
+    }
+
+    public boolean getBroadcastSetting(String levelName) {
+        if (levels.isSet(levelName + ".broadcast_completion"))
+            return levels.getBoolean(levelName + ".broadcast_completion");
+        return false;
+    }
+
     public static void setTitle(String levelName, String title) {
         if (levels.isSet(levelName))
             levels.set(levelName + ".title", title);

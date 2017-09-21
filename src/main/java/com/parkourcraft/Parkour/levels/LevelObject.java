@@ -16,6 +16,7 @@ public class LevelObject {
     private String respawnLocation = "spawn";
     private String message;
     private int maxCompletions = -1;
+    private boolean broadcastCompletion = false;
 
     public LevelObject(String levelName) {
         this.levelName = levelName;
@@ -50,6 +51,9 @@ public class LevelObject {
 
             if (levels.isSet(levelName + ".max_completions"))
                 maxCompletions = levels.getInt(levelName + ".max_completions");
+
+            if (levels.isSet(levelName + ".broadcast_completion"))
+                broadcastCompletion = levels.getBoolean(levelName + ".broadcast_completion");
         }
     }
 
@@ -114,6 +118,10 @@ public class LevelObject {
 
     public int getMaxCompletions() {
         return maxCompletions;
+    }
+
+    public boolean getBroadcastCompletion() {
+        return broadcastCompletion;
     }
 
 }
