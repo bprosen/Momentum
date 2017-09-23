@@ -1,21 +1,19 @@
 package com.parkourcraft.Parkour.data.menus;
 
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MenuPage extends Menu {
 
     public static MenuPage menuPage;
 
-    private int pageNumber;
-    private int rowCount;
+    private static int pageNumber;
+    private static int rowCount;
 
-    private List<MenuItem> pageItems = new ArrayList<>();
+    private static Map<Integer, MenuItem> pageItemsMap = new HashMap<>();
 
     public MenuPage() {
         menuPage = this;
@@ -23,35 +21,31 @@ public class MenuPage extends Menu {
 
     public void load(int pageNumber) {
         this.pageNumber = pageNumber;
-        rowCount = Menus_YAML.getRowCount(menu.getName(), pageNumber);
+        rowCount = Menus_YAML.getRowCount(getName(), pageNumber);
+        int slotCount = rowCount * 9;
 
-        for (int slot = 0; slot <= 53; slot++) {
-            if (Menus_YAML.hasItem(menu.getName(), pageNumber, slot)) {
+        for (int slot = 0; slot <= slotCount - 1; slot++) {
+            if (Menus_YAML.hasItem(getName(), pageNumber, slot)) {
                 MenuItem menuItem = new MenuItem();
 
                 menuItem.load(slot);
 
-                pageItems.add(menuItem);
+                pageItemsMap.put(slot, menuItem);
             }
         }
-
     }
 
-    public void formatInventory(PlayerStats playerStats, InventoryView inventory) {
-        for (MenuItem menuItem : pageItems)
+    public static void formatInventory(PlayerStats playerStats, InventoryView inventory) {
+        for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(playerStats, menuItem));
     }
 
-    public int getPageNumber() {
+    public static int getPageNumber() {
         return pageNumber;
     }
 
-    public int getRowCount() {
+    public static int getRowCount() {
         return rowCount;
-    }
-
-    public List<MenuItem> getPageItems() {
-        return pageItems;
     }
 
 }

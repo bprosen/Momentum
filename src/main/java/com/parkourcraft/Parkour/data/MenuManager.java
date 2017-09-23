@@ -64,12 +64,12 @@ public class MenuManager {
         Menu menu = getMenuFromTitle(inventory.getTitle());
 
         if (menu != null)
-            menu.updateInventory(playerStats, inventory);
+            menu.updateInventory(playerStats, inventory, 1);
     }
 
     public static void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName) {
         if (exists(menuName))
-            menuMap.get(menuName).updateInventory(playerStats, inventory);
+            menuMap.get(menuName).updateInventory(playerStats, inventory, 1);
     }
 
 }

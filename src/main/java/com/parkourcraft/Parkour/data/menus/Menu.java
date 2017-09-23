@@ -1,12 +1,8 @@
 package com.parkourcraft.Parkour.data.menus;
 
-import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.local.FileManager;
-import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -18,13 +14,13 @@ public class Menu {
 
     public static Menu menu;
 
-    private String name;
-    private String title;
-    private int pageCount;
-    private boolean updating;
-    private ItemStack selectItem;
+    private static String name;
+    private static String title;
+    private static int pageCount;
+    private static boolean updating;
+    private static ItemStack selectItem;
 
-    private Map<Integer, MenuPage> pageMap = new HashMap<>();
+    private static Map<Integer, MenuPage> pageMap = new HashMap<>();
 
     public Menu() {
         menu = this;
@@ -56,32 +52,31 @@ public class Menu {
         }
     }
 
-    public String getName() {
+    public static String getName() {
         return name;
     }
 
-    public String getTitle() {
+    public static String getTitle() {
         return title;
     }
 
-    public String getFormattedTitle() {
-        Parkour.getPluginLogger().info(title);
+    public static String getFormattedTitle() {
         return ChatColor.translateAlternateColorCodes('&', title);
     }
 
-    public int getPageCount() {
+    public static int getPageCount() {
         return pageCount;
     }
 
-    public boolean isUpdating() {
+    public static boolean isUpdating() {
         return updating;
     }
 
-    public ItemStack getSelectItem() {
+    public static ItemStack getSelectItem() {
         return selectItem;
     }
 
-    public Inventory getInventory(int pageNumber) {
+    public static Inventory getInventory(int pageNumber) {
         if (pageMap.containsKey(pageNumber)) {
             MenuPage menuPage = pageMap.get(pageNumber);
 
@@ -91,8 +86,9 @@ public class Menu {
         return Bukkit.createInventory(null, 9, getFormattedTitle());
     }
 
-    public void updateInventory(PlayerStats playerStats, InventoryView inventory) {
-
+    public static void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber) {
+        if (pageMap.containsKey(pageNumber))
+            pageMap.get(pageNumber).formatInventory(playerStats, inventory);
     }
 
 
