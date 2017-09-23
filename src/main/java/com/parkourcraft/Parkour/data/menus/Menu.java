@@ -1,10 +1,8 @@
-package com.parkourcraft.Parkour.menus.objects;
+package com.parkourcraft.Parkour.data.menus;
 
-
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;

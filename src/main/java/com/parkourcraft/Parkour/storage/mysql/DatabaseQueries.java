@@ -1,6 +1,5 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
-
 import com.parkourcraft.Parkour.Parkour;
 
 import java.sql.ResultSet;

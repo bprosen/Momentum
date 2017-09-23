@@ -1,12 +1,8 @@
 package com.parkourcraft.Parkour.listeners;
 
-
-import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.stats.StatsManager;
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.local.FileManager;
-import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
-import com.parkourcraft.Parkour.utils.storage.LocationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

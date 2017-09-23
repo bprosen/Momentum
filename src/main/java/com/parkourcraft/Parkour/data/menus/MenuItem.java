@@ -1,6 +1,6 @@
-package com.parkourcraft.Parkour.menus.objects;
+package com.parkourcraft.Parkour.data.menus;
 
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -55,7 +55,7 @@ public class MenuItem extends MenuPage {
 
                 if (menusConfig.isSet(itemItemPath + ".lore")) {
                     lore = menusConfig.getStringList(itemItemPath + ".lore");
-                    lore = Utils.getLoreFormatted(lore);
+                    lore = Utils.formatLore(lore);
                 }
             }
 

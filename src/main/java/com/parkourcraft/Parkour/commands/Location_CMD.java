@@ -1,6 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
-import com.parkourcraft.Parkour.utils.storage.LocationManager;
+import com.parkourcraft.Parkour.data.LocationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -20,7 +20,7 @@ public class Location_CMD implements CommandExecutor {
                         ChatColor.GRAY + "Locations: "
                         + ChatColor.GREEN + String.join(
                             ChatColor.GRAY + ", " + ChatColor.GREEN,
-                            LocationManager.getPositionNames()
+                                LocationManager.getNames()
                         )
                 );
             } else if (a[0].equalsIgnoreCase("go")) { //subcommand: go
@@ -59,7 +59,7 @@ public class Location_CMD implements CommandExecutor {
                         if (!LocationManager.exists(locationName)) {
                             Location playerLocation = player.getLocation();
 
-                            LocationManager.savePosition(locationName, playerLocation);
+                            LocationManager.save(locationName, playerLocation);
 
                             sender.sendMessage(
                                     ChatColor.GRAY + "Created location "

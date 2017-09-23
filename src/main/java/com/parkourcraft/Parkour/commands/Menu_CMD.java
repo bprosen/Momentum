@@ -1,11 +1,9 @@
 package com.parkourcraft.Parkour.commands;
 
-
-import com.parkourcraft.Parkour.menus.MenuManager;
-import com.parkourcraft.Parkour.stats.StatsManager;
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.MenuManager;
+import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.local.FileManager;
-import com.parkourcraft.Parkour.utils.storage.LocationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,7 +33,7 @@ public class Menu_CMD implements CommandExecutor {
                             Player player = ((Player) sender).getPlayer();
                             PlayerStats playerStats = StatsManager.getPlayerStats(player);
 
-                            Inventory inventory = MenuManager.getInventory(playerStats, menuName);
+                            Inventory inventory = MenuManager.getInventory(playerStats, menuName, 0);
 
                             if (inventory != null)
                                 player.openInventory(inventory);

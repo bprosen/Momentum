@@ -1,5 +1,4 @@
-package com.parkourcraft.Parkour.stats.objects;
-
+package com.parkourcraft.Parkour.data.stats;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,9 +1,8 @@
-package com.parkourcraft.Parkour.menus.objects;
+package com.parkourcraft.Parkour.data.menus;
 
-
-import com.parkourcraft.Parkour.levels.LevelManager;
-import com.parkourcraft.Parkour.levels.LevelObject;
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.levels.LevelObject;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -31,18 +30,18 @@ public class MenuItemType extends MenuItem {
     private ItemStack getLevel(PlayerStats playerStats) {
         ItemStack item = menuItem.getItem();
 
-        if (LevelManager.levelConfigured(value)) {
+        if (LevelManager.exists(value)) {
             String levelName = value;
             LevelObject level = LevelManager.getLevel(levelName);
 
             ItemMeta itemMeta = item.getItemMeta();
             List<String> itemLore = itemMeta.getLore();
 
-            itemMeta.setDisplayName(level.getTitleFormatted());
+            itemMeta.setDisplayName(level.getFormattedTitle());
 
             itemLore.add(
                     ChatColor.GRAY + "Click to go to " +
-                    level.getTitleFormatted().replace(ChatColor.BOLD + "", "")
+                    level.getFormattedTitle().replace(ChatColor.BOLD + "", "")
             );
 
             itemLore.add(ChatColor.GRAY + "Level Reward " + ChatColor.GOLD + level.getReward() + " Coins");

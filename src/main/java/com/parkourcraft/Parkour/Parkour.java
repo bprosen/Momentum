@@ -1,20 +1,16 @@
 package com.parkourcraft.Parkour;
 
-import com.parkourcraft.Parkour.commands.Level_CMD;
-import com.parkourcraft.Parkour.commands.Location_CMD;
-import com.parkourcraft.Parkour.commands.Menu_CMD;
-import com.parkourcraft.Parkour.commands.Stats_CMD;
-import com.parkourcraft.Parkour.levels.LevelManager;
+import com.parkourcraft.Parkour.commands.*;
+import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.listeners.JoinLeaveHandler;
 import com.parkourcraft.Parkour.listeners.LevelListener;
-import com.parkourcraft.Parkour.menus.MenuManager;
-import com.parkourcraft.Parkour.stats.StatsManager;
+import com.parkourcraft.Parkour.data.MenuManager;
+import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.TableManager;
 import com.parkourcraft.Parkour.utils.dependencies.Vault;
-import com.parkourcraft.Parkour.utils.storage.Levels_YAML;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -115,6 +111,7 @@ public class Parkour extends JavaPlugin {
         getCommand("location").setExecutor(new Location_CMD());
         getCommand("stats").setExecutor(new Stats_CMD());
         getCommand("menu").setExecutor(new Menu_CMD());
+        getCommand("rewards").setExecutor(new Rewards_CMD());
     }
 
 }

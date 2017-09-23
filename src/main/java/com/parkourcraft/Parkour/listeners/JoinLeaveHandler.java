@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.listeners;
 
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

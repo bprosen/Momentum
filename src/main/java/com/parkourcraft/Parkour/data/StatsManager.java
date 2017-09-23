@@ -1,7 +1,6 @@
-package com.parkourcraft.Parkour.stats;
+package com.parkourcraft.Parkour.data;
 
-
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

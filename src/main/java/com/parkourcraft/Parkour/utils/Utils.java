@@ -10,18 +10,25 @@ import java.util.List;
 public class Utils {
 
     public static ItemStack convertItem(String itemMaterial, int itemType) {
-        ItemStack item = new ItemStack(Material.getMaterial(itemMaterial), 1, (byte) itemType);
-
-        return item;
+        return new ItemStack(Material.getMaterial(itemMaterial), 1, (byte) itemType);
     }
 
-    public static List<String> getLoreFormatted(List<String> loreList) {
+    public static List<String> formatLore(List<String> loreList) {
         List<String> loreFormatted = new ArrayList<>();
 
         for (String lore : loreList)
             loreFormatted.add(ChatColor.translateAlternateColorCodes('&', lore));
 
         return loreFormatted;
+    }
+
+    public static boolean isInteger(String input) {
+        try {
+            Integer.parseInt(input);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 
 }

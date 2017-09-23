@@ -1,19 +1,16 @@
 package com.parkourcraft.Parkour.commands;
 
-
-import com.parkourcraft.Parkour.levels.LevelManager;
+import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
-import com.parkourcraft.Parkour.utils.CheckInteger;
-import com.parkourcraft.Parkour.utils.storage.Levels_YAML;
-import com.parkourcraft.Parkour.utils.storage.LocationManager;
+import com.parkourcraft.Parkour.data.levels.Levels_YAML;
+import com.parkourcraft.Parkour.data.LocationManager;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.logging.Level;
 
 public class Level_CMD implements CommandExecutor {
 
@@ -34,14 +31,14 @@ public class Level_CMD implements CommandExecutor {
                         ChatColor.GRAY + "Levels loaded in: "
                         + ChatColor.GREEN + String.join(
                                 ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                LevelManager.getLevelNames()
+                                LevelManager.getNames()
                         )
                 );
             } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
                 if (a.length == 2) {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName))
+                    if (LevelManager.exists(levelName))
                         sender.sendMessage(
                                 ChatColor.GRAY + "Level "
                                 + ChatColor.GREEN + levelName
@@ -63,14 +60,14 @@ public class Level_CMD implements CommandExecutor {
                 if (a.length == 2) {
                     String levelName = a[1];
 
-                    if (!Levels_YAML.levelExists(levelName))
+                    if (!LevelManager.exists(levelName))
                         sender.sendMessage(
                                 ChatColor.GRAY + "Level "
                                         + ChatColor.GREEN + levelName
                                         + ChatColor.GRAY + " does not exist"
                         );
                     else {
-                        Levels_YAML.delete(levelName);
+                        LevelManager.remove(levelName);
 
                         sender.sendMessage(
                                 ChatColor.GRAY + "Deleted level "
@@ -94,7 +91,7 @@ public class Level_CMD implements CommandExecutor {
                 if (a.length > 1) {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName)) {
+                    if (LevelManager.exists(levelName)) {
                         if (a.length > 2) {
                             String title = "";
                             for (int i = 2; i < a.length; i++)
@@ -134,9 +131,9 @@ public class Level_CMD implements CommandExecutor {
                 if (a.length > 1) {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName)) {
+                    if (LevelManager.exists(levelName)) {
                         if (a.length == 3) {
-                            if (CheckInteger.check(a[2])) {
+                            if (Utils.isInteger(a[2])) {
                                 Levels_YAML.setReward(levelName, Integer.parseInt(a[2]));
                                 sender.sendMessage(
                                         ChatColor.GRAY + "Set "
@@ -171,15 +168,15 @@ public class Level_CMD implements CommandExecutor {
                 } else {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName)) {
+                    if (LevelManager.exists(levelName)) {
                         if (sender instanceof Player) {
                             Player player = ((Player) sender).getPlayer();
 
                             Location playerLocation = player.getLocation();
                             String spawnPositionName = levelName + "-spawn";
 
-                            LocationManager.savePosition(spawnPositionName, playerLocation);
-                            Levels_YAML.setStartLocationName(levelName, spawnPositionName);
+                            LocationManager.save(spawnPositionName, playerLocation);
+                            Levels_YAML.commit(levelName);
 
                             sender.sendMessage(
                                     ChatColor.GRAY + "Location saved as "
@@ -203,13 +200,12 @@ public class Level_CMD implements CommandExecutor {
                 } else {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName)) {
+                    if (LevelManager.exists(levelName)) {
                         if (a.length > 2) {
                             if (a[2].equalsIgnoreCase("default")) {
                                 String completionLocationName = levelName + "-completion";
 
-                                LocationManager.deletePosition(completionLocationName);
-                                Levels_YAML.setCompletionLocationName(levelName, "default");
+                                LocationManager.remove(completionLocationName);
 
                                 sender.sendMessage(
                                         ChatColor.GRAY + "The completion location for "
@@ -234,8 +230,7 @@ public class Level_CMD implements CommandExecutor {
                                 Location playerLocation = player.getLocation();
                                 String completionLocationName = levelName + "-completion";
 
-                                LocationManager.savePosition(completionLocationName, playerLocation);
-                                Levels_YAML.setStartLocationName(levelName, completionLocationName);
+                                LocationManager.save(completionLocationName, playerLocation);
 
                                 sender.sendMessage(
                                         ChatColor.GRAY + "Location saved as "
@@ -262,7 +257,7 @@ public class Level_CMD implements CommandExecutor {
                 if (a.length > 1) {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName)) {
+                    if (LevelManager.exists(levelName)) {
                         if (a.length > 2) {
                             String message = "";
                             for (int i = 2; i < a.length; i++)
@@ -302,9 +297,9 @@ public class Level_CMD implements CommandExecutor {
                 if (a.length > 1) {
                     String levelName = a[1];
 
-                    if (Levels_YAML.levelExists(levelName)) {
+                    if (LevelManager.exists(levelName)) {
                         if (a.length == 3) {
-                            if (CheckInteger.check(a[2])) {
+                            if (Utils.isInteger(a[2])) {
                                 Levels_YAML.setMaxCompletions(levelName, Integer.parseInt(a[2]));
                                 sender.sendMessage(
                                         ChatColor.GRAY + "Set "
@@ -332,6 +327,30 @@ public class Level_CMD implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Incorrect parameters");
                     sender.sendMessage(getHelp("completions"));
                 }
+            } else if (a[0].equalsIgnoreCase("broadcast")) { //subcommand: broadcast
+                if (a.length > 1) {
+                    String levelName = a[1];
+
+                    if (LevelManager.exists(levelName)) {
+                        boolean broadcastSetting = Levels_YAML.getBroadcastSetting(levelName);
+
+                        Levels_YAML.setBroadcast(levelName, !broadcastSetting);
+
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Broadcast completion for "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " was set to " + (!broadcastSetting)
+                        );
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                    sender.sendMessage(getHelp("broadcast"));
+                }
             } else { // subcommand: unknown
                 sender.sendMessage(
                         ChatColor.RED + "'" + ChatColor.DARK_RED + a[0] +
@@ -358,6 +377,7 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("completionloc"));
         sender.sendMessage(getHelp("message"));
         sender.sendMessage(getHelp("completions"));
+        sender.sendMessage(getHelp("broadcast"));
     }
 
     private static String getHelp(String cmd) {
@@ -394,6 +414,9 @@ public class Level_CMD implements CommandExecutor {
         else if (cmd.equalsIgnoreCase("completions"))
             return ChatColor.GREEN + "/level completions <level> [completions]" +
                     ChatColor.GRAY + " View or set a level's max completions";
+        else if (cmd.equalsIgnoreCase("broadcast"))
+            return ChatColor.GREEN + "/level broadcast <level>" +
+                    ChatColor.GRAY + "Toggle if a level broadcast's completion";
         return "";
     }
 }

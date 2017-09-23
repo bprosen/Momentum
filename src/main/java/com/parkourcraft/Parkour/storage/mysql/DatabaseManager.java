@@ -1,7 +1,7 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.stats.StatsManager;
+import com.parkourcraft.Parkour.data.StatsManager;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

@@ -1,9 +1,9 @@
-package com.parkourcraft.Parkour.levels;
+package com.parkourcraft.Parkour.data;
 
-
+import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
-import com.parkourcraft.Parkour.utils.storage.Levels_YAML;
+import com.parkourcraft.Parkour.data.levels.Levels_YAML;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +12,22 @@ import java.util.Map;
 
 public class LevelManager {
 
-    private static Map<String, LevelObject> levelMap = new HashMap<>();
+    private static Map<String, LevelObject> levelsMap = new HashMap<>();
     private static Map<String, Integer> levelIDMap = new HashMap<>();
 
-    public static void loadLevels() {
-        levelMap = new HashMap<>();
+    public static void load(String levelName) {
+        if (!Levels_YAML.exists(levelName)
+                && exists(levelName))
+            levelsMap.remove(levelName);
+        else
+            levelsMap.put(levelName, new LevelObject(levelName));
+    }
 
-        for (String levelName : Levels_YAML.getLevelNames())
-            levelMap.put(levelName, new LevelObject(levelName));
+    public static void loadLevels() {
+        levelsMap = new HashMap<>();
+
+        for (String levelName : Levels_YAML.getNames())
+            load(levelName);
     }
 
     public static void loadLevelIDs() {
@@ -44,7 +52,7 @@ public class LevelManager {
     public static void syncLevelIDs() {
         List<String> levelsMissingID = new ArrayList<>();
 
-        for (String levelName : levelMap.keySet()) {
+        for (String levelName : levelsMap.keySet()) {
             if (!levelIDMap.containsKey(levelName))
                 levelsMissingID.add(levelName);
         }
@@ -70,24 +78,25 @@ public class LevelManager {
         }
     }
 
-    public static void loadLevel(String levelName) {
-        if (Levels_YAML.levelExists(levelName))
-            levelMap.put(levelName, new LevelObject(levelName));
+    public static boolean exists(String levelName) {
+        return levelsMap.containsKey(levelName);
     }
 
-    public static void unloadLevel(String levelName) {
-        if (levelMap.containsKey(levelName))
-            levelMap.remove(levelName);
+    public static void create(String levelName) {
+        Levels_YAML.create(levelName);
     }
 
-    public static List<String> getLevelNames(){
-        List<String> levelNames = new ArrayList<>(levelMap.keySet());
-
-        return levelNames;
+    public static void remove(String levelName) {
+        if (exists(levelName))
+            Levels_YAML.remove(levelName);
     }
 
-    public static Map<String, String> getLevelNamesLower() {
-        List<String> levelNames = LevelManager.getLevelNames();
+    public static List<String> getNames(){
+        return new ArrayList<>(levelsMap.keySet());
+    }
+
+    public static Map<String, String> getNamesLower() {
+        List<String> levelNames = getNames();
         Map<String, String> levelNamesLower = new HashMap<>();
 
         for (String levelName : levelNames)
@@ -96,7 +105,7 @@ public class LevelManager {
         return levelNamesLower;
     }
 
-    public static String getLevelNameFromID(int levelID) {
+    public static String getName(int levelID) {
         for (Map.Entry<String, Integer> entry : levelIDMap.entrySet()) {
             if (entry.getValue() == levelID)
                 return entry.getKey();
@@ -105,16 +114,12 @@ public class LevelManager {
         return "";
     }
 
-    public static int getLevelID(String levelName) {
+    public static int getID(String levelName) {
         return levelIDMap.get(levelName);
     }
 
     public static LevelObject getLevel(String levelName) {
-        return levelMap.get(levelName);
-    }
-
-    public static boolean levelConfigured(String levelName) {
-        return levelMap.containsKey(levelName);
+        return levelsMap.get(levelName);
     }
 
 }

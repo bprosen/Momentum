@@ -1,6 +1,5 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;

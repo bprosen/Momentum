@@ -1,7 +1,6 @@
-package com.parkourcraft.Parkour.stats.objects;
+package com.parkourcraft.Parkour.data.stats;
 
-
-import com.parkourcraft.Parkour.levels.LevelManager;
+import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
 import java.util.HashMap;
@@ -18,7 +17,7 @@ public class LeaderboardObject {
 
     public LeaderboardObject(String levelName) {
         this.levelName = levelName;
-        this.levelID = LevelManager.getLevelID(levelName);
+        this.levelID = LevelManager.getID(levelName);
     }
 
     public String getLevelName() {

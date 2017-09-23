@@ -1,10 +1,9 @@
 package com.parkourcraft.Parkour.commands;
 
-
-import com.parkourcraft.Parkour.stats.StatsManager;
-import com.parkourcraft.Parkour.stats.objects.LevelCompletion;
-import com.parkourcraft.Parkour.stats.objects.LevelStats;
-import com.parkourcraft.Parkour.stats.objects.PlayerStats;
+import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.data.stats.LevelCompletion;
+import com.parkourcraft.Parkour.data.stats.LevelStats;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
