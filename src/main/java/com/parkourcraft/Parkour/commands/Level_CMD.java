@@ -416,7 +416,7 @@ public class Level_CMD implements CommandExecutor {
                     ChatColor.GRAY + " View or set a level's max completions";
         else if (cmd.equalsIgnoreCase("broadcast"))
             return ChatColor.GREEN + "/level broadcast <level>" +
-                    ChatColor.GRAY + "Toggle if a level broadcast's completion";
+                    ChatColor.GRAY + " Toggle if a level broadcasts completions";
         return "";
     }
 }

@@ -86,7 +86,8 @@ public class Levels_YAML {
         if (exists(levelName)) {
             if (!setting)
                 levelsFile.set(levelName + ".broadcast_completion", null);
-            levelsFile.set(levelName + ".broadcast_completion", setting);
+            else
+                levelsFile.set(levelName + ".broadcast_completion", setting);
 
             commit(levelName);
         }

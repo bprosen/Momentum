@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.*;
 import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.listeners.JoinLeaveHandler;
 import com.parkourcraft.Parkour.listeners.LevelListener;
 import com.parkourcraft.Parkour.data.MenuManager;
@@ -38,6 +39,7 @@ public class Parkour extends JavaPlugin {
         DatabaseConnection.open();
         TableManager.setUp();
 
+        LocationManager.loadLocations();
         LevelManager.loadLevels();
         LevelManager.loadLevelIDs();
 

@@ -96,10 +96,9 @@ public class LevelManager {
     }
 
     public static Map<String, String> getNamesLower() {
-        List<String> levelNames = getNames();
         Map<String, String> levelNamesLower = new HashMap<>();
 
-        for (String levelName : levelNames)
+        for (String levelName : getNames())
             levelNamesLower.put(levelName.toLowerCase(), levelName);
 
         return levelNamesLower;
