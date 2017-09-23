@@ -1,35 +1,48 @@
 package com.parkourcraft.Parkour.data;
 
 import com.parkourcraft.Parkour.data.menus.Menu;
+import com.parkourcraft.Parkour.data.menus.Menus_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.local.FileManager;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MenuManager {
 
-    private static List<Menu> menuList = new ArrayList<>();
+    private static Map<String, Menu> menuMap = new HashMap<>();
 
-    private static FileConfiguration menusConfig = FileManager.getFileConfig("menus");
-
-    public static void loadMenus() {
-        menuList = new ArrayList<>();
-
-        for (String menuName : menusConfig.getKeys(false)) {
+    public static void load(String menuName) {
+        if (Menus_YAML.exists(menuName)) {
             Menu menu = new Menu();
 
-            menu.loadMenu(menuName);
+            menu.load(menuName);
 
-            menuList.add(menu);
+            menuMap.put(menuName, menu);
         }
     }
 
+    public static void loadMenus() {
+        menuMap = new HashMap<>();
+
+        for (String menuName : Menus_YAML.getNames())
+            load(menuName);
+    }
+
+    public static boolean exists(String menuName) {
+        return menuMap.containsKey(menuName);
+    }
+
     public static Menu getMenu(String menuName) {
-        for (Menu menu : menuList) {
-            if (menu.getName().equals(menuName))
+        return menuMap.get(menuName);
+    }
+
+    public static Menu getMenuFromTitle(String menuTitle) {
+        for (Menu menu : menuMap.values()) {
+            if (menuTitle.startsWith(menu.getFormattedTitle()))
                 return menu;
         }
 
@@ -37,29 +50,26 @@ public class MenuManager {
     }
 
     public static List<String> getMenuNames() {
-        List<String> menuNamesList = new ArrayList<>();
-
-        for (Menu menu : menuList)
-            menuNamesList.add(menu.getName());
-
-        return menuNamesList;
+        return new ArrayList<>(menuMap.keySet());
     }
 
-    public static boolean menuExists(String menuName) {
-
-        for (Menu menu : menuList) {
-            if (menu.getName().equals(menuName))
-                return true;
-        }
-
-        return false;
-    }
-
-    public static Inventory getInventory(PlayerStats playerStats, String menuName, int pageNumber) {
-        if (menuExists(menuName))
-            return getMenu(menuName).getMenu(playerStats, pageNumber);
+    public static Inventory getInventory(String menuName, int pageNumber) {
+        if (exists(menuName))
+            return menuMap.get(menuName).getInventory(pageNumber);
 
         return null;
+    }
+
+    public static void updateInventory(PlayerStats playerStats, InventoryView inventory) {
+        Menu menu = getMenuFromTitle(inventory.getTitle());
+
+        if (menu != null)
+            menu.updateInventory(playerStats, inventory);
+    }
+
+    public static void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName) {
+        if (exists(menuName))
+            menuMap.get(menuName).updateInventory(playerStats, inventory);
     }
 
 }

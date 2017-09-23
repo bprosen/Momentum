@@ -42,7 +42,6 @@ public class Parkour extends JavaPlugin {
         LocationManager.loadLocations();
         LevelManager.loadLevels();
         LevelManager.loadLevelIDs();
-
         MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup

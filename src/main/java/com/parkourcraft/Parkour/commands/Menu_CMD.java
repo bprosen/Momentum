@@ -4,6 +4,7 @@ import com.parkourcraft.Parkour.data.MenuManager;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.local.FileManager;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,16 +29,22 @@ public class Menu_CMD implements CommandExecutor {
                 if (sender instanceof Player) {
                     if (a.length > 1) {
                         String menuName = a[1];
+                        int pageNumber = 1;
 
-                        if (MenuManager.menuExists(a[0])) {
+                        if (a.length == 3
+                                && Utils.isInteger(a[2]))
+                                pageNumber = Integer.parseInt(a[2]);
+
+                        if (MenuManager.exists(menuName)) {
                             Player player = ((Player) sender).getPlayer();
                             PlayerStats playerStats = StatsManager.getPlayerStats(player);
 
-                            Inventory inventory = MenuManager.getInventory(playerStats, menuName, 0);
+                            Inventory inventory = MenuManager.getInventory(menuName, pageNumber);
 
-                            if (inventory != null)
+                            if (inventory != null) {
                                 player.openInventory(inventory);
-                            else
+                                MenuManager.updateInventory(playerStats, player.getOpenInventory(), menuName);
+                            } else
                                 sender.sendMessage(ChatColor.RED + "Error loading the inventory");
                         } else
                             sender.sendMessage(
@@ -87,7 +94,7 @@ public class Menu_CMD implements CommandExecutor {
             return ChatColor.GREEN + "/menu list" +
                     ChatColor.GRAY + " Lists the configured menus";
         else if (cmd.equalsIgnoreCase("open"))
-            return ChatColor.GREEN + "/menu open <menu>" +
+            return ChatColor.GREEN + "/menu open <menu> [page#]" +
                     ChatColor.GRAY + " Opens inventory menu";
         else if (cmd.equalsIgnoreCase("load"))
             return ChatColor.GREEN + "/menu load" +
