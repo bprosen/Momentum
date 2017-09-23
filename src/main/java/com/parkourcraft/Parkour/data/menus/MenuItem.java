@@ -4,15 +4,13 @@ import org.bukkit.inventory.ItemStack;
 
 public class MenuItem extends MenuPage {
 
-    public static MenuPage menuItem;
-
     private int slot;
     private ItemStack item;
     private String type;
     private String typeValue;
 
-    public MenuItem() {
-        menuItem = this;
+    MenuItem(int slot) {
+        load(slot);
     }
 
     public void load(int slot) {
@@ -23,19 +21,19 @@ public class MenuItem extends MenuPage {
         typeValue = Menus_YAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
     }
 
-    public int getSlot() {
+    int getSlot() {
         return slot;
     }
 
-    public ItemStack getItem() {
+    ItemStack getItem() {
         return item;
     }
 
-    public String getType() {
+    String getType() {
         return type;
     }
 
-    public String getTypeValue() {
+    String getTypeValue() {
         return typeValue;
     }
 

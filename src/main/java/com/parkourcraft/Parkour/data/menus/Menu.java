@@ -12,13 +12,13 @@ import java.util.Map;
 
 public class Menu {
 
-    public static Menu menu;
+    static Menu menu;
 
-    private static String name;
-    private static String title;
-    private static int pageCount;
-    private static boolean updating;
-    private static ItemStack selectItem;
+    private String name;
+    private String title;
+    private int pageCount;
+    private boolean updating;
+    private ItemStack selectItem;
 
     private static Map<Integer, MenuPage> pageMap = new HashMap<>();
 
@@ -52,31 +52,31 @@ public class Menu {
         }
     }
 
-    public static String getName() {
+    public String getName() {
         return name;
     }
 
-    public static String getTitle() {
+    public String getTitle() {
         return title;
     }
 
-    public static String getFormattedTitle() {
+    public String getFormattedTitle() {
         return ChatColor.translateAlternateColorCodes('&', title);
     }
 
-    public static int getPageCount() {
+    public int getPageCount() {
         return pageCount;
     }
 
-    public static boolean isUpdating() {
+    public boolean isUpdating() {
         return updating;
     }
 
-    public static ItemStack getSelectItem() {
+    public ItemStack getSelectItem() {
         return selectItem;
     }
 
-    public static Inventory getInventory(int pageNumber) {
+    public Inventory getInventory(int pageNumber) {
         if (pageMap.containsKey(pageNumber)) {
             MenuPage menuPage = pageMap.get(pageNumber);
 
@@ -86,7 +86,7 @@ public class Menu {
         return Bukkit.createInventory(null, 9, getFormattedTitle());
     }
 
-    public static void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber) {
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber) {
         if (pageMap.containsKey(pageNumber))
             pageMap.get(pageNumber).formatInventory(playerStats, inventory);
     }

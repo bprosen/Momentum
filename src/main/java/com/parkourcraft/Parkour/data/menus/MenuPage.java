@@ -8,14 +8,14 @@ import java.util.Map;
 
 public class MenuPage extends Menu {
 
-    public static MenuPage menuPage;
+    static MenuPage menuPage;
 
-    private static int pageNumber;
-    private static int rowCount;
+    private int pageNumber;
+    private int rowCount;
 
     private static Map<Integer, MenuItem> pageItemsMap = new HashMap<>();
 
-    public MenuPage() {
+    MenuPage() {
         menuPage = this;
     }
 
@@ -26,25 +26,23 @@ public class MenuPage extends Menu {
 
         for (int slot = 0; slot <= slotCount - 1; slot++) {
             if (Menus_YAML.hasItem(getName(), pageNumber, slot)) {
-                MenuItem menuItem = new MenuItem();
-
-                menuItem.load(slot);
+                MenuItem menuItem = new MenuItem(slot);
 
                 pageItemsMap.put(slot, menuItem);
             }
         }
     }
 
-    public static void formatInventory(PlayerStats playerStats, InventoryView inventory) {
+    void formatInventory(PlayerStats playerStats, InventoryView inventory) {
         for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(playerStats, menuItem));
     }
 
-    public static int getPageNumber() {
+    int getPageNumber() {
         return pageNumber;
     }
 
-    public static int getRowCount() {
+    int getRowCount() {
         return rowCount;
     }
 
