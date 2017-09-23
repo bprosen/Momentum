@@ -5,10 +5,7 @@ import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PlayerStats {
 
@@ -62,6 +59,14 @@ public class PlayerStats {
 
         return 0;
     }
+
+    public List<LevelCompletion> getQuickestCompletions(String levelName) {
+        if (levelStatsMap.containsKey(levelName))
+            return levelStatsMap.get(levelName).getQuickestCompletions();
+
+        return new ArrayList<>();
+    }
+
 
     public Map<String, LevelStats> getLevelStatsMap() {
         return levelStatsMap;

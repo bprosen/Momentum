@@ -16,13 +16,8 @@ public class MenuManager {
     private static Map<String, Menu> menuMap = new HashMap<>();
 
     public static void load(String menuName) {
-        if (Menus_YAML.exists(menuName)) {
-            Menu menu = new Menu();
-
-            menu.load(menuName);
-
-            menuMap.put(menuName, menu);
-        }
+        if (Menus_YAML.exists(menuName))
+            menuMap.put(menuName, new Menu(menuName));
     }
 
     public static void loadMenus() {

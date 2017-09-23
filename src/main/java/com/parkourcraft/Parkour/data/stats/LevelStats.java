@@ -38,4 +38,28 @@ public class LevelStats {
         return levelCompletionsMap.size();
     }
 
+    public List<LevelCompletion> getQuickestCompletions() {
+        List<LevelCompletion> levelCompletions = new ArrayList<>();
+
+        for (LevelCompletion levelCompletion : levelCompletionsMap.values())
+            if (levelCompletion.getCompletionTimeElapsed() > 0)
+                levelCompletions.add(levelCompletion);
+
+
+        for (int i = 0; i < levelCompletions.size() - 1; i++) {
+            int min_id = i;
+
+            for (int j = i + 1; j < levelCompletions.size(); j++)
+                if (levelCompletions.get(j).getCompletionTimeElapsed()
+                        < levelCompletions.get(min_id).getCompletionTimeElapsed())
+                    min_id = j;
+
+            LevelCompletion temp = levelCompletions.get(min_id);
+            levelCompletions.set(min_id, levelCompletions.get(i));
+            levelCompletions.set(i, temp);
+        }
+
+        return levelCompletions;
+    }
+
 }

@@ -12,29 +12,27 @@ import java.util.Map;
 
 public class Menu {
 
-    static Menu menu;
-
     private String name;
     private String title;
     private int pageCount;
     private boolean updating;
     private ItemStack selectItem;
 
-    private static Map<Integer, MenuPage> pageMap = new HashMap<>();
+    private Map<Integer, MenuPage> pageMap = new HashMap<>();
 
-    public Menu() {
-        menu = this;
-    }
-
-    public void load(String menuName) {
+    public Menu(String menuName) {
         name = menuName;
 
-        if (Menus_YAML.exists(menuName)) {
+        load();
+    }
 
-            title = Menus_YAML.getTitle(menuName);
-            pageCount = Menus_YAML.getPageCount(menuName);
-            updating = Menus_YAML.getUpdating(menuName);
-            selectItem = Menus_YAML.getSelectItem(menuName);
+    private void load() {
+        if (Menus_YAML.exists(name)) {
+
+            title = Menus_YAML.getTitle(name);
+            pageCount = Menus_YAML.getPageCount(name);
+            updating = Menus_YAML.getUpdating(name);
+            selectItem = Menus_YAML.getSelectItem(name);
 
             loadPages();
         }
@@ -42,13 +40,8 @@ public class Menu {
 
     private void loadPages() {
         for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
-            if (Menus_YAML.isSet(name, pageNumber + "")) {
-                MenuPage menuPage = new MenuPage();
-
-                menuPage.load(pageNumber);
-
-                pageMap.put(pageNumber, menuPage);
-            }
+            if (Menus_YAML.isSet(name, pageNumber + ""))
+                pageMap.put(pageNumber, new MenuPage(this, pageNumber));
         }
     }
 

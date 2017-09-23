@@ -2,38 +2,38 @@ package com.parkourcraft.Parkour.data.menus;
 
 import org.bukkit.inventory.ItemStack;
 
-public class MenuItem extends MenuPage {
+public class MenuItem {
 
     private int slot;
     private ItemStack item;
     private String type;
     private String typeValue;
 
-    MenuItem(int slot) {
-        load(slot);
-    }
-
-    public void load(int slot) {
+    MenuItem(Menu menu, MenuPage menuPage, int slot) {
         this.slot = slot;
 
+        load(menu, menuPage);
+    }
+
+    private void load(Menu menu, MenuPage menuPage) {
         item = Menus_YAML.getItem(menu.getName(), menuPage.getPageNumber(), slot);
         type = Menus_YAML.getItemType(menu.getName(), menuPage.getPageNumber(), slot);
         typeValue = Menus_YAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
     }
 
-    int getSlot() {
+    public int getSlot() {
         return slot;
     }
 
-    ItemStack getItem() {
+    public ItemStack getItem() {
         return item;
     }
 
-    String getType() {
+    public String getType() {
         return type;
     }
 
-    String getTypeValue() {
+    public String getTypeValue() {
         return typeValue;
     }
 

@@ -14,10 +14,10 @@ ore_levels:
     0:
       teleport: coal
       item:
-        title: "&0&l&oCoal &7&oLevels"
+        title: "&8&l&oCoal &7&oLevels"
         material: COAL_BLOCK
         lore:
-          - "&7Click to go to &0Coal &7levels"
+          - "&7Click to go to &8Coal &7levels"
           - "    &3&oVery Easy"
     1:
       level: coal-1

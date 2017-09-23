@@ -6,30 +6,26 @@ import org.bukkit.inventory.InventoryView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MenuPage extends Menu {
-
-    static MenuPage menuPage;
+public class MenuPage {
 
     private int pageNumber;
     private int rowCount;
 
-    private static Map<Integer, MenuItem> pageItemsMap = new HashMap<>();
+    private Map<Integer, MenuItem> pageItemsMap = new HashMap<>();
 
-    MenuPage() {
-        menuPage = this;
+    MenuPage(Menu menu, int pageNumber) {
+        this.pageNumber = pageNumber;
+
+        load(menu);
     }
 
-    public void load(int pageNumber) {
-        this.pageNumber = pageNumber;
-        rowCount = Menus_YAML.getRowCount(getName(), pageNumber);
+    private void load(Menu menu) {
+        rowCount = Menus_YAML.getRowCount(menu.getName(), pageNumber);
         int slotCount = rowCount * 9;
 
         for (int slot = 0; slot <= slotCount - 1; slot++) {
-            if (Menus_YAML.hasItem(getName(), pageNumber, slot)) {
-                MenuItem menuItem = new MenuItem(slot);
-
-                pageItemsMap.put(slot, menuItem);
-            }
+            if (Menus_YAML.hasItem(menu.getName(), pageNumber, slot))
+                pageItemsMap.put(slot, new MenuItem(menu, this, slot));
         }
     }
 

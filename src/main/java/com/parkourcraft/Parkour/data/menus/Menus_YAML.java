@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.data.menus;
 
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.utils.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -137,7 +138,7 @@ public class Menus_YAML {
 
         ItemMeta itemMeta = item.getItemMeta();
 
-        itemMeta.setDisplayName(title);
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', title));
 
         if (lore.size() > 0)
             itemMeta.setLore(lore);
