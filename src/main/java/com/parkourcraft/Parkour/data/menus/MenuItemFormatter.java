@@ -33,9 +33,7 @@ public class MenuItemFormatter {
             LevelObject level = LevelManager.getLevel(levelName);
 
             ItemMeta itemMeta = item.getItemMeta();
-            List<String> itemLore = itemMeta.getLore();
-            if (itemLore == null)
-                itemLore = new ArrayList<>();
+            List<String> itemLore = new ArrayList<>();
 
             String formattedTitle = level.getFormattedTitle();
             itemMeta.setDisplayName(formattedTitle);
@@ -45,30 +43,29 @@ public class MenuItemFormatter {
                             formattedTitle.replace(ChatColor.BOLD + "", "")
             );
 
-            itemLore.add(ChatColor.GRAY + "Reward " + ChatColor.GOLD + level.getReward() + " Coins");
+            itemLore.add("  " + ChatColor.GOLD + level.getReward() + " Coin " + ChatColor.GRAY + "Reward");
 
             int levelCompletionsCount = playerStats.getLevelCompletionsCount(levelName);
             if (levelCompletionsCount > 0) {
                 itemLore.add("");
 
-                itemLore.add(
-                        ChatColor.GRAY + "Times completed " +
-                                ChatColor.GREEN + levelCompletionsCount
-                );
+                String beatenMessage = ChatColor.GRAY + "Beaten " + ChatColor.GREEN + levelCompletionsCount
+                        + ChatColor.GRAY + " Time";
+                if (levelCompletionsCount > 1)
+                    beatenMessage += "s";
+
+                itemLore.add(beatenMessage);
 
                 List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(levelName);
                 if (bestLevelCompletions.size() > 0) {
-                    itemLore.add(ChatColor.GRAY + "Quickest times");
+                    itemLore.add(ChatColor.GRAY + " Top Personal Times");
 
-                    for (int i = 0; i < bestLevelCompletions.size() - 1 && i < 3; i++ ) {
+                    for (int i = 0; i <= (bestLevelCompletions.size()) - 1 && i <= 2; i++ ) {
                         double completionTime = ((double) bestLevelCompletions.get(i).getCompletionTimeElapsed()) / 1000;
-                        Parkour.getPluginLogger().info(bestLevelCompletions.get(i).getCompletionTimeElapsed() + "");
                         long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(i).getTimeOfCompletion();
 
-                        itemLore.add(
-                                "  " + ChatColor.GREEN + Double.toString(completionTime) + "s" +
-                                        ChatColor.GRAY + ", "+ Time.elapsedShortened(timeSince) + " ago"
-                        );
+                        itemLore.add("  " + ChatColor.GREEN + Double.toString(completionTime) + "s");
+                        itemLore.add("   " + ChatColor.GRAY + Time.elapsedShortened(timeSince) + "ago");
                     }
                 }
             }

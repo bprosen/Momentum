@@ -7,6 +7,7 @@ import com.parkourcraft.Parkour.listeners.JoinLeaveHandler;
 import com.parkourcraft.Parkour.listeners.LevelListener;
 import com.parkourcraft.Parkour.data.MenuManager;
 import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.listeners.MenuListener;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
@@ -77,6 +78,13 @@ public class Parkour extends JavaPlugin {
     private void runScheduler() {
         BukkitScheduler scheduler = getServer().getScheduler();
 
+        // update open menus (every .5 seconds)
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            public void run() {
+                MenuManager.updateOpenInventories();
+            }
+        }, 0L, 10L);
+
         // sync player and level data from database (every 10 seconds)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
@@ -105,6 +113,7 @@ public class Parkour extends JavaPlugin {
 
         pluginManager.registerEvents(new LevelListener(), this);
         pluginManager.registerEvents(new JoinLeaveHandler(), this);
+        pluginManager.registerEvents(new MenuListener(), this);
     }
 
     private void registerCommands() {

@@ -45,6 +45,8 @@ public class LevelStats {
             if (levelCompletion.getCompletionTimeElapsed() > 0)
                 levelCompletions.add(levelCompletion);
 
+        if (levelCompletions.size() < 2)
+            return levelCompletions;
 
         for (int i = 0; i < levelCompletions.size() - 1; i++) {
             int min_id = i;

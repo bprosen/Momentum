@@ -84,23 +84,11 @@ public class Menu {
             pageMap.get(pageNumber).formatInventory(playerStats, inventory);
     }
 
+    public MenuItem getMenuItemFromTitle(int pageNumber, String itemTitle) {
+        if (pageMap.containsKey(pageNumber))
+            return pageMap.get(pageNumber).getMenuItemFromTitle(itemTitle);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return null;
+    }
 
 }

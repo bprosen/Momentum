@@ -1,5 +1,8 @@
 package com.parkourcraft.Parkour.data.menus;
 
+import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.MenuManager;
+import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.inventory.InventoryView;
 
@@ -41,5 +44,23 @@ public class MenuPage {
     int getRowCount() {
         return rowCount;
     }
+
+    public MenuItem getMenuItemFromTitle(String itemTitle) {
+        for (MenuItem menuItem : pageItemsMap.values()) {
+            if (menuItem.getItem().getItemMeta().getDisplayName().equals(itemTitle))
+                return menuItem;
+
+            if (menuItem.getType().equals("level")) {
+                LevelObject level = LevelManager.getLevel(menuItem.getTypeValue());
+
+                if (level != null
+                        && level.getFormattedTitle().equals(itemTitle))
+                    return menuItem;
+            }
+        }
+
+        return null;
+    }
+
 
 }

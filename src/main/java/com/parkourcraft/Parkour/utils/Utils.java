@@ -31,4 +31,14 @@ public class Utils {
         return true;
     }
 
+    public static int getTrailingInt(String input) {
+        input = ChatColor.stripColor(input);
+        String finalChar = input.substring(input.length() - 1, input.length());
+
+        if (isInteger(finalChar))
+            return Integer.parseInt(finalChar);
+
+        return 1;
+    }
+
 }

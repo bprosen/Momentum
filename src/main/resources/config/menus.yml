@@ -3,7 +3,7 @@
 
 ore_levels:
   settings:
-    title: "&a&l&oOre Parkour"
+    title: "  &a&l&oOre Parkour"
     page_count: 1
     updating: true # Whether or not the menu refreshses, default false
     select_item:
@@ -33,3 +33,160 @@ ore_levels:
       item:
         material: COAL
         size: 3
+    5:
+      level: lapis-3
+      item:
+        material: INK_SACK
+        type: 4
+        size: 3
+    6:
+      level: lapis-2
+      item:
+        material: INK_SACK
+        type: 4
+        size: 2
+    7:
+      level: lapis-1
+      item:
+        material: INK_SACK
+        type: 4
+    8:
+      teleport: lapis
+      item:
+        title: "&1&l&oLapis &7&oLevels"
+        material: LAPIS_BLOCK
+        lore:
+          - "&7Click to go to &1Lapis &7levels"
+          - "    &3&oEasy"
+    9:
+      teleport: quartz
+      item:
+        title: "&f&l&oQuartz &7&oLevels"
+        material: QUARTZ_BLOCK
+        lore:
+          - "&7Click to go to &fQuartz &7levels"
+          - "    &3&oEasy-Medium"
+    10:
+      level: quartz-1
+      item:
+        material: QUARTZ
+    11:
+      level: quartz-2
+      item:
+        material: QUARTZ
+        size: 2
+    12:
+      level: quartz-3
+      item:
+        material: QUARTZ
+        size: 3
+    14:
+      level: iron-3
+      item:
+        material: IRON_INGOT
+        size: 3
+    15:
+      level: iron-2
+      item:
+        material: IRON_INGOT
+        size: 2
+    16:
+      level: iron-1
+      item:
+        material: IRON_INGOT
+    17:
+      teleport: iron
+      item:
+        title: "&7&l&oIron &7&oLevels"
+        material: IRON_BLOCK
+        lore:
+          - "&7Click to go to Iron &7levels"
+          - "    &3&oMedium"
+    18:
+      teleport: gold
+      item:
+        title: "&6&l&oGold &7&oLevels"
+        material: GOLD_BLOCK
+        lore:
+          - "&7Click to go to &6Gold &7levels"
+          - "    &3&oMedium-Hard"
+    19:
+      level: gold-1
+      item:
+        material: GOLD_INGOT
+    20:
+      level: gold-2
+      item:
+        material: GOLD_INGOT
+        size: 2
+    21:
+      level: gold-3
+      item:
+        material: GOLD_INGOT
+        size: 3
+    23:
+      level: redstone-3
+      item:
+        material: REDSTONE
+        size: 3
+    24:
+      level: redstone-2
+      item:
+        material: REDSTONE
+        size: 2
+    25:
+      level: redstone-1
+      item:
+        material: REDSTONE
+    26:
+      teleport: redstone
+      item:
+        title: "&4&l&oRedstone &7&oLevels"
+        material: REDSTONE_BLOCK
+        lore:
+          - "&7Click to go to &4Redstone &7levels"
+          - "    &3&oHard"
+    27:
+      teleport: emerald
+      item:
+        title: "&a&l&oEmerald &7&oLevels"
+        material: EMERALD_BLOCK
+        lore:
+          - "&7Click to go to &aEmerald &7levels"
+          - "    &3&oVery-Hard"
+    28:
+      level: emerald-1
+      item:
+        material: EMERALD
+    29:
+      level: emerald-2
+      item:
+        material: EMERALD
+        size: 2
+    30:
+      level: emerald-3
+      item:
+        material: EMERALD
+        size: 3
+    32:
+      level: diamond-3
+      item:
+        material: DIAMOND
+        size: 3
+    33:
+      level: diamond-2
+      item:
+        material: DIAMOND
+        size: 2
+    34:
+      level: diamond-1
+      item:
+        material: DIAMOND
+    35:
+      teleport: diamond
+      item:
+        title: "&b&l&oDiamond &7&oLevels"
+        material: DIAMOND_BLOCK
+        lore:
+          - "&7Click to go to &bDiamond &7levels"
+          - "    &3&oExtreme"
