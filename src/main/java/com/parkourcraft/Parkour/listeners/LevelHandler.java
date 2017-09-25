@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.listeners;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
@@ -38,8 +39,9 @@ public class LevelHandler {
 
                 level.addCompletion(); // totalLevelCompletionsCount
 
-                respawnPlayerToLobby(player);
+                Parkour.economy.depositPlayer(player, level.getReward());
 
+                respawnPlayerToLobby(player);
 
                 String messageFormatted = level.getFormattedMessage(playerStats);
 

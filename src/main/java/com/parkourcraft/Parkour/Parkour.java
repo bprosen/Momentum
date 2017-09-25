@@ -12,6 +12,7 @@ import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.TableManager;
+import com.parkourcraft.Parkour.utils.dependencies.FeatherboardPlaceholders;
 import com.parkourcraft.Parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -44,6 +45,8 @@ public class Parkour extends JavaPlugin {
         LevelManager.loadAll();
         LevelManager.loadIDs();
         MenuManager.loadMenus();
+
+        FeatherboardPlaceholders.registerPlaceholders();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
