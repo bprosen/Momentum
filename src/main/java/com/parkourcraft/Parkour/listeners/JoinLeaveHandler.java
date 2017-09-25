@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.listeners;
 
+import com.parkourcraft.Parkour.data.RewardManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,9 @@ public class JoinLeaveHandler implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         // Add to playerStats map (Async)
         DatabaseManager.addToLoadPlayersCache(event.getPlayer().getUniqueId().toString(), event.getPlayer().getName());
+
+        // Sync permissions based on rewards
+        RewardManager.syncPermissions(event.getPlayer());
     }
 
     @EventHandler

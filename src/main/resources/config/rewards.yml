@@ -1,3 +1,10 @@
 # Reward data yaml
 
 example_reward:
+  title: "&aExample Reward"
+  permissions:
+    - example.permission
+  requirements:
+    - coal-1
+    - coal-2
+  price: 10

@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.listeners;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.RewardManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
@@ -38,6 +39,7 @@ public class LevelHandler {
                 );
 
                 level.addCompletion(); // totalLevelCompletionsCount
+                RewardManager.syncPermissions(player); // sync permissions from rewards
 
                 Parkour.economy.depositPlayer(player, level.getReward());
 
