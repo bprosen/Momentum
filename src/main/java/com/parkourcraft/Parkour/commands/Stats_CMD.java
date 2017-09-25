@@ -49,10 +49,7 @@ public class Stats_CMD implements CommandExecutor {
 
                 int totalCompletionsCount = levelObject.getTotalCompletionsCount();
                 String outOfMessage = ChatColor.GRAY + "Out of "
-                        + ChatColor.GREEN + totalCompletionsCount
-                        + ChatColor.GRAY + " Completion";
-                if (totalCompletionsCount > 1)
-                    outOfMessage += "s";
+                        + ChatColor.GREEN + totalCompletionsCount;
 
                 sender.sendMessage(outOfMessage);
             } else

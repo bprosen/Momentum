@@ -1,11 +1,11 @@
 package com.parkourcraft.Parkour.listeners;
 
-import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.utils.Time;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
 import com.parkourcraft.Parkour.data.LocationManager;
 import org.bukkit.Bukkit;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class LevelHandler {
 
     public static void levelCompletion(Player player, String levelName) {
-        PlayerStats playerStats = StatsManager.get(player.getUniqueId().toString());
+        PlayerStats playerStats = StatsManager.get(player);
 
         if (playerStats != null
                 && LevelManager.exists(levelName)) {
@@ -27,10 +27,12 @@ public class LevelHandler {
             Location respawnLocation = level.getRespawnLocation();
 
             if (respawnLocation != null) {
+                Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
+
                 playerStats.levelCompletion(
                         levelName,
                         System.currentTimeMillis(),
-                        (System.currentTimeMillis() - playerStats.getLevelStartTime()),
+                        elapsedTime,
                         false
                 );
 
@@ -38,9 +40,13 @@ public class LevelHandler {
 
                 respawnPlayerToLobby(player);
 
-                Parkour.economy.depositPlayer(player, level.getReward());
 
-                String messageFormatted = level.getFormattedMessage(playerStats.getLevelCompletionsCount(levelName));
+                String messageFormatted = level.getFormattedMessage(playerStats);
+
+                if (elapsedTime > 0L
+                        && elapsedTime < 8388607L)
+                    messageFormatted += ChatColor.GRAY + " in " + ChatColor.GREEN +
+                            (((double) elapsedTime) / 1000) + "s";
 
                 player.sendMessage(messageFormatted);
 
@@ -56,6 +62,7 @@ public class LevelHandler {
                     Bukkit.broadcastMessage(broadcastMessage);
                 }
             }
+
         }
     }
 

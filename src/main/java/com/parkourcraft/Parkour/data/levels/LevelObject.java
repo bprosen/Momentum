@@ -4,6 +4,7 @@ import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -61,15 +62,18 @@ public class LevelObject {
         return message;
     }
 
-    public String getFormattedMessage(int completionsCount) {
+    public String getFormattedMessage(PlayerStats playerStats) {
         if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
+            String returnMessage = ChatColor.translateAlternateColorCodes('&', message);
 
-            message = message.replace("%title%", getFormattedTitle());
-            message = message.replace("%reward%", Integer.toString(reward));
-            message = message.replace("%completions%", Integer.toString(completionsCount));
+            returnMessage = returnMessage.replace("%title%", getFormattedTitle());
+            returnMessage = returnMessage.replace("%reward%", Integer.toString(reward));
+            returnMessage = returnMessage.replace(
+                    "%completions%",
+                    Integer.toString(playerStats.getLevelCompletionsCount(name))
+            );
 
-            return message;
+            return returnMessage;
         }
 
         return "";
@@ -142,11 +146,12 @@ public class LevelObject {
     public void loadLeaderboard() {
         leaderboardCache = new ArrayList<>();
 
-        if (totalCompletionsCount != 0) {
+        if (totalCompletionsCount != 0
+                && ID != -1) {
             List<Map<String, String>> results = DatabaseQueries.getResults(
                     "completions",
                     "player_id, time_taken, UNIX_TIMESTAMP(completion_date) AS date",
-                    "WHERE level_id=1 AND time_taken > 0 ORDER BY time_taken ASC LIMIT 10"
+                    "WHERE level_id=" + ID + " AND time_taken > 0 ORDER BY time_taken ASC LIMIT 10"
             );
 
             if (results.size() > 0) {
