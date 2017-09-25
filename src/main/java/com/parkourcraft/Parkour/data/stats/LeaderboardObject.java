@@ -17,7 +17,7 @@ public class LeaderboardObject {
 
     public LeaderboardObject(String levelName) {
         this.levelName = levelName;
-        this.levelID = LevelManager.getID(levelName);
+        this.levelID = LevelManager.getIDFromCache(levelName);
     }
 
     public String getLevelName() {
@@ -33,7 +33,7 @@ public class LeaderboardObject {
 
         List<Map<String, String>> leaderboardResults = DatabaseQueries.getResults(
                 "completions",
-                "player_id, time_take, UNIX_TIMESTAMP(completion_date)",
+                "player_id, time_taken, UNIX_TIMESTAMP(completion_date)",
                 "WHERE level_id=" + levelID + " ORDER BY time_taken DESC LIMIT 10"
         );
     }

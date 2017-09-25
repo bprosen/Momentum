@@ -51,7 +51,7 @@ public class MenuPage {
                 return menuItem;
 
             if (menuItem.getType().equals("level")) {
-                LevelObject level = LevelManager.getLevel(menuItem.getTypeValue());
+                LevelObject level = LevelManager.get(menuItem.getTypeValue());
 
                 if (level != null
                         && level.getFormattedTitle().equals(itemTitle))

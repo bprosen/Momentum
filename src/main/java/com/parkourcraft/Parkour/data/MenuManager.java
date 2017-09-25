@@ -95,7 +95,7 @@ public class MenuManager {
                 Menu menu = getMenuFromTitle(inventoryView.getTitle());
 
                 if (menu != null) {
-                    PlayerStats playerStats = StatsManager.getPlayerStats(player);
+                    PlayerStats playerStats = StatsManager.get(player);
 
                     updateInventory(playerStats, inventoryView, menu.getName());
                 }

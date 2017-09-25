@@ -20,4 +20,4 @@ commands:
     description: "PC-Parkour rewards management"
     aliases: [reward]
   stats:
-    description: "Display parkour stats"
+    description: "PC-Parkour stats display"

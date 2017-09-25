@@ -1,36 +1,78 @@
 package com.parkourcraft.Parkour.data;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.Parkour.data.levels.Levels_YAML;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LevelManager {
 
-    private static Map<String, LevelObject> levelsMap = new HashMap<>();
-    private static Map<String, Integer> levelIDMap = new HashMap<>();
+    private static List<LevelObject> levels = new ArrayList<>();
+    private static Map<String, Integer> levelIDCache = new HashMap<>();
+
+    public static LevelObject get(String levelName) {
+        for (LevelObject levelObject : levels)
+            if (levelObject.getName().equals(levelName))
+                return levelObject;
+
+        return null;
+    }
+
+    public static LevelObject get(int levelID) {
+        for (LevelObject levelObject : levels)
+            if (levelObject.getID() == levelID)
+                return levelObject;
+
+        return null;
+    }
+
+    public static int getIDFromCache(String levelName) {
+        return levelIDCache.get(levelName);
+    }
+
+    public static boolean exists(String levelName) {
+        if (get(levelName) != null)
+            return true;
+
+        return false;
+    }
+
+    public static void remove(String levelName) {
+        for (Iterator<LevelObject> iterator = levels.iterator(); iterator.hasNext();)
+            if (iterator.next().getName().equals(levelName))
+                iterator.remove();
+    }
 
     public static void load(String levelName) {
         if (!Levels_YAML.exists(levelName)
                 && exists(levelName))
-            levelsMap.remove(levelName);
-        else
-            levelsMap.put(levelName, new LevelObject(levelName));
+            remove(levelName);
+        else {
+            LevelObject levelObject = new LevelObject(levelName);
+
+            if (levelIDCache.containsKey(levelName))
+                levelObject.setID(levelIDCache.get(levelName));
+
+            levels.add(levelObject);
+        }
     }
 
-    public static void loadLevels() {
-        levelsMap = new HashMap<>();
+    public static void loadAll() {
+        levels = new ArrayList<>();
 
         for (String levelName : Levels_YAML.getNames())
             load(levelName);
+
+        Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
+
+        syncIDCache();
     }
 
-    public static void loadLevelIDs() {
+    public static void loadIDs() {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "levels",
                 "*",
@@ -38,10 +80,10 @@ public class LevelManager {
         );
 
         if (levelsResults.size() > 0) {
-            levelIDMap = new HashMap<>();
+            levelIDCache = new HashMap<>();
 
             for (Map<String, String> levelsResult : levelsResults) {
-                levelIDMap.put(
+                levelIDCache.put(
                         levelsResult.get("level_name"),
                         Integer.parseInt(levelsResult.get("level_id"))
                 );
@@ -49,50 +91,58 @@ public class LevelManager {
         }
     }
 
-    public static void syncLevelIDs() {
-        List<String> levelsMissingID = new ArrayList<>();
+    private static void syncIDCache() {
+        for (String levelName : levelIDCache.keySet()) {
+            LevelObject levelObject = get(levelName);
 
-        for (String levelName : levelsMap.keySet()) {
-            if (!levelIDMap.containsKey(levelName))
-                levelsMissingID.add(levelName);
+            if (levelObject != null)
+                levelObject.setID(levelIDCache.get(levelName));
         }
+    }
 
-        if (levelsMissingID.size() > 0) {
-            List<String> insertQueries = new ArrayList<>();
+    public static void syncIDs() {
+        syncIDCache();
 
-            for (String levelName : levelsMissingID) {
+        List<String> insertQueries = new ArrayList<>();
+
+        for (LevelObject levelObject : levels)
+            if (levelObject.getID() == -1) {
                 String query = "INSERT INTO levels " +
                         "(level_name)" +
                         " VALUES " +
-                        "('" + levelName + "')";
+                        "('" + levelObject.getName() + "')";
 
                 insertQueries.add(query);
             }
 
+
+        if (insertQueries.size() > 0) {
             String finalQuery = "";
             for (String sql : insertQueries)
                 finalQuery = finalQuery + sql + "; ";
 
             DatabaseManager.runQuery(finalQuery);
-            loadLevelIDs();
+            loadIDs();
+            syncIDs();
         }
     }
 
-    public static boolean exists(String levelName) {
-        return levelsMap.containsKey(levelName);
+    public static void loadLeaderboards() {
+        for (LevelObject levelObject : levels)
+            levelObject.loadLeaderboard();
     }
 
     public static void create(String levelName) {
         Levels_YAML.create(levelName);
     }
 
-    public static void remove(String levelName) {
-        if (exists(levelName))
-            Levels_YAML.remove(levelName);
-    }
+    public static List<String> getNames() {
+        List<String> names = new ArrayList<>();
 
-    public static List<String> getNames(){
-        return new ArrayList<>(levelsMap.keySet());
+        for (LevelObject levelObject : levels)
+            names.add(levelObject.getName());
+
+        return names;
     }
 
     public static Map<String, String> getNamesLower() {
@@ -102,23 +152,6 @@ public class LevelManager {
             levelNamesLower.put(levelName.toLowerCase(), levelName);
 
         return levelNamesLower;
-    }
-
-    public static String getName(int levelID) {
-        for (Map.Entry<String, Integer> entry : levelIDMap.entrySet()) {
-            if (entry.getValue() == levelID)
-                return entry.getKey();
-        }
-
-        return "";
-    }
-
-    public static int getID(String levelName) {
-        return levelIDMap.get(levelName);
-    }
-
-    public static LevelObject getLevel(String levelName) {
-        return levelsMap.get(levelName);
     }
 
 }

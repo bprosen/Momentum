@@ -5,6 +5,7 @@ public class LevelCompletion {
     private long timeOfCompletion;
     private long completionTimeElapsed; // time elapsed
     private boolean inDatabase;
+    private int playerID = -1;
 
     public LevelCompletion(long timeOfCompletion, long completionTimeElapsed, boolean inDatabase) {
         this.timeOfCompletion = timeOfCompletion;
@@ -29,6 +30,14 @@ public class LevelCompletion {
 
     public void enteredIntoDatabase() {
         inDatabase = true;
+    }
+
+    public void setPlayerID(int ID) {
+        playerID = ID;
+    }
+
+    public int getPlayerID() {
+        return playerID;
     }
 
 }

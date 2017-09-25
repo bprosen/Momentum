@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.data.stats;
 
 import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
@@ -100,21 +101,23 @@ public class PlayerStats {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
 
             for (Map<String, String> completionsResult : completionsResults) {
-                String levelName = LevelManager.getName(Integer.parseInt(completionsResult.get("level_id")));
+                LevelObject levelObject = LevelManager.get(Integer.parseInt(completionsResult.get("level_id")));
 
-                Date date;
-                try {
-                    date = dateFormat.parse(completionsResult.get("completion_date"));
-                } catch (Exception e) {
-                    continue;
+                if (levelObject != null) {
+                    Date date;
+                    try {
+                        date = dateFormat.parse(completionsResult.get("completion_date"));
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    levelCompletion(
+                            levelObject.getName(),
+                            date.getTime(),
+                            Long.parseLong(completionsResult.get("time_taken")),
+                            true
+                    );
                 }
-
-                levelCompletion(
-                        levelName,
-                        date.getTime(),
-                        Long.parseLong(completionsResult.get("time_taken")),
-                        true
-                );
             }
         }
     }
@@ -133,7 +136,7 @@ public class PlayerStats {
                         "(player_id, level_id, time_taken, completion_date)" +
                         " VALUES (" +
                         playerID + ", " +
-                        LevelManager.getID(levelStatsEntry.getKey()) + ", " +
+                        LevelManager.getIDFromCache(levelStatsEntry.getKey()) + ", " +
                         levelCompletion.getCompletionTimeElapsed() + ", " +
                         "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
                         ")"

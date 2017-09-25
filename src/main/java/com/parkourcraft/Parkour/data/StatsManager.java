@@ -1,54 +1,152 @@
 package com.parkourcraft.Parkour.data;
 
+import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class StatsManager {
 
-    private static Map<String, PlayerStats> playerStatsMap = new HashMap<>();
+    private static List<PlayerStats> playerStatsList = new ArrayList<>();
+    private static Map<Integer, String> playerIDtoNameCache = new HashMap<>();
 
-    public static void addPlayer(String UUID, String playerName) {
-        if (!playerStatsMap.containsKey(UUID))
-            playerStatsMap.put(UUID, new PlayerStats(UUID, playerName));
+    public static PlayerStats get(String UUID) {
+        for (PlayerStats playerStats : playerStatsList)
+            if (playerStats.getUUID().equals(UUID))
+                return playerStats;
+
+        return null;
     }
 
-    public static PlayerStats getPlayerStatsByPlayerName(String playerName) {
-        Player player = Bukkit.getPlayer(playerName);
-        if (player == null)
-            return null;
-        return getPlayerStats(player);
+    public static PlayerStats getByName(String playerName) {
+        for (PlayerStats playerStats : playerStatsList)
+            if (playerStats.getPlayerName().equals(playerName))
+                return playerStats;
+
+        return null;
     }
 
-    public static PlayerStats getPlayerStats(String UUID) {
-        return playerStatsMap.get(UUID);
+    public static PlayerStats get(Player player) {
+        return get(player.getUniqueId().toString());
     }
 
-    public static PlayerStats getPlayerStats(Player player) {
-        return playerStatsMap.get(player.getUniqueId().toString());
+    public static boolean exists(String UUID) {
+        if (get(UUID) != null)
+            return true;
+
+        return false;
     }
 
-    public static void updateOnlinePlayersInDatabase() {
-        Iterator<Map.Entry<String, PlayerStats>> iterator = playerStatsMap.entrySet().iterator();
+    public static void add(String UUID, String playerName) {
+        if (!exists(UUID))
+            playerStatsList.add(new PlayerStats(UUID, playerName));
+    }
 
-        while(iterator.hasNext()) {
-            Map.Entry<String, PlayerStats> entry = iterator.next();
-
-            entry.getValue().updateIntoDatabase();
-
-            if (Bukkit.getPlayer(UUID.fromString(entry.getValue().getUUID())) == null)
+    public static void remove(String UUID) {
+        for (Iterator<PlayerStats> iterator = playerStatsList.iterator(); iterator.hasNext();)
+            if (iterator.next().getUUID().equals(UUID))
                 iterator.remove();
+    }
+
+    public static void update(String UUID) {
+        PlayerStats playerStats = get(UUID);
+
+        if (playerStats != null)
+            playerStats.updateIntoDatabase();
+    }
+
+    public static void updateAll() {
+        List<String> removeList = new ArrayList<>();
+
+        for (PlayerStats playerStats : playerStatsList) {
+            playerStats.updateIntoDatabase();
+
+            if (Bukkit.getPlayer(UUID.fromString(playerStats.getUUID())) == null)
+                removeList.add(playerStats.getUUID());
+        }
+
+        for (String UUID : removeList)
+            remove(UUID);
+    }
+
+    public static void syncTotalCompletions() {
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                "completions",
+                "level_id, COUNT(*) AS total_completions",
+                "GROUP BY level_id"
+        );
+
+        for (Map<String, String> result : results) {
+            int levelID = Integer.parseInt(result.get("level_id"));
+            LevelObject levelObject = LevelManager.get(levelID);
+
+            if (levelObject != null)
+                levelObject.setTotalCompletionsCount(Integer.parseInt(result.get("total_completions")));
         }
     }
 
-    public static void updatePlayerInDatabase(String UUID) {
-        if (playerStatsMap.get(UUID) != null)
-            playerStatsMap.get(UUID).updateIntoDatabase();
+    public static void requiredID(int ID) {
+        if (!playerIDtoNameCache.containsKey(ID))
+            playerIDtoNameCache.put(ID, "");
     }
+
+    public static String getNameFromCache(int ID) {
+        if (playerIDtoNameCache.containsKey(ID))
+            return playerIDtoNameCache.get(ID);
+
+        return "";
+    }
+
+    public static void syncIDtoNameCache() {
+        List<String> unknownIDs = new ArrayList<>();
+
+        for (int ID : playerIDtoNameCache.keySet())
+            if (playerIDtoNameCache.get(ID).equals(""))
+                unknownIDs.add(Integer.toString(ID));
+
+
+        if (unknownIDs.size() > 0) {
+            String selection = String.join(", ", unknownIDs);
+
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "players",
+                    "player_id, player_name",
+                    "WHERE player_id IN (" + selection + ")"
+            );
+
+            for (Map<String, String> result : results)
+                playerIDtoNameCache.put(
+                        Integer.parseInt(result.get("player_id")),
+                        result.get("player_name")
+                );
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

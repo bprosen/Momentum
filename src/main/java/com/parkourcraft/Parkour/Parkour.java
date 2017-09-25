@@ -41,8 +41,8 @@ public class Parkour extends JavaPlugin {
         TableManager.setUp();
 
         LocationManager.loadLocations();
-        LevelManager.loadLevels();
-        LevelManager.loadLevelIDs();
+        LevelManager.loadAll();
+        LevelManager.loadIDs();
         MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup
@@ -55,7 +55,7 @@ public class Parkour extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        StatsManager.updateOnlinePlayersInDatabase();
+        StatsManager.updateAll();
 
         DatabaseConnection.close();
 
@@ -88,14 +88,23 @@ public class Parkour extends JavaPlugin {
         // sync player and level data from database (every 10 seconds)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
-                StatsManager.updateOnlinePlayersInDatabase();
+                StatsManager.updateAll();
             }
         }, 0L, 10L * 20L);
+
+        // load level leaderboards and sync the IDtoName cache (Every 1 minute)
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            public void run() {
+                StatsManager.syncTotalCompletions();
+                LevelManager.loadLeaderboards();
+                StatsManager.syncIDtoNameCache();
+            }
+        }, 10L, 60L * 20L);
 
         // runs the queries in the cache (every .2 seconds (5 times per second))
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
-                LevelManager.syncLevelIDs();
+                LevelManager.syncIDs();
                 DatabaseManager.runCaches();
             }
         }, 0L, 4L);

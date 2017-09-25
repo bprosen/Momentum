@@ -70,7 +70,7 @@ public class LevelListener implements Listener {
             String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 
             if (levelName != null) {
-                PlayerStats playerStats = StatsManager.getPlayerStats(event.getPlayer());
+                PlayerStats playerStats = StatsManager.get(event.getPlayer());
 
                 if (playerStats != null)
                     playerStats.startedLevel();
@@ -80,7 +80,7 @@ public class LevelListener implements Listener {
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
-        PlayerStats playerStats = StatsManager.getPlayerStats(event.getPlayer());
+        PlayerStats playerStats = StatsManager.get(event.getPlayer());
 
         if (playerStats != null)
             playerStats.disableLevelStartTime();

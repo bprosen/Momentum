@@ -37,7 +37,7 @@ public class Menu_CMD implements CommandExecutor {
 
                         if (MenuManager.exists(menuName)) {
                             Player player = ((Player) sender).getPlayer();
-                            PlayerStats playerStats = StatsManager.getPlayerStats(player);
+                            PlayerStats playerStats = StatsManager.get(player);
 
                             Inventory inventory = MenuManager.getInventory(menuName, pageNumber);
 

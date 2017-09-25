@@ -19,11 +19,11 @@ import java.util.Map;
 public class LevelHandler {
 
     public static void levelCompletion(Player player, String levelName) {
-        PlayerStats playerStats = StatsManager.getPlayerStats(player.getUniqueId().toString());
+        PlayerStats playerStats = StatsManager.get(player.getUniqueId().toString());
 
         if (playerStats != null
                 && LevelManager.exists(levelName)) {
-            LevelObject level = LevelManager.getLevel(levelName);
+            LevelObject level = LevelManager.get(levelName);
             Location respawnLocation = level.getRespawnLocation();
 
             if (respawnLocation != null) {
@@ -33,6 +33,8 @@ public class LevelHandler {
                         (System.currentTimeMillis() - playerStats.getLevelStartTime()),
                         false
                 );
+
+                level.addCompletion(); // totalLevelCompletionsCount
 
                 respawnPlayerToLobby(player);
 
@@ -88,7 +90,7 @@ public class LevelHandler {
 
     public static void respawnPlayerToStart(Player player, String levelName) {
         if (LevelManager.exists(levelName)) {
-            Location startLocation = LevelManager.getLevel(levelName).getStartLocation();
+            Location startLocation = LevelManager.get(levelName).getStartLocation();
 
             if (startLocation != null)
                 player.teleport(startLocation);

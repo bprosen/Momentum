@@ -1,13 +1,20 @@
 package com.parkourcraft.Parkour.data.levels;
 
+import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.LocationManager;
+import com.parkourcraft.Parkour.data.stats.LevelCompletion;
+import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class LevelObject {
 
-    private String levelName;
+    private String name;
     private String title;
     private int reward = 0;
     private Location startLocation;
@@ -15,44 +22,19 @@ public class LevelObject {
     private String message;
     private int maxCompletions;
     private boolean broadcastCompletion;
+    private int ID = -1;
+
+    private int totalCompletionsCount = -1;
+    private List<LevelCompletion> leaderboardCache = new ArrayList<>();
 
     public LevelObject(String levelName) {
-        this.levelName = levelName;
+        this.name = levelName;
 
         load();
     }
 
-    private void load() {
-        if (Levels_YAML.exists(levelName)) {
-
-            if (Levels_YAML.isSet(levelName, "title"))
-                title = Levels_YAML.getTitle(levelName);
-            else
-                title = levelName;
-
-            reward = Levels_YAML.getReward(levelName);
-
-            String startLocationName = levelName + "-spawn";
-            if (LocationManager.exists(startLocationName))
-                startLocation = LocationManager.get(startLocationName);
-            else
-                startLocation = LocationManager.get("spawn");
-
-            String respawnLocationName = levelName + "-completion";
-            if (LocationManager.exists(respawnLocationName))
-                respawnLocation = LocationManager.get(respawnLocationName);
-            else
-                respawnLocation = LocationManager.get("spawn");
-
-            if (Levels_YAML.isSet(levelName, "message"))
-                message = Levels_YAML.getMessage(levelName);
-            else
-                message = Settings_YAML.getLevelCompletionMessage();
-
-            maxCompletions = Levels_YAML.getMaxCompletions(levelName);
-
-            broadcastCompletion = Levels_YAML.getBroadcastSetting(levelName);
-        }
+    public String getName() {
+        return name;
     }
 
     public String getTitle() {
@@ -99,6 +81,97 @@ public class LevelObject {
 
     public boolean getBroadcastCompletion() {
         return broadcastCompletion;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setTotalCompletionsCount(int count) {
+        totalCompletionsCount = count;
+    }
+
+    public int getTotalCompletionsCount() {
+        return totalCompletionsCount;
+    }
+
+    public void addCompletion() {
+        if (totalCompletionsCount < 0)
+            totalCompletionsCount = 0;
+
+        totalCompletionsCount += 1;
+    }
+
+    private void load() {
+        if (Levels_YAML.exists(name)) {
+
+            if (Levels_YAML.isSet(name, "title"))
+                title = Levels_YAML.getTitle(name);
+            else
+                title = name;
+
+            reward = Levels_YAML.getReward(name);
+
+            String startLocationName = name + "-spawn";
+            if (LocationManager.exists(startLocationName))
+                startLocation = LocationManager.get(startLocationName);
+            else
+                startLocation = LocationManager.get("spawn");
+
+            String respawnLocationName = name + "-completion";
+            if (LocationManager.exists(respawnLocationName))
+                respawnLocation = LocationManager.get(respawnLocationName);
+            else
+                respawnLocation = LocationManager.get("spawn");
+
+            if (Levels_YAML.isSet(name, "message"))
+                message = Levels_YAML.getMessage(name);
+            else
+                message = Settings_YAML.getLevelCompletionMessage();
+
+            maxCompletions = Levels_YAML.getMaxCompletions(name);
+
+            broadcastCompletion = Levels_YAML.getBroadcastSetting(name);
+        }
+    }
+
+    public void loadLeaderboard() {
+        leaderboardCache = new ArrayList<>();
+
+        if (totalCompletionsCount != 0) {
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "completions",
+                    "player_id, time_taken, UNIX_TIMESTAMP(completion_date) AS date",
+                    "WHERE level_id=1 AND time_taken > 0 ORDER BY time_taken ASC LIMIT 10"
+            );
+
+            if (results.size() > 0) {
+                for (Map<String, String> result : results) {
+                    int playerID = Integer.parseInt(result.get("player_id"));
+
+                    StatsManager.requiredID(playerID);
+
+                    LevelCompletion levelCompletion =  new LevelCompletion(
+                            Long.parseLong(result.get("date")),
+                            Long.parseLong(result.get("time_taken")),
+                            true
+                    );
+
+                    levelCompletion.setPlayerID(playerID);
+
+                    leaderboardCache.add(levelCompletion);
+                }
+            } else
+                totalCompletionsCount = 0;
+        }
+    }
+
+    public List<LevelCompletion> getLeaderboard() {
+        return leaderboardCache;
     }
 
 }

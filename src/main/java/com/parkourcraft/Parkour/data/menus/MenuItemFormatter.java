@@ -30,7 +30,7 @@ public class MenuItemFormatter {
         String levelName = menuItem.getTypeValue();
 
         if (LevelManager.exists(levelName)) {
-            LevelObject level = LevelManager.getLevel(levelName);
+            LevelObject level = LevelManager.get(levelName);
 
             ItemMeta itemMeta = item.getItemMeta();
             List<String> itemLore = new ArrayList<>();
@@ -38,9 +38,13 @@ public class MenuItemFormatter {
             String formattedTitle = level.getFormattedTitle();
             itemMeta.setDisplayName(formattedTitle);
 
+
+
             itemLore.add(
                     ChatColor.GRAY + "Click to go to " +
-                            formattedTitle.replace(ChatColor.BOLD + "", "")
+                            formattedTitle
+                                    .replace(ChatColor.BOLD + "", "")
+                                    .replace(ChatColor.ITALIC + "", "")
             );
 
             itemLore.add("  " + ChatColor.GOLD + level.getReward() + " Coin " + ChatColor.GRAY + "Reward");

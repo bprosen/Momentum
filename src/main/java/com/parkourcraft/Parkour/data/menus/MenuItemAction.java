@@ -6,7 +6,6 @@ import com.parkourcraft.Parkour.data.MenuManager;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.listeners.LevelHandler;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,7 +18,7 @@ public class MenuItemAction {
         String itemType = menuItem.getType();
 
         if (itemType.equals("level")) {
-            LevelObject level = LevelManager.getLevel(menuItem.getTypeValue());
+            LevelObject level = LevelManager.get(menuItem.getTypeValue());
 
             player.closeInventory();
             player.teleport(level.getStartLocation());
@@ -43,7 +42,7 @@ public class MenuItemAction {
                 Inventory inventory = MenuManager.getInventory(menu.getName(), pageeNumber);
 
                 if (inventory != null) {
-                    PlayerStats playerStats = StatsManager.getPlayerStats(player);
+                    PlayerStats playerStats = StatsManager.get(player);
 
                     player.closeInventory();
                     player.openInventory(inventory);

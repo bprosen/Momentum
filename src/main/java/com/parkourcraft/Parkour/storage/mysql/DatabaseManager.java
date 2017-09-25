@@ -64,7 +64,7 @@ public class DatabaseManager {
             Map<String, String> cache = loadPlayersCache;
 
             for (String UUID : cache.keySet()) {
-                StatsManager.addPlayer(UUID, cache.get(UUID));
+                StatsManager.add(UUID, cache.get(UUID));
                 loadPlayersCache.remove(UUID);
             }
         } catch (Exception exception) {
@@ -79,7 +79,7 @@ public class DatabaseManager {
             List<String> cache = updatePlayersCache;
 
             for (String UUID : cache)
-                StatsManager.updatePlayerInDatabase(UUID);
+                StatsManager.update(UUID);
 
             updatePlayersCache.removeAll(cache); // removes all players that were updates
         } catch (Exception exception) {

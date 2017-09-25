@@ -85,8 +85,13 @@ public class Level_CMD implements CommandExecutor {
                         + ChatColor.GRAY + " from disk"
                 );
 
-                LevelManager.loadLevels();
-                sender.sendMessage(ChatColor.GRAY + "Loaded levels from " + ChatColor.GREEN + "levels.yml");
+                LevelManager.loadAll();
+                sender.sendMessage(
+                        ChatColor.GRAY + "Loaded levels from " + ChatColor.GREEN + "levels.yml"
+                        + ChatColor.GRAY + ", "
+                        + ChatColor.GREEN + LevelManager.getNames().size()
+                        + ChatColor.GRAY + " total"
+                );
             } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
                 if (a.length > 1) {
                     String levelName = a[1];
