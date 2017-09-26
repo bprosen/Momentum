@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.data.stats;
 
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
+import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
@@ -17,12 +18,13 @@ public class PlayerStats {
     private long levelStartTime = 0;
 
     private Map<String, LevelStats> levelStatsMap = new HashMap<>();
+    private Map<Integer, Long> perks = new HashMap<>();
 
     public PlayerStats(String UUID, String playerName) {
         this.UUID = UUID;
         this.playerName = playerName;
 
-        loadFromDatabase();
+        load();
     }
 
     public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed, boolean inDatabase) {
@@ -54,6 +56,10 @@ public class PlayerStats {
         return levelStartTime;
     }
 
+    public int getPlayerID() {
+        return playerID;
+    }
+
     public int getLevelCompletionsCount(String levelName) {
         if (levelStatsMap.containsKey(levelName))
             return levelStatsMap.get(levelName).getCompletionsCount();
@@ -73,7 +79,7 @@ public class PlayerStats {
         return levelStatsMap;
     }
 
-    public void loadFromDatabase() {
+    public void load() {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
                 "*",
@@ -87,39 +93,49 @@ public class PlayerStats {
                     "('" + UUID + "', '" + playerName + "')"
             );
 
-            loadFromDatabase();
+            load();
         } else {
             for (Map<String, String> playerResult : playerResults)
                 playerID = Integer.parseInt(playerResult.get("player_id"));
 
-            List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
-                    "completions",
-                    "*",
-                    "WHERE player_id=" + playerID + ""
-            );
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-
-            for (Map<String, String> completionsResult : completionsResults) {
-                LevelObject levelObject = LevelManager.get(Integer.parseInt(completionsResult.get("level_id")));
-
-                if (levelObject != null) {
-                    Date date;
-                    try {
-                        date = dateFormat.parse(completionsResult.get("completion_date"));
-                    } catch (Exception e) {
-                        continue;
-                    }
-
-                    levelCompletion(
-                            levelObject.getName(),
-                            date.getTime(),
-                            Long.parseLong(completionsResult.get("time_taken")),
-                            true
-                    );
-                }
-            }
+            loadCompletionsData();
+            loadPerksData();
         }
+
+    }
+
+    public void loadCompletionsData() {
+        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
+                "completions",
+                "level_id, time_taken, UNIX_TIMESTAMP(completion_date) AS date",
+                "WHERE player_id=" + playerID + ""
+        );
+
+        for (Map<String, String> completionsResult : completionsResults) {
+            LevelObject levelObject = LevelManager.get(Integer.parseInt(completionsResult.get("level_id")));
+
+            if (levelObject != null)
+                levelCompletion(
+                        levelObject.getName(),
+                        Long.parseLong(completionsResult.get("date")),
+                        Long.parseLong(completionsResult.get("time_taken")),
+                        true
+                );
+        }
+    }
+
+    public void loadPerksData() {
+        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
+                "ledger",
+                "perk_id, UNIX_TIMESTAMP(date) AS date",
+                "WHERE player_id=" + playerID + ""
+        );
+
+        for (Map<String, String> completionsResult : completionsResults)
+            perks.put(
+                    Integer.parseInt(completionsResult.get("perk_id")),
+                    Long.parseLong(completionsResult.get("date"))
+            );
     }
 
     public void updateIntoDatabase() {
@@ -147,5 +163,15 @@ public class PlayerStats {
             }
         }
     }
+
+    public void addPerk(int perkID, Long time) {
+        perks.put(perkID, time);
+    }
+
+    public boolean hasPerkID(int perkID) {
+        return perks.containsKey(perkID);
+    }
+
+
 
 }

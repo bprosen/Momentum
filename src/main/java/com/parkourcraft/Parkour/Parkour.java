@@ -1,12 +1,9 @@
 package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.*;
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.LocationManager;
+import com.parkourcraft.Parkour.data.*;
 import com.parkourcraft.Parkour.gameplay.JoinLeaveHandler;
 import com.parkourcraft.Parkour.gameplay.LevelListener;
-import com.parkourcraft.Parkour.data.MenuManager;
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.gameplay.MenuListener;
 import com.parkourcraft.Parkour.gameplay.Scoreboard;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
@@ -44,6 +41,8 @@ public class Parkour extends JavaPlugin {
         LocationManager.loadLocations();
         LevelManager.loadAll();
         LevelManager.loadIDs();
+        PerkManager.loadAll();
+        PerkManager.loadIDs();
         MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup
@@ -79,12 +78,19 @@ public class Parkour extends JavaPlugin {
     private void runScheduler() {
         BukkitScheduler scheduler = getServer().getScheduler();
 
-        // update open menus (every .5 seconds)
+        // update open menus every .5 seconds
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
                 MenuManager.updateOpenInventories();
             }
         }, 0L, 10L);
+
+        // update scoreboards every .2 seconds
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            public void run() {
+                Scoreboard.displayScoreboards();
+            }
+        }, 20L, 4L);
 
         // sync player and level data from database (every 10 seconds)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
@@ -93,19 +99,16 @@ public class Parkour extends JavaPlugin {
             }
         }, 0L, 10L * 20L);
 
-        // update scoreboards four times per second
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+        /*
+         * Asynchronously loads level ID's, leaderboards, and total
+         * number of completions from database and syncs the information
+         * interval: every 60 seconds
+         */
+        scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
-                Scoreboard.displayScoreboards();
-            }
-        }, 20L, 4L);
-
-        // load level leaderboards and sync the IDtoName cache (Every 1 minute)
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            public void run() {
-                StatsManager.syncTotalCompletions();
+                LevelManager.loadTotalCompletions();
                 LevelManager.loadLeaderboards();
-                StatsManager.syncIDtoNameCache();
+                StatsManager.loadIDtoNameCache();
             }
         }, 10L, 60L * 20L);
 
@@ -113,16 +116,10 @@ public class Parkour extends JavaPlugin {
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
                 LevelManager.syncIDs();
+                PerkManager.syncIDs();
                 DatabaseManager.runCaches();
             }
         }, 0L, 4L);
-
-        // keeps connection to the database alive (Every 2 minutes)
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            public void run() {
-                DatabaseManager.addUpdateQuery("SELECT * FROM players WHERE uuid='s'");
-            }
-        }, 1800L, 120L * 20L);
     }
 
     private void registerEvents() { // Register all of the gameplay

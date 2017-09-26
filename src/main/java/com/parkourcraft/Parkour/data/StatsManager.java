@@ -73,22 +73,6 @@ public class StatsManager {
             remove(UUID);
     }
 
-    public static void syncTotalCompletions() {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
-                "completions",
-                "level_id, COUNT(*) AS total_completions",
-                "GROUP BY level_id"
-        );
-
-        for (Map<String, String> result : results) {
-            int levelID = Integer.parseInt(result.get("level_id"));
-            LevelObject levelObject = LevelManager.get(levelID);
-
-            if (levelObject != null)
-                levelObject.setTotalCompletionsCount(Integer.parseInt(result.get("total_completions")));
-        }
-    }
-
     public static void requiredID(int ID) {
         if (!playerIDtoNameCache.containsKey(ID))
             playerIDtoNameCache.put(ID, "");
@@ -101,7 +85,7 @@ public class StatsManager {
         return "";
     }
 
-    public static void syncIDtoNameCache() {
+    public static void loadIDtoNameCache() {
         List<String> unknownIDs = new ArrayList<>();
 
         for (int ID : playerIDtoNameCache.keySet())

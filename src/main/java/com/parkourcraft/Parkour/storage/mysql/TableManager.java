@@ -17,6 +17,12 @@ public class TableManager {
         if (!tableNames.contains("levels"))
             createLevels();
 
+        if (!tableNames.contains("buyable_perks"))
+            createPerks();
+
+        if (!tableNames.contains("ledger"))
+            createLedger();
+
         if (!tableNames.contains("completions"))
             createCompletions();
     }
@@ -37,6 +43,26 @@ public class TableManager {
                 "level_id INT NOT NULL AUTO_INCREMENT, " +
                 "level_name VARCHAR(30) NOT NULL, " +
                 "PRIMARY KEY (level_id)" +
+                ")";
+
+        DatabaseManager.addUpdateQuery(sqlQuery);
+    }
+
+    private static void createPerks() {
+        String sqlQuery = "CREATE TABLE perks(" +
+                "perk_id INT NOT NULL AUTO_INCREMENT, " +
+                "perk_name VARCHAR(30) NOT NULL, " +
+                "PRIMARY KEY (perk_id)" +
+                ")";
+
+        DatabaseManager.addUpdateQuery(sqlQuery);
+    }
+
+    private static void createLedger() {
+        String sqlQuery = "CREATE TABLE ledger(" +
+                "player_id INT NOT NULL, " +
+                "perk_id INT NOT NULL, " +
+                "date TIMESTAMP NOT NULL" +
                 ")";
 
         DatabaseManager.addUpdateQuery(sqlQuery);

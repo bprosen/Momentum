@@ -10,7 +10,7 @@ public class FileLoader {
         add("levels");
         add("locations");
         add("menus");
-        add("rewards");
+        add("perks");
     }};
 
     public static void startUp() {

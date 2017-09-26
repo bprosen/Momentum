@@ -2,7 +2,6 @@ package com.parkourcraft.Parkour.data;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.Parkour.data.levels.Levels_YAML;
@@ -48,14 +47,19 @@ public class LevelManager {
     }
 
     public static void load(String levelName) {
+        boolean exists = exists(levelName);
+
         if (!Levels_YAML.exists(levelName)
-                && exists(levelName))
+                && exists)
             remove(levelName);
         else {
             LevelObject levelObject = new LevelObject(levelName);
 
             if (levelIDCache.containsKey(levelName))
                 levelObject.setID(levelIDCache.get(levelName));
+
+            if (exists)
+                remove(levelName);
 
             levels.add(levelObject);
         }
@@ -124,6 +128,22 @@ public class LevelManager {
             DatabaseManager.runQuery(finalQuery);
             loadIDs();
             syncIDs();
+        }
+    }
+
+    public static void loadTotalCompletions() {
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                "completions",
+                "level_id, COUNT(*) AS total_completions",
+                "GROUP BY level_id"
+        );
+
+        for (Map<String, String> result : results) {
+            int levelID = Integer.parseInt(result.get("level_id"));
+            LevelObject levelObject = LevelManager.get(levelID);
+
+            if (levelObject != null)
+                levelObject.setTotalCompletionsCount(Integer.parseInt(result.get("total_completions")));
         }
     }
 

@@ -1,7 +1,7 @@
 # Reward data yaml
 
-example_reward:
-  title: "&aExample Reward"
+example_perk:
+  title: "&aExample Perk"
   permissions:
     - example.permission
   requirements:
