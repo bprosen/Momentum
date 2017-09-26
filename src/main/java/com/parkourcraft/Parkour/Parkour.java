@@ -3,16 +3,16 @@ package com.parkourcraft.Parkour;
 import com.parkourcraft.Parkour.commands.*;
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.listeners.JoinLeaveHandler;
-import com.parkourcraft.Parkour.listeners.LevelListener;
+import com.parkourcraft.Parkour.gameplay.JoinLeaveHandler;
+import com.parkourcraft.Parkour.gameplay.LevelListener;
 import com.parkourcraft.Parkour.data.MenuManager;
 import com.parkourcraft.Parkour.data.StatsManager;
-import com.parkourcraft.Parkour.listeners.MenuListener;
+import com.parkourcraft.Parkour.gameplay.MenuListener;
+import com.parkourcraft.Parkour.gameplay.Scoreboard;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.TableManager;
-import com.parkourcraft.Parkour.utils.dependencies.FeatherboardPlaceholders;
 import com.parkourcraft.Parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -45,8 +45,6 @@ public class Parkour extends JavaPlugin {
         LevelManager.loadAll();
         LevelManager.loadIDs();
         MenuManager.loadMenus();
-
-        FeatherboardPlaceholders.registerPlaceholders();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
@@ -95,6 +93,13 @@ public class Parkour extends JavaPlugin {
             }
         }, 0L, 10L * 20L);
 
+        // update scoreboards four times per second
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            public void run() {
+                Scoreboard.displayScoreboards();
+            }
+        }, 20L, 4L);
+
         // load level leaderboards and sync the IDtoName cache (Every 1 minute)
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
@@ -120,7 +125,7 @@ public class Parkour extends JavaPlugin {
         }, 1800L, 120L * 20L);
     }
 
-    private void registerEvents() { // Register all of the listeners
+    private void registerEvents() { // Register all of the gameplay
         PluginManager pluginManager = getServer().getPluginManager();
 
         pluginManager.registerEvents(new LevelListener(), this);

@@ -1,6 +1,5 @@
-package com.parkourcraft.Parkour.listeners;
+package com.parkourcraft.Parkour.gameplay;
 
-import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.local.FileManager;

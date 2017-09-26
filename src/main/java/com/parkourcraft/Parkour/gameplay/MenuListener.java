@@ -1,4 +1,4 @@
-package com.parkourcraft.Parkour.listeners;
+package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.data.MenuManager;
 import com.parkourcraft.Parkour.data.StatsManager;

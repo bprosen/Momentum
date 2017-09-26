@@ -1,4 +1,4 @@
-package com.parkourcraft.Parkour.listeners;
+package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
@@ -7,7 +7,6 @@ import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.utils.Time;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
 import com.parkourcraft.Parkour.data.LocationManager;
 import org.bukkit.Bukkit;

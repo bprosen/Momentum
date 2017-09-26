@@ -1,4 +1,4 @@
-package com.parkourcraft.Parkour.listeners;
+package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.data.RewardManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
