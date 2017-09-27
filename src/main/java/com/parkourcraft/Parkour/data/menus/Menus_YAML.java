@@ -134,6 +134,16 @@ public class Menus_YAML {
         return new ArrayList<>();
     }
 
+    public static String getItemTitle(String menuName, int pageNumber, int itemSlot) {
+        String itemPath = pageNumber + "." + itemSlot + ".item";
+
+        if (isSet(menuName, itemPath + ".title"))
+            return menusConfig.getString(menuName + "." + itemPath + ".title");
+
+        return "";
+
+    }
+
     public static ItemStack getItem(String menuName, int pageNumber, int itemSlot) {
         String title = "";
         Material material = Material.STAINED_GLASS_PANE;

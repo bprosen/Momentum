@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.data.menus;
 
 import com.parkourcraft.Parkour.utils.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ public class MenuItem {
 
     private int slot;
     private ItemStack item;
+    private String title;
     private String type;
     private String typeValue;
     private List<String> lore;
@@ -24,6 +26,7 @@ public class MenuItem {
 
     private void load(Menu menu, MenuPage menuPage) {
         item = Menus_YAML.getItem(menu.getName(), menuPage.getPageNumber(), slot);
+        title = Menus_YAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), slot);
         type = Menus_YAML.getItemType(menu.getName(), menuPage.getPageNumber(), slot);
         typeValue = Menus_YAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
         lore = Menus_YAML.getItemLore(menu.getName(), menuPage.getPageNumber(), slot);
@@ -45,6 +48,10 @@ public class MenuItem {
 
     public String getTypeValue() {
         return typeValue;
+    }
+
+    public String getFormattedTitle() {
+        return ChatColor.translateAlternateColorCodes('&', title);
     }
 
     public List<String> getFormattedLore() {

@@ -58,7 +58,8 @@ public class MenuManager {
     public static Menu getMenuFromSelectItem(ItemStack item) {
         if (item != null)
             for (Menu menu : menuMap.values())
-                if (menu.getSelectItem().getType().equals(item.getType()))
+                if (menu.getSelectItem() != null
+                        && menu.getSelectItem().getType().equals(item.getType()))
                     return menu;
 
         return null;

@@ -40,38 +40,10 @@ public class MenuItemFormatter {
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
-            boolean commands = menuItem.getCommands().size() > 0 || menuItem.getConsoleCommands().size() > 0;
-
-            // Level Requirements, Price in Coins, and Perk Required Section
-            if (!commands) {
-                // Item Title Section
-                String formattedTitle = perk.getFormattedTitle();
-                itemMeta.setDisplayName(formattedTitle);
-
-                // Level Requirements Section
-                List<String> requirements = perk.getRequirements();
-                if (requirements.size() > 0) {
-                    itemLore.add("");
-                    itemLore.add(ChatColor.GRAY + "Level Requirements");
-
-                    for (String requirement : requirements) {
-                        LevelObject level = LevelManager.get(requirement);
-
-                        if (level != null)
-                            itemLore.add(ChatColor.GRAY + " - " + level.getFormattedTitle());
-                    }
-                }
-
-                // Price in Coins Section
-                if (perk.getPrice() > 0) {
-                    itemLore.add("");
-                    itemLore.add(
-                            ChatColor.YELLOW + "Price "
-                                    + ChatColor.GOLD + perk.getPrice() + ChatColor.BOLD + " Coins"
-                    );
-                }
-            } else {
-                // Perk Required Seciton
+            // Item Name Seciton (If not Perk Name, include Required Perk)
+            if (menuItem.getFormattedTitle().equals(""))
+                itemMeta.setDisplayName(perk.getFormattedTitle());
+            else {
                 itemLore.add("");
                 itemLore.add(ChatColor.GRAY + "Perk Required: " + perk.getFormattedTitle());
             }
@@ -80,27 +52,48 @@ public class MenuItemFormatter {
             itemLore.add("");
             if (perk.hasRequirements(playerStats))
                 itemLore.add(ChatColor.GREEN + "You own this perk");
-            else
+            else {
                 itemLore.add(ChatColor.RED + "You do not own this perk");
 
-            // Click to Buy Section (if no commands are set)
-            if (!commands
-                    && perk.getPrice() > 0) {
-                int playerBalance = (int) Parkour.economy.getBalance(player);
+                // Click to Buy Section
+                if (perk.getPrice() > 0) {
+                    int playerBalance = (int) Parkour.economy.getBalance(player);
 
-                if (playerBalance > perk.getPrice())
-                    itemLore.add(ChatColor.GRAY + "  Click to buy ");
-                else {
-                    int requiredCoins = perk.getPrice() - playerBalance;
+                    if (playerBalance > perk.getPrice())
+                        itemLore.add(ChatColor.GRAY + "  Click to buy ");
+                    else {
+                        int requiredCoins = perk.getPrice() - playerBalance;
 
-                    itemLore.add(
-                            ChatColor.GRAY + "  Requires "
-                            + ChatColor.GOLD + "" + requiredCoins
-                            + ChatColor.GRAY + " more "
-                            + ChatColor.GOLD + "Coins"
-                    );
+                        itemLore.add(
+                                ChatColor.GRAY + "  Requires "
+                                        + ChatColor.GOLD + "" + requiredCoins
+                                        + ChatColor.GRAY + " more "
+                                        + ChatColor.GOLD + "Coins"
+                        );
+                    }
                 }
 
+            }
+
+            // Level Requirements Section
+            List<String> requirements = perk.getRequirements();
+            if (requirements.size() > 0
+                    || perk.getPrice() > 0) {
+                itemLore.add("");
+                itemLore.add(ChatColor.GRAY + "Perk Requirements");
+
+                for (String requirement : requirements) {
+                    LevelObject level = LevelManager.get(requirement);
+
+                    if (level != null)
+                        itemLore.add(ChatColor.GRAY + " - " + level.getFormattedTitle());
+                }
+
+                if (perk.getPrice() > 0)
+                    itemLore.add(
+                            ChatColor.GRAY + " - Pay "
+                                    + ChatColor.GOLD + perk.getPrice() + " Coins"
+                    );
             }
 
             // Sections Over

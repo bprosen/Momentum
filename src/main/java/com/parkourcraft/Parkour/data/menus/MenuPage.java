@@ -51,6 +51,10 @@ public class MenuPage {
         return rowCount;
     }
 
+    public MenuItem getMenuItem(int slot) {
+        return pageItemsMap.get(slot);
+    }
+
     public MenuItem getMenuItemFromTitle(String itemTitle) {
         for (MenuItem menuItem : pageItemsMap.values()) {
             if (menuItem.getItem().getItemMeta().getDisplayName().equals(itemTitle))

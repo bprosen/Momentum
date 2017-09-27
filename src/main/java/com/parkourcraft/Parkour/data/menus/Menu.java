@@ -92,4 +92,11 @@ public class Menu {
         return null;
     }
 
+    public MenuItem getMenuItem(int pageNumber, int slot) {
+        if (pageMap.containsKey(pageNumber))
+            return pageMap.get(pageNumber).getMenuItem(slot);
+
+        return null;
+    }
+
 }

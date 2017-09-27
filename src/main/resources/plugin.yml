@@ -21,3 +21,5 @@ commands:
     aliases: [perk]
   stats:
     description: "PC-Parkour stats display"
+  setarmor:
+    description: "PC-Parkour armor setting command"

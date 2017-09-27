@@ -25,9 +25,9 @@ public class MenuListener implements Listener {
             if (event.getCurrentItem() != null
                     && event.getCurrentItem().getType() != Material.AIR
                     && event.getCurrentItem().getItemMeta().getDisplayName() != null) {
-                MenuItem menuItem = menu.getMenuItemFromTitle(
+                MenuItem menuItem = menu.getMenuItem(
                         Utils.getTrailingInt(event.getInventory().getTitle()),
-                        event.getCurrentItem().getItemMeta().getDisplayName()
+                        event.getSlot()
                 );
 
                 if (menuItem != null)
