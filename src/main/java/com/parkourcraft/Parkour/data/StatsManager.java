@@ -1,10 +1,8 @@
 package com.parkourcraft.Parkour.data;
 
-import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -41,9 +39,15 @@ public class StatsManager {
         return false;
     }
 
-    public static void add(String UUID, String playerName) {
-        if (!exists(UUID))
-            playerStatsList.add(new PlayerStats(UUID, playerName));
+    public static void add(Player player) {
+        if (!exists(player.getUniqueId().toString())) {
+            playerStatsList.add(new PlayerStats(
+                    player.getUniqueId().toString(),
+                    player.getName()
+                    ));
+
+            PerkManager.syncPermissions(player);
+        }
     }
 
     public static void remove(String UUID) {
@@ -109,28 +113,5 @@ public class StatsManager {
                 );
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

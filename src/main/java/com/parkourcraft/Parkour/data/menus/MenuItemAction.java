@@ -1,10 +1,9 @@
 package com.parkourcraft.Parkour.data.menus;
 
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.data.MenuManager;
-import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.Parkour;
+import com.parkourcraft.Parkour.data.*;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
+import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
@@ -26,6 +25,24 @@ public class MenuItemAction {
                     ChatColor.GRAY + "You were teleported to the beginning of "
                             + level.getFormattedTitle()
             );
+        } else if (itemType.equals("perk")) {
+            Perk perk = PerkManager.get(menuItem.getTypeValue());
+
+            if (perk != null) {
+                PlayerStats playerStas = StatsManager.get(player);
+
+                if (!playerStas.hasPerkID(perk.getID())
+                        && perk.getPrice() > 0) {
+                    int playerBalance = (int) Parkour.economy.getBalance(player);
+
+                    if (playerBalance > perk.getPrice()) {
+                        Parkour.economy.withdrawPlayer(player, perk.getPrice());
+                        PerkManager.bought(playerStas, perk);
+                        MenuManager.updateInventory(player, player.getOpenInventory());
+                    }
+                }
+            }
+
         } else if (itemType.equals("teleport")) {
             Location location = LocationManager.get(menuItem.getTypeValue());
 
@@ -42,11 +59,9 @@ public class MenuItemAction {
                 Inventory inventory = MenuManager.getInventory(menu.getName(), pageeNumber);
 
                 if (inventory != null) {
-                    PlayerStats playerStats = StatsManager.get(player);
-
                     player.closeInventory();
                     player.openInventory(inventory);
-                    MenuManager.updateInventory(playerStats, player.getOpenInventory(), menu.getName());
+                    MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName());
                 }
             }
         }

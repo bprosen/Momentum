@@ -43,7 +43,7 @@ public class Menu_CMD implements CommandExecutor {
 
                             if (inventory != null) {
                                 player.openInventory(inventory);
-                                MenuManager.updateInventory(playerStats, player.getOpenInventory(), menuName);
+                                MenuManager.updateInventory(player, player.getOpenInventory(), menuName);
                             } else
                                 sender.sendMessage(ChatColor.RED + "Error loading the inventory");
                         } else

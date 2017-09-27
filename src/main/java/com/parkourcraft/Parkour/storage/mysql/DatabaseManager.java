@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.StatsManager;
+import org.bukkit.entity.Player;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -12,7 +13,7 @@ public class DatabaseManager {
     private static boolean runningCaches = false;
 
     private static List<String> databaseQuriesCache = new ArrayList<>();
-    private static Map<String, String> loadPlayersCache = new HashMap<>();
+    private static List<Player>loadPlayersCache = new ArrayList<>();
     private static List<String> updatePlayersCache = new ArrayList<>();
 
     // order: runUpdateQueries, loadPlayersCache, updatePlayersCache
@@ -45,7 +46,7 @@ public class DatabaseManager {
         try {
             String finalQuery = "";
 
-            List<String> cache = databaseQuriesCache;
+            List<String> cache = new ArrayList<>(databaseQuriesCache);
 
             for (String sql : cache)
                 finalQuery = finalQuery + sql + "; ";
@@ -61,11 +62,11 @@ public class DatabaseManager {
 
     private static void runLoadPlayersCache() {
         try {
-            Map<String, String> cache = loadPlayersCache;
+            List<Player> cache = new ArrayList<>(loadPlayersCache);
 
-            for (String UUID : cache.keySet()) {
-                StatsManager.add(UUID, cache.get(UUID));
-                loadPlayersCache.remove(UUID);
+            for (Player player : cache) {
+                StatsManager.add(player);
+                loadPlayersCache.remove(player);
             }
         } catch (Exception exception) {
             Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runLoadPlayersCache()");
@@ -76,7 +77,7 @@ public class DatabaseManager {
 
     private static void runUpdatePlayersCache() {
         try {
-            List<String> cache = updatePlayersCache;
+            List<String> cache = new ArrayList<>(updatePlayersCache);
 
             for (String UUID : cache)
                 StatsManager.update(UUID);
@@ -92,8 +93,8 @@ public class DatabaseManager {
     /* LoadPlayersCache
     This cache is responsible for loading information for players who have just joined
     */
-    public static void addToLoadPlayersCache(String UUID, String playerName) {
-        loadPlayersCache.put(UUID, playerName);
+    public static void addToLoadPlayersCache(Player player) {
+        loadPlayersCache.add(player);
     }
 
     /* UpdatePlayersCache

@@ -1,11 +1,9 @@
 package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.data.MenuManager;
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.menus.Menu;
 import com.parkourcraft.Parkour.data.menus.MenuItem;
 import com.parkourcraft.Parkour.data.menus.MenuItemAction;
-import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -49,10 +47,8 @@ public class MenuListener implements Listener {
             Menu menu = MenuManager.getMenuFromSelectItem(player.getInventory().getItemInMainHand());
 
             if (menu != null) {
-                PlayerStats playerStats = StatsManager.get(player);
-
                 player.openInventory(MenuManager.getInventory(menu.getName(), 1));
-                MenuManager.updateInventory(playerStats, player.getOpenInventory(), menu.getName());
+                MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName());
             }
         }
 

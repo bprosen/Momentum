@@ -9,7 +9,7 @@ database:
 
 levels:
   message:
-    completion: "&7Rewarded &6%reward% &7coins for beating %title% &2(&a#%completions%&2)"
+    completion: "&7Rewarded &6%reward% Coins &7for beating %title% &7in &a%time% &2(&a#%completions%&2)"
     broadcast: "&a%player% &7has beaten %title%"
 
 # It will check if that line contains 'Click Here', or whatever is defined

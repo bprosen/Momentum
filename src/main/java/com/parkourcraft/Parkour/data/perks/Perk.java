@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.data.perks;
 
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import org.bukkit.ChatColor;
 
 import java.util.List;
@@ -68,7 +67,7 @@ public class Perk {
             if (playerStats.getLevelCompletionsCount(levelRequirement) < 1)
                 return false;
 
-        if (ID > 0)
+        if (price > 0)
             if (!playerStats.hasPerkID(ID))
                 return false;
 

@@ -17,7 +17,7 @@ public class TableManager {
         if (!tableNames.contains("levels"))
             createLevels();
 
-        if (!tableNames.contains("buyable_perks"))
+        if (!tableNames.contains("perks"))
             createPerks();
 
         if (!tableNames.contains("ledger"))

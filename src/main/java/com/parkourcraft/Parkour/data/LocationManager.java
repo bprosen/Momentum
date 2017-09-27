@@ -30,7 +30,7 @@ public class LocationManager {
         for (String locationName : Locations_YAML.getNames())
             load(locationName);
 
-        Parkour.getPluginLogger().info("Loaded " + locationsMap.size() + " locations");
+        Parkour.getPluginLogger().info("Locations loaded: " + locationsMap.size());
     }
 
     public static Location get(String locationName) {

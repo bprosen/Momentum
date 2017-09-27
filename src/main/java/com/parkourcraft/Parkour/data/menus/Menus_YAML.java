@@ -77,6 +77,8 @@ public class Menus_YAML {
 
         if (isSet(menuName, itemPath + ".level"))
             return "level";
+        if (isSet(menuName, itemPath + ".perk"))
+            return "perk";
         if (isSet(menuName, itemPath + ".teleport"))
             return "teleport";
         if (isSet(menuName, itemPath + ".open"))
@@ -90,6 +92,8 @@ public class Menus_YAML {
 
         if (isSet(menuName, itemPath + ".level"))
             return menusConfig.getString(menuName + "." + itemPath + ".level");
+        if (isSet(menuName, itemPath + ".perk"))
+            return menusConfig.getString(menuName + "." + itemPath + ".perk");
         if (isSet(menuName, itemPath + ".teleport"))
             return menusConfig.getString(menuName + "." + itemPath + ".teleport");
         if (isSet(menuName, itemPath + ".open"))
@@ -98,8 +102,18 @@ public class Menus_YAML {
         return "";
     }
 
+
     public static boolean hasItem(String menuName, int pageNumber, int itemSlot) {
         return isSet(menuName, pageNumber + "." + itemSlot);
+    }
+
+    public static List<String> getItemLore(String menuName, int pageNumber, int itemSlot) {
+        String itemPath = pageNumber + "." + itemSlot + ".item";
+
+        if (isSet(menuName, itemPath + ".lore"))
+            return menusConfig.getStringList(menuName + "." + itemPath + ".lore");
+
+        return new ArrayList<>();
     }
 
     public static ItemStack getItem(String menuName, int pageNumber, int itemSlot) {
@@ -128,10 +142,7 @@ public class Menus_YAML {
             if (isSet(menuName, itemPath + ".size"))
                 size = menusConfig.getInt(menuName + "." + itemPath + ".size");
 
-            if (isSet(menuName, itemPath + ".lore")) {
-                lore = menusConfig.getStringList(menuName + "." + itemPath + ".lore");
-                lore = Utils.formatLore(lore);
-            }
+            lore = Utils.formatLore(getItemLore(menuName, pageNumber, itemSlot));
         }
 
         ItemStack item = new ItemStack(material, size, (byte) type);

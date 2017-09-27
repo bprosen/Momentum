@@ -2,8 +2,10 @@ package com.parkourcraft.Parkour.data.menus;
 
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.MenuManager;
+import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
 import java.util.HashMap;
@@ -32,9 +34,13 @@ public class MenuPage {
         }
     }
 
-    void formatInventory(PlayerStats playerStats, InventoryView inventory) {
+    void formatInventory(Player player, InventoryView inventory) {
         for (MenuItem menuItem : pageItemsMap.values())
-            inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(playerStats, menuItem));
+            inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(
+                    player,
+                    StatsManager.get(player),
+                    menuItem)
+            );
     }
 
     int getPageNumber() {

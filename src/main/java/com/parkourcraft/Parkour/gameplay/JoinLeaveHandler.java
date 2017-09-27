@@ -1,6 +1,6 @@
 package com.parkourcraft.Parkour.gameplay;
 
-import com.parkourcraft.Parkour.data.PerkManager;
+import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,10 +14,10 @@ public class JoinLeaveHandler implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         // Add to playerStats map (Async)
-        DatabaseManager.addToLoadPlayersCache(event.getPlayer().getUniqueId().toString(), event.getPlayer().getName());
+        DatabaseManager.addToLoadPlayersCache(event.getPlayer());
 
-        // Sync permissions based on rewards
-        PerkManager.syncPermissions(event.getPlayer());
+        if (!event.getPlayer().isOp())
+        LocationManager.teleport(event.getPlayer(), "spawn");
     }
 
     @EventHandler

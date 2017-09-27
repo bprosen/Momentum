@@ -48,8 +48,16 @@ public class LevelHandler {
 
                 if (elapsedTime > 0L
                         && elapsedTime < 8388607L)
-                    messageFormatted += ChatColor.GRAY + " in " + ChatColor.GREEN +
-                            (((double) elapsedTime) / 1000) + "s";
+                    messageFormatted = messageFormatted.replace(
+                            "%time%",
+                            (((double) elapsedTime) / 1000) + "s"
+                    );
+                else
+                    messageFormatted = messageFormatted.replace(
+                            "%time%",
+                            "-"
+                    );
+
 
                 player.sendMessage(messageFormatted);
 

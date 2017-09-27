@@ -1,6 +1,10 @@
 package com.parkourcraft.Parkour.data.menus;
 
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuItem {
 
@@ -8,6 +12,7 @@ public class MenuItem {
     private ItemStack item;
     private String type;
     private String typeValue;
+    private List<String> lore;
 
     MenuItem(Menu menu, MenuPage menuPage, int slot) {
         this.slot = slot;
@@ -19,6 +24,7 @@ public class MenuItem {
         item = Menus_YAML.getItem(menu.getName(), menuPage.getPageNumber(), slot);
         type = Menus_YAML.getItemType(menu.getName(), menuPage.getPageNumber(), slot);
         typeValue = Menus_YAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
+        lore = Menus_YAML.getItemLore(menu.getName(), menuPage.getPageNumber(), slot);
     }
 
     public int getSlot() {
@@ -35,6 +41,10 @@ public class MenuItem {
 
     public String getTypeValue() {
         return typeValue;
+    }
+
+    public List<String> getFormattedLore() {
+        return Utils.formatLore(lore);
     }
 
 }

@@ -117,7 +117,7 @@ public class PlayerStats {
             if (levelObject != null)
                 levelCompletion(
                         levelObject.getName(),
-                        Long.parseLong(completionsResult.get("date")),
+                        (Long.parseLong(completionsResult.get("date")) * 1000),
                         Long.parseLong(completionsResult.get("time_taken")),
                         true
                 );

@@ -50,14 +50,14 @@ public class Scoreboard {
                 + ChatColor.WHITE + ChatColor.BOLD + "Craft"
         );
 
-        board.add("");
+        board.add(formatSpacing(ChatColor.GRAY + "---"));
 
         String coinBalance =
                 ChatColor.GOLD +  Integer.toString((int) Parkour.economy.getBalance(player))
                 + ChatColor.YELLOW + ChatColor.BOLD + " Coins";
         board.add(formatSpacing(coinBalance));
 
-        board.add("");
+        board.add(formatSpacing(ChatColor.GRAY + "---"));
 
         if (level != null) {
             PlayerStats playerStats = StatsManager.get(player);

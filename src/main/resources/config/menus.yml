@@ -1,5 +1,5 @@
 # Official Material List https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
-# Item type check level->teleport->open
+# Item type check level->perk->teleport->open
 
 ore_levels:
   settings:

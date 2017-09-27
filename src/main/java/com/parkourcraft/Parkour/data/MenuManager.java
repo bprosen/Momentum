@@ -75,16 +75,16 @@ public class MenuManager {
         return null;
     }
 
-    public static void updateInventory(PlayerStats playerStats, InventoryView inventory) {
+    public static void updateInventory(Player player, InventoryView inventory) {
         Menu menu = getMenuFromTitle(inventory.getTitle());
 
         if (menu != null)
-            menu.updateInventory(playerStats, inventory, Utils.getTrailingInt(inventory.getTitle()));
+            menu.updateInventory(player, inventory, Utils.getTrailingInt(inventory.getTitle()));
     }
 
-    public static void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName) {
+    public static void updateInventory(Player player, InventoryView inventory, String menuName) {
         if (exists(menuName))
-            menuMap.get(menuName).updateInventory(playerStats, inventory, 1);
+            menuMap.get(menuName).updateInventory(player, inventory, 1);
     }
 
     public static void updateOpenInventories() {
@@ -94,10 +94,11 @@ public class MenuManager {
             if (inventoryView != null) {
                 Menu menu = getMenuFromTitle(inventoryView.getTitle());
 
-                if (menu != null) {
+                if (menu != null
+                        && menu.isUpdating()) {
                     PlayerStats playerStats = StatsManager.get(player);
 
-                    updateInventory(playerStats, inventoryView, menu.getName());
+                    updateInventory(player, inventoryView, menu.getName());
                 }
             }
 

@@ -6,6 +6,7 @@ import com.parkourcraft.Parkour.data.perks.Perks_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -71,6 +72,11 @@ public class PerkManager {
             for (String permission : perk.getPermissions())
                 player.addAttachment(Parkour.getPlugin(), permission, hasRequirements);
         }
+    }
+
+    public static void syncPermissions() {
+        for (Player player : Bukkit.getOnlinePlayers())
+            syncPermissions(player);
     }
 
     public static void bought(PlayerStats playerStats, Perk perk) {
