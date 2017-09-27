@@ -107,6 +107,24 @@ public class Menus_YAML {
         return isSet(menuName, pageNumber + "." + itemSlot);
     }
 
+    public static List<String> getCommands(String menuName, int pageNumber, int itemSlot) {
+        String itemPath = pageNumber + "." + itemSlot;
+
+        if (isSet(menuName, itemPath + ".commands"))
+            return menusConfig.getStringList(menuName + "." + itemPath + ".commands");
+
+        return new ArrayList<>();
+    }
+
+    public static List<String> getConsoleCommands(String menuName, int pageNumber, int itemSlot) {
+        String itemPath = pageNumber + "." + itemSlot;
+
+        if (isSet(menuName, itemPath + ".console_commands"))
+            return menusConfig.getStringList(menuName + "." + itemPath + ".console_commands");
+
+        return new ArrayList<>();
+    }
+
     public static List<String> getItemLore(String menuName, int pageNumber, int itemSlot) {
         String itemPath = pageNumber + "." + itemSlot + ".item";
 

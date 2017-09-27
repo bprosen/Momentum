@@ -30,62 +30,80 @@ public class MenuItemFormatter {
     }
 
     private static ItemStack getPerk(Player player, PlayerStats playerStats, MenuItem menuItem) {
-        ItemStack item = menuItem.getItem();
+        ItemStack item = new ItemStack(menuItem.getItem());
         String perkName = menuItem.getTypeValue();
         Perk perk = PerkManager.get(perkName);
 
         if (perk != null) {
             ItemMeta itemMeta = item.getItemMeta();
+
+            // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
-            String formattedTitle = perk.getFormattedTitle();
-            itemMeta.setDisplayName(formattedTitle);
+            boolean commands = menuItem.getCommands().size() > 0 || menuItem.getConsoleCommands().size() > 0;
 
-            List<String> requirements = perk.getRequirements();
-            if (requirements.size() > 0) {
-                itemLore.add("");
-                itemLore.add(ChatColor.GRAY + "Level Requirements");
+            // Level Requirements, Price in Coins, and Perk Required Section
+            if (!commands) {
+                // Item Title Section
+                String formattedTitle = perk.getFormattedTitle();
+                itemMeta.setDisplayName(formattedTitle);
 
-                for (String requirement : requirements) {
-                    LevelObject level = LevelManager.get(requirement);
+                // Level Requirements Section
+                List<String> requirements = perk.getRequirements();
+                if (requirements.size() > 0) {
+                    itemLore.add("");
+                    itemLore.add(ChatColor.GRAY + "Level Requirements");
 
-                    if (level!=null)
-                        itemLore.add(ChatColor.GRAY + " - " + level.getFormattedTitle());
+                    for (String requirement : requirements) {
+                        LevelObject level = LevelManager.get(requirement);
+
+                        if (level != null)
+                            itemLore.add(ChatColor.GRAY + " - " + level.getFormattedTitle());
+                    }
                 }
-            }
 
-            if (perk.getPrice() > 0) {
+                // Price in Coins Section
+                if (perk.getPrice() > 0) {
+                    itemLore.add("");
+                    itemLore.add(
+                            ChatColor.YELLOW + "Price "
+                                    + ChatColor.GOLD + perk.getPrice() + ChatColor.BOLD + " Coins"
+                    );
+                }
+            } else {
+                // Perk Required Seciton
                 itemLore.add("");
-                itemLore.add(
-                        ChatColor.YELLOW + "Price "
-                        + ChatColor.GOLD + perk.getPrice() + ChatColor.BOLD + " Coins"
-                );
+                itemLore.add(ChatColor.GRAY + "Perk Required: " + perk.getFormattedTitle());
             }
 
+            // Ownership Status Section
             itemLore.add("");
             if (perk.hasRequirements(playerStats))
                 itemLore.add(ChatColor.GREEN + "You own this perk");
-            else {
+            else
                 itemLore.add(ChatColor.RED + "You do not own this perk");
 
-                if (perk.getPrice() > 0) {
-                    int playerBalance = (int) Parkour.economy.getBalance(player);
+            // Click to Buy Section (if no commands are set)
+            if (!commands
+                    && perk.getPrice() > 0) {
+                int playerBalance = (int) Parkour.economy.getBalance(player);
 
-                    if (playerBalance > perk.getPrice())
-                        itemLore.add(ChatColor.GRAY + "  Click to buy ");
-                    else {
-                        int requiredCoins = perk.getPrice() - playerBalance;
+                if (playerBalance > perk.getPrice())
+                    itemLore.add(ChatColor.GRAY + "  Click to buy ");
+                else {
+                    int requiredCoins = perk.getPrice() - playerBalance;
 
-                        itemLore.add(
-                                ChatColor.GRAY + "  Requires "
-                                + ChatColor.GOLD + "" + requiredCoins
-                                + ChatColor.GRAY + " more "
-                                + ChatColor.GOLD + "Coins"
-                        );
-                    }
+                    itemLore.add(
+                            ChatColor.GRAY + "  Requires "
+                            + ChatColor.GOLD + "" + requiredCoins
+                            + ChatColor.GRAY + " more "
+                            + ChatColor.GOLD + "Coins"
+                    );
                 }
+
             }
 
+            // Sections Over
             itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
         }
@@ -94,13 +112,13 @@ public class MenuItemFormatter {
     }
 
     private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem) {
-        ItemStack item = menuItem.getItem();
+        ItemStack item = new ItemStack(menuItem.getItem());
         String levelName = menuItem.getTypeValue();
         LevelObject level = LevelManager.get(levelName);
 
         if (level != null) {
             ItemMeta itemMeta = item.getItemMeta();
-            List<String> itemLore = new ArrayList<>();
+            List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
             String formattedTitle = level.getFormattedTitle();
             itemMeta.setDisplayName(formattedTitle);

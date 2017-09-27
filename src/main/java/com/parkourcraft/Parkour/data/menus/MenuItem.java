@@ -13,6 +13,8 @@ public class MenuItem {
     private String type;
     private String typeValue;
     private List<String> lore;
+    private List<String> commands;
+    private List<String> consoleCommands;
 
     MenuItem(Menu menu, MenuPage menuPage, int slot) {
         this.slot = slot;
@@ -25,6 +27,8 @@ public class MenuItem {
         type = Menus_YAML.getItemType(menu.getName(), menuPage.getPageNumber(), slot);
         typeValue = Menus_YAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
         lore = Menus_YAML.getItemLore(menu.getName(), menuPage.getPageNumber(), slot);
+        commands = Menus_YAML.getCommands(menu.getName(), menuPage.getPageNumber(), slot);
+        consoleCommands = Menus_YAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), slot);
     }
 
     public int getSlot() {
@@ -45,6 +49,14 @@ public class MenuItem {
 
     public List<String> getFormattedLore() {
         return Utils.formatLore(lore);
+    }
+
+    public List<String> getCommands() {
+        return commands;
+    }
+
+    public List<String> getConsoleCommands() {
+        return consoleCommands;
     }
 
 }

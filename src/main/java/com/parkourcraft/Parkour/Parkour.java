@@ -135,7 +135,7 @@ public class Parkour extends JavaPlugin {
         getCommand("location").setExecutor(new Location_CMD());
         getCommand("stats").setExecutor(new Stats_CMD());
         getCommand("menu").setExecutor(new Menu_CMD());
-        getCommand("rewards").setExecutor(new Rewards_CMD());
+        getCommand("perks").setExecutor(new Perks_CMD());
     }
 
 }

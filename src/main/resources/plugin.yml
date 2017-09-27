@@ -16,8 +16,8 @@ commands:
   menu:
     description: "PC-Parkour menu management"
     aliases: [menus]
-  rewards:
-    description: "PC-Parkour rewards management"
-    aliases: [reward]
+  perks:
+    description: "PC-Parkour perks management"
+    aliases: [perk]
   stats:
     description: "PC-Parkour stats display"
