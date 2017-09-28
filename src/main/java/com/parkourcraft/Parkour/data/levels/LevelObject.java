@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LevelObject {
+public class  LevelObject {
 
     private String name;
     private String title;
@@ -143,35 +143,8 @@ public class LevelObject {
         }
     }
 
-    public void loadLeaderboard() {
-        leaderboardCache = new ArrayList<>();
-
-        if (totalCompletionsCount != 0
-                && ID != -1) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "completions",
-                    "player_id, time_taken, UNIX_TIMESTAMP(completion_date) AS date",
-                    "WHERE level_id=" + ID + " AND time_taken > 0 ORDER BY time_taken ASC LIMIT 10"
-            );
-
-            if (results.size() > 0) {
-                for (Map<String, String> result : results) {
-                    int playerID = Integer.parseInt(result.get("player_id"));
-
-                    StatsManager.requiredID(playerID);
-
-                    LevelCompletion levelCompletion =  new LevelCompletion(
-                            Long.parseLong(result.get("date")),
-                            Long.parseLong(result.get("time_taken"))
-                    );
-
-                    levelCompletion.setPlayerID(playerID);
-
-                    leaderboardCache.add(levelCompletion);
-                }
-            } else
-                totalCompletionsCount = 0;
-        }
+    public void setLeaderboardCache(List<LevelCompletion> levelCompletions) {
+        leaderboardCache = levelCompletions;
     }
 
     public List<LevelCompletion> getLeaderboard() {

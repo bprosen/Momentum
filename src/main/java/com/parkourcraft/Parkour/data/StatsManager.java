@@ -11,7 +11,6 @@ import java.util.*;
 public class StatsManager {
 
     private static List<PlayerStats> playerStatsList = new ArrayList<>();
-    private static Map<Integer, String> playerIDtoNameCache = new HashMap<>();
 
     public static PlayerStats get(String UUID) {
         for (PlayerStats playerStats : playerStatsList)
@@ -67,43 +66,6 @@ public class StatsManager {
 
         for (String UUID : removeList)
             remove(UUID);
-    }
-
-    public static void requiredID(int ID) {
-        if (!playerIDtoNameCache.containsKey(ID))
-            playerIDtoNameCache.put(ID, "");
-    }
-
-    public static String getNameFromCache(int ID) {
-        if (playerIDtoNameCache.containsKey(ID))
-            return playerIDtoNameCache.get(ID);
-
-        return "";
-    }
-
-    public static void loadIDtoNameCache() {
-        List<String> unknownIDs = new ArrayList<>();
-
-        for (int ID : playerIDtoNameCache.keySet())
-            if (playerIDtoNameCache.get(ID).equals(""))
-                unknownIDs.add(Integer.toString(ID));
-
-
-        if (unknownIDs.size() > 0) {
-            String selection = String.join(", ", unknownIDs);
-
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "players",
-                    "player_id, player_name",
-                    "WHERE player_id IN (" + selection + ")"
-            );
-
-            for (Map<String, String> result : results)
-                playerIDtoNameCache.put(
-                        Integer.parseInt(result.get("player_id")),
-                        result.get("player_name")
-                );
-        }
     }
 
 }

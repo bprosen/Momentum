@@ -7,6 +7,7 @@ import com.parkourcraft.Parkour.gameplay.LevelListener;
 import com.parkourcraft.Parkour.gameplay.MenuListener;
 import com.parkourcraft.Parkour.gameplay.Scoreboard;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
+import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.TableManager;
@@ -99,9 +100,8 @@ public class Parkour extends JavaPlugin {
          */
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
-                LevelManager.loadTotalCompletions();
-                LevelManager.loadLeaderboards();
-                StatsManager.loadIDtoNameCache();
+                DataQueries.loadTotalCompletions();
+                DataQueries.loadLeaderboards();
             }
         }, 10L, 60L * 20L);
 

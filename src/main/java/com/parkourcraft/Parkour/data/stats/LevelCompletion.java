@@ -4,7 +4,6 @@ public class LevelCompletion {
 
     private long timeOfCompletion;
     private long completionTimeElapsed; // time elapsed
-    private int playerID = -1;
     private String playerName;
 
     public LevelCompletion(long timeOfCompletion, long completionTimeElapsed) {
@@ -21,14 +20,6 @@ public class LevelCompletion {
 
     public long getCompletionTimeElapsed() {
         return completionTimeElapsed;
-    }
-
-    public void setPlayerID(int ID) {
-        playerID = ID;
-    }
-
-    public int getPlayerID() {
-        return playerID;
     }
 
     public void setPlayerName(String playerName) {

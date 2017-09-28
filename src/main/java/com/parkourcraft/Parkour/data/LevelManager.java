@@ -29,6 +29,11 @@ public class LevelManager {
         return null;
     }
 
+    public static List<LevelObject> getLevels() {
+        return levels;
+    }
+
+
     public static int getIDFromCache(String levelName) {
         return levelIDCache.get(levelName);
     }
@@ -129,27 +134,6 @@ public class LevelManager {
             loadIDs();
             syncIDs();
         }
-    }
-
-    public static void loadTotalCompletions() {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
-                "completions",
-                "level_id, COUNT(*) AS total_completions",
-                "GROUP BY level_id"
-        );
-
-        for (Map<String, String> result : results) {
-            int levelID = Integer.parseInt(result.get("level_id"));
-            LevelObject levelObject = LevelManager.get(levelID);
-
-            if (levelObject != null)
-                levelObject.setTotalCompletionsCount(Integer.parseInt(result.get("total_completions")));
-        }
-    }
-
-    public static void loadLeaderboards() {
-        for (LevelObject levelObject : levels)
-            levelObject.loadLeaderboard();
     }
 
     public static void create(String levelName) {

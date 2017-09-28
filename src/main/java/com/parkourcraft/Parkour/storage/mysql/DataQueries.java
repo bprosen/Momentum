@@ -1,10 +1,12 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
+import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -116,5 +118,86 @@ public class DataQueries {
                         + ", FROM_UNIXTIME(" + (date / 1000) + "))"
         );
     }
+
+    public static void loadTotalCompletions() {
+        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                "completions",
+                "level.level_name, " +
+                        "COUNT(*) AS total_completions",
+                "JOIN levels level" +
+                        " ON level.level_id=completions.level_id" +
+                        " GROUP BY level_name"
+        );
+
+        for (Map<String, String> levelResult : levelsResults) {
+            LevelObject levelObject = LevelManager.get(levelResult.get("level_name"));
+
+            if (levelObject != null)
+                levelObject.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
+        }
+    }
+
+    public static void loadLeaderboards() {
+        for (LevelObject levelObject : LevelManager.getLevels())
+            loadLeaderboard(levelObject);
+    }
+
+    private static void loadLeaderboard(LevelObject levelObject) {
+        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                "completions",
+                        "player.player_name, " +
+                        "time_taken, " +
+                        "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
+                        "JOIN players player" +
+                        " on completions.player_id=player.player_id" +
+                        " WHERE completions.level_id=" + levelObject.getID() +
+                        " AND time_taken > 0" +
+                        " ORDER BY time_taken" +
+                        " ASC LIMIT 10"
+
+        );
+
+        List<LevelCompletion> levelCompletions = new ArrayList<>();
+
+        for (Map<String, String> levelResult : levelsResults) {
+            LevelCompletion levelCompletion =  new LevelCompletion(
+                    Long.parseLong(levelResult.get("date")),
+                    Long.parseLong(levelResult.get("time_taken"))
+            );
+
+            levelCompletion.setPlayerName(levelResult.get("player_name"));
+
+            levelCompletions.add(levelCompletion);
+        }
+
+        levelObject.setLeaderboardCache(levelCompletions);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

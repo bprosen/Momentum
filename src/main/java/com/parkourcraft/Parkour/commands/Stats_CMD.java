@@ -40,7 +40,7 @@ public class Stats_CMD implements CommandExecutor {
                                 "  " + ChatColor.GRAY
                                 + rank + " " + ChatColor.DARK_GREEN
                                 + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s "
-                                + ChatColor.GREEN + StatsManager.getNameFromCache(levelCompletion.getPlayerID())
+                                + ChatColor.GREEN + levelCompletion.getPlayerName()
                         );
                     }
                 else
