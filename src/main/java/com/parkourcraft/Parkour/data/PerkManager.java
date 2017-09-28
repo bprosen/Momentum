@@ -15,7 +15,6 @@ import java.util.*;
 public class PerkManager {
 
     private static List<Perk> perks = new ArrayList<>();
-    private static Map<String, Integer> perkIDCache = new HashMap<>();
 
     public static Perk get(String perkName) {
         for (Perk perk : perks)
@@ -23,6 +22,10 @@ public class PerkManager {
                 return perk;
 
         return null;
+    }
+
+    public static List<Perk> getPerks() {
+        return perks;
     }
 
     public static boolean exists(String perkName) {
@@ -60,8 +63,6 @@ public class PerkManager {
     public static void loadAll() {
         for (String perkName : Perks_YAML.getNames())
             load(perkName);
-
-        syncIDCache();
     }
 
     public static void syncPermissions(Player player) {
@@ -86,61 +87,6 @@ public class PerkManager {
 
             playerStats.addPerk(perk.getName(), date);
             DataQueries.insertPerk(playerStats, perk, date);
-        }
-    }
-
-    public static void loadIDs() {
-        List<Map<String, String>> perkResults = DatabaseQueries.getResults(
-                "perks",
-                "*",
-                ""
-        );
-
-        if (perkResults.size() > 0) {
-            perkIDCache = new HashMap<>();
-
-            for (Map<String, String> perkResult : perkResults) {
-                perkIDCache.put(
-                        perkResult.get("perk_name"),
-                        Integer.parseInt(perkResult.get("perk_id"))
-                );
-            }
-        }
-    }
-
-    private static void syncIDCache() {
-        for (String perkName : perkIDCache.keySet()) {
-            Perk perk = get(perkName);
-
-            if (perk != null)
-                perk.setID(perkIDCache.get(perkName));
-        }
-    }
-
-    public static void syncIDs() {
-        syncIDCache();
-
-        List<String> insertQueries = new ArrayList<>();
-
-        for (Perk perk : perks)
-            if (perk.getID() == -1) {
-                String query = "INSERT INTO perks " +
-                        "(perk_name)" +
-                        " VALUES " +
-                        "('" + perk.getName() + "')";
-
-                insertQueries.add(query);
-            }
-
-
-        if (insertQueries.size() > 0) {
-            String finalQuery = "";
-            for (String sql : insertQueries)
-                finalQuery = finalQuery + sql + "; ";
-
-            DatabaseManager.runQuery(finalQuery);
-            loadIDs();
-            syncIDs();
         }
     }
 

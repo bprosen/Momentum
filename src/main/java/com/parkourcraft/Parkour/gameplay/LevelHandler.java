@@ -31,18 +31,17 @@ public class LevelHandler {
 
             if (respawnLocation != null) {
                 Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
-
                 LevelCompletion levelCompletion = new LevelCompletion(
                         System.currentTimeMillis(),
                         elapsedTime
                 );
 
+                level.addCompletion(); // Update totalLevelCompletionsCount
+
+                // Update player information
                 playerStats.levelCompletion(levelName, levelCompletion);
                 DataQueries.insertCompletion(playerStats, level, levelCompletion);
-
-                level.addCompletion(); // totalLevelCompletionsCount
-                PerkManager.syncPermissions(player); // sync permissions from rewards
-
+                PerkManager.syncPermissions(player);
                 Parkour.economy.depositPlayer(player, level.getReward());
 
                 respawnPlayerToLobby(player);
@@ -61,9 +60,9 @@ public class LevelHandler {
                             "-"
                     );
 
-
                 player.sendMessage(messageFormatted);
 
+                // Broadcast the completion if enabled for the level
                 if (level.getBroadcastCompletion()) {
                     String broadcastMessage = ChatColor.translateAlternateColorCodes(
                             '&',

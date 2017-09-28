@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.PerkManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
@@ -208,6 +209,43 @@ public class DataQueries {
 
             DatabaseManager.runQuery(finalQuery);
             loadLevelIDs();
+        }
+    }
+
+    public static void loadPerkIDs() {
+        List<Map<String, String>> perkResults = DatabaseQueries.getResults(
+                "perks",
+                "perk_id, perk_name",
+                ""
+        );
+
+        for (Map<String, String> perkResult : perkResults) {
+            Perk perk = PerkManager.get(perkResult.get("perk_name"));
+
+            if (perk != null)
+                perk.setID(Integer.parseInt(perkResult.get("perk_id")));
+        }
+    }
+
+    public static void syncPerkIDs() {
+        List<String> insertQueries = new ArrayList<>();
+
+        for (Perk perk : PerkManager.getPerks())
+            if (perk.getID() == -1)
+                insertQueries.add(
+                        "INSERT INTO perks " +
+                                "(perk_name)" +
+                                " VALUES " +
+                                "('" + perk.getName() + "')"
+                );
+
+        if (insertQueries.size() > 0) {
+            String finalQuery = "";
+            for (String sql : insertQueries)
+                finalQuery = finalQuery + sql + "; ";
+
+            DatabaseManager.runQuery(finalQuery);
+            loadPerkIDs();
         }
     }
 

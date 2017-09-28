@@ -43,7 +43,7 @@ public class Parkour extends JavaPlugin {
         LevelManager.loadAll();
         DataQueries.loadLevelIDs();
         PerkManager.loadAll();
-        PerkManager.loadIDs();
+        DataQueries.loadPerkIDs();
         MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup
@@ -94,22 +94,23 @@ public class Parkour extends JavaPlugin {
         }, 20L, 4L);
 
         /*
-         * Asynchronously loads level ID's, leaderboards, and total
-         * number of completions from database and syncs the information
-         * interval: every 60 seconds
+         * Asynchronously grabs leaderboards and total
+         * number of completions from database
+         * while syncing the information into memory
+         * interval: every 30 seconds
          */
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
                 DataQueries.loadTotalCompletions();
                 DataQueries.loadLeaderboards();
             }
-        }, 10L, 60L * 20L);
+        }, 10L, 30L * 20L);
 
         // runs the queries in the cache (every .2 seconds (5 times per second))
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
                 DataQueries.syncLevelIDs();
-                PerkManager.syncIDs();
+                DataQueries.syncPerkIDs();
                 DatabaseManager.runCaches();
             }
         }, 0L, 4L);
