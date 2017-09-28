@@ -7,6 +7,7 @@ import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -173,31 +174,41 @@ public class DataQueries {
         levelObject.setLeaderboardCache(levelCompletions);
     }
 
+    public static void loadLevelIDs() {
+        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                "levels",
+                "level_id, level_name",
+                ""
+        );
 
+        for (Map<String, String> levelResult : levelsResults) {
+            LevelObject level = LevelManager.get(levelResult.get("level_name"));
 
+            if (level != null)
+                level.setID(Integer.parseInt(levelResult.get("level_id")));
+        }
+    }
 
+    public static void syncLevelIDs() {
+        List<String> insertQueries = new ArrayList<>();
 
+        for (LevelObject levelObject : LevelManager.getLevels())
+            if (levelObject.getID() == -1)
+                insertQueries.add(
+                        "INSERT INTO levels " +
+                        "(level_name)" +
+                        " VALUES " +
+                        "('" + levelObject.getName() + "')"
+                );
 
+        if (insertQueries.size() > 0) {
+            String finalQuery = "";
+            for (String sql : insertQueries)
+                finalQuery = finalQuery + sql + "; ";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            DatabaseManager.runQuery(finalQuery);
+            loadLevelIDs();
+        }
+    }
 
 }

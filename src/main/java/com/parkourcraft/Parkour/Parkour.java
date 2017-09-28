@@ -41,7 +41,7 @@ public class Parkour extends JavaPlugin {
 
         LocationManager.loadLocations();
         LevelManager.loadAll();
-        LevelManager.loadIDs();
+        DataQueries.loadLevelIDs();
         PerkManager.loadAll();
         PerkManager.loadIDs();
         MenuManager.loadMenus();
@@ -108,7 +108,7 @@ public class Parkour extends JavaPlugin {
         // runs the queries in the cache (every .2 seconds (5 times per second))
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
-                LevelManager.syncIDs();
+                DataQueries.syncLevelIDs();
                 PerkManager.syncIDs();
                 DatabaseManager.runCaches();
             }
