@@ -21,65 +21,61 @@ import java.util.Map;
 
 public class LevelHandler {
 
-    public static void levelCompletion(Player player, String levelName) {
+    static void levelCompletion(Player player, String levelName) {
         PlayerStats playerStats = StatsManager.get(player);
+        LevelObject level = LevelManager.get(levelName);
+        Location lobby = LocationManager.getLobbyLocation();
 
         if (playerStats != null
-                && LevelManager.exists(levelName)) {
-            LevelObject level = LevelManager.get(levelName);
-            Location respawnLocation = level.getRespawnLocation();
+                && level != null
+                && lobby != null) {
+            Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
+            LevelCompletion levelCompletion = new LevelCompletion(
+                    System.currentTimeMillis(),
+                    elapsedTime
+            );
 
-            if (respawnLocation != null) {
-                Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
-                LevelCompletion levelCompletion = new LevelCompletion(
-                        System.currentTimeMillis(),
-                        elapsedTime
+            level.addCompletion(); // Update totalLevelCompletionsCount
+
+            // Update player information
+            playerStats.levelCompletion(levelName, levelCompletion);
+            DataQueries.insertCompletion(playerStats, level, levelCompletion);
+            PerkManager.syncPermissions(player);
+            Parkour.economy.depositPlayer(player, level.getReward());
+
+            String messageFormatted = level.getFormattedMessage(playerStats);
+            if (elapsedTime > 0L
+                    && elapsedTime < 8388607L)
+                messageFormatted = messageFormatted.replace(
+                        "%time%",
+                        (((double) elapsedTime) / 1000) + "s"
+                );
+            else
+                messageFormatted = messageFormatted.replace(
+                        "%time%",
+                        "-"
                 );
 
-                level.addCompletion(); // Update totalLevelCompletionsCount
+            // Run gameplay actions: teleport and messaging
+            player.teleport(lobby);
+            player.sendMessage(messageFormatted);
 
-                // Update player information
-                playerStats.levelCompletion(levelName, levelCompletion);
-                DataQueries.insertCompletion(playerStats, level, levelCompletion);
-                PerkManager.syncPermissions(player);
-                Parkour.economy.depositPlayer(player, level.getReward());
+            // Broadcast the completion if enabled for the level
+            if (level.getBroadcastCompletion()) {
+                String broadcastMessage = ChatColor.translateAlternateColorCodes(
+                        '&',
+                        Settings_YAML.getLevelBroadcastCompletionMessage()
+                );
 
-                respawnPlayerToLobby(player);
+                broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
+                broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
 
-                String messageFormatted = level.getFormattedMessage(playerStats);
-
-                if (elapsedTime > 0L
-                        && elapsedTime < 8388607L)
-                    messageFormatted = messageFormatted.replace(
-                            "%time%",
-                            (((double) elapsedTime) / 1000) + "s"
-                    );
-                else
-                    messageFormatted = messageFormatted.replace(
-                            "%time%",
-                            "-"
-                    );
-
-                player.sendMessage(messageFormatted);
-
-                // Broadcast the completion if enabled for the level
-                if (level.getBroadcastCompletion()) {
-                    String broadcastMessage = ChatColor.translateAlternateColorCodes(
-                            '&',
-                            Settings_YAML.getLevelBroadcastCompletionMessage()
-                    );
-
-                    broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
-                    broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
-
-                    Bukkit.broadcastMessage(broadcastMessage);
-                }
+                Bukkit.broadcastMessage(broadcastMessage);
             }
-
         }
     }
 
-    public static String getLocationLevelName(Location location) {
+    static String getLocationLevelName(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
         Map<String, String> levelNamesLower = LevelManager.getNamesLower();
 
@@ -91,7 +87,7 @@ public class LevelHandler {
         return null;
     }
 
-    public static boolean locationInIgnoreArea(Location location) {
+    static boolean locationInIgnoreArea(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
         Map<String, String> levelNamesLower = LevelManager.getNamesLower();
 
@@ -108,20 +104,12 @@ public class LevelHandler {
         return inIgnoreArea;
     }
 
-    public static void respawnPlayerToStart(Player player, String levelName) {
-        if (LevelManager.exists(levelName)) {
-            Location startLocation = LevelManager.get(levelName).getStartLocation();
+    static void respawnPlayerToStart(Player player, String levelName) {
+        LevelObject level = LevelManager.get(levelName);
 
-            if (startLocation != null)
-                player.teleport(startLocation);
-        }
-    }
-
-    public static void respawnPlayerToLobby(Player player) {
-        if (LocationManager.exists("spawn")) {
-            LocationManager.teleport(player, "spawn");
-            player.sendMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "You have been teleported to the Parkour Lobby");
-        }
+        if (level != null
+                && level.getStartLocation() != null)
+            player.teleport(level.getStartLocation());
     }
 
 }

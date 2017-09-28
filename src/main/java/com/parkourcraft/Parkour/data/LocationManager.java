@@ -59,4 +59,8 @@ public class LocationManager {
             Locations_YAML.remove(locationName);
     }
 
+    public static Location getLobbyLocation() {
+        return LocationManager.get("spawn");
+    }
+
 }
