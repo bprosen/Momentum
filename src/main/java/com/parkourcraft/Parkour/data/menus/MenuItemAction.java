@@ -38,10 +38,10 @@ public class MenuItemAction {
                 PlayerStats playerStas = StatsManager.get(player);
 
                 if (commands
-                        && playerStas.hasPerkID(perk.getID())) {
+                        && playerStas.hasPerk(perk.getName())) {
                     player.closeInventory();
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
-                } else if (!playerStas.hasPerkID(perk.getID())
+                } else if (!playerStas.hasPerk(perk.getName())
                             && perk.getPrice() > 0) {
                         int playerBalance = (int) Parkour.economy.getBalance(player);
 

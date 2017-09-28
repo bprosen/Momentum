@@ -55,7 +55,7 @@ public class Parkour extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        StatsManager.updateAll();
+        DatabaseManager.runCaches();
 
         DatabaseConnection.close();
 
@@ -91,13 +91,6 @@ public class Parkour extends JavaPlugin {
                 Scoreboard.displayScoreboards();
             }
         }, 20L, 4L);
-
-        // sync player and level data from database (every 10 seconds)
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            public void run() {
-                StatsManager.updateAll();
-            }
-        }, 0L, 10L * 20L);
 
         /*
          * Asynchronously loads level ID's, leaderboards, and total

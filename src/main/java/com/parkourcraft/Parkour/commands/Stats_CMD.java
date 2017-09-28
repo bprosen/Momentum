@@ -4,7 +4,6 @@ import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
-import com.parkourcraft.Parkour.data.stats.LevelStats;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -64,19 +63,16 @@ public class Stats_CMD implements CommandExecutor {
                 PlayerStats playerStats = StatsManager.get(player);
 
                 if (playerStats != null) {
-                    Map<String, LevelStats> levelStatsMap = playerStats.getLevelStatsMap();
+                    Map<String, List<LevelCompletion>> levelCompletionsMap = playerStats.getLevelCompletionsMap();
 
-                    for (Map.Entry<String, LevelStats> levelStatsEntry : levelStatsMap.entrySet()) {
-                        Map<Long, LevelCompletion> levelCompletionMap = levelStatsEntry.getValue().getLevelCompletionsMap();
+                    for (Map.Entry<String, List<LevelCompletion>> levelCompletionsEntry : levelCompletionsMap.entrySet()) {
+                        List<LevelCompletion> levelCompletionsList = levelCompletionsEntry.getValue();
 
-                        String levelCompletions = levelStatsEntry.getKey() + ":";
+                        String levelCompletions = levelCompletionsEntry.getKey() + ":";
 
-                        for (Map.Entry<Long, LevelCompletion> levelCompletionsEntry : levelCompletionMap.entrySet()) {
-                            LevelCompletion completion = levelCompletionsEntry.getValue();
-
+                        for (LevelCompletion levelCompletion : levelCompletionsList)
                             levelCompletions = levelCompletions + " "
-                                    + (((double) completion.getCompletionTimeElapsed()) / 1000) + "s";
-                        }
+                                    + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s";
 
                         player.sendMessage(levelCompletions);
                     }

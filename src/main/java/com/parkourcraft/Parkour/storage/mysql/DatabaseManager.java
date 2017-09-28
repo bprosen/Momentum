@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.entity.Player;
 
 import java.sql.PreparedStatement;
@@ -13,8 +14,7 @@ public class DatabaseManager {
     private static boolean runningCaches = false;
 
     private static List<String> databaseQuriesCache = new ArrayList<>();
-    private static List<Player>loadPlayersCache = new ArrayList<>();
-    private static List<String> updatePlayersCache = new ArrayList<>();
+    private static List<PlayerStats> loadPlayersCache = new ArrayList<>();
 
     // order: runUpdateQueries, loadPlayersCache, updatePlayersCache
     public static void runCaches() {
@@ -29,9 +29,6 @@ public class DatabaseManager {
 
             if (loadPlayersCache.size() > 0)
                 runLoadPlayersCache();
-
-            if (updatePlayersCache.size() > 0)
-                runUpdatePlayersCache();
 
         } catch (Exception exception) {
             Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runCaches()");
@@ -62,11 +59,11 @@ public class DatabaseManager {
 
     private static void runLoadPlayersCache() {
         try {
-            List<Player> cache = new ArrayList<>(loadPlayersCache);
+            List<PlayerStats> cache = new ArrayList<>(loadPlayersCache);
 
-            for (Player player : cache) {
-                StatsManager.add(player);
-                loadPlayersCache.remove(player);
+            for (PlayerStats playerStats : cache) {
+                DataQueries.loadPlayerStats(playerStats);
+                loadPlayersCache.remove(playerStats);
             }
         } catch (Exception exception) {
             Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runLoadPlayersCache()");
@@ -75,34 +72,11 @@ public class DatabaseManager {
         }
     }
 
-    private static void runUpdatePlayersCache() {
-        try {
-            List<String> cache = new ArrayList<>(updatePlayersCache);
-
-            for (String UUID : cache)
-                StatsManager.update(UUID);
-
-            updatePlayersCache.removeAll(cache); // removes all players that were updates
-        } catch (Exception exception) {
-            Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runUpdatePlayersCache()");
-            Parkour.getPluginLogger().severe("ERROR:  printing StackTrace");
-            exception.printStackTrace();
-        }
-    }
-
     /* LoadPlayersCache
     This cache is responsible for loading information for players who have just joined
     */
-    public static void addToLoadPlayersCache(Player player) {
-        loadPlayersCache.add(player);
-    }
-
-    /* UpdatePlayersCache
-    This cache is responsible for updating a player's information in the database
-    */
-    public static void addToUpdatePlayersCache(String UUID) {
-        if (!updatePlayersCache.contains(UUID))
-            updatePlayersCache.add(UUID);
+    public static void addToLoadPlayersCache(PlayerStats playerStats) {
+        loadPlayersCache.add(playerStats);
     }
 
     /* DatabaseQueriesCache

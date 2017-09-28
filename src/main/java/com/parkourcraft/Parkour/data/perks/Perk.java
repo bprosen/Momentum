@@ -68,7 +68,7 @@ public class Perk {
                 return false;
 
         if (price > 0)
-            if (!playerStats.hasPerkID(ID))
+            if (!playerStats.hasPerk(name))
                 return false;
 
         return true;

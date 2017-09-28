@@ -162,8 +162,7 @@ public class LevelObject {
 
                     LevelCompletion levelCompletion =  new LevelCompletion(
                             Long.parseLong(result.get("date")),
-                            Long.parseLong(result.get("time_taken")),
-                            true
+                            Long.parseLong(result.get("time_taken"))
                     );
 
                     levelCompletion.setPlayerID(playerID);

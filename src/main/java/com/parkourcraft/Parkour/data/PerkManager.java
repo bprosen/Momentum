@@ -4,6 +4,7 @@ import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.perks.Perks_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
@@ -83,14 +84,8 @@ public class PerkManager {
         if (perk.getID() > 0) {
             Long date = System.currentTimeMillis();
 
-            playerStats.addPerk(perk.getID(), date);
-            DatabaseManager.addUpdateQuery(
-                    "INSERT INTO ledger (player_id, perk_id, date)"
-                    + " VALUES "
-                    + "(" + playerStats.getPlayerID()
-                    + ", " + perk.getID()
-                    + ", FROM_UNIXTIME(" + (date / 1000) + "))"
-            );
+            playerStats.addPerk(perk.getName(), date);
+            DataQueries.insertPerk(playerStats, perk, date);
         }
     }
 

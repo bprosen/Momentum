@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.data;
 
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -41,12 +42,13 @@ public class StatsManager {
 
     public static void add(Player player) {
         if (!exists(player.getUniqueId().toString())) {
-            playerStatsList.add(new PlayerStats(
+            PlayerStats playerStats = new PlayerStats(
                     player.getUniqueId().toString(),
                     player.getName()
-                    ));
+            );
 
-            PerkManager.syncPermissions(player);
+            playerStatsList.add(playerStats);
+            DatabaseManager.addToLoadPlayersCache(playerStats);
         }
     }
 
@@ -56,22 +58,12 @@ public class StatsManager {
                 iterator.remove();
     }
 
-    public static void update(String UUID) {
-        PlayerStats playerStats = get(UUID);
-
-        if (playerStats != null)
-            playerStats.updateIntoDatabase();
-    }
-
-    public static void updateAll() {
+    public static void cleanPlayerStats() {
         List<String> removeList = new ArrayList<>();
 
-        for (PlayerStats playerStats : playerStatsList) {
-            playerStats.updateIntoDatabase();
-
+        for (PlayerStats playerStats : playerStatsList)
             if (Bukkit.getPlayer(UUID.fromString(playerStats.getUUID())) == null)
                 removeList.add(playerStats.getUUID());
-        }
 
         for (String UUID : removeList)
             remove(UUID);

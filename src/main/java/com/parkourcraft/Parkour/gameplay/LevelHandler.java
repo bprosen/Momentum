@@ -6,7 +6,9 @@ import com.parkourcraft.Parkour.data.PerkManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
+import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
 import com.parkourcraft.Parkour.data.LocationManager;
 import org.bukkit.Bukkit;
@@ -30,12 +32,13 @@ public class LevelHandler {
             if (respawnLocation != null) {
                 Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
 
-                playerStats.levelCompletion(
-                        levelName,
+                LevelCompletion levelCompletion = new LevelCompletion(
                         System.currentTimeMillis(),
-                        elapsedTime,
-                        false
+                        elapsedTime
                 );
+
+                playerStats.levelCompletion(levelName, levelCompletion);
+                DataQueries.insertCompletion(playerStats, level, levelCompletion);
 
                 level.addCompletion(); // totalLevelCompletionsCount
                 PerkManager.syncPermissions(player); // sync permissions from rewards

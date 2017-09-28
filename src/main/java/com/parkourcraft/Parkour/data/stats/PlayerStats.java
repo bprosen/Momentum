@@ -17,23 +17,23 @@ public class PlayerStats {
 
     private long levelStartTime = 0;
 
-    private Map<String, LevelStats> levelStatsMap = new HashMap<>();
-    private Map<Integer, Long> perks = new HashMap<>();
+    private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
+    private Map<String, Long> perks = new HashMap<>();
 
     public PlayerStats(String UUID, String playerName) {
         this.UUID = UUID;
         this.playerName = playerName;
-
-        load();
     }
 
-    public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed, boolean inDatabase) {
-        if (!levelStatsMap.containsKey(levelName))
-            levelStatsMap.put(levelName, new LevelStats(levelName));
+    public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
+        if (!levelCompletionsMap.containsKey(levelName))
+            levelCompletionsMap.put(levelName, new ArrayList<>());
 
-        LevelCompletion levelCompletion = new LevelCompletion(timeOfCompletion, completionTimeElapsed, inDatabase);
+        levelCompletionsMap.get(levelName).add(levelCompletion);
+    }
 
-        levelStatsMap.get(levelName).levelCompletion(levelCompletion);
+    public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed) {
+        this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
     }
 
     public String getUUID() {
@@ -56,120 +56,60 @@ public class PlayerStats {
         return levelStartTime;
     }
 
+    public void setPlayerID(int playerID) {
+        this.playerID = playerID;
+    }
+
     public int getPlayerID() {
         return playerID;
     }
 
+    public Map<String, List<LevelCompletion>> getLevelCompletionsMap() {
+        return levelCompletionsMap;
+    }
+
     public int getLevelCompletionsCount(String levelName) {
-        if (levelStatsMap.containsKey(levelName))
-            return levelStatsMap.get(levelName).getCompletionsCount();
+        if (levelCompletionsMap.containsKey(levelName))
+            return levelCompletionsMap.get(levelName).size();
 
         return 0;
     }
 
     public List<LevelCompletion> getQuickestCompletions(String levelName) {
-        if (levelStatsMap.containsKey(levelName))
-            return levelStatsMap.get(levelName).getQuickestCompletions();
+        List<LevelCompletion> levelCompletions = new ArrayList<>();
 
-        return new ArrayList<>();
-    }
+        if (levelCompletionsMap.containsKey(levelName)) {
 
+            for (LevelCompletion levelCompletion : levelCompletionsMap.get(levelName))
+                if (levelCompletion.getCompletionTimeElapsed() > 0)
+                    levelCompletions.add(levelCompletion);
 
-    public Map<String, LevelStats> getLevelStatsMap() {
-        return levelStatsMap;
-    }
+            if (levelCompletions.size() < 2)
+                return levelCompletions;
 
-    public void load() {
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
-                "*",
-                " WHERE uuid='" + UUID + "'"
-        );
+            for (int i = 0; i < levelCompletions.size() - 1; i++) {
+                int min_id = i;
 
-        if (playerResults.size() == 0) {
-            DatabaseManager.runQuery("INSERT INTO players " +
-                    "(uuid, player_name)" +
-                    " VALUES " +
-                    "('" + UUID + "', '" + playerName + "')"
-            );
+                for (int j = i + 1; j < levelCompletions.size(); j++)
+                    if (levelCompletions.get(j).getCompletionTimeElapsed()
+                            < levelCompletions.get(min_id).getCompletionTimeElapsed())
+                        min_id = j;
 
-            load();
-        } else {
-            for (Map<String, String> playerResult : playerResults)
-                playerID = Integer.parseInt(playerResult.get("player_id"));
-
-            loadCompletionsData();
-            loadPerksData();
-        }
-
-    }
-
-    public void loadCompletionsData() {
-        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
-                "completions",
-                "level_id, time_taken, UNIX_TIMESTAMP(completion_date) AS date",
-                "WHERE player_id=" + playerID + ""
-        );
-
-        for (Map<String, String> completionsResult : completionsResults) {
-            LevelObject levelObject = LevelManager.get(Integer.parseInt(completionsResult.get("level_id")));
-
-            if (levelObject != null)
-                levelCompletion(
-                        levelObject.getName(),
-                        (Long.parseLong(completionsResult.get("date")) * 1000),
-                        Long.parseLong(completionsResult.get("time_taken")),
-                        true
-                );
-        }
-    }
-
-    public void loadPerksData() {
-        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
-                "ledger",
-                "perk_id, UNIX_TIMESTAMP(date) AS date",
-                "WHERE player_id=" + playerID + ""
-        );
-
-        for (Map<String, String> completionsResult : completionsResults)
-            perks.put(
-                    Integer.parseInt(completionsResult.get("perk_id")),
-                    Long.parseLong(completionsResult.get("date"))
-            );
-    }
-
-    public void updateIntoDatabase() {
-        String playersQuery = "UPDATE players SET " +
-                "player_name='" + playerName + "' " +
-                "WHERE uuid='" + UUID + "'"
-                ;
-
-        DatabaseManager.addUpdateQuery(playersQuery);
-
-        for (Map.Entry<String, LevelStats> levelStatsEntry : levelStatsMap.entrySet()) {
-            for (LevelCompletion levelCompletion : levelStatsEntry.getValue().getCompletionsNotInDatabase()) {
-                String updateQuery = "INSERT INTO completions " +
-                        "(player_id, level_id, time_taken, completion_date)" +
-                        " VALUES (" +
-                        playerID + ", " +
-                        LevelManager.getIDFromCache(levelStatsEntry.getKey()) + ", " +
-                        levelCompletion.getCompletionTimeElapsed() + ", " +
-                        "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
-                        ")"
-                        ;
-
-                DatabaseManager.addUpdateQuery(updateQuery);
-                levelCompletion.enteredIntoDatabase();
+                LevelCompletion temp = levelCompletions.get(min_id);
+                levelCompletions.set(min_id, levelCompletions.get(i));
+                levelCompletions.set(i, temp);
             }
         }
+
+        return levelCompletions;
     }
 
-    public void addPerk(int perkID, Long time) {
-        perks.put(perkID, time);
+    public void addPerk(String perkName, Long time) {
+        perks.put(perkName, time);
     }
 
-    public boolean hasPerkID(int perkID) {
-        return perks.containsKey(perkID);
+    public boolean hasPerk(String perkName) {
+        return perks.containsKey(perkName);
     }
 
 

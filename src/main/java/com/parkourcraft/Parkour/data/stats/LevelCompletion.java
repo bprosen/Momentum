@@ -4,16 +4,15 @@ public class LevelCompletion {
 
     private long timeOfCompletion;
     private long completionTimeElapsed; // time elapsed
-    private boolean inDatabase;
     private int playerID = -1;
+    private String playerName;
 
-    public LevelCompletion(long timeOfCompletion, long completionTimeElapsed, boolean inDatabase) {
+    public LevelCompletion(long timeOfCompletion, long completionTimeElapsed) {
         this.timeOfCompletion = timeOfCompletion;
         if (completionTimeElapsed < 72000000L)
             this.completionTimeElapsed = completionTimeElapsed;
         else
             this.completionTimeElapsed = 0L;
-        this.inDatabase = inDatabase;
     }
 
     public long getTimeOfCompletion() {
@@ -24,20 +23,20 @@ public class LevelCompletion {
         return completionTimeElapsed;
     }
 
-    public boolean inDatabase() {
-        return inDatabase;
-    }
-
-    public void enteredIntoDatabase() {
-        inDatabase = true;
-    }
-
     public void setPlayerID(int ID) {
         playerID = ID;
     }
 
     public int getPlayerID() {
         return playerID;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 
 }
