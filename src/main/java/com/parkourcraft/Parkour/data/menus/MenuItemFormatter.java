@@ -80,7 +80,7 @@ public class MenuItemFormatter {
             if (requirements.size() > 0
                     || perk.getPrice() > 0) {
                 itemLore.add("");
-                itemLore.add(ChatColor.GRAY + "Perk Requirements");
+                itemLore.add(ChatColor.GRAY + "Requirements");
 
                 for (String requirement : requirements) {
                     LevelObject level = LevelManager.get(requirement);
