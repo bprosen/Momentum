@@ -54,7 +54,16 @@ public class Menu {
         return title;
     }
 
-    public String getFormattedTitle() {
+    public String getFormattedTitle(int pageNumber) {
+        String menuTitle = ChatColor.translateAlternateColorCodes('&', title);
+
+        if (pageCount > 1)
+            menuTitle += ChatColor.GRAY + " Pg" + pageNumber;
+
+        return menuTitle;
+    }
+
+    public String getFormattedTitleBase() {
         return ChatColor.translateAlternateColorCodes('&', title);
     }
 
@@ -74,10 +83,10 @@ public class Menu {
         if (pageMap.containsKey(pageNumber)) {
             MenuPage menuPage = pageMap.get(pageNumber);
 
-            return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle());
+            return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle(pageNumber));
         }
 
-        return Bukkit.createInventory(null, 9, getFormattedTitle());
+        return Bukkit.createInventory(null, 9, getFormattedTitle(pageNumber));
     }
 
     public void updateInventory(Player player, InventoryView inventory, int pageNumber) {

@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.gameplay;
 
+import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.PerkManager;
@@ -44,11 +45,12 @@ public class LevelHandler {
             Parkour.economy.depositPlayer(player, level.getReward());
 
             String messageFormatted = level.getFormattedMessage(playerStats);
+            String time = (((double) elapsedTime) / 1000) + "s";
             if (elapsedTime > 0L
                     && elapsedTime < 8388607L)
                 messageFormatted = messageFormatted.replace(
                         "%time%",
-                        (((double) elapsedTime) / 1000) + "s"
+                        time
                 );
             else
                 messageFormatted = messageFormatted.replace(
@@ -56,9 +58,17 @@ public class LevelHandler {
                         "-"
                 );
 
+            String titleMessage = ChatColor.GRAY + "You Beat " + level.getFormattedTitle();
+            if (elapsedTime > 0L)
+                titleMessage += ChatColor.GRAY + " in " + ChatColor.GREEN + time;
+
             // Run gameplay actions: teleport and messaging
             player.teleport(lobby);
             player.sendMessage(messageFormatted);
+            TitleAPI.sendTitle(
+                    player, 10, 40, 10,
+                    "",
+                    titleMessage);
 
             // Broadcast the completion if enabled for the level
             if (level.getBroadcastCompletion()) {

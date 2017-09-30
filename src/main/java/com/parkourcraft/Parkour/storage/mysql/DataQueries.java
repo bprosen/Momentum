@@ -14,6 +14,9 @@ import java.util.Map;
 
 public class DataQueries {
 
+    private static Map<String, Integer> levelIDCache = new HashMap<>();
+    private static Map<String, Integer> perkIDCache = new HashMap<>();
+
     public static void loadPlayerStats(PlayerStats playerStats) {
         loadPlayerID(playerStats);
         loadCompletions(playerStats);
@@ -175,19 +178,30 @@ public class DataQueries {
         levelObject.setLeaderboardCache(levelCompletions);
     }
 
-    public static void loadLevelIDs() {
+    public static void syncLevelID(LevelObject levelObject) {
+        if (levelIDCache.containsKey(levelObject.getName()))
+            levelObject.setID(levelIDCache.get(levelObject.getName()));
+    }
+
+    public static void syncLevelIDCache() {
+        for (LevelObject levelObject : LevelManager.getLevels())
+            syncLevelID(levelObject);
+    }
+
+    public static void loadLevelIDCache() {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "levels",
                 "level_id, level_name",
                 ""
         );
 
-        for (Map<String, String> levelResult : levelsResults) {
-            LevelObject level = LevelManager.get(levelResult.get("level_name"));
+        for (Map<String, String> levelResult : levelsResults)
+            levelIDCache.put(
+                    levelResult.get("level_name"),
+                    Integer.parseInt(levelResult.get("level_id"))
+            );
 
-            if (level != null)
-                level.setID(Integer.parseInt(levelResult.get("level_id")));
-        }
+        syncLevelIDCache();
     }
 
     public static void syncLevelIDs() {
@@ -208,23 +222,34 @@ public class DataQueries {
                 finalQuery = finalQuery + sql + "; ";
 
             DatabaseManager.runQuery(finalQuery);
-            loadLevelIDs();
+            loadLevelIDCache();
         }
     }
 
-    public static void loadPerkIDs() {
+    public static void syncPerkID(Perk perk) {
+        if (perkIDCache.containsKey(perk.getName()))
+            perk.setID(perkIDCache.get(perk.getName()));
+    }
+
+    public static void syncPerkIDCache() {
+        for (Perk perk : PerkManager.getPerks())
+            syncPerkID(perk);
+    }
+
+    public static void loadPerkIDCache() {
         List<Map<String, String>> perkResults = DatabaseQueries.getResults(
                 "perks",
                 "perk_id, perk_name",
                 ""
         );
 
-        for (Map<String, String> perkResult : perkResults) {
-            Perk perk = PerkManager.get(perkResult.get("perk_name"));
+        for (Map<String, String> perkResult : perkResults)
+            perkIDCache.put(
+                    perkResult.get("perk_name"),
+                    Integer.parseInt(perkResult.get("perk_id"))
+            );
 
-            if (perk != null)
-                perk.setID(Integer.parseInt(perkResult.get("perk_id")));
-        }
+        syncPerkIDCache();
     }
 
     public static void syncPerkIDs() {
@@ -245,7 +270,7 @@ public class DataQueries {
                 finalQuery = finalQuery + sql + "; ";
 
             DatabaseManager.runQuery(finalQuery);
-            loadPerkIDs();
+            loadPerkIDCache();
         }
     }
 

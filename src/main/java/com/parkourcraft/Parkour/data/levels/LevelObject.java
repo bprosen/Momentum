@@ -1,17 +1,14 @@
 package com.parkourcraft.Parkour.data.levels;
 
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class  LevelObject {
 

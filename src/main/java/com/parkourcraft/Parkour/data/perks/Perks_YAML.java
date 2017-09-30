@@ -49,6 +49,13 @@ public class Perks_YAML {
         return new ArrayList<>();
     }
 
+    public static List<String> getRequiredPermissions(String perkName) {
+        if (isSet(perkName, "required_permissions"))
+            return perksConfig.getStringList(perkName + ".required_permissions");
+
+        return new ArrayList<>();
+    }
+
     public static int getPrice(String perkName) {
         if (isSet(perkName, "price"))
             return perksConfig.getInt(perkName + ".price");
@@ -86,9 +93,16 @@ public class Perks_YAML {
         commit(perkName);
     }
 
+    public static void setRequiredPermissions(String perkName, List<String> permissions) {
+        if (exists(perkName))
+            perksConfig.set(perkName + ".required_permissions", permissions);
+
+        commit(perkName);
+    }
+
     public static void setPrice(String perkName, int price) {
         if (exists(perkName))
-            perksConfig.set(perkName + ".requirements", price);
+            perksConfig.set(perkName + ".price", price);
 
         commit(perkName);
     }

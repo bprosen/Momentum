@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.commands;
 
 import com.parkourcraft.Parkour.data.LocationManager;
+import com.parkourcraft.Parkour.data.locations.Locations_YAML;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -12,79 +13,101 @@ public class Location_CMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (a.length == 0)
-            sendHelp(sender);
-        else {
-            if (a[0].equalsIgnoreCase("list")) { //subcommand: list
-                sender.sendMessage(
-                        ChatColor.GRAY + "Locations: "
-                        + ChatColor.GREEN + String.join(
-                            ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                LocationManager.getNames()
-                        )
-                );
-            } else if (a[0].equalsIgnoreCase("go")) { //subcommand: go
-                if (sender instanceof Player) {
-                    Player player = ((Player) sender).getPlayer();
+        if (sender.isOp()) {
+            if (a.length == 0)
+                sendHelp(sender);
+            else {
+                if (a[0].equalsIgnoreCase("list")) { //subcommand: list
+                    sender.sendMessage(
+                            ChatColor.GRAY + "Locations: "
+                                    + ChatColor.GREEN + String.join(
+                                    ChatColor.GRAY + ", " + ChatColor.GREEN,
+                                    LocationManager.getNames()
+                            )
+                    );
+                } else if (a[0].equalsIgnoreCase("go")) { //subcommand: go
+                    if (sender instanceof Player) {
+                        Player player = ((Player) sender).getPlayer();
 
-                    if (a.length == 2) {
-                        String locationName = a[1];
+                        if (a.length == 2) {
+                            String locationName = a[1];
 
-                        if (LocationManager.exists(locationName)) {
-                            LocationManager.teleport(player, locationName);
+                            if (LocationManager.exists(locationName)) {
+                                LocationManager.teleport(player, locationName);
 
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Attempted to send you to "
-                                    + ChatColor.GREEN + locationName
-                            );
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "The location "
-                                            + ChatColor.GREEN + locationName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
-                        sender.sendMessage(getHelp("go"));
-                    }
-                } else
-                    sender.sendMessage(ChatColor.RED + "This command must be run in-game");
-            } else if (a[0].equalsIgnoreCase("create")) {
-                if (sender instanceof Player) {
-                    Player player = ((Player) sender).getPlayer();
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Attempted to send you to "
+                                                + ChatColor.GREEN + locationName
+                                );
+                            } else
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "The location "
+                                                + ChatColor.GREEN + locationName
+                                                + ChatColor.GRAY + " does not exist"
+                                );
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                            sender.sendMessage(getHelp("go"));
+                        }
+                    } else
+                        sender.sendMessage(ChatColor.RED + "This command must be run in-game");
+                } else if (a[0].equalsIgnoreCase("set")) { //subcommand: set
+                    if (sender instanceof Player) {
+                        Player player = ((Player) sender).getPlayer();
 
-                    if (a.length == 2) {
-                        String locationName = a[1];
+                        if (a.length == 2) {
+                            String locationName = a[1];
 
-                        if (!LocationManager.exists(locationName)) {
                             Location playerLocation = player.getLocation();
 
                             LocationManager.save(locationName, playerLocation);
 
                             sender.sendMessage(
-                                    ChatColor.GRAY + "Created location "
+                                    ChatColor.GRAY + "Set location "
                                             + ChatColor.GREEN + locationName
                             );
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "The location "
-                                            + ChatColor.GREEN + locationName
-                                            + ChatColor.GRAY + " already exists"
-                            );
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
-                        sender.sendMessage(getHelp("create"));
-                    }
-                } else
-                    sender.sendMessage(ChatColor.RED + "This command must be run in-game");
-            } else {
-                sender.sendMessage(
-                        ChatColor.RED + "'" + ChatColor.DARK_RED + a[0] +
-                                ChatColor.RED + "' is not a valid parameter"
-                );
-                sendHelp(sender);
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                            sender.sendMessage(getHelp("set"));
+                        }
+                    } else
+                        sender.sendMessage(ChatColor.RED + "This command must be run in-game");
+                } else if (a[0].equalsIgnoreCase("del")) { //subcommand: del
+                    if (sender instanceof Player) {
+                        Player player = ((Player) sender).getPlayer();
+
+                        if (a.length == 2) {
+                            String locationName = a[1];
+
+                            if (LocationManager.exists(locationName)) {
+                                Locations_YAML.remove(locationName);
+
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Deleted location "
+                                                + ChatColor.GREEN + locationName
+                                );
+                            } else
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "The location "
+                                                + ChatColor.GREEN + locationName
+                                                + ChatColor.GRAY + " does not exist"
+                                );
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                            sender.sendMessage(getHelp("go"));
+                        }
+                    } else
+                        sender.sendMessage(ChatColor.RED + "This command must be run in-game");
+                } else {
+                    sender.sendMessage(
+                            ChatColor.RED + "'" + ChatColor.DARK_RED + a[0] +
+                                    ChatColor.RED + "' is not a valid parameter"
+                    );
+                    sendHelp(sender);
+                }
             }
-        }
+        } else
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
 
         return true;
     }
@@ -93,8 +116,8 @@ public class Location_CMD implements CommandExecutor {
         sender.sendMessage(ChatColor.GRAY + "Location names are case sensitive");
         sender.sendMessage(getHelp("go"));
         sender.sendMessage(getHelp("list"));
-        sender.sendMessage(getHelp("create"));
-        sender.sendMessage(getHelp("delete"));
+        sender.sendMessage(getHelp("set"));
+        sender.sendMessage(getHelp("del"));
     }
 
     private static String getHelp(String cmd) {
@@ -104,11 +127,11 @@ public class Location_CMD implements CommandExecutor {
         else if (cmd.equalsIgnoreCase("list"))
             return ChatColor.GREEN + "/loc list" +
                     ChatColor.GRAY + " Lists the configured locations";
-        else if (cmd.equalsIgnoreCase("create"))
-            return ChatColor.GREEN + "/loc create <location>" +
-                    ChatColor.GRAY + " Creates location from your current positon";
-        else if (cmd.equalsIgnoreCase("delete"))
-            return ChatColor.GREEN + "/loc delete <location>" +
+        else if (cmd.equalsIgnoreCase("set"))
+            return ChatColor.GREEN + "/loc set <location>" +
+                    ChatColor.GRAY + " Sets location from your current positon";
+        else if (cmd.equalsIgnoreCase("del"))
+            return ChatColor.GREEN + "/loc del <location>" +
                     ChatColor.GRAY + " Deletes location";
         return "";
     }

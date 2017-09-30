@@ -50,7 +50,7 @@ public class MenuItemFormatter {
 
             // Ownership Status Section
             itemLore.add("");
-            if (perk.hasRequirements(playerStats))
+            if (perk.hasRequirements(playerStats, player))
                 itemLore.add(ChatColor.GREEN + "You own this perk");
             else {
                 itemLore.add(ChatColor.RED + "You do not own this perk");

@@ -49,7 +49,7 @@ public class MenuManager {
 
     public static Menu getMenuFromTitle(String menuTitle) {
         for (Menu menu : menuMap.values())
-            if (menuTitle.startsWith(menu.getFormattedTitle()))
+            if (menuTitle.startsWith(menu.getFormattedTitleBase()))
                 return menu;
 
         return null;
@@ -83,9 +83,9 @@ public class MenuManager {
             menu.updateInventory(player, inventory, Utils.getTrailingInt(inventory.getTitle()));
     }
 
-    public static void updateInventory(Player player, InventoryView inventory, String menuName) {
+    public static void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
         if (exists(menuName))
-            menuMap.get(menuName).updateInventory(player, inventory, 1);
+            menuMap.get(menuName).updateInventory(player, inventory, pageNumber);
     }
 
     public static void updateOpenInventories() {
@@ -99,7 +99,12 @@ public class MenuManager {
                         && menu.isUpdating()) {
                     PlayerStats playerStats = StatsManager.get(player);
 
-                    updateInventory(player, inventoryView, menu.getName());
+                    updateInventory(
+                            player,
+                            inventoryView,
+                            menu.getName(),
+                            Utils.getTrailingInt(inventoryView.getTitle())
+                    );
                 }
             }
 

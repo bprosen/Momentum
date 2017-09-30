@@ -2,8 +2,7 @@ package com.parkourcraft.Parkour.data;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
+import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.data.levels.Levels_YAML;
 
 import java.util.*;
@@ -53,6 +52,7 @@ public class LevelManager {
             remove(levelName);
         else {
             LevelObject levelObject = new LevelObject(levelName);
+            DataQueries.syncLevelID(levelObject);
 
             if (exists)
                 remove(levelName);

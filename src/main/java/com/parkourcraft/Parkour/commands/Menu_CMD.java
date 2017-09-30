@@ -18,13 +18,14 @@ public class Menu_CMD implements CommandExecutor {
 
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("list")) {
-                sender.sendMessage(
-                        ChatColor.GRAY + "Menus: "
-                                + ChatColor.GREEN + String.join(
-                                ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                MenuManager.getMenuNames()
-                        )
-                );
+                if (sender.isOp())
+                    sender.sendMessage(
+                            ChatColor.GRAY + "Menus: "
+                                    + ChatColor.GREEN + String.join(
+                                    ChatColor.GRAY + ", " + ChatColor.GREEN,
+                                    MenuManager.getMenuNames()
+                            )
+                    );
             } else if (a[0].equalsIgnoreCase("open")) {
                 if (sender instanceof Player) {
                     if (a.length > 1) {
@@ -43,7 +44,7 @@ public class Menu_CMD implements CommandExecutor {
 
                             if (inventory != null) {
                                 player.openInventory(inventory);
-                                MenuManager.updateInventory(player, player.getOpenInventory(), menuName);
+                                MenuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
                             } else
                                 sender.sendMessage(ChatColor.RED + "Error loading the inventory");
                         } else
@@ -59,26 +60,36 @@ public class Menu_CMD implements CommandExecutor {
                 } else
                     sender.sendMessage(ChatColor.RED + "Must be in-game to run this command");
             } else if (a[0].equalsIgnoreCase("load")) {
-                FileManager.load("menus");
+                if (sender.isOp()) {
+                    FileManager.load("menus");
 
-                sender.sendMessage(
-                        ChatColor.GRAY + "Loaded " +
-                        ChatColor.GREEN + "menus.yml" +
-                        ChatColor.GRAY + " from disk"
-                );
+                    sender.sendMessage(
+                            ChatColor.GRAY + "Loaded " +
+                                    ChatColor.GREEN + "menus.yml" +
+                                    ChatColor.GRAY + " from disk"
+                    );
 
-                MenuManager.loadMenus();
-                sender.sendMessage(ChatColor.GRAY + "Loaded menus from the config");
+                    MenuManager.loadMenus();
+                    sender.sendMessage(ChatColor.GRAY + "Loaded menus from the config");
+                } else
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
             } else {
-                sender.sendMessage(
-                        ChatColor.RED + "'" +
-                        ChatColor.DARK_RED + a[0] +
-                        ChatColor.RED + "' is an unknown parameter"
-                );
-                sendHelp(sender);
+                if (sender.isOp()) {
+                    sender.sendMessage(
+                            ChatColor.RED + "'" +
+                                    ChatColor.DARK_RED + a[0] +
+                                    ChatColor.RED + "' is an unknown parameter"
+                    );
+                    sendHelp(sender);
+                } else
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
             }
-        } else
-            sendHelp(sender);
+        } else {
+            if (sender.isOp())
+                sendHelp(sender);
+            else
+                sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+        }
 
         return true;
     }

@@ -5,8 +5,6 @@ import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.perks.Perks_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DataQueries;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -53,10 +51,13 @@ public class PerkManager {
                 && exists)
             remove(perkName);
         else {
+            Perk perk = new Perk(perkName);
+            DataQueries.syncPerkID(perk);
+
             if (exists)
                 remove(perkName);
 
-            perks.add(new Perk(perkName));
+            perks.add(perk);
         }
     }
 
@@ -69,7 +70,7 @@ public class PerkManager {
         PlayerStats playerStats = StatsManager.get(player);
 
         for (Perk perk : perks) {
-            boolean hasRequirements = perk.hasRequirements(playerStats);
+            boolean hasRequirements = perk.hasRequirements(playerStats, player);
 
             for (String permission : perk.getPermissions())
                 player.addAttachment(Parkour.getPlugin(), permission, hasRequirements);

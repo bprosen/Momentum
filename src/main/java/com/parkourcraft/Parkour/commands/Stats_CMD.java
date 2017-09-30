@@ -67,14 +67,17 @@ public class Stats_CMD implements CommandExecutor {
 
                     for (Map.Entry<String, List<LevelCompletion>> levelCompletionsEntry : levelCompletionsMap.entrySet()) {
                         List<LevelCompletion> levelCompletionsList = levelCompletionsEntry.getValue();
+                        LevelObject level = LevelManager.get(levelCompletionsEntry.getKey());
 
-                        String levelCompletions = levelCompletionsEntry.getKey() + ":";
+                        if (level != null) {
+                            String levelCompletions = level.getFormattedTitle() + ChatColor.GRAY + " :" + ChatColor.GREEN;
 
-                        for (LevelCompletion levelCompletion : levelCompletionsList)
-                            levelCompletions = levelCompletions + " "
-                                    + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s";
+                            for (LevelCompletion levelCompletion : levelCompletionsList)
+                                levelCompletions = levelCompletions + " "
+                                        + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s";
 
-                        player.sendMessage(levelCompletions);
+                            player.sendMessage(levelCompletions);
+                        }
                     }
                 }
             }

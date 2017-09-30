@@ -80,7 +80,7 @@ public class MenuItemAction {
                     if (inventory != null) {
                         player.closeInventory();
                         player.openInventory(inventory);
-                        MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName());
+                        MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
                     }
                 }
             }

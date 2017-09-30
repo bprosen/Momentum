@@ -48,7 +48,7 @@ public class MenuListener implements Listener {
 
             if (menu != null) {
                 player.openInventory(MenuManager.getInventory(menu.getName(), 1));
-                MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName());
+                MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
             }
         }
 
