@@ -26,7 +26,7 @@ public class DataQueries {
     private static void loadPlayerID(PlayerStats playerStats) {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name",
+                "player_id, player_name, spectatable",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -36,6 +36,12 @@ public class DataQueries {
 
                 if (!playerResult.get("player_name").equals(playerStats.getPlayerName()))
                     updatePlayerName(playerStats);
+
+                int spectatable = Integer.parseInt(playerResult.get("spectatable"));
+                if (spectatable == 1)
+                    playerStats.isSpectatable(true);
+                else
+                    playerStats.isSpectatable(false);
             }
         } else {
             insertPlayerID(playerStats);
@@ -59,6 +65,20 @@ public class DataQueries {
     private static void updatePlayerName(PlayerStats playerStats) {
         String query = "UPDATE players SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_id='" + playerStats.getPlayerID() + "'"
+                ;
+
+        DatabaseManager.addUpdateQuery(query);
+    }
+
+    public static void updatePlayerSpectatable(PlayerStats playerStats) {
+        int spectatable = 0;
+
+        if (playerStats.isSpectatable())
+            spectatable = 1;
+
+        String query = "UPDATE players SET " +
+                "spectatable=" + spectatable + " " +
                 "WHERE player_id='" + playerStats.getPlayerID() + "'"
                 ;
 

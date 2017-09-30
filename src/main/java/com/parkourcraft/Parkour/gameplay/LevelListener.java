@@ -76,7 +76,8 @@ public class LevelListener implements Listener {
             if (levelName != null) {
                 PlayerStats playerStats = StatsManager.get(event.getPlayer());
 
-                if (playerStats != null)
+                if (playerStats != null
+                        && playerStats.getPlayerToSpectate() == null)
                     playerStats.startedLevel();
             }
         }
@@ -86,7 +87,8 @@ public class LevelListener implements Listener {
     public void onTeleport(PlayerTeleportEvent event) {
         PlayerStats playerStats = StatsManager.get(event.getPlayer());
 
-        if (playerStats != null)
+        if (playerStats != null
+                && playerStats.getPlayerToSpectate() == null)
             playerStats.disableLevelStartTime();
     }
 

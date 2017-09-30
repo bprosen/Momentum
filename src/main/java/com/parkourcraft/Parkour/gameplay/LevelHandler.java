@@ -28,60 +28,69 @@ public class LevelHandler {
         Location lobby = LocationManager.getLobbyLocation();
 
         if (playerStats != null
+                && playerStats.getPlayerToSpectate() == null
                 && level != null
                 && lobby != null) {
-            Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
-            LevelCompletion levelCompletion = new LevelCompletion(
-                    System.currentTimeMillis(),
-                    elapsedTime
-            );
+            int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 
-            level.addCompletion(); // Update totalLevelCompletionsCount
+            if (playerLevelCompletions >= level.getMaxCompletions()) {
 
-            // Update player information
-            playerStats.levelCompletion(levelName, levelCompletion);
-            DataQueries.insertCompletion(playerStats, level, levelCompletion);
-            PerkManager.syncPermissions(player);
-            Parkour.economy.depositPlayer(player, level.getReward());
-
-            String messageFormatted = level.getFormattedMessage(playerStats);
-            String time = (((double) elapsedTime) / 1000) + "s";
-            if (elapsedTime > 0L
-                    && elapsedTime < 8388607L)
-                messageFormatted = messageFormatted.replace(
-                        "%time%",
-                        time
-                );
-            else
-                messageFormatted = messageFormatted.replace(
-                        "%time%",
-                        "-"
+                Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
+                LevelCompletion levelCompletion = new LevelCompletion(
+                        System.currentTimeMillis(),
+                        elapsedTime
                 );
 
-            String titleMessage = ChatColor.GRAY + "You Beat " + level.getFormattedTitle();
-            if (elapsedTime > 0L)
-                titleMessage += ChatColor.GRAY + " in " + ChatColor.GREEN + time;
+                level.addCompletion(); // Update totalLevelCompletionsCount
 
-            // Run gameplay actions: teleport and messaging
-            player.teleport(lobby);
-            player.sendMessage(messageFormatted);
-            TitleAPI.sendTitle(
-                    player, 10, 40, 10,
-                    "",
-                    titleMessage);
+                // Update player information
+                playerStats.levelCompletion(levelName, levelCompletion);
+                DataQueries.insertCompletion(playerStats, level, levelCompletion);
+                PerkManager.syncPermissions(player);
+                Parkour.economy.depositPlayer(player, level.getReward());
 
-            // Broadcast the completion if enabled for the level
-            if (level.getBroadcastCompletion()) {
-                String broadcastMessage = ChatColor.translateAlternateColorCodes(
-                        '&',
-                        Settings_YAML.getLevelBroadcastCompletionMessage()
-                );
+                String messageFormatted = level.getFormattedMessage(playerStats);
+                String time = (((double) elapsedTime) / 1000) + "s";
+                if (elapsedTime > 0L
+                        && elapsedTime < 8388607L)
+                    messageFormatted = messageFormatted.replace(
+                            "%time%",
+                            time
+                    );
+                else
+                    messageFormatted = messageFormatted.replace(
+                            "%time%",
+                            "-"
+                    );
 
-                broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
-                broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
+                String titleMessage = ChatColor.GRAY + "You Beat " + level.getFormattedTitle();
+                if (elapsedTime > 0L
+                        && elapsedTime < 8388607L)
+                    titleMessage += ChatColor.GRAY + " in " + ChatColor.GREEN + time;
 
-                Bukkit.broadcastMessage(broadcastMessage);
-            }
+                // Run gameplay actions: teleport and messaging
+                player.teleport(lobby);
+                player.sendMessage(messageFormatted);
+                TitleAPI.sendTitle(
+                        player, 10, 40, 10,
+                        "",
+                        titleMessage);
+
+                // Broadcast the completion if enabled for the level
+                if (level.getBroadcastCompletion()) {
+                    String broadcastMessage = ChatColor.translateAlternateColorCodes(
+                            '&',
+                            Settings_YAML.getLevelBroadcastCompletionMessage()
+                    );
+
+                    broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
+                    broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
+
+                    Bukkit.broadcastMessage(broadcastMessage);
+
+                }
+            } else
+                player.sendMessage(ChatColor.RED + "You've reached the maximum number of completions");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.gameplay;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
@@ -19,7 +20,9 @@ public class JoinLeaveHandler implements Listener {
         StatsManager.add(event.getPlayer());
 
         if (!event.getPlayer().isOp())
-        LocationManager.teleport(event.getPlayer(), "spawn");
+            LocationManager.teleport(event.getPlayer(), "spawn");
+
+        Parkour.ghostFactory.addPlayer(event.getPlayer());
     }
 
     @EventHandler

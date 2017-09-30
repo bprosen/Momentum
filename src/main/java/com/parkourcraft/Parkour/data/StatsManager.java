@@ -1,8 +1,8 @@
 package com.parkourcraft.Parkour.data;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -19,9 +19,21 @@ public class StatsManager {
         return null;
     }
 
+    public static List<PlayerStats> getPlayerStats() {
+        return playerStatsList;
+    }
+
     public static PlayerStats getByName(String playerName) {
         for (PlayerStats playerStats : playerStatsList)
             if (playerStats.getPlayerName().equals(playerName))
+                return playerStats;
+
+        return null;
+    }
+
+    public static PlayerStats getByNameIgnoreCase(String playerName) {
+        for (PlayerStats playerStats : playerStatsList)
+            if (playerStats.getPlayerName().equalsIgnoreCase(playerName))
                 return playerStats;
 
         return null;
@@ -40,31 +52,26 @@ public class StatsManager {
 
     public static void add(Player player) {
         if (!exists(player.getUniqueId().toString())) {
-            PlayerStats playerStats = new PlayerStats(
-                    player.getUniqueId().toString(),
-                    player.getName()
-            );
+            PlayerStats playerStats = new PlayerStats(player);
 
             playerStatsList.add(playerStats);
             DatabaseManager.addToLoadPlayersCache(playerStats);
         }
     }
 
-    public static void remove(String UUID) {
-        for (Iterator<PlayerStats> iterator = playerStatsList.iterator(); iterator.hasNext();)
-            if (iterator.next().getUUID().equals(UUID))
-                iterator.remove();
+    public static void remove(PlayerStats playerStats) {
+        playerStatsList.remove(playerStats);
     }
 
-    public static void cleanPlayerStats() {
-        List<String> removeList = new ArrayList<>();
+    public static void clean() {
+        List<PlayerStats> removeList = new ArrayList<>();
 
         for (PlayerStats playerStats : playerStatsList)
-            if (Bukkit.getPlayer(UUID.fromString(playerStats.getUUID())) == null)
-                removeList.add(playerStats.getUUID());
+            if (!playerStats.getPlayer().isOnline())
+                removeList.add(playerStats);
 
-        for (String UUID : removeList)
-            remove(UUID);
+        for (PlayerStats playerStats : removeList)
+            remove(playerStats);
     }
 
 }

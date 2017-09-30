@@ -2,10 +2,7 @@ package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.*;
 import com.parkourcraft.Parkour.data.*;
-import com.parkourcraft.Parkour.gameplay.JoinLeaveHandler;
-import com.parkourcraft.Parkour.gameplay.LevelListener;
-import com.parkourcraft.Parkour.gameplay.MenuListener;
-import com.parkourcraft.Parkour.gameplay.Scoreboard;
+import com.parkourcraft.Parkour.gameplay.*;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
@@ -25,6 +22,7 @@ public class Parkour extends JavaPlugin {
     private static Plugin plugin;
     private static Logger logger;
     public static Economy economy;
+    public static GhostFactory ghostFactory;
 
     @Override
     public void onEnable() {
@@ -50,6 +48,8 @@ public class Parkour extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        ghostFactory = new GhostFactory(plugin);
 
         runScheduler();
     }
@@ -79,10 +79,12 @@ public class Parkour extends JavaPlugin {
     private void runScheduler() {
         BukkitScheduler scheduler = getServer().getScheduler();
 
-        // update open menus every .5 seconds
+        // update open menus, clean playerstats, and spectators every .5 seconds
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
+                StatsManager.clean();
                 MenuManager.updateOpenInventories();
+                SpectatorHandler.updateSpectators();
             }
         }, 0L, 10L);
 
@@ -122,6 +124,7 @@ public class Parkour extends JavaPlugin {
         pluginManager.registerEvents(new LevelListener(), this);
         pluginManager.registerEvents(new JoinLeaveHandler(), this);
         pluginManager.registerEvents(new MenuListener(), this);
+        pluginManager.registerEvents(new TestChamberHandler(), this);
     }
 
     private void registerCommands() {
@@ -131,6 +134,7 @@ public class Parkour extends JavaPlugin {
         getCommand("menu").setExecutor(new Menu_CMD());
         getCommand("perks").setExecutor(new Perks_CMD());
         getCommand("setarmor").setExecutor(new SetArmor_CMD());
+        getCommand("spectate").setExecutor(new Spectate_CMD());
     }
 
 }

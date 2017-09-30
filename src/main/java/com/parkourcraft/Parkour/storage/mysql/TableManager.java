@@ -32,10 +32,11 @@ public class TableManager {
                 "player_id INT NOT NULL AUTO_INCREMENT, " +
                 "uuid CHAR(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
+                "spectatable BIT DEFAULT 1, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 
-        DatabaseManager.addUpdateQuery(sqlQuery);
+        DatabaseManager.runQuery(sqlQuery);
     }
 
     private static void createLevels() {
@@ -45,7 +46,7 @@ public class TableManager {
                 "PRIMARY KEY (level_id)" +
                 ")";
 
-        DatabaseManager.addUpdateQuery(sqlQuery);
+        DatabaseManager.runQuery(sqlQuery);
     }
 
     private static void createPerks() {
@@ -55,7 +56,7 @@ public class TableManager {
                 "PRIMARY KEY (perk_id)" +
                 ")";
 
-        DatabaseManager.addUpdateQuery(sqlQuery);
+        DatabaseManager.runQuery(sqlQuery);
     }
 
     private static void createLedger() {
@@ -65,7 +66,7 @@ public class TableManager {
                 "date TIMESTAMP NOT NULL" +
                 ")";
 
-        DatabaseManager.addUpdateQuery(sqlQuery);
+        DatabaseManager.runQuery(sqlQuery);
     }
 
     private static void createCompletions() {
@@ -76,7 +77,7 @@ public class TableManager {
                 "completion_date TIMESTAMP NOT NULL" +
                 ")";
 
-        DatabaseManager.addUpdateQuery(sqlQuery);
+        DatabaseManager.runQuery(sqlQuery);
     }
 
     private static List<String> getTables() {

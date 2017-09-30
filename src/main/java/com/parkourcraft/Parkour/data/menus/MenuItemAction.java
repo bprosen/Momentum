@@ -38,7 +38,7 @@ public class MenuItemAction {
                 PlayerStats playerStas = StatsManager.get(player);
 
                 if (commands
-                        && playerStas.hasPerk(perk.getName())) {
+                        && perk.hasRequirements(playerStas, player)) {
                     player.closeInventory();
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
                 } else if (!playerStas.hasPerk(perk.getName())
@@ -54,14 +54,19 @@ public class MenuItemAction {
             }
         } else {
             if (itemType.equals("level")) {
+                PlayerStats playerStats = StatsManager.get(player);
                 LevelObject level = LevelManager.get(menuItem.getTypeValue());
 
-                player.closeInventory();
-                player.teleport(level.getStartLocation());
-                player.sendMessage(
-                        ChatColor.GRAY + "You were teleported to the beginning of "
-                                + level.getFormattedTitle()
-                );
+                int playerLevelCompletions = playerStats.getLevelCompletionsCount(menuItem.getTypeValue());
+
+                if (playerLevelCompletions < level.getMaxCompletions()) {
+                    player.closeInventory();
+                    player.teleport(level.getStartLocation());
+                    player.sendMessage(
+                            ChatColor.GRAY + "You were teleported to the beginning of "
+                                    + level.getFormattedTitle()
+                    );
+                }
             } else if (itemType.equals("teleport")) {
                 Location location = LocationManager.get(menuItem.getTypeValue());
 

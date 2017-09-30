@@ -1,28 +1,28 @@
 package com.parkourcraft.Parkour.data.stats;
 
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.data.perks.Perk;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.entity.Player;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PlayerStats {
 
+    private Player player;
     private String UUID;
     private String playerName;
     private int playerID;
-
     private long levelStartTime = 0;
+
+    private boolean spectatable;
+    private PlayerStats playerToSpectate;
 
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
-    public PlayerStats(String UUID, String playerName) {
-        this.UUID = UUID;
-        this.playerName = playerName;
+    public PlayerStats(Player player) {
+        this.player  = player;
+
+        this.UUID = player.getUniqueId().toString();
+        this.playerName = player.getName();
     }
 
     public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
@@ -34,6 +34,17 @@ public class PlayerStats {
 
     public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed) {
         this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
+    }
+
+    public boolean isLoaded() {
+        if (playerID > 0)
+            return true;
+
+        return false;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public String getUUID() {
@@ -62,6 +73,22 @@ public class PlayerStats {
 
     public int getPlayerID() {
         return playerID;
+    }
+
+    public void isSpectatable(boolean setting) {
+        spectatable = setting;
+    }
+
+    public boolean isSpectatable() {
+        return spectatable;
+    }
+
+    public void setPlayerToSpectate(PlayerStats playerStats) {
+        playerToSpectate = playerStats;
+    }
+
+    public PlayerStats getPlayerToSpectate() {
+        return playerToSpectate;
     }
 
     public Map<String, List<LevelCompletion>> getLevelCompletionsMap() {
