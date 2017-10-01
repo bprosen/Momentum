@@ -7,6 +7,7 @@ import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -70,6 +71,23 @@ public class LevelListener implements Listener {
     public void onStepOnPressurePlate(PlayerInteractEvent event) {
         if (event.getAction().equals(Action.PHYSICAL)
                 && event.getClickedBlock().getType().equals(Material.STONE_PLATE)) {
+            Player player = event.getPlayer();
+            String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+
+            if (levelName != null) {
+                PlayerStats playerStats = StatsManager.get(event.getPlayer());
+
+                if (playerStats != null
+                        && playerStats.getPlayerToSpectate() == null)
+                    playerStats.startedLevel();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onWalkOnPressurePlate(PlayerMoveEvent event) {
+        if (event.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.STONE_PLATE
+                || event.getTo().getBlock().getRelative(BlockFace.UP).getType() == Material.STONE_PLATE) {
             Player player = event.getPlayer();
             String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 

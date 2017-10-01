@@ -57,16 +57,12 @@ public class MenuItemAction {
                 PlayerStats playerStats = StatsManager.get(player);
                 LevelObject level = LevelManager.get(menuItem.getTypeValue());
 
-                int playerLevelCompletions = playerStats.getLevelCompletionsCount(menuItem.getTypeValue());
-
-                if (playerLevelCompletions < level.getMaxCompletions()) {
-                    player.closeInventory();
-                    player.teleport(level.getStartLocation());
-                    player.sendMessage(
-                            ChatColor.GRAY + "You were teleported to the beginning of "
-                                    + level.getFormattedTitle()
-                    );
-                }
+                player.closeInventory();
+                player.teleport(level.getStartLocation());
+                player.sendMessage(
+                        ChatColor.GRAY + "You were teleported to the beginning of "
+                        + level.getFormattedTitle()
+                );
             } else if (itemType.equals("teleport")) {
                 Location location = LocationManager.get(menuItem.getTypeValue());
 

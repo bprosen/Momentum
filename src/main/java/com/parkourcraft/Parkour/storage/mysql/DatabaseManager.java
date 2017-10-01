@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.Parkour;
+import com.parkourcraft.Parkour.data.PerkManager;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.entity.Player;
@@ -63,6 +64,7 @@ public class DatabaseManager {
 
             for (PlayerStats playerStats : cache) {
                 DataQueries.loadPlayerStats(playerStats);
+                PerkManager.syncPermissions(playerStats.getPlayer());
                 loadPlayersCache.remove(playerStats);
             }
         } catch (Exception exception) {

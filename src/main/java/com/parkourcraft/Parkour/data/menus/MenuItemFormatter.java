@@ -45,7 +45,8 @@ public class MenuItemFormatter {
                 itemMeta.setDisplayName(perk.getFormattedTitle());
             else {
                 itemLore.add("");
-                itemLore.add(ChatColor.GRAY + "Perk Required: " + perk.getFormattedTitle());
+                itemLore.add(ChatColor.GRAY + "Perk Required");
+                itemLore.add("  " + perk.getFormattedTitle());
             }
 
             // Ownership Status Section

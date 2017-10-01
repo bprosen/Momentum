@@ -3,10 +3,12 @@ package com.parkourcraft.Parkour.data.menus;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,6 +152,7 @@ public class Menus_YAML {
         int type = 7;
         int size = 1;
         List<String> lore = new ArrayList<>();
+        int armorColor = -1;
 
         if (hasItem(menuName, pageNumber, itemSlot)) {
             String itemPath = pageNumber + "." + itemSlot + ".item";
@@ -170,6 +173,9 @@ public class Menus_YAML {
             if (isSet(menuName, itemPath + ".size"))
                 size = menusConfig.getInt(menuName + "." + itemPath + ".size");
 
+            if (isSet(menuName, itemPath + ".armor_color"))
+                armorColor = menusConfig.getInt(menuName + "." + itemPath + ".armor_color");
+
             lore = Utils.formatLore(getItemLore(menuName, pageNumber, itemSlot));
         }
 
@@ -183,6 +189,12 @@ public class Menus_YAML {
             itemMeta.setLore(lore);
 
         item.setItemMeta(itemMeta);
+
+        if (armorColor > 0) {
+            LeatherArmorMeta leatherItemMeta = (LeatherArmorMeta) item.getItemMeta();
+            leatherItemMeta.setColor(Color.fromRGB(armorColor));
+            item.setItemMeta(leatherItemMeta);
+        }
 
         return item;
     }
