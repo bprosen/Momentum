@@ -55,7 +55,7 @@ public class SetArmor_CMD implements CommandExecutor {
                             + material.toLowerCase() + "."
                             + type;
 
-                    if (leatherArmorColor < -1)
+                    if (leatherArmorColor > 0)
                         permission += "." + leatherArmorColor;
 
                     if (player.isOp()
