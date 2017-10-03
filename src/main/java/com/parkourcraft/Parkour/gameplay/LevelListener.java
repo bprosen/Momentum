@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -72,31 +73,28 @@ public class LevelListener implements Listener {
         if (event.getAction().equals(Action.PHYSICAL)
                 && event.getClickedBlock().getType().equals(Material.STONE_PLATE)) {
             Player player = event.getPlayer();
-            String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 
-            if (levelName != null) {
-                PlayerStats playerStats = StatsManager.get(event.getPlayer());
+            if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
+                String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 
-                if (playerStats != null
-                        && playerStats.getPlayerToSpectate() == null)
-                    playerStats.startedLevel();
+                if (levelName != null)
+                    LevelHandler.startedLevel(player);
             }
         }
     }
 
     @EventHandler
     public void onWalkOnPressurePlate(PlayerMoveEvent event) {
-        if (event.getTo().getBlock().getRelative(BlockFace.DOWN).getType() == Material.STONE_PLATE
-                || event.getTo().getBlock().getRelative(BlockFace.UP).getType() == Material.STONE_PLATE) {
+        if (event.getTo().getBlock().getRelative(BlockFace.UP)
+                .getLocation().add(0, 1, 0)
+                .getBlock().getType() == Material.STONE_PLATE) {
             Player player = event.getPlayer();
-            String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 
-            if (levelName != null) {
-                PlayerStats playerStats = StatsManager.get(event.getPlayer());
+            if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
+                String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 
-                if (playerStats != null
-                        && playerStats.getPlayerToSpectate() == null)
-                    playerStats.startedLevel();
+                if (levelName != null)
+                    LevelHandler.startedLevel(player);
             }
         }
     }
@@ -108,6 +106,24 @@ public class LevelListener implements Listener {
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null)
             playerStats.disableLevelStartTime();
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void beforeDeath(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+
+            if (player.getHealth() - event.getFinalDamage() <= 0) {
+                String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+
+                if (levelName != null) {
+                    LevelHandler.respawnPlayerToStart(player, levelName);
+                    player.setHealth(20);
+                    player.setFireTicks(0);
+                    LevelHandler.clearPotionEffects(player);
+                }
+            }
+        }
     }
 
 }

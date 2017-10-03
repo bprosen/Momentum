@@ -66,4 +66,8 @@ public class MenuItem {
         return consoleCommands;
     }
 
+    public boolean hasCommands() {
+        return (commands.size() > 0 || consoleCommands.size() > 0);
+    }
+
 }

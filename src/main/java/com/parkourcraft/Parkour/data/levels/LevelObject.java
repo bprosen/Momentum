@@ -20,6 +20,7 @@ public class  LevelObject {
     private String message;
     private int maxCompletions;
     private boolean broadcastCompletion;
+    private List<String> requiredLevels;
     private int ID = -1;
 
     private int totalCompletionsCount = -1;
@@ -137,6 +138,8 @@ public class  LevelObject {
             maxCompletions = Levels_YAML.getMaxCompletions(name);
 
             broadcastCompletion = Levels_YAML.getBroadcastSetting(name);
+
+            requiredLevels = Levels_YAML.getRequiredLevels(name);
         }
     }
 
@@ -146,6 +149,18 @@ public class  LevelObject {
 
     public List<LevelCompletion> getLeaderboard() {
         return leaderboardCache;
+    }
+
+    public List<String> getRequiredLevels() {
+        return requiredLevels;
+    }
+
+    public boolean hasRequiredLevels(PlayerStats playerStats) {
+        for (String levelName : requiredLevels)
+            if (playerStats.getLevelCompletionsCount(levelName) < 1)
+                return false;
+
+        return true;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.commands;
 
 import com.parkourcraft.Parkour.data.LevelManager;
+import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.data.levels.Levels_YAML;
 import com.parkourcraft.Parkour.data.LocationManager;
@@ -11,6 +12,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class Level_CMD implements CommandExecutor {
 
@@ -356,6 +359,58 @@ public class Level_CMD implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Incorrect parameters");
                     sender.sendMessage(getHelp("broadcast"));
                 }
+            } else if (a[0].equalsIgnoreCase("requires")) { //subcommand: requires
+                if (a.length > 1) {
+                    String levelName = a[1];
+                    LevelObject level = LevelManager.get(levelName);
+
+                    if (level != null) {
+                        if (a.length == 3) {
+                            List<String> requiredLevels = level.getRequiredLevels();
+
+                            if (requiredLevels.contains(a[2])) {
+                                requiredLevels.remove(a[2]);
+                                Levels_YAML.setRequiredLevels(levelName, requiredLevels);
+
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Removed " +
+                                        ChatColor.RED + a[2] +
+                                        ChatColor.GRAY + " from required levels"
+                                );
+                            } else {
+                                requiredLevels.add(a[2]);
+                                Levels_YAML.setRequiredLevels(levelName, requiredLevels);
+
+                                sender.sendMessage(
+                                        ChatColor.GRAY + "Added " +
+                                                ChatColor.GREEN + a[2] +
+                                                ChatColor.GRAY + " to required levels"
+                                );
+                            }
+
+                        }
+
+                        level = LevelManager.get(levelName);
+
+                        sender.sendMessage(
+                                ChatColor.GREEN + levelName +
+                                        ChatColor.GRAY + "'s required levels: "
+                                        + ChatColor.GREEN + String.join(
+                                        ChatColor.GRAY + ", " + ChatColor.GREEN,
+                                        level.getRequiredLevels()
+                                )
+                        );
+
+                        if (a.length != 3)
+                            sender.sendMessage(getHelp("requires"));
+                    } else
+                        sender.sendMessage(
+                                ChatColor.GRAY + "Level "
+                                        + ChatColor.GREEN + levelName
+                                        + ChatColor.GRAY + " does not exist"
+                        );
+                } else
+                    sender.sendMessage(getHelp("requires"));
             } else { // subcommand: unknown
                 sender.sendMessage(
                         ChatColor.RED + "'" + ChatColor.DARK_RED + a[0] +
@@ -383,45 +438,49 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("message"));
         sender.sendMessage(getHelp("completions"));
         sender.sendMessage(getHelp("broadcast"));
+        sender.sendMessage(getHelp("requires"));
     }
 
     private static String getHelp(String cmd) {
         if (cmd.equalsIgnoreCase("show"))
             return ChatColor.GREEN + "/level show <level>" +
-                    ChatColor.GRAY + " Shows level information";
+                    ChatColor.GRAY + " Show level information";
         else if (cmd.equalsIgnoreCase("list"))
             return ChatColor.GREEN + "/level list" +
-                    ChatColor.GRAY + " Lists the configured levels";
+                    ChatColor.GRAY + " List levels loaded in memory";
         else if (cmd.equalsIgnoreCase("create"))
             return ChatColor.GREEN + "/level create <level>" +
-                    ChatColor.GRAY + " Creates a level";
+                    ChatColor.GRAY + " Create a level";
         else if (cmd.equalsIgnoreCase("load"))
             return ChatColor.GREEN + "/level load" +
                     ChatColor.GRAY + " Loads levels.yml, then levels";
         else if (cmd.equalsIgnoreCase("delete"))
             return ChatColor.GREEN + "/level delete <level>" +
-                    ChatColor.GRAY + " Deletes a level";
+                    ChatColor.GRAY + " Delete a level";
         else if (cmd.equalsIgnoreCase("title"))
             return ChatColor.GREEN + "/level title <level> [title]" +
-                    ChatColor.GRAY + " View or set a level's title";
+                    ChatColor.GRAY + " View/Set a level's title";
         else if (cmd.equalsIgnoreCase("reward"))
             return ChatColor.GREEN + "/level reward <level> [reward]" +
-                    ChatColor.GRAY + " View or set a level's reward";
+                    ChatColor.GRAY + " View/Set a level's reward";
         else if (cmd.equalsIgnoreCase("startloc"))
             return ChatColor.GREEN + "/level startloc <level>" +
-                    ChatColor.GRAY + " Sets the level's spawn to your location";
+                    ChatColor.GRAY + " Set the start to your location";
         else if (cmd.equalsIgnoreCase("completionloc"))
             return ChatColor.GREEN + "/level completionloc <level> [default]" +
-                    ChatColor.GRAY + " Sets the level's respawn to your location";
+                    ChatColor.GRAY + " Set respawn to your location";
         else if (cmd.equalsIgnoreCase("message"))
             return ChatColor.GREEN + "/level message <level> [message]" +
-                    ChatColor.GRAY + " View or set a level's completion mesage";
+                    ChatColor.GRAY + " View/Set completion mesage";
         else if (cmd.equalsIgnoreCase("completions"))
             return ChatColor.GREEN + "/level completions <level> [completions]" +
-                    ChatColor.GRAY + " View or set a level's max completions";
+                    ChatColor.GRAY + " View/Set max completions";
         else if (cmd.equalsIgnoreCase("broadcast"))
             return ChatColor.GREEN + "/level broadcast <level>" +
-                    ChatColor.GRAY + " Toggle if a level broadcasts completions";
+                    ChatColor.GRAY + " Toggle broadcast completion";
+        else if (cmd.equalsIgnoreCase("requires"))
+            return ChatColor.GREEN + "/level requires <level> <level>" +
+                    ChatColor.GRAY + " Add/Remove required level";
         return "";
     }
 }

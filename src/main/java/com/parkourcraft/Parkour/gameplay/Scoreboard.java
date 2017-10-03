@@ -50,6 +50,9 @@ public class Scoreboard {
                 + ChatColor.WHITE + ChatColor.BOLD + "Craft "
         );
 
+        if (level == null)
+            board.add(formatSpacing(ChatColor.GRAY + ""));
+
         String coinBalance =
                 ChatColor.GOLD +  Integer.toString((int) Parkour.economy.getBalance(player))
                 + ChatColor.YELLOW + ChatColor.BOLD + " Coins";

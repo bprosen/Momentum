@@ -93,6 +93,21 @@ public class Levels_YAML {
         }
     }
 
+    public static void setRequiredLevels(String levelName, List<String> requiredLevels) {
+        if (exists(levelName)) {
+            levelsFile.set(levelName + ".required_levels", requiredLevels);
+
+            commit(levelName);
+        }
+    }
+
+    public static List<String> getRequiredLevels(String levelName) {
+        if (isSet(levelName, "required_levels"))
+            return levelsFile.getStringList(levelName + ".required_levels");
+
+        return new ArrayList<>();
+    }
+
     public static String getTitle(String levelName) {
         if (levelsFile.isSet(levelName + ".title"))
             return levelsFile.getString(levelName + ".title");

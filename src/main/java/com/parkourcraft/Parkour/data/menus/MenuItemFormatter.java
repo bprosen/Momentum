@@ -112,20 +112,40 @@ public class MenuItemFormatter {
 
         if (level != null) {
             ItemMeta itemMeta = item.getItemMeta();
+
+            // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
+            // Item Title Section
             String formattedTitle = level.getFormattedTitle();
             itemMeta.setDisplayName(formattedTitle);
 
+            // Click To Go and Reward Section
             itemLore.add(
                     ChatColor.GRAY + "Click to go to " +
                             formattedTitle
                                     .replace(ChatColor.BOLD + "", "")
                                     .replace(ChatColor.ITALIC + "", "")
             );
-
             itemLore.add("  " + ChatColor.GOLD + level.getReward() + " Coin " + ChatColor.GRAY + "Reward");
 
+            // Required Levels Section
+            if (level.getRequiredLevels().size() > 0) {
+                itemLore.add("");
+                itemLore.add(ChatColor.GRAY + "Required Levels");
+
+                for (String requiredLevelName : level.getRequiredLevels()) {
+                    LevelObject requiredLevel = LevelManager.get(requiredLevelName);
+
+                    if (requiredLevel != null)
+                        itemLore.add(
+                                ChatColor.GRAY + " - "
+                                + requiredLevel.getFormattedTitle()
+                        );
+                }
+            }
+
+            // Personal Level Stats Section
             int levelCompletionsCount = playerStats.getLevelCompletionsCount(levelName);
             if (levelCompletionsCount > 0) {
                 itemLore.add("");
@@ -151,6 +171,7 @@ public class MenuItemFormatter {
                 }
             }
 
+            // Sections over
             itemMeta.setLore((itemLore));
             item.setItemMeta(itemMeta);
         }
