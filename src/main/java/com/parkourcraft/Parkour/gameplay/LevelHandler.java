@@ -36,7 +36,8 @@ public class LevelHandler {
             if (level.hasRequiredLevels(playerStats)) {
                 int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 
-                if (playerLevelCompletions < level.getMaxCompletions()) {
+                if (level.getMaxCompletions() == -1
+                        || playerLevelCompletions < level.getMaxCompletions()) {
                     Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
                     LevelCompletion levelCompletion = new LevelCompletion(
                             System.currentTimeMillis(),

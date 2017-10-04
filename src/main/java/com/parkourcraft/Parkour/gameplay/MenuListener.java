@@ -33,7 +33,9 @@ public class MenuListener implements Listener {
                 if (menuItem != null)
                     MenuItemAction.perform((Player) event.getWhoClicked(), menuItem);
             }
-        }
+        } else if (event.getWhoClicked() instanceof Player
+                && !event.getWhoClicked().isOp())
+            event.setCancelled(true);
     }
 
     @EventHandler
