@@ -80,6 +80,9 @@ public class PlayerStats {
     }
 
     public boolean isSpectatable() {
+        if (playerToSpectate != null)
+            return false;
+
         return spectatable;
     }
 

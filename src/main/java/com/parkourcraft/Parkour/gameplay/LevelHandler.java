@@ -27,12 +27,10 @@ public class LevelHandler {
     static void levelCompletion(Player player, String levelName) {
         PlayerStats playerStats = StatsManager.get(player);
         LevelObject level = LevelManager.get(levelName);
-        Location lobby = LocationManager.getLobbyLocation();
 
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null
-                && level != null
-                && lobby != null) {
+                && level != null) {
             if (level.hasRequiredLevels(playerStats)) {
                 int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 
@@ -72,7 +70,7 @@ public class LevelHandler {
                         titleMessage += ChatColor.GRAY + " in " + ChatColor.GREEN + time;
 
                     // Run gameplay actions: teleport and messaging
-                    player.teleport(lobby);
+                    player.teleport(level.getRespawnLocation());
                     player.sendMessage(messageFormatted);
                     TitleAPI.sendTitle(
                             player, 10, 40, 10,
