@@ -32,10 +32,7 @@ public class LevelManager {
     }
 
     public static boolean exists(String levelName) {
-        if (get(levelName) != null)
-            return true;
-
-        return false;
+        return get(levelName) != null;
     }
 
     public static void remove(String levelName) {
@@ -55,7 +52,7 @@ public class LevelManager {
             remove(levelName);
         else {
             LevelObject levelObject = new LevelObject(levelName);
-            DataQueries.syncLevelID(levelObject);
+            DataQueries.syncLevelData(levelObject);
 
             if (exists)
                 remove(levelName);

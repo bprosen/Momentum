@@ -192,7 +192,7 @@ public class DataQueries {
      * Levels Section
      */
 
-    private static void syncLevelData(LevelObject level) {
+    public static void syncLevelData(LevelObject level) {
         LevelData levelData = levelDataCache.get(level.getName());
 
         if (levelData != null) {
