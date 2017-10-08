@@ -3,6 +3,7 @@ package com.parkourcraft.Parkour.data;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -57,6 +58,12 @@ public class StatsManager {
             playerStatsList.add(playerStats);
             DatabaseManager.addToLoadPlayersCache(playerStats);
         }
+    }
+
+    public static void loadUnloadedStats() {
+        for (Player player : Bukkit.getOnlinePlayers())
+            if (!exists(player.getUniqueId().toString()))
+                add(player);
     }
 
     public static void remove(PlayerStats playerStats) {

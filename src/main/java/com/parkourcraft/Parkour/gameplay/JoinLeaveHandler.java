@@ -26,7 +26,7 @@ public class JoinLeaveHandler implements Listener {
     }
 
     @EventHandler
-    public void onLeave(PlayerQuitEvent event) {
+    public void onQuit(PlayerQuitEvent event) {
         playerLeft(event.getPlayer());
     }
 
@@ -36,11 +36,6 @@ public class JoinLeaveHandler implements Listener {
     }
 
     private void playerLeft(Player player) {
-        //Player Head Cache
-        //PlayerHeadCache.remove(player.getName());
-
-        //Remove from playerStats list and uploads player information
-        //Disabled due to the cache getting cleaned and updating information anyway
-        //DatabaseManager.addToUpdatePlayersCache(player.getUniqueId().toString());
+        Parkour.ghostFactory.removePlayer(player);
     }
 }

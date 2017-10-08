@@ -63,8 +63,13 @@ public class DatabaseManager {
             List<PlayerStats> cache = new ArrayList<>(loadPlayersCache);
 
             for (PlayerStats playerStats : cache) {
-                DataQueries.loadPlayerStats(playerStats);
-                PerkManager.syncPermissions(playerStats.getPlayer());
+                if (playerStats != null
+                        && playerStats.getPlayer() != null
+                        && playerStats.getPlayer().isOnline()) {
+                    DataQueries.loadPlayerStats(playerStats);
+                    PerkManager.syncPermissions(playerStats.getPlayer());
+                }
+
                 loadPlayersCache.remove(playerStats);
             }
         } catch (Exception exception) {

@@ -52,6 +52,8 @@ public class Parkour extends JavaPlugin {
         ghostFactory = new GhostFactory(plugin);
 
         runScheduler();
+
+        StatsManager.loadUnloadedStats();
     }
 
     @Override

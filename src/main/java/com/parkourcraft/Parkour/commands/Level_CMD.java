@@ -216,6 +216,7 @@ public class Level_CMD implements CommandExecutor {
                                     String completionLocationName = levelName + "-completion";
 
                                     LocationManager.remove(completionLocationName);
+                                    LevelManager.load(levelName);
 
                                     sender.sendMessage(
                                             ChatColor.GRAY + "The completion location for "
@@ -241,6 +242,7 @@ public class Level_CMD implements CommandExecutor {
                                     String completionLocationName = levelName + "-completion";
 
                                     LocationManager.save(completionLocationName, playerLocation);
+                                    LevelManager.load(levelName);
 
                                     sender.sendMessage(
                                             ChatColor.GRAY + "Location saved as "
@@ -432,7 +434,7 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(ChatColor.GRAY + "Level names are case sensitive");
         sender.sendMessage(getHelp("list"));
         sender.sendMessage(getHelp("load"));
-        sender.sendMessage(getHelp("show"));
+        //sender.sendMessage(getHelp("show"));
         sender.sendMessage(getHelp("create"));
         sender.sendMessage(getHelp("delete"));
         sender.sendMessage(getHelp("title"));

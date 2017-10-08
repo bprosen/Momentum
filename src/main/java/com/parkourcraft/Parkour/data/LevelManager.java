@@ -39,9 +39,12 @@ public class LevelManager {
     }
 
     public static void remove(String levelName) {
-        for (Iterator<LevelObject> iterator = levels.iterator(); iterator.hasNext();)
-            if (iterator.next().getName().equals(levelName))
+        for (Iterator<LevelObject> iterator = levels.iterator(); iterator.hasNext();) {
+            if (iterator.next().getName().equals(levelName)) {
+                Levels_YAML.remove(iterator.getClass().getName());
                 iterator.remove();
+            }
+        }
     }
 
     public static void load(String levelName) {
