@@ -22,6 +22,7 @@ public class  LevelObject {
     private boolean broadcastCompletion;
     private List<String> requiredLevels;
     private int ID = -1;
+    private int scoreModifier = 1;
 
     private int totalCompletionsCount = -1;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
@@ -42,6 +43,10 @@ public class  LevelObject {
 
     public String getFormattedTitle() {
         return ChatColor.translateAlternateColorCodes('&', title);
+    }
+
+    public void setReward(int reward) {
+        this.reward = reward;
     }
 
     public int getReward() {
@@ -108,6 +113,14 @@ public class  LevelObject {
         totalCompletionsCount += 1;
     }
 
+    public void setScoreModifier(int scoreModifier) {
+        this.scoreModifier = scoreModifier;
+    }
+
+    public int getScoreModifier() {
+        return scoreModifier;
+    }
+
     private void load() {
         if (Levels_YAML.exists(name)) {
 
@@ -115,8 +128,6 @@ public class  LevelObject {
                 title = Levels_YAML.getTitle(name);
             else
                 title = name;
-
-            reward = Levels_YAML.getReward(name);
 
             String startLocationName = name + "-spawn";
             if (LocationManager.exists(startLocationName))

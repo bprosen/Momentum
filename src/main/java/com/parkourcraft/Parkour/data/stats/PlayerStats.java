@@ -18,6 +18,8 @@ public class PlayerStats {
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
+    private int clanID;
+
     public PlayerStats(Player player) {
         this.player  = player;
 
@@ -84,6 +86,14 @@ public class PlayerStats {
             return false;
 
         return spectatable;
+    }
+
+    public void setClanID(int clanID) {
+        this.clanID = clanID;
+    }
+
+    public int getClanID() {
+        return clanID;
     }
 
     public void setPlayerToSpectate(PlayerStats playerStats) {

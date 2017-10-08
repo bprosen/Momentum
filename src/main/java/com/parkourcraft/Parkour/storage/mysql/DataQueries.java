@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.PerkManager;
+import com.parkourcraft.Parkour.data.levels.LevelData;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
@@ -14,8 +15,14 @@ import java.util.Map;
 
 public class DataQueries {
 
-    private static Map<String, Integer> levelIDCache = new HashMap<>();
+    //private static Map<String, Integer> levelIDCache = new HashMap<>();
     private static Map<String, Integer> perkIDCache = new HashMap<>();
+
+    private static Map<String, LevelData> levelDataCache = new HashMap<>();
+
+    /*
+     * Player Stats Section
+     */
 
     public static void loadPlayerStats(PlayerStats playerStats) {
         loadPlayerID(playerStats);
@@ -26,7 +33,7 @@ public class DataQueries {
     private static void loadPlayerID(PlayerStats playerStats) {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable",
+                "player_id, player_name, spectatable, clan_id",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -42,6 +49,8 @@ public class DataQueries {
                     playerStats.isSpectatable(true);
                 else
                     playerStats.isSpectatable(false);
+
+                playerStats.setClanID(Integer.parseInt(playerResult.get("clan_id")));
             }
         } else {
             insertPlayerID(playerStats);
@@ -85,6 +94,10 @@ public class DataQueries {
         DatabaseManager.addUpdateQuery(query);
     }
 
+    /*
+     * Completions Section
+     */
+
     private static void loadCompletions(PlayerStats playerStats) {
         List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                 "completions",
@@ -104,23 +117,6 @@ public class DataQueries {
             );
     }
 
-    private static void loadPerks(PlayerStats playerStats) {
-        List<Map<String, String>> perksResults = DatabaseQueries.getResults(
-                "ledger",
-                "perk.perk_name, " +
-                        "(UNIX_TIMESTAMP(date) * 1000) AS date",
-                "JOIN perks perk" +
-                        " on perk.perk_id=ledger.perk_id" +
-                        " WHERE player_id=" + playerStats.getPlayerID()
-        );
-
-        for (Map<String, String> perkResult : perksResults)
-            playerStats.addPerk(
-                    perkResult.get("perk_name"),
-                    Long.parseLong(perkResult.get("date"))
-            );
-    }
-
     public static void insertCompletion(PlayerStats playerStats, LevelObject level, LevelCompletion levelCompletion) {
         DatabaseManager.addUpdateQuery(
                 "INSERT INTO completions " +
@@ -134,15 +130,9 @@ public class DataQueries {
         );
     }
 
-    public static void insertPerk(PlayerStats playerStats, Perk perk, Long date) {
-        DatabaseManager.addUpdateQuery(
-                "INSERT INTO ledger (player_id, perk_id, date)"
-                        + " VALUES "
-                        + "(" + playerStats.getPlayerID()
-                        + ", " + perk.getID()
-                        + ", FROM_UNIXTIME(" + (date / 1000) + "))"
-        );
-    }
+    /*
+     * Leader Board Section
+     */
 
     public static void loadTotalCompletions() {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
@@ -198,42 +188,55 @@ public class DataQueries {
         levelObject.setLeaderboardCache(levelCompletions);
     }
 
-    public static void syncLevelID(LevelObject levelObject) {
-        if (levelIDCache.containsKey(levelObject.getName()))
-            levelObject.setID(levelIDCache.get(levelObject.getName()));
+    /*
+     * Levels Section
+     */
+
+    private static void syncLevelData(LevelObject level) {
+        LevelData levelData = levelDataCache.get(level.getName());
+
+        if (levelData != null) {
+            level.setID(levelData.getID());
+            level.setReward(levelData.getReward());
+            level.setScoreModifier(levelData.getScoreModifier());
+        }
     }
 
-    public static void syncLevelIDCache() {
+    private static void syncLevelDataCache() {
         for (LevelObject levelObject : LevelManager.getLevels())
-            syncLevelID(levelObject);
+            syncLevelData(levelObject);
     }
 
-    public static void loadLevelIDCache() {
+    public static void loadLevelDataCache() {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "levels",
-                "level_id, level_name",
+                "level_id, level_name, reward, score_modifier",
                 ""
         );
 
         for (Map<String, String> levelResult : levelsResults)
-            levelIDCache.put(
+            levelDataCache.put(
                     levelResult.get("level_name"),
-                    Integer.parseInt(levelResult.get("level_id"))
+                    new LevelData(
+                            Integer.parseInt(levelResult.get("level_id")),
+                            Integer.parseInt(levelResult.get("reward")),
+                            Integer.parseInt(levelResult.get("score_modifier"))
+                    )
             );
 
-        syncLevelIDCache();
+        syncLevelDataCache();
     }
 
-    public static void syncLevelIDs() {
+    public static void syncLevelData() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (LevelObject levelObject : LevelManager.getLevels())
-            if (levelObject.getID() == -1)
+        for (LevelObject level : LevelManager.getLevels())
+            if (!levelDataCache.containsKey(level.getName()))
                 insertQueries.add(
                         "INSERT INTO levels " +
                         "(level_name)" +
                         " VALUES " +
-                        "('" + levelObject.getName() + "')"
+                        "('" + level.getName() + "')"
                 );
 
         if (insertQueries.size() > 0) {
@@ -242,8 +245,57 @@ public class DataQueries {
                 finalQuery = finalQuery + sql + "; ";
 
             DatabaseManager.runQuery(finalQuery);
-            loadLevelIDCache();
+            loadLevelDataCache();
         }
+    }
+
+    public static void updateLevelReward(LevelObject level) {
+        String query = "UPDATE levels SET " +
+                "reward=" + level.getReward() + " " +
+                "WHERE level_id=" + level.getID() + ""
+                ;
+
+        DatabaseManager.addUpdateQuery(query);
+    }
+
+    public static void updateLevelScoreModifier(LevelObject level) {
+        String query = "UPDATE levels SET " +
+                "score_modifier=" + level.getScoreModifier() + " " +
+                "WHERE level_id=" + level.getID() + ""
+                ;
+
+        DatabaseManager.addUpdateQuery(query);
+    }
+
+    /*
+     * Perks Section
+     */
+
+    private static void loadPerks(PlayerStats playerStats) {
+        List<Map<String, String>> perksResults = DatabaseQueries.getResults(
+                "ledger",
+                "perk.perk_name, " +
+                        "(UNIX_TIMESTAMP(date) * 1000) AS date",
+                "JOIN perks perk" +
+                        " on perk.perk_id=ledger.perk_id" +
+                        " WHERE player_id=" + playerStats.getPlayerID()
+        );
+
+        for (Map<String, String> perkResult : perksResults)
+            playerStats.addPerk(
+                    perkResult.get("perk_name"),
+                    Long.parseLong(perkResult.get("date"))
+            );
+    }
+
+    public static void insertPerk(PlayerStats playerStats, Perk perk, Long date) {
+        DatabaseManager.addUpdateQuery(
+                "INSERT INTO ledger (player_id, perk_id, date)"
+                        + " VALUES "
+                        + "(" + playerStats.getPlayerID()
+                        + ", " + perk.getID()
+                        + ", FROM_UNIXTIME(" + (date / 1000) + "))"
+        );
     }
 
     public static void syncPerkID(Perk perk) {
@@ -251,7 +303,7 @@ public class DataQueries {
             perk.setID(perkIDCache.get(perk.getName()));
     }
 
-    public static void syncPerkIDCache() {
+    private static void syncPerkIDCache() {
         for (Perk perk : PerkManager.getPerks())
             syncPerkID(perk);
     }

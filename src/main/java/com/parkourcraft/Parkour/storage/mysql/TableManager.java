@@ -20,6 +20,9 @@ public class TableManager {
         if (!tableNames.contains("perks"))
             createPerks();
 
+        if (!tableNames.contains("clans"))
+            createClans();
+
         if (!tableNames.contains("ledger"))
             createLedger();
 
@@ -33,6 +36,7 @@ public class TableManager {
                 "uuid CHAR(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
                 "spectatable BIT DEFAULT 1, " +
+                "clan_id INT DEFAULT -1," +
                 "PRIMARY KEY (player_id)" +
                 ")";
 
@@ -43,6 +47,8 @@ public class TableManager {
         String sqlQuery = "CREATE TABLE levels(" +
                 "level_id INT NOT NULL AUTO_INCREMENT, " +
                 "level_name VARCHAR(30) NOT NULL, " +
+                "reward INT DEFAULT 0, " +
+                "score_modifier INT DEFAULT 1, " +
                 "PRIMARY KEY (level_id)" +
                 ")";
 
@@ -54,6 +60,17 @@ public class TableManager {
                 "perk_id INT NOT NULL AUTO_INCREMENT, " +
                 "perk_name VARCHAR(30) NOT NULL, " +
                 "PRIMARY KEY (perk_id)" +
+                ")";
+
+        DatabaseManager.runQuery(sqlQuery);
+    }
+
+    private static void createClans() {
+        String sqlQuery = "CREATE TABLE clans(" +
+                "clan_id INT NOT NULL AUTO_INCREMENT, " +
+                "clan_tag VARCHAR(7) NOT NULL, " +
+                "owner_player_id INT NOT NULL, " +
+                "PRIMARY KEY (clan_id)" +
                 ")";
 
         DatabaseManager.runQuery(sqlQuery);

@@ -5,6 +5,7 @@ import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.data.levels.Levels_YAML;
 import com.parkourcraft.Parkour.data.LocationManager;
+import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -140,11 +141,14 @@ public class Level_CMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
                     if (a.length > 1) {
                         String levelName = a[1];
+                        LevelObject level = LevelManager.get(levelName);
 
-                        if (LevelManager.exists(levelName)) {
+                        if (level != null) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
-                                    Levels_YAML.setReward(levelName, Integer.parseInt(a[2]));
+                                    level.setReward(Integer.parseInt(a[2]));
+                                    DataQueries.updateLevelReward(level);
+
                                     sender.sendMessage(
                                             ChatColor.GRAY + "Set "
                                                     + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s reward to "
@@ -157,7 +161,7 @@ public class Level_CMD implements CommandExecutor {
                             } else {
                                 sender.sendMessage(
                                         ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current reward: "
-                                                + ChatColor.GOLD + Levels_YAML.getReward(levelName)
+                                                + ChatColor.GOLD + level.getReward()
                                 );
                                 sender.sendMessage(getHelp("reward"));
                             }
@@ -415,6 +419,43 @@ public class Level_CMD implements CommandExecutor {
                             );
                     } else
                         sender.sendMessage(getHelp("requires"));
+                } else if (a[0].equalsIgnoreCase("modifier")) { //subcommand: modifier
+                    if (a.length > 1) {
+                        String levelName = a[1];
+                        LevelObject level = LevelManager.get(levelName);
+
+                        if (level != null) {
+                            if (a.length == 3) {
+                                if (Utils.isInteger(a[2])) {
+                                    level.setScoreModifier(Integer.parseInt(a[2]));
+                                    DataQueries.updateLevelScoreModifier(level);
+
+                                    sender.sendMessage(
+                                            ChatColor.GRAY + "Set "
+                                                    + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s score modifier to "
+                                                    + ChatColor.GOLD + a[2]
+                                    );
+                                } else {
+                                    sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
+                                    sender.sendMessage(getHelp("modifier"));
+                                }
+                            } else {
+                                sender.sendMessage(
+                                        ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current score modifier: "
+                                                + ChatColor.GOLD + level.getScoreModifier()
+                                );
+                                sender.sendMessage(getHelp("modifier"));
+                            }
+                        } else
+                            sender.sendMessage(
+                                    ChatColor.GRAY + "Level "
+                                            + ChatColor.GREEN + levelName
+                                            + ChatColor.GRAY + " does not exist"
+                            );
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(getHelp("modifier"));
+                    }
                 } else { // subcommand: unknown
                     sender.sendMessage(
                             ChatColor.RED + "'" + ChatColor.DARK_RED + a[0] +
@@ -445,6 +486,7 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("completions"));
         sender.sendMessage(getHelp("broadcast"));
         sender.sendMessage(getHelp("requires"));
+        sender.sendMessage(getHelp("modifier"));
     }
 
     private static String getHelp(String cmd) {
@@ -468,7 +510,7 @@ public class Level_CMD implements CommandExecutor {
                     ChatColor.GRAY + " View/Set a level's title";
         else if (cmd.equalsIgnoreCase("reward"))
             return ChatColor.GREEN + "/level reward <level> [reward]" +
-                    ChatColor.GRAY + " View/Set a level's reward";
+                    ChatColor.GRAY + " View/Set reward";
         else if (cmd.equalsIgnoreCase("startloc"))
             return ChatColor.GREEN + "/level startloc <level>" +
                     ChatColor.GRAY + " Set the start to your location";
@@ -487,6 +529,10 @@ public class Level_CMD implements CommandExecutor {
         else if (cmd.equalsIgnoreCase("requires"))
             return ChatColor.GREEN + "/level requires <level> <level>" +
                     ChatColor.GRAY + " Add/Remove required level";
+        else if (cmd.equalsIgnoreCase("modifier"))
+            return ChatColor.GREEN + "/level modifier <level> [modifier]" +
+                    ChatColor.GRAY + " View/Set score modifier";
+
         return "";
     }
 }

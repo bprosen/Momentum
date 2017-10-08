@@ -72,8 +72,13 @@ public class Stats_CMD implements CommandExecutor {
                         if (level != null) {
                             String levelCompletions = level.getFormattedTitle() + ChatColor.GRAY + " :" + ChatColor.GREEN;
 
+                            int untimed = 0;
+
                             for (LevelCompletion levelCompletion : levelCompletionsList)
-                                levelCompletions = levelCompletions + " "
+                                if (levelCompletion.getCompletionTimeElapsed() == 0L)
+                                    untimed++;
+                                else
+                                    levelCompletions = levelCompletions + " "
                                         + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s";
 
                             player.sendMessage(levelCompletions);

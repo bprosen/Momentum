@@ -51,16 +51,17 @@ public class Scoreboard {
         );
 
         if (level == null)
-            board.add(formatSpacing(ChatColor.GRAY + ""));
+            board.add(ChatColor.GRAY + "");
 
         String coinBalance =
                 ChatColor.GOLD +  Integer.toString((int) Parkour.economy.getBalance(player))
                 + ChatColor.YELLOW + ChatColor.BOLD + " Coins";
         board.add(formatSpacing(coinBalance));
 
-        board.add(formatSpacing(ChatColor.GRAY + ""));
 
         if (level != null) {
+            board.add(formatSpacing(ChatColor.GRAY + ""));
+
             PlayerStats playerStats = StatsManager.get(player);
 
             String title = level.getFormattedTitle();

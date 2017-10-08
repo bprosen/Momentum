@@ -41,7 +41,7 @@ public class Parkour extends JavaPlugin {
         PerkManager.loadAll();
         DataQueries.loadPerkIDCache();
         LevelManager.loadAll();
-        DataQueries.loadLevelIDCache();
+        DataQueries.loadLevelDataCache();
         MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup
@@ -113,7 +113,7 @@ public class Parkour extends JavaPlugin {
         // runs the queries in the cache (every .2 seconds (5 times per second))
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
-                DataQueries.syncLevelIDs();
+                DataQueries.syncLevelData();
                 DataQueries.syncPerkIDs();
                 DatabaseManager.runCaches();
             }

@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.data.levels;
 
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
+import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class Levels_YAML {
 
     public static void create(String levelName) {
         if (!exists(levelName)) {
-            levelsFile.set(levelName + ".reward", 0);
+            levelsFile.set(levelName + ".title", levelName);
 
             commit(levelName);
         }
@@ -47,14 +48,6 @@ public class Levels_YAML {
     public static void setTitle(String levelName, String title) {
         if (exists(levelName)) {
             levelsFile.set(levelName + ".title", title);
-
-            commit(levelName);
-        }
-    }
-
-    public static void setReward(String levelName, int reward) {
-        if (exists(levelName)) {
-            levelsFile.set(levelName + ".reward", reward);
 
             commit(levelName);
         }
@@ -114,12 +107,6 @@ public class Levels_YAML {
         return "";
     }
 
-    public static int getReward(String levelName) {
-        if (isSet(levelName, "reward"))
-            return levelsFile.getInt(levelName + ".reward");
-        return 0;
-    }
-
     public static String getMessage(String levelName) {
         if (isSet(levelName, "message"))
             return levelsFile.getString(levelName + ".message");
@@ -135,6 +122,7 @@ public class Levels_YAML {
     public static boolean getBroadcastSetting(String levelName) {
         if (isSet(levelName, "broadcast_completion"))
             return levelsFile.getBoolean(levelName + ".broadcast_completion");
+
         return false;
     }
 
