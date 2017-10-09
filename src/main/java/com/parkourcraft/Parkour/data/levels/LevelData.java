@@ -17,8 +17,16 @@ public class LevelData {
         return ID;
     }
 
+    public void setReward(int reward) {
+        this.reward = reward;
+    }
+
     public int getReward() {
         return reward;
+    }
+
+    public void setScoreModifier(int scoreModifier) {
+        this.scoreModifier = scoreModifier;
     }
 
     public int getScoreModifier() {

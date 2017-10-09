@@ -255,6 +255,10 @@ public class DataQueries {
                 "WHERE level_id=" + level.getID() + ""
                 ;
 
+        LevelData levelData = levelDataCache.get(level.getName());
+        if (levelData != null)
+            levelData.setReward(level.getReward());
+
         DatabaseManager.addUpdateQuery(query);
     }
 
@@ -263,6 +267,10 @@ public class DataQueries {
                 "score_modifier=" + level.getScoreModifier() + " " +
                 "WHERE level_id=" + level.getID() + ""
                 ;
+
+        LevelData levelData = levelDataCache.get(level.getName());
+        if (levelData != null)
+            levelData.setScoreModifier(level.getScoreModifier());
 
         DatabaseManager.addUpdateQuery(query);
     }
