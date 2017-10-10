@@ -30,7 +30,7 @@ public class SpectatorHandler implements Listener {
     }
 
     public static void respawnToLobby(Player player) {
-        Location lobby = LocationManager.getLobbyLocation();
+        Location lobby = Parkour.locationManager.getLobbyLocation();
 
         player.teleport(lobby);
 

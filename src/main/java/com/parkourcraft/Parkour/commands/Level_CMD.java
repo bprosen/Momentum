@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.storage.local.FileManager;
@@ -189,7 +190,7 @@ public class Level_CMD implements CommandExecutor {
                                 Location playerLocation = player.getLocation();
                                 String spawnPositionName = levelName + "-spawn";
 
-                                LocationManager.save(spawnPositionName, playerLocation);
+                                Parkour.locationManager.save(spawnPositionName, playerLocation);
                                 Levels_YAML.commit(levelName);
 
                                 sender.sendMessage(
@@ -219,7 +220,7 @@ public class Level_CMD implements CommandExecutor {
                                 if (a[2].equalsIgnoreCase("default")) {
                                     String completionLocationName = levelName + "-completion";
 
-                                    LocationManager.remove(completionLocationName);
+                                    Parkour.locationManager.remove(completionLocationName);
                                     LevelManager.load(levelName);
 
                                     sender.sendMessage(
@@ -245,7 +246,7 @@ public class Level_CMD implements CommandExecutor {
                                     Location playerLocation = player.getLocation();
                                     String completionLocationName = levelName + "-completion";
 
-                                    LocationManager.save(completionLocationName, playerLocation);
+                                    Parkour.locationManager.save(completionLocationName, playerLocation);
                                     LevelManager.load(levelName);
 
                                     sender.sendMessage(

@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.data.levels;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
@@ -130,16 +131,16 @@ public class  LevelObject {
                 title = name;
 
             String startLocationName = name + "-spawn";
-            if (LocationManager.exists(startLocationName))
-                startLocation = LocationManager.get(startLocationName);
+            if (Parkour.locationManager.exists(startLocationName))
+                startLocation = Parkour.locationManager.get(startLocationName);
             else
-                startLocation = LocationManager.get("spawn");
+                startLocation = Parkour.locationManager.get("spawn");
 
             String respawnLocationName = name + "-completion";
-            if (LocationManager.exists(respawnLocationName))
-                respawnLocation = LocationManager.get(respawnLocationName);
+            if (Parkour.locationManager.exists(respawnLocationName))
+                respawnLocation = Parkour.locationManager.get(respawnLocationName);
             else
-                respawnLocation = LocationManager.get("spawn");
+                respawnLocation = Parkour.locationManager.get("spawn");
 
             if (Levels_YAML.isSet(name, "message"))
                 message = Levels_YAML.getMessage(name);

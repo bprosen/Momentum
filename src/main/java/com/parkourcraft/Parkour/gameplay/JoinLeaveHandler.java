@@ -3,8 +3,6 @@ package com.parkourcraft.Parkour.gameplay;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.StatsManager;
-import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +18,7 @@ public class JoinLeaveHandler implements Listener {
         StatsManager.add(event.getPlayer());
 
         if (!event.getPlayer().isOp())
-            LocationManager.teleport(event.getPlayer(), "spawn");
+            Parkour.locationManager.teleport(event.getPlayer(), "spawn");
 
         Parkour.ghostFactory.addPlayer(event.getPlayer());
     }

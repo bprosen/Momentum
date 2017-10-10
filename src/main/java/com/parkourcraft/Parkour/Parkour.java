@@ -21,6 +21,10 @@ public class Parkour extends JavaPlugin {
 
     private static Plugin plugin;
     private static Logger logger;
+
+    public static LocationManager locationManager;
+    public static ClansManager clansManager;
+
     public static Economy economy;
     public static GhostFactory ghostFactory;
 
@@ -37,7 +41,9 @@ public class Parkour extends JavaPlugin {
         DatabaseConnection.open();
         TableManager.setUp();
 
-        LocationManager.loadLocations();
+        locationManager = new LocationManager();
+        clansManager = new ClansManager(plugin);
+
         PerkManager.loadAll();
         DataQueries.loadPerkIDCache();
         LevelManager.loadAll();
@@ -59,10 +65,14 @@ public class Parkour extends JavaPlugin {
     @Override
     public void onDisable() {
         DatabaseManager.runCaches();
-
         DatabaseConnection.close();
 
-        if (!Vault.setupEconomy() ) { // disable vault
+        // unload data objects
+        clansManager = null;
+        locationManager = null;
+
+        // disable vault
+        if (!Vault.setupEconomy() ) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }

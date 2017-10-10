@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.data.locations;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.Bukkit;
@@ -16,7 +17,7 @@ public class Locations_YAML {
 
     private static void commit(String locationName) {
         FileManager.save("locations");
-        LocationManager.load(locationName);
+        Parkour.locationManager.load(locationName);
     }
 
     private static boolean exists(String locationName) {

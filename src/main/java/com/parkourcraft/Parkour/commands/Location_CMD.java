@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.locations.Locations_YAML;
 import org.bukkit.ChatColor;
@@ -22,7 +23,7 @@ public class Location_CMD implements CommandExecutor {
                             ChatColor.GRAY + "Locations: "
                                     + ChatColor.GREEN + String.join(
                                     ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                    LocationManager.getNames()
+                                    Parkour.locationManager.getNames()
                             )
                     );
                 } else if (a[0].equalsIgnoreCase("go")) { //subcommand: go
@@ -32,8 +33,8 @@ public class Location_CMD implements CommandExecutor {
                         if (a.length == 2) {
                             String locationName = a[1];
 
-                            if (LocationManager.exists(locationName)) {
-                                LocationManager.teleport(player, locationName);
+                            if (Parkour.locationManager.exists(locationName)) {
+                                Parkour.locationManager.teleport(player, locationName);
 
                                 sender.sendMessage(
                                         ChatColor.GRAY + "Attempted to send you to "
@@ -60,7 +61,7 @@ public class Location_CMD implements CommandExecutor {
 
                             Location playerLocation = player.getLocation();
 
-                            LocationManager.save(locationName, playerLocation);
+                            Parkour.locationManager.save(locationName, playerLocation);
 
                             sender.sendMessage(
                                     ChatColor.GRAY + "Set location "
@@ -79,7 +80,7 @@ public class Location_CMD implements CommandExecutor {
                         if (a.length == 2) {
                             String locationName = a[1];
 
-                            if (LocationManager.exists(locationName)) {
+                            if (Parkour.locationManager.exists(locationName)) {
                                 Locations_YAML.remove(locationName);
 
                                 sender.sendMessage(

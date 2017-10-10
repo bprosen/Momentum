@@ -12,9 +12,22 @@ import java.util.Map;
 
 public class LocationManager {
 
-    private static Map<String, Location> locationsMap = new HashMap<>();
+    private Map<String, Location> locationsMap;
 
-    public static void load(String locationName) {
+    public LocationManager() {
+        load();
+    }
+
+    public void load() {
+        locationsMap = new HashMap<>();
+
+        for (String locationName : Locations_YAML.getNames())
+            load(locationName);
+
+        Parkour.getPluginLogger().info("Locations loaded: " + locationsMap.size());
+    }
+
+    public void load(String locationName) {
         Location location = Locations_YAML.get(locationName);
 
         if (location == null
@@ -24,43 +37,34 @@ public class LocationManager {
             locationsMap.put(locationName, location);
     }
 
-    public static void loadLocations() {
-        locationsMap = new HashMap<>();
-
-        for (String locationName : Locations_YAML.getNames())
-            load(locationName);
-
-        Parkour.getPluginLogger().info("Locations loaded: " + locationsMap.size());
-    }
-
-    public static Location get(String locationName) {
+    public Location get(String locationName) {
         return locationsMap.get(locationName);
     }
 
-    public static List<String> getNames() {
+    public List<String> getNames() {
         return new ArrayList<>(locationsMap.keySet());
     }
 
-    public static boolean exists(String locationName) {
+    public boolean exists(String locationName) {
         return locationsMap.containsKey(locationName);
     }
 
-    public static void teleport(Player player, String locationName) {
+    public void teleport(Player player, String locationName) {
         if (exists(locationName))
             player.teleport(get(locationName));
     }
 
-    public static void save(String locationName, Location location) {
+    public void save(String locationName, Location location) {
         Locations_YAML.save(locationName, location);
     }
 
-    public static void remove(String locationName) {
+    public void remove(String locationName) {
         if (exists(locationName))
             Locations_YAML.remove(locationName);
     }
 
-    public static Location getLobbyLocation() {
-        return LocationManager.get("spawn");
+    public Location getLobbyLocation() {
+        return get("spawn");
     }
 
 }

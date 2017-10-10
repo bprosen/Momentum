@@ -91,7 +91,7 @@ public class MenuItemAction {
     }
 
     private static void performTeleportItem(Player player, MenuItem menuItem) {
-        Location location = LocationManager.get(menuItem.getTypeValue());
+        Location location = Parkour.locationManager.get(menuItem.getTypeValue());
 
         if (location != null) {
             player.closeInventory();

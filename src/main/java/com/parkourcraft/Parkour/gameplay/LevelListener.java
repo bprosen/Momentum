@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.gameplay;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
@@ -59,7 +60,7 @@ public class LevelListener implements Listener {
                     if (levelName != null)
                         LevelHandler.levelCompletion(player, levelName);
                 } else if (ChatColor.stripColor(signLines[1]).contains(secondLineSpawn)) {
-                    Location lobby = LocationManager.getLobbyLocation();
+                    Location lobby = Parkour.locationManager.getLobbyLocation();
 
                     if (lobby != null)
                         player.teleport(lobby);

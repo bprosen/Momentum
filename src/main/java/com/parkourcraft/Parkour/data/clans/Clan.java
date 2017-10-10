@@ -1,32 +1,45 @@
 package com.parkourcraft.Parkour.data.clans;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Clan {
 
     private int ID;
-    private String name;
+    private String tag;
+    private int ownerID;
 
-    private ClanMember owner;
     private List<ClanMember> members = new ArrayList<>(); // Does not include the owner
     private List<String> invitedUUIDs = new ArrayList<>();
 
-    public Clan(int ID) {
-        this.ID = ID;
+    public Clan(int clanID, String clanTag, int clanOwnerID) {
+        this.ID = clanID;
+        this.tag = clanTag;
+        this.ownerID = clanOwnerID;
+    }
+
+    public void setID(int clanID) {
+        this.ID = clanID;
     }
 
     public int getID() {
         return ID;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
-    public String getName() {
-        return name;
+    public String getTag() {
+        return tag;
+    }
+
+    public void setClanOwnerID(int clanOwnerID) {
+        this.ownerID = clanOwnerID;
+    }
+
+    public int getOwnerID() {
+        return ownerID;
     }
 
     public ClanMember getMember(String UUID) {
@@ -38,16 +51,23 @@ public class Clan {
     }
 
     public ClanMember getOwner() {
-        return owner;
+        for (ClanMember member : members)
+            if (member.isOwner())
+                return member;
+
+        return null;
     }
 
     public void promoteOwner(String UUID) {
+        ClanMember currentOwner = getOwner();
         ClanMember newOwner = getMember(UUID);
 
         if (newOwner != null) {
-            members.add(owner);
-            owner = newOwner;
-            members.remove(newOwner);
+            ownerID = newOwner.getPlayerID();
+            newOwner.isOwner(true);
+
+            if (currentOwner != null)
+                currentOwner.isOwner(false);
         }
     }
 
