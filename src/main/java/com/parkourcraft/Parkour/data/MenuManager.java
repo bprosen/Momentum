@@ -3,12 +3,14 @@ package com.parkourcraft.Parkour.data;
 import com.parkourcraft.Parkour.data.menus.Menu;
 import com.parkourcraft.Parkour.data.menus.Menus_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,29 +19,43 @@ import java.util.Map;
 
 public class MenuManager {
 
-    private static Map<String, Menu> menuMap = new HashMap<>();
+    private Map<String, Menu> menuMap = new HashMap<>();
 
-    public static void load(String menuName) {
-        if (Menus_YAML.exists(menuName))
-            menuMap.put(menuName, new Menu(menuName));
+    public MenuManager(Plugin plugin) {
+        load();
+
+        startScheduler(plugin);
     }
 
-    public static void loadMenus() {
+    public void load() {
         menuMap = new HashMap<>();
 
         for (String menuName : Menus_YAML.getNames())
             load(menuName);
     }
 
-    public static boolean exists(String menuName) {
+    private void startScheduler(Plugin plugin) {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            public void run() {
+                updateOpenInventories();
+            }
+        }, 0L, 10L);
+    }
+
+    public void load(String menuName) {
+        if (Menus_YAML.exists(menuName))
+            menuMap.put(menuName, new Menu(menuName));
+    }
+
+    public boolean exists(String menuName) {
         return menuMap.containsKey(menuName);
     }
 
-    public static Menu getMenu(String menuName) {
+    public Menu getMenu(String menuName) {
         return menuMap.get(menuName);
     }
 
-    public static Menu getMenuFromStartingChars(String input) {
+    public Menu getMenuFromStartingChars(String input) {
         for (Menu menu : menuMap.values())
             if (input.startsWith(menu.getName()))
                 return menu;
@@ -47,7 +63,7 @@ public class MenuManager {
         return null;
     }
 
-    public static Menu getMenuFromTitle(String menuTitle) {
+    public Menu getMenuFromTitle(String menuTitle) {
         for (Menu menu : menuMap.values())
             if (menuTitle.startsWith(menu.getFormattedTitleBase()))
                 return menu;
@@ -55,7 +71,7 @@ public class MenuManager {
         return null;
     }
 
-    public static Menu getMenuFromSelectItem(ItemStack item) {
+    public Menu getMenuFromSelectItem(ItemStack item) {
         if (item != null)
             for (Menu menu : menuMap.values())
                 if (menu.getSelectItem() != null
@@ -65,30 +81,30 @@ public class MenuManager {
         return null;
     }
 
-    public static List<String> getMenuNames() {
+    public List<String> getMenuNames() {
         return new ArrayList<>(menuMap.keySet());
     }
 
-    public static Inventory getInventory(String menuName, int pageNumber) {
+    public Inventory getInventory(String menuName, int pageNumber) {
         if (exists(menuName))
             return menuMap.get(menuName).getInventory(pageNumber);
 
         return null;
     }
 
-    public static void updateInventory(Player player, InventoryView inventory) {
+    public void updateInventory(Player player, InventoryView inventory) {
         Menu menu = getMenuFromTitle(inventory.getTitle());
 
         if (menu != null)
             menu.updateInventory(player, inventory, Utils.getTrailingInt(inventory.getTitle()));
     }
 
-    public static void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
+    public void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
         if (exists(menuName))
             menuMap.get(menuName).updateInventory(player, inventory, pageNumber);
     }
 
-    public static void updateOpenInventories() {
+    public void updateOpenInventories() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryView inventoryView = player.getOpenInventory();
 

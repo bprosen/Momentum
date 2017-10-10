@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.gameplay;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.MenuManager;
 import com.parkourcraft.Parkour.data.menus.Menu;
 import com.parkourcraft.Parkour.data.menus.MenuItem;
@@ -17,7 +18,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Menu menu = MenuManager.getMenuFromTitle(event.getInventory().getTitle());
+        Menu menu = Parkour.menuManager.getMenuFromTitle(event.getInventory().getTitle());
 
         if (menu != null) {
             event.setCancelled(true);
@@ -46,11 +47,11 @@ public class MenuListener implements Listener {
                 || event.getAction() == Action.RIGHT_CLICK_BLOCK
                 || event.getAction() == Action.LEFT_CLICK_AIR
                 || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            Menu menu = MenuManager.getMenuFromSelectItem(player.getInventory().getItemInMainHand());
+            Menu menu = Parkour.menuManager.getMenuFromSelectItem(player.getInventory().getItemInMainHand());
 
             if (menu != null) {
-                player.openInventory(MenuManager.getInventory(menu.getName(), 1));
-                MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
+                player.openInventory(Parkour.menuManager.getInventory(menu.getName(), 1));
+                Parkour.menuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
             }
         }
 

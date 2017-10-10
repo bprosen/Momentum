@@ -63,7 +63,7 @@ public class MenuItemAction {
                 if (playerBalance > perk.getPrice()) {
                     Parkour.economy.withdrawPlayer(player, perk.getPrice());
                     PerkManager.bought(playerStas, perk);
-                    MenuManager.updateInventory(player, player.getOpenInventory());
+                    Parkour.menuManager.updateInventory(player, player.getOpenInventory());
                 }
             }
         }
@@ -100,17 +100,17 @@ public class MenuItemAction {
     }
 
     private static void performOpenItem(Player player, MenuItem menuItem) {
-        Menu menu = MenuManager.getMenuFromStartingChars(menuItem.getTypeValue());
+        Menu menu = Parkour.menuManager.getMenuFromStartingChars(menuItem.getTypeValue());
 
         if (menu != null) {
             int pageeNumber = Utils.getTrailingInt(menuItem.getTypeValue());
 
-            Inventory inventory = MenuManager.getInventory(menu.getName(), pageeNumber);
+            Inventory inventory = Parkour.menuManager.getInventory(menu.getName(), pageeNumber);
 
             if (inventory != null) {
                 player.closeInventory();
                 player.openInventory(inventory);
-                MenuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
+                Parkour.menuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
             }
         }
     }

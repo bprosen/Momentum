@@ -1,8 +1,7 @@
 package com.parkourcraft.Parkour.commands;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.MenuManager;
-import com.parkourcraft.Parkour.data.StatsManager;
-import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
@@ -15,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 public class Menu_CMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        MenuManager menuManager = Parkour.menuManager;
 
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("list")) {
@@ -23,7 +23,7 @@ public class Menu_CMD implements CommandExecutor {
                             ChatColor.GRAY + "Menus: "
                                     + ChatColor.GREEN + String.join(
                                     ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                    MenuManager.getMenuNames()
+                                    menuManager.getMenuNames()
                             )
                     );
             } else if (a[0].equalsIgnoreCase("open")) {
@@ -36,15 +36,14 @@ public class Menu_CMD implements CommandExecutor {
                                 && Utils.isInteger(a[2]))
                                 pageNumber = Integer.parseInt(a[2]);
 
-                        if (MenuManager.exists(menuName)) {
+                        if (menuManager.exists(menuName)) {
                             Player player = ((Player) sender).getPlayer();
-                            PlayerStats playerStats = StatsManager.get(player);
 
-                            Inventory inventory = MenuManager.getInventory(menuName, pageNumber);
+                            Inventory inventory = menuManager.getInventory(menuName, pageNumber);
 
                             if (inventory != null) {
                                 player.openInventory(inventory);
-                                MenuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
+                                menuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
                             } else
                                 sender.sendMessage(ChatColor.RED + "Error loading the inventory");
                         } else
@@ -69,7 +68,7 @@ public class Menu_CMD implements CommandExecutor {
                                     ChatColor.GRAY + " from disk"
                     );
 
-                    MenuManager.loadMenus();
+                    menuManager.load();
                     sender.sendMessage(ChatColor.GRAY + "Loaded menus from the config");
                 } else
                     sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");

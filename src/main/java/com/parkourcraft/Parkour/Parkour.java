@@ -23,6 +23,7 @@ public class Parkour extends JavaPlugin {
     private static Logger logger;
 
     public static LocationManager locationManager;
+    public static MenuManager menuManager;
     public static ClansManager clansManager;
 
     public static Economy economy;
@@ -42,13 +43,13 @@ public class Parkour extends JavaPlugin {
         TableManager.setUp();
 
         locationManager = new LocationManager();
+        menuManager = new MenuManager(plugin);
         clansManager = new ClansManager(plugin);
 
         PerkManager.loadAll();
         DataQueries.loadPerkIDCache();
         LevelManager.loadAll();
         DataQueries.loadLevelDataCache();
-        MenuManager.loadMenus();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
@@ -69,6 +70,7 @@ public class Parkour extends JavaPlugin {
 
         // unload data objects
         clansManager = null;
+        menuManager = null;
         locationManager = null;
 
         // disable vault
@@ -95,7 +97,6 @@ public class Parkour extends JavaPlugin {
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
                 StatsManager.clean();
-                MenuManager.updateOpenInventories();
                 SpectatorHandler.updateSpectators();
             }
         }, 0L, 10L);
