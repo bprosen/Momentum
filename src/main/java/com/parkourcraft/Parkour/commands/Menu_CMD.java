@@ -14,7 +14,7 @@ import org.bukkit.inventory.Inventory;
 public class Menu_CMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
-        MenuManager menuManager = Parkour.menuManager;
+        MenuManager menuManager = Parkour.menus;
 
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("list")) {

@@ -5,7 +5,6 @@ import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
-import com.parkourcraft.Parkour.data.settings.Settings_YAML;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DataQueries;
@@ -44,7 +43,7 @@ public class LevelHandler {
                     // Update player information
                     playerStats.levelCompletion(levelName, levelCompletion);
                     DataQueries.insertCompletion(playerStats, level, levelCompletion);
-                    Parkour.perkManager.syncPermissions(player);
+                    Parkour.perks.syncPermissions(player);
                     Parkour.economy.depositPlayer(player, level.getReward());
 
                     String messageFormatted = level.getFormattedMessage(playerStats);
@@ -79,7 +78,7 @@ public class LevelHandler {
                     if (level.getBroadcastCompletion()) {
                         String broadcastMessage = ChatColor.translateAlternateColorCodes(
                                 '&',
-                                Settings_YAML.getLevelBroadcastCompletionMessage()
+                                Parkour.settings.levels_message_broadcast
                         );
 
                         broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());

@@ -16,7 +16,7 @@ public class Perks_CMD implements CommandExecutor {
             FileManager.load("perks");
             sender.sendMessage("Loaded perks.yml from disk");
 
-            Parkour.perkManager.load();
+            Parkour.perks.load();
             sender.sendMessage("Loaded all perks into memory");
         } else
             sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");

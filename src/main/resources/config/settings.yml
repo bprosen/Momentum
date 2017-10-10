@@ -18,3 +18,9 @@ signs:
   second_line:
     completion: "To redeem"
     spawn: "To return to"
+
+clans:
+  max_members: 5
+  price:
+    create: 10000
+    tag: 1000

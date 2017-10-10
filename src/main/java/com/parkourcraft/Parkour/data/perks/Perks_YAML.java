@@ -13,7 +13,7 @@ public class Perks_YAML {
 
     private static void commit(String perkName) {
         FileManager.save("perks");
-        Parkour.perkManager.load(perkName);
+        Parkour.perks.load(perkName);
     }
 
     public static List<String> getNames() {

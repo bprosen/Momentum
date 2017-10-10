@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour.data.clans;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.ClansManager;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
@@ -77,5 +78,33 @@ public class ClansData {
                 ")"
         );
     }
+
+    public static void updatePlayerClanID(PlayerStats playerStats) {
+        String query = "UPDATE players SET " +
+                "clan_id=" + playerStats.getClanID() +
+                " WHERE player_id=" + playerStats.getPlayerID()
+                ;
+
+        DatabaseManager.addUpdateQuery(query);
+    }
+
+    public static void updateClanTag(Clan clan) {
+        String query = "UPDATE clans SET " +
+                "clan_tag='" + clan.getTag() + "' " +
+                "WHERE clan_id=" + clan.getID()
+                ;
+
+        DatabaseManager.addUpdateQuery(query);
+    }
+
+    public static void updateClanOwnerID(Clan clan) {
+        String query = "UPDATE clans SET " +
+                "owner_player_id=" + clan.getOwnerID() +
+                "WHERE clan_id=" + clan.getID()
+                ;
+
+        DatabaseManager.addUpdateQuery(query);
+    }
+
 
 }

@@ -4,11 +4,14 @@ import com.parkourcraft.Parkour.commands.*;
 import com.parkourcraft.Parkour.data.*;
 import com.parkourcraft.Parkour.data.perks.PerkData;
 import com.parkourcraft.Parkour.gameplay.*;
+import com.parkourcraft.Parkour.data.SettingsManager;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
+import com.parkourcraft.Parkour.storage.local.FileManager;
 import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.TableManager;
+import com.parkourcraft.Parkour.utils.dependencies.GhostFactory;
 import com.parkourcraft.Parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -23,10 +26,11 @@ public class Parkour extends JavaPlugin {
     private static Plugin plugin;
     private static Logger logger;
 
-    public static LocationManager locationManager;
-    public static MenuManager menuManager;
-    public static PerkManager perkManager;
-    public static ClansManager clansManager;
+    public static SettingsManager settings;
+    public static LocationManager locations;
+    public static MenuManager menus;
+    public static PerkManager perks;
+    public static ClansManager clans;
 
     public static Economy economy;
     public static GhostFactory ghostFactory;
@@ -44,10 +48,11 @@ public class Parkour extends JavaPlugin {
         DatabaseConnection.open();
         TableManager.setUp();
 
-        locationManager = new LocationManager();
-        menuManager = new MenuManager(plugin);
-        perkManager = new PerkManager();
-        clansManager = new ClansManager(plugin);
+        settings = new SettingsManager(FileManager.getFileConfig("settings"));
+        locations = new LocationManager();
+        menus = new MenuManager(plugin);
+        perks = new PerkManager();
+        clans = new ClansManager(plugin);
 
         PerkData.loadPerkIDCache();
         LevelManager.loadAll();
@@ -71,16 +76,11 @@ public class Parkour extends JavaPlugin {
         DatabaseConnection.close();
 
         // unload data objects
-        clansManager = null;
-        menuManager = null;
-        perkManager = null;
-        locationManager = null;
-
-        // disable vault
-        if (!Vault.setupEconomy() ) {
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        clans = null;
+        perks = null;
+        menus = null;
+        locations = null;
+        settings = null;
 
         plugin = null;
     }
@@ -151,6 +151,7 @@ public class Parkour extends JavaPlugin {
         getCommand("perks").setExecutor(new Perks_CMD());
         getCommand("setarmor").setExecutor(new SetArmor_CMD());
         getCommand("spectate").setExecutor(new Spectate_CMD());
+        getCommand("clan").setExecutor(new Clan_CMD());
     }
 
 }

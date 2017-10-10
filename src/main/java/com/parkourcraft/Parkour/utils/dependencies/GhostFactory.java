@@ -1,6 +1,5 @@
-package com.parkourcraft.Parkour.gameplay;
+package com.parkourcraft.Parkour.utils.dependencies;
 
-import com.parkourcraft.Parkour.Parkour;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

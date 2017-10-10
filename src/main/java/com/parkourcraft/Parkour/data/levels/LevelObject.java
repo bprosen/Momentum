@@ -1,8 +1,6 @@
 package com.parkourcraft.Parkour.data.levels;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.settings.Settings_YAML;
-import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.ChatColor;
@@ -131,21 +129,21 @@ public class  LevelObject {
                 title = name;
 
             String startLocationName = name + "-spawn";
-            if (Parkour.locationManager.exists(startLocationName))
-                startLocation = Parkour.locationManager.get(startLocationName);
+            if (Parkour.locations.exists(startLocationName))
+                startLocation = Parkour.locations.get(startLocationName);
             else
-                startLocation = Parkour.locationManager.get("spawn");
+                startLocation = Parkour.locations.get("spawn");
 
             String respawnLocationName = name + "-completion";
-            if (Parkour.locationManager.exists(respawnLocationName))
-                respawnLocation = Parkour.locationManager.get(respawnLocationName);
+            if (Parkour.locations.exists(respawnLocationName))
+                respawnLocation = Parkour.locations.get(respawnLocationName);
             else
-                respawnLocation = Parkour.locationManager.get("spawn");
+                respawnLocation = Parkour.locations.get("spawn");
 
             if (Levels_YAML.isSet(name, "message"))
                 message = Levels_YAML.getMessage(name);
             else
-                message = Settings_YAML.getLevelCompletionMessage();
+                message = Parkour.settings.levels_message_completion;
 
             maxCompletions = Levels_YAML.getMaxCompletions(name);
 

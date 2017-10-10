@@ -17,7 +17,7 @@ public class Locations_YAML {
 
     private static void commit(String locationName) {
         FileManager.save("locations");
-        Parkour.locationManager.load(locationName);
+        Parkour.locations.load(locationName);
     }
 
     private static boolean exists(String locationName) {

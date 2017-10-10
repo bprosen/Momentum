@@ -72,7 +72,7 @@ public class DataQueries {
     private static void updatePlayerName(PlayerStats playerStats) {
         String query = "UPDATE players SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_id='" + playerStats.getPlayerID() + "'"
+                "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
         DatabaseManager.addUpdateQuery(query);
@@ -86,7 +86,7 @@ public class DataQueries {
 
         String query = "UPDATE players SET " +
                 "spectatable=" + spectatable + " " +
-                "WHERE player_id='" + playerStats.getPlayerID() + "'"
+                "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
         DatabaseManager.addUpdateQuery(query);

@@ -23,7 +23,7 @@ public class Location_CMD implements CommandExecutor {
                             ChatColor.GRAY + "Locations: "
                                     + ChatColor.GREEN + String.join(
                                     ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                    Parkour.locationManager.getNames()
+                                    Parkour.locations.getNames()
                             )
                     );
                 } else if (a[0].equalsIgnoreCase("go")) { //subcommand: go
@@ -33,8 +33,8 @@ public class Location_CMD implements CommandExecutor {
                         if (a.length == 2) {
                             String locationName = a[1];
 
-                            if (Parkour.locationManager.exists(locationName)) {
-                                Parkour.locationManager.teleport(player, locationName);
+                            if (Parkour.locations.exists(locationName)) {
+                                Parkour.locations.teleport(player, locationName);
 
                                 sender.sendMessage(
                                         ChatColor.GRAY + "Attempted to send you to "
@@ -61,7 +61,7 @@ public class Location_CMD implements CommandExecutor {
 
                             Location playerLocation = player.getLocation();
 
-                            Parkour.locationManager.save(locationName, playerLocation);
+                            Parkour.locations.save(locationName, playerLocation);
 
                             sender.sendMessage(
                                     ChatColor.GRAY + "Set location "
@@ -80,7 +80,7 @@ public class Location_CMD implements CommandExecutor {
                         if (a.length == 2) {
                             String locationName = a[1];
 
-                            if (Parkour.locationManager.exists(locationName)) {
+                            if (Parkour.locations.exists(locationName)) {
                                 Locations_YAML.remove(locationName);
 
                                 sender.sendMessage(

@@ -39,12 +39,12 @@ public class PerkData {
     }
 
     public static void syncPerkID(Perk perk) {
-        if (Parkour.perkManager.getPerkIDCache().containsKey(perk.getName()))
-            perk.setID(Parkour.perkManager.getPerkIDCache().get(perk.getName()));
+        if (Parkour.perks.getPerkIDCache().containsKey(perk.getName()))
+            perk.setID(Parkour.perks.getPerkIDCache().get(perk.getName()));
     }
 
     private static void syncPerkIDCache() {
-        for (Perk perk : Parkour.perkManager.getPerks())
+        for (Perk perk : Parkour.perks.getPerks())
             syncPerkID(perk);
     }
 
@@ -56,7 +56,7 @@ public class PerkData {
         );
 
         for (Map<String, String> perkResult : perkResults)
-            Parkour.perkManager.getPerkIDCache().put(
+            Parkour.perks.getPerkIDCache().put(
                     perkResult.get("perk_name"),
                     Integer.parseInt(perkResult.get("perk_id"))
             );
@@ -67,7 +67,7 @@ public class PerkData {
     public static void syncPerkIDs() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (Perk perk : Parkour.perkManager.getPerks())
+        for (Perk perk : Parkour.perks.getPerks())
             if (perk.getID() == -1)
                 insertQueries.add(
                         "INSERT INTO perks " +

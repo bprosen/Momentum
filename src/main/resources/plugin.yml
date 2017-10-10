@@ -25,3 +25,6 @@ commands:
     description: "PC-Parkour armor setting command"
   spectate:
     description: "Spectate another player"
+  clan:
+    description: "Clan management"
+    aliases: [clans]

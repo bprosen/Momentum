@@ -32,7 +32,7 @@ public class MenuItemFormatter {
     private static ItemStack getPerk(Player player, PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String perkName = menuItem.getTypeValue();
-        Perk perk = Parkour.perkManager.get(perkName);
+        Perk perk = Parkour.perks.get(perkName);
 
         if (perk != null) {
             ItemMeta itemMeta = item.getItemMeta();

@@ -190,7 +190,7 @@ public class Level_CMD implements CommandExecutor {
                                 Location playerLocation = player.getLocation();
                                 String spawnPositionName = levelName + "-spawn";
 
-                                Parkour.locationManager.save(spawnPositionName, playerLocation);
+                                Parkour.locations.save(spawnPositionName, playerLocation);
                                 Levels_YAML.commit(levelName);
 
                                 sender.sendMessage(
@@ -220,7 +220,7 @@ public class Level_CMD implements CommandExecutor {
                                 if (a[2].equalsIgnoreCase("default")) {
                                     String completionLocationName = levelName + "-completion";
 
-                                    Parkour.locationManager.remove(completionLocationName);
+                                    Parkour.locations.remove(completionLocationName);
                                     LevelManager.load(levelName);
 
                                     sender.sendMessage(
@@ -246,7 +246,7 @@ public class Level_CMD implements CommandExecutor {
                                     Location playerLocation = player.getLocation();
                                     String completionLocationName = levelName + "-completion";
 
-                                    Parkour.locationManager.save(completionLocationName, playerLocation);
+                                    Parkour.locations.save(completionLocationName, playerLocation);
                                     LevelManager.load(levelName);
 
                                     sender.sendMessage(

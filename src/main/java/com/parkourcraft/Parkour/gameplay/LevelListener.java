@@ -47,20 +47,16 @@ public class LevelListener implements Listener {
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
 
-            FileConfiguration settings = FileManager.getFileConfig("settings");
-            String firstLine = settings.getString("signs.first_line");
-
-            if (ChatColor.stripColor(signLines[0]).contains(firstLine)) {
+            if (ChatColor.stripColor(signLines[0]).contains(Parkour.settings.signs_first_line)) {
                 Player player = event.getPlayer();
-                String secondLineCompletion = settings.getString("signs.second_line.completion");
-                String secondLineSpawn = settings.getString("signs.second_line.spawn");
 
-                if (ChatColor.stripColor(signLines[1]).contains(secondLineCompletion)) {
+                if (ChatColor.stripColor(signLines[1]).contains(Parkour.settings.signs_second_line_completion)) {
                     String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+
                     if (levelName != null)
                         LevelHandler.levelCompletion(player, levelName);
-                } else if (ChatColor.stripColor(signLines[1]).contains(secondLineSpawn)) {
-                    Location lobby = Parkour.locationManager.getLobbyLocation();
+                } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.settings.signs_second_line_spawn)) {
+                    Location lobby = Parkour.locations.getLobbyLocation();
 
                     if (lobby != null)
                         player.teleport(lobby);

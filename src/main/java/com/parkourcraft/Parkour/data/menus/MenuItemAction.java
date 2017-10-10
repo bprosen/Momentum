@@ -47,7 +47,7 @@ public class MenuItemAction {
     }
 
     private static void performPerkItem(Player player, MenuItem menuItem) {
-        Perk perk = Parkour.perkManager.get(menuItem.getTypeValue());
+        Perk perk = Parkour.perks.get(menuItem.getTypeValue());
 
         if (perk != null) {
             PlayerStats playerStas = StatsManager.get(player);
@@ -62,8 +62,8 @@ public class MenuItemAction {
 
                 if (playerBalance > perk.getPrice()) {
                     Parkour.economy.withdrawPlayer(player, perk.getPrice());
-                    Parkour.perkManager.bought(playerStas, perk);
-                    Parkour.menuManager.updateInventory(player, player.getOpenInventory());
+                    Parkour.perks.bought(playerStas, perk);
+                    Parkour.menus.updateInventory(player, player.getOpenInventory());
                 }
             }
         }
@@ -91,7 +91,7 @@ public class MenuItemAction {
     }
 
     private static void performTeleportItem(Player player, MenuItem menuItem) {
-        Location location = Parkour.locationManager.get(menuItem.getTypeValue());
+        Location location = Parkour.locations.get(menuItem.getTypeValue());
 
         if (location != null) {
             player.closeInventory();
@@ -100,17 +100,17 @@ public class MenuItemAction {
     }
 
     private static void performOpenItem(Player player, MenuItem menuItem) {
-        Menu menu = Parkour.menuManager.getMenuFromStartingChars(menuItem.getTypeValue());
+        Menu menu = Parkour.menus.getMenuFromStartingChars(menuItem.getTypeValue());
 
         if (menu != null) {
             int pageeNumber = Utils.getTrailingInt(menuItem.getTypeValue());
 
-            Inventory inventory = Parkour.menuManager.getInventory(menu.getName(), pageeNumber);
+            Inventory inventory = Parkour.menus.getInventory(menu.getName(), pageeNumber);
 
             if (inventory != null) {
                 player.closeInventory();
                 player.openInventory(inventory);
-                Parkour.menuManager.updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
+                Parkour.menus.updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
             }
         }
     }

@@ -18,7 +18,7 @@ public class JoinLeaveHandler implements Listener {
         StatsManager.add(event.getPlayer());
 
         if (!event.getPlayer().isOp())
-            Parkour.locationManager.teleport(event.getPlayer(), "spawn");
+            Parkour.locations.teleport(event.getPlayer(), "spawn");
 
         Parkour.ghostFactory.addPlayer(event.getPlayer());
     }
