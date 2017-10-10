@@ -3,7 +3,6 @@ package com.parkourcraft.Parkour.gameplay;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.PerkManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.settings.Settings_YAML;
@@ -11,10 +10,8 @@ import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
-import com.parkourcraft.Parkour.data.LocationManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -47,7 +44,7 @@ public class LevelHandler {
                     // Update player information
                     playerStats.levelCompletion(levelName, levelCompletion);
                     DataQueries.insertCompletion(playerStats, level, levelCompletion);
-                    PerkManager.syncPermissions(player);
+                    Parkour.perkManager.syncPermissions(player);
                     Parkour.economy.depositPlayer(player, level.getReward());
 
                     String messageFormatted = level.getFormattedMessage(playerStats);

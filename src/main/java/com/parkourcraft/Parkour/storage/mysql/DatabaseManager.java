@@ -67,7 +67,7 @@ public class DatabaseManager {
                         && playerStats.getPlayer() != null
                         && playerStats.getPlayer().isOnline()) {
                     DataQueries.loadPlayerStats(playerStats);
-                    PerkManager.syncPermissions(playerStats.getPlayer());
+                    Parkour.perkManager.syncPermissions(playerStats.getPlayer());
                 }
 
                 loadPlayersCache.remove(playerStats);

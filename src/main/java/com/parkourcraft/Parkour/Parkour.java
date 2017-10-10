@@ -2,6 +2,7 @@ package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.*;
 import com.parkourcraft.Parkour.data.*;
+import com.parkourcraft.Parkour.data.perks.PerkData;
 import com.parkourcraft.Parkour.gameplay.*;
 import com.parkourcraft.Parkour.storage.local.FileLoader;
 import com.parkourcraft.Parkour.storage.mysql.DataQueries;
@@ -24,6 +25,7 @@ public class Parkour extends JavaPlugin {
 
     public static LocationManager locationManager;
     public static MenuManager menuManager;
+    public static PerkManager perkManager;
     public static ClansManager clansManager;
 
     public static Economy economy;
@@ -44,10 +46,10 @@ public class Parkour extends JavaPlugin {
 
         locationManager = new LocationManager();
         menuManager = new MenuManager(plugin);
+        perkManager = new PerkManager();
         clansManager = new ClansManager(plugin);
 
-        PerkManager.loadAll();
-        DataQueries.loadPerkIDCache();
+        PerkData.loadPerkIDCache();
         LevelManager.loadAll();
         DataQueries.loadLevelDataCache();
 
@@ -71,6 +73,7 @@ public class Parkour extends JavaPlugin {
         // unload data objects
         clansManager = null;
         menuManager = null;
+        perkManager = null;
         locationManager = null;
 
         // disable vault
@@ -93,7 +96,7 @@ public class Parkour extends JavaPlugin {
     private void runScheduler() {
         BukkitScheduler scheduler = getServer().getScheduler();
 
-        // update open menus, clean playerstats, and spectators every .5 seconds
+        // update clean playerstats, and spectators every .5 seconds
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
                 StatsManager.clean();
@@ -125,7 +128,7 @@ public class Parkour extends JavaPlugin {
         scheduler.runTaskTimerAsynchronously(this, new Runnable() {
             public void run() {
                 DataQueries.syncLevelData();
-                DataQueries.syncPerkIDs();
+                PerkData.syncPerkIDs();
                 DatabaseManager.runCaches();
             }
         }, 0L, 4L);

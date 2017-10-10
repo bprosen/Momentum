@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.PerkManager;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.ChatColor;
@@ -15,7 +16,7 @@ public class Perks_CMD implements CommandExecutor {
             FileManager.load("perks");
             sender.sendMessage("Loaded perks.yml from disk");
 
-            PerkManager.loadAll();
+            Parkour.perkManager.load();
             sender.sendMessage("Loaded all perks into memory");
         } else
             sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");

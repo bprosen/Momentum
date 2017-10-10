@@ -1,6 +1,6 @@
 package com.parkourcraft.Parkour.data.perks;
 
-import com.parkourcraft.Parkour.data.PerkManager;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -13,7 +13,7 @@ public class Perks_YAML {
 
     private static void commit(String perkName) {
         FileManager.save("perks");
-        PerkManager.load(perkName);
+        Parkour.perkManager.load(perkName);
     }
 
     public static List<String> getNames() {

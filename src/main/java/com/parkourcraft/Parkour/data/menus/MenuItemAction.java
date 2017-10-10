@@ -47,7 +47,7 @@ public class MenuItemAction {
     }
 
     private static void performPerkItem(Player player, MenuItem menuItem) {
-        Perk perk = PerkManager.get(menuItem.getTypeValue());
+        Perk perk = Parkour.perkManager.get(menuItem.getTypeValue());
 
         if (perk != null) {
             PlayerStats playerStas = StatsManager.get(player);
@@ -62,7 +62,7 @@ public class MenuItemAction {
 
                 if (playerBalance > perk.getPrice()) {
                     Parkour.economy.withdrawPlayer(player, perk.getPrice());
-                    PerkManager.bought(playerStas, perk);
+                    Parkour.perkManager.bought(playerStas, perk);
                     Parkour.menuManager.updateInventory(player, player.getOpenInventory());
                 }
             }
