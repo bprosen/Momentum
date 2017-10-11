@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class Perks_DB {
 
-    public static void loadIDCache() {
-        Map<String, Integer> updatedIDCache = new HashMap<>(Parkour.perks.getIDCache());
+    static Map<String, Integer> getIDCache() {
+        Map<String, Integer> IDCache = new HashMap<>();
 
         List<Map<String, String>> perkResults = DatabaseQueries.getResults(
                 "perks",
@@ -22,26 +22,27 @@ public class Perks_DB {
         );
 
         for (Map<String, String> perkResult : perkResults)
-            updatedIDCache.put(
+            IDCache.put(
                     perkResult.get("perk_name"),
                     Integer.parseInt(perkResult.get("perk_id"))
             );
 
-        Parkour.perks.setIDCache(updatedIDCache);
-        syncIDCache();
+        Parkour.getPluginLogger().info("Perk IDs in cache: " + IDCache.size());
+
+        return IDCache;
     }
 
-    static void syncID(Perk perk) {
-        if (Parkour.perks.getIDCache().containsKey(perk.getName()))
-            perk.setID(Parkour.perks.getIDCache().get(perk.getName()));
-    }
-
-    private static void syncIDCache() {
+    static void syncIDCache() {
         for (Perk perk : Parkour.perks.getPerks())
-            syncID(perk);
+            syncIDCache(perk, Parkour.perks.getIDCache());
     }
 
-    public static void syncPerkIDs() {
+    static void syncIDCache(Perk perk, Map<String, Integer> IDCache) {
+        if (IDCache.containsKey(perk.getName()))
+            perk.setID(IDCache.get(perk.getName()));
+    }
+
+    static boolean syncPerkIDs() {
         List<String> insertQueries = new ArrayList<>();
 
         for (Perk perk : Parkour.perks.getPerks())
@@ -59,8 +60,11 @@ public class Perks_DB {
                 finalQuery = finalQuery + sql + "; ";
 
             Parkour.database.run(finalQuery);
-            loadIDCache();
+
+            return true;
         }
+
+        return false;
     }
 
     public static void loadPerks(PlayerStats playerStats) {

@@ -13,10 +13,9 @@ public class LevelManager {
     private Map<String, LevelData> levelDataCache;
 
     public LevelManager(Plugin plugin) {
-        load(); // Loads levels from configuration
+        this.levelDataCache = Levels_DB.getDataCache();
 
-        levelDataCache = Levels_DB.getDataCache();
-        Levels_DB.syncDataCache();
+        load(); // Loads levels from configuration
 
         startScheduler(plugin);
     }
@@ -38,7 +37,7 @@ public class LevelManager {
             remove(levelName);
         else {
             LevelObject levelObject = new LevelObject(levelName);
-            Levels_DB.syncData(levelObject, levelDataCache);
+            Levels_DB.syncDataCache(levelObject, levelDataCache);
 
             if (exists)
                 remove(levelName);
@@ -50,12 +49,16 @@ public class LevelManager {
     private void startScheduler(Plugin plugin) {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             public void run() {
-                if (Levels_DB.syncAllData()) {
-                    levelDataCache = Levels_DB.getDataCache();
+                if (Levels_DB.syncLevelData()) {
+                    Parkour.levels.setLevelDataCache(Levels_DB.getDataCache());
                     Levels_DB.syncDataCache();
                 }
             }
-        }, 0L, 4L);
+        }, 0L, 10L);
+    }
+
+    void setLevelDataCache(Map<String, LevelData> levelDataCache) {
+        this.levelDataCache = levelDataCache;
     }
 
     Map<String, LevelData> getLevelDataCache() {

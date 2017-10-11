@@ -14,6 +14,8 @@ public class SettingsManager {
     public int clans_max_members;
     public int clans_price_create;
     public int clans_price_tag;
+    public int clans_tag_length_min;
+    public int clans_tag_length_max;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
@@ -30,6 +32,8 @@ public class SettingsManager {
         clans_max_members = settings.getInt("clans.max_members");
         clans_price_create = settings.getInt("clans.price.create");
         clans_price_tag = settings.getInt("clans.price.tag");
+        clans_tag_length_min = settings.getInt("clans.tag_length.min");
+        clans_tag_length_max = settings.getInt("clans.tag_length.max");
     }
 
 }

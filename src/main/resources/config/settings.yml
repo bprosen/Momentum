@@ -24,3 +24,6 @@ clans:
   price:
     create: 10000
     tag: 1000
+  tag_length:
+    min: 4
+    max: 6

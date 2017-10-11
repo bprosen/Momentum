@@ -1,5 +1,8 @@
 package com.parkourcraft.Parkour.commands;
 
+import com.parkourcraft.Parkour.Parkour;
+import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.data.stats.StatsManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,11 +22,29 @@ public class Clan_CMD implements CommandExecutor {
             } else if (sender instanceof Player) {
                 // Sub commands here cannot be ran by non-players
                 Player player = ((Player) sender).getPlayer();
+                PlayerStats playerStats = Parkour.stats.get(player);
 
 
                 if (a[0].equalsIgnoreCase("create")) {
                     // Creates a clan at the set price
 
+                    if (playerStats.getClanID() == -1) {
+                        int playerBalance  = (int) Parkour.economy.getBalance(player);
+
+                        if (playerBalance > Parkour.settings.clans_price_create) {
+                            if (a.length > 1) {
+
+                            } else {
+                                sender.sendMessage(ChatColor.RED + "No clan tag specified");
+                                sender.sendMessage(getHelp("create"));
+                            }
+                        } else
+                            sender.sendMessage(
+                                    ChatColor.RED + "You cannot afford to create a clan. It requires " +
+                                            ChatColor.GOLD + Parkour.settings.clans_price_create + " Coins"
+                            );
+                    } else
+                        sender.sendMessage(ChatColor.RED + "You cannot create a clan while in one");
 
                 } else if (a[0].equalsIgnoreCase("tag")) {
                     // Changes clan tag
@@ -54,6 +75,7 @@ public class Clan_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("kick"));
         sender.sendMessage(getHelp("invite"));
         sender.sendMessage(getHelp("deinvite"));
+        sender.sendMessage(getHelp("disband"));
     }
 
     private static String getHelp(String cmd) {

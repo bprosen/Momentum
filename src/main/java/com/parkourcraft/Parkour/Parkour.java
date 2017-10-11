@@ -55,7 +55,6 @@ public class Parkour extends JavaPlugin {
             return;
         }
 
-
         Scoreboard.startScheduler(plugin);
         SpectatorHandler.startScheduler(plugin);
 
@@ -89,6 +88,7 @@ public class Parkour extends JavaPlugin {
         getCommand("setarmor").setExecutor(new SetArmor_CMD());
         getCommand("spectate").setExecutor(new Spectate_CMD());
         getCommand("clan").setExecutor(new Clan_CMD());
+        getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
     }
 
     private static void loadData() {

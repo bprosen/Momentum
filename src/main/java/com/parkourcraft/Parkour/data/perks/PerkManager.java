@@ -14,9 +14,9 @@ public class PerkManager {
     private Map<String, Integer> IDCache = new HashMap<>();
 
     public PerkManager(Plugin plugin) {
-        load();
+        this.IDCache = Perks_DB.getIDCache();
 
-        Perks_DB.loadIDCache();
+        load();
 
         startScheduler(plugin);
     }
@@ -25,15 +25,20 @@ public class PerkManager {
         for (String perkName : Perks_YAML.getNames())
             load(perkName);
 
+        Parkour.getPluginLogger().info("Perks loaded: " + perks.size());
+
         syncPermissions();
     }
 
     private void startScheduler(Plugin plugin) {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             public void run() {
-                Perks_DB.syncPerkIDs();
+                if (Perks_DB.syncPerkIDs()) {
+                    Parkour.perks.setIDCache(Perks_DB.getIDCache());
+                    Perks_DB.syncIDCache();
+                }
             }
-        }, 0L, 4L);
+        }, 0L, 10L);
     }
 
     public void setIDCache(Map<String, Integer> IDCache) {
@@ -79,7 +84,7 @@ public class PerkManager {
             remove(perkName);
         else {
             Perk perk = new Perk(perkName);
-            Perks_DB.syncID(perk);
+            Perks_DB.syncIDCache(perk, IDCache);
 
             if (exists)
                 remove(perkName);

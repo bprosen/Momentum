@@ -11,14 +11,12 @@ public class PlayerStats {
     private String playerName;
     private int playerID = -1;
     private long levelStartTime = 0;
-
     private boolean spectatable;
     private PlayerStats playerToSpectate;
+    private int clanID = -1;
 
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
-
-    private int clanID;
 
     public PlayerStats(Player player) {
         this.player  = player;

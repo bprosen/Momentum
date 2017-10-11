@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.data.levels;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
 import java.util.ArrayList;
@@ -30,15 +29,17 @@ public class Levels_DB {
                     )
             );
 
+        Parkour.getPluginLogger().info("Levels in data cache: " + levelData.size());
+
         return levelData;
     }
 
     static void syncDataCache() {
         for (LevelObject levelObject : Parkour.levels.getLevels())
-            syncData(levelObject, Parkour.levels.getLevelDataCache());
+            syncDataCache(levelObject, Parkour.levels.getLevelDataCache());
     }
 
-    static void syncData(LevelObject level, Map<String, LevelData> levelDataCache) {
+    static void syncDataCache(LevelObject level, Map<String, LevelData> levelDataCache) {
         LevelData levelData = levelDataCache.get(level.getName());
 
         if (levelData != null) {
@@ -48,7 +49,7 @@ public class Levels_DB {
         }
     }
 
-    static boolean syncAllData() {
+    static boolean syncLevelData() {
         List<String> insertQueries = new ArrayList<>();
 
         for (LevelObject level : Parkour.levels.getLevels())
@@ -66,6 +67,7 @@ public class Levels_DB {
                 finalQuery = finalQuery + sql + "; ";
 
             Parkour.database.run(finalQuery);
+
             return true;
         }
 

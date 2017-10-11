@@ -28,3 +28,5 @@ commands:
   clan:
     description: "Clan management"
     aliases: [clans]
+  pc-parkour:
+    description: "Parkour"
