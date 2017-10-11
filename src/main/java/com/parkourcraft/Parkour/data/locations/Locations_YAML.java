@@ -1,8 +1,7 @@
 package com.parkourcraft.Parkour.data.locations;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.storage.local.FileManager;
+import com.parkourcraft.Parkour.storage.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -13,10 +12,10 @@ import java.util.List;
 
 public class Locations_YAML {
 
-    private static FileConfiguration locationsFile = FileManager.getFileConfig("locations");
+    private static FileConfiguration locationsFile = Parkour.configs.get("locations");
 
     private static void commit(String locationName) {
-        FileManager.save("locations");
+        Parkour.configs.save("locations");
         Parkour.locations.load(locationName);
     }
 

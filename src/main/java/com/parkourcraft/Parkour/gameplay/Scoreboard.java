@@ -1,14 +1,13 @@
 package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,14 @@ import java.util.List;
 public class Scoreboard {
 
     private static int boardWidth = 23;
+
+    public static void startScheduler(Plugin plugin) {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            public void run() {
+                displayScoreboards();
+            }
+        }, 20L, 4L);
+    }
 
     private static String getSpaces(int length) {
         String spaces = "";
@@ -42,7 +49,7 @@ public class Scoreboard {
 
     private static void displayScoreboard(Player player) {
         List<String> board = new ArrayList<>();
-        LevelObject level = LevelManager.get(LevelHandler.getLocationLevelName(player.getLocation()));
+        LevelObject level = Parkour.levels.get(LevelHandler.getLocationLevelName(player.getLocation()));
 
         // Title
         board.add(
@@ -62,7 +69,7 @@ public class Scoreboard {
         if (level != null) {
             board.add(formatSpacing(ChatColor.GRAY + ""));
 
-            PlayerStats playerStats = StatsManager.get(player);
+            PlayerStats playerStats = Parkour.stats.get(player);
 
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));

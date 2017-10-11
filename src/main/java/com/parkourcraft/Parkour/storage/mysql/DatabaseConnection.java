@@ -8,14 +8,16 @@ import java.sql.SQLException;
 import com.parkourcraft.Parkour.Parkour;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.parkourcraft.Parkour.storage.local.FileManager;
-
 public class DatabaseConnection {
 
-    private static Connection connection;
+    private Connection connection;
 
-    public static void open() {
-        FileConfiguration settings = FileManager.getFileConfig("settings");
+    public DatabaseConnection() {
+        open();
+    }
+
+    private void open() {
+        FileConfiguration settings = Parkour.configs.get("settings");
         String dbPath = "database";
 
         String username = settings.getString(dbPath + ".username");
@@ -39,10 +41,10 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
 
-        Parkour.getPluginLogger().info("Successfully connected to mySQL database: " + host);
+        Parkour.getPluginLogger().info("Successfully opened the connection to the database");
     }
 
-    public static void close() {
+    public void close() {
         try {
             if (!connection.isClosed())
                 connection.close();
@@ -51,17 +53,19 @@ public class DatabaseConnection {
         }
     }
 
-    public static Connection get() {
+    public Connection get() {
         return connection;
     }
 
-    public static DatabaseMetaData getMeta() {
+    public DatabaseMetaData getMeta() {
         DatabaseMetaData meta = null;
+
         try {
             meta = get().getMetaData();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return meta;
     }
 

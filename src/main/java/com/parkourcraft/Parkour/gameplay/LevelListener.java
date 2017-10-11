@@ -1,16 +1,12 @@
 package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -98,7 +94,7 @@ public class LevelListener implements Listener {
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
-        PlayerStats playerStats = StatsManager.get(event.getPlayer());
+        PlayerStats playerStats = Parkour.stats.get(event.getPlayer());
 
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null)

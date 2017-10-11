@@ -1,8 +1,6 @@
 package com.parkourcraft.Parkour.data.menus;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.PerkManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
@@ -84,7 +82,7 @@ public class MenuItemFormatter {
                 itemLore.add(ChatColor.GRAY + "Requirements");
 
                 for (String requirement : requirements) {
-                    LevelObject level = LevelManager.get(requirement);
+                    LevelObject level = Parkour.levels.get(requirement);
 
                     if (level != null)
                         itemLore.add(ChatColor.GRAY + " - " + level.getFormattedTitle());
@@ -108,7 +106,7 @@ public class MenuItemFormatter {
     private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String levelName = menuItem.getTypeValue();
-        LevelObject level = LevelManager.get(levelName);
+        LevelObject level = Parkour.levels.get(levelName);
 
         if (level != null) {
             ItemMeta itemMeta = item.getItemMeta();
@@ -135,7 +133,7 @@ public class MenuItemFormatter {
                 itemLore.add(ChatColor.GRAY + "Required Levels");
 
                 for (String requiredLevelName : level.getRequiredLevels()) {
-                    LevelObject requiredLevel = LevelManager.get(requiredLevelName);
+                    LevelObject requiredLevel = Parkour.levels.get(requiredLevelName);
 
                     if (requiredLevel != null)
                         itemLore.add(

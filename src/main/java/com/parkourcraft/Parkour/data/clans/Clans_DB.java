@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.data.clans;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.ClansManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ClansData {
+public class Clans_DB {
 
     public static void loadClans(List<Clan> clans) {
         clans = new ArrayList<>();
@@ -68,7 +67,7 @@ public class ClansData {
     }
 
     private static void insertClan(Clan clan) {
-        DatabaseManager.runQuery(
+        Parkour.database.run(
                 "INSERT INTO clans " +
                 "(clan_tag, owner_player_id)" +
                 " VALUES " +
@@ -85,7 +84,7 @@ public class ClansData {
                 " WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        DatabaseManager.addUpdateQuery(query);
+        Parkour.database.add(query);
     }
 
     public static void updateClanTag(Clan clan) {
@@ -94,7 +93,7 @@ public class ClansData {
                 "WHERE clan_id=" + clan.getID()
                 ;
 
-        DatabaseManager.addUpdateQuery(query);
+        Parkour.database.add(query);
     }
 
     public static void updateClanOwnerID(Clan clan) {
@@ -103,7 +102,7 @@ public class ClansData {
                 "WHERE clan_id=" + clan.getID()
                 ;
 
-        DatabaseManager.addUpdateQuery(query);
+        Parkour.database.add(query);
     }
 
 

@@ -1,6 +1,6 @@
 package com.parkourcraft.Parkour.data.menus;
 
-import com.parkourcraft.Parkour.storage.local.FileManager;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Menus_YAML {
 
-    private static FileConfiguration menusConfig = FileManager.getFileConfig("menus");
+    private static FileConfiguration menusConfig = Parkour.configs.get("menus");
 
     public static List<String> getNames() {
         return new ArrayList<>(menusConfig.getKeys(false));

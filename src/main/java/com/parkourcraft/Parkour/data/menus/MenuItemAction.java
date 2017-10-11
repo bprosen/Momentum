@@ -2,7 +2,6 @@ package com.parkourcraft.Parkour.data.menus;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.*;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
@@ -50,7 +49,7 @@ public class MenuItemAction {
         Perk perk = Parkour.perks.get(menuItem.getTypeValue());
 
         if (perk != null) {
-            PlayerStats playerStas = StatsManager.get(player);
+            PlayerStats playerStas = Parkour.stats.get(player);
 
             if (menuItem.hasCommands()
                     && perk.hasRequirements(playerStas, player)) {
@@ -70,8 +69,8 @@ public class MenuItemAction {
     }
 
     private static void performLevelItem(Player player, MenuItem menuItem) {
-        PlayerStats playerStats = StatsManager.get(player);
-        LevelObject level = LevelManager.get(menuItem.getTypeValue());
+        PlayerStats playerStats = Parkour.stats.get(player);
+        LevelObject level = Parkour.levels.get(menuItem.getTypeValue());
 
         if (level.hasRequiredLevels(playerStats)) {
             player.closeInventory();

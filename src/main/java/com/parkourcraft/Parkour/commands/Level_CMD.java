@@ -1,12 +1,9 @@
 package com.parkourcraft.Parkour.commands;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.storage.local.FileManager;
+import com.parkourcraft.Parkour.data.levels.Levels_DB;
 import com.parkourcraft.Parkour.data.levels.Levels_YAML;
-import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -38,14 +35,14 @@ public class Level_CMD implements CommandExecutor {
                             ChatColor.GRAY + "Levels loaded in: "
                                     + ChatColor.GREEN + String.join(
                                     ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                    LevelManager.getNames()
+                                    Parkour.levels.getNames()
                             )
                     );
                 } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
                     if (a.length == 2) {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName))
+                        if (Parkour.levels.exists(levelName))
                             sender.sendMessage(
                                     ChatColor.GRAY + "Level "
                                             + ChatColor.GREEN + levelName
@@ -67,14 +64,14 @@ public class Level_CMD implements CommandExecutor {
                     if (a.length == 2) {
                         String levelName = a[1];
 
-                        if (!LevelManager.exists(levelName))
+                        if (!Parkour.levels.exists(levelName))
                             sender.sendMessage(
                                     ChatColor.GRAY + "Level "
                                             + ChatColor.GREEN + levelName
                                             + ChatColor.GRAY + " does not exist"
                             );
                         else {
-                            LevelManager.remove(levelName);
+                            Parkour.levels.remove(levelName);
 
                             sender.sendMessage(
                                     ChatColor.GRAY + "Deleted level "
@@ -86,24 +83,24 @@ public class Level_CMD implements CommandExecutor {
                         sender.sendMessage(getHelp("delete"));
                     }
                 } else if (a[0].equalsIgnoreCase("load")) { // subcommand: load
-                    FileManager.load("levels");
+                    Parkour.configs.load("levels");
                     sender.sendMessage(
                             ChatColor.GRAY + "Loaded " + ChatColor.GREEN + "levels.yml"
                                     + ChatColor.GRAY + " from disk"
                     );
 
-                    LevelManager.loadAll();
+                    Parkour.levels.load();
                     sender.sendMessage(
                             ChatColor.GRAY + "Loaded levels from " + ChatColor.GREEN + "levels.yml"
                                     + ChatColor.GRAY + ", "
-                                    + ChatColor.GREEN + LevelManager.getNames().size()
+                                    + ChatColor.GREEN + Parkour.levels.getNames().size()
                                     + ChatColor.GRAY + " total"
                     );
                 } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName)) {
+                        if (Parkour.levels.exists(levelName)) {
                             if (a.length > 2) {
                                 String title = "";
                                 for (int i = 2; i < a.length; i++)
@@ -142,13 +139,13 @@ public class Level_CMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
                     if (a.length > 1) {
                         String levelName = a[1];
-                        LevelObject level = LevelManager.get(levelName);
+                        LevelObject level = Parkour.levels.get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
                                     level.setReward(Integer.parseInt(a[2]));
-                                    DataQueries.updateLevelReward(level);
+                                    Levels_DB.updateReward(level);
 
                                     sender.sendMessage(
                                             ChatColor.GRAY + "Set "
@@ -183,7 +180,7 @@ public class Level_CMD implements CommandExecutor {
                     } else {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName)) {
+                        if (Parkour.levels.exists(levelName)) {
                             if (sender instanceof Player) {
                                 Player player = ((Player) sender).getPlayer();
 
@@ -215,13 +212,13 @@ public class Level_CMD implements CommandExecutor {
                     } else {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName)) {
+                        if (Parkour.levels.exists(levelName)) {
                             if (a.length > 2) {
                                 if (a[2].equalsIgnoreCase("default")) {
                                     String completionLocationName = levelName + "-completion";
 
                                     Parkour.locations.remove(completionLocationName);
-                                    LevelManager.load(levelName);
+                                    Parkour.levels.load(levelName);
 
                                     sender.sendMessage(
                                             ChatColor.GRAY + "The completion location for "
@@ -247,7 +244,7 @@ public class Level_CMD implements CommandExecutor {
                                     String completionLocationName = levelName + "-completion";
 
                                     Parkour.locations.save(completionLocationName, playerLocation);
-                                    LevelManager.load(levelName);
+                                    Parkour.levels.load(levelName);
 
                                     sender.sendMessage(
                                             ChatColor.GRAY + "Location saved as "
@@ -274,7 +271,7 @@ public class Level_CMD implements CommandExecutor {
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName)) {
+                        if (Parkour.levels.exists(levelName)) {
                             if (a.length > 2) {
                                 String message = "";
                                 for (int i = 2; i < a.length; i++)
@@ -314,7 +311,7 @@ public class Level_CMD implements CommandExecutor {
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName)) {
+                        if (Parkour.levels.exists(levelName)) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
                                     Levels_YAML.setMaxCompletions(levelName, Integer.parseInt(a[2]));
@@ -348,7 +345,7 @@ public class Level_CMD implements CommandExecutor {
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (LevelManager.exists(levelName)) {
+                        if (Parkour.levels.exists(levelName)) {
                             boolean broadcastSetting = Levels_YAML.getBroadcastSetting(levelName);
 
                             Levels_YAML.setBroadcast(levelName, !broadcastSetting);
@@ -371,7 +368,7 @@ public class Level_CMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("requires")) { //subcommand: requires
                     if (a.length > 1) {
                         String levelName = a[1];
-                        LevelObject level = LevelManager.get(levelName);
+                        LevelObject level = Parkour.levels.get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
@@ -399,7 +396,7 @@ public class Level_CMD implements CommandExecutor {
 
                             }
 
-                            level = LevelManager.get(levelName);
+                            level = Parkour.levels.get(levelName);
 
                             sender.sendMessage(
                                     ChatColor.GREEN + levelName +
@@ -423,13 +420,13 @@ public class Level_CMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("modifier")) { //subcommand: modifier
                     if (a.length > 1) {
                         String levelName = a[1];
-                        LevelObject level = LevelManager.get(levelName);
+                        LevelObject level = Parkour.levels.get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
                                     level.setScoreModifier(Integer.parseInt(a[2]));
-                                    DataQueries.updateLevelScoreModifier(level);
+                                    Levels_DB.updateScoreModifier(level);
 
                                     sender.sendMessage(
                                             ChatColor.GRAY + "Set "

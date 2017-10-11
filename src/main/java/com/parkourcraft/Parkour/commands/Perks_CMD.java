@@ -1,8 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.PerkManager;
-import com.parkourcraft.Parkour.storage.local.FileManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,7 +11,7 @@ public class Perks_CMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (sender.isOp()) {
-            FileManager.load("perks");
+            Parkour.configs.load("perks");
             sender.sendMessage("Loaded perks.yml from disk");
 
             Parkour.perks.load();

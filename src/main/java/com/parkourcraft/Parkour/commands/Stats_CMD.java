@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
@@ -21,7 +20,7 @@ public class Stats_CMD implements CommandExecutor {
         if (a.length > 0) {
             String levelName = a[0];
 
-            LevelObject levelObject = LevelManager.get(levelName);
+            LevelObject levelObject = Parkour.levels.get(levelName);
 
             if (levelObject != null) {
                 sender.sendMessage(
@@ -60,14 +59,14 @@ public class Stats_CMD implements CommandExecutor {
         } else {
             if (sender instanceof Player) {
                 Player player = ((Player) sender).getPlayer();
-                PlayerStats playerStats = StatsManager.get(player);
+                PlayerStats playerStats = Parkour.stats.get(player);
 
                 if (playerStats != null) {
                     Map<String, List<LevelCompletion>> levelCompletionsMap = playerStats.getLevelCompletionsMap();
 
                     for (Map.Entry<String, List<LevelCompletion>> levelCompletionsEntry : levelCompletionsMap.entrySet()) {
                         List<LevelCompletion> levelCompletionsList = levelCompletionsEntry.getValue();
-                        LevelObject level = LevelManager.get(levelCompletionsEntry.getKey());
+                        LevelObject level = Parkour.levels.get(levelCompletionsEntry.getKey());
 
                         if (level != null) {
                             String levelCompletions = level.getFormattedTitle() + ChatColor.GRAY + " :" + ChatColor.GREEN;

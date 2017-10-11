@@ -1,23 +1,21 @@
 package com.parkourcraft.Parkour;
 
 import com.parkourcraft.Parkour.commands.*;
-import com.parkourcraft.Parkour.data.*;
-import com.parkourcraft.Parkour.data.perks.PerkData;
+import com.parkourcraft.Parkour.data.clans.ClansManager;
+import com.parkourcraft.Parkour.data.levels.LevelManager;
+import com.parkourcraft.Parkour.data.locations.LocationManager;
+import com.parkourcraft.Parkour.data.menus.MenuManager;
+import com.parkourcraft.Parkour.data.perks.PerkManager;
+import com.parkourcraft.Parkour.data.stats.StatsManager;
 import com.parkourcraft.Parkour.gameplay.*;
 import com.parkourcraft.Parkour.data.SettingsManager;
-import com.parkourcraft.Parkour.storage.local.FileLoader;
-import com.parkourcraft.Parkour.storage.local.FileManager;
-import com.parkourcraft.Parkour.storage.mysql.DataQueries;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseConnection;
+import com.parkourcraft.Parkour.storage.ConfigManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
-import com.parkourcraft.Parkour.storage.mysql.TableManager;
 import com.parkourcraft.Parkour.utils.dependencies.GhostFactory;
 import com.parkourcraft.Parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.logging.Logger;
 
@@ -26,11 +24,15 @@ public class Parkour extends JavaPlugin {
     private static Plugin plugin;
     private static Logger logger;
 
+    public static ConfigManager configs;
+    public static DatabaseManager database;
     public static SettingsManager settings;
     public static LocationManager locations;
-    public static MenuManager menus;
+    public static LevelManager levels;
     public static PerkManager perks;
+    public static StatsManager stats;
     public static ClansManager clans;
+    public static MenuManager menus;
 
     public static Economy economy;
     public static GhostFactory ghostFactory;
@@ -40,107 +42,42 @@ public class Parkour extends JavaPlugin {
         plugin = this;
         logger = getLogger();
 
-        FileLoader.startUp();
-
         registerEvents();
         registerCommands();
 
-        DatabaseConnection.open();
-        TableManager.setUp();
+        configs = new ConfigManager(plugin);
+        database = new DatabaseManager(plugin);
 
-        settings = new SettingsManager(FileManager.getFileConfig("settings"));
-        locations = new LocationManager();
-        menus = new MenuManager(plugin);
-        perks = new PerkManager();
-        clans = new ClansManager(plugin);
-
-        PerkData.loadPerkIDCache();
-        LevelManager.loadAll();
-        DataQueries.loadLevelDataCache();
+        loadData();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        ghostFactory = new GhostFactory(plugin);
 
-        runScheduler();
+        Scoreboard.startScheduler(plugin);
+        SpectatorHandler.startScheduler(plugin);
 
-        StatsManager.loadUnloadedStats();
+        stats.addUnloadedPlayers();
     }
 
     @Override
     public void onDisable() {
-        DatabaseManager.runCaches();
-        DatabaseConnection.close();
+        unloadData();
 
-        // unload data objects
-        clans = null;
-        perks = null;
-        menus = null;
-        locations = null;
-        settings = null;
+        configs = null;
+        database.close();
+        database = null;
 
         plugin = null;
     }
 
-    public static Plugin getPlugin() {
-        return plugin;
-    }
-
-    public static Logger getPluginLogger() {
-        return logger;
-    }
-
-    private void runScheduler() {
-        BukkitScheduler scheduler = getServer().getScheduler();
-
-        // update clean playerstats, and spectators every .5 seconds
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            public void run() {
-                StatsManager.clean();
-                SpectatorHandler.updateSpectators();
-            }
-        }, 0L, 10L);
-
-        // update scoreboards every .2 seconds
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            public void run() {
-                Scoreboard.displayScoreboards();
-            }
-        }, 20L, 4L);
-
-        /*
-         * Asynchronously grabs leaderboards and total
-         * number of completions from database
-         * while syncing the information into memory
-         * interval: every 30 seconds
-         */
-        scheduler.runTaskTimerAsynchronously(this, new Runnable() {
-            public void run() {
-                DataQueries.loadTotalCompletions();
-                DataQueries.loadLeaderboards();
-            }
-        }, 10L, 30L * 20L);
-
-        // runs the queries in the cache (every .2 seconds (5 times per second))
-        scheduler.runTaskTimerAsynchronously(this, new Runnable() {
-            public void run() {
-                DataQueries.syncLevelData();
-                PerkData.syncPerkIDs();
-                DatabaseManager.runCaches();
-            }
-        }, 0L, 4L);
-    }
-
-    private void registerEvents() { // Register all of the gameplay
-        PluginManager pluginManager = getServer().getPluginManager();
-
-        pluginManager.registerEvents(new LevelListener(), this);
-        pluginManager.registerEvents(new JoinLeaveHandler(), this);
-        pluginManager.registerEvents(new MenuListener(), this);
-        pluginManager.registerEvents(new TestChamberHandler(), this);
+    private void registerEvents() {
+        getServer().getPluginManager().registerEvents(new LevelListener(), this);
+        getServer().getPluginManager().registerEvents(new JoinLeaveHandler(), this);
+        getServer().getPluginManager().registerEvents(new MenuListener(), this);
+        getServer().getPluginManager().registerEvents(new TestChamberHandler(), this);
     }
 
     private void registerCommands() {
@@ -152,6 +89,38 @@ public class Parkour extends JavaPlugin {
         getCommand("setarmor").setExecutor(new SetArmor_CMD());
         getCommand("spectate").setExecutor(new Spectate_CMD());
         getCommand("clan").setExecutor(new Clan_CMD());
+    }
+
+    private static void loadData() {
+        settings = new SettingsManager(configs.get("settings"));
+        locations = new LocationManager();
+        levels = new LevelManager(plugin);
+        perks = new PerkManager(plugin);
+        stats = new StatsManager(plugin);
+        clans = new ClansManager(plugin);
+        menus = new MenuManager(plugin);
+
+        ghostFactory = new GhostFactory(plugin);
+    }
+
+    private static void unloadData() {
+        menus = null;
+        clans = null;
+        stats = null;
+        perks = null;
+        levels = null;
+        locations = null;
+        settings = null;
+
+        ghostFactory = null;
+    }
+
+    public static Plugin getPlugin() {
+        return plugin;
+    }
+
+    public static Logger getPluginLogger() {
+        return logger;
     }
 
 }

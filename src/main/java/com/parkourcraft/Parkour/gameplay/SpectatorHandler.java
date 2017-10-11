@@ -1,17 +1,25 @@
 package com.parkourcraft.Parkour.gameplay;
 
-
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.data.stats.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 
 public class SpectatorHandler implements Listener {
+
+    public static void startScheduler(Plugin plugin) {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            public void run() {
+                updateSpectators();
+            }
+        }, 0L, 10L);
+    }
 
     public static void spectateToPlayer(Player spectator, Player player) {
         if (player.isOnline()
@@ -56,7 +64,7 @@ public class SpectatorHandler implements Listener {
     }
 
     public static void updateSpectators() {
-        for (PlayerStats playerStats : StatsManager.getPlayerStats()) {
+        for (PlayerStats playerStats : Parkour.stats.getPlayerStats()) {
             if (playerStats.isLoaded()
                     && playerStats.getPlayer().isOnline()
                     && playerStats.getPlayerToSpectate() != null)

@@ -1,23 +1,24 @@
-package com.parkourcraft.Parkour.data;
+package com.parkourcraft.Parkour.data.perks;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.perks.Perk;
-import com.parkourcraft.Parkour.data.perks.PerkData;
-import com.parkourcraft.Parkour.data.perks.Perks_YAML;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 
 public class PerkManager {
 
     private List<Perk> perks = new ArrayList<>();
-    private Map<String, Integer> perkIDCache = new HashMap<>();
+    private Map<String, Integer> IDCache = new HashMap<>();
 
-    public PerkManager() {
+    public PerkManager(Plugin plugin) {
         load();
+
+        Perks_DB.loadIDCache();
+
+        startScheduler(plugin);
     }
 
     public void load() {
@@ -27,8 +28,20 @@ public class PerkManager {
         syncPermissions();
     }
 
-    public Map<String, Integer> getPerkIDCache() {
-        return perkIDCache;
+    private void startScheduler(Plugin plugin) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+            public void run() {
+                Perks_DB.syncPerkIDs();
+            }
+        }, 0L, 4L);
+    }
+
+    public void setIDCache(Map<String, Integer> IDCache) {
+        this.IDCache = IDCache;
+    }
+
+    public Map<String, Integer> getIDCache() {
+        return IDCache;
     }
 
     public Perk get(String perkName) {
@@ -66,7 +79,7 @@ public class PerkManager {
             remove(perkName);
         else {
             Perk perk = new Perk(perkName);
-            PerkData.syncPerkID(perk);
+            Perks_DB.syncID(perk);
 
             if (exists)
                 remove(perkName);
@@ -76,7 +89,7 @@ public class PerkManager {
     }
 
     public void syncPermissions(Player player) {
-        PlayerStats playerStats = StatsManager.get(player);
+        PlayerStats playerStats = Parkour.stats.get(player);
 
         for (Perk perk : perks) {
             boolean hasRequirements = perk.hasRequirements(playerStats, player);
@@ -96,7 +109,7 @@ public class PerkManager {
             Long date = System.currentTimeMillis();
 
             playerStats.addPerk(perk.getName(), date);
-            PerkData.insertPerk(playerStats, perk, date);
+            Perks_DB.insertPerk(playerStats, perk, date);
         }
     }
 

@@ -41,7 +41,7 @@ public class DatabaseQueries {
             query = query + " " + trailingSQL;
 
         try {
-            Statement statement = DatabaseConnection.get().createStatement();
+            Statement statement = Parkour.database.get().get().createStatement();
             ResultSet results = statement.executeQuery(query);
 
             while (results.next())

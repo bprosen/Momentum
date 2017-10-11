@@ -1,9 +1,7 @@
-package com.parkourcraft.Parkour.data;
+package com.parkourcraft.Parkour.data.menus;
 
-import com.parkourcraft.Parkour.data.menus.Menu;
-import com.parkourcraft.Parkour.data.menus.Menus_YAML;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -113,7 +111,7 @@ public class MenuManager {
 
                 if (menu != null
                         && menu.isUpdating()) {
-                    PlayerStats playerStats = StatsManager.get(player);
+                    PlayerStats playerStats = Parkour.stats.get(player);
 
                     updateInventory(
                             player,

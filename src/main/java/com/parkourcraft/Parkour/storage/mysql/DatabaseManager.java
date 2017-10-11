@@ -1,10 +1,9 @@
 package com.parkourcraft.Parkour.storage.mysql;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.PerkManager;
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -12,24 +11,47 @@ import java.util.*;
 
 public class DatabaseManager {
 
-    private static boolean runningCaches = false;
+    private DatabaseConnection connection;
 
-    private static List<String> databaseQuriesCache = new ArrayList<>();
-    private static List<PlayerStats> loadPlayersCache = new ArrayList<>();
+    private boolean running = false;
 
-    // order: runUpdateQueries, loadPlayersCache, updatePlayersCache
-    public static void runCaches() {
-        if (runningCaches) // makes sure it isn't already running
+    private List<String> cache = new ArrayList<>();
+
+    public DatabaseManager(Plugin plugin) {
+        connection = new DatabaseConnection();
+
+        Tables_DB.configure(this);
+
+        startScheduler(plugin);
+    }
+
+    public void close() {
+        runCaches();
+        connection.close();
+    }
+
+    private void startScheduler(Plugin plugin) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+            public void run() {
+                runCaches();
+            }
+        }, 0L, 2L);
+    }
+
+    public DatabaseConnection get() {
+        return connection;
+    }
+
+    private void runCaches() {
+        if (running) // makes sure it isn't already running
             return;
-        runningCaches = true; // makes this method run the only one that can run
+
+        running = true; // ensures this method run the only one that can run
 
         try {
 
-            if (databaseQuriesCache.size() > 0)
-                runDatabaseQueriesCache();
-
-            if (loadPlayersCache.size() > 0)
-                runLoadPlayersCache();
+            if (cache.size() > 0)
+                runCache();
 
         } catch (Exception exception) {
             Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runCaches()");
@@ -37,69 +59,38 @@ public class DatabaseManager {
             exception.printStackTrace();
         }
 
-        runningCaches = false; // allows the method to be ran again
+        running = false; // allows the method to be ran again
     }
 
-    private static void runDatabaseQueriesCache() {
+    private void runCache() {
         try {
             String finalQuery = "";
 
-            List<String> cache = new ArrayList<>(databaseQuriesCache);
+            List<String> tempCache = new ArrayList<>(cache);
 
-            for (String sql : cache)
+            for (String sql : tempCache)
                 finalQuery = finalQuery + sql + "; ";
 
-            runQuery(finalQuery);
-            databaseQuriesCache.removeAll(cache); // removes queries that have been ran
+            run(finalQuery);
+            cache.removeAll(tempCache); // removes queries that have been ran
         } catch (Exception exception) {
-            Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runDatabaseQueriesCache()");
+            Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runCache()");
             Parkour.getPluginLogger().severe("ERROR:  printing StackTrace");
             exception.printStackTrace();
         }
     }
 
-    private static void runLoadPlayersCache() {
+    public void add(String sql) {
+        cache.add(sql);
+    }
+
+    public void run(String sql) {
         try {
-            List<PlayerStats> cache = new ArrayList<>(loadPlayersCache);
-
-            for (PlayerStats playerStats : cache) {
-                if (playerStats != null
-                        && playerStats.getPlayer() != null
-                        && playerStats.getPlayer().isOnline()) {
-                    DataQueries.loadPlayerStats(playerStats);
-                    Parkour.perks.syncPermissions(playerStats.getPlayer());
-                }
-
-                loadPlayersCache.remove(playerStats);
-            }
-        } catch (Exception exception) {
-            Parkour.getPluginLogger().severe("ERROR: Occurred within DatabaseManager.runLoadPlayersCache()");
-            Parkour.getPluginLogger().severe("ERROR:  printing StackTrace");
-            exception.printStackTrace();
-        }
-    }
-
-    /* LoadPlayersCache
-    This cache is responsible for loading information for players who have just joined
-    */
-    public static void addToLoadPlayersCache(PlayerStats playerStats) {
-        loadPlayersCache.add(playerStats);
-    }
-
-    /* DatabaseQueriesCache
-    This cache is responsible for running all queries
-    */
-    public static void addUpdateQuery(String sql) {
-        databaseQuriesCache.add(sql);
-    }
-
-    public static void runQuery(String sql) {
-        try {
-            PreparedStatement statement = DatabaseConnection.get().prepareStatement(sql);
+            PreparedStatement statement = connection.get().prepareStatement(sql);
             statement.execute();
             statement.close();
         } catch (SQLException e) {
-            Parkour.getPluginLogger().severe("ERROR: SQL Failed to runQuery: " + sql);
+            Parkour.getPluginLogger().severe("ERROR: SQL Failed to run query: " + sql);
             e.printStackTrace();
         }
     }

@@ -1,8 +1,7 @@
 package com.parkourcraft.Parkour.commands;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.MenuManager;
-import com.parkourcraft.Parkour.storage.local.FileManager;
+import com.parkourcraft.Parkour.data.menus.MenuManager;
 import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -60,7 +59,7 @@ public class Menu_CMD implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Must be in-game to run this command");
             } else if (a[0].equalsIgnoreCase("load")) {
                 if (sender.isOp()) {
-                    FileManager.load("menus");
+                    Parkour.configs.load("menus");
 
                     sender.sendMessage(
                             ChatColor.GRAY + "Loaded " +

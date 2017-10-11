@@ -1,10 +1,9 @@
 package com.parkourcraft.Parkour.commands;
 
-
-import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.data.stats.Stats_DB;
 import com.parkourcraft.Parkour.gameplay.SpectatorHandler;
-import com.parkourcraft.Parkour.storage.mysql.DataQueries;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,7 +17,7 @@ public class Spectate_CMD implements CommandExecutor {
         if (sender instanceof Player) {
             if (sender.hasPermission("parkourcraft.localcommands.donator")) {
 
-                PlayerStats spectatorStats = StatsManager.get(((Player) sender).getPlayer());
+                PlayerStats spectatorStats = Parkour.stats.get(((Player) sender).getPlayer());
 
                 if (spectatorStats != null) {
                     if (a.length > 0) {
@@ -29,9 +28,9 @@ public class Spectate_CMD implements CommandExecutor {
                                 sender.sendMessage(ChatColor.GRAY + "You can now be spectated");
 
                             spectatorStats.isSpectatable(!spectatorStats.isSpectatable());
-                            DataQueries.updatePlayerSpectatable(spectatorStats);
+                            Stats_DB.updatePlayerSpectatable(spectatorStats);
                         } else {
-                            PlayerStats playerStats = StatsManager.getByNameIgnoreCase(a[0]);
+                            PlayerStats playerStats = Parkour.stats.getByNameIgnoreCase(a[0]);
 
                             if (playerStats != null
                                     && playerStats.getPlayer().isOnline()) {

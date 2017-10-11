@@ -1,8 +1,7 @@
 package com.parkourcraft.Parkour.gameplay;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LocationManager;
-import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.data.stats.StatsManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,7 +14,7 @@ public class JoinLeaveHandler implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         // Add to playerStats map (Async)
-        StatsManager.add(event.getPlayer());
+        Parkour.stats.add(event.getPlayer());
 
         if (!event.getPlayer().isOp())
             Parkour.locations.teleport(event.getPlayer(), "spawn");

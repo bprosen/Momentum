@@ -2,12 +2,10 @@ package com.parkourcraft.Parkour.gameplay;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LevelManager;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.data.StatsManager;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.mysql.DataQueries;
+import com.parkourcraft.Parkour.data.stats.Stats_DB;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,8 +19,8 @@ import java.util.Map;
 public class LevelHandler {
 
     static void levelCompletion(Player player, String levelName) {
-        PlayerStats playerStats = StatsManager.get(player);
-        LevelObject level = LevelManager.get(levelName);
+        PlayerStats playerStats = Parkour.stats.get(player);
+        LevelObject level = Parkour.levels.get(levelName);
 
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null
@@ -42,7 +40,7 @@ public class LevelHandler {
 
                     // Update player information
                     playerStats.levelCompletion(levelName, levelCompletion);
-                    DataQueries.insertCompletion(playerStats, level, levelCompletion);
+                    Stats_DB.insertCompletion(playerStats, level, levelCompletion);
                     Parkour.perks.syncPermissions(player);
                     Parkour.economy.depositPlayer(player, level.getReward());
 
@@ -96,7 +94,7 @@ public class LevelHandler {
 
     static String getLocationLevelName(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
-        Map<String, String> levelNamesLower = LevelManager.getNamesLower();
+        Map<String, String> levelNamesLower = Parkour.levels.getNamesLower();
 
         for (String regionName : regionNames) {
             if (levelNamesLower.containsKey(regionName))
@@ -108,7 +106,7 @@ public class LevelHandler {
 
     static boolean locationInIgnoreArea(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
-        Map<String, String> levelNamesLower = LevelManager.getNamesLower();
+        Map<String, String> levelNamesLower = Parkour.levels.getNamesLower();
 
         boolean inIgnoreArea = true;
 
@@ -124,7 +122,7 @@ public class LevelHandler {
     }
 
     static void respawnPlayerToStart(Player player, String levelName) {
-        LevelObject level = LevelManager.get(levelName);
+        LevelObject level = Parkour.levels.get(levelName);
 
         if (level != null
                 && level.getStartLocation() != null)
@@ -132,7 +130,7 @@ public class LevelHandler {
     }
 
     static void startedLevel(Player player) {
-        PlayerStats playerStats = StatsManager.get(player);
+        PlayerStats playerStats = Parkour.stats.get(player);
 
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null) {

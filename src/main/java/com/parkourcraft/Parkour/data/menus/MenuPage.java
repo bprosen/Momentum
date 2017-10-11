@@ -1,10 +1,7 @@
 package com.parkourcraft.Parkour.data.menus;
 
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.MenuManager;
-import com.parkourcraft.Parkour.data.StatsManager;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
@@ -38,7 +35,7 @@ public class MenuPage {
         for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(
                     player,
-                    StatsManager.get(player),
+                    Parkour.stats.get(player),
                     menuItem)
             );
     }
@@ -61,7 +58,7 @@ public class MenuPage {
                 return menuItem;
 
             if (menuItem.getType().equals("level")) {
-                LevelObject level = LevelManager.get(menuItem.getTypeValue());
+                LevelObject level = Parkour.levels.get(menuItem.getTypeValue());
 
                 if (level != null
                         && level.getFormattedTitle().equals(itemTitle))

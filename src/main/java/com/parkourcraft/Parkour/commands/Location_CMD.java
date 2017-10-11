@@ -1,7 +1,6 @@
 package com.parkourcraft.Parkour.commands;
 
 import com.parkourcraft.Parkour.Parkour;
-import com.parkourcraft.Parkour.data.LocationManager;
 import com.parkourcraft.Parkour.data.locations.Locations_YAML;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

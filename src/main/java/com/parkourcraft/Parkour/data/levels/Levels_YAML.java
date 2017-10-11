@@ -1,8 +1,6 @@
 package com.parkourcraft.Parkour.data.levels;
 
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.storage.local.FileManager;
-import com.parkourcraft.Parkour.storage.mysql.DataQueries;
+import com.parkourcraft.Parkour.Parkour;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -10,11 +8,11 @@ import java.util.List;
 
 public class Levels_YAML {
 
-    private static FileConfiguration levelsFile = FileManager.getFileConfig("levels");
+    private static FileConfiguration levelsFile = Parkour.configs.get("levels");
 
     public static void commit(String levelName) {
-        FileManager.save("levels");
-        LevelManager.load(levelName);
+        Parkour.configs.save("levels");
+        Parkour.levels.load(levelName);
     }
 
     public static boolean exists(String levelName) {

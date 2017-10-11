@@ -1,22 +1,15 @@
-package com.parkourcraft.Parkour.storage.mysql;
+package com.parkourcraft.Parkour.data.stats;
 
-import com.parkourcraft.Parkour.data.LevelManager;
-import com.parkourcraft.Parkour.data.PerkManager;
-import com.parkourcraft.Parkour.data.levels.LevelData;
+import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
-import com.parkourcraft.Parkour.data.perks.Perk;
-import com.parkourcraft.Parkour.data.perks.PerkData;
-import com.parkourcraft.Parkour.data.stats.LevelCompletion;
-import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.data.perks.Perks_DB;
+import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DataQueries {
-
-    private static Map<String, LevelData> levelDataCache = new HashMap<>();
+public class Stats_DB {
 
     /*
      * Player Stats Section
@@ -25,7 +18,7 @@ public class DataQueries {
     public static void loadPlayerStats(PlayerStats playerStats) {
         loadPlayerID(playerStats);
         loadCompletions(playerStats);
-        PerkData.loadPerks(playerStats);
+        Perks_DB.loadPerks(playerStats);
     }
 
     private static void loadPlayerID(PlayerStats playerStats) {
@@ -66,7 +59,7 @@ public class DataQueries {
                 "')"
                 ;
 
-        DatabaseManager.runQuery(query);
+        Parkour.database.run(query);
     }
 
     private static void updatePlayerName(PlayerStats playerStats) {
@@ -75,7 +68,7 @@ public class DataQueries {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        DatabaseManager.addUpdateQuery(query);
+        Parkour.database.add(query);
     }
 
     public static void updatePlayerSpectatable(PlayerStats playerStats) {
@@ -89,7 +82,7 @@ public class DataQueries {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        DatabaseManager.addUpdateQuery(query);
+        Parkour.database.add(query);
     }
 
     /*
@@ -116,15 +109,15 @@ public class DataQueries {
     }
 
     public static void insertCompletion(PlayerStats playerStats, LevelObject level, LevelCompletion levelCompletion) {
-        DatabaseManager.addUpdateQuery(
+        Parkour.database.add(
                 "INSERT INTO completions " +
-                "(player_id, level_id, time_taken, completion_date)" +
-                " VALUES (" +
-                playerStats.getPlayerID() + ", " +
-                level.getID() + ", " +
-                levelCompletion.getCompletionTimeElapsed() + ", " +
-                "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
-                ")"
+                        "(player_id, level_id, time_taken, completion_date)" +
+                        " VALUES (" +
+                        playerStats.getPlayerID() + ", " +
+                        level.getID() + ", " +
+                        levelCompletion.getCompletionTimeElapsed() + ", " +
+                        "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
+                        ")"
         );
     }
 
@@ -143,7 +136,7 @@ public class DataQueries {
         );
 
         for (Map<String, String> levelResult : levelsResults) {
-            LevelObject levelObject = LevelManager.get(levelResult.get("level_name"));
+            LevelObject levelObject = Parkour.levels.get(levelResult.get("level_name"));
 
             if (levelObject != null)
                 levelObject.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
@@ -151,17 +144,17 @@ public class DataQueries {
     }
 
     public static void loadLeaderboards() {
-        for (LevelObject levelObject : LevelManager.getLevels())
+        for (LevelObject levelObject : Parkour.levels.getLevels())
             loadLeaderboard(levelObject);
     }
 
     private static void loadLeaderboard(LevelObject levelObject) {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "completions",
-                        "player.player_name, " +
+                "player.player_name, " +
                         "time_taken, " +
                         "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
-                        "JOIN players player" +
+                "JOIN players player" +
                         " on completions.player_id=player.player_id" +
                         " WHERE completions.level_id=" + levelObject.getID() +
                         " AND time_taken > 0" +
@@ -184,93 +177,6 @@ public class DataQueries {
         }
 
         levelObject.setLeaderboardCache(levelCompletions);
-    }
-
-    /*
-     * Levels Section
-     */
-
-    public static void syncLevelData(LevelObject level) {
-        LevelData levelData = levelDataCache.get(level.getName());
-
-        if (levelData != null) {
-            level.setID(levelData.getID());
-            level.setReward(levelData.getReward());
-            level.setScoreModifier(levelData.getScoreModifier());
-        }
-    }
-
-    private static void syncLevelDataCache() {
-        for (LevelObject levelObject : LevelManager.getLevels())
-            syncLevelData(levelObject);
-    }
-
-    public static void loadLevelDataCache() {
-        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "levels",
-                "level_id, level_name, reward, score_modifier",
-                ""
-        );
-
-        for (Map<String, String> levelResult : levelsResults)
-            levelDataCache.put(
-                    levelResult.get("level_name"),
-                    new LevelData(
-                            Integer.parseInt(levelResult.get("level_id")),
-                            Integer.parseInt(levelResult.get("reward")),
-                            Integer.parseInt(levelResult.get("score_modifier"))
-                    )
-            );
-
-        syncLevelDataCache();
-    }
-
-    public static void syncLevelData() {
-        List<String> insertQueries = new ArrayList<>();
-
-        for (LevelObject level : LevelManager.getLevels())
-            if (!levelDataCache.containsKey(level.getName()))
-                insertQueries.add(
-                        "INSERT INTO levels " +
-                        "(level_name)" +
-                        " VALUES " +
-                        "('" + level.getName() + "')"
-                );
-
-        if (insertQueries.size() > 0) {
-            String finalQuery = "";
-            for (String sql : insertQueries)
-                finalQuery = finalQuery + sql + "; ";
-
-            DatabaseManager.runQuery(finalQuery);
-            loadLevelDataCache();
-        }
-    }
-
-    public static void updateLevelReward(LevelObject level) {
-        String query = "UPDATE levels SET " +
-                "reward=" + level.getReward() + " " +
-                "WHERE level_id=" + level.getID() + ""
-                ;
-
-        LevelData levelData = levelDataCache.get(level.getName());
-        if (levelData != null)
-            levelData.setReward(level.getReward());
-
-        DatabaseManager.addUpdateQuery(query);
-    }
-
-    public static void updateLevelScoreModifier(LevelObject level) {
-        String query = "UPDATE levels SET " +
-                "score_modifier=" + level.getScoreModifier() + " " +
-                "WHERE level_id=" + level.getID() + ""
-                ;
-
-        LevelData levelData = levelDataCache.get(level.getName());
-        if (levelData != null)
-            levelData.setScoreModifier(level.getScoreModifier());
-
-        DatabaseManager.addUpdateQuery(query);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.parkourcraft.Parkour.data;
+package com.parkourcraft.Parkour.data.locations;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.locations.Locations_YAML;
@@ -12,19 +12,19 @@ import java.util.Map;
 
 public class LocationManager {
 
-    private Map<String, Location> locationsMap;
+    private Map<String, Location> locations;
 
     public LocationManager() {
         load();
     }
 
     public void load() {
-        locationsMap = new HashMap<>();
+        locations = new HashMap<>();
 
         for (String locationName : Locations_YAML.getNames())
             load(locationName);
 
-        Parkour.getPluginLogger().info("Locations loaded: " + locationsMap.size());
+        Parkour.getPluginLogger().info("Locations loaded: " + locations.size());
     }
 
     public void load(String locationName) {
@@ -32,21 +32,21 @@ public class LocationManager {
 
         if (location == null
                 && exists(locationName))
-            locationsMap.remove(locationName);
+            locations.remove(locationName);
         else
-            locationsMap.put(locationName, location);
+            locations.put(locationName, location);
     }
 
     public Location get(String locationName) {
-        return locationsMap.get(locationName);
+        return locations.get(locationName);
     }
 
     public List<String> getNames() {
-        return new ArrayList<>(locationsMap.keySet());
+        return new ArrayList<>(locations.keySet());
     }
 
     public boolean exists(String locationName) {
-        return locationsMap.containsKey(locationName);
+        return locations.containsKey(locationName);
     }
 
     public void teleport(Player player, String locationName) {

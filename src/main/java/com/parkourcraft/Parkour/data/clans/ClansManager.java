@@ -1,7 +1,5 @@
-package com.parkourcraft.Parkour.data;
+package com.parkourcraft.Parkour.data.clans;
 
-import com.parkourcraft.Parkour.data.clans.Clan;
-import com.parkourcraft.Parkour.data.clans.ClansData;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -19,8 +17,8 @@ public class ClansManager {
     }
 
     private void load() {
-        ClansData.loadClans(clans);
-        ClansData.loadMembers(this);
+        Clans_DB.loadClans(clans);
+        Clans_DB.loadMembers(this);
     }
 
     public Clan get(int clanID) {
@@ -42,7 +40,7 @@ public class ClansManager {
     private void syncNewClans() {
         for (Clan clan : clans)
             if (clan.getID() == -1)
-                ClansData.newClan(clan);
+                Clans_DB.newClan(clan);
     }
 
     private void startScheduler(Plugin plugin) {

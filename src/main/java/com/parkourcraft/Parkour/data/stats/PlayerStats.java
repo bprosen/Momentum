@@ -9,7 +9,7 @@ public class PlayerStats {
     private Player player;
     private String UUID;
     private String playerName;
-    private int playerID;
+    private int playerID = -1;
     private long levelStartTime = 0;
 
     private boolean spectatable;
