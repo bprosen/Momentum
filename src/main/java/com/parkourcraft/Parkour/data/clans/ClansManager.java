@@ -5,6 +5,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ClansManager {
 
@@ -17,8 +18,32 @@ public class ClansManager {
     }
 
     private void load() {
-        Clans_DB.loadClans(clans);
-        Clans_DB.loadMembers(this);
+        clans = Clans_DB.getClans();
+
+        Map<Integer, List<ClanMember>> members = Clans_DB.getMembers();
+
+        syncMembers(members);
+    }
+
+    private void syncMembers(Map<Integer, List<ClanMember>> members) {
+        for (Map.Entry<Integer, List<ClanMember>> entry : members.entrySet()) {
+            Clan clan = get(entry.getKey());
+
+            if (clan != null)
+                for (ClanMember member : entry.getValue())
+                    clan.addMember(member);
+        }
+    }
+
+    public void add(Clan clan) {
+        clans.add(clan);
+    }
+
+    public void addMember(int clanID, ClanMember clanMember) {
+        Clan clan = get(clanID);
+
+        if (clan != null)
+            clan.addMember(clanMember);
     }
 
     public Clan get(int clanID) {

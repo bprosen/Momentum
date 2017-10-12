@@ -52,23 +52,17 @@ public class Clan {
 
     public ClanMember getOwner() {
         for (ClanMember member : members)
-            if (member.isOwner())
+            if (member.getPlayerID() == ownerID)
                 return member;
 
         return null;
     }
 
     public void promoteOwner(String UUID) {
-        ClanMember currentOwner = getOwner();
         ClanMember newOwner = getMember(UUID);
 
-        if (newOwner != null) {
+        if (newOwner != null)
             ownerID = newOwner.getPlayerID();
-            newOwner.isOwner(true);
-
-            if (currentOwner != null)
-                currentOwner.isOwner(false);
-        }
     }
 
     public boolean isMember(String UUID) {

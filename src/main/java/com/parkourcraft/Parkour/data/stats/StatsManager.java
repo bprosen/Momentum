@@ -48,6 +48,14 @@ public class StatsManager {
         return null;
     }
 
+    public PlayerStats get(int playerID) {
+        for (PlayerStats playerStats : playerStatsList)
+            if (playerStats.getPlayerID() == playerID)
+                return playerStats;
+
+        return null;
+    }
+
     public List<PlayerStats> getPlayerStats() {
         return playerStatsList;
     }

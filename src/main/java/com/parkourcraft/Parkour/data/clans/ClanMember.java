@@ -5,7 +5,6 @@ public class ClanMember {
     private int playerID;
     private String UUID;
     private String playerName;
-    private boolean isOwner = false;
 
     public ClanMember(int playerID, String UUID, String playerName) {
         this.playerID = playerID;
@@ -23,14 +22,6 @@ public class ClanMember {
 
     public String getPlayerName() {
         return playerName;
-    }
-
-    public void isOwner(boolean isOwner) {
-        this.isOwner = isOwner;
-    }
-
-    public boolean isOwner() {
-        return isOwner;
     }
 
 }

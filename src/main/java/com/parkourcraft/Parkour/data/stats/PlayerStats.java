@@ -1,5 +1,6 @@
 package com.parkourcraft.Parkour.data.stats;
 
+import com.parkourcraft.Parkour.data.clans.Clan;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -13,7 +14,7 @@ public class PlayerStats {
     private long levelStartTime = 0;
     private boolean spectatable;
     private PlayerStats playerToSpectate;
-    private int clanID = -1;
+    private Clan clan;
 
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
@@ -86,12 +87,12 @@ public class PlayerStats {
         return spectatable;
     }
 
-    public void setClanID(int clanID) {
-        this.clanID = clanID;
+    public void setClan(Clan clan) {
+        this.clan = clan;
     }
 
-    public int getClanID() {
-        return clanID;
+    public Clan getClan() {
+        return clan;
     }
 
     public void setPlayerToSpectate(PlayerStats playerStats) {

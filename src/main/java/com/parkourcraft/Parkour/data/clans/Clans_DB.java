@@ -2,17 +2,18 @@ package com.parkourcraft.Parkour.data.clans;
 
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
-import com.parkourcraft.Parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Clans_DB {
 
-    public static void loadClans(List<Clan> clans) {
-        clans = new ArrayList<>();
+    static List<Clan> getClans() {
+        List<Clan> clans = new ArrayList<>();
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",
@@ -23,16 +24,20 @@ public class Clans_DB {
         for (Map<String, String> result : results)
             clans.add(
                     new Clan(
-                        Integer.parseInt(result.get("clan_id")),
+                            Integer.parseInt(result.get("clan_id")),
                             result.get("clan_tag"),
-                        Integer.parseInt(result.get("owner_player_id"))
+                            Integer.parseInt(result.get("owner_player_id"))
                     )
             );
 
         Parkour.getPluginLogger().info("Clans Loaded: " + results.size());
+
+        return clans;
     }
 
-    public static void loadMembers(ClansManager clansManager) {
+    static Map<Integer, List<ClanMember>> getMembers() {
+        Map<Integer, List<ClanMember>> members = new HashMap<>();
+
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "players",
                 "player_id, uuid, player_name, clan_id",
@@ -40,17 +45,21 @@ public class Clans_DB {
         );
 
         for (Map<String, String> result : results) {
-            Clan clan = clansManager.get(Integer.parseInt(result.get("clan_id")));
+            int clanID = Integer.parseInt(result.get("clan_id"));
 
-            if (clan != null)
-                clan.addMember(new ClanMember(
-                        Integer.parseInt(result.get("player_id")),
-                        result.get("uuid"),
-                        result.get("player_name")
-                ));
+            if (!members.containsKey(clanID))
+                members.put(clanID, new ArrayList<>());
+
+            members.get(clanID).add(new ClanMember(
+                    Integer.parseInt(result.get("player_id")),
+                    result.get("uuid"),
+                    result.get("player_name")
+            ));
         }
 
         Parkour.getPluginLogger().info("Clan Members Loaded: " + results.size());
+
+        return members;
     }
 
     public static void newClan(Clan clan) {
@@ -64,6 +73,21 @@ public class Clans_DB {
 
         for (Map<String, String> result : results)
             clan.setID(Integer.parseInt(result.get("clan_id")));
+
+        PlayerStats owner = Parkour.stats.get(clan.getOwnerID());
+
+        if (owner != null) {
+            owner.setClan(clan);
+
+            updatePlayerClanID(owner);
+
+            if (owner.getPlayer() != null
+                    && owner.getPlayer().isOnline())
+                owner.getPlayer().sendMessage(
+                        ChatColor.GRAY + "Successfully created your Clan called " +
+                                ChatColor.AQUA + clan.getTag()
+                );
+        }
     }
 
     private static void insertClan(Clan clan) {
@@ -79,8 +103,12 @@ public class Clans_DB {
     }
 
     public static void updatePlayerClanID(PlayerStats playerStats) {
+        int clanID = -1;
+        if (playerStats.getClan() != null)
+            clanID = playerStats.getClan().getID();
+
         String query = "UPDATE players SET " +
-                "clan_id=" + playerStats.getClanID() +
+                "clan_id=" + clanID +
                 " WHERE player_id=" + playerStats.getPlayerID()
                 ;
 

@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.data.stats;
 
 import com.parkourcraft.Parkour.Parkour;
+import com.parkourcraft.Parkour.data.clans.Clan;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.perks.Perks_DB;
 import com.parkourcraft.Parkour.storage.mysql.DatabaseQueries;
@@ -41,7 +42,15 @@ public class Stats_DB {
                 else
                     playerStats.isSpectatable(false);
 
-                playerStats.setClanID(Integer.parseInt(playerResult.get("clan_id")));
+                int clanID = Integer.parseInt(playerResult.get("clan_id"));
+                Parkour.getPluginLogger().info("clanID=" + clanID);
+                if (clanID > 0) {
+                    Clan clan = Parkour.clans.get(clanID);
+                    Parkour.getPluginLogger().info("clan=" + clan);
+
+                    if (clan != null)
+                        playerStats.setClan(clan);
+                }
             }
         } else {
             insertPlayerID(playerStats);
