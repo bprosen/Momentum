@@ -195,10 +195,10 @@ public class Stats_DB {
             levelCompletion.setPlayerName(levelResult.get("player_name"));
             levelCompletions.add(levelCompletion);
 
-            for (int i = 0; i < levelCompletions.size(); i++)
-                for (int j = i + 1; j < levelCompletions.size(); j++)
-                    if (levelCompletions.get(i).getPlayerName().equalsIgnoreCase(
-                        levelCompletions.get(j).getPlayerName()))
+            for (int outer = 0; outer < levelCompletions.size(); outer++)
+                for (int inner = outer + 1; inner < levelCompletions.size(); inner++)
+                    if (levelCompletions.get(inner).getPlayerName().equalsIgnoreCase(
+                        levelCompletions.get(outer).getPlayerName()))
                         levelCompletions.remove(levelCompletion);
         }
         levelObject.setLeaderboardCache(levelCompletions);
