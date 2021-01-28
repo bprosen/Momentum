@@ -7,9 +7,7 @@ import com.parkourcraft.parkour.data.perks.Perks_DB;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Stats_DB {
 
@@ -122,7 +120,6 @@ public class Stats_DB {
         if (!level.getLeaderboard().isEmpty() &&
             playerStats.getQuickestCompletions(level.getName()).get(0).getCompletionTimeElapsed()
             < levelCompletion.getCompletionTimeElapsed()) {
-
             time = 0L;
         }
         Parkour.getDatabaseManager().add(
@@ -168,6 +165,7 @@ public class Stats_DB {
     }
 
     public static void loadLeaderboard(LevelObject levelObject) {
+        // Artificial limit of 500
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "completions",
                 "player.player_name, " +
@@ -178,29 +176,31 @@ public class Stats_DB {
                         " WHERE completions.level_id=" + levelObject.getID() +
                         " AND time_taken > 0" +
                         " ORDER BY time_taken" +
-                        " ASC LIMIT 10"
+                        " ASC LIMIT 500"
 
         );
 
         List<LevelCompletion> levelCompletions = new ArrayList<>();
 
         for (Map<String, String> levelResult : levelsResults) {
+
+            if (levelCompletions.size() >= 10)
+                break;
+
             LevelCompletion levelCompletion = new LevelCompletion(
                     Long.parseLong(levelResult.get("date")),
                     Long.parseLong(levelResult.get("time_taken"))
             );
 
             levelCompletion.setPlayerName(levelResult.get("player_name"));
-
             levelCompletions.add(levelCompletion);
+
+            for (int i = 0; i < levelCompletions.size(); i++)
+                for (int j = i + 1; j < levelCompletions.size(); j++)
+                    if (levelCompletions.get(i).getPlayerName().equalsIgnoreCase(
+                        levelCompletions.get(j).getPlayerName()))
+                        levelCompletions.remove(levelCompletion);
         }
-
         levelObject.setLeaderboardCache(levelCompletions);
-    }
-
-    public static void removeCompletion(int levelId, int timeTaken) {
-
-        Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" + levelId +
-                " AND time_taken=" + timeTaken);
     }
 }

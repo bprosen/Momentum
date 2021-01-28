@@ -106,7 +106,7 @@ public class  LevelObject {
         return totalCompletionsCount;
     }
 
-    private void sortNewCompletion(LevelCompletion levelCompletion) {
+    public void sortNewCompletion(LevelCompletion levelCompletion) {
         List<LevelCompletion> newLeaderboard = new ArrayList<>(leaderboardCache);
 
         if (newLeaderboard.size() > 0) {
@@ -154,10 +154,18 @@ public class  LevelObject {
         if (levelCompletion.getCompletionTimeElapsed() <= 0)
             return;
 
-
         // Compare completion against scoreboard
         if (leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed()
                 > levelCompletion.getCompletionTimeElapsed()) {
+
+            LevelCompletion completionToRemove = null;
+            for (LevelCompletion completion : leaderboardCache) {
+                if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
+                    completionToRemove = completion;
+            }
+            if (completionToRemove != null)
+            leaderboardCache.remove(completionToRemove);
+
             sortNewCompletion(levelCompletion);
         }
     }

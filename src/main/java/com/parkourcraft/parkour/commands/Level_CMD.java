@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
@@ -304,10 +305,18 @@ public class Level_CMD implements CommandExecutor {
                                 int name = row - 1;
                                 LevelCompletion levelCompletion = completions.get(name);
                                 int time = (int) levelCompletion.getCompletionTimeElapsed();
-                                Stats_DB.removeCompletion(levelObject.getID(), time);
+                                Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" +
+                                        levelObject.getID() + " AND time_taken=" + time);
                                 completions.remove(levelCompletion);
+                                levelObject.setTotalCompletionsCount(levelObject.getTotalCompletionsCount() - 1);
                                 sender.sendMessage(Utils.translate("&4" + levelCompletion.getPlayerName() + "'s" +
                                                    " &ctime has been removed succesfully from &4" + levelName));
+                                // run it async 0.25 seconds later so it does it when database has updated
+                                new BukkitRunnable() {
+                                    public void run() {
+                                        Stats_DB.loadLeaderboard(levelObject);
+                                    }
+                                }.runTaskLaterAsynchronously(Parkour.getPlugin(), 5);
                             } else {
                                 sender.sendMessage(Utils.translate("&cYou are entering an integer above 9"));
                             }
@@ -448,7 +457,7 @@ public class Level_CMD implements CommandExecutor {
             case "modifier":
                 return Utils.translate("&a/level modifier <level> [modifier]  &7View/Set Score Modifier");
             case "removetime":
-                return Utils.translate("&2/level removetime <level> <leaderboardPlace>  &7Removes a player's time " +
+                return Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time " +
                                       "from a level's leaderboard");
             case "addleaderboard":
                 return Utils.translate("&a/level addleaderboard <level> &7Add a leaderboard to cache");
