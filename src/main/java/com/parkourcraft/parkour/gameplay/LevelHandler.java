@@ -21,12 +21,11 @@ import java.util.Map;
 public class LevelHandler {
 
     static void levelCompletion(Player player, String levelName) {
+
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         LevelObject level = Parkour.getLevelManager().get(levelName);
 
-        if (playerStats != null
-                && playerStats.getPlayerToSpectate() == null
-                && level != null) {
+        if (playerStats != null && playerStats.getPlayerToSpectate() == null && level != null) {
             if (level.hasRequiredLevels(playerStats)) {
                 int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 
@@ -54,8 +53,7 @@ public class LevelHandler {
 
                     String messageFormatted = level.getFormattedMessage(playerStats);
                     String time = (((double) elapsedTime) / 1000) + "s";
-                    if (elapsedTime > 0L
-                            && elapsedTime < 8388607L)
+                    if (elapsedTime > 0L && elapsedTime < 8388607L)
                         messageFormatted = messageFormatted.replace("%time%", time);
                     else
                         messageFormatted = messageFormatted.replace("%time%","-");
