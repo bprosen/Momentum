@@ -43,11 +43,9 @@ public class Stats_DB {
                     playerStats.isSpectatable(false);
 
                 int clanID = Integer.parseInt(playerResult.get("clan_id"));
-                Parkour.getPluginLogger().info("clanID=" + clanID);
+
                 if (clanID > 0) {
                     Clan clan = Parkour.getClansManager().get(clanID);
-                    Parkour.getPluginLogger().info("clan=" + clan);
-
                     if (clan != null)
                         playerStats.setClan(clan);
                 }

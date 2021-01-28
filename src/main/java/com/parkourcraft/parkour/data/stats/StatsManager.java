@@ -100,7 +100,6 @@ public class StatsManager {
                     Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
                 }
             }
-
             running = false;
         }
     }
