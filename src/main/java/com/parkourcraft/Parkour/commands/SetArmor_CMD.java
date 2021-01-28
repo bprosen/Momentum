@@ -17,12 +17,11 @@ public class SetArmor_CMD implements CommandExecutor {
         // setarmor <head/chest/leg/feet> MATERIAL [itemType] [leatherArmorColor]
 
         if (sender.isOp()) {
-            sender.sendMessage(ChatColor.GREEN + "the following is only sent to OPs");
+            sender.sendMessage(Utils.translate("&aThe following is only sent to OPs"));
             sender.sendMessage("/setarmor <head/chest/leg/feet> MATERIAL [itemType] [leatherArmorColor]");
         }
 
-        if (sender instanceof Player
-                && a.length >= 1) {
+        if (sender instanceof Player && a.length >= 1) {
             Player player = (Player) sender;
 
             String bodyPart = a[0];
@@ -32,11 +31,9 @@ public class SetArmor_CMD implements CommandExecutor {
 
             if (a.length >= 2)
                 material = a[1];
-            if (a.length >= 3
-                    && Utils.isInteger(a[2]))
+            if (a.length >= 3 && Utils.isInteger(a[2]))
                 type = Integer.parseInt(a[2]);
-            if (a.length >= 4
-                    && Utils.isInteger(a[3]))
+            if (a.length >= 4 && Utils.isInteger(a[3]))
                 leatherArmorColor = Integer.parseInt(a[3]);
 
             Material itemMaterial = Material.getMaterial(material);
@@ -51,16 +48,12 @@ public class SetArmor_CMD implements CommandExecutor {
                 }
 
                 if (item != null) {
-                    String permission = "parkour.setarmor."
-                            + material.toLowerCase() + "."
-                            + type;
+                    String permission = "parkour.setarmor." + material.toLowerCase() + "." + type;
 
                     if (leatherArmorColor > 0)
                         permission += "." + leatherArmorColor;
 
-                    if (player.isOp()
-                            || player.hasPermission(permission)
-                            || material.equals("AIR")) {
+                    if (player.isOp() || player.hasPermission(permission) || material.equals("AIR")) {
                         if (bodyPart.equals("head"))
                             player.getInventory().setHelmet(item);
                         else if (bodyPart.equals("chest"))
@@ -70,16 +63,12 @@ public class SetArmor_CMD implements CommandExecutor {
                         else if (bodyPart.equals("feet"))
                             player.getInventory().setBoots(item);
 
-                        if (player.isOp()
-                                && !material.equals("AIR")) {
-                            sender.sendMessage(ChatColor.YELLOW + "  permission: " + permission);
-                        }
+                        if (player.isOp() && !material.equals("AIR"))
+                            sender.sendMessage(Utils.translate("&ePermission: " + permission));
                     }
                 }
             }
         }
-
-
         return true;
     }
 }

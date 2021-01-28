@@ -6,6 +6,7 @@ import com.parkourcraft.Parkour.data.levels.LevelManager;
 import com.parkourcraft.Parkour.data.locations.LocationManager;
 import com.parkourcraft.Parkour.data.menus.MenuManager;
 import com.parkourcraft.Parkour.data.perks.PerkManager;
+import com.parkourcraft.Parkour.data.spectator.SpectatorManager;
 import com.parkourcraft.Parkour.data.stats.StatsManager;
 import com.parkourcraft.Parkour.gameplay.*;
 import com.parkourcraft.Parkour.data.SettingsManager;
@@ -24,18 +25,20 @@ public class Parkour extends JavaPlugin {
     private static Plugin plugin;
     private static Logger logger;
 
-    public static ConfigManager configs;
-    public static DatabaseManager database;
-    public static SettingsManager settings;
-    public static LocationManager locations;
-    public static LevelManager levels;
-    public static PerkManager perks;
-    public static StatsManager stats;
-    public static ClansManager clans;
-    public static MenuManager menus;
+    private static ConfigManager configs;
+    private static DatabaseManager database;
+    private static SettingsManager settings;
+    private static LocationManager locations;
+    private static LevelManager levels;
+    private static PerkManager perks;
+    private static StatsManager stats;
+    private static ClansManager clans;
+    private static MenuManager menus;
 
-    public static Economy economy;
-    public static GhostFactory ghostFactory;
+    private static Economy economy;
+    private static SpectatorManager spectator;
+    // Pending recode for SpectatorManager
+    //private static GhostFactory ghostFactory;
 
     @Override
     public void onEnable() {
@@ -99,8 +102,7 @@ public class Parkour extends JavaPlugin {
         stats = new StatsManager(plugin);
         clans = new ClansManager(plugin);
         menus = new MenuManager(plugin);
-
-        ghostFactory = new GhostFactory(plugin);
+        spectator = new SpectatorManager(plugin);
     }
 
     private static void unloadData() {
@@ -111,8 +113,7 @@ public class Parkour extends JavaPlugin {
         levels = null;
         locations = null;
         settings = null;
-
-        ghostFactory = null;
+        spectator = null;
     }
 
     public static Plugin getPlugin() {
@@ -123,4 +124,40 @@ public class Parkour extends JavaPlugin {
         return logger;
     }
 
+    // All manager methods
+    public static SettingsManager getSettingsManager() {
+        return settings;
+    }
+    public static DatabaseManager getDatabaseManager() {
+        return database;
+    }
+    public static ConfigManager getConfigManager() {
+        return configs;
+    }
+    public static LocationManager getLocationManager() {
+        return locations;
+    }
+    public static LevelManager getLevelManager() {
+        return levels;
+    }
+    public static PerkManager getPerkManager() {
+        return perks;
+    }
+    public static MenuManager getMenuManager() {
+        return menus;
+    }
+    public static StatsManager getStatsManager() {
+        return stats;
+    }
+    public static ClansManager getClansManager() {
+        return clans;
+    }
+    public static Economy getEconomy() {
+        return economy;
+    }
+    public static SpectatorManager getSpectatorManager() {
+        return spectator;
+    }
+
+    public static void setEconomy(Economy eco) { economy = eco; }
 }

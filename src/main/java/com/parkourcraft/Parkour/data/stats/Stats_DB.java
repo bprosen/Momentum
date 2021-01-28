@@ -45,7 +45,7 @@ public class Stats_DB {
                 int clanID = Integer.parseInt(playerResult.get("clan_id"));
                 Parkour.getPluginLogger().info("clanID=" + clanID);
                 if (clanID > 0) {
-                    Clan clan = Parkour.clans.get(clanID);
+                    Clan clan = Parkour.getClansManager().get(clanID);
                     Parkour.getPluginLogger().info("clan=" + clan);
 
                     if (clan != null)
@@ -68,7 +68,7 @@ public class Stats_DB {
                 "')"
                 ;
 
-        Parkour.database.run(query);
+        Parkour.getDatabaseManager().run(query);
     }
 
     private static void updatePlayerName(PlayerStats playerStats) {
@@ -77,7 +77,7 @@ public class Stats_DB {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
 
     public static void updatePlayerSpectatable(PlayerStats playerStats) {
@@ -91,7 +91,7 @@ public class Stats_DB {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
 
     /*
@@ -118,7 +118,7 @@ public class Stats_DB {
     }
 
     public static void insertCompletion(PlayerStats playerStats, LevelObject level, LevelCompletion levelCompletion) {
-        Parkour.database.add(
+        Parkour.getDatabaseManager().add(
                 "INSERT INTO completions " +
                         "(player_id, level_id, time_taken, completion_date)" +
                         " VALUES (" +
@@ -145,7 +145,7 @@ public class Stats_DB {
         );
 
         for (Map<String, String> levelResult : levelsResults) {
-            LevelObject levelObject = Parkour.levels.get(levelResult.get("level_name"));
+            LevelObject levelObject = Parkour.getLevelManager().get(levelResult.get("level_name"));
 
             if (levelObject != null)
                 levelObject.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
@@ -153,7 +153,7 @@ public class Stats_DB {
     }
 
     public static void loadLeaderboards() {
-        for (LevelObject levelObject : Parkour.levels.getLevels())
+        for (LevelObject levelObject : Parkour.getLevelManager().getLevels())
             loadLeaderboard(levelObject);
     }
 

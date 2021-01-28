@@ -4,6 +4,7 @@ import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.data.stats.Stats_DB;
 import com.parkourcraft.Parkour.gameplay.SpectatorHandler;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,22 +16,23 @@ public class Spectate_CMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (sender instanceof Player) {
-            if (sender.hasPermission("parkourcraft.localcommands.donator")) {
+            Player player = (Player) sender;
+            if (sender.hasPermission("pc-parkour.donator")) {
 
-                PlayerStats spectatorStats = Parkour.stats.get(((Player) sender).getPlayer());
+                PlayerStats spectatorStats = Parkour.getStatsManager().get(player);
 
                 if (spectatorStats != null) {
                     if (a.length > 0) {
-                        if (a[0].equalsIgnoreCase("public")) {
+                        if (a[0].equalsIgnoreCase("toggle")) {
                             if (spectatorStats.isSpectatable())
-                                sender.sendMessage(ChatColor.GRAY + "You can no longer be spectated");
+                                sender.sendMessage(Utils.translate("&7You can no longer be spectated"));
                             else
-                                sender.sendMessage(ChatColor.GRAY + "You can now be spectated");
+                                sender.sendMessage(Utils.translate("&7You can now be spectated"));
 
                             spectatorStats.isSpectatable(!spectatorStats.isSpectatable());
                             Stats_DB.updatePlayerSpectatable(spectatorStats);
                         } else {
-                            PlayerStats playerStats = Parkour.stats.getByNameIgnoreCase(a[0]);
+                            PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
 
                             if (playerStats != null
                                     && playerStats.getPlayer().isOnline()) {
@@ -42,50 +44,46 @@ public class Spectate_CMD implements CommandExecutor {
                                             playerStats.getPlayer()
                                     );
 
-                                    playerStats.getPlayer().sendMessage(
-                                            ChatColor.GREEN + spectatorStats.getPlayerName()
-                                                    + ChatColor.GRAY + " began to spectate you"
-                                    );
-                                } else
-                                    sender.sendMessage(ChatColor.RED + "That player cannot be spectated");
-                            } else
-                                sender.sendMessage(
-                                        ChatColor.RED + "There is no player online named "
-                                                + ChatColor.DARK_RED + a[0]
-                                );
+                                    playerStats.getPlayer().sendMessage(Utils.translate("&2" +
+                                            spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                } else {
+                                    sender.sendMessage(Utils.translate("&cThat player cannot be spectated"));
+                                }
+                            } else {
+                                sender.sendMessage(Utils.translate("&cThere is no player online named &4" + a[0]));
+                            }
                         }
                     } else if (spectatorStats.getPlayerToSpectate() != null)
                         SpectatorHandler.removeSpectatorMode(spectatorStats);
                     else {
                         if (spectatorStats.isSpectatable())
-                            sender.sendMessage(ChatColor.GRAY + "You can be spectated");
+                            sender.sendMessage(Utils.translate("&7You can be spectated"));
                         else
-                            sender.sendMessage(ChatColor.GRAY + "You can not be spectated");
+                            sender.sendMessage(Utils.translate("&7You can not be spectated"));
                         sendHelp(sender);
                     }
-                } else
-                    sender.sendMessage(ChatColor.RED + "Error loading your data");
-            } else
-                sender.sendMessage(ChatColor.RED + "Only Donators can use spectate mode");
-        } else
-            sender.sendMessage(ChatColor.RED + "Only players can run this command");
-
+                } else {
+                    sender.sendMessage(Utils.translate("&cError loading your data"));
+                }
+            } else {
+                sender.sendMessage(Utils.translate("&cOnly Donators can use spectate mode"));
+            }
+        } else {
+            sender.sendMessage(Utils.translate("&cOnly players can run this command"));
+        }
         return true;
     }
 
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(getHelp("player"));
-        sender.sendMessage(getHelp("public"));
+        sender.sendMessage(getHelp("toggle"));
     }
 
     private static String getHelp(String cmd) {
         if (cmd.equalsIgnoreCase("player"))
-            return ChatColor.GREEN + "/spectate <player>" +
-                    ChatColor.GRAY + " Spectates a player";
-        else if (cmd.equalsIgnoreCase("public"))
-            return ChatColor.GREEN + "/spectate public" +
-                    ChatColor.GRAY + " Toggles if you can be spectated";
+            return Utils.translate("&2/spectate <player>  &7Spectates a player");
+        else if (cmd.equalsIgnoreCase("toggle"))
+            return Utils.translate("&2/spectate toggle  &7Toggles if you can be spectated");
         return "";
     }
-
 }

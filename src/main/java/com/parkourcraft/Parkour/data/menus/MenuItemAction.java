@@ -46,10 +46,10 @@ public class MenuItemAction {
     }
 
     private static void performPerkItem(Player player, MenuItem menuItem) {
-        Perk perk = Parkour.perks.get(menuItem.getTypeValue());
+        Perk perk = Parkour.getPerkManager().get(menuItem.getTypeValue());
 
         if (perk != null) {
-            PlayerStats playerStas = Parkour.stats.get(player);
+            PlayerStats playerStas = Parkour.getStatsManager().get(player);
 
             if (menuItem.hasCommands()
                     && perk.hasRequirements(playerStas, player)) {
@@ -57,29 +57,27 @@ public class MenuItemAction {
                 runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
             } else if (!playerStas.hasPerk(perk.getName())
                     && perk.getPrice() > 0) {
-                int playerBalance = (int) Parkour.economy.getBalance(player);
+                int playerBalance = (int) Parkour.getEconomy().getBalance(player);
 
                 if (playerBalance > perk.getPrice()) {
-                    Parkour.economy.withdrawPlayer(player, perk.getPrice());
-                    Parkour.perks.bought(playerStas, perk);
-                    Parkour.menus.updateInventory(player, player.getOpenInventory());
+                    Parkour.getEconomy().withdrawPlayer(player, perk.getPrice());
+                    Parkour.getPerkManager().bought(playerStas, perk);
+                    Parkour.getMenuManager().updateInventory(player, player.getOpenInventory());
                 }
             }
         }
     }
 
     private static void performLevelItem(Player player, MenuItem menuItem) {
-        PlayerStats playerStats = Parkour.stats.get(player);
-        LevelObject level = Parkour.levels.get(menuItem.getTypeValue());
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        LevelObject level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
         if (level.hasRequiredLevels(playerStats)) {
             player.closeInventory();
             player.teleport(level.getStartLocation());
 
-            player.sendMessage(
-                    ChatColor.GRAY + "You were teleported to the beginning of "
-                            + level.getFormattedTitle()
-            );
+            player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
+                               + level.getFormattedTitle()));
 
             TitleAPI.sendTitle(
                     player, 10, 40, 10,
@@ -90,7 +88,7 @@ public class MenuItemAction {
     }
 
     private static void performTeleportItem(Player player, MenuItem menuItem) {
-        Location location = Parkour.locations.get(menuItem.getTypeValue());
+        Location location = Parkour.getLocationManager().get(menuItem.getTypeValue());
 
         if (location != null) {
             player.closeInventory();
@@ -99,17 +97,17 @@ public class MenuItemAction {
     }
 
     private static void performOpenItem(Player player, MenuItem menuItem) {
-        Menu menu = Parkour.menus.getMenuFromStartingChars(menuItem.getTypeValue());
+        Menu menu = Parkour.getMenuManager().getMenuFromStartingChars(menuItem.getTypeValue());
 
         if (menu != null) {
             int pageeNumber = Utils.getTrailingInt(menuItem.getTypeValue());
 
-            Inventory inventory = Parkour.menus.getInventory(menu.getName(), pageeNumber);
+            Inventory inventory = Parkour.getMenuManager().getInventory(menu.getName(), pageeNumber);
 
             if (inventory != null) {
                 player.closeInventory();
                 player.openInventory(inventory);
-                Parkour.menus.updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
+                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
             }
         }
     }

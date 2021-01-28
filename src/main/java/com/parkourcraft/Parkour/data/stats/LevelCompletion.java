@@ -29,5 +29,4 @@ public class LevelCompletion {
     public String getPlayerName() {
         return playerName;
     }
-
 }

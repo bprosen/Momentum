@@ -19,6 +19,8 @@ public class GhostFactory {
     /**
      * Team of ghosts and people who can see ghosts.
      */
+
+    /*
     private static final String GHOST_TEAM_NAME = "Ghosts";
     private static final long UPDATE_DELAY = 20L;
 
@@ -41,9 +43,7 @@ public class GhostFactory {
 
     private void createGetTeam() {
         Scoreboard board = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
-
         ghostTeam = board.getTeam(GHOST_TEAM_NAME);
-
         // Create a new ghost team if needed
         if (ghostTeam == null) {
             ghostTeam = board.registerNewTeam(GHOST_TEAM_NAME);
@@ -74,6 +74,7 @@ public class GhostFactory {
     /**
      * Remove all existing player members and ghosts.
      */
+    /*
     public void clearMembers() {
         if (ghostTeam != null) {
             for (OfflinePlayer player : getMembers()) {
@@ -86,6 +87,7 @@ public class GhostFactory {
      * Add the given player to this ghost manager. This ensures that it can see ghosts, and later become one.
      * @param player - the player to add to the ghost manager.
      */
+    /*
     public void addPlayer(Player player) {
         validateState();
         if (!ghostTeam.hasPlayer(player)) {
@@ -99,6 +101,7 @@ public class GhostFactory {
      * @param player - the player to test.
      * @return TRUE if it is, FALSE otherwise.
      */
+    /*
     public boolean isGhost(Player player) {
         return player != null && hasPlayer(player) && ghosts.contains(player.getName());
     }
@@ -108,6 +111,7 @@ public class GhostFactory {
      * @param player - the player to check.
      * @return TRUE if it is, FALSE otherwise.
      */
+    /*
     public boolean hasPlayer(Player player) {
         validateState();
         return ghostTeam.hasPlayer(player);
@@ -118,6 +122,7 @@ public class GhostFactory {
      * @param player - the player to set as a ghost.
      * @param isGhost - TRUE to make the given player into a ghost, FALSE otherwise.
      */
+    /*
     public void setGhost(Player player, boolean isGhost) {
         // Make sure the player is tracked by this manager
         if (!hasPlayer(player))
@@ -136,6 +141,7 @@ public class GhostFactory {
      * Remove the given player from the manager, turning it back into the living and making it unable to see ghosts.
      * @param player - the player to remove from the ghost manager.
      */
+    /*
     public void removePlayer(Player player) {
         validateState();
         if (ghostTeam.removePlayer(player)) {
@@ -147,6 +153,7 @@ public class GhostFactory {
      * Retrieve every ghost currently tracked by this manager.
      * @return Every tracked ghost.
      */
+    /*
     public OfflinePlayer[] getGhosts() {
         validateState();
         Set<OfflinePlayer> players = new HashSet<OfflinePlayer>(ghostTeam.getPlayers());
@@ -164,6 +171,7 @@ public class GhostFactory {
      * Retrieve every ghost and every player that can see ghosts.
      * @return Every ghost or every observer.
      */
+    /*
     public OfflinePlayer[] getMembers() {
         validateState();
         return toArray(ghostTeam.getPlayers());
@@ -193,6 +201,5 @@ public class GhostFactory {
         if (closed) {
             throw new IllegalStateException("Ghost factory has closed. Cannot reuse instances.");
         }
-    }
-
+    }*/
 }

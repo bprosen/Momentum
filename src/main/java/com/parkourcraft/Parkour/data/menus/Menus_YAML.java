@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Menus_YAML {
 
-    private static FileConfiguration menusConfig = Parkour.configs.get("menus");
+    private static FileConfiguration menusConfig = Parkour.getConfigManager().get("menus");
 
     public static List<String> getNames() {
         return new ArrayList<>(menusConfig.getKeys(false));

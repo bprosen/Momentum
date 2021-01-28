@@ -75,6 +75,4 @@ public class ClansManager {
             }
         }, 0L, 5L);
     }
-
-
 }

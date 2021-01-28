@@ -150,7 +150,4 @@ public class PlayerStats {
     public boolean hasPerk(String perkName) {
         return perks.containsKey(perkName);
     }
-
-
-
 }

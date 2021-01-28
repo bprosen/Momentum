@@ -3,6 +3,7 @@ package com.parkourcraft.Parkour.gameplay;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.utils.Utils;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -49,42 +50,36 @@ public class Scoreboard {
 
     private static void displayScoreboard(Player player) {
         List<String> board = new ArrayList<>();
-        LevelObject level = Parkour.levels.get(LevelHandler.getLocationLevelName(player.getLocation()));
+        LevelObject level = Parkour.getLevelManager().get(LevelHandler.getLocationLevelName(player.getLocation()));
 
         // Title
-        board.add(
-                ChatColor.GREEN + "" + ChatColor.BOLD + "Parkour"
-                + ChatColor.WHITE + ChatColor.BOLD + "Craft "
-        );
+        board.add(Utils.translate("&c&lRenatus Network"));
 
         if (level == null)
-            board.add(ChatColor.GRAY + "");
+            board.add(Utils.translate("&7"));
 
-        String coinBalance =
-                ChatColor.GOLD +  Integer.toString((int) Parkour.economy.getBalance(player))
-                + ChatColor.YELLOW + ChatColor.BOLD + " Coins";
+        String coinBalance = Utils.translate("&6" + (int) Parkour.getEconomy().getBalance(player) + " &2&lCoins");
         board.add(formatSpacing(coinBalance));
 
 
         if (level != null) {
-            board.add(formatSpacing(ChatColor.GRAY + ""));
-
-            PlayerStats playerStats = Parkour.stats.get(player);
+            board.add(formatSpacing(Utils.translate("&7")));
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));
 
-            String reward = ChatColor.GOLD + Integer.toString(level.getReward());
+            String reward = Utils.translate("&6" + level.getReward());
             board.add(formatSpacing(reward));
 
             if (playerStats != null
                     && playerStats.getLevelStartTime() > 0) {
                 double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                String timing = ChatColor.GRAY + Double.toString(Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
                 board.add(formatSpacing(timing));
             } else
-                board.add(formatSpacing(ChatColor.GRAY  + "-"));
+                board.add(formatSpacing(Utils.translate("&7-")));
         }
 
 

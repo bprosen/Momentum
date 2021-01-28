@@ -1,6 +1,7 @@
 package com.parkourcraft.Parkour.data.perks;
 
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -46,7 +47,7 @@ public class Perk {
     }
 
     public String getFormattedTitle() {
-        return ChatColor.translateAlternateColorCodes('&', title);
+        return Utils.translate(title);
     }
 
     public List<String> getPermissions() {

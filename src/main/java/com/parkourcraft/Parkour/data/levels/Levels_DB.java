@@ -35,8 +35,8 @@ public class Levels_DB {
     }
 
     static void syncDataCache() {
-        for (LevelObject levelObject : Parkour.levels.getLevels())
-            syncDataCache(levelObject, Parkour.levels.getLevelDataCache());
+        for (LevelObject levelObject : Parkour.getLevelManager().getLevels())
+            syncDataCache(levelObject, Parkour.getLevelManager().getLevelDataCache());
     }
 
     static void syncDataCache(LevelObject level, Map<String, LevelData> levelDataCache) {
@@ -52,8 +52,8 @@ public class Levels_DB {
     static boolean syncLevelData() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (LevelObject level : Parkour.levels.getLevels())
-            if (!Parkour.levels.getLevelDataCache().containsKey(level.getName()))
+        for (LevelObject level : Parkour.getLevelManager().getLevels())
+            if (!Parkour.getLevelManager().getLevelDataCache().containsKey(level.getName()))
                 insertQueries.add(
                         "INSERT INTO levels " +
                                 "(level_name)" +
@@ -66,7 +66,7 @@ public class Levels_DB {
             for (String sql : insertQueries)
                 finalQuery = finalQuery + sql + "; ";
 
-            Parkour.database.run(finalQuery);
+            Parkour.getDatabaseManager().run(finalQuery);
 
             return true;
         }
@@ -80,11 +80,11 @@ public class Levels_DB {
                 "WHERE level_id=" + level.getID() + ""
                 ;
 
-        LevelData levelData = Parkour.levels.getLevelDataCache().get(level.getName());
+        LevelData levelData = Parkour.getLevelManager().getLevelDataCache().get(level.getName());
         if (levelData != null)
             levelData.setReward(level.getReward());
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
 
     public static void updateScoreModifier(LevelObject level) {
@@ -93,11 +93,11 @@ public class Levels_DB {
                 "WHERE level_id=" + level.getID() + ""
                 ;
 
-        LevelData levelData = Parkour.levels.getLevelDataCache().get(level.getName());
+        LevelData levelData = Parkour.getLevelManager().getLevelDataCache().get(level.getName());
         if (levelData != null)
             levelData.setScoreModifier(level.getScoreModifier());
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
 
 }

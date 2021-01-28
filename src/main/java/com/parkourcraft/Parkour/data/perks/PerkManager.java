@@ -11,13 +11,11 @@ import java.util.*;
 public class PerkManager {
 
     private List<Perk> perks = new ArrayList<>();
-    private Map<String, Integer> IDCache = new HashMap<>();
+    private Map<String, Integer> IDCache;
 
     public PerkManager(Plugin plugin) {
         this.IDCache = Perks_DB.getIDCache();
-
         load();
-
         startScheduler(plugin);
     }
 
@@ -34,7 +32,7 @@ public class PerkManager {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             public void run() {
                 if (Perks_DB.syncPerkIDs()) {
-                    Parkour.perks.setIDCache(Perks_DB.getIDCache());
+                    Parkour.getPerkManager().setIDCache(Perks_DB.getIDCache());
                     Perks_DB.syncIDCache();
                 }
             }
@@ -94,7 +92,7 @@ public class PerkManager {
     }
 
     public void syncPermissions(Player player) {
-        PlayerStats playerStats = Parkour.stats.get(player);
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         for (Perk perk : perks) {
             boolean hasRequirements = perk.hasRequirements(playerStats, player);

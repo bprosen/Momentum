@@ -41,4 +41,8 @@ public class Utils {
         return 1;
     }
 
+    public static String translate(String msg) {
+        return ChatColor.translateAlternateColorCodes('&', msg);
+    }
+
 }

@@ -17,8 +17,8 @@ public class Vault {
         if (rsp == null)
             return false;
 
-        Parkour.economy = rsp.getProvider();
-        return Parkour.economy != null;
+        Parkour.setEconomy(rsp.getProvider());
+        return Parkour.getEconomy() != null;
     }
 
 }

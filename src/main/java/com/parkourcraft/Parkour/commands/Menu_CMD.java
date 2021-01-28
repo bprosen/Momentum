@@ -13,80 +13,65 @@ import org.bukkit.inventory.Inventory;
 public class Menu_CMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
-        MenuManager menuManager = Parkour.menus;
+        MenuManager menuManager = Parkour.getMenuManager();
 
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("list")) {
                 if (sender.isOp())
-                    sender.sendMessage(
-                            ChatColor.GRAY + "Menus: "
-                                    + ChatColor.GREEN + String.join(
-                                    ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                    menuManager.getMenuNames()
-                            )
-                    );
+                    sender.sendMessage(Utils.translate("&7Menus: &2" + String.join("&7, &2",
+                                       menuManager.getMenuNames())));
             } else if (a[0].equalsIgnoreCase("open")) {
                 if (sender instanceof Player) {
+                    Player player = (Player) sender;
                     if (a.length > 1) {
                         String menuName = a[1];
                         int pageNumber = 1;
 
-                        if (a.length == 3
-                                && Utils.isInteger(a[2]))
+                        if (a.length == 3 && Utils.isInteger(a[2]))
                                 pageNumber = Integer.parseInt(a[2]);
 
                         if (menuManager.exists(menuName)) {
-                            Player player = ((Player) sender).getPlayer();
 
                             Inventory inventory = menuManager.getInventory(menuName, pageNumber);
 
                             if (inventory != null) {
                                 player.openInventory(inventory);
                                 menuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
-                            } else
-                                sender.sendMessage(ChatColor.RED + "Error loading the inventory");
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "'" +
-                                    ChatColor.RED + menuName +
-                                    ChatColor.GRAY + "' is not an existing menu"
-                            );
+                            } else {
+                                sender.sendMessage(Utils.translate("&cError loading the inventory"));
+                            }
+                        } else {
+                            sender.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
+                        }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("open"));
                     }
                 } else
-                    sender.sendMessage(ChatColor.RED + "Must be in-game to run this command");
+                    sender.sendMessage(Utils.translate("&cMust be in-game to run this command"));
             } else if (a[0].equalsIgnoreCase("load")) {
                 if (sender.isOp()) {
-                    Parkour.configs.load("menus");
+                    Parkour.getConfigManager().load("menus");
 
-                    sender.sendMessage(
-                            ChatColor.GRAY + "Loaded " +
-                                    ChatColor.GREEN + "menus.yml" +
-                                    ChatColor.GRAY + " from disk"
-                    );
-
+                    sender.sendMessage(Utils.translate("&7Loaded &2menus.yml &7from disk"));
                     menuManager.load();
-                    sender.sendMessage(ChatColor.GRAY + "Loaded menus from the config");
-                } else
-                    sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                    sender.sendMessage(Utils.translate("&7Loaded menus from the config"));
+                } else {
+                    sender.sendMessage(Utils.translate("&cYou do not have permission to use this command"));
+                }
             } else {
                 if (sender.isOp()) {
-                    sender.sendMessage(
-                            ChatColor.RED + "'" +
-                                    ChatColor.DARK_RED + a[0] +
-                                    ChatColor.RED + "' is an unknown parameter"
-                    );
+                    sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is an unknown parameter"));
                     sendHelp(sender);
-                } else
-                    sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                } else {
+                    sender.sendMessage(Utils.translate("&cYou do not have permission to use this command"));
+                }
             }
         } else {
             if (sender.isOp())
                 sendHelp(sender);
             else
-                sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                sender.sendMessage(Utils.translate("&cYou do not have permission to use this command"));
         }
 
         return true;
@@ -100,14 +85,11 @@ public class Menu_CMD implements CommandExecutor {
 
     private static String getHelp(String cmd) {
         if (cmd.equalsIgnoreCase("list"))
-            return ChatColor.GREEN + "/menu list" +
-                    ChatColor.GRAY + " Lists the configured menus";
+            return Utils.translate("&2/menu list  &7Lists the configured menus");
         else if (cmd.equalsIgnoreCase("open"))
-            return ChatColor.GREEN + "/menu open <menu> [page#]" +
-                    ChatColor.GRAY + " Opens inventory menu";
+            return Utils.translate("&2/menu open <menu> [page#]  &7Opens inventory menu");
         else if (cmd.equalsIgnoreCase("load"))
-            return ChatColor.GREEN + "/menu load" +
-                    ChatColor.GRAY + " Loads menus from config";
+            return Utils.translate("&2/menu load  &7Loads menus from config");
         return "";
     }
 

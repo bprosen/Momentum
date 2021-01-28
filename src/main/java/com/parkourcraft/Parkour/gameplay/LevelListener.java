@@ -43,16 +43,16 @@ public class LevelListener implements Listener {
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
 
-            if (ChatColor.stripColor(signLines[0]).contains(Parkour.settings.signs_first_line)) {
+            if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line)) {
                 Player player = event.getPlayer();
 
-                if (ChatColor.stripColor(signLines[1]).contains(Parkour.settings.signs_second_line_completion)) {
+                if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
                     String levelName = LevelHandler.getLocationLevelName(player.getLocation());
 
                     if (levelName != null)
                         LevelHandler.levelCompletion(player, levelName);
-                } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.settings.signs_second_line_spawn)) {
-                    Location lobby = Parkour.locations.getLobbyLocation();
+                } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
+                    Location lobby = Parkour.getLocationManager().getLobbyLocation();
 
                     if (lobby != null)
                         player.teleport(lobby);
@@ -79,8 +79,7 @@ public class LevelListener implements Listener {
     @EventHandler
     public void onWalkOnPressurePlate(PlayerMoveEvent event) {
         if (event.getTo().getBlock().getRelative(BlockFace.UP)
-                .getLocation().add(0, 1, 0)
-                .getBlock().getType() == Material.STONE_PLATE) {
+            .getLocation().add(0, 1, 0).getBlock().getType() == Material.STONE_PLATE) {
             Player player = event.getPlayer();
 
             if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
@@ -94,10 +93,9 @@ public class LevelListener implements Listener {
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
-        PlayerStats playerStats = Parkour.stats.get(event.getPlayer());
+        PlayerStats playerStats = Parkour.getStatsManager().get(event.getPlayer());
 
-        if (playerStats != null
-                && playerStats.getPlayerToSpectate() == null)
+        if (playerStats != null && playerStats.getPlayerToSpectate() == null)
             playerStats.disableLevelStartTime();
     }
 
@@ -118,5 +116,4 @@ public class LevelListener implements Listener {
             }
         }
     }
-
 }

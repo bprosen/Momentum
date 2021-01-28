@@ -35,7 +35,7 @@ public class MenuPage {
         for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(
                     player,
-                    Parkour.stats.get(player),
+                    Parkour.getStatsManager().get(player),
                     menuItem)
             );
     }
@@ -58,7 +58,7 @@ public class MenuPage {
                 return menuItem;
 
             if (menuItem.getType().equals("level")) {
-                LevelObject level = Parkour.levels.get(menuItem.getTypeValue());
+                LevelObject level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
                 if (level != null
                         && level.getFormattedTitle().equals(itemTitle))

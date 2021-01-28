@@ -17,7 +17,7 @@ public class DatabaseConnection {
     }
 
     private void open() {
-        FileConfiguration settings = Parkour.configs.get("settings");
+        FileConfiguration settings = Parkour.getConfigManager().get("settings");
         String dbPath = "database";
 
         String username = settings.getString(dbPath + ".username");

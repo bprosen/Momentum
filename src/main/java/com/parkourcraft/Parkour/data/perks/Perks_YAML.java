@@ -8,11 +8,11 @@ import java.util.List;
 
 public class Perks_YAML {
 
-    private static FileConfiguration perksConfig = Parkour.configs.get("perks");
+    private static FileConfiguration perksConfig = Parkour.getConfigManager().get("perks");
 
     private static void commit(String perkName) {
-        Parkour.configs.save("perks");
-        Parkour.perks.load(perkName);
+        Parkour.getConfigManager().save("perks");
+        Parkour.getPerkManager().load(perkName);
     }
 
     public static List<String> getNames() {

@@ -8,11 +8,11 @@ import java.util.List;
 
 public class Levels_YAML {
 
-    private static FileConfiguration levelsFile = Parkour.configs.get("levels");
+    private static FileConfiguration levelsFile = Parkour.getConfigManager().get("levels");
 
     public static void commit(String levelName) {
-        Parkour.configs.save("levels");
-        Parkour.levels.load(levelName);
+        Parkour.getConfigManager().save("levels");
+        Parkour.getLevelManager().load(levelName);
     }
 
     public static boolean exists(String levelName) {

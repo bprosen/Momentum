@@ -6,6 +6,7 @@ import com.parkourcraft.Parkour.data.perks.Perk;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.utils.Time;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +31,7 @@ public class MenuItemFormatter {
     private static ItemStack getPerk(Player player, PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String perkName = menuItem.getTypeValue();
-        Perk perk = Parkour.perks.get(perkName);
+        Perk perk = Parkour.getPerkManager().get(perkName);
 
         if (perk != null) {
             ItemMeta itemMeta = item.getItemMeta();
@@ -43,35 +44,29 @@ public class MenuItemFormatter {
                 itemMeta.setDisplayName(perk.getFormattedTitle());
             else {
                 itemLore.add("");
-                itemLore.add(ChatColor.GRAY + "Perk Required");
+                itemLore.add(Utils.translate("&7Perk Required"));
                 itemLore.add("  " + perk.getFormattedTitle());
             }
 
             // Ownership Status Section
             itemLore.add("");
             if (perk.hasRequirements(playerStats, player))
-                itemLore.add(ChatColor.GREEN + "You own this perk");
+                itemLore.add(Utils.translate("&2You own this perk"));
             else {
-                itemLore.add(ChatColor.RED + "You do not own this perk");
+                itemLore.add(Utils.translate("&cYou do not own this perk"));
 
                 // Click to Buy Section
                 if (perk.getPrice() > 0) {
-                    int playerBalance = (int) Parkour.economy.getBalance(player);
+                    int playerBalance = (int) Parkour.getEconomy().getBalance(player);
 
                     if (playerBalance > perk.getPrice())
-                        itemLore.add(ChatColor.GRAY + "  Click to buy ");
+                        itemLore.add(Utils.translate("&7  Click to buy "));
                     else {
                         int requiredCoins = perk.getPrice() - playerBalance;
 
-                        itemLore.add(
-                                ChatColor.GRAY + "  Requires "
-                                        + ChatColor.GOLD + "" + requiredCoins
-                                        + ChatColor.GRAY + " more "
-                                        + ChatColor.GOLD + "Coins"
-                        );
+                        itemLore.add(Utils.translate("&7  Requires &6" + requiredCoins + " &7more &6Coins"));
                     }
                 }
-
             }
 
             // Level Requirements Section
@@ -79,20 +74,17 @@ public class MenuItemFormatter {
             if (requirements.size() > 0
                     || perk.getPrice() > 0) {
                 itemLore.add("");
-                itemLore.add(ChatColor.GRAY + "Requirements");
+                itemLore.add(Utils.translate("&7Requirements"));
 
                 for (String requirement : requirements) {
-                    LevelObject level = Parkour.levels.get(requirement);
+                    LevelObject level = Parkour.getLevelManager().get(requirement);
 
                     if (level != null)
-                        itemLore.add(ChatColor.GRAY + " - " + level.getFormattedTitle());
+                        itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
                 }
 
                 if (perk.getPrice() > 0)
-                    itemLore.add(
-                            ChatColor.GRAY + " - Pay "
-                                    + ChatColor.GOLD + perk.getPrice() + " Coins"
-                    );
+                    itemLore.add(Utils.translate("&7 - Pay &6" + perk.getPrice() + " Coins"));
             }
 
             // Sections Over
@@ -106,7 +98,7 @@ public class MenuItemFormatter {
     private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String levelName = menuItem.getTypeValue();
-        LevelObject level = Parkour.levels.get(levelName);
+        LevelObject level = Parkour.getLevelManager().get(levelName);
 
         if (level != null) {
             ItemMeta itemMeta = item.getItemMeta();
@@ -119,27 +111,20 @@ public class MenuItemFormatter {
             itemMeta.setDisplayName(formattedTitle);
 
             // Click To Go and Reward Section
-            itemLore.add(
-                    ChatColor.GRAY + "Click to go to " +
-                            formattedTitle
-                                    .replace(ChatColor.BOLD + "", "")
-                                    .replace(ChatColor.ITALIC + "", "")
-            );
-            itemLore.add("  " + ChatColor.GOLD + level.getReward() + " Coin " + ChatColor.GRAY + "Reward");
+            itemLore.add(Utils.translate("&7Click to go to " + formattedTitle
+                         .replace("&l", "").replace("&o", "")));
+            itemLore.add(Utils.translate("  &6" + level.getReward() + " Coin &7Reward"));
 
             // Required Levels Section
             if (level.getRequiredLevels().size() > 0) {
                 itemLore.add("");
-                itemLore.add(ChatColor.GRAY + "Required Levels");
+                itemLore.add(Utils.translate("&7Required Levels"));
 
                 for (String requiredLevelName : level.getRequiredLevels()) {
-                    LevelObject requiredLevel = Parkour.levels.get(requiredLevelName);
+                    LevelObject requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
                     if (requiredLevel != null)
-                        itemLore.add(
-                                ChatColor.GRAY + " - "
-                                + requiredLevel.getFormattedTitle()
-                        );
+                        itemLore.add(Utils.translate("&7 - " + requiredLevel.getFormattedTitle()));
                 }
             }
 
@@ -148,8 +133,7 @@ public class MenuItemFormatter {
             if (levelCompletionsCount > 0) {
                 itemLore.add("");
 
-                String beatenMessage = ChatColor.GRAY + "Beaten " + ChatColor.GREEN + levelCompletionsCount
-                        + ChatColor.GRAY + " Time";
+                String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
                 if (levelCompletionsCount > 1)
                     beatenMessage += "s";
 
@@ -157,24 +141,21 @@ public class MenuItemFormatter {
 
                 List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(levelName);
                 if (bestLevelCompletions.size() > 0) {
-                    itemLore.add(ChatColor.GRAY + " Top Personal Times");
+                    itemLore.add(Utils.translate("&7 Top Personal Times"));
 
                     for (int i = 0; i <= (bestLevelCompletions.size()) - 1 && i <= 2; i++ ) {
                         double completionTime = ((double) bestLevelCompletions.get(i).getCompletionTimeElapsed()) / 1000;
                         long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(i).getTimeOfCompletion();
 
-                        itemLore.add("  " + ChatColor.GREEN + Double.toString(completionTime) + "s");
-                        itemLore.add("   " + ChatColor.GRAY + Time.elapsedShortened(timeSince) + "ago");
+                        itemLore.add(Utils.translate("  &2" + completionTime + "s"));
+                        itemLore.add(Utils.translate("   &7" + Time.elapsedShortened(timeSince) + "ago"));
                     }
                 }
             }
-
             // Sections over
             itemMeta.setLore((itemLore));
             item.setItemMeta(itemMeta);
         }
-
         return item;
     }
-
 }

@@ -4,6 +4,7 @@ import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.clans.Clan;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.data.stats.StatsManager;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,107 +16,75 @@ public class Clan_CMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (a.length > 0) {
-
             if (a[0].equalsIgnoreCase("stats")) {
                 // Displays stats of clan requested, or personal if available
-
 
             } else if (sender instanceof Player) {
                 // Sub commands here cannot be ran by non-players
                 Player player = ((Player) sender).getPlayer();
-                PlayerStats playerStats = Parkour.stats.get(player);
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-
-                if (a[0].equalsIgnoreCase("create")) {
+                if (a.length == 2 && a[0].equalsIgnoreCase("create")) {
                     // Creates a clan at the set price
-
                     if (playerStats.getClan() == null) {
-                        int playerBalance  = (int) Parkour.economy.getBalance(player);
+                        int playerBalance  = (int) Parkour.getEconomy().getBalance(player);
 
-                        if (playerBalance > Parkour.settings.clans_price_create) {
+                        if (playerBalance > Parkour.getSettingsManager().clans_price_create) {
                             if (a.length > 1) {
                                 String clanTag = a[1];
 
                                 if (clanTagRequirements(clanTag, sender)) {
-                                    Parkour.economy.withdrawPlayer(player, Parkour.settings.clans_price_create);
-
-                                    Parkour.clans.add(new Clan(-1, clanTag, playerStats.getPlayerID()));
+                                    Parkour.getEconomy().withdrawPlayer(player, Parkour.getSettingsManager().clans_price_create);
+                                    Parkour.getClansManager().add(new Clan(-1, clanTag, playerStats.getPlayerID()));
                                 }
                             } else {
-                                sender.sendMessage(ChatColor.RED + "No clan tag specified");
+                                sender.sendMessage(Utils.translate("&cNo clan tag specified"));
                                 sender.sendMessage(getHelp("create"));
                             }
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.RED + "You need " +
-                                            ChatColor.GOLD + Parkour.settings.clans_price_create + " Coins" +
-                                            ChatColor.RED + " to create a clan, pleb!"
-                            );
-                    } else
-                        sender.sendMessage(ChatColor.RED + "You cannot create a clan while in one");
-
-                } else if (a[0].equalsIgnoreCase("tag")) {
+                        } else {
+                            sender.sendMessage(Utils.translate("&cYou need &6" +
+                                    Parkour.getSettingsManager().clans_price_create + " Coins &cto create a clan"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cYou cannot create a clan while in one"));
+                    }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("changetag")) {
                     // Changes clan tag
-
-
                 } else {
                     // Unknown argument
-
                     sendHelp(sender);
-                    sender.sendMessage(
-                            ChatColor.RED + "Unknown argument '" +
-                                    ChatColor.DARK_RED + a[0]
-                                    + ChatColor.RED + "'"
-                    );
                 }
-            } else
-                sender.sendMessage(ChatColor.RED + "Most clan commands can only be run in-game");
-        } else
-            sendHelp(sender);
-
+            } else {
+                sender.sendMessage(Utils.translate("&cMost clan commands can only be run in-game"));
+            }
+        } else {
+                sendHelp(sender);
+        }
         return true;
     }
 
     private static boolean clanTagRequirements(String clanTag, CommandSender sender) {
-        if (clanTag.length() < Parkour.settings.clans_tag_length_min
-                && clanTag.length() > Parkour.settings.clans_tag_length_max) {
-            // Clan Tag has improper length
+        // Clan Tag has improper length
+        if (clanTag.length() < Parkour.getSettingsManager().clans_tag_length_min
+            && clanTag.length() > Parkour.getSettingsManager().clans_tag_length_max) {
 
-            sender.sendMessage(
-                    ChatColor.RED + "'" +
-                            ChatColor.DARK_RED + clanTag +
-                            ChatColor.RED + "' does not fit Clan Tag requirements"
-            );
-            sender.sendMessage(
-                    ChatColor.RED + "Clan Tags must be " +
-                            ChatColor.DARK_RED + Parkour.settings.clans_tag_length_min
-                            + "-" + Parkour.settings.clans_tag_length_max +
-                            ChatColor.RED + " characters"
-            );
-
+            sender.sendMessage(Utils.translate("&c'&4" + clanTag + "&c' does not fit Clan Tag requirements"));
+            sender.sendMessage(Utils.translate("&cClan Tags must be &4" + Parkour.getSettingsManager().clans_tag_length_min + "-"
+                                               + Parkour.getSettingsManager().clans_tag_length_max + " &ccharacters"));
             return false;
-        }
-
-        if (Parkour.clans.get(clanTag) != null) {
-            // Clan Tag already taken
-
-            sender.sendMessage(
-                    ChatColor.RED + "The Clan Tag '" +
-                            ChatColor.DARK_RED + clanTag +
-                            ChatColor.RED + "' is already taken"
-            );
-
+        } else if (Parkour.getClansManager().get(clanTag) != null) {
+            sender.sendMessage(Utils.translate("&cThe Clan Tag '&4" + clanTag + " &c' is already taken"));
             return false;
+        } else {
+            return true;
         }
-
-        return true;
     }
 
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(getHelp("stats")); // console friendly
         sender.sendMessage(getHelp("create"));
-        sender.sendMessage(getHelp("tag"));
-        sender.sendMessage(getHelp("owner"));
+        sender.sendMessage(getHelp("changetag"));
+        sender.sendMessage(getHelp("setowner"));
         sender.sendMessage(getHelp("kick"));
         sender.sendMessage(getHelp("invite"));
         sender.sendMessage(getHelp("deinvite"));
@@ -123,41 +92,24 @@ public class Clan_CMD implements CommandExecutor {
     }
 
     private static String getHelp(String cmd) {
-        if (cmd.equalsIgnoreCase("stats"))
-            return ChatColor.DARK_AQUA + "/clan stats [clan]" +
-                    ChatColor.GRAY + " Display clan statistics";
-
-        else if (cmd.equalsIgnoreCase("create"))
-            return ChatColor.DARK_AQUA + "/clan create <tag>" +
-                    ChatColor.GRAY + " Create a clan " +
-                    ChatColor.GOLD + Parkour.settings.clans_price_create + " Coins";
-
-        else if (cmd.equalsIgnoreCase("tag"))
-            return ChatColor.DARK_AQUA + "/clan tag <tag>" +
-                    ChatColor.GRAY + " Change clan tag " +
-                    ChatColor.GOLD + Parkour.settings.clans_price_tag + " Coins";
-
-        if (cmd.equalsIgnoreCase("owner"))
-            return ChatColor.DARK_AQUA + "/clan owner [player]" +
-                    ChatColor.GRAY + " Give your clan ownership";
-
-        if (cmd.equalsIgnoreCase("kick"))
-            return ChatColor.DARK_AQUA + "/clan kick [player]" +
-                    ChatColor.GRAY + " Kick player from your clan";
-
-        if (cmd.equalsIgnoreCase("invite"))
-            return ChatColor.DARK_AQUA + "/clan invite [player]" +
-                    ChatColor.GRAY + " Invite player to your clan";
-
-        if (cmd.equalsIgnoreCase("deinvite"))
-            return ChatColor.DARK_AQUA + "/clan deinvite [player]" +
-                    ChatColor.GRAY + " Revoke invitation";
-
-        if (cmd.equalsIgnoreCase("disband"))
-            return ChatColor.DARK_AQUA + "/clan disband" +
-                    ChatColor.GRAY + " Disband your clan";
-
+        switch (cmd.toLowerCase()) {
+            case "stats":
+                return Utils.translate("&3/clans stats <clan>  &7Display clan statistics");
+            case "create":
+                return Utils.translate("&3/clan create <tag>  &7Create a clan &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
+            case "changetag":
+                return Utils.translate("&3/clan changetag <tag>  &7Change clan tag &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
+            case "setowner":
+                return Utils.translate("&3/clan owner <player>  &7Give your clan ownership");
+            case "kick":
+                return Utils.translate("&3/clan kick <player>  &7Kick player from your clan");
+            case "invite":
+                return Utils.translate("&3/clan invite <player>  &7Invite player to your clan");
+            case "deinvite":
+                return Utils.translate("&3/clan deinvite <player>  &7Revoke invitation");
+            case "disband":
+                return Utils.translate("&3/clan disband  &7Disband your clan");
+        }
         return "";
     }
-
 }

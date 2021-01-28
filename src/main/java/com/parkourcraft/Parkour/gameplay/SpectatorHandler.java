@@ -4,6 +4,7 @@ import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.StatsManager;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,43 +29,38 @@ public class SpectatorHandler implements Listener {
 
             TitleAPI.sendTitle(
                     spectator, 10, 40, 10,
-                    "",
-                    ChatColor.GRAY + "Teleported to " + player.getDisplayName()
-                    + ChatColor.GRAY + ", use "
-                    + ChatColor.GREEN + "/spectate"
-                    + ChatColor.GRAY + " to stop"
-            );
+                    "", Utils.translate("&7Teleported to " + player.getDisplayName() +
+                            "&7, use &2/spectate &7 to stop"));
         }
     }
 
     public static void respawnToLobby(Player player) {
-        Location lobby = Parkour.locations.getLobbyLocation();
-
+        Location lobby = Parkour.getLocationManager().getLobbyLocation();
         player.teleport(lobby);
-
         TitleAPI.sendTitle(
                 player, 10, 40, 10,
                 "",
-                ChatColor.GRAY + "You are no longer spectating anyone"
-        );
+                Utils.translate("&7You are no longer spectating anyone"));
     }
 
     public static void setSpectatorMode(Player spectator) {
-        Parkour.ghostFactory.setGhost(spectator, true);
+        // For pending recode
+        //Parkour.getSpectatorManager().setGhost(spectator, true);
         spectator.setAllowFlight(true);
         spectator.setFlying(true);
     }
 
     public static void removeSpectatorMode(PlayerStats playerStats) {
         playerStats.setPlayerToSpectate(null);
-        Parkour.ghostFactory.setGhost(playerStats.getPlayer(), false);
+        // For pending recode
+        //Parkour.ghostFactory.setGhost(playerStats.getPlayer(), false);
         playerStats.getPlayer().setFlying(false);
         playerStats.getPlayer().setAllowFlight(false);
         respawnToLobby(playerStats.getPlayer());
     }
 
     public static void updateSpectators() {
-        for (PlayerStats playerStats : Parkour.stats.getPlayerStats()) {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
             if (playerStats.isLoaded()
                     && playerStats.getPlayer().isOnline()
                     && playerStats.getPlayerToSpectate() != null)

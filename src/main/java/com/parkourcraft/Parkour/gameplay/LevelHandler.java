@@ -6,6 +6,7 @@ import com.parkourcraft.Parkour.data.levels.LevelObject;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
 import com.parkourcraft.Parkour.data.stats.Stats_DB;
+import com.parkourcraft.Parkour.utils.Utils;
 import com.parkourcraft.Parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,8 +20,8 @@ import java.util.Map;
 public class LevelHandler {
 
     static void levelCompletion(Player player, String levelName) {
-        PlayerStats playerStats = Parkour.stats.get(player);
-        LevelObject level = Parkour.levels.get(levelName);
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        LevelObject level = Parkour.getLevelManager().get(levelName);
 
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null
@@ -41,27 +42,20 @@ public class LevelHandler {
                     // Update player information
                     playerStats.levelCompletion(levelName, levelCompletion);
                     Stats_DB.insertCompletion(playerStats, level, levelCompletion);
-                    Parkour.perks.syncPermissions(player);
-                    Parkour.economy.depositPlayer(player, level.getReward());
+                    Parkour.getPerkManager().syncPermissions(player);
+                    Parkour.getEconomy().depositPlayer(player, level.getReward());
 
                     String messageFormatted = level.getFormattedMessage(playerStats);
                     String time = (((double) elapsedTime) / 1000) + "s";
                     if (elapsedTime > 0L
                             && elapsedTime < 8388607L)
-                        messageFormatted = messageFormatted.replace(
-                                "%time%",
-                                time
-                        );
+                        messageFormatted = messageFormatted.replace("%time%", time);
                     else
-                        messageFormatted = messageFormatted.replace(
-                                "%time%",
-                                "-"
-                        );
+                        messageFormatted = messageFormatted.replace("%time%","-");
 
-                    String titleMessage = ChatColor.GRAY + "You Beat " + level.getFormattedTitle();
-                    if (elapsedTime > 0L
-                            && elapsedTime < 8388607L)
-                        titleMessage += ChatColor.GRAY + " in " + ChatColor.GREEN + time;
+                    String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
+                    if (elapsedTime > 0L && elapsedTime < 8388607L)
+                        titleMessage += Utils.translate("&7 in &2" + time);
 
                     // Run gameplay actions: teleport and messaging
                     player.teleport(level.getRespawnLocation());
@@ -76,8 +70,7 @@ public class LevelHandler {
                     if (level.getBroadcastCompletion()) {
                         String broadcastMessage = ChatColor.translateAlternateColorCodes(
                                 '&',
-                                Parkour.settings.levels_message_broadcast
-                        );
+                                Parkour.getSettingsManager().levels_message_broadcast);
 
                         broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
                         broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
@@ -85,16 +78,18 @@ public class LevelHandler {
                         Bukkit.broadcastMessage(broadcastMessage);
 
                     }
-                } else
-                    player.sendMessage(ChatColor.RED + "You've reached the maximum number of completions");
-            } else
-                player.sendMessage(ChatColor.RED + "You do not have the required levels to complete this level");
+                } else {
+                    player.sendMessage(Utils.translate("&cYou've reached the maximum number of completions"));
+                }
+            } else {
+                    player.sendMessage(Utils.translate("&cYou do not have the required levels to complete this level"));
+            }
         }
     }
 
     static String getLocationLevelName(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
-        Map<String, String> levelNamesLower = Parkour.levels.getNamesLower();
+        Map<String, String> levelNamesLower = Parkour.getLevelManager().getNamesLower();
 
         for (String regionName : regionNames) {
             if (levelNamesLower.containsKey(regionName))
@@ -106,7 +101,7 @@ public class LevelHandler {
 
     static boolean locationInIgnoreArea(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
-        Map<String, String> levelNamesLower = Parkour.levels.getNamesLower();
+        Map<String, String> levelNamesLower = Parkour.getLevelManager().getNamesLower();
 
         boolean inIgnoreArea = true;
 
@@ -122,7 +117,7 @@ public class LevelHandler {
     }
 
     static void respawnPlayerToStart(Player player, String levelName) {
-        LevelObject level = Parkour.levels.get(levelName);
+        LevelObject level = Parkour.getLevelManager().get(levelName);
 
         if (level != null
                 && level.getStartLocation() != null)
@@ -130,7 +125,7 @@ public class LevelHandler {
     }
 
     static void startedLevel(Player player) {
-        PlayerStats playerStats = Parkour.stats.get(player);
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (playerStats != null
                 && playerStats.getPlayerToSpectate() == null) {

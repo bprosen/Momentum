@@ -50,7 +50,7 @@ public class LevelManager {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             public void run() {
                 if (Levels_DB.syncLevelData()) {
-                    Parkour.levels.setLevelDataCache(Levels_DB.getDataCache());
+                    Parkour.getLevelManager().setLevelDataCache(Levels_DB.getDataCache());
                     Levels_DB.syncDataCache();
                 }
             }

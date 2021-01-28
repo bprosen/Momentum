@@ -3,6 +3,7 @@ package com.parkourcraft.Parkour.data.levels;
 import com.parkourcraft.Parkour.Parkour;
 import com.parkourcraft.Parkour.data.stats.LevelCompletion;
 import com.parkourcraft.Parkour.data.stats.PlayerStats;
+import com.parkourcraft.Parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
@@ -41,7 +42,7 @@ public class  LevelObject {
     }
 
     public String getFormattedTitle() {
-        return ChatColor.translateAlternateColorCodes('&', title);
+        return Utils.translate(title);
     }
 
     public void setReward(int reward) {
@@ -66,7 +67,7 @@ public class  LevelObject {
 
     public String getFormattedMessage(PlayerStats playerStats) {
         if (message != null) {
-            String returnMessage = ChatColor.translateAlternateColorCodes('&', message);
+            String returnMessage = Utils.translate(message);
 
             returnMessage = returnMessage.replace("%title%", getFormattedTitle());
             returnMessage = returnMessage.replace("%reward%", Integer.toString(reward));
@@ -129,21 +130,21 @@ public class  LevelObject {
                 title = name;
 
             String startLocationName = name + "-spawn";
-            if (Parkour.locations.exists(startLocationName))
-                startLocation = Parkour.locations.get(startLocationName);
+            if (Parkour.getLocationManager().exists(startLocationName))
+                startLocation = Parkour.getLocationManager().get(startLocationName);
             else
-                startLocation = Parkour.locations.get("spawn");
+                startLocation = Parkour.getLocationManager().get("spawn");
 
             String respawnLocationName = name + "-completion";
-            if (Parkour.locations.exists(respawnLocationName))
-                respawnLocation = Parkour.locations.get(respawnLocationName);
+            if (Parkour.getLocationManager().exists(respawnLocationName))
+                respawnLocation = Parkour.getLocationManager().get(respawnLocationName);
             else
-                respawnLocation = Parkour.locations.get("spawn");
+                respawnLocation = Parkour.getLocationManager().get("spawn");
 
             if (Levels_YAML.isSet(name, "message"))
                 message = Levels_YAML.getMessage(name);
             else
-                message = Parkour.settings.levels_message_completion;
+                message = Parkour.getSettingsManager().levels_message_completion;
 
             maxCompletions = Levels_YAML.getMaxCompletions(name);
 
@@ -172,5 +173,4 @@ public class  LevelObject {
 
         return true;
     }
-
 }

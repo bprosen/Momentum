@@ -14,14 +14,13 @@ public class JoinLeaveHandler implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         // Add to playerStats map (Async)
-        Parkour.stats.add(event.getPlayer());
-
-        if (!event.getPlayer().isOp())
-            Parkour.locations.teleport(event.getPlayer(), "spawn");
-
-        Parkour.ghostFactory.addPlayer(event.getPlayer());
+        Parkour.getStatsManager().add(event.getPlayer());
+        //
+        // Pending recode
+        // Parkour.ghostFactory.addPlayer(event.getPlayer());
     }
 
+    /*
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         playerLeft(event.getPlayer());
@@ -30,9 +29,5 @@ public class JoinLeaveHandler implements Listener {
     @EventHandler
     public void onKick(PlayerKickEvent event) {
         playerLeft(event.getPlayer());
-    }
-
-    private void playerLeft(Player player) {
-        Parkour.ghostFactory.removePlayer(player);
-    }
+    }*/
 }

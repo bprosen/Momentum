@@ -74,7 +74,7 @@ public class Clans_DB {
         for (Map<String, String> result : results)
             clan.setID(Integer.parseInt(result.get("clan_id")));
 
-        PlayerStats owner = Parkour.stats.get(clan.getOwnerID());
+        PlayerStats owner = Parkour.getStatsManager().get(clan.getOwnerID());
 
         if (owner != null) {
             owner.setClan(clan);
@@ -91,14 +91,14 @@ public class Clans_DB {
     }
 
     private static void insertClan(Clan clan) {
-        Parkour.database.run(
+        Parkour.getDatabaseManager().run(
                 "INSERT INTO clans " +
-                "(clan_tag, owner_player_id)" +
-                " VALUES " +
-                "('" +
-                clan.getTag() + "', " +
-                clan.getOwnerID() +
-                ")"
+                        "(clan_tag, owner_player_id)" +
+                        " VALUES " +
+                        "('" +
+                        clan.getTag() + "', " +
+                        clan.getOwnerID() +
+                        ")"
         );
     }
 
@@ -109,29 +109,24 @@ public class Clans_DB {
 
         String query = "UPDATE players SET " +
                 "clan_id=" + clanID +
-                " WHERE player_id=" + playerStats.getPlayerID()
-                ;
+                " WHERE player_id=" + playerStats.getPlayerID();
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
 
     public static void updateClanTag(Clan clan) {
         String query = "UPDATE clans SET " +
                 "clan_tag='" + clan.getTag() + "' " +
-                "WHERE clan_id=" + clan.getID()
-                ;
+                "WHERE clan_id=" + clan.getID();
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
 
     public static void updateClanOwnerID(Clan clan) {
         String query = "UPDATE clans SET " +
                 "owner_player_id=" + clan.getOwnerID() +
-                "WHERE clan_id=" + clan.getID()
-                ;
+                "WHERE clan_id=" + clan.getID();
 
-        Parkour.database.add(query);
+        Parkour.getDatabaseManager().add(query);
     }
-
-
 }

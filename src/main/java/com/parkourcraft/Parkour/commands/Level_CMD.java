@@ -27,80 +27,51 @@ public class Level_CMD implements CommandExecutor {
                     if (a.length == 2) {
                         sender.sendMessage("unfinished");
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("show"));
                     }
                 } else if (a[0].equalsIgnoreCase("list")) { // subcommand: list
-                    sender.sendMessage(
-                            ChatColor.GRAY + "Levels loaded in: "
-                                    + ChatColor.GREEN + String.join(
-                                    ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                    Parkour.levels.getNames()
-                            )
-                    );
+                    sender.sendMessage(Utils.translate("&7Levels loaded in: &2" + String.join("&7, &2",
+                                       Parkour.getLevelManager().getNames())));
                 } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
                     if (a.length == 2) {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName))
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " already exists"
-                            );
+                        if (Parkour.getLevelManager().exists(levelName))
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7already exists"));
                         else {
                             Levels_YAML.create(levelName);
-
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Created level "
-                                            + ChatColor.GREEN + levelName
-                            );
+                            sender.sendMessage(Utils.translate("&7Created level &2" + levelName));
                         }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("create"));
                     }
                 } else if (a[0].equalsIgnoreCase("delete")) { // subcommand: delete
                     if (a.length == 2) {
                         String levelName = a[1];
 
-                        if (!Parkour.levels.exists(levelName))
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                        if (!Parkour.getLevelManager().exists(levelName))
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                         else {
-                            Parkour.levels.remove(levelName);
-
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Deleted level "
-                                            + ChatColor.GREEN + levelName
-                            );
+                            Parkour.getLevelManager().remove(levelName);
+                            sender.sendMessage(Utils.translate("&7Deleted level &2" + levelName));
                         }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("delete"));
                     }
                 } else if (a[0].equalsIgnoreCase("load")) { // subcommand: load
-                    Parkour.configs.load("levels");
-                    sender.sendMessage(
-                            ChatColor.GRAY + "Loaded " + ChatColor.GREEN + "levels.yml"
-                                    + ChatColor.GRAY + " from disk"
-                    );
-
-                    Parkour.levels.load();
-                    sender.sendMessage(
-                            ChatColor.GRAY + "Loaded levels from " + ChatColor.GREEN + "levels.yml"
-                                    + ChatColor.GRAY + ", "
-                                    + ChatColor.GREEN + Parkour.levels.getNames().size()
-                                    + ChatColor.GRAY + " total"
-                    );
+                    Parkour.getConfigManager().load("levels");
+                    sender.sendMessage(Utils.translate("&7Loaded &2levels.yml &7from disk"));
+                    Parkour.getLevelManager().load();
+                    sender.sendMessage(Utils.translate("&7Loaded levels from &2levels.yml&7, &a" +
+                                       Parkour.getLevelManager().getNames().size() + " &7total"));
                 } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName)) {
+                        if (Parkour.getLevelManager().exists(levelName)) {
                             if (a.length > 2) {
                                 String title = "";
                                 for (int i = 2; i < a.length; i++)
@@ -108,133 +79,91 @@ public class Level_CMD implements CommandExecutor {
                                 title = title.trim();
 
                                 Levels_YAML.setTitle(levelName, title);
-                                sender.sendMessage(
-                                        ChatColor.GRAY + "Set "
-                                                + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s title to "
-                                                + ChatColor.RESET + ChatColor.translateAlternateColorCodes(
-                                                '&',
-                                                title
-                                        )
-                                );
+                                sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's title to &2title"));
                             } else {
-                                sender.sendMessage(
-                                        ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current title: "
-                                                + ChatColor.translateAlternateColorCodes(
-                                                '&',
-                                                Levels_YAML.getTitle(levelName)
-                                        )
-                                );
+                                sender.sendMessage(Utils.translate("&2" + levelName + " &7's current title: &2" +
+                                                   Levels_YAML.getTitle(levelName)));
                                 sender.sendMessage(getHelp("title"));
                             }
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                        } else {
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
+                        }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("title"));
                     }
                 } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
                     if (a.length > 1) {
                         String levelName = a[1];
-                        LevelObject level = Parkour.levels.get(levelName);
+                        LevelObject level = Parkour.getLevelManager().get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
                                     level.setReward(Integer.parseInt(a[2]));
                                     Levels_DB.updateReward(level);
-
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Set "
-                                                    + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s reward to "
-                                                    + ChatColor.GOLD + a[2]
-                                    );
+                                    sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's reward to &6" + a[2]));
                                 } else {
-                                    sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
+                                    sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
                                     sender.sendMessage(getHelp("reward"));
                                 }
                             } else {
-                                sender.sendMessage(
-                                        ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current reward: "
-                                                + ChatColor.GOLD + level.getReward()
-                                );
+                                sender.sendMessage(Utils.translate("&2" + levelName + "&7's current reward: &6" + level.getReward()));
                                 sender.sendMessage(getHelp("reward"));
                             }
                         } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("reward"));
                     }
                 } else if (a[0].equalsIgnoreCase("startloc")) { //subcommand: startloc
                     if (a.length < 2) {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("startloc"));
                     } else {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName)) {
+                        if (Parkour.getLevelManager().exists(levelName)) {
                             if (sender instanceof Player) {
                                 Player player = ((Player) sender).getPlayer();
 
                                 Location playerLocation = player.getLocation();
                                 String spawnPositionName = levelName + "-spawn";
 
-                                Parkour.locations.save(spawnPositionName, playerLocation);
+                                Parkour.getLocationManager().save(spawnPositionName, playerLocation);
                                 Levels_YAML.commit(levelName);
 
-                                sender.sendMessage(
-                                        ChatColor.GRAY + "Location saved as "
-                                                + ChatColor.GREEN + spawnPositionName
-                                                + ChatColor.GRAY + " for "
-                                                + ChatColor.GREEN + levelName
-                                );
-                            } else
-                                sender.sendMessage(ChatColor.DARK_RED + "This command can only be run in-game");
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                                sender.sendMessage(Utils.translate("&7Location saved as &2" + spawnPositionName +
+                                                   " &7for &2" + levelName));
+                            } else {
+                                sender.sendMessage(Utils.translate("&4This command can only be run in-game"));
+                            }
+                        } else {
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
+                        }
                     }
                 } else if (a[0].equalsIgnoreCase("completionloc")) { //subcommand: completionloc
                     if (a.length < 2) {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("completionloc"));
                     } else {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName)) {
+                        if (Parkour.getLevelManager().exists(levelName)) {
                             if (a.length > 2) {
                                 if (a[2].equalsIgnoreCase("default")) {
                                     String completionLocationName = levelName + "-completion";
 
-                                    Parkour.locations.remove(completionLocationName);
-                                    Parkour.levels.load(levelName);
+                                    Parkour.getLocationManager().remove(completionLocationName);
+                                    Parkour.getLevelManager().load(levelName);
 
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "The completion location for "
-                                                    + ChatColor.GREEN + levelName
-                                                    + ChatColor.GRAY + " has been reset to default"
-                                    );
+                                    sender.sendMessage(Utils.translate("&7The completion location for &2" +
+                                                       levelName + " &7has been reset to default"));
                                 } else {
-                                    sender.sendMessage(
-                                            ChatColor.RED + "The only parameter that can be used is "
-                                                    + ChatColor.DARK_RED + "default"
-                                    );
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "In order to reset the completion location use "
-                                                    + ChatColor.GREEN + "/levels completionloc "
-                                                    + levelName + " default"
-                                    );
+                                    sender.sendMessage(Utils.translate("&cThe only parameter that can be used is &4default"));
+                                    sender.sendMessage(Utils.translate("&7In order to reset the completion " +
+                                                       "location, use &/levels completionloc " + levelName + " default"));
                                 }
                             } else {
                                 if (sender instanceof Player) {
@@ -243,35 +172,25 @@ public class Level_CMD implements CommandExecutor {
                                     Location playerLocation = player.getLocation();
                                     String completionLocationName = levelName + "-completion";
 
-                                    Parkour.locations.save(completionLocationName, playerLocation);
-                                    Parkour.levels.load(levelName);
+                                    Parkour.getLocationManager().save(completionLocationName, playerLocation);
+                                    Parkour.getLevelManager().load(levelName);
 
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Location saved as "
-                                                    + ChatColor.GREEN + completionLocationName
-                                                    + ChatColor.GRAY + " for "
-                                                    + ChatColor.GREEN + levelName
-                                    );
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "In order to reset the completion location use "
-                                                    + ChatColor.GREEN + "/levels completionloc "
-                                                    + levelName + " default"
-                                    );
-                                } else
-                                    sender.sendMessage(ChatColor.DARK_RED + "This command can only be run in-game");
+                                    sender.sendMessage(Utils.translate("&7Location saved as &2" +
+                                                       completionLocationName + " &7for &2" + levelName));
+                                    sender.sendMessage(Utils.translate("&7In order to reset the completion " +
+                                                       "location, use &2/levels completionloc " + levelName + "default"));
+                                } else {
+                                    sender.sendMessage(Utils.translate("&cThis command can only be run in-game"));
+                                }
                             }
                         } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     }
                 } else if (a[0].equalsIgnoreCase("message")) { //subcommand: message
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName)) {
+                        if (Parkour.getLocationManager().exists(levelName)) {
                             if (a.length > 2) {
                                 String message = "";
                                 for (int i = 2; i < a.length; i++)
@@ -279,96 +198,64 @@ public class Level_CMD implements CommandExecutor {
                                 message = message.trim();
 
                                 Levels_YAML.setMessage(levelName, message);
-                                sender.sendMessage(
-                                        ChatColor.GRAY + "Set "
-                                                + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s completion message to "
-                                                + ChatColor.RESET + ChatColor.translateAlternateColorCodes(
-                                                '&',
-                                                message
-                                        )
-                                );
+                                sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's completion message" +
+                                                   " to &2" + message));
                             } else {
-                                sender.sendMessage(
-                                        ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current message: "
-                                                + ChatColor.translateAlternateColorCodes(
-                                                '&',
-                                                Levels_YAML.getMessage(levelName)
-                                        )
-                                );
+                                sender.sendMessage(Utils.translate("&2" + levelName + "&7's current message: "
+                                                  + Levels_YAML.getMessage(levelName)));
                                 sender.sendMessage(getHelp("message"));
                             }
                         } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + "&7does not exist"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("message"));
                     }
                 } else if (a[0].equalsIgnoreCase("completions")) { //subcommand: completions
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName)) {
+                        if (Parkour.getLevelManager().exists(levelName)) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
                                     Levels_YAML.setMaxCompletions(levelName, Integer.parseInt(a[2]));
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Set "
-                                                    + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s max completions to "
-                                                    + ChatColor.GREEN + a[2]
-                                    );
+                                    sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's max completions to &2" + a[2]));
                                 } else {
-                                    sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
+                                    sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
                                     sender.sendMessage(getHelp("completions"));
                                 }
                             } else {
-                                sender.sendMessage(
-                                        ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current max completions: "
-                                                + ChatColor.GREEN + Levels_YAML.getMaxCompletions(levelName)
-                                );
+                                sender.sendMessage(Utils.translate("&2" + levelName + "&7's current max " +
+                                                   "completions: &2" + Levels_YAML.getMaxCompletions(levelName)));
                                 sender.sendMessage(getHelp("completions"));
                             }
                         } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + "&7 does not exist"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("completions"));
                     }
                 } else if (a[0].equalsIgnoreCase("broadcast")) { //subcommand: broadcast
                     if (a.length > 1) {
                         String levelName = a[1];
 
-                        if (Parkour.levels.exists(levelName)) {
+                        if (Parkour.getLevelManager().exists(levelName)) {
                             boolean broadcastSetting = Levels_YAML.getBroadcastSetting(levelName);
 
                             Levels_YAML.setBroadcast(levelName, !broadcastSetting);
 
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Broadcast completion for "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " was set to " + (!broadcastSetting)
-                            );
+                            sender.sendMessage(Utils.translate("&7Broadcast completion for &2" + levelName +
+                                               " &7was set to " + (!broadcastSetting)));
                         } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("broadcast"));
                     }
                 } else if (a[0].equalsIgnoreCase("requires")) { //subcommand: requires
                     if (a.length > 1) {
                         String levelName = a[1];
-                        LevelObject level = Parkour.levels.get(levelName);
+                        LevelObject level = Parkour.getLevelManager().get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
@@ -378,49 +265,31 @@ public class Level_CMD implements CommandExecutor {
                                     requiredLevels.remove(a[2]);
                                     Levels_YAML.setRequiredLevels(levelName, requiredLevels);
 
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Removed " +
-                                                    ChatColor.RED + a[2] +
-                                                    ChatColor.GRAY + " from required levels"
-                                    );
+                                    sender.sendMessage(Utils.translate("&7Removed &c" + a[2] + " &7from required" +
+                                                       " levels"));
                                 } else {
                                     requiredLevels.add(a[2]);
                                     Levels_YAML.setRequiredLevels(levelName, requiredLevels);
 
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Added " +
-                                                    ChatColor.GREEN + a[2] +
-                                                    ChatColor.GRAY + " to required levels"
-                                    );
+                                    sender.sendMessage(Utils.translate("&7Added &2" + a[2] + " &7to required levels"));
                                 }
-
                             }
-
-                            level = Parkour.levels.get(levelName);
-
-                            sender.sendMessage(
-                                    ChatColor.GREEN + levelName +
-                                            ChatColor.GRAY + "'s required levels: "
-                                            + ChatColor.GREEN + String.join(
-                                            ChatColor.GRAY + ", " + ChatColor.GREEN,
-                                            level.getRequiredLevels()
-                                    )
-                            );
+                            level = Parkour.getLevelManager().get(levelName);
+                            sender.sendMessage(Utils.translate("&2" + levelName + "&7'srequired levels: &2" +
+                                               String.join("&7, &2", level.getRequiredLevels())));
 
                             if (a.length != 3)
                                 sender.sendMessage(getHelp("requires"));
-                        } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
-                    } else
+                        } else {
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
+                        }
+                    } else {
                         sender.sendMessage(getHelp("requires"));
+                    }
                 } else if (a[0].equalsIgnoreCase("modifier")) { //subcommand: modifier
                     if (a.length > 1) {
                         String levelName = a[1];
-                        LevelObject level = Parkour.levels.get(levelName);
+                        LevelObject level = Parkour.getLevelManager().get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
@@ -428,37 +297,25 @@ public class Level_CMD implements CommandExecutor {
                                     level.setScoreModifier(Integer.parseInt(a[2]));
                                     Levels_DB.updateScoreModifier(level);
 
-                                    sender.sendMessage(
-                                            ChatColor.GRAY + "Set "
-                                                    + ChatColor.GREEN + levelName + ChatColor.GRAY + "'s score modifier to "
-                                                    + ChatColor.GOLD + a[2]
-                                    );
+                                    sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's " +
+                                                       "score modifier to &6" + a[2]));
                                 } else {
-                                    sender.sendMessage(ChatColor.RED + "Incorrect parameters, must enter integer");
+                                    sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
                                     sender.sendMessage(getHelp("modifier"));
                                 }
                             } else {
-                                sender.sendMessage(
-                                        ChatColor.GREEN + levelName + ChatColor.GRAY + "'s current score modifier: "
-                                                + ChatColor.GOLD + level.getScoreModifier()
-                                );
+                                sender.sendMessage(Utils.translate("&2" + levelName + "&7's current score modifier:" +
+                                                   " &6" + level.getScoreModifier()));
                                 sender.sendMessage(getHelp("modifier"));
                             }
                         } else
-                            sender.sendMessage(
-                                    ChatColor.GRAY + "Level "
-                                            + ChatColor.GREEN + levelName
-                                            + ChatColor.GRAY + " does not exist"
-                            );
+                            sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Incorrect parameters");
+                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("modifier"));
                     }
                 } else { // subcommand: unknown
-                    sender.sendMessage(
-                            ChatColor.RED + "'" + ChatColor.DARK_RED + a[0] +
-                                    ChatColor.RED + "' is not a valid parameter"
-                    );
+                    sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
                 }
             }
@@ -469,8 +326,8 @@ public class Level_CMD implements CommandExecutor {
     }
 
     private static void sendHelp(CommandSender sender) {
-        sender.sendMessage(ChatColor.GRAY + "To apply changes use " + ChatColor.GREEN + "/level load");
-        sender.sendMessage(ChatColor.GRAY + "Level names are case sensitive");
+        sender.sendMessage(Utils.translate("&aTo apply changes use &2/level load"));
+        sender.sendMessage(Utils.translate("&7Level names are case sensitive"));
         sender.sendMessage(getHelp("list"));
         sender.sendMessage(getHelp("load"));
         //sender.sendMessage(getHelp("show"));
@@ -488,49 +345,36 @@ public class Level_CMD implements CommandExecutor {
     }
 
     private static String getHelp(String cmd) {
-        if (cmd.equalsIgnoreCase("show"))
-            return ChatColor.GREEN + "/level show <level>" +
-                    ChatColor.GRAY + " Show level information";
-        else if (cmd.equalsIgnoreCase("list"))
-            return ChatColor.GREEN + "/level list" +
-                    ChatColor.GRAY + " List levels loaded in memory";
-        else if (cmd.equalsIgnoreCase("create"))
-            return ChatColor.GREEN + "/level create <level>" +
-                    ChatColor.GRAY + " Create a level";
-        else if (cmd.equalsIgnoreCase("load"))
-            return ChatColor.GREEN + "/level load" +
-                    ChatColor.GRAY + " Loads levels.yml, then levels";
-        else if (cmd.equalsIgnoreCase("delete"))
-            return ChatColor.GREEN + "/level delete <level>" +
-                    ChatColor.GRAY + " Delete a level";
-        else if (cmd.equalsIgnoreCase("title"))
-            return ChatColor.GREEN + "/level title <level> [title]" +
-                    ChatColor.GRAY + " View/Set a level's title";
-        else if (cmd.equalsIgnoreCase("reward"))
-            return ChatColor.GREEN + "/level reward <level> [reward]" +
-                    ChatColor.GRAY + " View/Set reward";
-        else if (cmd.equalsIgnoreCase("startloc"))
-            return ChatColor.GREEN + "/level startloc <level>" +
-                    ChatColor.GRAY + " Set the start to your location";
-        else if (cmd.equalsIgnoreCase("completionloc"))
-            return ChatColor.GREEN + "/level completionloc <level> [default]" +
-                    ChatColor.GRAY + " Set respawn to your location";
-        else if (cmd.equalsIgnoreCase("message"))
-            return ChatColor.GREEN + "/level message <level> [message]" +
-                    ChatColor.GRAY + " View/Set completion mesage";
-        else if (cmd.equalsIgnoreCase("completions"))
-            return ChatColor.GREEN + "/level completions <level> [completions]" +
-                    ChatColor.GRAY + " View/Set max completions";
-        else if (cmd.equalsIgnoreCase("broadcast"))
-            return ChatColor.GREEN + "/level broadcast <level>" +
-                    ChatColor.GRAY + " Toggle broadcast completion";
-        else if (cmd.equalsIgnoreCase("requires"))
-            return ChatColor.GREEN + "/level requires <level> <level>" +
-                    ChatColor.GRAY + " Add/Remove required level";
-        else if (cmd.equalsIgnoreCase("modifier"))
-            return ChatColor.GREEN + "/level modifier <level> [modifier]" +
-                    ChatColor.GRAY + " View/Set score modifier";
-
+        switch (cmd.toLowerCase()) {
+            case "show":
+                return Utils.translate("&a/level show <level>  &7Show level information");
+            case "list":
+                return Utils.translate("&a/level list  &7List levels loaded in memory");
+            case "create":
+                return Utils.translate("&a/level create <level>  &7Create a level");
+            case "load":
+                return Utils.translate("&a/level load  &7Loads levels.yml then levels");
+            case "delete":
+                return Utils.translate("&a/level delete <level>  &7Delete a level");
+            case "title":
+                return Utils.translate("&a/level title <level> [title]  &7View/Set a level's title");
+            case "reward":
+                return Utils.translate("&a/level reward <level> [reward]  &7View/Set a level's reward");
+            case "startloc":
+                return Utils.translate("&a/level startloc <level>  &7Sets the start to your location");
+            case "completionloc":
+                return Utils.translate("&a/level completionloc <leveL>  &7Sets the completion to your location");
+            case "message":
+                return Utils.translate("&a/level message <level> [message]  &7View/Set completion message");
+            case "completions":
+                return Utils.translate("&a/level completions <level> [completions]  &7View/Set max completions");
+            case "broadcast":
+                return Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion");
+            case "requires":
+                Utils.translate("&a/level requires <level> <level>  &7Add/Remove required level");
+            case "modifier":
+                Utils.translate("&a/level modifier <level> [modifier]  &7View/Set Score Modifier");
+        }
         return "";
     }
 }

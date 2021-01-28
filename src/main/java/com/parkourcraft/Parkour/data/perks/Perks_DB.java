@@ -33,8 +33,8 @@ public class Perks_DB {
     }
 
     static void syncIDCache() {
-        for (Perk perk : Parkour.perks.getPerks())
-            syncIDCache(perk, Parkour.perks.getIDCache());
+        for (Perk perk : Parkour.getPerkManager().getPerks())
+            syncIDCache(perk, Parkour.getPerkManager().getIDCache());
     }
 
     static void syncIDCache(Perk perk, Map<String, Integer> IDCache) {
@@ -45,7 +45,7 @@ public class Perks_DB {
     static boolean syncPerkIDs() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (Perk perk : Parkour.perks.getPerks())
+        for (Perk perk : Parkour.getPerkManager().getPerks())
             if (perk.getID() == -1)
                 insertQueries.add(
                         "INSERT INTO perks " +
@@ -59,8 +59,7 @@ public class Perks_DB {
             for (String sql : insertQueries)
                 finalQuery = finalQuery + sql + "; ";
 
-            Parkour.database.run(finalQuery);
-
+            Parkour.getDatabaseManager().run(finalQuery);
             return true;
         }
 
@@ -85,7 +84,7 @@ public class Perks_DB {
     }
 
     public static void insertPerk(PlayerStats playerStats, Perk perk, Long date) {
-        Parkour.database.add(
+        Parkour.getDatabaseManager().add(
                 "INSERT INTO ledger (player_id, perk_id, date)"
                         + " VALUES "
                         + "(" + playerStats.getPlayerID()
@@ -93,5 +92,4 @@ public class Perks_DB {
                         + ", FROM_UNIXTIME(" + (date / 1000) + "))"
         );
     }
-
 }

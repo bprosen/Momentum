@@ -97,7 +97,7 @@ public class StatsManager {
             for (PlayerStats playerStats : playerStatsList) {
                 if (playerStats.getPlayerID() == -1) {
                     Stats_DB.loadPlayerStats(playerStats);
-                    Parkour.perks.syncPermissions(playerStats.getPlayer());
+                    Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
                 }
             }
 

@@ -12,11 +12,11 @@ import java.util.List;
 
 public class Locations_YAML {
 
-    private static FileConfiguration locationsFile = Parkour.configs.get("locations");
+    private static FileConfiguration locationsFile = Parkour.getConfigManager().get("locations");
 
     private static void commit(String locationName) {
-        Parkour.configs.save("locations");
-        Parkour.locations.load(locationName);
+        Parkour.getConfigManager().save("locations");
+        Parkour.getLocationManager().load(locationName);
     }
 
     private static boolean exists(String locationName) {
@@ -73,5 +73,4 @@ public class Locations_YAML {
             commit(locationName);
         }
     }
-
 }

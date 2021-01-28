@@ -17,7 +17,7 @@ public class MenuListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Menu menu = Parkour.menus.getMenuFromTitle(event.getInventory().getTitle());
+        Menu menu = Parkour.getMenuManager().getMenuFromTitle(event.getInventory().getTitle());
 
         if (menu != null) {
             event.setCancelled(true);
@@ -46,14 +46,12 @@ public class MenuListener implements Listener {
                 || event.getAction() == Action.RIGHT_CLICK_BLOCK
                 || event.getAction() == Action.LEFT_CLICK_AIR
                 || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            Menu menu = Parkour.menus.getMenuFromSelectItem(player.getInventory().getItemInMainHand());
+            Menu menu = Parkour.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
 
             if (menu != null) {
-                player.openInventory(Parkour.menus.getInventory(menu.getName(), 1));
-                Parkour.menus.updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
+                player.openInventory(Parkour.getMenuManager().getInventory(menu.getName(), 1));
+                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
             }
         }
-
     }
-
 }

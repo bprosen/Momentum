@@ -21,7 +21,6 @@ public class MenuManager {
 
     public MenuManager(Plugin plugin) {
         load();
-
         startScheduler(plugin);
     }
 
@@ -111,7 +110,7 @@ public class MenuManager {
 
                 if (menu != null
                         && menu.isUpdating()) {
-                    PlayerStats playerStats = Parkour.stats.get(player);
+                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                     updateInventory(
                             player,
