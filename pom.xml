@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <mainClass>com.parkourcraft.Parkour.Parkour</mainClass>
+        <mainClass>com.parkourcraft.parkour.Parkour</mainClass>
         <spigotVersion>1.12.1-R0.1-SNAPSHOT</spigotVersion>
     </properties>
 
