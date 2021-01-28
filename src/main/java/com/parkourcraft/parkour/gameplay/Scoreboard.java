@@ -49,7 +49,7 @@ public class Scoreboard {
 
     private static void displayScoreboard(Player player) {
         List<String> board = new ArrayList<>();
-        LevelObject level = Parkour.getLevelManager().get(LevelHandler.getLocationLevelName(player.getLocation()));
+        LevelObject level = Parkour.getLevelManager().get(LevelHandler.getLocationLevelName(player, player.getLocation()));
 
         // Title
         board.add(Utils.translate("&c&lRenatus Network"));
@@ -57,7 +57,7 @@ public class Scoreboard {
         if (level == null)
             board.add(Utils.translate("&7"));
 
-        String coinBalance = Utils.translate("&6" + (int) Parkour.getEconomy().getBalance(player) + " &2&lCoins");
+        String coinBalance = Utils.translate("&6" + (int) Parkour.getEconomy().getBalance(player) + " &e&lCoins");
         board.add(formatSpacing(coinBalance));
 
 
@@ -71,8 +71,7 @@ public class Scoreboard {
             String reward = Utils.translate("&6" + level.getReward());
             board.add(formatSpacing(reward));
 
-            if (playerStats != null
-                    && playerStats.getLevelStartTime() > 0) {
+            if (playerStats != null && playerStats.getLevelStartTime() > 0) {
                 double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
                 String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
@@ -80,8 +79,6 @@ public class Scoreboard {
             } else
                 board.add(formatSpacing(Utils.translate("&7-")));
         }
-
-
         ScoreboardUtil.unrankedSidebarDisplay(player, board.toArray(new String[board.size()]));
     }
 

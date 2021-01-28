@@ -75,8 +75,9 @@ public class Stats_CMD implements CommandExecutor {
                     }
                 }
             }
+        } else {
+            sender.sendMessage(Utils.translate("&2/stats <level> &7 View a level's stats"));
         }
-        sender.sendMessage(Utils.translate("&2/stats <level> &7 View a level's stats"));
         return true;
     }
 }

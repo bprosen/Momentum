@@ -37,11 +37,11 @@ public class LevelHandler {
                     );
 
                     levelCompletion.setPlayerName(player.getName());
-                    level.addCompletion(levelCompletion); // Update totalLevelCompletionsCount
+                    Stats_DB.insertCompletion(playerStats, level, levelCompletion);
+                    level.addCompletion(player, levelCompletion, level); // Update totalLevelCompletionsCount
 
                     // Update player information
                     playerStats.levelCompletion(levelName, levelCompletion);
-                    Stats_DB.insertCompletion(playerStats, level, levelCompletion);
                     Parkour.getEconomy().depositPlayer(player, level.getReward());
 
                     // This can be run in async, stops BIG sync loads and main thread pauses onCompletion
@@ -90,15 +90,12 @@ public class LevelHandler {
         }
     }
 
-    static String getLocationLevelName(Location location) {
-        List<String> regionNames = WorldGuardUtils.getRegions(location);
+    static String getLocationLevelName(Player player, Location location) {
         Map<String, String> levelNamesLower = Parkour.getLevelManager().getNamesLower();
+        String region = WorldGuardUtils.getPlayerRegionMap().get(player.getName());
 
-        for (String regionName : regionNames) {
-            if (levelNamesLower.containsKey(regionName))
-                return levelNamesLower.get(regionName);
-        }
-
+        if (levelNamesLower.containsKey(region))
+            return levelNamesLower.get(region);
         return null;
     }
 

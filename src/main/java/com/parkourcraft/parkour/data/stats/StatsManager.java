@@ -13,7 +13,13 @@ public class StatsManager {
     private List<PlayerStats> playerStatsList = new ArrayList<>();
 
     public StatsManager(Plugin plugin) {
+        addEnabledLeaderboards();
         startScheduler(plugin);
+    }
+
+    private void addEnabledLeaderboards() {
+        for (String levelName : Parkour.getConfigManager().get("levels").getStringList("leaderboard.levels"))
+            Parkour.getLevelManager().getEnabledLeaderboards().add(levelName);
     }
 
     private void startScheduler(Plugin plugin) {

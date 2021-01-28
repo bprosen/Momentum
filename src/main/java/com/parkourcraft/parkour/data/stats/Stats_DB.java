@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perks_DB;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,13 +117,21 @@ public class Stats_DB {
     }
 
     public static void insertCompletion(PlayerStats playerStats, LevelObject level, LevelCompletion levelCompletion) {
+        Long time = levelCompletion.getCompletionTimeElapsed();
+
+        if (!level.getLeaderboard().isEmpty() &&
+            playerStats.getQuickestCompletions(level.getName()).get(0).getCompletionTimeElapsed()
+            < levelCompletion.getCompletionTimeElapsed()) {
+
+            time = 0L;
+        }
         Parkour.getDatabaseManager().add(
                 "INSERT INTO completions " +
                         "(player_id, level_id, time_taken, completion_date)" +
                         " VALUES (" +
                         playerStats.getPlayerID() + ", " +
                         level.getID() + ", " +
-                        levelCompletion.getCompletionTimeElapsed() + ", " +
+                        time + ", " +
                         "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
                         ")"
         );
@@ -151,9 +160,10 @@ public class Stats_DB {
     }
 
     public static void loadLeaderboards() {
-        for (LevelObject levelObject : Parkour.getLevelManager().getLevels()) {
-            if (Parkour.getLevelManager().getEnabledLeaderboards().contains(levelObject.getName()))
-            loadLeaderboard(levelObject);
+        for (String levelName : Parkour.getLevelManager().getEnabledLeaderboards()) {
+            LevelObject levelObject = Parkour.getLevelManager().get(levelName);
+            if (levelObject != null)
+                loadLeaderboard(levelObject);
         }
     }
 
@@ -175,7 +185,7 @@ public class Stats_DB {
         List<LevelCompletion> levelCompletions = new ArrayList<>();
 
         for (Map<String, String> levelResult : levelsResults) {
-            LevelCompletion levelCompletion =  new LevelCompletion(
+            LevelCompletion levelCompletion = new LevelCompletion(
                     Long.parseLong(levelResult.get("date")),
                     Long.parseLong(levelResult.get("time_taken"))
             );

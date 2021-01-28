@@ -2,11 +2,14 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,6 +18,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.List;
 
 public class LevelListener implements Listener {
 
@@ -26,7 +31,7 @@ public class LevelListener implements Listener {
             Location playerLocation = player.getLocation();
 
             if (!LevelHandler.locationInIgnoreArea(playerLocation)) {
-                String levelName = LevelHandler.getLocationLevelName(playerLocation);
+                String levelName = LevelHandler.getLocationLevelName(player, playerLocation);
 
                 if (levelName != null)
                     LevelHandler.respawnPlayerToStart(player, levelName);
@@ -46,7 +51,7 @@ public class LevelListener implements Listener {
                 Player player = event.getPlayer();
 
                 if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
-                    String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+                    String levelName = LevelHandler.getLocationLevelName(player, player.getLocation());
 
                     if (levelName != null)
                         LevelHandler.levelCompletion(player, levelName);
@@ -67,7 +72,7 @@ public class LevelListener implements Listener {
             Player player = event.getPlayer();
 
             if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
-                String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+                String levelName = LevelHandler.getLocationLevelName(player, player.getLocation());
 
                 if (levelName != null)
                     LevelHandler.startedLevel(player);
@@ -82,7 +87,7 @@ public class LevelListener implements Listener {
             Player player = event.getPlayer();
 
             if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
-                String levelName = LevelHandler.getLocationLevelName(player.getLocation());
+                String levelName = LevelHandler.getLocationLevelName(player, player.getLocation());
 
                 if (levelName != null)
                     LevelHandler.startedLevel(player);
@@ -92,9 +97,21 @@ public class LevelListener implements Listener {
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
-        PlayerStats playerStats = Parkour.getStatsManager().get(event.getPlayer());
+        Player player = event.getPlayer();
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (playerStats != null && playerStats.getPlayerToSpectate() == null)
             playerStats.disableLevelStartTime();
+
+        List<String> getToRegions = WorldGuardUtils.getRegions(event.getTo());
+        if (getToRegions.isEmpty()) {
+            if (WorldGuardUtils.getPlayerRegionMap().containsKey(player.getName())) {
+                WorldGuardUtils.getPlayerRegionMap().remove(player.getName());
+                return;
+            } else {
+                return;
+            }
+        }
+        WorldGuardUtils.getPlayerRegionMap().put(player.getName(), getToRegions.get(0));
     }
 }

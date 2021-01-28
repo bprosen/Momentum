@@ -1,8 +1,10 @@
 package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -16,7 +18,6 @@ public class LevelManager {
         this.levelDataCache = Levels_DB.getDataCache();
 
         load(); // Loads levels from configuration
-
         startScheduler(plugin);
     }
 
@@ -47,14 +48,14 @@ public class LevelManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+        new BukkitRunnable() {
             public void run() {
                 if (Levels_DB.syncLevelData()) {
                     setLevelDataCache(Levels_DB.getDataCache());
                     Levels_DB.syncDataCache();
                 }
             }
-        }, 0L, 10L);
+        }.runTaskTimerAsynchronously(plugin, 0, 10);
     }
 
     void setLevelDataCache(Map<String, LevelData> levelDataCache) {

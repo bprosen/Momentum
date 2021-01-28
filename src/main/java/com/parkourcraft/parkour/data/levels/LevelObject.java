@@ -4,7 +4,9 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,6 @@ public class  LevelObject {
 
     public LevelObject(String levelName) {
         this.name = levelName;
-
         load();
     }
 
@@ -134,19 +135,25 @@ public class  LevelObject {
         leaderboardCache = newLeaderboard;
     }
 
-    public void addCompletion(LevelCompletion levelCompletion) {
+    public void addCompletion(Player player, LevelCompletion levelCompletion, LevelObject level) {
         if (totalCompletionsCount < 0)
             totalCompletionsCount = 0;
 
         totalCompletionsCount += 1;
 
-        if (levelCompletion.getCompletionTimeElapsed() <= 0)
-            return;
-
         if (leaderboardCache.isEmpty()) {
             leaderboardCache.add(levelCompletion);
             return;
         }
+        
+        if (Parkour.getStatsManager().get(player).getQuickestCompletions(level.getName()).get(0)
+            .getCompletionTimeElapsed() < levelCompletion.getCompletionTimeElapsed()) {
+            return;
+        }
+
+        if (levelCompletion.getCompletionTimeElapsed() <= 0)
+            return;
+
 
         // Compare completion against scoreboard
         if (leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed()

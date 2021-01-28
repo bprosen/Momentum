@@ -37,7 +37,6 @@ public class Perks_YAML {
     public static List<String> getPermissions(String perkName) {
         if (isSet(perkName, "permissions"))
             return perksConfig.getStringList(perkName + ".permissions");
-
         return new ArrayList<>();
     }
 

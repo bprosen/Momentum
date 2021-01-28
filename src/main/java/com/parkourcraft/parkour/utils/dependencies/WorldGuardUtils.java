@@ -5,14 +5,23 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class WorldGuardUtils {
+public class WorldGuardUtils implements Listener {
+
+    private static HashMap<String, String> inLevelRegions = new HashMap<>();
 
     private static WorldGuardPlugin getWorldGuard() {
         Plugin plugin = Parkour.getPlugin().getServer().getPluginManager().getPlugin("WorldGuard");
@@ -26,16 +35,18 @@ public class WorldGuardUtils {
 
     public static List<String> getRegions(Location location) {
         WorldGuardPlugin guard = getWorldGuard();
-        Vector v = location.toVector();
         RegionManager manager = guard.getRegionManager(location.getWorld());
 
         ApplicableRegionSet regions = manager.getApplicableRegions(location);
-        List<String> regionNames = new ArrayList<String>();
+        List<String> regionName = new ArrayList<>();
 
         for (ProtectedRegion region : regions)
-            regionNames.add(region.getId());
+            regionName.add(region.getId());
 
-        return regionNames;
+        return regionName;
     }
 
+    public static HashMap<String, String> getPlayerRegionMap() {
+        return inLevelRegions;
+    }
 }

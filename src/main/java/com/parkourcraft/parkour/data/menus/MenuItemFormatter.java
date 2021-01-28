@@ -140,15 +140,13 @@ public class MenuItemFormatter {
 
                 List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(levelName);
                 if (bestLevelCompletions.size() > 0) {
-                    itemLore.add(Utils.translate("&7 Top Personal Times"));
+                    itemLore.add(Utils.translate("&7 Best Personal Time"));
 
-                    for (int i = 0; i <= (bestLevelCompletions.size()) - 1 && i <= 2; i++ ) {
-                        double completionTime = ((double) bestLevelCompletions.get(i).getCompletionTimeElapsed()) / 1000;
-                        long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(i).getTimeOfCompletion();
+                    double completionTime = ((double) bestLevelCompletions.get(0).getCompletionTimeElapsed()) / 1000;
+                    long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
 
-                        itemLore.add(Utils.translate("  &2" + completionTime + "s"));
-                        itemLore.add(Utils.translate("   &7" + Time.elapsedShortened(timeSince) + "ago"));
-                    }
+                    itemLore.add(Utils.translate("  &2" + completionTime + "s"));
+                    itemLore.add(Utils.translate("   &7" + Time.elapsedShortened(timeSince) + "ago"));
                 }
             }
             // Sections over
