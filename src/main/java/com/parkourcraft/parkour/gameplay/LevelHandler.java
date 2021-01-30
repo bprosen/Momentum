@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,12 @@ public class LevelHandler {
 
                     // Run gameplay actions: teleport and messaging
                     player.teleport(level.getRespawnLocation());
+                    List<String> getToRegions = WorldGuardUtils.getRegions(level.getRespawnLocation());
+                    if (getToRegions.isEmpty())
+                        Parkour.getLevelManager().removeFromLevelMap(player.getName());
+                    else
+                        Parkour.getLevelManager().addToLevelMap(player.getName(), getToRegions.get(0));
+
                     player.sendMessage(messageFormatted);
                     TitleAPI.sendTitle(
                             player, 10, 40, 10,
@@ -90,12 +97,11 @@ public class LevelHandler {
         }
     }
 
-    static String getLocationLevelName(Player player, Location location) {
-        Map<String, String> levelNamesLower = Parkour.getLevelManager().getNamesLower();
-        String region = WorldGuardUtils.getPlayerRegionMap().get(player.getName());
+    static String getLocationLevelName(Player player) {
+        HashMap<String, String> playersInLevels = Parkour.getLevelManager().getPlayerRegionMap();
 
-        if (levelNamesLower.containsKey(region))
-            return levelNamesLower.get(region);
+        if (playersInLevels.containsKey(player.getName()))
+            return playersInLevels.get(player.getName());
         return null;
     }
 

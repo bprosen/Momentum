@@ -75,8 +75,7 @@ public class MenuItemAction {
         if (level.hasRequiredLevels(playerStats)) {
             player.closeInventory();
             player.teleport(level.getStartLocation());
-            WorldGuardUtils.getPlayerRegionMap().put(player.getName(), level.getName());
-            Bukkit.broadcastMessage(WorldGuardUtils.getPlayerRegionMap().toString());
+            Parkour.getLevelManager().addToLevelMap(player.getName(), level.getName());
 
             player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                + level.getFormattedTitle()));

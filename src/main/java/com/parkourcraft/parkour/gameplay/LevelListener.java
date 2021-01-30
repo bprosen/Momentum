@@ -31,7 +31,7 @@ public class LevelListener implements Listener {
             Location playerLocation = player.getLocation();
 
             if (!LevelHandler.locationInIgnoreArea(playerLocation)) {
-                String levelName = LevelHandler.getLocationLevelName(player, playerLocation);
+                String levelName = LevelHandler.getLocationLevelName(player);
 
                 if (levelName != null)
                     LevelHandler.respawnPlayerToStart(player, levelName);
@@ -41,9 +41,9 @@ public class LevelListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSignClick(PlayerInteractEvent event) {
-        if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK)
-                        || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
-                && event.getClickedBlock().getType().equals(Material.WALL_SIGN)) {
+        if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
+             && event.getClickedBlock().getType().equals(Material.WALL_SIGN)) {
+
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
 
@@ -51,7 +51,7 @@ public class LevelListener implements Listener {
                 Player player = event.getPlayer();
 
                 if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
-                    String levelName = LevelHandler.getLocationLevelName(player, player.getLocation());
+                    String levelName = LevelHandler.getLocationLevelName(player);
 
                     if (levelName != null)
                         LevelHandler.levelCompletion(player, levelName);
@@ -72,7 +72,7 @@ public class LevelListener implements Listener {
             Player player = event.getPlayer();
 
             if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
-                String levelName = LevelHandler.getLocationLevelName(player, player.getLocation());
+                String levelName = LevelHandler.getLocationLevelName(player);
 
                 if (levelName != null)
                     LevelHandler.startedLevel(player);
@@ -87,7 +87,7 @@ public class LevelListener implements Listener {
             Player player = event.getPlayer();
 
             if (!LevelHandler.locationInIgnoreArea(player.getLocation())) {
-                String levelName = LevelHandler.getLocationLevelName(player, player.getLocation());
+                String levelName = LevelHandler.getLocationLevelName(player);
 
                 if (levelName != null)
                     LevelHandler.startedLevel(player);
@@ -102,9 +102,5 @@ public class LevelListener implements Listener {
 
         if (playerStats != null && playerStats.getPlayerToSpectate() == null)
             playerStats.disableLevelStartTime();
-
-        List<String> getToRegions = WorldGuardUtils.getRegions(event.getTo());
-        if (WorldGuardUtils.getPlayerRegionMap().containsKey(player.getName()) && getToRegions.isEmpty())
-            WorldGuardUtils.getPlayerRegionMap().remove(player.getName());
     }
 }

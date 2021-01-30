@@ -145,11 +145,6 @@ public class  LevelObject {
             leaderboardCache.add(levelCompletion);
             return;
         }
-        
-        if (Parkour.getStatsManager().get(player).getQuickestCompletions(level.getName()).get(0)
-            .getCompletionTimeElapsed() < levelCompletion.getCompletionTimeElapsed()) {
-            return;
-        }
 
         if (levelCompletion.getCompletionTimeElapsed() <= 0)
             return;

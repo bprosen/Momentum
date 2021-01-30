@@ -115,20 +115,14 @@ public class Stats_DB {
     }
 
     public static void insertCompletion(PlayerStats playerStats, LevelObject level, LevelCompletion levelCompletion) {
-        Long time = levelCompletion.getCompletionTimeElapsed();
 
-        if (!level.getLeaderboard().isEmpty() &&
-            playerStats.getQuickestCompletions(level.getName()).get(0).getCompletionTimeElapsed()
-            < levelCompletion.getCompletionTimeElapsed()) {
-            time = 0L;
-        }
         Parkour.getDatabaseManager().add(
                 "INSERT INTO completions " +
                         "(player_id, level_id, time_taken, completion_date)" +
                         " VALUES (" +
                         playerStats.getPlayerID() + ", " +
                         level.getID() + ", " +
-                        time + ", " +
+                        levelCompletion.getCompletionTimeElapsed() + ", " +
                         "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
                         ")"
         );

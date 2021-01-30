@@ -21,8 +21,6 @@ import java.util.Map;
 
 public class WorldGuardUtils implements Listener {
 
-    private static HashMap<String, String> inLevelRegions = new HashMap<>();
-
     private static WorldGuardPlugin getWorldGuard() {
         Plugin plugin = Parkour.getPlugin().getServer().getPluginManager().getPlugin("WorldGuard");
 
@@ -44,9 +42,5 @@ public class WorldGuardUtils implements Listener {
             regionName.add(region.getId());
 
         return regionName;
-    }
-
-    public static HashMap<String, String> getPlayerRegionMap() {
-        return inLevelRegions;
     }
 }

@@ -20,8 +20,7 @@ public class Level_CMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (sender.isOp()
-                || !(sender instanceof  Player)) {
+        if (sender.isOp() || !(sender instanceof  Player)) {
             if (a.length == 0) {
                 sendHelp(sender);
             } else {
@@ -37,9 +36,11 @@ public class Level_CMD implements CommandExecutor {
                                        Parkour.getLevelManager().getNames())));
                 } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
                     if (a.length == 2) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
-                        if (Parkour.getLevelManager().exists(levelName))
+                        if (levelName.contains("'"))
+                            sender.sendMessage(Utils.translate("&7Please do not use ' ..."));
+                        else if (Parkour.getLevelManager().exists(levelName))
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7already exists"));
                         else {
                             Levels_YAML.create(levelName);
@@ -51,7 +52,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("delete")) { // subcommand: delete
                     if (a.length == 2) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (!Parkour.getLevelManager().exists(levelName))
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
@@ -71,7 +72,7 @@ public class Level_CMD implements CommandExecutor {
                                        Parkour.getLevelManager().getNames().size() + " &7total"));
                 } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (Parkour.getLevelManager().exists(levelName)) {
                             if (a.length > 2) {
@@ -96,7 +97,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
                         LevelObject level = Parkour.getLevelManager().get(levelName);
 
                         if (level != null) {
@@ -124,7 +125,7 @@ public class Level_CMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("startloc"));
                     } else {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (Parkour.getLevelManager().exists(levelName)) {
                             if (sender instanceof Player) {
@@ -150,7 +151,7 @@ public class Level_CMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("completionloc"));
                     } else {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (Parkour.getLevelManager().exists(levelName)) {
                             if (a.length > 2) {
@@ -190,7 +191,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("message")) { //subcommand: message
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (Parkour.getLocationManager().exists(levelName)) {
                             if (a.length > 2) {
@@ -215,7 +216,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("completions")) { //subcommand: completions
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (Parkour.getLevelManager().exists(levelName)) {
                             if (a.length == 3) {
@@ -239,7 +240,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("broadcast")) { //subcommand: broadcast
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
 
                         if (Parkour.getLevelManager().exists(levelName)) {
                             boolean broadcastSetting = Levels_YAML.getBroadcastSetting(levelName);
@@ -256,7 +257,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("requires")) { //subcommand: requires
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
                         LevelObject level = Parkour.getLevelManager().get(levelName);
 
                         if (level != null) {
@@ -290,7 +291,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("removetime") && a.length == 3) {
 
-                    String levelName = a[1];
+                    String levelName = a[1].toLowerCase();
                     LevelObject levelObject = Parkour.getLevelManager().get(levelName);
 
                     if (Utils.isInteger(a[2])) {
@@ -328,7 +329,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("modifier")) { //subcommand: modifier
                     if (a.length > 1) {
-                        String levelName = a[1];
+                        String levelName = a[1].toLowerCase();
                         LevelObject level = Parkour.getLevelManager().get(levelName);
 
                         if (level != null) {
@@ -356,7 +357,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("addleaderboard")) {
 
-                    String levelName = a[1];
+                    String levelName = a[1].toLowerCase();
 
                     if (Parkour.getLevelManager().exists(levelName)) {
                         if (!Parkour.getLevelManager().getEnabledLeaderboards().contains(levelName)) {
@@ -376,7 +377,7 @@ public class Level_CMD implements CommandExecutor {
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("removeleaderboard")) {
 
-                    String levelName = a[1];
+                    String levelName = a[1].toLowerCase();
 
                     if (Parkour.getLevelManager().exists(levelName)) {
                         if (Parkour.getLevelManager().getEnabledLeaderboards().contains(levelName)) {
@@ -406,7 +407,7 @@ public class Level_CMD implements CommandExecutor {
 
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&aTo apply changes use &2/level load"));
-        sender.sendMessage(Utils.translate("&7Level names are case sensitive"));
+        sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
         sender.sendMessage(getHelp("list"));
         sender.sendMessage(getHelp("load"));
         sender.sendMessage(getHelp("remove"));
