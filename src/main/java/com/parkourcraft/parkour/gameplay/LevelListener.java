@@ -104,14 +104,7 @@ public class LevelListener implements Listener {
             playerStats.disableLevelStartTime();
 
         List<String> getToRegions = WorldGuardUtils.getRegions(event.getTo());
-        if (getToRegions.isEmpty()) {
-            if (WorldGuardUtils.getPlayerRegionMap().containsKey(player.getName())) {
-                WorldGuardUtils.getPlayerRegionMap().remove(player.getName());
-                return;
-            } else {
-                return;
-            }
-        }
-        WorldGuardUtils.getPlayerRegionMap().put(player.getName(), getToRegions.get(0));
+        if (WorldGuardUtils.getPlayerRegionMap().containsKey(player.getName()) && getToRegions.isEmpty())
+            WorldGuardUtils.getPlayerRegionMap().remove(player.getName());
     }
 }

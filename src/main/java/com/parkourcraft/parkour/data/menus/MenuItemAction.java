@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -74,6 +75,8 @@ public class MenuItemAction {
         if (level.hasRequiredLevels(playerStats)) {
             player.closeInventory();
             player.teleport(level.getStartLocation());
+            WorldGuardUtils.getPlayerRegionMap().put(player.getName(), level.getName());
+            Bukkit.broadcastMessage(WorldGuardUtils.getPlayerRegionMap().toString());
 
             player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                + level.getFormattedTitle()));
