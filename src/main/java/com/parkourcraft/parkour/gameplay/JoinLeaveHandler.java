@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,6 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.List;
+import java.util.UUID;
 
 public class JoinLeaveHandler implements Listener {
 
@@ -29,11 +31,23 @@ public class JoinLeaveHandler implements Listener {
     }
 
     @EventHandler
+    public void onAsyncJoin(AsyncPlayerPreLoginEvent event) {
+
+        UUID uuid = event.getUniqueId();
+
+        if (Checkpoint_DB.hasCheckpoint(uuid))
+            Checkpoint_DB.loadPlayer(uuid);
+    }
+
+    @EventHandler
     public void onQuit(PlayerQuitEvent event) {
 
         Player player = event.getPlayer();
 
         if (Parkour.getLevelManager().getPlayerRegionMap().containsKey(player.getName()))
             Parkour.getLevelManager().removeFromLevelMap(player.getName());
+
+        if (Parkour.getCheckpointManager().contains(player))
+            Checkpoint_DB.savePlayer(player);
     }
 }

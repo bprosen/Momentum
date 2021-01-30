@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.storage.mysql;
 import com.parkourcraft.parkour.Parkour;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -92,4 +93,18 @@ public class DatabaseManager {
         }
     }
 
+    public void asyncRun(String sql) {
+        new BukkitRunnable() {
+            public void run() {
+                try {
+                    PreparedStatement statement = connection.get().prepareStatement(sql);
+                    statement.execute();
+                    statement.close();
+                } catch (SQLException e) {
+                    Parkour.getPluginLogger().severe("ERROR: SQL Failed to asyncRun query: " + sql);
+                    e.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
+    }
 }

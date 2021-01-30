@@ -1,7 +1,9 @@
 package com.parkourcraft.parkour;
 
 import com.parkourcraft.parkour.commands.*;
+import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.clans.ClansManager;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointManager;
 import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.menus.MenuManager;
@@ -33,7 +35,7 @@ public class Parkour extends JavaPlugin {
     private static StatsManager stats;
     private static ClansManager clans;
     private static MenuManager menus;
-
+    private static CheckpointManager checkpoint;
     private static Economy economy;
     private static SpectatorManager spectator;
     // Pending recode for SpectatorManager
@@ -46,11 +48,7 @@ public class Parkour extends JavaPlugin {
 
         registerEvents();
         registerCommands();
-
-        configs = new ConfigManager(plugin);
-        database = new DatabaseManager(plugin);
-
-        loadData();
+        loadClasses();
 
         if (!Vault.setupEconomy()) { // vault setup
             getServer().getPluginManager().disablePlugin(this);
@@ -65,11 +63,9 @@ public class Parkour extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        unloadData();
-
-        configs = null;
+        Checkpoint_DB.saveOnlinePlayers();
         database.close();
-        database = null;
+        unloadClasses();
 
         plugin = null;
     }
@@ -93,9 +89,12 @@ public class Parkour extends JavaPlugin {
         getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
     }
 
-    private static void loadData() {
+    private static void loadClasses() {
+        configs = new ConfigManager(plugin);
         settings = new SettingsManager(configs.get("settings"));
         locations = new LocationManager();
+        checkpoint = new CheckpointManager();
+        database = new DatabaseManager(plugin);
         levels = new LevelManager(plugin);
         perks = new PerkManager(plugin);
         stats = new StatsManager(plugin);
@@ -104,8 +103,9 @@ public class Parkour extends JavaPlugin {
         spectator = new SpectatorManager(plugin);
     }
 
-    private static void unloadData() {
+    private static void unloadClasses() {
         menus = null;
+        checkpoint = null;
         clans = null;
         stats = null;
         perks = null;
@@ -113,6 +113,8 @@ public class Parkour extends JavaPlugin {
         locations = null;
         settings = null;
         spectator = null;
+        configs = null;
+        database = null;
     }
 
     public static Plugin getPlugin() {
@@ -157,6 +159,6 @@ public class Parkour extends JavaPlugin {
     public static SpectatorManager getSpectatorManager() {
         return spectator;
     }
-
+    public static CheckpointManager getCheckpointManager() { return checkpoint; }
     public static void setEconomy(Economy eco) { economy = eco; }
 }

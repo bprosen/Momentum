@@ -28,6 +28,9 @@ public class Tables_DB {
 
         if (!tableNames.contains("completions"))
             createCompletions(database);
+
+        if (!tableNames.contains("checkpoints"))
+            createCheckpoints(database);
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -113,4 +116,16 @@ public class Tables_DB {
         database.run(sqlQuery);
     }
 
+    private static void createCheckpoints(DatabaseManager database) {
+        String sqlQuery = "CREATE TABLE checkpoints(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "player_name VARCHAR(16) NOT NULL, " +
+                "world VARCHAR(15) NOT NULL, " +
+                "x INT NOT NULL, " +
+                "y INT NOT NULL, " +
+                "z INT NOT NULL" +
+                ")";
+
+        database.run(sqlQuery);
+    }
 }

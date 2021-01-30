@@ -8,6 +8,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
+import com.sk89q.commandbook.locations.TeleportSession;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -71,6 +72,9 @@ public class LevelHandler {
                     else
                         Parkour.getLevelManager().addToLevelMap(player.getName(), getToRegions.get(0));
 
+                    if (Parkour.getCheckpointManager().contains(player))
+                        Parkour.getCheckpointManager().removePlayer(player);
+
                     player.sendMessage(messageFormatted);
                     TitleAPI.sendTitle(
                             player, 10, 40, 10,
@@ -105,7 +109,8 @@ public class LevelHandler {
         return null;
     }
 
-    static boolean locationInIgnoreArea(Location location) {
+    // No idea what this is for
+    /*static boolean locationInIgnoreArea(Location location) {
         List<String> regionNames = WorldGuardUtils.getRegions(location);
         Map<String, String> levelNamesLower = Parkour.getLevelManager().getNamesLower();
 
@@ -120,14 +125,14 @@ public class LevelHandler {
         }
 
         return inIgnoreArea;
-    }
+    }*/
 
-    static void respawnPlayerToStart(Player player, String levelName) {
-        LevelObject level = Parkour.getLevelManager().get(levelName);
+    // Respawn player if checkpoint isn't there
+    static void respawnPlayer(Player player, LevelObject level) {
+        Location loc = level.getStartLocation();
 
-        if (level != null
-                && level.getStartLocation() != null)
-            player.teleport(level.getStartLocation());
+        if (level != null && loc != null)
+            player.teleport(loc);
     }
 
     static void startedLevel(Player player) {

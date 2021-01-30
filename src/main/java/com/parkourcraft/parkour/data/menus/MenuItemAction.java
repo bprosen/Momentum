@@ -49,19 +49,18 @@ public class MenuItemAction {
         Perk perk = Parkour.getPerkManager().get(menuItem.getTypeValue());
 
         if (perk != null) {
-            PlayerStats playerStas = Parkour.getStatsManager().get(player);
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (menuItem.hasCommands()
-                    && perk.hasRequirements(playerStas, player)) {
+            if (menuItem.hasCommands() && perk.hasRequirements(playerStats, player)) {
                 player.closeInventory();
                 runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
-            } else if (!playerStas.hasPerk(perk.getName())
+            } else if (!playerStats.hasPerk(perk.getName())
                     && perk.getPrice() > 0) {
                 int playerBalance = (int) Parkour.getEconomy().getBalance(player);
 
                 if (playerBalance > perk.getPrice()) {
                     Parkour.getEconomy().withdrawPlayer(player, perk.getPrice());
-                    Parkour.getPerkManager().bought(playerStas, perk);
+                    Parkour.getPerkManager().bought(playerStats, perk);
                     Parkour.getMenuManager().updateInventory(player, player.getOpenInventory());
                 }
             }
@@ -76,6 +75,9 @@ public class MenuItemAction {
             player.closeInventory();
             player.teleport(level.getStartLocation());
             Parkour.getLevelManager().addToLevelMap(player.getName(), level.getName());
+
+            if (Parkour.getCheckpointManager().contains(player))
+                Parkour.getCheckpointManager().removePlayer(player);
 
             player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                + level.getFormattedTitle()));
