@@ -138,8 +138,7 @@ public class LevelHandler {
     static void startedLevel(Player player) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        if (playerStats != null
-                && playerStats.getPlayerToSpectate() == null) {
+        if (playerStats != null && playerStats.getPlayerToSpectate() == null) {
             LevelHandler.clearPotionEffects(player);
             playerStats.startedLevel();
         }

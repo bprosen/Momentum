@@ -2,7 +2,9 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
+import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +27,7 @@ public class JoinLeaveHandler implements Listener {
         if (!regions.isEmpty())
             Parkour.getLevelManager().addToLevelMap(player.getName(), regions.get(0));
 
+        PlayerHider.hideHiddenPlayersFromJoined(player);
         //
         // Pending recode
         // Parkour.ghostFactory.addPlayer(event.getPlayer());
@@ -48,6 +51,9 @@ public class JoinLeaveHandler implements Listener {
             Parkour.getLevelManager().removeFromLevelMap(player.getName());
 
         if (Parkour.getCheckpointManager().contains(player))
-            Checkpoint_DB.savePlayer(player);
+            Checkpoint_DB.savePlayerAsync(player);
+
+        if (PlayerHider.containsPlayer(player))
+            PlayerHider.removeHiddenPlayer(player);
     }
 }

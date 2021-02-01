@@ -103,14 +103,14 @@ public class MenuItemAction {
         Menu menu = Parkour.getMenuManager().getMenuFromStartingChars(menuItem.getTypeValue());
 
         if (menu != null) {
-            int pageeNumber = Utils.getTrailingInt(menuItem.getTypeValue());
+            int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
 
-            Inventory inventory = Parkour.getMenuManager().getInventory(menu.getName(), pageeNumber);
+            Inventory inventory = Parkour.getMenuManager().getInventory(menu.getName(), pageNumber);
 
             if (inventory != null) {
                 player.closeInventory();
                 player.openInventory(inventory);
-                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageeNumber);
+                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
             }
         }
     }

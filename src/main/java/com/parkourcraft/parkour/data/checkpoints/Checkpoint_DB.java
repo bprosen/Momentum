@@ -34,26 +34,52 @@ public class Checkpoint_DB {
         }
 
         if (playerName != null && worldName != null) {
-            Parkour.getCheckpointManager().addPlayer(playerName,
-                    new Location(Bukkit.getWorld(worldName), x, y, z));
+            Parkour.getCheckpointManager().addPlayer(playerName, new Location(Bukkit.getWorld(worldName), x, y, z));
             Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid.toString() + "'");
         }
     }
 
+
     public static void savePlayer(Player player) {
+
+        Location loc = Parkour.getCheckpointManager().get(player);
+
+        Parkour.getDatabaseManager().run("INSERT INTO checkpoints " +
+                "(uuid, player_name, world, x, y, z)" +
+                " VALUES ('" +
+                player.getUniqueId().toString() + "','" +
+                player.getName() + "','" +
+                loc.getWorld().getName() + "','" +
+                loc.getBlockX() + "','" +
+                loc.getBlockY() + "','" +
+                loc.getBlockZ() +
+                "')"
+        );
+    }
+    public static void savePlayerAsync(Player player) {
+
+        Location loc = Parkour.getCheckpointManager().get(player);
 
         Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
                 "(uuid, player_name, world, x, y, z)" +
                 " VALUES ('" +
-                player.getUniqueId().toString() + "',' " +
-                player.getName() + "',' " +
-                player.getWorld().getName() + "',' " +
-                player.getLocation().getBlockX() + "',' " +
-                player.getLocation().getBlockY() + "',' " +
-                player.getLocation().getBlockZ() +
+                player.getUniqueId().toString() + "','" +
+                player.getName() + "','" +
+                loc.getWorld().getName() + "','" +
+                loc.getBlockX() + "','" +
+                loc.getBlockY() + "','" +
+                loc.getBlockZ() +
                 "')"
         );
+
         Parkour.getCheckpointManager().removePlayer(player);
+    }
+
+    public static void saveAllPlayers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (Parkour.getCheckpointManager().contains(player))
+                savePlayer(player);
+        }
     }
 
     public static boolean hasCheckpoint(UUID uuid) {
@@ -67,22 +93,5 @@ public class Checkpoint_DB {
         if (!levelsResults.isEmpty())
             return true;
         return false;
-    }
-
-    public static void saveOnlinePlayers() {
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Parkour.getDatabaseManager().run( "INSERT INTO checkpoints " +
-                    "(uuid, player_name, world, x, y, z)" +
-                    " VALUES ('" +
-                    player.getUniqueId().toString() + "',' " +
-                    player.getName() + "',' " +
-                    player.getWorld().getName() + "',' " +
-                    player.getLocation().getBlockX() + "',' " +
-                    player.getLocation().getBlockY() + "',' " +
-                    player.getLocation().getBlockZ() +
-                    "')"
-            );
-        }
     }
 }

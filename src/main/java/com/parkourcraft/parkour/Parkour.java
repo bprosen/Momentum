@@ -63,7 +63,7 @@ public class Parkour extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Checkpoint_DB.saveOnlinePlayers();
+        Checkpoint_DB.saveAllPlayers();
         database.close();
         unloadClasses();
 
@@ -87,6 +87,7 @@ public class Parkour extends JavaPlugin {
         getCommand("spectate").setExecutor(new Spectate_CMD());
         getCommand("clan").setExecutor(new Clan_CMD());
         getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
+        getCommand("toggleplayers").setExecutor(new PlayerToggle_CMD());
     }
 
     private static void loadClasses() {

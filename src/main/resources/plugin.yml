@@ -30,3 +30,5 @@ commands:
     aliases: [clans]
   pc-parkour:
     description: "Parkour"
+  toggleplayers:
+    description: "PC-Parkour Player Toggling Command"
