@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class  LevelObject {
     private List<String> requiredLevels;
     private int ID = -1;
     private int scoreModifier = 1;
+    private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private int totalCompletionsCount = -1;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
@@ -199,10 +201,9 @@ public class  LevelObject {
                 message = Parkour.getSettingsManager().levels_message_completion;
 
             maxCompletions = Levels_YAML.getMaxCompletions(name);
-
             broadcastCompletion = Levels_YAML.getBroadcastSetting(name);
-
             requiredLevels = Levels_YAML.getRequiredLevels(name);
+            potionEffects = Levels_YAML.getPotionEffects(name);
         }
     }
 
@@ -216,6 +217,10 @@ public class  LevelObject {
 
     public List<String> getRequiredLevels() {
         return requiredLevels;
+    }
+
+    public List<PotionEffect> getPotionEffects() {
+        return potionEffects;
     }
 
     public boolean hasRequiredLevels(PlayerStats playerStats) {

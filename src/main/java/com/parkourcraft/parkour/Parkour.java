@@ -88,6 +88,7 @@ public class Parkour extends JavaPlugin {
         getCommand("clan").setExecutor(new Clan_CMD());
         getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
         getCommand("toggleplayers").setExecutor(new PlayerToggle_CMD());
+        getCommand("checkpoint").setExecutor(new Checkpoint_CMD());
     }
 
     private static void loadClasses() {

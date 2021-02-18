@@ -2,6 +2,8 @@ package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,10 @@ public class Levels_YAML {
 
     public static boolean isSet(String levelName, String valueName) {
         return levelsFile.isSet(levelName + "." + valueName);
+    }
+
+    public static boolean isSection(String levelName, String valueName) {
+        return levelsFile.isConfigurationSection(levelName + "." + valueName);
     }
 
     public static void create(String levelName) {
@@ -124,4 +130,29 @@ public class Levels_YAML {
         return false;
     }
 
+    public static List<PotionEffect> getPotionEffects(String levelName) {
+        List<PotionEffect> potionEffects = new ArrayList<>();
+
+        if (isSection(levelName, "potion-effects")) {
+            for (int i = 1;; i++) {
+                if (Parkour.getConfigManager().get("levels").isConfigurationSection(
+                        levelName + ".potion-effects." + i)) {
+
+                    String potionType = Parkour.getConfigManager().get("levels").getString(
+                            levelName + ".potion-effects." + i + ".type");
+                    int amplifier = Parkour.getConfigManager().get("levels").getInt(
+                            levelName + ".potion-effects." + i + ".amplifier");
+                    int duration = Parkour.getConfigManager().get("levels").getInt(
+                            levelName + ".potion-effects." + i + ".duration");
+
+                    potionEffects.add(
+                            new PotionEffect(
+                                    PotionEffectType.getByName(potionType), duration * 20, amplifier));
+                } else {
+                    break;
+                }
+            }
+        }
+        return potionEffects;
+    }
 }

@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -73,11 +75,20 @@ public class MenuItemAction {
 
         if (level.hasRequiredLevels(playerStats)) {
             player.closeInventory();
+
+            for (PotionEffect potionEffect : player.getActivePotionEffects())
+                player.removePotionEffect(potionEffect.getType());
+
             player.teleport(level.getStartLocation());
             Parkour.getLevelManager().addToLevelMap(player.getName(), level.getName());
 
             if (Parkour.getCheckpointManager().contains(player))
                 Parkour.getCheckpointManager().removePlayer(player);
+
+            if (!level.getPotionEffects().isEmpty()) {
+                for (PotionEffect potionEffect : level.getPotionEffects())
+                    player.addPotionEffect(potionEffect);
+            }
 
             player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                + level.getFormattedTitle()));
