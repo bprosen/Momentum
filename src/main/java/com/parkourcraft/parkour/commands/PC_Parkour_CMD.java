@@ -19,5 +19,4 @@ public class PC_Parkour_CMD implements CommandExecutor {
         }
         return true;
     }
-
 }

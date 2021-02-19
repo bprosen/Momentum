@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.utils.Utils;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,8 +31,16 @@ public class Checkpoint_CMD implements CommandExecutor {
 
     private void teleportPlayerToCheckpoint(Player player) {
         if (Parkour.getStatsManager().get(player).getCheckpoint() != null) {
-            Parkour.getCheckpointManager().teleportPlayer(player);
-            player.sendMessage(Utils.translate("&eYou have been teleported to your checkpoint"));
+
+            if (!WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
+
+                Parkour.getCheckpointManager().teleportPlayer(player);
+                player.sendMessage(Utils.translate("&eYou have been teleported to your checkpoint"));
+
+            } else {
+                player.sendMessage(Utils.translate("&cYou cannot teleport to your checkpoint here"));
+            }
+
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
         }
