@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +21,8 @@ public class JoinLeaveHandler implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        // Add to playerStats map (Async)
+        UUID uuid = player.getUniqueId();
+
         Parkour.getStatsManager().add(player);
 
         List<String> regions = WorldGuardUtils.getRegions(player.getLocation());
@@ -28,18 +30,17 @@ public class JoinLeaveHandler implements Listener {
             Parkour.getLevelManager().addToLevelMap(player.getName(), regions.get(0));
 
         PlayerHider.hideHiddenPlayersFromJoined(player);
+
+        // run async
+        new BukkitRunnable() {
+            public void run() {
+                if (Checkpoint_DB.hasCheckpoint(uuid))
+                    Checkpoint_DB.loadPlayer(uuid);
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
         //
         // Pending recode
         // Parkour.ghostFactory.addPlayer(event.getPlayer());
-    }
-
-    @EventHandler
-    public void onAsyncJoin(AsyncPlayerPreLoginEvent event) {
-
-        UUID uuid = event.getUniqueId();
-
-        if (Checkpoint_DB.hasCheckpoint(uuid))
-            Checkpoint_DB.loadPlayer(uuid);
     }
 
     @EventHandler
@@ -50,7 +51,7 @@ public class JoinLeaveHandler implements Listener {
         if (Parkour.getLevelManager().getPlayerRegionMap().containsKey(player.getName()))
             Parkour.getLevelManager().removeFromLevelMap(player.getName());
 
-        if (Parkour.getCheckpointManager().contains(player))
+        if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
             Checkpoint_DB.savePlayerAsync(player);
 
         if (PlayerHider.containsPlayer(player))

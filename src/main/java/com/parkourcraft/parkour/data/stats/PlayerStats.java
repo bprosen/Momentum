@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.data.clans.Clan;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -15,12 +16,12 @@ public class PlayerStats {
     private boolean spectatable;
     private PlayerStats playerToSpectate;
     private Clan clan;
-
+    private Location currentCheckpoint = null;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
     public PlayerStats(Player player) {
-        this.player  = player;
+        this.player = player;
         this.UUID = player.getUniqueId().toString();
         this.playerName = player.getName();
     }
@@ -148,5 +149,16 @@ public class PlayerStats {
 
     public boolean hasPerk(String perkName) {
         return perks.containsKey(perkName);
+    }
+
+    public void setCheckpoint(Location loc) {
+        currentCheckpoint = loc;
+    }
+
+    public Location getCheckpoint() { return currentCheckpoint; }
+
+    public void resetCheckpoint() {
+        if (currentCheckpoint != null)
+            currentCheckpoint = null;
     }
 }

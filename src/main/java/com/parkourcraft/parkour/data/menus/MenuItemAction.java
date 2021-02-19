@@ -82,8 +82,7 @@ public class MenuItemAction {
             player.teleport(level.getStartLocation());
             Parkour.getLevelManager().addToLevelMap(player.getName(), level.getName());
 
-            if (Parkour.getCheckpointManager().contains(player))
-                Parkour.getCheckpointManager().removePlayer(player);
+            Parkour.getStatsManager().get(player).resetCheckpoint();
 
             if (!level.getPotionEffects().isEmpty()) {
                 for (PotionEffect potionEffect : level.getPotionEffects())

@@ -34,7 +34,7 @@ public class Checkpoint_DB {
         }
 
         if (playerName != null && worldName != null) {
-            Parkour.getCheckpointManager().addPlayer(playerName, new Location(Bukkit.getWorld(worldName), x, y, z));
+            Parkour.getStatsManager().get(uuid.toString()).setCheckpoint(new Location(Bukkit.getWorld(worldName), x, y, z));
             Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid.toString() + "'");
         }
     }
@@ -42,7 +42,7 @@ public class Checkpoint_DB {
 
     public static void savePlayer(Player player) {
 
-        Location loc = Parkour.getCheckpointManager().get(player);
+        Location loc = Parkour.getStatsManager().get(player).getCheckpoint();
 
         Parkour.getDatabaseManager().run("INSERT INTO checkpoints " +
                 "(uuid, player_name, world, x, y, z)" +
@@ -58,7 +58,7 @@ public class Checkpoint_DB {
     }
     public static void savePlayerAsync(Player player) {
 
-        Location loc = Parkour.getCheckpointManager().get(player);
+        Location loc = Parkour.getStatsManager().get(player).getCheckpoint();
 
         Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
                 "(uuid, player_name, world, x, y, z)" +
@@ -72,12 +72,12 @@ public class Checkpoint_DB {
                 "')"
         );
 
-        Parkour.getCheckpointManager().removePlayer(player);
+        Parkour.getStatsManager().get(player).resetCheckpoint();
     }
 
     public static void saveAllPlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (Parkour.getCheckpointManager().contains(player))
+            if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
                 savePlayer(player);
         }
     }

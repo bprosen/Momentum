@@ -93,7 +93,6 @@ public class StatsManager {
     public void add(Player player) {
         if (!exists(player.getUniqueId().toString())) {
             PlayerStats playerStats = new PlayerStats(player);
-
             playerStatsList.add(playerStats);
         }
     }

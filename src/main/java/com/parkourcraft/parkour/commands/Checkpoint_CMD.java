@@ -29,7 +29,7 @@ public class Checkpoint_CMD implements CommandExecutor {
     }
 
     private void teleportPlayerToCheckpoint(Player player) {
-        if (Parkour.getCheckpointManager().contains(player)) {
+        if (Parkour.getStatsManager().get(player).getCheckpoint() != null) {
             Parkour.getCheckpointManager().teleportPlayer(player);
             player.sendMessage(Utils.translate("&eYou have been teleported to your checkpoint"));
         } else {

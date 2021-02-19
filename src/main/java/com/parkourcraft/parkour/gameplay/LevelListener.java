@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.gameplay;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,7 +29,7 @@ public class LevelListener implements Listener {
         if (event.getTo().getBlock().isLiquid()) {
             String levelName = LevelHandler.getLocationLevelName(player);
             if (levelName != null) {
-                if (Parkour.getCheckpointManager().contains(player))
+                if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
                     Parkour.getCheckpointManager().teleportPlayer(player);
                 else
                     LevelHandler.respawnPlayer(player, Parkour.getLevelManager().get(levelName));
@@ -53,19 +54,22 @@ public class LevelListener implements Listener {
         // Checkpoint
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.GOLD_PLATE)) {
 
-            CheckpointManager checkpointManager = Parkour.getCheckpointManager();
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
             String levelName = LevelHandler.getLocationLevelName(player);
 
             if (levelName != null) {
-                if (checkpointManager.contains(player)) {
+                if (playerStats.getCheckpoint() != null) {
 
-                    int blockX = checkpointManager.get(player).getBlockX();
-                    int blockZ = checkpointManager.get(player).getBlockZ();
+                    int blockX = playerStats.getCheckpoint().getBlockX();
+                    int blockZ = playerStats.getCheckpoint().getBlockZ();
 
-                    if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ()))
-                        checkpointManager.setCheckpoint(player, block.getLocation());
+                    if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
+                        playerStats.setCheckpoint(block.getLocation());
+                        player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
+                    }
                 } else {
-                    checkpointManager.setCheckpoint(player, block.getLocation());
+                    playerStats.setCheckpoint(block.getLocation());
+                    player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
                 }
             }
         }
@@ -102,7 +106,7 @@ public class LevelListener implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        if (playerStats != null && playerStats.getPlayerToSpectate() == null && !Parkour.getCheckpointManager().contains(player))
+        if (playerStats != null && playerStats.getPlayerToSpectate() == null && playerStats.getCheckpoint() == null)
             playerStats.disableLevelStartTime();
     }
 }

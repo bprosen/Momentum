@@ -72,8 +72,7 @@ public class LevelHandler {
                     else
                         Parkour.getLevelManager().addToLevelMap(player.getName(), getToRegions.get(0));
 
-                    if (Parkour.getCheckpointManager().contains(player))
-                        Parkour.getCheckpointManager().removePlayer(player);
+                    Parkour.getStatsManager().get(player).resetCheckpoint();
 
                     player.sendMessage(messageFormatted);
                     TitleAPI.sendTitle(
@@ -139,13 +138,7 @@ public class LevelHandler {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (playerStats != null && playerStats.getPlayerToSpectate() == null) {
-            LevelHandler.clearPotionEffects(player);
             playerStats.startedLevel();
         }
-    }
-
-    static void clearPotionEffects(Player player) {
-        for (PotionEffect effect : player.getActivePotionEffects())
-            player.removePotionEffect(effect.getType());
     }
 }
