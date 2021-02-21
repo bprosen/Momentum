@@ -25,7 +25,7 @@ public class InteractListener implements Listener {
 
             ItemStack item = event.getItem();
 
-            if (item == null || item.getItemMeta() == null)
+            if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null)
                 return;
 
             if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&2Players &7»"))) {
