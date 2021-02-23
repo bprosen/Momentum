@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
@@ -47,12 +48,16 @@ public class JoinLeaveHandler implements Listener {
     public void onQuit(PlayerQuitEvent event) {
 
         Player player = event.getPlayer();
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (Parkour.getLevelManager().getPlayerRegionMap().containsKey(player.getName()))
             Parkour.getLevelManager().removeFromLevelMap(player.getName());
 
-        if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
+        if (playerStats.getCheckpoint() != null)
             Checkpoint_DB.savePlayerAsync(player);
+
+        if (playerStats.getPlayerToSpectate() != null)
+            Parkour.getSpectatorManager().removeSpectatorMode(playerStats);
 
         if (PlayerHider.containsPlayer(player))
             PlayerHider.removeHiddenPlayer(player);

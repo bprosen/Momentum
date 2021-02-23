@@ -32,8 +32,7 @@ public class Spectate_CMD implements CommandExecutor {
                         } else {
                             PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
 
-                            if (playerStats != null
-                                    && playerStats.getPlayer().isOnline()) {
+                            if (playerStats != null && playerStats.getPlayer().isOnline()) {
                                 if (playerStats.isSpectatable()) {
                                     spectatorStats.setPlayerToSpectate(playerStats);
                                     Parkour.getSpectatorManager().setSpectatorMode(
