@@ -8,6 +8,7 @@ import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.perks.PerkManager;
+import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.spectator.SpectatorManager;
 import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.gameplay.*;
@@ -38,6 +39,7 @@ public class Parkour extends JavaPlugin {
     private static CheckpointManager checkpoint;
     private static Economy economy;
     private static SpectatorManager spectator;
+    private static RaceManager races;
 
     @Override
     public void onEnable() {
@@ -102,6 +104,7 @@ public class Parkour extends JavaPlugin {
         clans = new ClansManager(plugin);
         menus = new MenuManager(plugin);
         spectator = new SpectatorManager(plugin);
+        races = new RaceManager();
     }
 
     private static void unloadClasses() {
@@ -158,5 +161,6 @@ public class Parkour extends JavaPlugin {
         return spectator;
     }
     public static CheckpointManager getCheckpointManager() { return checkpoint; }
+    public static RaceManager getRaceManager() { return races; }
     public static void setEconomy(Economy eco) { economy = eco; }
 }

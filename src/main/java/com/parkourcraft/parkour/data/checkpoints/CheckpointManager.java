@@ -6,8 +6,6 @@ import org.bukkit.entity.Player;
 
 public class CheckpointManager {
 
-    public CheckpointManager() { }
-
     public void teleportPlayer(Player player) {
 
         Location loc = Parkour.getStatsManager().get(player).getCheckpoint().clone();
