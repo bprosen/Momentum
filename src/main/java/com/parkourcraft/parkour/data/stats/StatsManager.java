@@ -120,6 +120,10 @@ public class StatsManager {
     }
 
     public void clean() {
+
+        if (playerStatsList.isEmpty())
+            return;
+
         List<PlayerStats> removeList = new ArrayList<>();
 
         for (PlayerStats playerStats : playerStatsList)

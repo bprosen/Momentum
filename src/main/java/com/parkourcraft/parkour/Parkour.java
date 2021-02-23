@@ -120,10 +120,7 @@ public class Parkour extends JavaPlugin {
         database = null;
     }
 
-    public static Plugin getPlugin() {
-        return plugin;
-    }
-
+    public static Plugin getPlugin() { return plugin; }
     public static Logger getPluginLogger() {
         return logger;
     }
