@@ -61,6 +61,7 @@ public class Parkour extends JavaPlugin {
     @Override
     public void onDisable() {
         Checkpoint_DB.saveAllPlayers();
+        spectator.shutdown();
         database.close();
         unloadClasses();
 

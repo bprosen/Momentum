@@ -48,9 +48,9 @@ public class SpectatorManager {
     }
 
     public void setSpectatorMode(Player spectator, Player player) {
-        player.setAllowFlight(true);
-        player.setFlying(true);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+        spectator.setAllowFlight(true);
+        spectator.setFlying(true);
+        spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         spectateToPlayer(spectator, player);
     }
 
@@ -80,6 +80,13 @@ public class SpectatorManager {
                 spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer());
         } else {
             removeSpectatorMode(spectator);
+        }
+    }
+
+    public void shutdown() {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
+                removeSpectatorMode(playerStats);
         }
     }
 }

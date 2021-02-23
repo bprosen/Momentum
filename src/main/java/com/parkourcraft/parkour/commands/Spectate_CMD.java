@@ -34,12 +34,16 @@ public class Spectate_CMD implements CommandExecutor {
 
                             if (playerStats != null && playerStats.getPlayer().isOnline()) {
                                 if (playerStats.isSpectatable()) {
-                                    spectatorStats.setPlayerToSpectate(playerStats);
-                                    Parkour.getSpectatorManager().setSpectatorMode(
-                                            spectatorStats.getPlayer(), player.getPlayer());
+                                    if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
+                                        spectatorStats.setPlayerToSpectate(playerStats);
+                                        Parkour.getSpectatorManager().setSpectatorMode(
+                                                spectatorStats.getPlayer(), playerStats.getPlayer());
 
-                                    playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                            spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                        playerStats.getPlayer().sendMessage(Utils.translate("&2" +
+                                                spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                    } else {
+                                        sender.sendMessage(Utils.translate("&cYou are not in the same world as &4" + a[0]));
+                                    }
                                 } else {
                                     sender.sendMessage(Utils.translate("&cThat player cannot be spectated"));
                                 }
