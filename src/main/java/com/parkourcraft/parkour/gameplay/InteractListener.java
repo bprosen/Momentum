@@ -57,12 +57,10 @@ public class InteractListener implements Listener {
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
                 event.setCancelled(true);
 
-                if (Parkour.getStatsManager().get(player).getCheckpoint() != null) {
+                if (Parkour.getStatsManager().get(player).getCheckpoint() != null &&
+                    !WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
 
-                    if (!WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn"))
                         Parkour.getCheckpointManager().teleportPlayer(player);
-                    else
-                        player.sendMessage(Utils.translate("&cYou cannot teleport to your checkpoint here"));
 
                 } else {
                     player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
