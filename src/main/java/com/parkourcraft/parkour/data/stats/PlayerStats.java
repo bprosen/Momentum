@@ -76,7 +76,7 @@ public class PlayerStats {
         return playerID;
     }
 
-    public void isSpectatable(boolean setting) {
+    public void setSpectatable(boolean setting) {
         spectatable = setting;
     }
 

@@ -1,10 +1,8 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.checkpoints.CheckpointManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

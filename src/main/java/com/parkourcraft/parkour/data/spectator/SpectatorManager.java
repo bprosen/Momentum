@@ -1,78 +1,85 @@
 package com.parkourcraft.parkour.data.spectator;
+import com.connorlinfoot.titleapi.TitleAPI;
+import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SpectatorManager {
-
-    private List<Spectator> spectatorList = new ArrayList<>();
 
     public SpectatorManager(Plugin plugin) {
         startScheduler(plugin);
     }
 
     public void startScheduler(Plugin plugin) {
-        // run clean every 5 seconds for garbage collection
+
+        // update any current spectators every second
         new BukkitRunnable() {
             public void run() {
-                clean();
+                updateSpectators();
             }
-        }.runTaskTimer(plugin, 20 * 5, 20 * 5);
+        }.runTaskTimer(plugin, 20, 20);
     }
 
-    public boolean exists(String UUID) {
-        if (get(UUID) != null)
-            return true;
-        return false;
-    }
+    public void spectateToPlayer(Player spectator, Player player) {
+        if (player.isOnline() && spectator.isOnline()) {
 
-    public void add(Player player) {
-        if (!exists(player.getUniqueId().toString())) {
-            Spectator spectator = new Spectator(player);
-            spectatorList.add(spectator);
+            spectator.teleport(player.getLocation());
+
+            TitleAPI.sendTitle(
+                    spectator, 10, 40, 10,
+                    "", Utils.translate("&7Teleported to " + player.getDisplayName() +
+                            "&7, use &2/spectate &7 to stop"));
         }
     }
 
-    public void remove(Spectator spectator) {
-       if (exists(spectator.getUUID()))
-           spectatorList.remove(spectator);
+    public void respawnToLobby(Player player) {
+        Location lobby = Parkour.getLocationManager().getLobbyLocation();
+        player.teleport(lobby);
+        TitleAPI.sendTitle(
+                player, 10, 40, 10,
+                "",
+                Utils.translate("&7You are no longer spectating anyone"));
     }
 
-    public Spectator get(String UUID) {
-        for (Spectator spectators : spectatorList)
-            if (spectators.getUUID().equals(UUID))
-                return spectators;
-
-        return null;
+    public void setSpectatorMode(Player spectator, Player player) {
+        player.setAllowFlight(true);
+        player.setFlying(true);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+        spectateToPlayer(spectator, player);
     }
 
-    public Spectator getByName(String playerName) {
-        for (Spectator spectators : spectatorList)
-            if (spectators.getName().equalsIgnoreCase(playerName))
-                return spectators;
+    public void removeSpectatorMode(PlayerStats spectatorStats) {
 
-        return null;
+        Player player = spectatorStats.getPlayer();
+
+        spectatorStats.setPlayerToSpectate(null);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        player.removePotionEffect(PotionEffectType.INVISIBILITY);
+        respawnToLobby(player);
     }
 
-    public void clean() {
-
-        if (spectatorList.isEmpty())
-            return;
-
-        List<Spectator> removeList = new ArrayList<>();
-
-        for (Spectator spectators : spectatorList)
-            if (!spectators.getPlayer().isOnline())
-                removeList.add(spectators);
-
-        for (Spectator spectator : removeList)
-            remove(spectator);
+    public void updateSpectators() {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
+                updateSpectator(playerStats);
+        }
     }
 
-    public List<Spectator> getSpectatorList() {
-        return spectatorList;
+    public void updateSpectator(PlayerStats spectator) {
+        PlayerStats playerStats = spectator.getPlayerToSpectate();
+
+        if (playerStats != null && playerStats.getPlayer().isOnline() && playerStats.isSpectatable()) {
+            if (spectator.getPlayer().getLocation().distance(playerStats.getPlayer().getLocation()) > 20)
+                spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer());
+        } else {
+            removeSpectatorMode(spectator);
+        }
     }
 }

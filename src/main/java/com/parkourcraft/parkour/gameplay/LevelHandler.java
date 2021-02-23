@@ -8,17 +8,13 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
-import com.sk89q.commandbook.locations.TeleportSession;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LevelHandler {
 

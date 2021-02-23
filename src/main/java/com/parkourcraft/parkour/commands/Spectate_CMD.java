@@ -3,7 +3,6 @@ package com.parkourcraft.parkour.commands;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
-import com.parkourcraft.parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,7 +27,7 @@ public class Spectate_CMD implements CommandExecutor {
                             else
                                 sender.sendMessage(Utils.translate("&7You can now be spectated"));
 
-                            spectatorStats.isSpectatable(!spectatorStats.isSpectatable());
+                            spectatorStats.setSpectatable(!spectatorStats.isSpectatable());
                             Stats_DB.updatePlayerSpectatable(spectatorStats);
                         } else {
                             PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
@@ -37,11 +36,8 @@ public class Spectate_CMD implements CommandExecutor {
                                     && playerStats.getPlayer().isOnline()) {
                                 if (playerStats.isSpectatable()) {
                                     spectatorStats.setPlayerToSpectate(playerStats);
-                                    SpectatorHandler.setSpectatorMode(spectatorStats.getPlayer());
-                                    SpectatorHandler.spectateToPlayer(
-                                            spectatorStats.getPlayer(),
-                                            playerStats.getPlayer()
-                                    );
+                                    Parkour.getSpectatorManager().setSpectatorMode(
+                                            spectatorStats.getPlayer(), player.getPlayer());
 
                                     playerStats.getPlayer().sendMessage(Utils.translate("&2" +
                                             spectatorStats.getPlayerName() + " &7began to spectate you"));
@@ -53,7 +49,7 @@ public class Spectate_CMD implements CommandExecutor {
                             }
                         }
                     } else if (spectatorStats.getPlayerToSpectate() != null)
-                        SpectatorHandler.removeSpectatorMode(spectatorStats);
+                        Parkour.getSpectatorManager().removeSpectatorMode(spectatorStats);
                     else {
                         if (spectatorStats.isSpectatable())
                             sender.sendMessage(Utils.translate("&7You can be spectated"));

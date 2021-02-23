@@ -38,8 +38,6 @@ public class Parkour extends JavaPlugin {
     private static CheckpointManager checkpoint;
     private static Economy economy;
     private static SpectatorManager spectator;
-    // Pending recode for SpectatorManager
-    //private static GhostFactory ghostFactory;
 
     @Override
     public void onEnable() {
@@ -56,7 +54,6 @@ public class Parkour extends JavaPlugin {
         }
 
         Scoreboard.startScheduler(plugin);
-        SpectatorHandler.startScheduler(plugin);
 
         stats.addUnloadedPlayers();
     }

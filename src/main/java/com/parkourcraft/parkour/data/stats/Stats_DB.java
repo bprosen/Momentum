@@ -5,7 +5,6 @@ import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perks_DB;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
-import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -22,6 +21,7 @@ public class Stats_DB {
     }
 
     private static void loadPlayerID(PlayerStats playerStats) {
+
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
                 "player_id, player_name, spectatable, clan_id",
@@ -37,9 +37,9 @@ public class Stats_DB {
 
                 int spectatable = Integer.parseInt(playerResult.get("spectatable"));
                 if (spectatable == 1)
-                    playerStats.isSpectatable(true);
+                    playerStats.setSpectatable(true);
                 else
-                    playerStats.isSpectatable(false);
+                    playerStats.setSpectatable(false);
 
                 int clanID = Integer.parseInt(playerResult.get("clan_id"));
 
