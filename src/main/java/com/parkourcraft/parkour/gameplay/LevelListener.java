@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,13 +26,12 @@ public class LevelListener implements Listener {
         Player player = event.getPlayer();
         // In water
         if (event.getTo().getBlock().isLiquid()) {
-            String levelName = LevelHandler.getLocationLevelName(player);
+            String levelName = Parkour.getStatsManager().get(player).getLevel();
             if (levelName != null) {
                 if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
                     Parkour.getCheckpointManager().teleportPlayer(player);
                 else
                     LevelHandler.respawnPlayer(player, Parkour.getLevelManager().get(levelName));
-
             }
         }
     }
@@ -45,7 +45,7 @@ public class LevelListener implements Listener {
         // Start timer
         if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.STONE_PLATE)) {
 
-            String levelName = LevelHandler.getLocationLevelName(player);
+            String levelName = Parkour.getStatsManager().get(player).getLevel();
             if (levelName != null)
                 LevelHandler.startedLevel(player);
 
@@ -53,7 +53,7 @@ public class LevelListener implements Listener {
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.GOLD_PLATE)) {
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            String levelName = LevelHandler.getLocationLevelName(player);
+            String levelName = Parkour.getStatsManager().get(player).getLevel();
 
             if (levelName != null) {
                 if (playerStats.getCheckpoint() != null) {
@@ -85,7 +85,7 @@ public class LevelListener implements Listener {
                 Player player = event.getPlayer();
 
                 if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
-                    String levelName = LevelHandler.getLocationLevelName(player);
+                    String levelName = Parkour.getStatsManager().get(player).getLevel();
 
                     if (levelName != null)
                         LevelHandler.levelCompletion(player, levelName);

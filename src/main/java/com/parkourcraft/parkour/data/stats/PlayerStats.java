@@ -11,6 +11,7 @@ public class PlayerStats {
     private Player player;
     private String UUID;
     private String playerName;
+    private String level = null;
     private int playerID = -1;
     private long levelStartTime = 0;
     private boolean spectatable;
@@ -50,6 +51,24 @@ public class PlayerStats {
 
     public String getUUID() {
         return UUID;
+    }
+
+    public boolean inLevel() {
+        if (level != null)
+            return true;
+        return false;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public void resetLevel() {
+        level = null;
+    }
+
+    public String getLevel() {
+        return level;
     }
 
     public String getPlayerName() {

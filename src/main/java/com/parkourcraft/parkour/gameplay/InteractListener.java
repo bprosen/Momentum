@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.gameplay;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
@@ -58,20 +59,19 @@ public class InteractListener implements Listener {
 
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
 
-                if (Parkour.getStatsManager().get(player).getCheckpoint() != null &&
-                    !WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
-
-                        Parkour.getCheckpointManager().teleportPlayer(player);
-
-                } else {
+                if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
+                    Parkour.getCheckpointManager().teleportPlayer(player);
+                else
                     player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
-                }
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
 
-                if (!WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
-                    LevelObject level = Parkour.getLevelManager().get(LevelHandler.getLocationLevelName(player));
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                String levelName = playerStats.getLevel();
+
+                if (levelName != null) {
+                    LevelObject level = Parkour.getLevelManager().get(levelName);
                     if (level != null) {
-                        Parkour.getStatsManager().get(player).resetCheckpoint();
+                        playerStats.resetCheckpoint();
                         player.teleport(level.getStartLocation());
                     }
                 } else {

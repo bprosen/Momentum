@@ -63,10 +63,11 @@ public class LevelHandler {
                     // Run gameplay actions: teleport and messaging
                     player.teleport(level.getRespawnLocation());
                     List<String> getToRegions = WorldGuardUtils.getRegions(level.getRespawnLocation());
+
                     if (getToRegions.isEmpty())
-                        Parkour.getLevelManager().removeFromLevelMap(player.getName());
+                        playerStats.resetLevel();
                     else
-                        Parkour.getLevelManager().addToLevelMap(player.getName(), getToRegions.get(0));
+                        playerStats.setLevel(getToRegions.get(0));
 
                     Parkour.getStatsManager().get(player).resetCheckpoint();
 
@@ -94,14 +95,6 @@ public class LevelHandler {
                     player.sendMessage(Utils.translate("&cYou do not have the required levels to complete this level"));
             }
         }
-    }
-
-    static String getLocationLevelName(Player player) {
-        HashMap<String, String> playersInLevels = Parkour.getLevelManager().getPlayerRegionMap();
-
-        if (playersInLevels.containsKey(player.getName()))
-            return playersInLevels.get(player.getName());
-        return null;
     }
 
     // No idea what this is for

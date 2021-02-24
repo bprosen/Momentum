@@ -49,7 +49,7 @@ public class Scoreboard {
 
     private static void displayScoreboard(Player player) {
         List<String> board = new ArrayList<>();
-        LevelObject level = Parkour.getLevelManager().get(LevelHandler.getLocationLevelName(player));
+        LevelObject level = Parkour.getLevelManager().get(Parkour.getStatsManager().get(player).getLevel());
 
         // Title
         board.add(Utils.translate("&c&lRenatus Network"));

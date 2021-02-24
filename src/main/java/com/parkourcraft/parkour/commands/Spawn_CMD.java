@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,7 +34,7 @@ public class Spawn_CMD implements CommandExecutor {
                     return true;
                 }
 
-                victimPlayer.teleport(Parkour.getSettingsManager().spawn_location);
+                teleportToSpawn(victimPlayer);
                 player.sendMessage(Utils.translate("&cYou teleported &4" + victim + " &cto spawn"));
             }
         } else if (a.length == 0) {
@@ -45,9 +46,12 @@ public class Spawn_CMD implements CommandExecutor {
     private void teleportToSpawn(Player player) {
         Location loc = Parkour.getSettingsManager().spawn_location;
 
-        if (loc != null)
+        if (loc != null) {
             player.teleport(loc);
-        else
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            playerStats.resetCheckpoint();
+            playerStats.resetLevel();
+        } else
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
     }
 }

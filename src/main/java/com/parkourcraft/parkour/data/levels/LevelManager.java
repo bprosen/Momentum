@@ -13,7 +13,6 @@ public class LevelManager {
     private List<LevelObject> levels = new ArrayList<>();
     private Map<String, LevelData> levelDataCache;
     private List<String> enabledLeaderboards = new ArrayList<>();
-    private HashMap<String, String> inLevelRegions = new HashMap<>();
 
     public LevelManager(Plugin plugin) {
         this.levelDataCache = Levels_DB.getDataCache();
@@ -126,16 +125,4 @@ public class LevelManager {
         return enabledLeaderboards;
     }
 
-
-    public HashMap<String, String> getPlayerRegionMap() {
-        return inLevelRegions;
-    }
-
-    public void addToLevelMap(String playerName, String levelName) {
-        inLevelRegions.put(playerName, levelName.toLowerCase());
-    }
-
-    public void removeFromLevelMap(String playerName) {
-        inLevelRegions.remove(playerName);
-    }
 }

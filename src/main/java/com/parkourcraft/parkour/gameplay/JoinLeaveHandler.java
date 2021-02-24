@@ -41,7 +41,7 @@ public class JoinLeaveHandler implements Listener {
 
         List<String> regions = WorldGuardUtils.getRegions(player.getLocation());
         if (!regions.isEmpty())
-            Parkour.getLevelManager().addToLevelMap(player.getName(), regions.get(0));
+            Parkour.getStatsManager().get(player).setLevel(regions.get(0));
 
         PlayerHider.hideHiddenPlayersFromJoined(player);
 
@@ -62,9 +62,6 @@ public class JoinLeaveHandler implements Listener {
 
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-        if (Parkour.getLevelManager().getPlayerRegionMap().containsKey(player.getName()))
-            Parkour.getLevelManager().removeFromLevelMap(player.getName());
 
         if (playerStats.getCheckpoint() != null)
             Checkpoint_DB.savePlayerAsync(player);
