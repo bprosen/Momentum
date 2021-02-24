@@ -34,3 +34,7 @@ commands:
     description: "PC-Parkour Player Toggling Command"
   checkpoint:
     description: "PC-Parkour Checkpoint COmmand"
+  setspawn:
+    description: "PC-Parkour SetSpawn Command"
+  spawn:
+    description: "PC-Parkour Spawn Command"

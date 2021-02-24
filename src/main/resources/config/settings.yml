@@ -27,3 +27,6 @@ clans:
   tag_length:
     min: 4
     max: 6
+
+spawn:
+  location:

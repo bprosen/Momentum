@@ -15,6 +15,7 @@ import com.parkourcraft.parkour.gameplay.*;
 import com.parkourcraft.parkour.data.SettingsManager;
 import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
+import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -56,7 +57,7 @@ public class Parkour extends JavaPlugin {
         }
 
         Scoreboard.startScheduler(plugin);
-
+        Utils.loadSpawn();
         stats.addUnloadedPlayers();
     }
 
@@ -90,6 +91,8 @@ public class Parkour extends JavaPlugin {
         getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
         getCommand("toggleplayers").setExecutor(new PlayerToggle_CMD());
         getCommand("checkpoint").setExecutor(new Checkpoint_CMD());
+        getCommand("setspawn").setExecutor(new Spawn_CMD());
+        getCommand("spawn").setExecutor(new SetSpawn_CMD());
     }
 
     private static void loadClasses() {

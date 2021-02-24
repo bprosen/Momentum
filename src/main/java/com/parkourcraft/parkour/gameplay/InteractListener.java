@@ -1,6 +1,8 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.levels.LevelManager;
+import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
@@ -28,8 +30,8 @@ public class InteractListener implements Listener {
             if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null)
                 return;
 
+            event.setCancelled(true);
             if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&2Players &7»"))) {
-                event.setCancelled(true);
 
                 player.getInventory().removeItem(item);
                 if (PlayerHider.containsPlayer(player)) {
@@ -55,7 +57,6 @@ public class InteractListener implements Listener {
                 }
 
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
-                event.setCancelled(true);
 
                 if (Parkour.getStatsManager().get(player).getCheckpoint() != null &&
                     !WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
@@ -64,6 +65,17 @@ public class InteractListener implements Listener {
 
                 } else {
                     player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+                }
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
+
+                if (!WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
+                    LevelObject level = Parkour.getLevelManager().get(LevelHandler.getLocationLevelName(player));
+                    if (level != null) {
+                        Parkour.getStatsManager().get(player).resetCheckpoint();
+                        player.teleport(level.getStartLocation());
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou are not in a level"));
                 }
             }
         }
