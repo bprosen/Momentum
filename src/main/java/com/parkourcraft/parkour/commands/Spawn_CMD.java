@@ -48,6 +48,6 @@ public class Spawn_CMD implements CommandExecutor {
         if (loc != null)
             player.teleport(loc);
         else
-            Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn");
+            Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
     }
 }
