@@ -25,9 +25,12 @@ public class JoinLeaveHandler implements Listener {
 
         Player player = event.getPlayer();
 
-        if (!player.hasPlayedBefore())
+        if (!player.hasPlayedBefore()) {
             player.teleport(Utils.getSpawn());
-
+            Bukkit.broadcastMessage(Utils.translate(
+                    "&a&o" + player.getDisplayName() + "&7&o joined &b&l&oParkour &7&ofor the first time"
+            ));
+        }
         UUID uuid = player.getUniqueId();
 
         Parkour.getStatsManager().add(player);

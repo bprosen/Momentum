@@ -34,7 +34,7 @@ public class SetSpawn_CMD implements CommandExecutor {
                 Parkour.getConfigManager().get("settings")
                         .set("spawn.location", world + ":" + x + ":" + y + ":" + z + ":" + yaw + ":" + pitch);
                 Utils.loadSpawn();
-                player.sendMessage(Utils.translate("&cYou set the world spawn"));
+                player.sendMessage(Utils.translate("&cYou set the global spawnpoint"));
             }
         }
         return false;

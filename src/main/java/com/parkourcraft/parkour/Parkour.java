@@ -77,6 +77,7 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         getServer().getPluginManager().registerEvents(new TestChamberHandler(), this);
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
+        getServer().getPluginManager().registerEvents(new RespawnListener(), this);
     }
 
     private void registerCommands() {
@@ -91,8 +92,8 @@ public class Parkour extends JavaPlugin {
         getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
         getCommand("toggleplayers").setExecutor(new PlayerToggle_CMD());
         getCommand("checkpoint").setExecutor(new Checkpoint_CMD());
-        getCommand("setspawn").setExecutor(new Spawn_CMD());
-        getCommand("spawn").setExecutor(new SetSpawn_CMD());
+        getCommand("spawn").setExecutor(new Spawn_CMD());
+        getCommand("setspawn").setExecutor(new SetSpawn_CMD());
     }
 
     private static void loadClasses() {
