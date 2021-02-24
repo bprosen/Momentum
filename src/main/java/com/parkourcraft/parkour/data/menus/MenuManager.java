@@ -1,9 +1,6 @@
 package com.parkourcraft.parkour.data.menus;
 
-import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -19,9 +16,9 @@ public class MenuManager {
 
     private Map<String, Menu> menuMap = new HashMap<>();
 
-    public MenuManager(Plugin plugin) {
+    public MenuManager() {
         load();
-        startScheduler(plugin);
+        //startScheduler(plugin);
     }
 
     public void load() {
@@ -31,13 +28,14 @@ public class MenuManager {
             load(menuName);
     }
 
-    private void startScheduler(Plugin plugin) {
+    // disabled due to really not worth it for the micro-optimization lost from using it
+    /*private void startScheduler(Plugin plugin) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             public void run() {
                 updateOpenInventories();
             }
         }, 0L, 10L);
-    }
+    }*/
 
     public void load(String menuName) {
         if (Menus_YAML.exists(menuName))
@@ -101,7 +99,7 @@ public class MenuManager {
             menuMap.get(menuName).updateInventory(player, inventory, pageNumber);
     }
 
-    public void updateOpenInventories() {
+    /*public void updateOpenInventories() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryView inventoryView = player.getOpenInventory();
 
@@ -120,8 +118,6 @@ public class MenuManager {
                     );
                 }
             }
-
         }
-    }
-
+    }*/
 }

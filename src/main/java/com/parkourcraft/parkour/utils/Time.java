@@ -42,7 +42,7 @@ public class Time {
         long days = hours / 24;
         long months = days / 30;
         long years = months / 12;
-        String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m " + seconds % 60 + "s ";
+        String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m ";
         if (years == 0L)
             time = time.replace("0Y ", "");
         if (months % 12 == 0L)
@@ -53,8 +53,6 @@ public class Time {
             time = time.replace("0h ", "");
         if (minutes % 60 == 0L)
             time = time.replace("0m ", "");
-        if (seconds % 60 == 0L)
-            time = time.replace("0s ", "");
         return time;
     }
 
@@ -100,7 +98,7 @@ public class Time {
         long days = hours / 24;
         long months = days / 30;
         long years = months / 12;
-        String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m " + seconds % 60 + "s ";
+        String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m ";
         if (years == 0L)
             time = time.replace("0Y ", "");
         if (months % 12 == 0L)
@@ -111,8 +109,6 @@ public class Time {
             time = time.replace("0h ", "");
         if (minutes % 60 == 0L)
             time = time.replace("0m ", "");
-        if (seconds % 60 == 0L)
-            time = time.replace("0s ", "");
         return time;
     }
 
