@@ -9,29 +9,6 @@ import java.util.List;
 
 public class Utils {
 
-    private static Location spawnLocation = null;
-
-    public static void loadSpawn() {
-        String locationString = Parkour.getConfigManager().get("settings").getString("spawn.location");
-
-        if (locationString != null) {
-
-            String[] locStringSplit = locationString.split(":");
-            World world = Bukkit.getWorld(locStringSplit[0]);
-            double x = Double.parseDouble(locStringSplit[1]);
-            double y = Double.parseDouble(locStringSplit[2]);
-            double z = Double.parseDouble(locStringSplit[3]);
-            float yaw = Float.parseFloat(locStringSplit[4]);
-            float pitch = Float.parseFloat(locStringSplit[5]);
-
-            spawnLocation = new Location(world, x, y, z, yaw, pitch);
-        }
-    }
-
-    public static Location getSpawn() {
-        return spawnLocation;
-    }
-
     public static ItemStack convertItem(String itemMaterial, int itemType) {
         return new ItemStack(Material.getMaterial(itemMaterial), 1, (byte) itemType);
     }

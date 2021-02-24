@@ -57,7 +57,7 @@ public class Parkour extends JavaPlugin {
         }
 
         Scoreboard.startScheduler(plugin);
-        Utils.loadSpawn();
+        settings.loadSpawn();
         stats.addUnloadedPlayers();
     }
 

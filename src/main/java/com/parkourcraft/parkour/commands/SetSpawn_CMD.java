@@ -2,7 +2,6 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,7 +32,9 @@ public class SetSpawn_CMD implements CommandExecutor {
 
                 Parkour.getConfigManager().get("settings")
                         .set("spawn.location", world + ":" + x + ":" + y + ":" + z + ":" + yaw + ":" + pitch);
-                Utils.loadSpawn();
+                Parkour.getConfigManager().save("settings");
+                Parkour.getConfigManager().load("settings");
+                Parkour.getSettingsManager().loadSpawn();
                 player.sendMessage(Utils.translate("&cYou set the global spawnpoint"));
             }
         }

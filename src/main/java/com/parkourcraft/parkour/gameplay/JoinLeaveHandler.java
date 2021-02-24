@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,10 +27,13 @@ public class JoinLeaveHandler implements Listener {
         Player player = event.getPlayer();
 
         if (!player.hasPlayedBefore()) {
-            player.teleport(Utils.getSpawn());
-            Bukkit.broadcastMessage(Utils.translate(
-                    "&a&o" + player.getDisplayName() + "&7&o joined &b&l&oParkour &7&ofor the first time"
-            ));
+            Location spawn = Parkour.getSettingsManager().spawn_location;
+            if (spawn != null) {
+                player.teleport(Parkour.getSettingsManager().spawn_location);
+                Bukkit.broadcastMessage(Utils.translate(
+                        "&a&o" + player.getDisplayName() + "&7&o joined &b&l&oParkour &7&ofor the first time"
+                ));
+            }
         }
         UUID uuid = player.getUniqueId();
 

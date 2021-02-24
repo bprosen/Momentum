@@ -1,5 +1,9 @@
 package com.parkourcraft.parkour.data;
 
+import com.parkourcraft.parkour.Parkour;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class SettingsManager {
@@ -17,6 +21,8 @@ public class SettingsManager {
     public int clans_tag_length_min;
     public int clans_tag_length_max;
 
+    public Location spawn_location = null;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -32,5 +38,24 @@ public class SettingsManager {
         clans_price_tag = settings.getInt("clans.price.tag");
         clans_tag_length_min = settings.getInt("clans.tag_length.min");
         clans_tag_length_max = settings.getInt("clans.tag_length.max");
+        loadSpawn();
+    }
+
+    public void loadSpawn() {
+
+        String locationString = Parkour.getConfigManager().get("settings").getString("spawn.location");
+
+        if (locationString != null) {
+
+            String[] locStringSplit = locationString.split(":");
+            World world = Bukkit.getWorld(locStringSplit[0]);
+            double x = Double.parseDouble(locStringSplit[1]);
+            double y = Double.parseDouble(locStringSplit[2]);
+            double z = Double.parseDouble(locStringSplit[3]);
+            float yaw = Float.parseFloat(locStringSplit[4]);
+            float pitch = Float.parseFloat(locStringSplit[5]);
+
+            spawn_location = new Location(world, x, y, z, yaw, pitch);
+        }
     }
 }
