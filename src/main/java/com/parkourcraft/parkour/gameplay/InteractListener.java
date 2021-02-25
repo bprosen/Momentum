@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,8 +16,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import java.util.HashMap;
 
 public class InteractListener implements Listener {
+
+    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
@@ -71,8 +77,26 @@ public class InteractListener implements Listener {
                 if (levelName != null) {
                     LevelObject level = Parkour.getLevelManager().get(levelName);
                     if (level != null) {
-                        playerStats.resetCheckpoint();
-                        player.teleport(level.getStartLocation());
+
+                        // gets if they have right clicked it already, if so, cancel the task and reset them
+                        if (confirmMap.containsKey(player.getName())) {
+                            confirmMap.get(player.getName()).cancel();
+                            confirmMap.remove(player.getName());
+                            playerStats.resetCheckpoint();
+                            player.teleport(level.getStartLocation());
+
+                        } else {
+                            // otherwise, put them in and ask them to confirm within 5 seconds
+                            player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+                            confirmMap.put(player.getName(), new BukkitRunnable() {
+                                public void run() {
+                                    if (confirmMap.containsKey(player.getName())) {
+                                        confirmMap.remove(player.getName());
+                                        player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                    }
+                                }
+                            }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                        }
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou are not in a level"));
