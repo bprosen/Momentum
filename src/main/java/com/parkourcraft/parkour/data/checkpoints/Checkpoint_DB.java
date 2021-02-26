@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.checkpoints;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,12 +12,13 @@ import java.util.UUID;
 
 public class Checkpoint_DB {
 
-    public static void loadPlayer(UUID uuid) {
+    public static void loadPlayer(UUID uuid, String levelName) {
 
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "checkpoints",
                 "*",
-                "WHERE UUID='" + uuid.toString() + "'"
+                "WHERE UUID='" + uuid.toString() + "' " +
+                "AND LEVEL_NAME='" + levelName + "'"
         );
 
         String playerName = null;
@@ -35,20 +37,23 @@ public class Checkpoint_DB {
 
         if (playerName != null && worldName != null) {
             Parkour.getStatsManager().get(uuid.toString()).setCheckpoint(new Location(Bukkit.getWorld(worldName), x, y, z));
-            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid.toString() + "'");
+            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid.toString() +
+                                             "' AND LEVEL_NAME='" + levelName + "'");
         }
     }
 
 
     public static void savePlayer(Player player) {
 
-        Location loc = Parkour.getStatsManager().get(player).getCheckpoint();
+        PlayerStats stats = Parkour.getStatsManager().get(player);
+        Location loc = stats.getCheckpoint();
 
         Parkour.getDatabaseManager().run("INSERT INTO checkpoints " +
-                "(uuid, player_name, world, x, y, z)" +
+                "(uuid, player_name, level_name, world, x, y, z)" +
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
                 player.getName() + "','" +
+                stats.getLevel() + "','" +
                 loc.getWorld().getName() + "','" +
                 loc.getBlockX() + "','" +
                 loc.getBlockY() + "','" +
@@ -56,23 +61,24 @@ public class Checkpoint_DB {
                 "')"
         );
     }
+
     public static void savePlayerAsync(Player player) {
 
-        Location loc = Parkour.getStatsManager().get(player).getCheckpoint();
+        PlayerStats stats = Parkour.getStatsManager().get(player);
+        Location loc = stats.getCheckpoint();
 
         Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
-                "(uuid, player_name, world, x, y, z)" +
+                "(uuid, player_name, level_name, world, x, y, z)" +
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
                 player.getName() + "','" +
+                stats.getLevel() + "','" +
                 loc.getWorld().getName() + "','" +
                 loc.getBlockX() + "','" +
                 loc.getBlockY() + "','" +
                 loc.getBlockZ() +
                 "')"
         );
-
-        Parkour.getStatsManager().get(player).resetCheckpoint();
     }
 
     public static void saveAllPlayers() {
@@ -82,12 +88,13 @@ public class Checkpoint_DB {
         }
     }
 
-    public static boolean hasCheckpoint(UUID uuid) {
+    public static boolean hasCheckpoint(UUID uuid, String levelName) {
 
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "checkpoints",
                 "*",
-                "WHERE UUID='" + uuid.toString() + "'"
+                "WHERE UUID='" + uuid.toString() + "' " +
+                         "AND LEVEL_NAME='" + levelName + "'"
         );
 
         if (!levelsResults.isEmpty())

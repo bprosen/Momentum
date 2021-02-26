@@ -36,22 +36,20 @@ public class JoinLeaveHandler implements Listener {
             }
         }
         UUID uuid = player.getUniqueId();
-
         Parkour.getStatsManager().add(player);
-
-        List<String> regions = WorldGuardUtils.getRegions(player.getLocation());
-        if (!regions.isEmpty())
-            Parkour.getStatsManager().get(player).setLevel(regions.get(0));
-
         PlayerHider.hideHiddenPlayersFromJoined(player);
 
-        // run async
-        new BukkitRunnable() {
-            public void run() {
-                if (Checkpoint_DB.hasCheckpoint(uuid))
-                    Checkpoint_DB.loadPlayer(uuid);
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
+        List<String> regions = WorldGuardUtils.getRegions(player.getLocation());
+        if (!regions.isEmpty()) {
+            Parkour.getStatsManager().get(player).setLevel(regions.get(0));
+            // run async
+            new BukkitRunnable() {
+                public void run() {
+                    if (Checkpoint_DB.hasCheckpoint(uuid, regions.get(0)))
+                        Checkpoint_DB.loadPlayer(uuid, regions.get(0));
+                }
+            }.runTaskAsynchronously(Parkour.getPlugin());
+        }
         //
         // Pending recode
         // Parkour.ghostFactory.addPlayer(event.getPlayer());

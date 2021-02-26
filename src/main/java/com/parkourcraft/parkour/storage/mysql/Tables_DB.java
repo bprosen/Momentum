@@ -120,6 +120,7 @@ public class Tables_DB {
         String sqlQuery = "CREATE TABLE checkpoints(" +
                 "uuid CHAR(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
+                "level_name VARCHAR(30) NOT NULL, " +
                 "world VARCHAR(15) NOT NULL, " +
                 "x INT NOT NULL, " +
                 "y INT NOT NULL, " +

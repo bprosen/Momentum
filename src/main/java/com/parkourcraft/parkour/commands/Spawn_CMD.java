@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -49,7 +50,12 @@ public class Spawn_CMD implements CommandExecutor {
         if (loc != null) {
             player.teleport(loc);
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            playerStats.resetCheckpoint();
+
+            if (playerStats.getCheckpoint() != null) {
+                Checkpoint_DB.savePlayerAsync(player);
+                playerStats.resetCheckpoint();
+            }
+
             playerStats.resetLevel();
         } else
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");

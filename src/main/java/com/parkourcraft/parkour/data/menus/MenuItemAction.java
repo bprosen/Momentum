@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.menus;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -79,10 +80,21 @@ public class MenuItemAction {
             for (PotionEffect potionEffect : player.getActivePotionEffects())
                 player.removePotionEffect(potionEffect.getType());
 
-            player.teleport(level.getStartLocation());
-            playerStats.setLevel(level.getName());
+            // save if has checkpoint
+            if (playerStats.getCheckpoint() != null) {
+                Checkpoint_DB.savePlayerAsync(player);
+                playerStats.resetCheckpoint();
+            }
 
-            Parkour.getStatsManager().get(player).resetCheckpoint();
+            if (Checkpoint_DB.hasCheckpoint(player.getUniqueId(), level.getName())) {
+                Checkpoint_DB.loadPlayer(player.getUniqueId(), level.getName());
+                Parkour.getCheckpointManager().teleportPlayer(player);
+                player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+            } else {
+                player.teleport(level.getStartLocation());
+            }
+
+            playerStats.setLevel(level.getName());
 
             if (!level.getPotionEffects().isEmpty()) {
                 for (PotionEffect potionEffect : level.getPotionEffects())
