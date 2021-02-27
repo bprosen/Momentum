@@ -9,13 +9,12 @@ import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.perks.PerkManager;
 import com.parkourcraft.parkour.data.races.RaceManager;
-import com.parkourcraft.parkour.data.spectator.SpectatorManager;
+import com.parkourcraft.parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.gameplay.*;
 import com.parkourcraft.parkour.data.SettingsManager;
 import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
-import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -39,7 +38,7 @@ public class Parkour extends JavaPlugin {
     private static MenuManager menus;
     private static CheckpointManager checkpoint;
     private static Economy economy;
-    private static SpectatorManager spectator;
+    private static SpectatorHandler spectator;
     private static RaceManager races;
 
     @Override
@@ -57,6 +56,7 @@ public class Parkour extends JavaPlugin {
         }
 
         Scoreboard.startScheduler(plugin);
+        SpectatorHandler.startScheduler(plugin);
         settings.loadSpawn();
         stats.addUnloadedPlayers();
     }
@@ -107,7 +107,6 @@ public class Parkour extends JavaPlugin {
         stats = new StatsManager(plugin);
         clans = new ClansManager(plugin);
         menus = new MenuManager();
-        spectator = new SpectatorManager(plugin);
         races = new RaceManager();
     }
 
@@ -161,7 +160,7 @@ public class Parkour extends JavaPlugin {
     public static Economy getEconomy() {
         return economy;
     }
-    public static SpectatorManager getSpectatorManager() {
+    public static SpectatorHandler getSpectatorManager() {
         return spectator;
     }
     public static CheckpointManager getCheckpointManager() { return checkpoint; }

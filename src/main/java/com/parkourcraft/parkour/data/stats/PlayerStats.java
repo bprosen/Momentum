@@ -18,6 +18,7 @@ public class PlayerStats {
     private PlayerStats playerToSpectate;
     private Clan clan;
     private Location currentCheckpoint = null;
+    private boolean practiceMode = false;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -104,6 +105,14 @@ public class PlayerStats {
             return false;
 
         return spectatable;
+    }
+
+    public boolean inPracticeMode() {
+        return practiceMode;
+    }
+
+    public void setPracticeMode(boolean practiceMode) {
+        this.practiceMode = practiceMode;
     }
 
     public void setClan(Clan clan) {
