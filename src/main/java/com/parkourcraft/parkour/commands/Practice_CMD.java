@@ -2,6 +2,9 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.gameplay.PracticeHandler;
+import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,10 +23,20 @@ public class Practice_CMD implements CommandExecutor {
 
         if (a.length == 0) {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            if (playerStats.inPracticeMode()) {
-                // disable
+
+            if (playerStats.getLevel() != null) {
+                if (player.isOnGround()) {
+                    if (playerStats.getPracticeLocation() != null) {
+                        PracticeHandler.resetPlayer(player, true);
+                    } else {
+                        playerStats.setPracticeMode(player.getLocation());
+                        player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot enable/disable practice mode while falling"));
+                }
             } else {
-                // enable
+                player.sendMessage(Utils.translate("&cYou cannot enter practice mode when not in a level"));
             }
         }
         return false;

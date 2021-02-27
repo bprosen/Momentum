@@ -38,3 +38,6 @@ commands:
     description: "PC-Parkour SetSpawn Command"
   spawn:
     description: "PC-Parkour Spawn Command"
+  practice:
+    description: "PC-Parkour Practice Command"
+    aliases: [prac]

@@ -5,13 +5,12 @@ import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
-import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -39,20 +38,21 @@ public class JoinLeaveHandler implements Listener {
         Parkour.getStatsManager().add(player);
         PlayerHider.hideHiddenPlayersFromJoined(player);
 
-        List<String> regions = WorldGuardUtils.getRegions(player.getLocation());
+        List<String> regions = WorldGuard.getRegions(player.getLocation());
         if (!regions.isEmpty()) {
-            Parkour.getStatsManager().get(player).setLevel(regions.get(0));
-            // run async
-            new BukkitRunnable() {
-                public void run() {
-                    if (Checkpoint_DB.hasCheckpoint(uuid, regions.get(0)))
-                        Checkpoint_DB.loadPlayer(uuid, regions.get(0));
-                }
-            }.runTaskAsynchronously(Parkour.getPlugin());
+            // make sure the area they are spawning in is a level
+            if (Parkour.getLevelManager().get(regions.get(0)) != null) {
+                Parkour.getStatsManager().get(player).setLevel(regions.get(0));
+
+                // run async
+                new BukkitRunnable() {
+                    public void run() {
+                        if (Checkpoint_DB.hasCheckpoint(uuid, regions.get(0)))
+                            Checkpoint_DB.loadPlayer(uuid, regions.get(0));
+                    }
+                }.runTaskAsynchronously(Parkour.getPlugin());
+            }
         }
-        //
-        // Pending recode
-        // Parkour.ghostFactory.addPlayer(event.getPlayer());
     }
 
     @EventHandler
@@ -65,7 +65,10 @@ public class JoinLeaveHandler implements Listener {
             Checkpoint_DB.savePlayerAsync(player);
 
         if (playerStats.getPlayerToSpectate() != null)
-            Parkour.getSpectatorManager().removeSpectatorMode(playerStats);
+            SpectatorHandler.removeSpectatorMode(playerStats);
+
+        if (playerStats.getPracticeLocation() != null)
+            PracticeHandler.resetPlayer(player, false);
 
         if (PlayerHider.containsPlayer(player))
             PlayerHider.removeHiddenPlayer(player);

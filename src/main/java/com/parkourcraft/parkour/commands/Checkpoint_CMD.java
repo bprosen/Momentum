@@ -2,8 +2,6 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.utils.Utils;
-import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,30 +18,13 @@ public class Checkpoint_CMD implements CommandExecutor {
         Player player = (Player) sender;
 
         if (a.length == 0) {
-            teleportPlayerToCheckpoint(player);
+            Parkour.getCheckpointManager().teleportPlayer(player);
         } else if (a.length == 1 && a[0].equalsIgnoreCase("teleport")) {
-            teleportPlayerToCheckpoint(player);
+            Parkour.getCheckpointManager().teleportPlayer(player);
         } else {
             sendHelp(player);
         }
         return false;
-    }
-
-    private void teleportPlayerToCheckpoint(Player player) {
-        if (Parkour.getStatsManager().get(player).getCheckpoint() != null) {
-
-            if (!WorldGuardUtils.getRegions(player.getLocation()).get(0).equalsIgnoreCase("spawn")) {
-
-                Parkour.getCheckpointManager().teleportPlayer(player);
-                player.sendMessage(Utils.translate("&eYou have been teleported to your checkpoint"));
-
-            } else {
-                player.sendMessage(Utils.translate("&cYou cannot teleport to your checkpoint here"));
-            }
-
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
-        }
     }
 
     private void sendHelp(Player player) {

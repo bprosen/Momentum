@@ -38,7 +38,6 @@ public class Parkour extends JavaPlugin {
     private static MenuManager menus;
     private static CheckpointManager checkpoint;
     private static Economy economy;
-    private static SpectatorHandler spectator;
     private static RaceManager races;
 
     @Override
@@ -50,7 +49,7 @@ public class Parkour extends JavaPlugin {
         registerCommands();
         loadClasses();
 
-        if (!Vault.setupEconomy()) { // vault setup
+        if (!Vault.setupEconomy()) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -59,14 +58,19 @@ public class Parkour extends JavaPlugin {
         SpectatorHandler.startScheduler(plugin);
         settings.loadSpawn();
         stats.addUnloadedPlayers();
+
+        getLogger().info("PC-Parkour Enabled");
     }
 
     @Override
     public void onDisable() {
         Checkpoint_DB.saveAllPlayers();
-        spectator.shutdown();
+        PracticeHandler.shutdown();
+        SpectatorHandler.shutdown();
         database.close();
         unloadClasses();
+
+        getLogger().info("PC-Parkour Disabled");
 
         plugin = null;
     }
@@ -94,6 +98,7 @@ public class Parkour extends JavaPlugin {
         getCommand("checkpoint").setExecutor(new Checkpoint_CMD());
         getCommand("spawn").setExecutor(new Spawn_CMD());
         getCommand("setspawn").setExecutor(new SetSpawn_CMD());
+        getCommand("practice").setExecutor(new Practice_CMD());
     }
 
     private static void loadClasses() {
@@ -119,7 +124,6 @@ public class Parkour extends JavaPlugin {
         levels = null;
         locations = null;
         settings = null;
-        spectator = null;
         configs = null;
         database = null;
     }
@@ -159,9 +163,6 @@ public class Parkour extends JavaPlugin {
     }
     public static Economy getEconomy() {
         return economy;
-    }
-    public static SpectatorHandler getSpectatorManager() {
-        return spectator;
     }
     public static CheckpointManager getCheckpointManager() { return checkpoint; }
     public static RaceManager getRaceManager() { return races; }

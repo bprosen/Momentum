@@ -56,8 +56,12 @@ public class Spawn_CMD implements CommandExecutor {
                 playerStats.resetCheckpoint();
             }
 
+            if (playerStats.getPracticeLocation() != null) {
+                playerStats.resetPracticeMode();
+            }
             playerStats.resetLevel();
-        } else
+        } else {
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
+        }
     }
 }

@@ -28,7 +28,10 @@ public class LevelListener implements Listener {
         if (event.getTo().getBlock().isLiquid()) {
             String levelName = Parkour.getStatsManager().get(player).getLevel();
             if (levelName != null) {
-                if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
+
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
                     Parkour.getCheckpointManager().teleportPlayer(player);
                 else
                     LevelHandler.respawnPlayer(player, Parkour.getLevelManager().get(levelName));
@@ -56,18 +59,22 @@ public class LevelListener implements Listener {
             String levelName = Parkour.getStatsManager().get(player).getLevel();
 
             if (levelName != null) {
-                if (playerStats.getCheckpoint() != null) {
+                if (playerStats.getPracticeLocation() == null) {
+                    if (playerStats.getCheckpoint() != null) {
 
-                    int blockX = playerStats.getCheckpoint().getBlockX();
-                    int blockZ = playerStats.getCheckpoint().getBlockZ();
+                        int blockX = playerStats.getCheckpoint().getBlockX();
+                        int blockZ = playerStats.getCheckpoint().getBlockZ();
 
-                    if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
+                        if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
+                            playerStats.setCheckpoint(block.getLocation());
+                            player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
+                        }
+                    } else {
                         playerStats.setCheckpoint(block.getLocation());
                         player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
                     }
                 } else {
-                    playerStats.setCheckpoint(block.getLocation());
-                    player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
+                    player.sendMessage(Utils.translate("&cYou cannot set a checkpoint while in practice mode"));
                 }
             }
         }
@@ -104,7 +111,11 @@ public class LevelListener implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        if (playerStats != null && playerStats.getPlayerToSpectate() == null && playerStats.getCheckpoint() == null)
+        if (playerStats != null &&
+            playerStats.getPlayerToSpectate() == null &&
+            playerStats.getCheckpoint() == null &&
+            playerStats.getPracticeLocation() == null)
+
             playerStats.disableLevelStartTime();
     }
 }

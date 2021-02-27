@@ -1,17 +1,15 @@
 package com.parkourcraft.parkour.utils;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-
-    public static ItemStack convertItem(String itemMaterial, int itemType) {
-        return new ItemStack(Material.getMaterial(itemMaterial), 1, (byte) itemType);
-    }
 
     public static List<String> formatLore(List<String> loreList) {
         List<String> loreFormatted = new ArrayList<>();

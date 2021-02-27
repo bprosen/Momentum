@@ -1,13 +1,10 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
-import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,6 +35,8 @@ public class InteractListener implements Listener {
                 return;
 
             event.setCancelled(true);
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
             if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&2Players &7»"))) {
 
                 player.getInventory().removeItem(item);
@@ -65,13 +64,12 @@ public class InteractListener implements Listener {
 
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
 
-                if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
+                if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
                     Parkour.getCheckpointManager().teleportPlayer(player);
                 else
                     player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 String levelName = playerStats.getLevel();
 
                 if (levelName != null) {
@@ -83,19 +81,21 @@ public class InteractListener implements Listener {
                             confirmMap.get(player.getName()).cancel();
                             confirmMap.remove(player.getName());
                             playerStats.resetCheckpoint();
+                            playerStats.resetPracticeMode();
                             player.teleport(level.getStartLocation());
-
                         } else {
                             // otherwise, put them in and ask them to confirm within 5 seconds
                             player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+
                             confirmMap.put(player.getName(), new BukkitRunnable() {
                                 public void run() {
-                                    if (confirmMap.containsKey(player.getName())) {
-                                        confirmMap.remove(player.getName());
-                                        player.sendMessage(Utils.translate("&cYou did not confirm in time"));
-                                    }
+                                if (confirmMap.containsKey(player.getName())) {
+                                    confirmMap.remove(player.getName());
+                                    player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                }
                                 }
                             }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+
                         }
                     }
                 } else {

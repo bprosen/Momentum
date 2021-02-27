@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.commands;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
+import com.parkourcraft.parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,7 +37,7 @@ public class Spectate_CMD implements CommandExecutor {
                                 if (playerStats.isSpectatable()) {
                                     if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
                                         spectatorStats.setPlayerToSpectate(playerStats);
-                                        Parkour.getSpectatorManager().setSpectatorMode(
+                                        SpectatorHandler.setSpectatorMode(
                                                 spectatorStats.getPlayer(), playerStats.getPlayer());
 
                                         playerStats.getPlayer().sendMessage(Utils.translate("&2" +
@@ -52,7 +53,7 @@ public class Spectate_CMD implements CommandExecutor {
                             }
                         }
                     } else if (spectatorStats.getPlayerToSpectate() != null)
-                        Parkour.getSpectatorManager().removeSpectatorMode(spectatorStats);
+                        SpectatorHandler.removeSpectatorMode(spectatorStats);
                     else {
                         if (spectatorStats.isSpectatable())
                             sender.sendMessage(Utils.translate("&7You can be spectated"));

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WorldGuardUtils implements Listener {
+public class WorldGuard implements Listener {
 
     private static WorldGuardPlugin getWorldGuard() {
         Plugin plugin = Parkour.getPlugin().getServer().getPluginManager().getPlugin("WorldGuard");

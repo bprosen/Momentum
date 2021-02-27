@@ -1,5 +1,6 @@
 package com.parkourcraft.parkour.data.stats;
 
+import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,7 +19,7 @@ public class PlayerStats {
     private PlayerStats playerToSpectate;
     private Clan clan;
     private Location currentCheckpoint = null;
-    private boolean practiceMode = false;
+    private Location practiceSpawn = null;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -107,12 +108,16 @@ public class PlayerStats {
         return spectatable;
     }
 
-    public boolean inPracticeMode() {
-        return practiceMode;
+    public void setPracticeMode(Location loc) {
+        practiceSpawn = loc;
     }
 
-    public void setPracticeMode(boolean practiceMode) {
-        this.practiceMode = practiceMode;
+    public void resetPracticeMode() {
+        practiceSpawn = null;
+    }
+
+    public Location getPracticeLocation() {
+        return practiceSpawn;
     }
 
     public void setClan(Clan clan) {

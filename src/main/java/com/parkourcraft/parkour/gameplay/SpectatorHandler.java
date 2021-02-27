@@ -78,7 +78,7 @@ public class SpectatorHandler {
         }
     }
 
-    public void shutdown() {
+    public static void shutdown() {
         for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
             if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
                 removeSpectatorMode(playerStats);

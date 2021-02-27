@@ -7,13 +7,11 @@ import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
-import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -85,6 +83,10 @@ public class MenuItemAction {
                 Checkpoint_DB.savePlayerAsync(player);
                 playerStats.resetCheckpoint();
             }
+
+            // if in practice mode
+            if (playerStats.getPracticeLocation() != null)
+                playerStats.resetPracticeMode();
 
             if (Checkpoint_DB.hasCheckpoint(player.getUniqueId(), level.getName())) {
                 Checkpoint_DB.loadPlayer(player.getUniqueId(), level.getName());

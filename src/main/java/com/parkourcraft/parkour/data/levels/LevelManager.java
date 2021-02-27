@@ -1,8 +1,6 @@
 package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.utils.dependencies.WorldGuardUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 

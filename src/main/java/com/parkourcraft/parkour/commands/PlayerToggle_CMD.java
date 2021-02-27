@@ -1,6 +1,5 @@
 package com.parkourcraft.parkour.commands;
 
-import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
