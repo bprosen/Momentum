@@ -60,14 +60,19 @@ public class LevelHandler {
                         if (elapsedTime > 0L && elapsedTime < 8388607L)
                             titleMessage += Utils.translate("&7 in &2" + time);
 
-                        // Run gameplay actions: teleport and messaging
+                        // run gameplay actions: teleport and messaging
                         player.teleport(level.getRespawnLocation());
                         List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());
 
+                        // if area they are teleporting to is empty
+                        // if not empty, make sure it is a level
+                        // if not a level (like spawn), reset level
                         if (getToRegions.isEmpty())
                             playerStats.resetLevel();
-                        else
+                        else if (Parkour.getLevelManager().get(getToRegions.get(0)) != null)
                             playerStats.setLevel(getToRegions.get(0));
+                        else
+                            playerStats.resetLevel();
 
                         Parkour.getStatsManager().get(player).resetCheckpoint();
 

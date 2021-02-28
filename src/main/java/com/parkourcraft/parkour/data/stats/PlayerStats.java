@@ -1,6 +1,5 @@
 package com.parkourcraft.parkour.data.stats;
 
-import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
