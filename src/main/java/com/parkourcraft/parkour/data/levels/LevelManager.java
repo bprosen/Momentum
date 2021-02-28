@@ -11,11 +11,13 @@ public class LevelManager {
     private List<LevelObject> levels = new ArrayList<>();
     private Map<String, LevelData> levelDataCache;
     private List<String> enabledLeaderboards = new ArrayList<>();
+    private String featuredLevel = null;
 
     public LevelManager(Plugin plugin) {
         this.levelDataCache = Levels_DB.getDataCache();
 
         load(); // Loads levels from configuration
+        pickFeatured();
         startScheduler(plugin);
     }
 
@@ -43,6 +45,33 @@ public class LevelManager {
 
             levels.add(levelObject);
         }
+    }
+
+    public void pickFeatured() {
+
+        List<LevelObject> temporaryList = new ArrayList<>();
+
+        // sort through all levels to make sure it does not have required levels and has more than 0 coin reward
+        for (LevelObject level : levels) {
+            if (level.getRequiredLevels().isEmpty() && level.getReward() > 0)
+                temporaryList.add(level);
+        }
+
+        Random ran = new Random();
+        LevelObject level = temporaryList.get(ran.nextInt(temporaryList.size()));
+
+        if (level != null) {
+            featuredLevel = level.getName();
+            Parkour.getPluginLogger().info("Featured Level: " + level.getName());
+        }
+    }
+
+    public LevelObject getFeaturedLevel() {
+        LevelObject levelObject = Parkour.getLevelManager().get(featuredLevel);
+
+        if (levelObject != null)
+            return levelObject;
+        return null;
     }
 
     private void startScheduler(Plugin plugin) {
@@ -122,5 +151,4 @@ public class LevelManager {
     public List<String> getEnabledLeaderboards() {
         return enabledLeaderboards;
     }
-
 }

@@ -83,8 +83,12 @@ public class LevelHandler {
                                 titleMessage
                         );
 
-                        // Broadcast the completion if enabled for the level
-                        if (level.getBroadcastCompletion()) {
+                        // broadcast completed if it the featured level
+                        if (levelName.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName())) {
+                            Bukkit.broadcastMessage(Utils.translate(
+                                    "&c&l" + player.getName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
+                            ));
+                        } else if (level.getBroadcastCompletion()) {
                             String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
 
                             broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
