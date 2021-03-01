@@ -26,6 +26,10 @@ public class LevelObject {
     private int scoreModifier = 1;
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
+    private boolean raceLevel = false;
+    private Location raceLocation1 = null;
+    private Location raceLocation2 = null;
+
     private int totalCompletionsCount = -1;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
 
@@ -199,6 +203,18 @@ public class LevelObject {
             else
                 message = Parkour.getSettingsManager().levels_message_completion;
 
+            // this acts as a boolean for races
+            if (Levels_YAML.isSection(name, "race")) {
+                // this checks if player1 and player2 has locations
+                if (Levels_YAML.isSection(name, "race.player1-loc") &&
+                    Levels_YAML.isSection(name, "race.player2-loc")) {
+
+                    raceLevel = true;
+                    raceLocation1 = Levels_YAML.getPlayerRaceLocation("player1", name);
+                    raceLocation2 = Levels_YAML.getPlayerRaceLocation("player2", name);
+                }
+            }
+
             maxCompletions = Levels_YAML.getMaxCompletions(name);
             broadcastCompletion = Levels_YAML.getBroadcastSetting(name);
             requiredLevels = Levels_YAML.getRequiredLevels(name);
@@ -220,6 +236,18 @@ public class LevelObject {
 
     public List<PotionEffect> getPotionEffects() {
         return potionEffects;
+    }
+
+    public Location getRaceLocation1() {
+        return raceLocation1;
+    }
+
+    public Location getRaceLocation2() {
+        return raceLocation2;
+    }
+
+    public boolean isRaceLevel() {
+        return raceLevel;
     }
 
     public boolean hasRequiredLevels(PlayerStats playerStats) {

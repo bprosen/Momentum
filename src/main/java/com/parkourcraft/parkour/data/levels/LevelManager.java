@@ -151,4 +151,15 @@ public class LevelManager {
     public List<String> getEnabledLeaderboards() {
         return enabledLeaderboards;
     }
+
+    public List<String> getRaceLevels() {
+
+        List<String> temporaryRaceLevelList = new ArrayList<>();
+
+        for (LevelObject levelObject : levels) {
+            if (levelObject.isRaceLevel())
+                temporaryRaceLevelList.add(levelObject.getName());
+        }
+        return temporaryRaceLevelList;
+    }
 }

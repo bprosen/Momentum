@@ -1,6 +1,9 @@
 package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -135,15 +138,11 @@ public class Levels_YAML {
 
         if (isSection(levelName, "potion-effects")) {
             for (int i = 1;; i++) {
-                if (Parkour.getConfigManager().get("levels").isConfigurationSection(
-                        levelName + ".potion-effects." + i)) {
+                if (isSection(levelName, "potion-effects." + i)) {
 
-                    String potionType = Parkour.getConfigManager().get("levels").getString(
-                            levelName + ".potion-effects." + i + ".type");
-                    int amplifier = Parkour.getConfigManager().get("levels").getInt(
-                            levelName + ".potion-effects." + i + ".amplifier");
-                    int duration = Parkour.getConfigManager().get("levels").getInt(
-                            levelName + ".potion-effects." + i + ".duration");
+                    String potionType = levelsFile.getString(levelName + ".potion-effects." + i + ".type");
+                    int amplifier = levelsFile.getInt(levelName + ".potion-effects." + i + ".amplifier");
+                    int duration = levelsFile.getInt(levelName + ".potion-effects." + i + ".duration");
 
                     potionEffects.add(
                             new PotionEffect(
@@ -154,5 +153,18 @@ public class Levels_YAML {
             }
         }
         return potionEffects;
+    }
+
+    public static Location getPlayerRaceLocation(String player, String levelName) {
+
+        String[] locStringSplit = levelsFile.getString(levelName + ".race." + player + "-loc").split(":");
+        World world = Bukkit.getWorld(locStringSplit[0]);
+        double x = Double.parseDouble(locStringSplit[1]);
+        double y = Double.parseDouble(locStringSplit[2]);
+        double z = Double.parseDouble(locStringSplit[3]);
+        float yaw = Float.parseFloat(locStringSplit[4]);
+        float pitch = Float.parseFloat(locStringSplit[5]);
+
+        return new Location(world, x, y, z, yaw, pitch);
     }
 }
