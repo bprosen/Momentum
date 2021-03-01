@@ -41,3 +41,6 @@ commands:
   practice:
     description: "PC-Parkour Practice Command"
     aliases: [prac]
+  race:
+    description: "PC-Parkour Race Command"
+    aliases: [races]
