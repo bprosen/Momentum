@@ -25,6 +25,11 @@ public class LevelHandler {
         if (playerStats != null && playerStats.getPlayerToSpectate() == null && level != null) {
             if (level.hasRequiredLevels(playerStats)) {
                 if (playerStats.getPracticeLocation() == null) {
+
+                    // if it is a race completion, end it
+                    if (playerStats.inRace())
+                        Parkour.getRaceManager().endRace(player);
+
                     int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 
                     if (level.getMaxCompletions() == -1 || playerLevelCompletions < level.getMaxCompletions()) {
