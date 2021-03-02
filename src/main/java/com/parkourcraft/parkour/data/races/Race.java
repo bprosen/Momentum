@@ -11,8 +11,8 @@ public class Race {
     private boolean bet = false;
     private LevelObject level;
     private double betAmount;
-    private Location originalPlayer1Loc = null;
-    private Location originalPlayer2Loc = null;
+    private Location originalPlayer1Loc;
+    private Location originalPlayer2Loc;
 
     public Race(Player player1, Player player2, LevelObject level, boolean doingBet, double betAmount) {
         this.player1 = player1;

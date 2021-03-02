@@ -394,7 +394,31 @@ public class Level_CMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&c&l" + levelName + " &7is not a level!"));
                     }
-                } else { // subcommand: unknown
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("raceset")) {
+
+                    if (!(sender instanceof Player)) {
+                        return true;
+                    }
+
+                    Player player = (Player) sender;
+
+                    if (a[2].equalsIgnoreCase("player1") || a[2].equalsIgnoreCase("player2")) {
+                        String levelName = a[1].toLowerCase();
+
+                        if (Parkour.getLevelManager().exists(levelName)) {
+                            if (Parkour.getLevelManager().get(levelName).isRaceLevel()) {
+                                Levels_YAML.setPlayerRaceLocation(a[2], levelName, player.getLocation());
+                                player.sendMessage(Utils.translate("&cYou set the location for &4" + a[2] + " &con level &4" + levelName));
+                            } else {
+                                sender.sendMessage(Utils.translate("&7The level &c" + levelName + " &7is not a race level"));
+                            }
+                        } else {
+                            sender.sendMessage(Utils.translate("&7The level &c" + levelName + " &7does not exist"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cPlayer must be player1 or player2"));
+                    }
+                } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
                 }
@@ -425,6 +449,7 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("removetime"));
         sender.sendMessage(getHelp("addleaderboard"));
         sender.sendMessage(getHelp("removeleaderboard"));
+        sender.sendMessage(getHelp("raceset"));
     }
 
     private static String getHelp(String cmd) {
@@ -461,9 +486,11 @@ public class Level_CMD implements CommandExecutor {
                 return Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time " +
                                       "from a level's leaderboard");
             case "addleaderboard":
-                return Utils.translate("&a/level addleaderboard <level> &7Add a leaderboard to cache");
+                return Utils.translate("&a/level addleaderboard <level>  &7Add a leaderboard to cache");
             case "removeleaderboard":
-                return Utils.translate("&a/level removeleaderboard <level> &7Remove a leaderboard from cache");
+                return Utils.translate("&a/level removeleaderboard <level>  &7Remove a leaderboard from cache");
+            case "raceset":
+                return Utils.translate("&a/level raceset <level> <player1/player2>  &7Sets the race location for player 1 or 2");
         }
         return "";
     }

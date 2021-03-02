@@ -155,6 +155,19 @@ public class Levels_YAML {
         return potionEffects;
     }
 
+    public static void setPlayerRaceLocation(String player, String levelName, Location loc) {
+
+        String world = loc.getWorld().getName();
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
+        float yaw = loc.getYaw();
+        float pitch = loc.getPitch();
+
+        levelsFile.set(levelName + ".race." + player + "-loc", world + ":" + x + ":" + y + ":" + z + ":" + yaw + ":" + pitch);
+        commit(levelName);
+    }
+
     public static Location getPlayerRaceLocation(String player, String levelName) {
 
         String[] locStringSplit = levelsFile.getString(levelName + ".race." + player + "-loc").split(":");

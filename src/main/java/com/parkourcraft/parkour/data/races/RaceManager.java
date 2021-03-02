@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.races;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Levels_YAML;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,26 +19,35 @@ public class RaceManager {
 
         List<String> temporaryLevelList = new ArrayList<>();
 
-        // this is what filters not in use races
-        for (Race race : getRaces()) {
-            for (String levelName : Parkour.getLevelManager().getRaceLevels()) {
-                if (!race.getRaceLevel().getName().equalsIgnoreCase(levelName))
-                    temporaryLevelList.add(levelName);
-            }
-        }
+        // if races are in use, then filter through which ones are in use
+        if (!getRaces().isEmpty()) {
+            // this is what filters not in use races
+            for (Race race : getRaces()) {
+                for (String levelName : Parkour.getLevelManager().getRaceLevels()) {
+                    if (!race.getRaceLevel().getName().equalsIgnoreCase(levelName)
+                            && Parkour.getLevelManager().get(levelName).hasValidRaceLocations()) {
 
-        // if there are no levels available
-        if (temporaryLevelList.isEmpty()) {
-            player1.sendMessage(Utils.translate("&cNo maps available for use, try again later"));
-            player2.sendMessage(Utils.translate("&cNo maps available for use, try again later"));
-            return;
+                        temporaryLevelList.add(levelName);
+                    }
+                }
+            }
+
+            // if there are no levels available
+            if (temporaryLevelList.isEmpty()) {
+                player1.sendMessage(Utils.translate("&cNo maps available for use, try again later"));
+                player2.sendMessage(Utils.translate("&cNo maps available for use, try again later"));
+                return;
+            }
+        } else {
+            // otherwise, add all race levels if none are in use
+            temporaryLevelList.addAll(Parkour.getLevelManager().getRaceLevels());
         }
 
         // picks random map
         Random ran = new Random();
         LevelObject level = Parkour.getLevelManager().get(
-                                temporaryLevelList.get(ran.nextInt(temporaryLevelList.size())
-                            ));
+                temporaryLevelList.get(ran.nextInt(temporaryLevelList.size())
+                ));
 
         // make sure it is not an invalid level
         if (level != null) {
@@ -47,6 +57,10 @@ public class RaceManager {
 
             player1.teleport(level.getRaceLocation1());
             player2.teleport(level.getRaceLocation2());
+
+            //
+            // TODO: then do a countdown and freeze them until its over
+            //
         } else {
             player1.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
             player2.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));

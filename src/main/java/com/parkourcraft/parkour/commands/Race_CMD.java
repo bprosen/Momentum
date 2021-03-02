@@ -53,18 +53,21 @@ public class Race_CMD implements CommandExecutor {
             return;
         }
 
-        if (confirmMap.containsKey(player.getName() + ":" + victim.getName())) {
-            confirmMap.get(player.getName() + ":" + victim.getName()).cancel();
-            confirmMap.remove(player.getName() + ":" + victim.getName());
+        if (confirmMap.containsKey(victim.getName() + ":" + player.getName())) {
+            confirmMap.get(victim.getName() + ":" + player.getName()).cancel();
+            confirmMap.remove(victim.getName() + ":" + player.getName());
 
             // start race
             Parkour.getRaceManager().startRace(player, victim, bet, betAmount);
         } else {
             // otherwise, put them in and ask them to confirm within 5 seconds
-            if (bet)
+            if (bet) {
                 victim.sendMessage(Utils.translate("&4" + player.getName() + " &7has sent you a race request with bet amount &4$" + betAmount));
-            else
-                victim.sendMessage(Utils.translate("&4" + player + " &7has sent you a race request"));
+                player.sendMessage(Utils.translate("&7You sent &4" + victim.getName() + " &7a race request with bet amount &4$" + betAmount));
+            } else {
+                victim.sendMessage(Utils.translate("&4" + player.getName() + " &7has sent you a race request"));
+                player.sendMessage(Utils.translate("&7You sent &4" + victim.getName() + " &7a race request"));
+            }
 
             victim.sendMessage(Utils.translate("&7Type &c/race " + player.getName() + " &7within &c15 seconds &7to accept"));
 

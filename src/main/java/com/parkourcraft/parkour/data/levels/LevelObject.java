@@ -206,10 +206,11 @@ public class LevelObject {
             // this acts as a boolean for races
             if (Levels_YAML.isSection(name, "race")) {
                 // this checks if player1 and player2 has locations
-                if (Levels_YAML.isSection(name, "race.player1-loc") &&
-                    Levels_YAML.isSection(name, "race.player2-loc")) {
+                raceLevel = true;
 
-                    raceLevel = true;
+                if (Levels_YAML.isSet(name, "race.player1-loc") &&
+                    Levels_YAML.isSet(name, "race.player2-loc")) {
+
                     raceLocation1 = Levels_YAML.getPlayerRaceLocation("player1", name);
                     raceLocation2 = Levels_YAML.getPlayerRaceLocation("player2", name);
                 }
@@ -248,6 +249,12 @@ public class LevelObject {
 
     public boolean isRaceLevel() {
         return raceLevel;
+    }
+
+    public boolean hasValidRaceLocations() {
+        if (Levels_YAML.isSet(name, "race.player1-loc") && Levels_YAML.isSet(name, "race.player2-loc"))
+            return true;
+        return false;
     }
 
     public boolean hasRequiredLevels(PlayerStats playerStats) {
