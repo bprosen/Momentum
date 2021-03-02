@@ -123,6 +123,7 @@ public class Parkour extends JavaPlugin {
         stats = null;
         perks = null;
         levels = null;
+        races = null;
         locations = null;
         settings = null;
         configs = null;
