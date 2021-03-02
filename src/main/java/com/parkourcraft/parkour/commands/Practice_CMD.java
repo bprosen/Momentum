@@ -26,11 +26,15 @@ public class Practice_CMD implements CommandExecutor {
 
             if (playerStats.getLevel() != null) {
                 if (player.isOnGround()) {
-                    if (playerStats.getPracticeLocation() != null) {
-                        PracticeHandler.resetPlayer(player, true);
+                    if (!playerStats.inRace()) {
+                        if (playerStats.getPracticeLocation() != null) {
+                            PracticeHandler.resetPlayer(player, true);
+                        } else {
+                            playerStats.setPracticeMode(player.getLocation());
+                            player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                        }
                     } else {
-                        playerStats.setPracticeMode(player.getLocation());
-                        player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou cannot enable/disable practice mode while falling"));

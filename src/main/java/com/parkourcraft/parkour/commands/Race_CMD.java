@@ -57,8 +57,14 @@ public class Race_CMD implements CommandExecutor {
             return;
         }
 
-        if (Parkour.getStatsManager().get(player).getPlayerToSpectate() != null) {
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        if (playerStats.getPlayerToSpectate() != null) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
+            return;
+        }
+
+        if (playerStats.getPracticeLocation() != null) {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
             return;
         }
 
