@@ -1,11 +1,13 @@
 package com.parkourcraft.parkour.data.races;
 
+import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.levels.Levels_YAML;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +60,59 @@ public class RaceManager {
             player1.teleport(level.getRaceLocation1());
             player2.teleport(level.getRaceLocation2());
 
-            //
-            // TODO: then do a countdown and freeze them until its over
-            //
+            // freeze and do countdown
+            new BukkitRunnable() {
+                int runCycles = 0;
+                public void run() {
+
+                    runCycles++;
+
+                    if (runCycles == 100) {
+                        TitleAPI.sendTitle(player1, 0, 20, 0, "&RACE", "");
+                        TitleAPI.sendTitle(player2, 0, 20, 0, "&RACE", "");
+                        return;
+                    }
+
+                    // race location variables
+                    double race1X = level.getRaceLocation1().getX();
+                    double race1Z = level.getRaceLocation1().getZ();
+                    double race2X = level.getRaceLocation2().getX();
+                    double race2Z = level.getRaceLocation2().getZ();
+
+                    // player location variables
+                    double player1X = player1.getLocation().getX();
+                    double player1Z = player1.getLocation().getZ();
+                    double player2X = player2.getLocation().getX();
+                    double player2Z = player2.getLocation().getZ();
+
+                    // teleport back if moved
+                    if (race1X != player1X || race1Z != player1Z)
+                        player1.teleport(level.getRaceLocation1());
+
+                    if (race2X != player2X || race2Z != player2Z)
+                        player2.teleport(level.getRaceLocation2());
+
+
+                    // countdown switch case
+                    switch (runCycles) {
+                        case 0:
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&Race Starting!", "&65");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&Race Starting!", "&65");
+                        case 20:
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&Race Starting!", "&64");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&Race Starting!", "&64");
+                        case 40:
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&Race Starting!", "&c3");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&Race Starting!", "&c3");
+                        case 60:
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&Race Starting!", "&c2");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&Race Starting!", "&c2");
+                        case 80:
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&Race Starting!", "&c1");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&Race Starting!", "&c1");
+                    }
+                }
+            }.runTaskTimer(Parkour.getPlugin(), 1, 1);
         } else {
             player1.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
             player2.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
@@ -86,9 +138,11 @@ public class RaceManager {
                 Bukkit.broadcastMessage("");
             }
 
-            // give winner money and take from loser
-            Parkour.getEconomy().withdrawPlayer(loser, raceObject.getBet());
-            Parkour.getEconomy().depositPlayer(winner, raceObject.getBet());
+            // give winner money and take from loser if betted on race
+            if (raceObject.hasBet()) {
+                Parkour.getEconomy().withdrawPlayer(loser, raceObject.getBet());
+                Parkour.getEconomy().depositPlayer(winner, raceObject.getBet());
+            }
 
             // check if winner is player 1, then teleport accordingly, otherwise they are player 2
             if (raceObject.isPlayer1(winner)) {
