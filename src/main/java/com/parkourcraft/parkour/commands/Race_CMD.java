@@ -73,6 +73,14 @@ public class Race_CMD implements CommandExecutor {
 
         // make sure they have enough money for the bet
         double victimBalance = Parkour.getEconomy().getBalance(victim);
+        double senderBalance = Parkour.getEconomy().getBalance(player);
+
+        if (senderBalance < betAmount) {
+            player.sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
+                    " Your Balance &4$" + senderBalance));
+            return;
+        }
+
         if (victimBalance < betAmount) {
             player.sendMessage(Utils.translate("&c" + victimName + " &7does not have enough to do this bet" +
                     " - &cTheir Balance &4$" + victimBalance));
@@ -115,21 +123,42 @@ public class Race_CMD implements CommandExecutor {
         // request exists
         if (inConfirmMap(victim, accepter)) {
 
+            String[] split = getStringFromConfirmMap(victim, accepter).split(":");
+            boolean doingBet = Boolean.parseBoolean(split[2]);
+            double betAmount = Double.parseDouble(split[3]);
+
             // conditions to cancel
             PlayerStats playerStats = Parkour.getStatsManager().get(accepter);
             if (playerStats.getPlayerToSpectate() != null) {
                 accepter.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
+                removeFromConfirmMap(victim, accepter);
                 return;
             }
 
             if (playerStats.getPracticeLocation() != null) {
                 accepter.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                removeFromConfirmMap(victim, accepter);
                 return;
             }
 
-            String[] split = getStringFromConfirmMap(victim, accepter).split(":");
-            boolean doingBet = Boolean.parseBoolean(split[2]);
-            double betAmount = Double.parseDouble(split[3]);
+            // make sure they still have enough money for the bet
+            double accepterBalance = Parkour.getEconomy().getBalance(accepter);
+            double senderBalance = Parkour.getEconomy().getBalance(victim);
+            if (accepterBalance < betAmount) {
+                accepter.sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
+                        " Your Balance &4$" + senderBalance));
+                removeFromConfirmMap(victim, accepter);
+                return;
+            }
+
+            if (senderBalance < betAmount) {
+                accepter.sendMessage(Utils.translate("&c" + victim.getName() + " &7does not have enough to do this bet" +
+                        " - &cTheir Balance &4$" + senderBalance));
+                removeFromConfirmMap(victim, accepter);
+                return;
+            }
+
+            // otherwise do race
             Parkour.getRaceManager().startRace(victim, accepter, doingBet, betAmount);
             removeFromConfirmMap(victim, accepter);
         } else {
