@@ -34,6 +34,20 @@ public class DatabaseManager {
                 runCaches();
             }
         }, 0L, 2L);
+
+        // run async random queue every 10 minutes to keep connection alive if nobody is online
+        new BukkitRunnable() {
+            public void run() {
+                try {
+                    PreparedStatement statement = connection.get().prepareStatement(
+                            "SELECT * FROM checkpoints WHERE UUID='s'");
+                    statement.execute();
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 20 * 60 * 10, 20 * 60 * 10);
     }
 
     public DatabaseConnection get() {
