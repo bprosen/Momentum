@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsManager;
+import com.parkourcraft.parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -53,6 +54,11 @@ public class Race_CMD implements CommandExecutor {
         Player victim = Bukkit.getPlayer(victimName);
         if (victim == null) {
             player.sendMessage(Utils.translate("&4" + victimName + " &cis offline"));
+            return;
+        }
+
+        if (Parkour.getStatsManager().get(player).getPlayerToSpectate() != null) {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
             return;
         }
 

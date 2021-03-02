@@ -19,6 +19,7 @@ public class PlayerStats {
     private Clan clan;
     private Location currentCheckpoint = null;
     private Location practiceSpawn = null;
+    private boolean inRace = false;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -58,6 +59,18 @@ public class PlayerStats {
         if (level != null)
             return true;
         return false;
+    }
+
+    public void startedRace() {
+        inRace = true;
+    }
+
+    public void endedRace() {
+        inRace = false;
+    }
+
+    public boolean inRace() {
+        return inRace;
     }
 
     public void setLevel(String level) {

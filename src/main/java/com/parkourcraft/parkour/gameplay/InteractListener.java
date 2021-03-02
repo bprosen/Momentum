@@ -64,42 +64,50 @@ public class InteractListener implements Listener {
 
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
 
-                if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                    Parkour.getCheckpointManager().teleportPlayer(player);
-                else
-                    player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+                if (!playerStats.inRace()) {
+                    if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                        Parkour.getCheckpointManager().teleportPlayer(player);
+                    else
+                        player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                }
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
 
                 String levelName = playerStats.getLevel();
 
-                if (levelName != null) {
-                    LevelObject level = Parkour.getLevelManager().get(levelName);
-                    if (level != null) {
+                if (!playerStats.inRace()) {
+                    if (levelName != null) {
+                        LevelObject level = Parkour.getLevelManager().get(levelName);
+                        if (level != null) {
 
-                        // gets if they have right clicked it already, if so, cancel the task and reset them
-                        if (confirmMap.containsKey(player.getName())) {
-                            confirmMap.get(player.getName()).cancel();
-                            confirmMap.remove(player.getName());
-                            playerStats.resetCheckpoint();
-                            playerStats.resetPracticeMode();
-                            player.teleport(level.getStartLocation());
-                        } else {
-                            // otherwise, put them in and ask them to confirm within 5 seconds
-                            player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+                            // gets if they have right clicked it already, if so, cancel the task and reset them
+                            if (confirmMap.containsKey(player.getName())) {
+                                confirmMap.get(player.getName()).cancel();
+                                confirmMap.remove(player.getName());
+                                playerStats.resetCheckpoint();
+                                playerStats.resetPracticeMode();
+                                player.teleport(level.getStartLocation());
+                            } else {
+                                // otherwise, put them in and ask them to confirm within 5 seconds
+                                player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
 
-                            confirmMap.put(player.getName(), new BukkitRunnable() {
-                                public void run() {
-                                if (confirmMap.containsKey(player.getName())) {
-                                    confirmMap.remove(player.getName());
-                                    player.sendMessage(Utils.translate("&cYou did not confirm in time"));
-                                }
-                                }
-                            }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                                confirmMap.put(player.getName(), new BukkitRunnable() {
+                                    public void run() {
+                                        if (confirmMap.containsKey(player.getName())) {
+                                            confirmMap.remove(player.getName());
+                                            player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                        }
+                                    }
+                                }.runTaskLater(Parkour.getPlugin(), 20 * 5));
 
+                            }
                         }
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou are not in a level"));
                     }
                 } else {
-                    player.sendMessage(Utils.translate("&cYou are not in a level"));
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                 }
             }
         }
