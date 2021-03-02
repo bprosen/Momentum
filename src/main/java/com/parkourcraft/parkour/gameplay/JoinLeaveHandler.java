@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
+import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
@@ -60,16 +61,25 @@ public class JoinLeaveHandler implements Listener {
 
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        RaceManager raceManager = Parkour.getRaceManager();
 
+        // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
             Checkpoint_DB.savePlayerAsync(player);
 
+        // if left in spectator, remove it
         if (playerStats.getPlayerToSpectate() != null)
             SpectatorHandler.removeSpectatorMode(playerStats);
 
+        // if left in practice mode, reset it
         if (playerStats.getPracticeLocation() != null)
             PracticeHandler.resetPlayer(player, false);
 
+        // if left in race, end it
+        if (playerStats.inRace())
+            raceManager.endRace(raceManager.get(player).getOpponent(player));
+
+        // if left as hidden, remove them
         if (PlayerHider.containsPlayer(player))
             PlayerHider.removeHiddenPlayer(player);
     }
