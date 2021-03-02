@@ -10,6 +10,7 @@ import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -70,6 +71,15 @@ public class RaceManager {
 
             player1.teleport(level.getRaceLocation1());
             player2.teleport(level.getRaceLocation2());
+
+            // remove potion effects
+            for (PotionEffect effects : player1.getActivePotionEffects()) {
+                player1.removePotionEffect(effects.getType());
+            }
+
+            for (PotionEffect effects : player2.getActivePotionEffects()) {
+                player2.removePotionEffect(effects.getType());
+            }
 
             // freeze and do countdown
             new BukkitRunnable() {
@@ -146,7 +156,7 @@ public class RaceManager {
 
             if (raceObject.hasBet())
                 Bukkit.broadcastMessage(Utils.translate("&4&l" + winner.getName() + " &chas beaten &4&l" + loser.getName()
-                                        + " &cin a race for &6&l$" + raceObject.getBet()));
+                                        + " &cin a race for &6$" + raceObject.getBet()));
             else
                 Bukkit.broadcastMessage(Utils.translate("&4&l" + winner.getName() + " &chas beaten &4&l" + loser.getName()
                                         + " &cin a race!"));

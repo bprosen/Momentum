@@ -136,10 +136,12 @@ public class LevelHandler {
 
     // Respawn player if checkpoint isn't there
     static void respawnPlayer(Player player, LevelObject level) {
-        Location loc = level.getStartLocation();
+        if (level != null) {
+            Location loc = level.getStartLocation();
 
-        if (level != null && loc != null)
-            player.teleport(loc);
+            if (loc != null)
+                player.teleport(loc);
+        }
     }
 
     static void startedLevel(Player player) {

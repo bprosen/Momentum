@@ -82,9 +82,9 @@ public class Checkpoint_DB {
     }
 
     public static void saveAllPlayers() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (Parkour.getStatsManager().get(player).getCheckpoint() != null)
-                savePlayer(player);
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getCheckpoint() != null)
+                savePlayer(playerStats.getPlayer());
         }
     }
 
