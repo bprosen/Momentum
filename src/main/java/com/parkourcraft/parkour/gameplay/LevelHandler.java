@@ -27,8 +27,10 @@ public class LevelHandler {
                 if (playerStats.getPracticeLocation() == null) {
 
                     // if it is a race completion, end it
-                    if (playerStats.inRace())
+                    if (playerStats.inRace()) {
                         Parkour.getRaceManager().endRace(player);
+                        return;
+                    }
 
                     int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 
