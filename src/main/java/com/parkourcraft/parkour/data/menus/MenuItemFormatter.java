@@ -112,7 +112,7 @@ public class MenuItemFormatter {
             // Click To Go and Reward Section
             itemLore.add(Utils.translate("&7Click to go to " + formattedTitle
                          .replace("&l", "").replace("&o", "")));
-            itemLore.add(Utils.translate("  &6" + level.getReward() + " Coin &7Reward"));
+            itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
 
             // Required Levels Section
             if (level.getRequiredLevels().size() > 0) {
