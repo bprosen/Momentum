@@ -73,47 +73,52 @@ public class MenuItemAction {
         LevelObject level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
         if (!playerStats.inRace()) {
-            if (level.hasRequiredLevels(playerStats)) {
+            if (!level.getName().equalsIgnoreCase(playerStats.getLevel())) {
+                if (level.hasRequiredLevels(playerStats)) {
+                    player.closeInventory();
+
+                    playerStats.setLevel(level.getName());
+
+                    for (PotionEffect potionEffect : player.getActivePotionEffects())
+                        player.removePotionEffect(potionEffect.getType());
+
+                    // save if has checkpoint
+                    if (playerStats.getCheckpoint() != null) {
+                        Checkpoint_DB.savePlayerAsync(player);
+                        playerStats.resetCheckpoint();
+                    }
+
+                    // if in practice mode
+                    if (playerStats.getPracticeLocation() != null)
+                        playerStats.resetPracticeMode();
+
+                    if (Checkpoint_DB.hasCheckpoint(player.getUniqueId(), level.getName())) {
+                        Checkpoint_DB.loadPlayer(player.getUniqueId(), level.getName());
+                        Parkour.getCheckpointManager().teleportPlayer(player);
+                        player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                    } else {
+                        player.teleport(level.getStartLocation());
+                        player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
+                                + level.getFormattedTitle()));
+                    }
+
+                    if (!level.getPotionEffects().isEmpty()) {
+                        for (PotionEffect potionEffect : level.getPotionEffects())
+                            player.addPotionEffect(potionEffect);
+                    }
+
+                    TitleAPI.sendTitle(
+                            player, 10, 40, 10,
+                            "",
+                            level.getFormattedTitle()
+                    );
+                }
+            } else {
                 player.closeInventory();
-
-                for (PotionEffect potionEffect : player.getActivePotionEffects())
-                    player.removePotionEffect(potionEffect.getType());
-
-                // save if has checkpoint
-                if (playerStats.getCheckpoint() != null) {
-                    Checkpoint_DB.savePlayerAsync(player);
-                    playerStats.resetCheckpoint();
-                }
-
-                // if in practice mode
-                if (playerStats.getPracticeLocation() != null)
-                    playerStats.resetPracticeMode();
-
-                if (Checkpoint_DB.hasCheckpoint(player.getUniqueId(), level.getName())) {
-                    Checkpoint_DB.loadPlayer(player.getUniqueId(), level.getName());
-                    Parkour.getCheckpointManager().teleportPlayer(player);
-                    player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
-                } else {
-                    player.teleport(level.getStartLocation());
-                }
-
-                playerStats.setLevel(level.getName());
-
-                if (!level.getPotionEffects().isEmpty()) {
-                    for (PotionEffect potionEffect : level.getPotionEffects())
-                        player.addPotionEffect(potionEffect);
-                }
-
-                player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
-                        + level.getFormattedTitle()));
-
-                TitleAPI.sendTitle(
-                        player, 10, 40, 10,
-                        "",
-                        level.getFormattedTitle()
-                );
+                player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
             }
         } else {
+            player.closeInventory();
             player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
         }
     }

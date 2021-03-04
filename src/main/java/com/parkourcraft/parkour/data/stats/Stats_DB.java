@@ -25,7 +25,7 @@ public class Stats_DB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id",
+                "player_id, player_name, spectatable, clan_id, rank_id",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 

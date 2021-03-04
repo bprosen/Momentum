@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -55,16 +56,15 @@ public class Scoreboard {
         // Title
         board.add(Utils.translate("&c&lRenatus Network"));
 
-        if (level == null)
-            board.add(Utils.translate("&7"));
-
-        String coinBalance = Utils.translate("&6" + (int) Parkour.getEconomy().getBalance(player) + " &e&lCoins");
-        board.add(formatSpacing(coinBalance));
+        board.add(Utils.translate("&7"));
 
         if (playerStats.getRank() != null) {
-            String rankString = Utils.translate("&6&lRank &c" + playerStats.getRank().getRankTitle());
-            board.add(formatSpacing(rankString));
+            String rankString = Utils.translate("   &e&lRank &6" + playerStats.getRank().getRankTitle());
+            board.add(rankString);
         }
+
+        String coinBalance = Utils.translate("   &e&lCoins &6" + Utils.formatNumber(Parkour.getEconomy().getBalance(player)));
+        board.add(coinBalance);
 
         if (level != null) {
             board.add(formatSpacing(Utils.translate("&7")));
@@ -72,7 +72,7 @@ public class Scoreboard {
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));
 
-            String reward = Utils.translate("&6" + level.getReward());
+            String reward = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
             board.add(formatSpacing(reward));
 
             if (playerStats != null && playerStats.getLevelStartTime() > 0) {

@@ -42,7 +42,6 @@ public class Parkour extends JavaPlugin {
     private static RaceManager races;
     private static RanksManager ranks;
 
-
     @Override
     public void onEnable() {
         plugin = this;
