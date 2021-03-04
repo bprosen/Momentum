@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -99,8 +100,8 @@ public class MenuItemAction {
                         player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                 + level.getFormattedTitle()));
                     }
-
                     playerStats.setLevel(level.getName());
+                    playerStats.disableLevelStartTime();
 
                     if (!level.getPotionEffects().isEmpty()) {
                         for (PotionEffect potionEffect : level.getPotionEffects())
