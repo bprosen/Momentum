@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perks_DB;
+import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 
 import java.util.*;
@@ -48,6 +49,11 @@ public class Stats_DB {
                     if (clan != null)
                         playerStats.setClan(clan);
                 }
+
+                int rankID = Integer.parseInt(playerResult.get("rank_id"));
+                Rank rank = Parkour.getRanksManager().get(rankID);
+                if (rank != null)
+                    playerStats.setRank(rank);
             }
         } else {
             insertPlayerID(playerStats);

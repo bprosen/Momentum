@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.data.clans.Clan;
+import com.parkourcraft.parkour.data.rank.Rank;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -20,6 +21,7 @@ public class PlayerStats {
     private Location currentCheckpoint = null;
     private Location practiceSpawn = null;
     private boolean inRace = false;
+    private Rank rank;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -120,6 +122,14 @@ public class PlayerStats {
         return spectatable;
     }
 
+    public void setRank(Rank rank) {
+        this.rank = rank;
+    }
+
+    public Rank getRank() {
+        return rank;
+    }
+
     public void setPracticeMode(Location loc) {
         practiceSpawn = loc;
     }
@@ -203,7 +213,6 @@ public class PlayerStats {
     public Location getCheckpoint() { return currentCheckpoint; }
 
     public void resetCheckpoint() {
-        if (currentCheckpoint != null)
-            currentCheckpoint = null;
+        currentCheckpoint = null;
     }
 }

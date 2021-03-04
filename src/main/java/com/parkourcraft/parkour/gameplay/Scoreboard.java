@@ -49,7 +49,8 @@ public class Scoreboard {
 
     private static void displayScoreboard(Player player) {
         List<String> board = new ArrayList<>();
-        LevelObject level = Parkour.getLevelManager().get(Parkour.getStatsManager().get(player).getLevel());
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        LevelObject level = Parkour.getLevelManager().get(playerStats.getLevel());
 
         // Title
         board.add(Utils.translate("&c&lRenatus Network"));
@@ -60,10 +61,13 @@ public class Scoreboard {
         String coinBalance = Utils.translate("&6" + (int) Parkour.getEconomy().getBalance(player) + " &e&lCoins");
         board.add(formatSpacing(coinBalance));
 
+        if (playerStats.getRank() != null) {
+            String rankString = Utils.translate("&6&lRank &c" + playerStats.getRank().getRankTitle());
+            board.add(formatSpacing(rankString));
+        }
 
         if (level != null) {
             board.add(formatSpacing(Utils.translate("&7")));
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));
