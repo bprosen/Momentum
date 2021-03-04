@@ -77,8 +77,6 @@ public class MenuItemAction {
                 if (level.hasRequiredLevels(playerStats)) {
                     player.closeInventory();
 
-                    playerStats.setLevel(level.getName());
-
                     for (PotionEffect potionEffect : player.getActivePotionEffects())
                         player.removePotionEffect(potionEffect.getType());
 
@@ -101,6 +99,8 @@ public class MenuItemAction {
                         player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                 + level.getFormattedTitle()));
                     }
+
+                    playerStats.setLevel(level.getName());
 
                     if (!level.getPotionEffects().isEmpty()) {
                         for (PotionEffect potionEffect : level.getPotionEffects())
