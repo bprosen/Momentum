@@ -23,6 +23,7 @@ public class ConfigManager {
         initialize("locations", plugin);
         initialize("menus", plugin);
         initialize("perks", plugin);
+        initialize("ranks", plugin);
     }
 
     private void initialize(String fileName, Plugin plugin) {
