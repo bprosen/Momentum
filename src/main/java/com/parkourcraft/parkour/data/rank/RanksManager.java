@@ -62,6 +62,15 @@ public class RanksManager {
         }
     }
 
+    public List<String> getNames() {
+        List<String> tempList = new ArrayList<>();
+
+        for (Rank rank : rankList)
+            tempList.add(rank.getRankName());
+
+        return tempList;
+    }
+
     public void remove(String rankName) {
         for (Iterator<Rank> iterator = rankList.iterator(); iterator.hasNext();) {
             if (iterator.next().getRankName().equals(rankName)) {
@@ -69,6 +78,10 @@ public class RanksManager {
                 iterator.remove();
             }
         }
+    }
+
+    public List<Rank> getRankList() {
+        return rankList;
     }
 
     public boolean exists(String rankName) {
