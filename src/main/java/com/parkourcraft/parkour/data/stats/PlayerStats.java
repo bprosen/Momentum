@@ -100,6 +100,10 @@ public class PlayerStats {
         this.spectateSpawn = spectateSpawn;
     }
 
+    public void resetSpectateSpawn() {
+        spectateSpawn = null;
+    }
+
     public Location getSpectateSpawn() {
         return spectateSpawn;
     }

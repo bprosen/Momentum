@@ -43,7 +43,7 @@ public class SpectatorHandler {
                     player, 10, 40, 10,
                     "",
                     Utils.translate("&7You are no longer spectating anyone"));
-            playerStats.setSpectateSpawn(null);
+            playerStats.resetSpectateSpawn();
         }
     }
 
