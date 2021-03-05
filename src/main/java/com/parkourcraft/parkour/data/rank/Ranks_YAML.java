@@ -11,7 +11,7 @@ public class Ranks_YAML {
     private static FileConfiguration ranksConfig = Parkour.getConfigManager().get("ranks");
 
     private static void commit() {
-        Parkour.getConfigManager().save("perks");
+        Parkour.getConfigManager().save("ranks");
     }
 
     public static List<String> getNames() {

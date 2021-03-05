@@ -44,8 +44,8 @@ commands:
   race:
     description: "PC-Parkour Race Command"
     aliases: [races]
-  ranks:
+  rank:
     description: "PC-Parkour Rank Command"
-    aliases: [rank]
+    aliases: [ranks]
   rankup:
     description: "PC-Parkour Rankup Command"

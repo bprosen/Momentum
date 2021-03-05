@@ -202,8 +202,7 @@ public class PlayerStats {
     }
 
     public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed) {
-        if (levelName != null)
-            this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
+        this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
     }
 
     public Map<String, List<LevelCompletion>> getLevelCompletionsMap() {

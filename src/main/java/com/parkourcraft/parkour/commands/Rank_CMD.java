@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Levels_YAML;
 import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.rank.RanksManager;
+import com.parkourcraft.parkour.data.rank.Ranks_DB;
 import com.parkourcraft.parkour.data.rank.Ranks_YAML;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -12,7 +13,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Ranks_CMD implements CommandExecutor {
+import java.util.Arrays;
+
+public class Rank_CMD implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
@@ -39,7 +42,8 @@ public class Ranks_CMD implements CommandExecutor {
 
                 if (ranksManager.exists(rankName)) {
                     Rank rank = ranksManager.get(rankName);
-                    Parkour.getStatsManager().get(player).setRank(rank);
+                    Parkour.getStatsManager().get(victim).setRank(rank);
+                    Ranks_DB.updateRank(victim.getUniqueId(), rank.getRankId());
                     player.sendMessage(Utils.translate("&7You set &c" + victim.getName() + "&7's rank to &c" + rank.getRankTitle()));
                 } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
@@ -49,13 +53,15 @@ public class Ranks_CMD implements CommandExecutor {
                 player.sendMessage(Utils.translate("&7Ranks Loaded: " + String.join("&7, &c",
                         Parkour.getRanksManager().getNames())));
 
-            } else if (a.length == 4 && a[0].equalsIgnoreCase("create")) {
+            } else if (a.length >= 4 && a[0].equalsIgnoreCase("create")) {
 
-                String rankName = a[1];
-                String rankTitle = a[2];
+                String rankName = a[1].toLowerCase();
 
-                if (Utils.isDouble(a[3])) {
-                    double rankUpPrice = Double.parseDouble(a[3]);
+                String[] split = Arrays.copyOfRange(a, 3, a.length);
+                String rankTitle = String.join(" ", split);
+
+                if (Utils.isDouble(a[2])) {
+                    double rankUpPrice = Double.parseDouble(a[2]);
                     if (!ranksManager.exists(rankName)) {
 
                         // create in config
@@ -98,7 +104,7 @@ public class Ranks_CMD implements CommandExecutor {
     }
 
     private void sendRank(Player player) {
-        player.sendMessage(Utils.translate("&a&lYour rank &6" +
+        player.sendMessage(Utils.translate("&cYou are &6" +
                 Parkour.getStatsManager().get(player).getRank().getRankTitle()));
     }
 
@@ -125,12 +131,13 @@ public class Ranks_CMD implements CommandExecutor {
             case "load":
                 return Utils.translate("&c/ranks load  &7Loads ranks.yml then ranks");
             case "create":
-                return Utils.translate("&c/ranks create <rankName> <rankTitle> <rankUpPrice>  &7Create a rank");
+                return Utils.translate("&c/ranks create <rankName> <rankUpPrice> <rankTitle>  &7Create a rank (can use spaces in <rankTitle>)");
             case "set":
                 return Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank");
             case "help":
                 return Utils.translate("&c/ranks help  &7Displays this page");
             case "":
+                return Utils.translate("&c/rank  &7Tells you your rank");
         }
         return "";
     }
