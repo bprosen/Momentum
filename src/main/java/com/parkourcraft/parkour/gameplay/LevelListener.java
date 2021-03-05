@@ -117,13 +117,14 @@ public class LevelListener implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        // this is mainly QOL for operators!
-        if (player.isOp()) {
+        // this is mainly QOL for staff!
+        if (player.hasPermission("pc-parkour.staff")) {
             List<String> regions = WorldGuard.getRegions(event.getTo());
             if (!regions.isEmpty()) {
 
                 // make sure the area they are spawning in is a level
                 LevelObject level = Parkour.getLevelManager().get(regions.get(0));
+
                 if (level != null && !level.getName().equalsIgnoreCase(playerStats.getLevel()))
                     Parkour.getStatsManager().get(player).setLevel(regions.get(0));
 
@@ -133,7 +134,6 @@ public class LevelListener implements Listener {
                     Checkpoint_DB.savePlayerAsync(player);
                     playerStats.resetCheckpoint();
                 }
-
                 playerStats.resetLevel();
             }
         }
