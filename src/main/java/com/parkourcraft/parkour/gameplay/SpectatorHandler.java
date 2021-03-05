@@ -45,7 +45,7 @@ public class SpectatorHandler {
     public static void setSpectatorMode(Player spectator, Player player) {
         spectator.setAllowFlight(true);
         spectator.setFlying(true);
-        PlayerHider.hidePlayer(spectator);
+        PlayerHider.hidePlayer(spectator, true);
         spectateToPlayer(spectator, player);
     }
 
@@ -56,7 +56,7 @@ public class SpectatorHandler {
         spectatorStats.setPlayerToSpectate(null);
         player.setFlying(false);
         player.setAllowFlight(false);
-        PlayerHider.showPlayer(player);
+        PlayerHider.showPlayer(player, true);
         respawnToLobby(player);
     }
 

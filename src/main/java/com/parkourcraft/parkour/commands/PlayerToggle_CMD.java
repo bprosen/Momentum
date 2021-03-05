@@ -18,10 +18,10 @@ public class PlayerToggle_CMD implements CommandExecutor {
 
         if (a.length == 0)
             if (PlayerHider.containsPlayer(player)) {
-                PlayerHider.showPlayer(player);
+                PlayerHider.showPlayer(player, false);
                 player.sendMessage(Utils.translate("&aYou have turned on players"));
             } else {
-                PlayerHider.hidePlayer(player);
+                PlayerHider.hidePlayer(player, false);
                 player.sendMessage(Utils.translate("&cYou have turned off players"));
             }
         return true;

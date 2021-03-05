@@ -9,19 +9,24 @@ public class PlayerHider {
 
     private static HashSet<String> hiddenPlayers = new HashSet<>();
 
-    public static void hidePlayer(Player player) {
+    public static void hidePlayer(Player player, boolean spectator) {
         hiddenPlayers.add(player.getName());
         for (Player online : Bukkit.getOnlinePlayers()) {
-            if (!player.isOp())
+            if (!online.isOp() && !spectator)
                 player.hidePlayer(online);
+            // if they are op, but the person thats hiding everyone is a spectator
+            else if (spectator)
+                online.hidePlayer(player);
         }
     }
 
-    public static void showPlayer(Player player) {
+    public static void showPlayer(Player player, boolean spectator) {
         hiddenPlayers.remove(player.getName());
         for (Player online : Bukkit.getOnlinePlayers()) {
-            if (!player.isOp())
+            if (!online.isOp() && !spectator)
                 player.showPlayer(online);
+            else if (spectator)
+                online.showPlayer(player);
         }
     }
 
