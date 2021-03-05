@@ -50,18 +50,18 @@ public class LevelListener implements Listener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // Start timer
         if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.STONE_PLATE)) {
 
             String levelName = Parkour.getStatsManager().get(player).getLevel();
-            if (levelName != null)
+            if (levelName != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null)
                 LevelHandler.startedLevel(player);
 
         // Checkpoint
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.GOLD_PLATE)) {
 
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
             String levelName = Parkour.getStatsManager().get(player).getLevel();
 
             if (levelName != null) {
@@ -79,8 +79,6 @@ public class LevelListener implements Listener {
                         playerStats.setCheckpoint(block.getLocation());
                         player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
                     }
-                } else {
-                    player.sendMessage(Utils.translate("&cYou cannot set a checkpoint while in practice mode"));
                 }
             }
         }
