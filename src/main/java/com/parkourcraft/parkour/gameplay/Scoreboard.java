@@ -63,7 +63,7 @@ public class Scoreboard {
             board.add(rankString);
         }
 
-        String coinBalance = Utils.translate("  &e&lCoins &6" + Utils.formatNumber(Parkour.getEconomy().getBalance(player)));
+        String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(player));
         board.add(coinBalance);
 
         if (level != null) {
@@ -72,7 +72,7 @@ public class Scoreboard {
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));
 
-            String reward = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
+            String reward = Utils.translate("&6" + level.getReward());
             board.add(formatSpacing(reward));
 
             if (playerStats != null && playerStats.getLevelStartTime() > 0) {
