@@ -76,7 +76,7 @@ public class Scoreboard {
         // practice section of scoreboard
         } else if (playerStats.getPracticeLocation() != null) {
 
-            board.add(formatSpacing(Utils.translate("&6Prac Mode &aOn")));
+            board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
             board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
 
         // level section of scoreboard
