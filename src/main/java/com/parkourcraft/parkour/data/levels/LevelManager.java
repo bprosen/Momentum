@@ -10,7 +10,6 @@ public class LevelManager {
 
     private List<LevelObject> levels = new ArrayList<>();
     private Map<String, LevelData> levelDataCache;
-    private List<String> enabledLeaderboards = new ArrayList<>();
     private String featuredLevel = null;
 
     public LevelManager(Plugin plugin) {
@@ -146,10 +145,6 @@ public class LevelManager {
             levelNamesLower.put(level.getName().toLowerCase(), level.getName());
 
         return levelNamesLower;
-    }
-
-    public List<String> getEnabledLeaderboards() {
-        return enabledLeaderboards;
     }
 
     public List<String> getRaceLevels() {

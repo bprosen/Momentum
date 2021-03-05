@@ -23,28 +23,24 @@ public class Stats_CMD implements CommandExecutor {
             LevelObject levelObject = Parkour.getLevelManager().get(levelName);
 
             if (levelObject != null) {
-                if (Parkour.getLevelManager().getEnabledLeaderboards().contains(levelName)) {
-                    sender.sendMessage(Utils.translate(levelObject.getFormattedTitle() + " &7Leaderboard"));
-                    List<LevelCompletion> completions = levelObject.getLeaderboard();
+                sender.sendMessage(Utils.translate(levelObject.getFormattedTitle() + " &7Leaderboard"));
+                List<LevelCompletion> completions = levelObject.getLeaderboard();
 
-                    if (completions.size() > 0)
-                        for (int i = 0; i <= completions.size() - 1; i++) {
-                            LevelCompletion levelCompletion = completions.get(i);
-                            int rank = i + 1;
-                            sender.sendMessage(Utils.translate(" &7" + rank + " &2" +
-                                    (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" +
-                                    levelCompletion.getPlayerName()));
-                        }
-                    else
-                        sender.sendMessage(Utils.translate("&cNo timed completions to display"));
+                if (completions.size() > 0)
+                    for (int i = 0; i <= completions.size() - 1; i++) {
+                        LevelCompletion levelCompletion = completions.get(i);
+                        int rank = i + 1;
+                        sender.sendMessage(Utils.translate(" &7" + rank + " &2" +
+                                (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" +
+                                levelCompletion.getPlayerName()));
+                    }
+                else
+                    sender.sendMessage(Utils.translate("&cNo timed completions to display"));
 
-                    int totalCompletionsCount = levelObject.getTotalCompletionsCount();
-                    String outOfMessage = Utils.translate("&7Out of &2" + totalCompletionsCount);
+                int totalCompletionsCount = levelObject.getTotalCompletionsCount();
+                String outOfMessage = Utils.translate("&7Out of &2" + totalCompletionsCount);
 
-                    sender.sendMessage(outOfMessage);
-                } else {
-                    sender.sendMessage(Utils.translate("&7This level does not have an enabled leaderboard"));
-                }
+                sender.sendMessage(outOfMessage);
             } else {
                 sender.sendMessage(Utils.translate("&&No level named '&c" + levelName + "&7' exists"));
             }
@@ -60,18 +56,14 @@ public class Stats_CMD implements CommandExecutor {
                     LevelObject level = Parkour.getLevelManager().get(levelCompletionsEntry.getKey());
 
                     if (level != null) {
-                        String levelCompletions = level.getFormattedTitle() + Utils.translate("&& :&2");
 
-                        int untimed = 0;
+                        LevelCompletion levelCompletion = levelCompletionsList.get(0);
 
-                        for (LevelCompletion levelCompletion : levelCompletionsList)
-                            if (levelCompletion.getCompletionTimeElapsed() == 0L)
-                                untimed++;
-                            else
-                                levelCompletions = levelCompletions + " "
-                                    + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s";
-
-                        player.sendMessage(levelCompletions);
+                        if (levelCompletion.getCompletionTimeElapsed() > 0) {
+                            String levelCompletions = Utils.translate(level.getFormattedTitle() + "  &2"
+                                        + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s");
+                            player.sendMessage(levelCompletions);
+                        }
                     }
                 }
             }

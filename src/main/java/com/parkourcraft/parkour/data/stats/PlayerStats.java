@@ -175,7 +175,7 @@ public class PlayerStats {
         if (levelCompletionsMap.containsKey(levelName)) {
 
             for (LevelCompletion levelCompletion : levelCompletionsMap.get(levelName))
-                if (levelCompletion.getCompletionTimeElapsed() > 0)
+                if (levelCompletion != null && levelCompletion.getCompletionTimeElapsed() > 0)
                     levelCompletions.add(levelCompletion);
 
             if (levelCompletions.size() < 2)

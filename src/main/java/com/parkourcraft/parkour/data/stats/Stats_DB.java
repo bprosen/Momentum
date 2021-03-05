@@ -157,8 +157,7 @@ public class Stats_DB {
     }
 
     public static void loadLeaderboards() {
-        for (String levelName : Parkour.getLevelManager().getEnabledLeaderboards()) {
-            LevelObject levelObject = Parkour.getLevelManager().get(levelName);
+        for (LevelObject levelObject : Parkour.getLevelManager().getLevels()) {
             if (levelObject != null)
                 loadLeaderboard(levelObject);
         }

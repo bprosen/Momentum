@@ -355,45 +355,6 @@ public class Level_CMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         sender.sendMessage(getHelp("modifier"));
                     }
-                } else if (a.length == 2 && a[0].equalsIgnoreCase("addleaderboard")) {
-
-                    String levelName = a[1].toLowerCase();
-
-                    if (Parkour.getLevelManager().exists(levelName)) {
-                        if (!Parkour.getLevelManager().getEnabledLeaderboards().contains(levelName)) {
-                            Parkour.getLevelManager().getEnabledLeaderboards().add(levelName);
-                            Stats_DB.loadLeaderboard(Parkour.getLevelManager().get(levelName));
-
-                            Parkour.getConfigManager().get("levels").set("leaderboard.levels", Parkour.getLevelManager().getEnabledLeaderboards());
-                            Parkour.getConfigManager().save("levels");
-                            Parkour.getConfigManager().load("levels");
-
-                            sender.sendMessage(Utils.translate("&7You succesfully enabled &c&l" + levelName + "&7's Leaderboard"));
-                        } else {
-                            sender.sendMessage(Utils.translate("&7This level already has a leaderboard enabled!"));
-                        }
-                    } else {
-                            sender.sendMessage(Utils.translate("&c&l" + levelName + " &7is not a level!"));
-                    }
-                } else if (a.length == 2 && a[0].equalsIgnoreCase("removeleaderboard")) {
-
-                    String levelName = a[1].toLowerCase();
-
-                    if (Parkour.getLevelManager().exists(levelName)) {
-                        if (Parkour.getLevelManager().getEnabledLeaderboards().contains(levelName)) {
-                            Parkour.getLevelManager().getEnabledLeaderboards().remove(levelName);
-
-                            Parkour.getConfigManager().get("levels").set("leaderboard.levels", Parkour.getLevelManager().getEnabledLeaderboards());
-                            Parkour.getConfigManager().save("levels");
-                            Parkour.getConfigManager().load("levels");
-
-                            sender.sendMessage(Utils.translate("&7You succesfully disabled &c&l" + levelName + "&7's Leaderboard"));
-                        } else {
-                            sender.sendMessage(Utils.translate("&7This level does not have a leaderboard enabled!"));
-                        }
-                    } else {
-                        sender.sendMessage(Utils.translate("&c&l" + levelName + " &7is not a level!"));
-                    }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("raceset")) {
 
                     if (!(sender instanceof Player)) {
@@ -447,8 +408,6 @@ public class Level_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("requires"));
         sender.sendMessage(getHelp("modifier"));
         sender.sendMessage(getHelp("removetime"));
-        sender.sendMessage(getHelp("addleaderboard"));
-        sender.sendMessage(getHelp("removeleaderboard"));
         sender.sendMessage(getHelp("raceset"));
     }
 
@@ -485,10 +444,6 @@ public class Level_CMD implements CommandExecutor {
             case "removetime":
                 return Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time " +
                                       "from a level's leaderboard");
-            case "addleaderboard":
-                return Utils.translate("&a/level addleaderboard <level>  &7Add a leaderboard to cache");
-            case "removeleaderboard":
-                return Utils.translate("&a/level removeleaderboard <level>  &7Remove a leaderboard from cache");
             case "raceset":
                 return Utils.translate("&a/level raceset <level> <player1/player2>  &7Sets the race location for player 1 or 2");
         }

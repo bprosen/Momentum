@@ -146,7 +146,15 @@ public class MenuItemFormatter {
                     long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
 
                     itemLore.add(Utils.translate("  &2" + completionTime + "s"));
-                    itemLore.add(Utils.translate("   &7" + Time.elapsedShortened(timeSince) + "ago"));
+
+                    // this makes it so it will not have " ago" if they just completed it
+                    String timeSinceString;
+                    if (Time.elapsedShortened(timeSince).equalsIgnoreCase(""))
+                        timeSinceString = Utils.translate("   &7Just now");
+                    else
+                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince) + "ago");
+
+                    itemLore.add(timeSinceString);
                 }
             }
             // Sections over
