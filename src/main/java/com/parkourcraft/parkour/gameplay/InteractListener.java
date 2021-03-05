@@ -34,10 +34,9 @@ public class InteractListener implements Listener {
             if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null)
                 return;
 
-            event.setCancelled(true);
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
             if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&2Players &7»"))) {
+
+                event.setCancelled(true);
 
                 player.getInventory().removeItem(item);
                 if (PlayerHider.containsPlayer(player)) {
@@ -64,6 +63,9 @@ public class InteractListener implements Listener {
 
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
 
+                event.setCancelled(true);
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
                 if (!playerStats.inRace()) {
                     if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
                         Parkour.getCheckpointManager().teleportPlayer(player);
@@ -74,6 +76,8 @@ public class InteractListener implements Listener {
                 }
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
 
+                event.setCancelled(true);
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 String levelName = playerStats.getLevel();
 
                 if (!playerStats.inRace()) {
