@@ -32,17 +32,9 @@ public class PlayerStats {
         this.playerName = player.getName();
     }
 
-    public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
-        if (!levelCompletionsMap.containsKey(levelName))
-            levelCompletionsMap.put(levelName, new ArrayList<>());
-
-        levelCompletionsMap.get(levelName).add(levelCompletion);
-    }
-
-    public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed) {
-        this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
-    }
-
+    //
+    // Player Info Section
+    //
     public boolean isLoaded() {
         if (playerID > 0)
             return true;
@@ -54,16 +46,25 @@ public class PlayerStats {
         return player;
     }
 
+    public String getPlayerName() {
+        return playerName;
+    }
+
     public String getUUID() {
         return UUID;
     }
 
-    public boolean inLevel() {
-        if (level != null)
-            return true;
-        return false;
+    public void setPlayerID(int playerID) {
+        this.playerID = playerID;
     }
 
+    public int getPlayerID() {
+        return playerID;
+    }
+
+    //
+    // Race Section
+    //
     public void startedRace() {
         inRace = true;
     }
@@ -76,6 +77,9 @@ public class PlayerStats {
         return inRace;
     }
 
+    //
+    // Level Section
+    //
     public void setLevel(String level) {
         this.level = level;
     }
@@ -88,24 +92,14 @@ public class PlayerStats {
         return level;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public boolean inLevel() {
+        if (level != null)
+            return true;
+        return false;
     }
 
     public void startedLevel() {
         levelStartTime = System.currentTimeMillis();
-    }
-
-    public void setSpectateSpawn(Location spectateSpawn) {
-        this.spectateSpawn = spectateSpawn;
-    }
-
-    public void resetSpectateSpawn() {
-        spectateSpawn = null;
-    }
-
-    public Location getSpectateSpawn() {
-        return spectateSpawn;
     }
 
     public void disableLevelStartTime() {
@@ -116,12 +110,17 @@ public class PlayerStats {
         return levelStartTime;
     }
 
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
+    //
+    // Spectator Section
+    //
+    public void setSpectateSpawn(Location spectateSpawn) {
+        this.spectateSpawn = spectateSpawn;
     }
 
-    public int getPlayerID() {
-        return playerID;
+    public void resetSpectateSpawn() { spectateSpawn = null; }
+
+    public Location getSpectateSpawn() {
+        return spectateSpawn;
     }
 
     public void setSpectatable(boolean setting) {
@@ -131,10 +130,20 @@ public class PlayerStats {
     public boolean isSpectatable() {
         if (playerToSpectate != null)
             return false;
-
         return spectatable;
     }
 
+    public void setPlayerToSpectate(PlayerStats playerStats) {
+        playerToSpectate = playerStats;
+    }
+
+    public PlayerStats getPlayerToSpectate() {
+        return playerToSpectate;
+    }
+
+    //
+    // Rank Section
+    //
     public void setRank(Rank rank) {
         this.rank = rank;
     }
@@ -143,6 +152,9 @@ public class PlayerStats {
         return rank;
     }
 
+    //
+    // Practice Mode Section
+    //
     public void setPracticeMode(Location loc) {
         practiceSpawn = loc;
     }
@@ -155,6 +167,9 @@ public class PlayerStats {
         return practiceSpawn;
     }
 
+    //
+    // Clan Section
+    //
     public void setClan(Clan clan) {
         this.clan = clan;
     }
@@ -163,12 +178,31 @@ public class PlayerStats {
         return clan;
     }
 
-    public void setPlayerToSpectate(PlayerStats playerStats) {
-        playerToSpectate = playerStats;
+    //
+    // Checkpoint Section
+    //
+    public void setCheckpoint(Location loc) {
+        currentCheckpoint = loc;
     }
 
-    public PlayerStats getPlayerToSpectate() {
-        return playerToSpectate;
+    public Location getCheckpoint() { return currentCheckpoint; }
+
+    public void resetCheckpoint() {
+        currentCheckpoint = null;
+    }
+
+    //
+    // Completions Section
+    //
+    public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
+        if (!levelCompletionsMap.containsKey(levelName))
+            levelCompletionsMap.put(levelName, new ArrayList<>());
+
+        levelCompletionsMap.get(levelName).add(levelCompletion);
+    }
+
+    public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed) {
+        this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
     }
 
     public Map<String, List<LevelCompletion>> getLevelCompletionsMap() {
@@ -211,21 +245,14 @@ public class PlayerStats {
         return levelCompletions;
     }
 
+    //
+    // Perks Section
+    //
     public void addPerk(String perkName, Long time) {
         perks.put(perkName, time);
     }
 
     public boolean hasPerk(String perkName) {
         return perks.containsKey(perkName);
-    }
-
-    public void setCheckpoint(Location loc) {
-        currentCheckpoint = loc;
-    }
-
-    public Location getCheckpoint() { return currentCheckpoint; }
-
-    public void resetCheckpoint() {
-        currentCheckpoint = null;
     }
 }
