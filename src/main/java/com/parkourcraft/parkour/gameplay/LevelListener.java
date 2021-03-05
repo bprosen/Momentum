@@ -1,9 +1,13 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
+import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +21,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.List;
 
 public class LevelListener implements Listener {
 
@@ -111,11 +117,32 @@ public class LevelListener implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
+        // this is mainly QOL for operators!
+        if (player.isOp()) {
+            List<String> regions = WorldGuard.getRegions(event.getTo());
+            if (!regions.isEmpty()) {
+
+                // make sure the area they are spawning in is a level
+                LevelObject level = Parkour.getLevelManager().get(regions.get(0));
+                if (level != null && !level.getName().equalsIgnoreCase(playerStats.getLevel()))
+                    Parkour.getStatsManager().get(player).setLevel(regions.get(0));
+
+            } else if (playerStats.getLevel() != null) {
+                // save checkpoint if had one
+                if (playerStats.getCheckpoint() != null) {
+                    Checkpoint_DB.savePlayerAsync(player);
+                    playerStats.resetCheckpoint();
+                }
+
+                playerStats.resetLevel();
+            }
+        }
+
         if (playerStats != null &&
             playerStats.getPlayerToSpectate() == null &&
             playerStats.getCheckpoint() == null &&
-            playerStats.getPracticeLocation() == null)
-
+            playerStats.getPracticeLocation() == null) {
             playerStats.disableLevelStartTime();
+        }
     }
 }
