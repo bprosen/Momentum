@@ -33,18 +33,29 @@ public class SpectatorHandler {
         }
     }
 
-    public static void respawnToLobby(Player player) {
-        Location lobby = Parkour.getLocationManager().getLobbyLocation();
-        player.teleport(lobby);
-        TitleAPI.sendTitle(
-                player, 10, 40, 10,
-                "",
-                Utils.translate("&7You are no longer spectating anyone"));
+    public static void respawnToLastLocation(PlayerStats playerStats) {
+        Location loc = playerStats.getSpectateSpawn();
+        Player player = playerStats.getPlayer();
+
+        if (loc != null) {
+            player.teleport(loc);
+            TitleAPI.sendTitle(
+                    player, 10, 40, 10,
+                    "",
+                    Utils.translate("&7You are no longer spectating anyone"));
+            playerStats.setSpectateSpawn(null);
+        }
     }
 
-    public static void setSpectatorMode(Player spectator, Player player) {
+    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats) {
+
+        Player spectator = spectatorStats.getPlayer();
+        Player player = playerStats.getPlayer();
+
         spectator.setAllowFlight(true);
         spectator.setFlying(true);
+        spectatorStats.setPlayerToSpectate(playerStats);
+        spectatorStats.setSpectateSpawn(spectator.getLocation());
         PlayerHider.hidePlayer(spectator, true);
         spectateToPlayer(spectator, player);
     }
@@ -57,7 +68,7 @@ public class SpectatorHandler {
         player.setFlying(false);
         player.setAllowFlight(false);
         PlayerHider.showPlayer(player, true);
-        respawnToLobby(player);
+        respawnToLastLocation(spectatorStats);
     }
 
     public static void updateSpectators() {

@@ -36,9 +36,9 @@ public class Spectate_CMD implements CommandExecutor {
                             if (playerStats != null && playerStats.getPlayer().isOnline()) {
                                 if (playerStats.isSpectatable()) {
                                     if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
-                                        spectatorStats.setPlayerToSpectate(playerStats);
-                                        SpectatorHandler.setSpectatorMode(
-                                                spectatorStats.getPlayer(), playerStats.getPlayer());
+
+                                        // enable spectator mode
+                                        SpectatorHandler.setSpectatorMode(spectatorStats, playerStats);
 
                                         playerStats.getPlayer().sendMessage(Utils.translate("&2" +
                                                 spectatorStats.getPlayerName() + " &7began to spectate you"));
@@ -52,15 +52,13 @@ public class Spectate_CMD implements CommandExecutor {
                                 sender.sendMessage(Utils.translate("&cThere is no player online named &4" + a[0]));
                             }
                         }
-                    } else if (spectatorStats.getPlayerToSpectate() != null)
+                    } else if (spectatorStats.getPlayerToSpectate() != null) {
                         SpectatorHandler.removeSpectatorMode(spectatorStats);
-                    else {
-                        if (spectatorStats.isSpectatable())
+                    } else if (spectatorStats.isSpectatable())
                             sender.sendMessage(Utils.translate("&7You can be spectated"));
                         else
                             sender.sendMessage(Utils.translate("&7You can not be spectated"));
                         sendHelp(sender);
-                    }
                 } else {
                     sender.sendMessage(Utils.translate("&cError loading your data"));
                 }

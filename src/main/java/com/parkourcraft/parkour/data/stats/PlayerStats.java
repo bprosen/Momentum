@@ -20,6 +20,7 @@ public class PlayerStats {
     private Clan clan;
     private Location currentCheckpoint = null;
     private Location practiceSpawn = null;
+    private Location spectateSpawn = null;
     private boolean inRace = false;
     private Rank rank;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
@@ -93,6 +94,14 @@ public class PlayerStats {
 
     public void startedLevel() {
         levelStartTime = System.currentTimeMillis();
+    }
+
+    public void setSpectateSpawn(Location spectateSpawn) {
+        this.spectateSpawn = spectateSpawn;
+    }
+
+    public Location getSpectateSpawn() {
+        return spectateSpawn;
     }
 
     public void disableLevelStartTime() {
