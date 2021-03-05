@@ -65,9 +65,22 @@ public class Scoreboard {
 
         String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(player));
         board.add(coinBalance);
+        board.add(formatSpacing(Utils.translate("&7")));
 
-        if (level != null) {
-            board.add(formatSpacing(Utils.translate("&7")));
+        // spectator section of scoreboard
+        if (playerStats.getPlayerToSpectate() != null) {
+
+            board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getPlayerName())));
+            board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
+
+        // practice section of scoreboard
+        } else if (playerStats.getPracticeLocation() != null) {
+
+            board.add(formatSpacing(Utils.translate("&6Prac Mode &aOn")));
+            board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
+
+        // level section of scoreboard
+        } else if (level != null) {
 
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));

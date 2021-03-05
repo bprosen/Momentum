@@ -195,10 +195,12 @@ public class PlayerStats {
     // Completions Section
     //
     public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
-        if (!levelCompletionsMap.containsKey(levelName))
-            levelCompletionsMap.put(levelName, new ArrayList<>());
+        if (levelCompletion != null) {
+            if (!levelCompletionsMap.containsKey(levelName))
+                levelCompletionsMap.put(levelName, new ArrayList<>());
 
-        levelCompletionsMap.get(levelName).add(levelCompletion);
+            levelCompletionsMap.get(levelName).add(levelCompletion);
+        }
     }
 
     public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed) {
