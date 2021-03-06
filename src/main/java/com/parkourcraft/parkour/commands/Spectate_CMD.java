@@ -22,7 +22,7 @@ public class Spectate_CMD implements CommandExecutor {
 
                 if (spectatorStats != null) {
                     if (a.length > 0) {
-                        if (a[0].equalsIgnoreCase("toggle")) {
+                        if (a.length == 1 && a[0].equalsIgnoreCase("toggle")) {
                             if (spectatorStats.isSpectatable())
                                 sender.sendMessage(Utils.translate("&7You can no longer be spectated"));
                             else
@@ -30,7 +30,10 @@ public class Spectate_CMD implements CommandExecutor {
 
                             spectatorStats.setSpectatable(!spectatorStats.isSpectatable());
                             Stats_DB.updatePlayerSpectatable(spectatorStats);
-                        } else {
+                        } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
+                            sendHelp(sender);
+                        // spectate to player
+                        } else if (a.length == 1) {
                             PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
 
                             if (playerStats != null && playerStats.getPlayer().isOnline()) {
@@ -55,13 +58,12 @@ public class Spectate_CMD implements CommandExecutor {
                                 sender.sendMessage(Utils.translate("&cThere is no player online named &4" + a[0]));
                             }
                         }
+                    // if they just run /spectate
                     } else if (spectatorStats.getPlayerToSpectate() != null) {
                         SpectatorHandler.removeSpectatorMode(spectatorStats);
-                    } else if (spectatorStats.isSpectatable())
-                            sender.sendMessage(Utils.translate("&7You can be spectated"));
-                        else
-                            sender.sendMessage(Utils.translate("&7You can not be spectated"));
+                    } else {
                         sendHelp(sender);
+                    }
                 } else {
                     sender.sendMessage(Utils.translate("&cError loading your data"));
                 }
@@ -77,6 +79,7 @@ public class Spectate_CMD implements CommandExecutor {
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(getHelp("player"));
         sender.sendMessage(getHelp("toggle"));
+        sender.sendMessage(getHelp("help"));
     }
 
     private static String getHelp(String cmd) {
@@ -84,6 +87,8 @@ public class Spectate_CMD implements CommandExecutor {
             return Utils.translate("&2/spectate <player>  &7Spectates a player");
         else if (cmd.equalsIgnoreCase("toggle"))
             return Utils.translate("&2/spectate toggle  &7Toggles if you can be spectated");
+        else if (cmd.equalsIgnoreCase("help"))
+            return Utils.translate("&2/spectate help  &7Display this page");
         return "";
     }
 }
