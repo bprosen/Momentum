@@ -79,6 +79,13 @@ public class Scoreboard {
             board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
             board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
 
+        // race section of scoreboard
+        } else if (playerStats.inRace()) {
+
+            board.add(formatSpacing(Utils.translate("&6You are in a race!")));
+            board.add(formatSpacing(Utils.translate("&7vs. &c" + Parkour.getRaceManager().get(player)
+                                                                      .getOpponent(player).getName())));
+
         // level section of scoreboard
         } else if (level != null) {
 
