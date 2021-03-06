@@ -172,7 +172,8 @@ public class MenuItemAction {
             // TODO: and in levelcompletion needed stage and sets them to true in here
         } else {
             player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
-            player.sendMessage(Utils.translate("  &7You need &4$" + (int) (playerStats.getRank().getRankUpPrice() - playerBalance) + " &7more!"));
+            player.sendMessage(Utils.translate("  &7You need &4$" +
+                    Utils.formatNumber(playerStats.getRank().getRankUpPrice() - playerBalance) + " &7more!"));
             player.closeInventory();
         }
     }

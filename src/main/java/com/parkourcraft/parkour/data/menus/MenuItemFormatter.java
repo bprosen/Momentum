@@ -110,7 +110,7 @@ public class MenuItemFormatter {
             itemMeta.setDisplayName(Utils.translate("&2Click to Rankup"));
             itemLore.add(Utils.translate("  &c&l" + rank.getRankTitle() + " &7-> &c&l" +
                                         Parkour.getRanksManager().get(rank.getRankId() + 1).getRankTitle()));
-            itemLore.add(Utils.translate("  &7Cost of Rankup &6$" + (int) rank.getRankUpPrice()));
+            itemLore.add(Utils.translate("  &7Cost of Rankup &6$" + Utils.formatNumber(rank.getRankUpPrice())));
             itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
         }
