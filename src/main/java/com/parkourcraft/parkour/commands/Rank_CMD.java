@@ -50,7 +50,7 @@ public class Rank_CMD implements CommandExecutor {
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
 
-                player.sendMessage(Utils.translate("&7Ranks Loaded: " + String.join("&7, &c",
+                player.sendMessage(Utils.translate("&7Ranks Loaded: &c" + String.join("&7, &c",
                         Parkour.getRanksManager().getNames())));
 
             } else if (a.length >= 4 && a[0].equalsIgnoreCase("create")) {
