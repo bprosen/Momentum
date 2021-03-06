@@ -177,7 +177,10 @@ public class Race_CMD implements CommandExecutor {
                 return;
             }
 
-            // otherwise do race
+            // otherwise do race and disable any current time on levels
+            playerStats.disableLevelStartTime();
+            Parkour.getStatsManager().get(victim).disableLevelStartTime();
+
             Parkour.getRaceManager().startRace(victim, accepter, doingBet, betAmount);
             removeFromConfirmMap(victim, accepter);
         } else {

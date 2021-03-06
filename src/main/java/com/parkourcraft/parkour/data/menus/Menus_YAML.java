@@ -85,6 +85,8 @@ public class Menus_YAML {
             return "teleport";
         if (isSet(menuName, itemPath + ".open"))
             return "open";
+        if (isSet(menuName, itemPath + ".type"))
+            return "type";
 
         return "display";
     }
@@ -100,7 +102,8 @@ public class Menus_YAML {
             return menusConfig.getString(menuName + "." + itemPath + ".teleport");
         if (isSet(menuName, itemPath + ".open"))
             return menusConfig.getString(menuName + "." + itemPath + ".open");
-
+        if (isSet(menuName, itemPath + ".type"))
+            return menusConfig.getString(menuName + "." + itemPath + ".type");
         return "";
     }
 

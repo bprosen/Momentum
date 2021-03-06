@@ -1,5 +1,6 @@
 package com.parkourcraft.parkour.data.stats;
 
+import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.rank.Rank;
 import org.bukkit.Location;
@@ -150,6 +151,13 @@ public class PlayerStats {
 
     public Rank getRank() {
         return rank;
+    }
+
+    public boolean isLastRank() {
+        // get if they are at last rank
+        if (rank != null && rank.getRankId() == Parkour.getRanksManager().getRankList().size())
+            return true;
+        return false;
     }
 
     //

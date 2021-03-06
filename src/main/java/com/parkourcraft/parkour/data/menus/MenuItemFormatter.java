@@ -3,10 +3,12 @@ package com.parkourcraft.parkour.data.menus;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
+import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,6 +23,8 @@ public class MenuItemFormatter {
             return getLevel(playerStats, menuItem);
         if (menuItem.getType().equals("perk"))
             return getPerk(player, playerStats, menuItem);
+        if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("rankup"))
+            return getRankUp(playerStats, menuItem);
 
         // Add in some '%player%' and such formatters for lore
 
@@ -87,6 +91,26 @@ public class MenuItemFormatter {
             }
 
             // Sections Over
+            itemMeta.setLore(itemLore);
+            item.setItemMeta(itemMeta);
+        }
+
+        return item;
+    }
+
+    private static ItemStack getRankUp(PlayerStats playerStats, MenuItem menuItem) {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        Rank rank = playerStats.getRank();
+
+        if (rank != null) {
+            // Existing Lore Section
+            ItemMeta itemMeta = item.getItemMeta();
+            List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
+
+            itemMeta.setDisplayName(Utils.translate("&2Click to Rankup"));
+            itemLore.add(Utils.translate("  &c&l" + rank.getRankTitle() + " &7-> &c&l" +
+                                        Parkour.getRanksManager().get(rank.getRankId() + 1).getRankTitle()));
+            itemLore.add(Utils.translate("  &7Cost of Rankup &6$" + (int) rank.getRankUpPrice()));
             itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
         }

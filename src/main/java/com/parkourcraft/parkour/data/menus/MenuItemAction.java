@@ -5,6 +5,8 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
+import com.parkourcraft.parkour.data.rank.Rank;
+import com.parkourcraft.parkour.data.rank.Ranks_DB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
@@ -34,17 +36,24 @@ public class MenuItemAction {
 
         if (itemType.equals("perk"))
             performPerkItem(player, menuItem);
-        else {
-            if (itemType.equals("level"))
-                performLevelItem(player, menuItem);
-            else if (itemType.equals("teleport"))
-                performTeleportItem(player, menuItem);
-            else if (itemType.equals("open"))
-                performOpenItem(player, menuItem);
+        else if (itemType.equals("level"))
+            performLevelItem(player, menuItem);
+        else if (itemType.equals("teleport"))
+            performTeleportItem(player, menuItem);
+        else if (itemType.equals("open"))
+            performOpenItem(player, menuItem);
+        else if (itemType.equals("type")) {
+
+            String typeValue = menuItem.getTypeValue();
+            if (typeValue.equals("rankup"))
+                performRankupItem(player);
+            else if (typeValue.equals("exit"))
+                player.closeInventory();
+        }
+
 
             if (menuItem.hasCommands())
                 runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
-        }
     }
 
     private static void performPerkItem(Player player, MenuItem menuItem) {
@@ -150,36 +159,21 @@ public class MenuItemAction {
         }
     }
 
+    private static void performRankupItem(Player player) {
 
+        double playerBalance = Parkour.getEconomy().getBalance(player);
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        Rank nextRank = Parkour.getRanksManager().get(playerStats.getRank().getRankId() + 1);
 
+        if (playerBalance >= nextRank.getRankUpPrice()) {
+            player.closeInventory();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            // TODO: add a column in players table that stores if they bought the rankup
+            // TODO: and in levelcompletion needed stage and sets them to true in here
+        } else {
+            player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
+            player.sendMessage(Utils.translate("  &7You need &4$" + (int) (playerStats.getRank().getRankUpPrice() - playerBalance) + " &7more!"));
+            player.closeInventory();
+        }
+    }
 }
