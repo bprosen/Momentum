@@ -18,6 +18,30 @@ public class RanksManager {
         load();
     }
 
+    public void load() {
+        rankList = new ArrayList<>();
+
+        for (String rankName : Ranks_YAML.getNames())
+            load(rankName);
+
+        updatePlayers();
+        Parkour.getPluginLogger().info("Ranks loaded: " + rankList.size());
+    }
+
+    public void load(String rankName) {
+
+        boolean exists = exists(rankName);
+
+        if (!Ranks_YAML.exists(rankName) && exists)
+            remove(rankName);
+        else {
+            if (exists)
+                remove(rankName);
+
+            add(rankName);
+        }
+    }
+
     public void add(String rankName) {
         // get from YAML
         String rankTitle = Ranks_YAML.getRankTitle(rankName);
@@ -44,28 +68,12 @@ public class RanksManager {
         return null;
     }
 
-    public void load() {
-        rankList = new ArrayList<>();
-
-        for (String rankName : Ranks_YAML.getNames())
-            load(rankName);
-
-        updatePlayers();
-        Parkour.getPluginLogger().info("Ranks loaded: " + rankList.size());
+    public boolean exists(String rankName) {
+        return (get(rankName) != null);
     }
 
-    public void load(String rankName) {
-
-        boolean exists = exists(rankName);
-
-        if (!Ranks_YAML.exists(rankName) && exists)
-            remove(rankName);
-        else {
-            if (exists)
-                remove(rankName);
-
-            add(rankName);
-        }
+    public boolean exists(int rankId) {
+        return (get(rankId) != null);
     }
 
     public List<String> getNames() {
@@ -95,11 +103,26 @@ public class RanksManager {
         }
     }
 
-    public List<Rank> getRankList() {
-        return rankList;
+    public void resetPlayersInRank(Rank rank) {
+
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+            if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
+
+                // if in rank, then delete from database and lower rank by 1
+                if (playerStats.getRank().getRankId() == rank.getRankId()) {
+                    for (int i = playerStats.getRank().getRankId() - 1; i >= 2; i--) {
+                        if (exists(i)) {
+                            playerStats.setRank(get(i));
+                            Ranks_DB.updateRank(playerStats.getPlayer().getUniqueId(), i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    public static void updatePlayers() {
+    public void updatePlayers() {
 
         // update online players ranks
         for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
@@ -126,7 +149,8 @@ public class RanksManager {
         }
     }
 
-    public boolean exists(String rankName) {
-        return (get(rankName) != null);
+    public List<Rank> getRankList() {
+        return rankList;
     }
+
 }

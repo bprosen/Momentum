@@ -84,6 +84,13 @@ public class Rank_CMD implements CommandExecutor {
                 String rankName = a[1].toLowerCase();
 
                 if (ranksManager.exists(rankName)) {
+                    if (Parkour.getRanksManager().get(rankName).getRankId() == 1) {
+                        player.sendMessage(Utils.translate("&cYou cannot delete the default rank"));
+                        return true;
+                    }
+
+                    // reset people in the rank
+                    ranksManager.resetPlayersInRank(ranksManager.get(rankName));
                     // remove in config
                     Ranks_YAML.remove(rankName);
                     // remove object
@@ -128,6 +135,7 @@ public class Rank_CMD implements CommandExecutor {
         player.sendMessage(getHelp("list"));
         player.sendMessage(getHelp("load"));
         player.sendMessage(getHelp("create"));
+        player.sendMessage(getHelp("remove"));
         player.sendMessage(getHelp("set"));
     }
 
@@ -145,6 +153,8 @@ public class Rank_CMD implements CommandExecutor {
                 return Utils.translate("&c/ranks load  &7Loads ranks.yml then ranks");
             case "create":
                 return Utils.translate("&c/ranks create <rankName> <rankUpPrice> <rankTitle>  &7Create a rank (can use spaces in <rankTitle>)");
+            case "remove":
+                return Utils.translate("&c/ranks remove <rankName>  &7Removes a rank from config/database and rank players down in the rank");
             case "set":
                 return Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank");
             case "help":
