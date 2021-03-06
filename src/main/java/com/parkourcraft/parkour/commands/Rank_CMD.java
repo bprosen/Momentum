@@ -79,6 +79,19 @@ public class Rank_CMD implements CommandExecutor {
                 } else {
                     player.sendMessage(Utils.translate("&cThat is not a valid integer for rankup price"));
                 }
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("remove")) {
+
+                String rankName = a[1].toLowerCase();
+
+                if (ranksManager.exists(rankName)) {
+                    // remove in config
+                    Ranks_YAML.remove(rankName);
+                    // remove object
+                    ranksManager.remove(rankName);
+                    player.sendMessage(Utils.translate("&7Removed rank &c" + rankName));
+                } else {
+                    player.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
+                }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
 
                 Parkour.getConfigManager().load("ranks");

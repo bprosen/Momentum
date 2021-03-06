@@ -87,6 +87,19 @@ public class Race_CMD implements CommandExecutor {
             return;
         }
 
+        // if they are in race
+        if (playerStats.inRace()) {
+            player.sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
+            return;
+        }
+
+        // if target is in race
+        PlayerStats victimStats = Parkour.getStatsManager().get(victim);
+        if (victimStats.inRace()) {
+            player.sendMessage(Utils.translate("&cYou cannot send a request while &4" + victimName + " &cis in a race"));
+            return;
+        }
+
         if (inConfirmMap(player, victim)) {
             player.sendMessage(Utils.translate("&cYou have already send one to them!"));
         } else {
@@ -138,6 +151,12 @@ public class Race_CMD implements CommandExecutor {
             if (playerStats.getPracticeLocation() != null) {
                 accepter.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                 removeFromConfirmMap(victim, accepter);
+                return;
+            }
+
+            // if accepting race while in race
+            if (playerStats.inRace()) {
+                accepter.sendMessage(Utils.translate("&cYou cannot race someone else while in a race"));
                 return;
             }
 

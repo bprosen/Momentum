@@ -32,8 +32,7 @@ public class LevelManager {
     public void load(String levelName) {
         boolean exists = exists(levelName);
 
-        if (!Levels_YAML.exists(levelName)
-                && exists)
+        if (!Levels_YAML.exists(levelName) && exists)
             remove(levelName);
         else {
             LevelObject levelObject = new LevelObject(levelName);

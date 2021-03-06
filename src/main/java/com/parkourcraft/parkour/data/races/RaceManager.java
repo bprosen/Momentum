@@ -9,6 +9,7 @@ import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -91,6 +92,8 @@ public class RaceManager {
                         cancel();
                         TitleAPI.sendTitle(player1, 0, 20, 10, "&cRACE", "");
                         TitleAPI.sendTitle(player2, 0, 20, 10, "&cRACE", "");
+                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
+                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
                         return;
                     }
 
@@ -125,18 +128,28 @@ public class RaceManager {
                     if (runCycles == 0) {
                         TitleAPI.sendTitle(player1, 0, 20, 0, "&a5", "");
                         TitleAPI.sendTitle(player2, 0, 20, 0, "&a5", "");
+                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                     } else if (runCycles == 20) {
                         TitleAPI.sendTitle(player1, 0, 20, 0, "&e4", "");
                         TitleAPI.sendTitle(player2, 0, 20, 0, "&e4", "");
+                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                     } else if (runCycles == 40) {
                         TitleAPI.sendTitle(player1, 0, 20, 0, "&63", "");
                         TitleAPI.sendTitle(player2, 0, 20, 0, "&63", "");
+                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                     } else if (runCycles == 60) {
                         TitleAPI.sendTitle(player1, 0, 20, 0, "&c2", "");
                         TitleAPI.sendTitle(player2, 0, 20, 0, "&c2", "");
+                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                     } else if (runCycles == 80) {
                         TitleAPI.sendTitle(player1, 0, 20, 0, "&41", "");
                         TitleAPI.sendTitle(player2, 0, 20, 0, "&41", "");
+                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                     }
                     runCycles++;
                 }

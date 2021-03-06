@@ -81,6 +81,11 @@ public class LevelListener implements Listener {
                     }
                 }
             }
+        } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.IRON_PLATE)) {
+            // end if in race
+            if (Parkour.getStatsManager().get(player).inRace()) {
+                Parkour.getRaceManager().endRace(player);
+            }
         }
     }
 

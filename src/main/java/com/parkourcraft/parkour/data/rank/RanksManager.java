@@ -1,9 +1,14 @@
 package com.parkourcraft.parkour.data.rank;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class RanksManager {
 
@@ -45,6 +50,7 @@ public class RanksManager {
         for (String rankName : Ranks_YAML.getNames())
             load(rankName);
 
+        updatePlayers();
         Parkour.getPluginLogger().info("Ranks loaded: " + rankList.size());
     }
 
@@ -71,9 +77,18 @@ public class RanksManager {
         return tempList;
     }
 
+    public List<Integer> getIDs() {
+        List<Integer> tempList = new ArrayList<>();
+
+        for (Rank rank : rankList)
+            tempList.add(rank.getRankId());
+
+        return tempList;
+    }
+
     public void remove(String rankName) {
         for (Iterator<Rank> iterator = rankList.iterator(); iterator.hasNext();) {
-            if (iterator.next().getRankName().equals(rankName)) {
+            if (iterator.next().getRankName().equalsIgnoreCase(rankName)) {
                 Ranks_YAML.remove(iterator.getClass().getName());
                 iterator.remove();
             }
@@ -82,6 +97,33 @@ public class RanksManager {
 
     public List<Rank> getRankList() {
         return rankList;
+    }
+
+    public static void updatePlayers() {
+
+        // update online players ranks
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+
+            if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
+
+                List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                        "players",
+                        "rank_id",
+                        " WHERE uuid='" + playerStats.getUUID() + "'"
+                );
+
+                if (playerResults.size() > 0) {
+                    for (Map<String, String> playerResult : playerResults) {
+
+                        int rankID = Integer.parseInt(playerResult.get("rank_id"));
+                        Rank rank = Parkour.getRanksManager().get(rankID);
+
+                        if (rank != null)
+                            playerStats.setRank(rank);
+                    }
+                }
+            }
+        }
     }
 
     public boolean exists(String rankName) {
