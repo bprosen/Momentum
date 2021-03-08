@@ -51,7 +51,9 @@ public class MenuItemAction {
             String typeValue = menuItem.getTypeValue();
             if (typeValue.equals("coin-rankup"))
                 performRankupItem(player);
-            else if (typeValue.equals("rankup-level-1") || typeValue.equals("rankup-level-2"))
+            else if (typeValue.equals("rankup-level-1")
+                    || typeValue.equals("rankup-level-2")
+                    || typeValue.equals("rankup-level"))
                 performLevelRankUpItem(player, menuItem);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
@@ -196,8 +198,13 @@ public class MenuItemAction {
             playerStats.setRankUpStage(2);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
 
+            String menuName;
             // open level menu
-            String menuName = "level-rankup";
+            if (Ranks_YAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
+                menuName = "single-level-rankup";
+            else
+                menuName = "double-level-rankup";
+
             MenuManager menuManager = Parkour.getMenuManager();
 
             if (menuManager.exists(menuName)) {

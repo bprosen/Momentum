@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.rank;
 
 import com.parkourcraft.parkour.Parkour;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -89,6 +90,12 @@ public class Ranks_YAML {
             ranksConfig.set(rankName + ".rankup-price", rankUpPrice);
             commit();
         }
+    }
+
+    public static boolean isSingleLevelRankup(String rankName) {
+        if (isSet(rankName, "single-level-rankup"))
+            return ranksConfig.getBoolean(rankName + ".single-level-rankup");
+        return false;
     }
 
     public static void remove(String rankName) {

@@ -29,7 +29,10 @@ public class MenuItemFormatter {
             if (menuItem.getTypeValue().equals("coin-rankup"))
                 return getRankUp(playerStats, menuItem);
             // make levels for /rankup if in stage 2
-            else if (menuItem.getTypeValue().equals("rankup-level-1") || menuItem.getTypeValue().equals("rankup-level-2")) {
+            else if (menuItem.getTypeValue().equals("rankup-level-1")
+                    || menuItem.getTypeValue().equals("rankup-level-2")
+                    || menuItem.getTypeValue().equals("rankup-level")) {
+
                 ItemStack levelItem = getRankUpLevel(playerStats, menuItem);
                 if (levelItem != null)
                     return levelItem;

@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.MenuManager;
+import com.parkourcraft.parkour.data.rank.Ranks_YAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
@@ -34,8 +35,13 @@ public class Rankup_CMD implements CommandExecutor {
             if (playerStats.getRankUpStage() == 1)
                 menuName = "coin-rankup";
             // stage 2, meaning level rankup part
-            else if (playerStats.getRankUpStage() == 2)
-                menuName = "level-rankup";
+            else if (playerStats.getRankUpStage() == 2) {
+                // get if it is a single level style rankup (expert and up)
+                if (Ranks_YAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
+                    menuName = "single-level-rankup";
+                else
+                    menuName = "double-level-rankup";
+            }
 
             if (menuManager.exists(menuName)) {
 
