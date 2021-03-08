@@ -25,7 +25,7 @@ public class Stats_DB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id",
+                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -54,6 +54,9 @@ public class Stats_DB {
                 Rank rank = Parkour.getRanksManager().get(rankID);
                 if (rank != null)
                     playerStats.setRank(rank);
+
+                int rankUpStage = Integer.parseInt(playerResult.get("rankup_stage"));
+                playerStats.setRankUpStage(rankUpStage);
             }
         } else {
             insertPlayerID(playerStats);

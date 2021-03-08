@@ -57,6 +57,7 @@ public class Tables_DB {
                 "spectatable BIT DEFAULT 1, " +
                 "clan_id INT DEFAULT -1," +
                 "rank_id INT DEFAULT 1," +
+                "rankup_stage BIT default 1," +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

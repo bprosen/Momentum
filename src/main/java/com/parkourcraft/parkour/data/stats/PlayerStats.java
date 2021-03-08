@@ -24,6 +24,7 @@ public class PlayerStats {
     private Location spectateSpawn = null;
     private boolean inRace = false;
     private Rank rank;
+    private int rankUpStage;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -158,6 +159,14 @@ public class PlayerStats {
         if (rank != null && rank.getRankId() == Parkour.getRanksManager().getRankList().size())
             return true;
         return false;
+    }
+
+    public void setRankUpStage(int rankUpStage) {
+        this.rankUpStage = rankUpStage;
+    }
+
+    public int getRankUpStage() {
+        return rankUpStage;
     }
 
     //
