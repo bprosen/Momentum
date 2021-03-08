@@ -45,7 +45,7 @@ public class MenuItemAction {
         else if (itemType.equals("type")) {
 
             String typeValue = menuItem.getTypeValue();
-            if (typeValue.equals("rankup"))
+            if (typeValue.equals("coin-rankup"))
                 performRankupItem(player);
             else if (typeValue.equals("exit"))
                 player.closeInventory();

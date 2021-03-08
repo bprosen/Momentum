@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.MenuManager;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,15 +20,23 @@ public class Rankup_CMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
         MenuManager menuManager = Parkour.getMenuManager();
 
         if (a.length == 0) {
-            if (Parkour.getStatsManager().get(player).isLastRank()) {
+            if (playerStats.isLastRank()) {
                 player.sendMessage(Utils.translate("&cYou are at last rank!"));
                 return true;
             }
 
-            String menuName = "rankup";
+            String menuName = null;
+            // stage 1, meaning coin rankup part
+            if (playerStats.getRankUpStage() == 1)
+                menuName = "coin-rankup";
+            // stage 2, meaning level rankup part
+            else if (playerStats.getRankUpStage() == 2)
+                menuName = "level-rankup";
+
             if (menuManager.exists(menuName)) {
 
                 Inventory inventory = menuManager.getInventory(menuName, 1);

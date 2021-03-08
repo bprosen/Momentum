@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.rank.Rank;
+import com.parkourcraft.parkour.data.rank.Ranks_YAML;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
@@ -23,14 +24,24 @@ public class MenuItemFormatter {
             return getLevel(playerStats, menuItem);
         if (menuItem.getType().equals("perk"))
             return getPerk(player, playerStats, menuItem);
-        if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("rankup"))
-            return getRankUp(playerStats, menuItem);
-
+        if (menuItem.getType().equals("type")) {
+            // make coin rankup menu for /rankup if in stage 1
+            if (menuItem.getTypeValue().equals("coin-rankup"))
+                return getRankUp(playerStats, menuItem);
+            // make levels for /rankup if in stage 2
+            else if (menuItem.getTypeValue().equals("level-rankup-1") || menuItem.getTypeValue().equals("level-rankup-2")) {
+                ItemStack levelItem = getRankUpLevel(playerStats, menuItem);
+                if (levelItem != null)
+                    return levelItem;
+            }
+        }
         // Add in some '%player%' and such formatters for lore
-
         return menuItem.getItem();
     }
 
+    //
+    // Perk Section
+    //
     private static ItemStack getPerk(Player player, PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String perkName = menuItem.getTypeValue();
@@ -98,6 +109,9 @@ public class MenuItemFormatter {
         return item;
     }
 
+    //
+    // Level + Rankup Section
+    //
     private static ItemStack getRankUp(PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         Rank rank = playerStats.getRank();
@@ -109,7 +123,7 @@ public class MenuItemFormatter {
 
             itemMeta.setDisplayName(Utils.translate("&2Click to Rankup"));
             itemLore.add(Utils.translate("  &c&l" + rank.getRankTitle() + " &7-> &c&l" +
-                                        Parkour.getRanksManager().get(rank.getRankId() + 1).getRankTitle()));
+                    Parkour.getRanksManager().get(rank.getRankId() + 1).getRankTitle()));
             itemLore.add(Utils.translate("  &7Cost of Rankup &6$" + Utils.formatNumber(rank.getRankUpPrice())));
             itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
@@ -123,6 +137,25 @@ public class MenuItemFormatter {
         String levelName = menuItem.getTypeValue();
         LevelObject level = Parkour.getLevelManager().get(levelName);
 
+        return createLevelItem(playerStats, level, menuItem, item);
+    }
+
+
+    private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem) {
+
+        ItemStack item = new ItemStack(menuItem.getItem());
+        String levelName = Ranks_YAML.getRankUpLevel(playerStats.getRank().getRankName(), menuItem.getTypeValue());
+
+        if (levelName != null) {
+            LevelObject level = Parkour.getLevelManager().get(levelName);
+
+            return createLevelItem(playerStats, level, menuItem, item);
+        }
+        return null;
+    }
+
+    private static ItemStack createLevelItem(PlayerStats playerStats, LevelObject level, MenuItem menuItem, ItemStack item) {
+
         if (level != null) {
             ItemMeta itemMeta = item.getItemMeta();
 
@@ -135,7 +168,7 @@ public class MenuItemFormatter {
 
             // Click To Go and Reward Section
             itemLore.add(Utils.translate("&7Click to go to " + formattedTitle
-                         .replace("&l", "").replace("&o", "")));
+                    .replace("&l", "").replace("&o", "")));
             itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
 
             // Required Levels Section
@@ -152,7 +185,7 @@ public class MenuItemFormatter {
             }
 
             // Personal Level Stats Section
-            int levelCompletionsCount = playerStats.getLevelCompletionsCount(levelName);
+            int levelCompletionsCount = playerStats.getLevelCompletionsCount(level.getName());
             if (levelCompletionsCount > 0) {
                 itemLore.add("");
 
@@ -162,7 +195,7 @@ public class MenuItemFormatter {
 
                 itemLore.add(beatenMessage);
 
-                List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(levelName);
+                List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(level.getName());
                 if (bestLevelCompletions.size() > 0) {
                     itemLore.add(Utils.translate("&7 Best Personal Time"));
 

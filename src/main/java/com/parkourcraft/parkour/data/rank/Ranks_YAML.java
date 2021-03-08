@@ -55,6 +55,14 @@ public class Ranks_YAML {
         return 0.0;
     }
 
+    public static String getRankUpLevel(String rankName, String levelType) {
+        if (isSet(rankName, levelType)) {
+            String rankUpLevel = ranksConfig.getString(rankName + "." + levelType);
+            return rankUpLevel;
+        }
+        return null;
+    }
+
     public static void create(String rankName) {
         if (!exists(rankName)) {
             ranksConfig.set(rankName + ".title", rankName);
