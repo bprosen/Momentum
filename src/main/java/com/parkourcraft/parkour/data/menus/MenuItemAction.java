@@ -9,6 +9,7 @@ import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.rank.Ranks_DB;
 import com.parkourcraft.parkour.data.rank.Ranks_YAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -189,8 +190,7 @@ public class MenuItemAction {
         if (playerBalance >= nextRank.getRankUpPrice()) {
             player.closeInventory();
 
-            // TODO: add a column in players table that stores if they bought the rankup
-            // TODO: and in levelcompletion needed stage and sets them to true in here
+
         } else {
             player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
             player.sendMessage(Utils.translate("  &7You need &4$" +

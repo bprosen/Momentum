@@ -108,6 +108,12 @@ public class Levels_YAML {
         return new ArrayList<>();
     }
 
+    public static boolean getRankUpLevelSwitch(String levelName) {
+        if (levelsFile.isSet(levelName + ".rankup-level"))
+            return levelsFile.getBoolean(levelName + ".rankup-level");
+        return false;
+    }
+
     public static String getTitle(String levelName) {
         if (levelsFile.isSet(levelName + ".title"))
             return levelsFile.getString(levelName + ".title");

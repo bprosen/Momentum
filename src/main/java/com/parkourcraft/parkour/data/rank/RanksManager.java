@@ -2,8 +2,11 @@ package com.parkourcraft.parkour.data.rank;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -147,6 +150,18 @@ public class RanksManager {
                 }
             }
         }
+    }
+
+    public void doRankUp(Player player) {
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        int newId = playerStats.getRank().getRankId() + 1;
+        Rank rank = get(newId);
+        playerStats.setRank(rank);
+        Ranks_DB.updateRank(player.getUniqueId(), newId);
+
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
+        Bukkit.broadcastMessage("");
     }
 
     public List<Rank> getRankList() {

@@ -24,6 +24,7 @@ public class LevelObject {
     private List<String> requiredLevels;
     private int ID = -1;
     private int scoreModifier = 1;
+    private boolean isRankUpLevel = false;
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
@@ -109,6 +110,14 @@ public class LevelObject {
 
     public int getTotalCompletionsCount() {
         return totalCompletionsCount;
+    }
+
+    public boolean isRankUpLevel() {
+        return isRankUpLevel;
+    }
+
+    public void setRankUpLevel(boolean isRankupLevel) {
+        this.isRankUpLevel = isRankupLevel;
     }
 
     public void sortNewCompletion(LevelCompletion levelCompletion) {
@@ -215,6 +224,10 @@ public class LevelObject {
                     raceLocation2 = Levels_YAML.getPlayerRaceLocation("player2", name);
                 }
             }
+
+            // if level is a rankUpLevel
+            if (Levels_YAML.isSet(name, "rankup-level"))
+                isRankUpLevel = Levels_YAML.getRankUpLevelSwitch(name);
 
             maxCompletions = Levels_YAML.getMaxCompletions(name);
             broadcastCompletion = Levels_YAML.getBroadcastSetting(name);
