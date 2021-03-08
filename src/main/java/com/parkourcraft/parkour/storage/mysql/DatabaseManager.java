@@ -35,7 +35,7 @@ public class DatabaseManager {
             }
         }, 0L, 2L);
 
-        // run async random queue every 10 minutes to keep connection alive if nobody is online
+        // run async random queue every 10 minutes to keep connection alive if nobody is online and no database activity
         new BukkitRunnable() {
             public void run() {
                 try {
