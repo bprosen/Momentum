@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.rank.Ranks_DB;
+import com.parkourcraft.parkour.data.rank.Ranks_YAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
@@ -47,6 +48,8 @@ public class MenuItemAction {
             String typeValue = menuItem.getTypeValue();
             if (typeValue.equals("coin-rankup"))
                 performRankupItem(player);
+            else if (typeValue.equals("rankup-level-1") || typeValue.equals("rankup-level-2"))
+                performLevelRankUpItem(player, menuItem);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         }
@@ -78,10 +81,28 @@ public class MenuItemAction {
         }
     }
 
+    private static void performLevelRankUpItem(Player player, MenuItem menuItem) {
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        String rankName = playerStats.getRank().getRankName();
+        String levelType = menuItem.getTypeValue();
+        String levelName = Ranks_YAML.getRankUpLevel(rankName, levelType);
+
+        if (levelName != null) {
+            LevelObject level = Parkour.getLevelManager().get(levelName);
+            if (level != null)
+                performLevelTeleport(playerStats, player, level);
+        }
+    }
+
     private static void performLevelItem(Player player, MenuItem menuItem) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         LevelObject level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
+        performLevelTeleport(playerStats, player, level);
+    }
+
+    private static void performLevelTeleport(PlayerStats playerStats, Player player, LevelObject level) {
         if (!playerStats.inRace()) {
             if (!level.getName().equalsIgnoreCase(playerStats.getLevel())) {
                 if (level.hasRequiredLevels(playerStats)) {
