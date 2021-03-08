@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -159,6 +160,8 @@ public class RanksManager {
         playerStats.setRank(rank);
         Ranks_DB.updateRank(player.getUniqueId(), newId);
         Ranks_DB.updateStage(player.getUniqueId(), 1);
+        // play sound
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
 
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));

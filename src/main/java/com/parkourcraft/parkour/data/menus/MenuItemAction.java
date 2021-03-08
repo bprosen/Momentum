@@ -14,6 +14,7 @@ import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.potion.PotionEffect;
@@ -185,15 +186,15 @@ public class MenuItemAction {
 
         double playerBalance = Parkour.getEconomy().getBalance(player);
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        Rank nextRank = Parkour.getRanksManager().get(playerStats.getRank().getRankId() + 1);
 
-        if (playerBalance >= nextRank.getRankUpPrice()) {
+        if (playerBalance >= playerStats.getRank().getRankUpPrice()) {
             player.closeInventory();
             // remove amount
             Parkour.getEconomy().withdrawPlayer(player, playerStats.getRank().getRankUpPrice());
             // change to next stage
             Ranks_DB.updateStage(player.getUniqueId(), 2);
             playerStats.setRankUpStage(2);
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
 
             // open level menu
             String menuName = "level-rankup";
@@ -203,6 +204,7 @@ public class MenuItemAction {
 
                 Inventory inventory = menuManager.getInventory(menuName, 1);
                 if (inventory != null) {
+                    player.closeInventory();
                     player.openInventory(inventory);
                     menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
                 } else {
