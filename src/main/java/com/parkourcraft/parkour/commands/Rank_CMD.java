@@ -107,6 +107,26 @@ public class Rank_CMD implements CommandExecutor {
                 sender.sendMessage(Utils.translate("&7Loaded ranks from &cranks.yml&7, &c" +
                         Parkour.getRanksManager().getNames().size() + " &7total"));
 
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("setstage")) {
+
+                Player victim = Bukkit.getPlayer(a[1]);
+
+                if (victim == null) {
+                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
+                    return true;
+                }
+
+                if (Utils.isInteger(a[2])) {
+                    int stage = Integer.parseInt(a[2]);
+
+                    // can only be stage 1 or stage 2
+                    if (stage == 1 || stage == 2) {
+                        Ranks_DB.updateStage(victim.getUniqueId(), stage);
+                        player.sendMessage(Utils.translate("&cYou updated &4" + victim.getName() + "'s Stage &cto &4" + stage));
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou cannot set a stage that does not exist (1 or 2 only)"));
+                    }
+                }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
                 sendAdminHelp(player);
             } else {
@@ -137,6 +157,7 @@ public class Rank_CMD implements CommandExecutor {
         player.sendMessage(getHelp("create"));
         player.sendMessage(getHelp("remove"));
         player.sendMessage(getHelp("set"));
+        player.sendMessage(getHelp("setstage"));
     }
 
     private void sendPlayerHelp(Player player) {
@@ -157,6 +178,8 @@ public class Rank_CMD implements CommandExecutor {
                 return Utils.translate("&c/ranks remove <rankName>  &7Removes a rank from config/database and rank players down in the rank");
             case "set":
                 return Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank");
+            case "setstage":
+                return Utils.translate("&c/ranks setstage <player> stage  &7Sets players stage in rankup");
             case "help":
                 return Utils.translate("&c/ranks help  &7Displays this page");
             case "":

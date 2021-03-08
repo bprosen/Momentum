@@ -189,8 +189,12 @@ public class MenuItemAction {
 
         if (playerBalance >= nextRank.getRankUpPrice()) {
             player.closeInventory();
+            // change to next stage
+            Ranks_DB.updateStage(player.getUniqueId(), 2);
 
-
+            player.sendMessage("");
+            player.sendMessage(Utils.translate("&7You completed &6&lStage 1 &7of &cRankup! &7Type &c/rankup &7again to go through &6&lStage 2"));
+            player.sendMessage("");
         } else {
             player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
             player.sendMessage(Utils.translate("  &7You need &4$" +

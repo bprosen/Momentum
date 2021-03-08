@@ -131,24 +131,6 @@ public class LevelHandler {
         }
     }
 
-    // No idea what this is for
-    /*static boolean locationInIgnoreArea(Location location) {
-        List<String> regionNames = WorldGuardUtils.getRegions(location);
-        Map<String, String> levelNamesLower = Parkour.getLevelManager().getNamesLower();
-
-        boolean inIgnoreArea = true;
-
-        for (String regionName : regionNames) {
-            if (regionName.contains("ignore"))
-                return true;
-
-            if (levelNamesLower.containsKey(regionName))
-                inIgnoreArea = false;
-        }
-
-        return inIgnoreArea;
-    }*/
-
     // Respawn player if checkpoint isn't there
     static void respawnPlayer(Player player, LevelObject level) {
         if (level != null) {

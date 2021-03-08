@@ -16,4 +16,15 @@ public class Ranks_DB {
 
         Parkour.getDatabaseManager().add(query);
     }
+
+    public static void updateStage(UUID uuid, int stage) {
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(uuid.toString());
+        String query = "UPDATE players SET " +
+                "rank_stage='" + stage + "' " +
+                "WHERE player_id=" + playerStats.getPlayerID()
+                ;
+
+        Parkour.getDatabaseManager().add(query);
+    }
 }
