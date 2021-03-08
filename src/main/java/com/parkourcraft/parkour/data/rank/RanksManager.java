@@ -158,6 +158,7 @@ public class RanksManager {
         Rank rank = get(newId);
         playerStats.setRank(rank);
         Ranks_DB.updateRank(player.getUniqueId(), newId);
+        Ranks_DB.updateStage(player.getUniqueId(), 1);
 
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));

@@ -122,6 +122,7 @@ public class Rank_CMD implements CommandExecutor {
                     // can only be stage 1 or stage 2
                     if (stage == 1 || stage == 2) {
                         Ranks_DB.updateStage(victim.getUniqueId(), stage);
+                        Parkour.getStatsManager().get(player).setRankUpStage(stage);
                         player.sendMessage(Utils.translate("&cYou updated &4" + victim.getName() + "'s Stage &cto &4" + stage));
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot set a stage that does not exist (1 or 2 only)"));
@@ -179,7 +180,7 @@ public class Rank_CMD implements CommandExecutor {
             case "set":
                 return Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank");
             case "setstage":
-                return Utils.translate("&c/ranks setstage <player> stage  &7Sets players stage in rankup");
+                return Utils.translate("&c/ranks setstage <player> <stage>  &7Sets players stage in rankup (1/2)");
             case "help":
                 return Utils.translate("&c/ranks help  &7Displays this page");
             case "":

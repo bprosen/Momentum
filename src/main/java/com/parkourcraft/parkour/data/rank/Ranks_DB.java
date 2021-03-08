@@ -19,9 +19,12 @@ public class Ranks_DB {
 
     public static void updateStage(UUID uuid, int stage) {
 
+        // -1 for BIT type in database
+        stage--;
+
         PlayerStats playerStats = Parkour.getStatsManager().get(uuid.toString());
         String query = "UPDATE players SET " +
-                "rank_stage='" + stage + "' " +
+                "rankup_stage=" + stage + " " +
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 

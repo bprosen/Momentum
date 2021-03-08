@@ -189,8 +189,11 @@ public class MenuItemAction {
 
         if (playerBalance >= nextRank.getRankUpPrice()) {
             player.closeInventory();
+            // remove amount
+            Parkour.getEconomy().withdrawPlayer(player, playerStats.getRank().getRankUpPrice());
             // change to next stage
             Ranks_DB.updateStage(player.getUniqueId(), 2);
+            playerStats.setRankUpStage(2);
 
             player.sendMessage("");
             player.sendMessage(Utils.translate("&7You completed &6&lStage 1 &7of &cRankup! &7Type &c/rankup &7again to go through &6&lStage 2"));

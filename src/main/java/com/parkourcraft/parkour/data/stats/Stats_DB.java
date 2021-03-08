@@ -55,7 +55,8 @@ public class Stats_DB {
                 if (rank != null)
                     playerStats.setRank(rank);
 
-                int rankUpStage = Integer.parseInt(playerResult.get("rankup_stage"));
+                // add +1 so it is normal stage 1/2 out of database
+                int rankUpStage = Integer.parseInt(playerResult.get("rankup_stage")) + 1;
                 playerStats.setRankUpStage(rankUpStage);
             }
         } else {
