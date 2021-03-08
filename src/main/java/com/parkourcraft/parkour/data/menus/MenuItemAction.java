@@ -195,9 +195,20 @@ public class MenuItemAction {
             Ranks_DB.updateStage(player.getUniqueId(), 2);
             playerStats.setRankUpStage(2);
 
-            player.sendMessage("");
-            player.sendMessage(Utils.translate("&7You completed &6&lStage 1&7! &7Type &c/rankup &7again to go through &6&lStage 2"));
-            player.sendMessage("");
+            // open level menu
+            String menuName = "level-rankup";
+            MenuManager menuManager = Parkour.getMenuManager();
+
+            if (menuManager.exists(menuName)) {
+
+                Inventory inventory = menuManager.getInventory(menuName, 1);
+                if (inventory != null) {
+                    player.openInventory(inventory);
+                    menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
+                } else {
+                    player.sendMessage(Utils.translate("&cError loading the inventory"));
+                }
+            }
         } else {
             player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
             player.sendMessage(Utils.translate("  &7You need &4$" +
