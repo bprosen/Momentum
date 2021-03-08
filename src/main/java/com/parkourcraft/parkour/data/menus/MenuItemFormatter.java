@@ -121,10 +121,10 @@ public class MenuItemFormatter {
             ItemMeta itemMeta = item.getItemMeta();
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
-            itemMeta.setDisplayName(Utils.translate("&2Click to Rankup"));
+            itemMeta.setDisplayName(Utils.translate("&2Click to enter Stage 2 of RankUp"));
             itemLore.add(Utils.translate("  &c&l" + rank.getRankTitle() + " &7-> &c&l" +
                     Parkour.getRanksManager().get(rank.getRankId() + 1).getRankTitle()));
-            itemLore.add(Utils.translate("  &7Cost of Rankup &6$" + Utils.formatNumber(rank.getRankUpPrice())));
+            itemLore.add(Utils.translate("  &7Cost of RankUp to Stage 2 &6$" + Utils.formatNumber(rank.getRankUpPrice())));
             itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
         }

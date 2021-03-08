@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.menus.Menu;
 import com.parkourcraft.parkour.data.menus.MenuItem;
 import com.parkourcraft.parkour.data.menus.MenuItemAction;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +26,7 @@ public class MenuListener implements Listener {
             if (event.getCurrentItem() != null
                     && event.getCurrentItem().getType() != Material.AIR
                     && event.getCurrentItem().getItemMeta().getDisplayName() != null) {
+
                 MenuItem menuItem = menu.getMenuItem(
                         Utils.getTrailingInt(event.getInventory().getTitle()),
                         event.getSlot()

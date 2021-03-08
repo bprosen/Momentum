@@ -46,6 +46,7 @@ public class MenuItemAction {
             performOpenItem(player, menuItem);
         else if (itemType.equals("type")) {
 
+            // certain conditions of types for rankup
             String typeValue = menuItem.getTypeValue();
             if (typeValue.equals("coin-rankup"))
                 performRankupItem(player);
@@ -55,9 +56,8 @@ public class MenuItemAction {
                 player.closeInventory();
         }
 
-
-            if (menuItem.hasCommands())
-                runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+        if (menuItem.hasCommands())
+            runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
     private static void performPerkItem(Player player, MenuItem menuItem) {
@@ -196,7 +196,7 @@ public class MenuItemAction {
             playerStats.setRankUpStage(2);
 
             player.sendMessage("");
-            player.sendMessage(Utils.translate("&7You completed &6&lStage 1 &7of &cRankup! &7Type &c/rankup &7again to go through &6&lStage 2"));
+            player.sendMessage(Utils.translate("&7You completed &6&lStage 1&7! &7Type &c/rankup &7again to go through &6&lStage 2"));
             player.sendMessage("");
         } else {
             player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
