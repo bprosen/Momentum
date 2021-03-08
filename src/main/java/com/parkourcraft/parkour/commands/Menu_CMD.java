@@ -19,6 +19,7 @@ public class Menu_CMD implements CommandExecutor {
                 if (sender.isOp())
                     sender.sendMessage(Utils.translate("&7Menus: &2" + String.join("&7, &2",
                                        menuManager.getMenuNames())));
+
             } else if (a[0].equalsIgnoreCase("open")) {
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
