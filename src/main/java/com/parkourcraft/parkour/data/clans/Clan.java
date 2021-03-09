@@ -42,9 +42,17 @@ public class Clan {
         return ownerID;
     }
 
-    public ClanMember getMember(String UUID) {
+    public ClanMember getMemberFromUUID(String UUID) {
         for (ClanMember member : members)
             if (member.getUUID().equals(UUID))
+                return member;
+
+        return null;
+    }
+
+    public ClanMember getMemberFromName(String playerName) {
+        for (ClanMember member : members)
+            if (member.getPlayerName().equals(playerName))
                 return member;
 
         return null;
@@ -59,14 +67,14 @@ public class Clan {
     }
 
     public void promoteOwner(String UUID) {
-        ClanMember newOwner = getMember(UUID);
+        ClanMember newOwner = getMemberFromUUID(UUID);
 
         if (newOwner != null)
             ownerID = newOwner.getPlayerID();
     }
 
     public boolean isMember(String UUID) {
-        return getMember(UUID) != null;
+        return getMemberFromUUID(UUID) != null;
     }
 
     public void addMember(ClanMember clanMember) {
@@ -74,8 +82,15 @@ public class Clan {
             members.add(clanMember);
     }
 
-    public void removeMember(String UUID) {
-        ClanMember clanMember = getMember(UUID);
+    public void removeMemberFromUUID(String UUID) {
+        ClanMember clanMember = getMemberFromUUID(UUID);
+
+        if (clanMember != null)
+            members.remove(clanMember);
+    }
+
+    public void removeMemberFromName(String playerName) {
+        ClanMember clanMember = getMemberFromName(playerName);
 
         if (clanMember != null)
             members.remove(clanMember);

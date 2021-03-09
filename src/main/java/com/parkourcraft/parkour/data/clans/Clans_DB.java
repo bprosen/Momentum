@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.data.clans;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -83,14 +84,12 @@ public class Clans_DB {
 
             if (owner.getPlayer() != null
                     && owner.getPlayer().isOnline())
-                owner.getPlayer().sendMessage(
-                        ChatColor.GRAY + "Successfully created your Clan called " +
-                                ChatColor.AQUA + clan.getTag()
-                );
+                owner.getPlayer().sendMessage(Utils.translate("&7Successfully created your Clan called &b"
+                        + clan.getTag()));
         }
     }
 
-    private static void insertClan(Clan clan) {
+    public static void insertClan(Clan clan) {
         Parkour.getDatabaseManager().run(
                 "INSERT INTO clans " +
                         "(clan_tag, owner_player_id)" +
@@ -100,6 +99,40 @@ public class Clans_DB {
                         clan.getOwnerID() +
                         ")"
         );
+    }
+
+    public static void removeClan(int clanID) {
+        Parkour.getDatabaseManager().add(
+                "DELETE FROM clans " +
+                "WHERE clan_id=" + clanID);
+    }
+
+    public static void resetClanMember(String playerName) {
+        Parkour.getDatabaseManager().add(
+                "UPDATE players SET " +
+                "clan_id=" + -1 +
+                " WHERE player_name='" + playerName + "'");
+    }
+
+    public static Clan getClan(String playerName) {
+        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
+                "players",
+                "clan_id",
+                "WHERE player_name=" + playerName
+        );
+
+        for (Map<String, String> completionResult : completionsResults) {
+
+            int clanId = Integer.parseInt(completionResult.get("clan_id"));
+
+            if (clanId > 0) {
+                Clan clan = Parkour.getClansManager().get(clanId);
+
+                if (clan != null)
+                    return clan;
+            }
+        }
+        return null;
     }
 
     public static void updatePlayerClanID(PlayerStats playerStats) {

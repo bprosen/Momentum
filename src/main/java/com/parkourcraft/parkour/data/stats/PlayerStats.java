@@ -195,6 +195,8 @@ public class PlayerStats {
         return clan;
     }
 
+    public void resetClan() { clan = null; }
+
     //
     // Checkpoint Section
     //

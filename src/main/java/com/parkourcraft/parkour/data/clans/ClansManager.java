@@ -1,11 +1,17 @@
 package com.parkourcraft.parkour.data.clans;
 
+import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.Stats_DB;
+import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ClansManager {
 
@@ -60,6 +66,31 @@ public class ClansManager {
                 return clan;
 
         return null;
+    }
+
+    public void deleteClan(int clanID) {
+        Clan clan = get(clanID);
+
+        if (clan != null) {
+            // iterate through existing clan members to reset/remove their data
+            for (ClanMember clanMember : clan.getMembers()) {
+
+                // reset clan member in database
+                Clans_DB.resetClanMember(clanMember.getPlayerName());
+
+                Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+                if (clanPlayer != null) {
+                    clanPlayer.sendMessage(Utils.translate("&4" + clan.getOwner().getPlayerName() +
+                            " &chas disbanded your &6&lClan &c" + clan.getTag()));
+
+                    // reset data on the players
+                    Parkour.getStatsManager().get(clanPlayer).resetClan();
+                }
+            }
+            // remove from database and list
+            Clans_DB.removeClan(clanID);
+            clans.remove(clan);
+        }
     }
 
     private void syncNewClans() {
