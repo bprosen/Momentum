@@ -94,4 +94,7 @@ public class Clan {
         return invitedUUIDs.contains(UUID);
     }
 
+    public List<ClanMember> getMembers() {
+        return members;
+    }
 }
