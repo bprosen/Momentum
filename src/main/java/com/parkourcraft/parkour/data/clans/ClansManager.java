@@ -52,6 +52,13 @@ public class ClansManager {
             clan.addMember(clanMember);
     }
 
+    public void removeClan(int clanID) {
+        Clan clan = get(clanID);
+
+        if (clan != null)
+            clans.remove(clan);
+    }
+
     public Clan get(int clanID) {
         for (Clan clan : clans)
             if (clan.getID() == clanID)
@@ -80,8 +87,8 @@ public class ClansManager {
 
                 Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
                 if (clanPlayer != null) {
-                    clanPlayer.sendMessage(Utils.translate("&4" + clan.getOwner().getPlayerName() +
-                            " &chas disbanded your &6&lClan &c" + clan.getTag()));
+                    clanPlayer.sendMessage(Utils.translate("&6&l" + clan.getOwner().getPlayerName() +
+                            " &ehas disbanded your &6&lClan &6" + clan.getTag()));
 
                     // reset data on the players
                     Parkour.getStatsManager().get(clanPlayer).resetClan();

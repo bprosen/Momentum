@@ -78,13 +78,12 @@ public class Clans_DB {
         PlayerStats owner = Parkour.getStatsManager().get(clan.getOwnerID());
 
         if (owner != null) {
+            clan.addMember(new ClanMember(owner.getPlayerID(), owner.getUUID(), owner.getPlayer().getName()));
             owner.setClan(clan);
-
             updatePlayerClanID(owner);
 
-            if (owner.getPlayer() != null
-                    && owner.getPlayer().isOnline())
-                owner.getPlayer().sendMessage(Utils.translate("&7Successfully created your Clan called &b"
+            if (owner.getPlayer() != null && owner.getPlayer().isOnline())
+                owner.getPlayer().sendMessage(Utils.translate("&7Successfully created your Clan called &3"
                         + clan.getTag()));
         }
     }
@@ -118,7 +117,7 @@ public class Clans_DB {
         List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                 "players",
                 "clan_id",
-                "WHERE player_name=" + playerName
+                "WHERE player_name='" + playerName + "'"
         );
 
         for (Map<String, String> completionResult : completionsResults) {
@@ -158,7 +157,7 @@ public class Clans_DB {
     public static void updateClanOwnerID(Clan clan) {
         String query = "UPDATE clans SET " +
                 "owner_player_id=" + clan.getOwnerID() +
-                "WHERE clan_id=" + clan.getID();
+                " WHERE clan_id=" + clan.getID();
 
         Parkour.getDatabaseManager().add(query);
     }

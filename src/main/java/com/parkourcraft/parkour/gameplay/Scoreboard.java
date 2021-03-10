@@ -60,7 +60,6 @@ public class Scoreboard {
 
         String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(player));
         board.add(coinBalance);
-        board.add(formatSpacing(Utils.translate("&7")));
 
         if (playerStats.getRank() != null) {
             String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
@@ -71,6 +70,8 @@ public class Scoreboard {
             String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
             board.add(clanString);
         }
+
+        board.add(formatSpacing(Utils.translate("&7")));
 
         // spectator section of scoreboard
         if (playerStats.getPlayerToSpectate() != null) {

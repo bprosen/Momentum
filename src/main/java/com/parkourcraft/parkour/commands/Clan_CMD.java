@@ -72,8 +72,8 @@ public class Clan_CMD implements CommandExecutor {
                                     // update in data
                                     clan.setTag(clanTag);
                                     Clans_DB.updateClanTag(clan);
-                                    sendClanMessage(clan, "&6&lClan &6Owner " +
-                                            player.getName() + " &ehas changed your clan's tag to &c" + clanTag);
+                                    sendClanMessage(clan, "&6&lClan Owner " +
+                                            player.getName() + " &ehas changed your clan's tag to &c" + clanTag, true, player);
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&cNo clan tag specified"));
@@ -104,7 +104,7 @@ public class Clan_CMD implements CommandExecutor {
                                     clan.promoteOwner(victim.getUniqueId().toString());
                                     Clans_DB.updateClanOwnerID(clan);
                                     sendClanMessage(clan, "&6" + victim.getName() + " &ehas been promoted to" +
-                                            " &6&lClan Owner &eby &6" + player.getName());
+                                            " &6&lClan Owner &eby &6" + player.getName(), true, player);
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot switch clan owners if you are not owner"));
                                 }
@@ -128,18 +128,25 @@ public class Clan_CMD implements CommandExecutor {
                             return true;
                         }
 
-                        // if they are already in a clan
-                        if (Parkour.getStatsManager().get(victim).getClan() != null) {
+                        // if they are not in a clan
+                        if (Parkour.getStatsManager().get(victim).getClan() == null) {
 
                             // if they already have an invite or not
                             if (!clan.isInvited(victim.getUniqueId().toString())) {
 
                                 // add an invite
+                                victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
+                                        " invitation to their &6&lClan &c" + clan.getTag()));
+                                victim.sendMessage(Utils.translate("   &7Type &e/clan accept " + player.getName() +
+                                        " &7within &c20 seconds &7to accept"));
+                                player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
+                                        + " &ethey have 20 seconds to accept"));
+
                                 clan.addInvite(victim.getUniqueId().toString());
                                 new BukkitRunnable() {
                                     public void run() {
                                         // ran out of time
-                                        if (clan.isInvited(player.getUniqueId().toString())) {
+                                        if (clan.isInvited(victim.getUniqueId().toString())) {
 
                                             player.sendMessage(Utils.translate("&6" + victim.getName() +
                                                     " &edid not accept your &6&lClan Invite &ein time"));
@@ -147,7 +154,7 @@ public class Clan_CMD implements CommandExecutor {
                                                     player.getName() + "&e's &6&lClan Invite &ein time"));
 
                                             // remove old invite
-                                            clan.removeInvite(player.getUniqueId().toString());
+                                            clan.removeInvite(victim.getUniqueId().toString());
                                         }
                                     }
                                     // 20 seconds to accept invite
@@ -165,7 +172,7 @@ public class Clan_CMD implements CommandExecutor {
                     // accept invite if they have one
 
                     // make sure they are not in a clan
-                    if (clan != null) {
+                    if (clan == null) {
 
                         Player victim = Bukkit.getPlayer(a[1]);
                         if (victim == null) {
@@ -184,7 +191,8 @@ public class Clan_CMD implements CommandExecutor {
                                 playerStats.setClan(targetClan);
                                 Clans_DB.updatePlayerClanID(playerStats);
                                 targetClan.removeInvite(player.getUniqueId().toString());
-                                sendClanMessage(targetClan, "&6&l" + player.getName() + " &ehas joined your clan!");
+                                sendClanMessage(targetClan, "&6" + player.getName() + " &ehas joined your clan!", false, player);
+                                player.sendMessage(Utils.translate("&eYou joined the &6&lClan &c" + targetClan.getTag()));
                             } else {
                                 player.sendMessage(Utils.translate("&eYou do not have an invite from &6Clan &c" + targetClan.getTag()));
                             }
@@ -203,19 +211,35 @@ public class Clan_CMD implements CommandExecutor {
                         if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
 
                             String victimName = a[1];
+                            if (Bukkit.getPlayer(victimName) == null) {
+                                player.sendMessage(Utils.translate("&4" + victimName + " &cis not online"));
+                                return true;
+                            }
+
+                            Player victim = Bukkit.getPlayer(victimName);
                             Clan targetClan = Clans_DB.getClan(victimName);
 
-                            // if they do not have a clan stored in database
-                            if (targetClan != null) {
+                            // make sure they are not trying to kick themselves
+                            if (!victim.getName().equalsIgnoreCase(player.getName())) {
+                                // if they do not have a clan stored in database
+                                if (targetClan != null) {
 
-                                // make sure they are kicking from the same clan
-                                if (targetClan.getID() == clan.getID()) {
+                                    // make sure they are kicking from the same clan
+                                    if (targetClan.getID() == clan.getID()) {
 
-                                    targetClan.removeMemberFromName(victimName);
-                                    sendClanMessage(clan, "&6&l" + victimName + " &ehas been removed from your &6Clan");
+                                        sendClanMessage(clan, "&6" + victimName + " &ehas been removed from your clan", true, victim);
+
+                                        targetClan.removeMemberFromName(victimName);
+
+                                        PlayerStats victimStats = Parkour.getStatsManager().get(victim);
+                                        victimStats.resetClan();
+                                        Clans_DB.updatePlayerClanID(victimStats);
+                                    }
+                                } else {
+                                    player.sendMessage(Utils.translate("&4" + victimName + " &cis not in your clan"));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&4" + victimName + " &cis not in your clan"));
+                                player.sendMessage(Utils.translate("&cYou cannot kick yourself"));
                             }
                         } else {
                             player.sendMessage(Utils.translate("&cYou cannot kick a member from a clan you do not own!"));
@@ -236,6 +260,33 @@ public class Clan_CMD implements CommandExecutor {
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot disband a clan if you are not in one"));
+                    }
+                } else if (a.length == 1 && a[0].equalsIgnoreCase("leave")) {
+                    // leave if in a clan
+
+                    if (clan != null) {
+                        // if they are only one in their clan
+                        if (clan.getMembers().size() == 1) {
+
+                            Clans_DB.resetClanMember(player.getName());
+                            Clans_DB.removeClan(clan.getID());
+                            Parkour.getClansManager().removeClan(clan.getID());
+                            playerStats.resetClan();
+                            player.sendMessage(Utils.translate("&eYou have left your clan"));
+
+                        // if not only one, make sure they are not the owner
+                        } else if (!clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
+
+                            Clans_DB.resetClanMember(player.getName());
+                            clan.removeMemberFromName(player.getName());
+                            playerStats.resetClan();
+                            player.sendMessage(Utils.translate("&eYou have left your clan"));
+                            sendClanMessage(clan, "&6" + player.getName() + " &ehas left your clan", false, player);
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot leave a clan you own"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou are not in a clan"));
                     }
                 } else {
                     // Unknown argument
@@ -267,25 +318,32 @@ public class Clan_CMD implements CommandExecutor {
         }
     }
 
-    private static void sendClanMessage(Clan targetClan, String message) {
+    private static void sendClanMessage(Clan targetClan, String message, boolean sendToSelf, Player self) {
         for (ClanMember clanMember : targetClan.getMembers()) {
             // make sure they are online
             Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
 
-            if (clanPlayer != null)
-                clanPlayer.sendMessage(Utils.translate(message));
+            if (clanPlayer != null) {
+                // if it will send to self, then do everyone
+                if (sendToSelf)
+                    clanPlayer.sendMessage(Utils.translate(message));
+                // otherwise make sure it is not the same person
+                else if (clanPlayer.getName() != self.getName())
+                    clanPlayer.sendMessage(Utils.translate(message));
+            }
         }
     }
 
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(getHelp("stats")); // console friendly
         sender.sendMessage(getHelp("create"));
+        sender.sendMessage(getHelp("invite"));
+        sender.sendMessage(getHelp("accept"));
+        sender.sendMessage(getHelp("leave"));
+        sender.sendMessage(getHelp("kick"));
+        sender.sendMessage(getHelp("disband"));
         sender.sendMessage(getHelp("changetag"));
         sender.sendMessage(getHelp("setowner"));
-        sender.sendMessage(getHelp("kick"));
-        sender.sendMessage(getHelp("invite"));
-        sender.sendMessage(getHelp("disband"));
-        sender.sendMessage(getHelp("accept"));
     }
 
     private static String getHelp(String cmd) {
@@ -297,7 +355,7 @@ public class Clan_CMD implements CommandExecutor {
             case "changetag":
                 return Utils.translate("&3/clan changetag <tag>  &7Change clan tag &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
             case "setowner":
-                return Utils.translate("&3/clan owner <player>  &7Give your clan ownership");
+                return Utils.translate("&3/clan setowner <player>  &7Give your clan ownership");
             case "kick":
                 return Utils.translate("&3/clan kick <player>  &7Kick player from your clan");
             case "invite":
@@ -306,6 +364,8 @@ public class Clan_CMD implements CommandExecutor {
                 return Utils.translate("&3/clan accept <player>  &7Accept invite from player");
             case "disband":
                 return Utils.translate("&3/clan disband  &7Disband your clan");
+            case "leave":
+                return Utils.translate("&3/clan leave  &7Leave your clan");
         }
         return "";
     }
