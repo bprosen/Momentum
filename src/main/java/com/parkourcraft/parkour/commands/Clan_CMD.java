@@ -349,7 +349,7 @@ public class Clan_CMD implements CommandExecutor {
     private static String getHelp(String cmd) {
         switch (cmd.toLowerCase()) {
             case "stats":
-                return Utils.translate("&3/clans stats <clan>  &7Display clan statistics");
+                return Utils.translate("&3/clan stats <clan>  &7Display clan statistics");
             case "create":
                 return Utils.translate("&3/clan create <tag>  &7Create a clan &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
             case "changetag":
