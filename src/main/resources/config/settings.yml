@@ -27,6 +27,10 @@ clans:
   tag_length:
     min: 4
     max: 6
+  clan_xp_calc:
+    level-reward-needed: 100
+    min-percent: 10
+    max-percent: 25
 
 spawn:
   location:

@@ -95,6 +95,11 @@ public class LevelHandler {
         Parkour.getStatsManager().get(player).resetCheckpoint();
 
         if (!rankUpLevel) {
+            // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
+            if (playerStats.getClan() != null && level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed) {
+                Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, level);
+            }
+
             String messageFormatted = level.getFormattedMessage(playerStats);
             String time = (((double) elapsedTime) / 1000) + "s";
             if (elapsedTime > 0L && elapsedTime < 8388607L)

@@ -24,6 +24,7 @@ public class ConfigManager {
         initialize("menus", plugin);
         initialize("perks", plugin);
         initialize("ranks", plugin);
+        initialize("clans", plugin);
     }
 
     private void initialize(String fileName, Plugin plugin) {

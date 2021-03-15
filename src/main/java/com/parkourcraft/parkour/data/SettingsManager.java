@@ -20,6 +20,9 @@ public class SettingsManager {
     public int clans_price_tag;
     public int clans_tag_length_min;
     public int clans_tag_length_max;
+    public int clan_calc_percent_min;
+    public int clan_calc_percent_max;
+    public int clan_calc_level_reward_needed;
 
     public Location spawn_location = null;
 
@@ -38,6 +41,9 @@ public class SettingsManager {
         clans_price_tag = settings.getInt("clans.price.tag");
         clans_tag_length_min = settings.getInt("clans.tag_length.min");
         clans_tag_length_max = settings.getInt("clans.tag_length.max");
+        clan_calc_percent_min = settings.getInt("clans.clan_xp_calc.min-percent");
+        clan_calc_percent_max = settings.getInt("clans.clan_xp_calc.max-percent");
+        clan_calc_level_reward_needed = settings.getInt("clans.clan_xp_calc.level-reward-needed");
         loadSpawn();
     }
 

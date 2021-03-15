@@ -42,6 +42,17 @@ public class Clan {
 
     public long getXP() { return clanXP; }
 
+    public void resetXP() {
+        clanXP = 0;
+    }
+
+    public void setXP(long clanXP) { this.clanXP = clanXP; }
+    public void addXP(long clanXP) { this.clanXP += clanXP; }
+
+    public void setLevel(int level) {
+        clanLevel = level;
+    }
+
     public void setClanOwnerID(int clanOwnerID) {
         this.ownerID = clanOwnerID;
     }

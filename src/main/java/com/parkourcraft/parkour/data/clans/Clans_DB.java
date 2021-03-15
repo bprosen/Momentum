@@ -104,6 +104,18 @@ public class Clans_DB {
         );
     }
 
+    public static void setClanXP(long clanXP, int clanID) {
+        Parkour.getDatabaseManager().add("UPDATE clans SET " +
+                "clan_xp=" + clanXP +
+                " WHERE clan_id=" + clanID);
+    }
+
+    public static void setClanLevel(int clanLevel, int clanID) {
+        Parkour.getDatabaseManager().add("UPDATE clans SET " +
+                "clan_level=" + clanLevel +
+                " WHERE clan_id=" + clanID);
+    }
+
     public static void removeClan(int clanID) {
         Parkour.getDatabaseManager().add(
                 "DELETE FROM clans " +

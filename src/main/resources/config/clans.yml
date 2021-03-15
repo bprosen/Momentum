@@ -1,0 +1,12 @@
+clans:
+  # XP Needed to level up
+  '1':
+    xp-needed: 1000
+  '2':
+    xp-needed: 10000
+  '3':
+    xp-needed: 100000
+  '4':
+    xp-needed: 1000000
+  '5':
+    xp-needed: 10000000

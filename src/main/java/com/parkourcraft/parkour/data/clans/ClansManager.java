@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.clans;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.utils.Utils;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ClansManager {
 
@@ -73,6 +75,60 @@ public class ClansManager {
                 return clan;
 
         return null;
+    }
+
+    public void doClanXPCalc(Clan clan, Player player, LevelObject levelObject) {
+        int min = Parkour.getSettingsManager().clan_calc_percent_min;
+        int max = Parkour.getSettingsManager().clan_calc_percent_max;
+
+        // get random percent
+        double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
+        long clanXP = (long) (levelObject.getReward() * percent);
+        long totalXP = clanXP + clan.getXP();
+
+        //
+        // TODO: If their gained xp will be higher than multiple levels, skip them along!
+        //
+
+        // level them up
+        if (totalXP > Clans_YAML.getLevelUpPrice(clan)) {
+
+            // left over after level up
+            long clanXPOverflow = totalXP - Clans_YAML.getLevelUpPrice(clan);
+            int newLevel = clan.getLevel() + 1;
+
+            clan.setLevel(newLevel);
+
+            // send announcement to all online clan members
+            for (ClanMember clanMember : clan.getMembers()) {
+                // make sure they are online
+                Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+
+                if (clanPlayer != null)
+                    clanPlayer.sendMessage(Utils.translate("&eYour clan has leveled up to &6&lLevel " + newLevel));
+            }
+            // add rest of xp after leveling up
+            Clans_DB.setClanLevel(newLevel, clan.getID());
+            Clans_DB.setClanXP(clanXPOverflow, clan.getID());
+            clan.setXP(clanXPOverflow);
+
+        } else {
+
+            // otherwise add xp to cache and database
+            clan.addXP(clanXP);
+            Clans_DB.setClanXP(totalXP, clan.getID());
+
+            long clanXPNeeded = Clans_YAML.getLevelUpPrice(clan) - clan.getXP();
+
+            for (ClanMember clanMember : clan.getMembers()) {
+                // make sure they are online
+                Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+
+                if (clanPlayer != null)
+                    clanPlayer.sendMessage(Utils.translate("&6" + player.getName() + " &ehas gained &6&l" + clanXP
+                            + " &eXP for your clan! &c(XP Needed to Level Up - &4" + clanXPNeeded + "&c)"));
+            }
+        }
     }
 
     public void deleteClan(int clanID) {
