@@ -8,14 +8,18 @@ public class Clan {
     private int ID;
     private String tag;
     private int ownerID;
+    private int clanLevel;
+    private long clanXP;
 
     private List<ClanMember> members = new ArrayList<>(); // Does not include the owner
     private List<String> invitedUUIDs = new ArrayList<>();
 
-    public Clan(int clanID, String clanTag, int clanOwnerID) {
+    public Clan(int clanID, String clanTag, int clanOwnerID, int clanLevel, long clanXP) {
         this.ID = clanID;
         this.tag = clanTag;
         this.ownerID = clanOwnerID;
+        this.clanLevel = clanLevel;
+        this.clanXP = clanXP;
     }
 
     public void setID(int clanID) {
@@ -33,6 +37,10 @@ public class Clan {
     public String getTag() {
         return tag;
     }
+
+    public int getLevel() { return clanLevel; }
+
+    public long getXP() { return clanXP; }
 
     public void setClanOwnerID(int clanOwnerID) {
         this.ownerID = clanOwnerID;

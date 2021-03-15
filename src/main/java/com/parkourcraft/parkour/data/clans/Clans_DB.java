@@ -18,7 +18,7 @@ public class Clans_DB {
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",
-                "clan_id, clan_tag, owner_player_id",
+                "clan_id, clan_tag, owner_player_id, clan_level, clan_xp",
                 ""
         );
 
@@ -27,7 +27,9 @@ public class Clans_DB {
                     new Clan(
                             Integer.parseInt(result.get("clan_id")),
                             result.get("clan_tag"),
-                            Integer.parseInt(result.get("owner_player_id"))
+                            Integer.parseInt(result.get("owner_player_id")),
+                            Integer.parseInt(result.get("clan_level")),
+                            Long.parseLong(result.get("clan_xp"))
                     )
             );
 
@@ -91,11 +93,13 @@ public class Clans_DB {
     public static void insertClan(Clan clan) {
         Parkour.getDatabaseManager().run(
                 "INSERT INTO clans " +
-                        "(clan_tag, owner_player_id)" +
+                        "(clan_tag, owner_player_id, clan_level, clan_xp)" +
                         " VALUES " +
                         "('" +
                         clan.getTag() + "', " +
-                        clan.getOwnerID() +
+                        clan.getOwnerID() + ", " +
+                        clan.getLevel() + ", " +
+                        clan.getXP() +
                         ")"
         );
     }

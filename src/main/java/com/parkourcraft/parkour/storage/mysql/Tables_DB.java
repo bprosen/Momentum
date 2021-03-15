@@ -90,6 +90,8 @@ public class Tables_DB {
         String sqlQuery = "CREATE TABLE clans(" +
                 "clan_id INT NOT NULL AUTO_INCREMENT, " +
                 "clan_tag VARCHAR(7) NOT NULL, " +
+                "clan_level SMALLINT NOT NULL, " +
+                "clan_xp INT NOT NULL, " +
                 "owner_player_id INT NOT NULL, " +
                 "PRIMARY KEY (clan_id)" +
                 ")";

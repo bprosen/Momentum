@@ -25,8 +25,14 @@ public class Clan_CMD implements CommandExecutor {
 
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("stats")) {
-                // Displays stats of clan requested, or personal if available
+                String clanName = a[1];
 
+                Clan targetClan = Parkour.getClansManager().get(clanName);
+                if (targetClan != null) {
+
+                    sender.sendMessage(Utils.translate("&cClan Level &4" + targetClan.getLevel()));
+                    sender.sendMessage(Utils.translate("&cClan XP &4" + targetClan.getXP()));
+                }
             } else if (sender instanceof Player) {
                 // Sub commands here cannot be ran by non-players
                 Player player = (Player) sender;
@@ -45,7 +51,7 @@ public class Clan_CMD implements CommandExecutor {
 
                                 if (clanTagRequirements(clanTag, sender)) {
                                     Parkour.getEconomy().withdrawPlayer(player, Parkour.getSettingsManager().clans_price_create);
-                                    Parkour.getClansManager().add(new Clan(-1, clanTag, playerStats.getPlayerID()));
+                                    Parkour.getClansManager().add(new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0));
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&cNo clan tag specified"));
