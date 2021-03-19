@@ -140,31 +140,37 @@ public class Clan_CMD implements CommandExecutor {
                             // if they already have an invite or not
                             if (!clan.isInvited(victim.getUniqueId().toString())) {
 
-                                // add an invite
-                                victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
-                                        " invitation to their &6&lClan &c" + clan.getTag()));
-                                victim.sendMessage(Utils.translate("   &7Type &e/clan accept " + player.getName() +
-                                        " &7within &c20 seconds &7to accept"));
-                                player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
-                                        + " &ethey have 20 seconds to accept"));
+                                int maxMembers = Parkour.getSettingsManager().clans_max_members;
+                                if (clan.getMembers().size() <= maxMembers) {
+                                    // add an invite
+                                    victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
+                                            " invitation to their &6&lClan &c" + clan.getTag()));
+                                    victim.sendMessage(Utils.translate("   &7Type &e/clan accept " + player.getName() +
+                                            " &7within &c20 seconds &7to accept"));
+                                    player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
+                                            + " &ethey have 20 seconds to accept"));
 
-                                clan.addInvite(victim.getUniqueId().toString());
-                                new BukkitRunnable() {
-                                    public void run() {
-                                        // ran out of time
-                                        if (clan.isInvited(victim.getUniqueId().toString())) {
+                                    clan.addInvite(victim.getUniqueId().toString());
+                                    new BukkitRunnable() {
+                                        public void run() {
+                                            // ran out of time
+                                            if (clan.isInvited(victim.getUniqueId().toString())) {
 
-                                            player.sendMessage(Utils.translate("&6" + victim.getName() +
-                                                    " &edid not accept your &6&lClan Invite &ein time"));
-                                            victim.sendMessage(Utils.translate("&6You did not accept &6" +
-                                                    player.getName() + "&e's &6&lClan Invite &ein time"));
+                                                player.sendMessage(Utils.translate("&6" + victim.getName() +
+                                                        " &edid not accept your &6&lClan Invite &ein time"));
+                                                victim.sendMessage(Utils.translate("&6You did not accept &6" +
+                                                        player.getName() + "&e's &6&lClan Invite &ein time"));
 
-                                            // remove old invite
-                                            clan.removeInvite(victim.getUniqueId().toString());
+                                                // remove old invite
+                                                clan.removeInvite(victim.getUniqueId().toString());
+                                            }
                                         }
-                                    }
-                                    // 20 seconds to accept invite
-                                }.runTaskLater(Parkour.getPlugin(), 20 * 20);
+                                        // 20 seconds to accept invite
+                                    }.runTaskLater(Parkour.getPlugin(), 20 * 20);
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou cannot invite anymore people to your" +
+                                                                        " clan! Max - " + maxMembers));
+                                }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou have already sent an invite to &4" + victim.getUniqueId().toString()));
                             }
@@ -192,13 +198,18 @@ public class Clan_CMD implements CommandExecutor {
                             // if they are invited
                             if (targetClan.isInvited(player.getUniqueId().toString())) {
 
-                                // add to clan and remove invite
-                                targetClan.addMember(new ClanMember(playerStats.getPlayerID(), playerStats.getUUID(), player.getName()));
-                                playerStats.setClan(targetClan);
-                                Clans_DB.updatePlayerClanID(playerStats);
-                                targetClan.removeInvite(player.getUniqueId().toString());
-                                sendClanMessage(targetClan, "&6" + player.getName() + " &ehas joined your clan!", false, player);
-                                player.sendMessage(Utils.translate("&eYou joined the &6&lClan &c" + targetClan.getTag()));
+                                if (targetClan.getMembers().size() <= Parkour.getSettingsManager().clans_max_members) {
+                                    // add to clan and remove invite
+                                    targetClan.addMember(new ClanMember(playerStats.getPlayerID(), playerStats.getUUID(), player.getName()));
+                                    playerStats.setClan(targetClan);
+                                    Clans_DB.updatePlayerClanID(playerStats);
+                                    targetClan.removeInvite(player.getUniqueId().toString());
+                                    sendClanMessage(targetClan, "&6" + player.getName() + " &ehas joined your clan!", false, player);
+                                    player.sendMessage(Utils.translate("&eYou joined the &6&lClan &c" + targetClan.getTag()));
+
+                                } else {
+                                    player.sendMessage(Utils.translate("&cThat clan is full!"));
+                                }
                             } else {
                                 player.sendMessage(Utils.translate("&eYou do not have an invite from &6Clan &c" + targetClan.getTag()));
                             }
