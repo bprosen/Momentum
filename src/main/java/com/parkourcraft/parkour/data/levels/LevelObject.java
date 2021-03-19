@@ -76,7 +76,7 @@ public class LevelObject {
             String returnMessage = Utils.translate(message);
 
             returnMessage = returnMessage.replace("%title%", getFormattedTitle());
-            returnMessage = returnMessage.replace("%reward%", Integer.toString(reward));
+            returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
             returnMessage = returnMessage.replace(
                     "%completions%",
                     Integer.toString(playerStats.getLevelCompletionsCount(name))

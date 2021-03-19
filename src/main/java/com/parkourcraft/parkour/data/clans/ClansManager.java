@@ -134,8 +134,9 @@ public class ClansManager {
                 Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
 
                 if (clanPlayer != null)
-                    clanPlayer.sendMessage(Utils.translate("&6" + player.getName() + " &ehas gained &6&l" + clanXP
-                            + " &eXP for your clan! &c(XP Needed to Level Up - &4" + clanXPNeeded + "&c)"));
+                    clanPlayer.sendMessage(Utils.translate("&6" + player.getName() + " &ehas gained &6&l" +
+                            Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
+                            Utils.formatNumber(clanXPNeeded) + "&c)"));
             }
         }
     }
