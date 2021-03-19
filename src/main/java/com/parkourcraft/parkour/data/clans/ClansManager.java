@@ -86,16 +86,25 @@ public class ClansManager {
         long clanXP = (long) (levelObject.getReward() * percent);
         long totalXP = clanXP + clan.getXP();
 
-        //
-        // TODO: If their gained xp will be higher than multiple levels, skip them along!
-        //
-
         // level them up
         if (totalXP > Clans_YAML.getLevelUpPrice(clan)) {
 
             // left over after level up
             long clanXPOverflow = totalXP - Clans_YAML.getLevelUpPrice(clan);
             int newLevel = clan.getLevel() + 1;
+
+            // this is the section that will determine if they will skip any levels
+            for (int i = clan.getLevel(); i <= Clans_YAML.getMaxLevel(); i++) {
+                // this means they are still above the next level amount
+                if (clanXPOverflow >= Clans_YAML.getLevelUpPrice(newLevel)) {
+
+                    // remove from overflow and add +1 level
+                    clanXPOverflow -= Clans_YAML.getLevelUpPrice(newLevel);
+                    newLevel++;
+                } else {
+                    break;
+                }
+            }
 
             clan.setLevel(newLevel);
 

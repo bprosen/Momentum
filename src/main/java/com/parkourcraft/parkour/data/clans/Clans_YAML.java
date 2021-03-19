@@ -26,4 +26,17 @@ public class Clans_YAML {
             return clansConfig.getLong("clans." + clan.getLevel() + ".xp-needed");
         return 0;
     }
+
+    public static long getLevelUpPrice(int level) {
+        if (isSection("clans." + level))
+            return clansConfig.getLong("clans." + level + ".xp-needed");
+        return 0;
+    }
+
+    public static int getMaxLevel() {
+        for (int i = 1;; i++) {
+            if (!isSection("clans." + i))
+                return i;
+        }
+    }
 }
