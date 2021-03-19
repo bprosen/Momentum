@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.clans.ClanMember;
 import com.parkourcraft.parkour.data.clans.Clans_DB;
+import com.parkourcraft.parkour.data.clans.Clans_YAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.utils.Utils;
@@ -30,8 +31,11 @@ public class Clan_CMD implements CommandExecutor {
                 Clan targetClan = Parkour.getClansManager().get(clanName);
                 if (targetClan != null) {
 
-                    sender.sendMessage(Utils.translate("&cClan Level &4" + targetClan.getLevel()));
-                    sender.sendMessage(Utils.translate("&cClan XP &4" + targetClan.getXP()));
+                    // send stats
+                    sender.sendMessage(Utils.translate("&6&l" + targetClan.getTag() + "&e's Stats"));
+                    sender.sendMessage(Utils.translate("  &cMember Count &4" + targetClan.getMembers().size()));
+                    sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
+                    sender.sendMessage(Utils.translate("  &cClan XP &4" + targetClan.getXP()));
                 }
             } else if (sender instanceof Player) {
                 // Sub commands here cannot be ran by non-players
@@ -39,7 +43,62 @@ public class Clan_CMD implements CommandExecutor {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 Clan clan = playerStats.getClan();
 
-                if (a.length == 2 && a[0].equalsIgnoreCase("create")) {
+                if (a.length == 3 && a[0].equalsIgnoreCase("setxp")) {
+
+                    if (player.hasPermission("pc-parkour.admin")) {
+                        String clanName = a[1];
+                        if (Utils.isLong(a[2])) {
+                            Long newXp = Long.parseLong(a[2]);
+
+                            Clan targetClan = Parkour.getClansManager().get(clanName);
+                            if (targetClan != null) {
+                                // make sure it is not negative xp
+                                if (newXp > 0) {
+                                    targetClan.setXP(newXp);
+                                    // update in db
+                                    Clans_DB.setClanXP(newXp, targetClan.getID());
+                                    player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
+                                            " XP to &6" + newXp));
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou cannot set negative xp!"));
+                                }
+                            } else {
+                                player.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate(""));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                    }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("setlevel")) {
+
+                    if (player.hasPermission("pc-parkour.admin")) {
+                        String clanName = a[1];
+
+                        if (Utils.isInteger(a[2])) {
+                            int newLevel = Integer.parseInt(a[2]);
+
+                            Clan targetClan = Parkour.getClansManager().get(clanName);
+                            if (targetClan != null) {
+                                // make sure it is actually a level
+                                if (Clans_YAML.isSection("clans." + newLevel)) {
+                                    targetClan.setLevel(newLevel);
+                                    // update in db
+                                    Clans_DB.setClanLevel(newLevel, targetClan.getID());
+                                    player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
+                                                                        " level to &6" + newLevel));
+                                } else {
+                                    player.sendMessage(Utils.translate("&cThat level does not exist!"));
+                                }
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                    }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("create")) {
                     // Creates a clan at the set price
                     if (clan == null) {
 
@@ -361,6 +420,15 @@ public class Clan_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("disband"));
         sender.sendMessage(getHelp("changetag"));
         sender.sendMessage(getHelp("setowner"));
+
+        // send admin section
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (player.hasPermission("pc-parkour.admin")) {
+                sender.sendMessage(getHelp("setlevel"));
+                sender.sendMessage(getHelp("setxp"));
+            }
+        }
     }
 
     private static String getHelp(String cmd) {
@@ -383,6 +451,10 @@ public class Clan_CMD implements CommandExecutor {
                 return Utils.translate("&3/clan disband  &7Disband your clan");
             case "leave":
                 return Utils.translate("&3/clan leave  &7Leave your clan");
+            case "setxp":
+                return Utils.translate("&3/clan setxp <clan> <xp>  &7Sets clan XP");
+            case "setlevel":
+                return Utils.translate("&3/clan setlevel <clan> <level>  &7Sets clan level");
         }
         return "";
     }
