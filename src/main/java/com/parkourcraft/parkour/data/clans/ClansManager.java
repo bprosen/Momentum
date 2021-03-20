@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -75,6 +76,31 @@ public class ClansManager {
                 return clan;
 
         return null;
+    }
+
+    public void doSplitClanReward(Clan clan, Player player, LevelObject levelObject) {
+
+        double percentage = (double) clan.getLevel() / 100;
+        double splitAmountPerMember = levelObject.getReward() * percentage;
+
+        for (ClanMember clanMember : clan.getMembers()) {
+            // make sure it is not given to the completioner
+            if (!clanMember.getPlayerName().equalsIgnoreCase(player.getName())) {
+                // check if they are online
+                if (Bukkit.getPlayer(UUID.fromString(clanMember.getUUID())) != null) {
+
+                    Player onlineMember = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+                    Parkour.getEconomy().depositPlayer(onlineMember, splitAmountPerMember);
+
+                    onlineMember.sendMessage(Utils.translate("&6" + player.getName() + " &ehas completed &6" +
+                            levelObject.getFormattedTitle() + " &eand you received &6" + (percentage * 100) + "%" +
+                            " &eof the reward! &6($" + (int) splitAmountPerMember + ")"));
+                } else {
+                    OfflinePlayer offlineMember = Bukkit.getOfflinePlayer(UUID.fromString(clanMember.getUUID()));
+                    Parkour.getEconomy().depositPlayer(offlineMember, splitAmountPerMember);
+                }
+            }
+        }
     }
 
     public void doClanXPCalc(Clan clan, Player player, LevelObject levelObject) {

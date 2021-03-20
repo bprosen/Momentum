@@ -21,6 +21,7 @@ signs:
 
 clans:
   max_members: 5
+  split_reward_min_needed: 300
   price:
     create: 10000
     tag: 1000
