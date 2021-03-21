@@ -8,6 +8,7 @@ import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.perks.PerkManager;
+import com.parkourcraft.parkour.data.playersubmitted.PSubmittedManager;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.rank.RanksManager;
 import com.parkourcraft.parkour.gameplay.SpectatorHandler;
@@ -41,6 +42,7 @@ public class Parkour extends JavaPlugin {
     private static Economy economy;
     private static RaceManager races;
     private static RanksManager ranks;
+    private static PSubmittedManager playersubmitted;
 
     @Override
     public void onEnable() {
@@ -119,6 +121,7 @@ public class Parkour extends JavaPlugin {
         menus = new MenuManager();
         races = new RaceManager();
         ranks = new RanksManager();
+        playersubmitted = new PSubmittedManager();
     }
 
     private static void unloadClasses() {
@@ -134,6 +137,7 @@ public class Parkour extends JavaPlugin {
         settings = null;
         configs = null;
         database = null;
+        playersubmitted = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -170,10 +174,9 @@ public class Parkour extends JavaPlugin {
     public static ClansManager getClansManager() {
         return clans;
     }
-    public static Economy getEconomy() {
-        return economy;
-    }
+    public static Economy getEconomy() { return economy; }
     public static CheckpointManager getCheckpointManager() { return checkpoint; }
     public static RaceManager getRaceManager() { return races; }
     public static RanksManager getRanksManager() { return ranks; }
+    public static PSubmittedManager getPSubmittedManager() { return playersubmitted; }
 }
