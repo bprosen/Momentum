@@ -25,6 +25,8 @@ public class SettingsManager {
     public int clan_calc_level_reward_needed;
     public int clan_split_reward_min_needed;
 
+    public String player_submitted_world;
+
     public Location spawn_location = null;
 
     public SettingsManager(FileConfiguration settings) {
@@ -46,6 +48,7 @@ public class SettingsManager {
         clan_calc_percent_max = settings.getInt("clans.clan_xp_calc.max-percent");
         clan_calc_level_reward_needed = settings.getInt("clans.clan_xp_calc.level-reward-needed");
         clan_split_reward_min_needed = settings.getInt("clans.split_reward_min_needed");
+        player_submitted_world = settings.getString("player_submitted.world");
         loadSpawn();
     }
 

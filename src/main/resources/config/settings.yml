@@ -32,6 +32,7 @@ clans:
     level-reward-needed: 100
     min-percent: 10
     max-percent: 25
-
+player_submitted:
+  world: ""
 spawn:
   location:

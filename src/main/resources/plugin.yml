@@ -49,3 +49,8 @@ commands:
     aliases: [ranks]
   rankup:
     description: "PC-Parkour Rankup Command"
+  plot:
+    description: "PC-Parkour Player Submitted Command"
+    aliases: [plots, playersubmitted, playersubmit]
+  submit:
+    description: "PC-Parkour Player Submitted Submit Command"

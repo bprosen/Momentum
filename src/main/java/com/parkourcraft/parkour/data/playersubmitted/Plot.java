@@ -3,12 +3,12 @@ package com.parkourcraft.parkour.data.playersubmitted;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-
 public class Plot {
 
     private String ownerName;
     private String ownerUUID;
     private Location spawnLoc;
+    private boolean submitted = false;
 
     // add via player object
     public Plot(Player owner, Location spawnLoc) {
@@ -34,5 +34,17 @@ public class Plot {
 
     public Location getSpawnLoc() {
         return spawnLoc;
+    }
+
+    public boolean isSubmitted() {
+        return submitted;
+    }
+
+    public void submit() {
+        submitted = true;
+    }
+
+    public void desubmit() {
+        submitted = false;
     }
 }

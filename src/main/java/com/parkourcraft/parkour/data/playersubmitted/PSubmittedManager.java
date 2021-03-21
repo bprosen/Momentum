@@ -57,4 +57,9 @@ public class PSubmittedManager {
         if (existsFromUUID(playerUUID))
             plotList.remove(playerUUID);
     }
+
+    // creation algorithm (completablefuture)
+    public void createPlot(Player player) {
+
+    }
 }
