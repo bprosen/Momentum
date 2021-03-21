@@ -1,9 +1,11 @@
 package com.parkourcraft.parkour.data.playersubmitted;
 
+import com.parkourcraft.parkour.Parkour;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class PSubmittedManager {
 
@@ -58,8 +60,17 @@ public class PSubmittedManager {
             plotList.remove(playerUUID);
     }
 
-    // creation algorithm (completablefuture)
+    // creation algorithm
     public void createPlot(Player player) {
 
+        // this is an example, will likely be used for the entirety of the creation algorithm
+        CompletableFuture.supplyAsync(() -> {
+            if (player.isOnline())
+                return "";
+            return null;
+        }).thenAccept(result -> {
+            if (result != null)
+                player.teleport(Parkour.getSettingsManager().spawn_location);
+        });
     }
 }
