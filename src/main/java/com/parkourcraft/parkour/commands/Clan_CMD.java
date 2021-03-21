@@ -26,16 +26,59 @@ public class Clan_CMD implements CommandExecutor {
 
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("stats")) {
-                String clanName = a[1];
 
-                Clan targetClan = Parkour.getClansManager().get(clanName);
+                String clanName = "";
+                Clan targetClan;
+
+                // this is what allows "/clan stats" to do self check
+                if (a.length == 1) {
+                    // make sure it is a player, not console
+                    if (sender instanceof Player) {
+
+                        Player player = (Player) sender;
+                        Clan selfClan = Parkour.getStatsManager().get(player).getClan();
+                        // check if they are in a clan
+                        if (selfClan != null)
+                            targetClan = selfClan;
+                        else {
+                            player.sendMessage(Utils.translate("&cYou are not in a clan!"));
+                            return true;
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cConsole cannot execute this"));
+                        return true;
+                    }
+                } else {
+                    targetClan = Parkour.getClansManager().get(a[1]);
+                }
+
                 if (targetClan != null) {
+
+                    long clanXPNeeded = Clans_YAML.getLevelUpPrice(targetClan) - targetClan.getXP();
 
                     // send stats
                     sender.sendMessage(Utils.translate("&6&l" + targetClan.getTag() + "&e's Stats"));
-                    sender.sendMessage(Utils.translate("  &cMember Count &4" + targetClan.getMembers().size()));
                     sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
-                    sender.sendMessage(Utils.translate("  &cClan XP &4" + targetClan.getXP()));
+                    sender.sendMessage(Utils.translate("  &cClan XP &4" + Utils.formatNumber(targetClan.getXP())));
+                    sender.sendMessage(Utils.translate("  &cXP to Level Up"));
+                    sender.sendMessage(Utils.translate("    &4" + Utils.formatNumber(clanXPNeeded)));
+                    sender.sendMessage("");
+                    sender.sendMessage(Utils.translate( "&6Members &e" + targetClan.getMembers().size()));
+
+                    for (ClanMember clanMember : targetClan.getMembers()) {
+
+                        Player player = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+                        String onlineString = "  &c" + clanMember.getPlayerName() + " ";
+                        // change string based on if they are online
+                        if (player == null)
+                            onlineString += " &4Offline";
+                        else
+                            onlineString += " &aOnline";
+
+                        sender.sendMessage(Utils.translate(onlineString));
+                    }
+                } else {
+                    sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan!"));
                 }
             } else if (sender instanceof Player) {
                 // Sub commands here cannot be ran by non-players
