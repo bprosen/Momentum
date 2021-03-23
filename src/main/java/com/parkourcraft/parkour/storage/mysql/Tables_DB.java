@@ -31,6 +31,9 @@ public class Tables_DB {
 
         if (!tableNames.contains("checkpoints"))
             createCheckpoints(database);
+
+        if (!tableNames.contains("plots"))
+            createPlots(database);
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -117,6 +120,17 @@ public class Tables_DB {
                 "completion_date TIMESTAMP NOT NULL" +
                 ")";
 
+        database.run(sqlQuery);
+    }
+
+    private static void createPlots(DatabaseManager database) {
+        String sqlQuery = "CREATE TABLE plots(" +
+                "uuid char(36) NOT NULL, " +
+                "player_name VARCHAR(16) NOT NULL, " +
+                "plot_id INT NOT NULL, " +
+                "center_x INT NOT NULL, " +
+                "center_z INT NOT NULL" +
+                ")";
         database.run(sqlQuery);
     }
 

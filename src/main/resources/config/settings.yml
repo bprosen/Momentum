@@ -34,5 +34,7 @@ clans:
     max-percent: 25
 player_submitted:
   world: ""
+  plot_width: 75
+  plot_default_y: 64
 spawn:
   location:

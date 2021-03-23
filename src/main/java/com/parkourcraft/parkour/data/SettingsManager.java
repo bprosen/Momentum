@@ -26,6 +26,8 @@ public class SettingsManager {
     public int clan_split_reward_min_needed;
 
     public String player_submitted_world;
+    public int player_submitted_plot_width;
+    public int player_submitted_plot_default_y;
 
     public Location spawn_location = null;
 
@@ -49,6 +51,8 @@ public class SettingsManager {
         clan_calc_level_reward_needed = settings.getInt("clans.clan_xp_calc.level-reward-needed");
         clan_split_reward_min_needed = settings.getInt("clans.split_reward_min_needed");
         player_submitted_world = settings.getString("player_submitted.world");
+        player_submitted_plot_width = settings.getInt("player_submitted.plot_width");
+        player_submitted_plot_default_y = settings.getInt("player_submitted.plot_default_y");
         loadSpawn();
     }
 
