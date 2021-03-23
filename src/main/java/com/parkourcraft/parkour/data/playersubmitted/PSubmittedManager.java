@@ -62,7 +62,7 @@ public class PSubmittedManager {
             plotList.remove(playerUUID);
     }
 
-    // creation algorithm
+    // creation algorithm with CompletableFuture
     public void createPlot(Player player) {
 
         CompletableFuture.supplyAsync(() -> {
@@ -74,6 +74,12 @@ public class PSubmittedManager {
         });
     }
 
+    /*
+      This method works in complete async and operates in an infinite (biggest int) loop.
+      It will start at 0 + half plot width, 0 + half plot width then keeps track of which way it
+      is going so it can check if there is a plot to the right of it based on direction. If there is no
+      plot to the right, it turns right otherwise if there is a plot to the right, it moves forward.
+     */
     private String findNextFreePlot(String playerUUID) {
 
         int max = Integer.MAX_VALUE;
