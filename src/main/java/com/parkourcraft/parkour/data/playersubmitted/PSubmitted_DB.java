@@ -13,11 +13,11 @@ public class PSubmitted_DB {
         // get all plots from database
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "plots",
-                "uuid, plot_id, center_x, center_y, center_z", "");
+                "uuid, plot_id, center_x, center_z", "");
 
         List<String> tempList = new ArrayList<>();
         for (Map<String, String> result : results)
-            tempList.add(result.get("center_x") + ":" + result.get("center_y") + ":" + result.get("center_z"));
+            tempList.add(result.get("center_x") + ":" + result.get("center_z"));
 
         return tempList;
     }

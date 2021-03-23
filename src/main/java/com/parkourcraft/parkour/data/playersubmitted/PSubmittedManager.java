@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.playersubmitted;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class PSubmittedManager {
             return findNextFreePlot(player.getUniqueId().toString());
         }).thenAccept(result -> {
             if (result != null) {
-
+                Bukkit.broadcastMessage(result);
             }
         });
     }
