@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
+import com.parkourcraft.parkour.data.playersubmitted.PSubmitted_DB;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
@@ -54,6 +55,23 @@ public class JoinLeaveHandler implements Listener {
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
         }
+
+        // plot check and add
+        new BukkitRunnable() {
+            public void run() {
+                if (PSubmitted_DB.hasPlot(uuid.toString())) {
+                    String locString = PSubmitted_DB.getPlotCenter(uuid.toString());
+                    String[] locSplit = locString.split(":");
+
+                    // loc from database
+                    Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
+                            Double.parseDouble(locSplit[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
+                            Double.parseDouble(locSplit[1]));
+
+                    Parkour.getPSubmittedManager().add(player.getName(), uuid.toString(), loc);
+                }
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     @EventHandler

@@ -125,11 +125,12 @@ public class Tables_DB {
 
     private static void createPlots(DatabaseManager database) {
         String sqlQuery = "CREATE TABLE plots(" +
+                "plot_id INT NOT NULL AUTO_INCREMENT, " +
                 "uuid char(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
-                "plot_id INT NOT NULL, " +
                 "center_x INT NOT NULL, " +
-                "center_z INT NOT NULL" +
+                "center_z INT NOT NULL,  " +
+                "PRIMARY KEY (plot_id)" +
                 ")";
         database.run(sqlQuery);
     }

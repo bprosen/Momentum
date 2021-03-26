@@ -19,10 +19,10 @@ public class Plot_CMD implements CommandExecutor {
 
         // send help
         if (a.length == 0) {
-            Parkour.getPSubmittedManager().createPlot(player);
+
         // do create algorithm after
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
-
+            Parkour.getPSubmittedManager().createPlot(player);
         // teleport to plot
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") || a[0].equalsIgnoreCase("teleport"))) {
 
@@ -34,7 +34,7 @@ public class Plot_CMD implements CommandExecutor {
 
         // clear and delete their plot data
         } else if (a.length == 1 && a[0].equalsIgnoreCase("delete")) {
-
+            Parkour.getPSubmittedManager().deletePlot(player);
         }
         return false;
     }
