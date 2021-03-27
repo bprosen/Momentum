@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,18 +72,21 @@ public class PSubmittedManager {
         CompletableFuture.supplyAsync(() -> {
             return findNextFreePlot(player.getUniqueId().toString());
         }).thenAccept(result -> {
-            Bukkit.broadcastMessage(result);
             if (result != null && !result.equalsIgnoreCase("")) {
 
                 String[] split = result.split(":");
                 // teleport to found plot!
+                Bukkit.broadcastMessage("got here");
                 Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
                                Double.parseDouble(split[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
-                               Double.parseDouble(split[1]));
+                               Double.parseDouble(split[1]), player.getLocation().getYaw(), player.getLocation().getPitch());
 
+                Bukkit.broadcastMessage("got here 2 " + loc);
                 // set bedrock -1 where they teleport
                 loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
-                player.teleport(loc);
+                Bukkit.broadcastMessage("got here 3 " + loc);
+                player.teleport(loc.clone().add(0.5, 0, 0.5));
+                Bukkit.broadcastMessage("got here 4 " + loc);
                 // add data
                 add(player);
                 PSubmitted_DB.addPlot(player, loc);
