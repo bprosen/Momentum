@@ -6,7 +6,9 @@ import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -69,28 +71,31 @@ public class PSubmittedManager {
     // creation algorithm with CompletableFuture
     public void createPlot(Player player) {
 
-        CompletableFuture.supplyAsync(() -> {
-            return findNextFreePlot(player.getUniqueId().toString());
-        }).thenAccept(result -> {
+        // run algorithm in async
+        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Parkour.getPlugin(), () -> {
+
+        String result = findNextFreePlot(player.getUniqueId().toString());
+
+        // run teleport and creation in sync
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Parkour.getPlugin(), () -> {
             if (result != null && !result.equalsIgnoreCase("")) {
 
                 String[] split = result.split(":");
                 // teleport to found plot!
-                Bukkit.broadcastMessage("got here");
-                Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                               Double.parseDouble(split[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
-                               Double.parseDouble(split[1]), player.getLocation().getYaw(), player.getLocation().getPitch());
 
-                Bukkit.broadcastMessage("got here 2 " + loc);
+                Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
+                        Double.parseDouble(split[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
+                        Double.parseDouble(split[1]), player.getLocation().getYaw(), player.getLocation().getPitch());
+
                 // set bedrock -1 where they teleport
                 loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
-                Bukkit.broadcastMessage("got here 3 " + loc);
+
                 player.teleport(loc.clone().add(0.5, 0, 0.5));
-                Bukkit.broadcastMessage("got here 4 " + loc);
                 // add data
                 add(player);
                 PSubmitted_DB.addPlot(player, loc);
-            }
+                }
+            });
         });
     }
 
@@ -122,8 +127,6 @@ public class PSubmittedManager {
         List<String> plots = PSubmitted_DB.getPlotCenters();
         if (!plots.isEmpty()) {
 
-            Bukkit.broadcastMessage("plots exist!");
-
             List<String> checkedLocs = new ArrayList<>();
             int x = plotWidth / 2;
             int z = plotWidth / 2;
@@ -140,8 +143,6 @@ public class PSubmittedManager {
                 if (results.isEmpty()) {
                     boolean isPlot = false;
 
-                    Bukkit.broadcastMessage("player does not have plot!");
-
                     for (String plotString : plots) {
                         String[] split = plotString.split(":");
                         int plotX = Integer.parseInt(split[0]);
@@ -150,7 +151,6 @@ public class PSubmittedManager {
                         // check if the x and z coords exist in database
                         if (plotX == x && plotZ == z) {
                             isPlot = true;
-                            Bukkit.broadcastMessage("found plot for player");
                             break;
                         }
                     }
@@ -189,21 +189,17 @@ public class PSubmittedManager {
 
                         // add to checked locs
                         checkedLocs.add(x + ":" + z);
-                        Bukkit.broadcastMessage("changed direction and x and y");
                     // create plot
                     } else {
-                        Bukkit.broadcastMessage("returns x and y");
                         return x + ":" + z;
                     }
                 // already has plot
                 } else {
-                    Bukkit.broadcastMessage("already has plot");
                     return null;
                 }
             }
         // first plot
         } else {
-            Bukkit.broadcastMessage("first plot created!");
             return (plotWidth / 2) + ":" + (plotWidth / 2);
         }
         return null;
