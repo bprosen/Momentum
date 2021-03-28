@@ -68,7 +68,7 @@ public class PSubmittedManager {
             plotList.remove(playerUUID);
     }
 
-    // creation algorithm with CompletableFuture
+    // creation algorithm
     public void createPlot(Player player) {
 
         // run algorithm in async
