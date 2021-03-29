@@ -30,7 +30,7 @@ public class Plot_CMD implements CommandExecutor {
 
         // send help
         if (a.length == 0) {
-
+            sendHelp(sender);
         // do create algorithm after
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
             Parkour.getPlotsManager().createPlot(player);
