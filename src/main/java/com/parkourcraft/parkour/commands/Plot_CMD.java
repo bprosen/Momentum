@@ -58,6 +58,10 @@ public class Plot_CMD implements CommandExecutor {
                 confirmPlayer(player);
                 player.sendMessage(Utils.translate("&cAre you sure? &7Type &c/plot delete &7again within 30 seconds to confirm"));
             }
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
+            sendHelp(sender);
+        } else {
+            sendHelp(sender);
         }
         return false;
     }
@@ -72,5 +76,32 @@ public class Plot_CMD implements CommandExecutor {
                 }
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 30));
+    }
+
+    private static void sendHelp(CommandSender sender) {
+        sender.sendMessage(getHelp("create")); // console friendly
+        sender.sendMessage(getHelp("delete"));
+        sender.sendMessage(getHelp("clear"));
+        sender.sendMessage(getHelp("home"));
+        sender.sendMessage(getHelp("visit"));
+        sender.sendMessage(getHelp("help"));
+    }
+
+    private static String getHelp(String cmd) {
+        switch (cmd.toLowerCase()) {
+            case "create":
+                return Utils.translate("&a/plot create  &7Automatically create a plot");
+            case "delete":
+                return Utils.translate("&a/plot delete  &7Deletes your plot (confirm needed)");
+            case "clear":
+                return Utils.translate("&a/plot clear  &7Clears your plot but does not delete it");
+            case "home":
+                return Utils.translate("&a/plot home  &7Teleports you to your plot");
+            case "visit":
+                return Utils.translate("&a/plot visit <player>  &7Visit another player's plot");
+            case "help":
+                return Utils.translate("&a/plot help  &7Sends this display");
+        }
+        return "";
     }
 }
