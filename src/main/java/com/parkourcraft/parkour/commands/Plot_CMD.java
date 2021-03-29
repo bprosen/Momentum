@@ -2,7 +2,10 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.plots.Plot;
+import com.parkourcraft.parkour.data.plots.Plots_DB;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,7 +35,10 @@ public class Plot_CMD implements CommandExecutor {
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
             Parkour.getPlotsManager().createPlot(player);
         // teleport to plot
-        } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") || a[0].equalsIgnoreCase("teleport"))) {
+        } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") ||
+                                     a[0].equalsIgnoreCase("teleport") ||
+                                     a[0].equalsIgnoreCase("h"))) {
+
             Plot plot = Parkour.getPlotsManager().get(player.getName());
 
             // make sure they have a plot
@@ -41,8 +47,26 @@ public class Plot_CMD implements CommandExecutor {
             else
                 player.sendMessage(Utils.translate("&cYou do not have a plot to teleport to"));
         // visit someone else
-        } else if (a.length == 2 && a[0].equalsIgnoreCase("visit")) {
+        } else if (a.length == 2 && (a[0].equalsIgnoreCase("visit") ||
+                                     a[0].equalsIgnoreCase("v"))) {
 
+            String playerName = a[1];
+            if (Plots_DB.playerNameHasPlot(playerName)) {
+                String targetLoc = Plots_DB.getPlotCenterFromName(playerName);
+                String[] split = targetLoc.split(":");
+
+                // get loc from result
+                Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
+                                            Double.parseDouble(split[0]),
+                                            Parkour.getSettingsManager().player_submitted_plot_default_y,
+                                            Double.parseDouble(split[1]),
+                                            player.getLocation().getYaw(), player.getLocation().getPitch());
+
+                player.teleport(loc);
+                player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
+            } else {
+                player.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a plot"));
+            }
         // clear stuff on plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
 

@@ -35,11 +35,33 @@ public class Plots_DB {
         return false;
     }
 
+    public static boolean playerNameHasPlot(String playerName) {
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                "plots",
+                "*", " WHERE player_name='" + playerName + "'");
+
+        if (!results.isEmpty())
+            return true;
+        return false;
+    }
+
     public static String getPlotCenter(String UUID) {
         if (hasPlot(UUID)) {
             List<Map<String, String>> results = DatabaseQueries.getResults(
                     "plots",
                     "center_x, center_z", " WHERE uuid='" + UUID + "'");
+
+            for (Map<String, String> result : results)
+                return result.get("center_x") + ":" + result.get("center_z");
+        }
+        return null;
+    }
+
+    public static String getPlotCenterFromName(String playerName) {
+        if (playerNameHasPlot(playerName)) {
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "plots",
+                    "center_x, center_z", " WHERE player_name='" + playerName + "'");
 
             for (Map<String, String> result : results)
                 return result.get("center_x") + ":" + result.get("center_z");
