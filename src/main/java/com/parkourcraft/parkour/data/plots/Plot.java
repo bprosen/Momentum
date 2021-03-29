@@ -1,4 +1,4 @@
-package com.parkourcraft.parkour.data.playersubmitted;
+package com.parkourcraft.parkour.data.plots;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

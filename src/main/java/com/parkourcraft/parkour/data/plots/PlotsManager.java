@@ -1,4 +1,4 @@
-package com.parkourcraft.parkour.data.playersubmitted;
+package com.parkourcraft.parkour.data.plots;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
@@ -6,21 +6,17 @@ import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-public class PSubmittedManager {
+public class PlotsManager {
 
     private List<Plot> plotList = new ArrayList<>();
 
-    public PSubmittedManager() {
+    public PlotsManager() {
     }
 
     // player param version
@@ -80,6 +76,12 @@ public class PSubmittedManager {
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Parkour.getPlugin(), () -> {
             if (result != null && !result.equalsIgnoreCase("")) {
 
+                // if they have a plot
+                if (result.equalsIgnoreCase("hasPlot")) {
+                    player.sendMessage(Utils.translate("&cYou already have a plot!"));
+                    return;
+                }
+
                 String[] split = result.split(":");
                 // teleport to found plot!
 
@@ -93,7 +95,9 @@ public class PSubmittedManager {
                 player.teleport(loc.clone().add(0.5, 0, 0.5));
                 // add data
                 add(player);
-                PSubmitted_DB.addPlot(player, loc);
+                Plots_DB.addPlot(player, loc);
+                player.sendMessage(Utils.translate("&7Your &a&lPlot &7has been created!" +
+                                                        " &7Type &a/plot home &7to get back!"));
                 }
             });
         });
@@ -106,8 +110,12 @@ public class PSubmittedManager {
         if (plot != null) {
             // remove from cache and teleport to spawn
             plotList.remove(plot);
-            PSubmitted_DB.removePlot(player);
-            player.teleport(Parkour.getSettingsManager().spawn_location);
+            Plots_DB.removePlot(player);
+            // if they are in plot world, teleport them
+            if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                player.teleport(Parkour.getSettingsManager().spawn_location);
+
+            player.sendMessage(Utils.translate("&cYou have deleted your plot"));
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot!"));
         }
@@ -124,7 +132,7 @@ public class PSubmittedManager {
         int max = Integer.MAX_VALUE;
         int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width;
 
-        List<String> plots = PSubmitted_DB.getPlotCenters();
+        List<String> plots = Plots_DB.getPlotCenters();
         if (!plots.isEmpty()) {
 
             List<String> checkedLocs = new ArrayList<>();
@@ -195,7 +203,7 @@ public class PSubmittedManager {
                     }
                 // already has plot
                 } else {
-                    return null;
+                    return "hasPlot";
                 }
             }
         // first plot

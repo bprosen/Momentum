@@ -1,4 +1,4 @@
-package com.parkourcraft.parkour.data.playersubmitted;
+package com.parkourcraft.parkour.data.plots;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PSubmitted_DB {
+public class Plots_DB {
 
     public static List<String> getPlotCenters() {
 

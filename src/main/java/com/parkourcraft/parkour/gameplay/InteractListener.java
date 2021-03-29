@@ -104,7 +104,6 @@ public class InteractListener implements Listener {
                                         }
                                     }
                                 }.runTaskLater(Parkour.getPlugin(), 20 * 5));
-
                             }
                         }
                     } else {
