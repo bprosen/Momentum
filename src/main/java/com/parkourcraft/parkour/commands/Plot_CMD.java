@@ -62,7 +62,7 @@ public class Plot_CMD implements CommandExecutor {
                                             Double.parseDouble(split[1]),
                                             player.getLocation().getYaw(), player.getLocation().getPitch());
 
-                player.teleport(loc);
+                player.teleport(loc.clone().add(0.5, 0, 0.5));
                 player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
             } else {
                 player.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a plot"));
