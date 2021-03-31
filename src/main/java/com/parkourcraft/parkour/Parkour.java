@@ -1,5 +1,8 @@
 package com.parkourcraft.parkour;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketEvent;
 import com.parkourcraft.parkour.commands.*;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.clans.ClansManager;
@@ -17,6 +20,7 @@ import com.parkourcraft.parkour.gameplay.*;
 import com.parkourcraft.parkour.data.SettingsManager;
 import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
+import com.parkourcraft.parkour.utils.dependencies.ProtocolLib;
 import com.parkourcraft.parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -43,6 +47,11 @@ public class Parkour extends JavaPlugin {
     private static RaceManager races;
     private static RanksManager ranks;
     private static PlotsManager plots;
+    private static ProtocolManager protocolManager;
+
+    public void onLoad() {
+        protocolManager = ProtocolLibrary.getProtocolManager();
+    }
 
     @Override
     public void onEnable() {
@@ -51,13 +60,28 @@ public class Parkour extends JavaPlugin {
 
         registerEvents();
         registerCommands();
-        loadClasses();
 
-        if (!Vault.setupEconomy()) {
+        // check before loading classes
+        if (!ProtocolLib.setupProtocol()) {
+            getLogger().info("ProtocolLib v4.6.0 not found or disabled");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
+        // load all classes
+        loadClasses();
+
+        // setup vault
+        if (!Vault.setupEconomy()) {
+            getLogger().info("Vault not found or disabled");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // initialize packet listeners
+        PacketListener.loadListeners(this);
+
+        // start schedulers and any settings
         Scoreboard.startScheduler(plugin);
         SpectatorHandler.startScheduler(plugin);
         settings.loadSpawn();
@@ -68,9 +92,11 @@ public class Parkour extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // save and do all shutdown methods
         Checkpoint_DB.saveAllPlayers();
         PracticeHandler.shutdown();
         SpectatorHandler.shutdown();
+        // close database and unload classes
         database.close();
         unloadClasses();
 
@@ -86,6 +112,7 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TestChamberHandler(), this);
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new RespawnListener(), this);
+        getServer().getPluginManager().registerEvents(new PacketListener(), this);
     }
 
     private void registerCommands() {
@@ -124,6 +151,7 @@ public class Parkour extends JavaPlugin {
         races = new RaceManager();
         ranks = new RanksManager();
         plots = new PlotsManager();
+        protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
     private static void unloadClasses() {
@@ -140,6 +168,7 @@ public class Parkour extends JavaPlugin {
         configs = null;
         database = null;
         plots = null;
+        protocolManager = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -181,4 +210,5 @@ public class Parkour extends JavaPlugin {
     public static RaceManager getRaceManager() { return races; }
     public static RanksManager getRanksManager() { return ranks; }
     public static PlotsManager getPlotsManager() { return plots; }
+    public static ProtocolManager getProtocolManager() { return protocolManager; }
 }
