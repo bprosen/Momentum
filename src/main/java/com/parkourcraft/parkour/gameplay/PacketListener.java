@@ -52,7 +52,9 @@ public class PacketListener implements Listener {
                         // block placed is in the plot
                         if (!blockInPlot(loc, plot)) {
                             player.sendMessage(Utils.translate("&cYou cannot do this here"));
-
+                            //
+                            // TODO: FIND A WAY TO CANCEL, event.setCancelled(true); IS NOT WORKING AS INTENDED FOR SOME REASON
+                            //
                         }
                     }
                 }
