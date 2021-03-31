@@ -47,11 +47,7 @@ public class Parkour extends JavaPlugin {
     private static RaceManager races;
     private static RanksManager ranks;
     private static PlotsManager plots;
-    private static ProtocolManager protocolManager;
-
-    public void onLoad() {
-        protocolManager = ProtocolLibrary.getProtocolManager();
-    }
+    private static ProtocolManager protocol;
 
     @Override
     public void onEnable() {
@@ -151,7 +147,7 @@ public class Parkour extends JavaPlugin {
         races = new RaceManager();
         ranks = new RanksManager();
         plots = new PlotsManager();
-        protocolManager = ProtocolLibrary.getProtocolManager();
+        protocol = ProtocolLibrary.getProtocolManager();
     }
 
     private static void unloadClasses() {
@@ -168,7 +164,7 @@ public class Parkour extends JavaPlugin {
         configs = null;
         database = null;
         plots = null;
-        protocolManager = null;
+        protocol = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -187,9 +183,7 @@ public class Parkour extends JavaPlugin {
     public static ConfigManager getConfigManager() {
         return configs;
     }
-    public static LocationManager getLocationManager() {
-        return locations;
-    }
+    public static LocationManager getLocationManager() { return locations; }
     public static LevelManager getLevelManager() {
         return levels;
     }
@@ -210,5 +204,5 @@ public class Parkour extends JavaPlugin {
     public static RaceManager getRaceManager() { return races; }
     public static RanksManager getRanksManager() { return ranks; }
     public static PlotsManager getPlotsManager() { return plots; }
-    public static ProtocolManager getProtocolManager() { return protocolManager; }
+    public static ProtocolManager getProtocolManager() { return protocol; }
 }
