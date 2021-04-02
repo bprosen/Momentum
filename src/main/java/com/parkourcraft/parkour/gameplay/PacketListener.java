@@ -42,19 +42,52 @@ public class PacketListener implements Listener {
                     Plot plot = Parkour.getPlotsManager().get(player.getName());
 
                     // make sure they are in the right world
-                    if (plot != null && player.getWorld().getName()
-                            .equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
 
                         BlockPosition blockPosition = packet.getBlockPositionModifier().read(0);
                         Location loc = blockPosition.toVector().toLocation(
                                 Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world));
 
-                        // block placed is in the plot
-                        if (!blockInPlot(loc, plot)) {
+                        // if it is a block place, adjust location to the block being placed, not what it is placed on
+                        if (packet.getType() == PacketType.Play.Client.USE_ITEM) {
+                            String direction = packet.getDirections().read(0).toString();
+
+                            // adjust location
+                            switch (direction) {
+                                case "UP":
+                                    loc.add(0, 1, 0);
+                                    break;
+                                case "DOWN":
+                                    loc.subtract(0, 1, 0);
+                                    break;
+                                case "NORTH":
+                                    loc.subtract(0, 0, 1);
+                                    break;
+                                case "EAST":
+                                    loc.add(1, 0, 0);
+                                    break;
+                                case "SOUTH":
+                                    loc.add(0, 0, 1);
+                                    break;
+                                case "WEST":
+                                    loc.subtract(1, 0, 0);
+                                    break;
+                            }
+                        }
+
+                        boolean doCancel = false;
+                        // check if they have a plot
+                        if (plot != null) {
+                            // check if the block is not in the plot
+                            if (!blockInPlot(loc, plot))
+                                doCancel = true;
+                        } else
+                            doCancel = true;
+
+                        if (doCancel) {
                             player.sendMessage(Utils.translate("&cYou cannot do this here"));
-                            //
-                            // TODO: FIND A WAY TO CANCEL, event.setCancelled(true); IS NOT WORKING AS INTENDED FOR SOME REASON
-                            //
+                            event.setCancelled(true);
+                            player.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
                         }
                     }
                 }

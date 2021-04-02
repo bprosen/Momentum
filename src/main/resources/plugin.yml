@@ -4,7 +4,7 @@ main: ${mainClass}
 version: ${project.version}
 author: [CrazySeanPC, xxBen]
 
-depend: [TitleAPI, Vault, WorldGuard, EasyScoreboards]
+depend: [TitleAPI, Vault, WorldGuard, EasyScoreboards, ProtocolLib]
 
 commands:
   level:
