@@ -130,14 +130,18 @@ public class PlotsManager {
     private String findNextFreePlot(String playerUUID) {
 
         int max = Integer.MAX_VALUE;
-        int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width;
+        // add buffer so plots will not touch eachother
+        int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width
+                        + Parkour.getSettingsManager().player_submitted_plot_buffer_width;
+
 
         List<String> plots = Plots_DB.getPlotCenters();
         if (!plots.isEmpty()) {
 
             List<String> checkedLocs = new ArrayList<>();
-            int x = plotWidth / 2;
-            int z = plotWidth / 2;
+            // so plots do not hug eachother
+            int x = (plotWidth / 2);
+            int z = (plotWidth / 2);
             int direction = 1; // direction, 1 = north, 2 = east, 3 = south, 4 = west
 
             for (int i = 0; i < max; i++) {

@@ -36,5 +36,6 @@ player_submitted:
   world: ""
   plot_width: 75
   plot_default_y: 64
+  plot_buffer_width: 10
 spawn:
   location:

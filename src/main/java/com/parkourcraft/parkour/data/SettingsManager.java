@@ -28,6 +28,7 @@ public class SettingsManager {
     public String player_submitted_world;
     public int player_submitted_plot_width;
     public int player_submitted_plot_default_y;
+    public int player_submitted_plot_buffer_width;
 
     public Location spawn_location = null;
 
@@ -53,6 +54,7 @@ public class SettingsManager {
         player_submitted_world = settings.getString("player_submitted.world");
         player_submitted_plot_width = settings.getInt("player_submitted.plot_width");
         player_submitted_plot_default_y = settings.getInt("player_submitted.plot_default_y");
+        player_submitted_plot_buffer_width = settings.getInt("player_submitted.plot_buffer_width");
         loadSpawn();
     }
 
