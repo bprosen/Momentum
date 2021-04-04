@@ -40,8 +40,9 @@ public class PacketListener implements Listener {
 
                     Player player = event.getPlayer();
 
-                    // make sure they are in the right world
-                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+                    // make sure they are in the right world and not opped
+                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)
+                        && !player.isOp()) {
 
                         BlockPosition blockPosition = packet.getBlockPositionModifier().read(0);
                         Location loc = blockPosition.toVector().toLocation(
