@@ -128,6 +128,7 @@ public class Tables_DB {
                 "plot_id INT NOT NULL AUTO_INCREMENT, " +
                 "uuid char(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
+                "trusted_players TEXT NOT NULL, " +
                 "center_x INT NOT NULL, " +
                 "center_z INT NOT NULL,  " +
                 "PRIMARY KEY (plot_id)" +

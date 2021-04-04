@@ -39,7 +39,6 @@ public class PacketListener implements Listener {
                     packet.getType() == PacketType.Play.Client.USE_ITEM) {
 
                     Player player = event.getPlayer();
-                    Plot plot = Parkour.getPlotsManager().get(player.getName());
 
                     // make sure they are in the right world
                     if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
@@ -75,11 +74,15 @@ public class PacketListener implements Listener {
                             }
                         }
 
+                        // get nearest plot from location
+                        Plot plot = Parkour.getPlotsManager().getNearestPlot(loc);
+
                         boolean doCancel = false;
                         // check if they have a plot
                         if (plot != null) {
-                            // check if the block is not in the plot
-                            if (!blockInPlot(loc, plot))
+                            // check if they are trusted and it is not the owner trying
+                            if (!plot.getTrustedPlayers().contains(player.getName()) &&
+                                !plot.getOwnerName().equalsIgnoreCase(player.getName()))
                                 doCancel = true;
                         } else
                             doCancel = true;
@@ -93,17 +96,5 @@ public class PacketListener implements Listener {
                 }
             }
         });
-    }
-
-    private static boolean blockInPlot(Location loc, Plot plot) {
-
-        int maxX = plot.getSpawnLoc().getBlockX() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);
-        int maxZ = plot.getSpawnLoc().getBlockZ() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);
-        int minX = plot.getSpawnLoc().getBlockX() - (Parkour.getSettingsManager().player_submitted_plot_width / 2);
-        int minZ = plot.getSpawnLoc().getBlockZ() - (Parkour.getSettingsManager().player_submitted_plot_width / 2);
-
-        if (loc.getBlockX() <= maxX && loc.getBlockX() >= minX && loc.getBlockZ() <= maxZ && loc.getBlockZ() >= minZ)
-            return true;
-        return false;
     }
 }

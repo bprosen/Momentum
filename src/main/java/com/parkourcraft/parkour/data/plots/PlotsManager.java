@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,26 @@ public class PlotsManager {
     private List<Plot> plotList = new ArrayList<>();
 
     public PlotsManager() {
+        load();
     }
 
+    public void load() {
+        // loop through and add to cache
+        for (String uuidString : Plots_DB.getPlotOwnerUUIDs()) {
+
+            String playerName = Plots_DB.getPlotOwnerName(uuidString);
+            String locString = Plots_DB.getPlotCenter(uuidString);
+            String[] locSplit = locString.split(":");
+
+            // loc from database
+            Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
+                    Double.parseDouble(locSplit[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
+                    Double.parseDouble(locSplit[1]));
+
+            add(playerName, uuidString, loc);
+        }
+        Parkour.getPluginLogger().info("Plots Loaded: " + plotList.size());
+    }
     // player param version
     public void add(Player player) {
         Plot rank = new Plot(player, player.getLocation());
@@ -94,8 +113,8 @@ public class PlotsManager {
 
                 player.teleport(loc.clone().add(0.5, 0, 0.5));
                 // add data
-                add(player);
                 Plots_DB.addPlot(player, loc);
+                add(player);
                 player.sendMessage(Utils.translate("&7Your &a&lPlot &7has been created!" +
                                                         " &7Type &a/plot home &7to get back!"));
                 }
@@ -215,5 +234,30 @@ public class PlotsManager {
             return (plotWidth / 2) + ":" + (plotWidth / 2);
         }
         return null;
+    }
+
+    // get nearest plot from location
+    public Plot getNearestPlot(Location loc) {
+
+        Plot nearestPlot = null;
+        for (Plot plot : plotList) {
+            if (blockInPlot(loc, plot)) {
+                nearestPlot = plot;
+                break;
+            }
+        }
+        return nearestPlot;
+    }
+
+    public boolean blockInPlot(Location loc, Plot plot) {
+
+        int maxX = plot.getSpawnLoc().getBlockX() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);
+        int maxZ = plot.getSpawnLoc().getBlockZ() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);
+        int minX = plot.getSpawnLoc().getBlockX() - (Parkour.getSettingsManager().player_submitted_plot_width / 2);
+        int minZ = plot.getSpawnLoc().getBlockZ() - (Parkour.getSettingsManager().player_submitted_plot_width / 2);
+
+        if (loc.getBlockX() <= maxX && loc.getBlockX() >= minX && loc.getBlockZ() <= maxZ && loc.getBlockZ() >= minZ)
+            return true;
+        return false;
     }
 }

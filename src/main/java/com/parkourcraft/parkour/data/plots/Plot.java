@@ -1,13 +1,18 @@
 package com.parkourcraft.parkour.data.plots;
 
+import com.parkourcraft.parkour.Parkour;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.List;
 
 public class Plot {
 
     private String ownerName;
     private String ownerUUID;
     private Location spawnLoc;
+    private List<String> trustedPlayers;
     private boolean submitted = false;
 
     // add via player object
@@ -15,6 +20,13 @@ public class Plot {
         this.ownerName = owner.getName();
         this.ownerUUID = owner.getUniqueId().toString();
         this.spawnLoc = spawnLoc;
+
+        // run async
+        new BukkitRunnable() {
+            public void run() {
+                trustedPlayers = Plots_DB.getTrustedPlayers(owner.getUniqueId().toString());
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     // no player object addition
@@ -22,6 +34,13 @@ public class Plot {
         this.ownerName = ownerName;
         this.ownerUUID = ownerUUID;
         this.spawnLoc = spawnLoc;
+
+        // run async
+        new BukkitRunnable() {
+            public void run() {
+                trustedPlayers = Plots_DB.getTrustedPlayers(ownerUUID);
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     public String getOwnerName() {
@@ -36,6 +55,12 @@ public class Plot {
         return spawnLoc;
     }
 
+    public List<String> getTrustedPlayers() { return trustedPlayers; }
+
+    public void addTrustedPlayer(Player player) { trustedPlayers.add(player.getName()); }
+
+    public void removeTrustedPlayer(Player player) { trustedPlayers.remove(player.getName()); }
+
     public boolean isSubmitted() {
         return submitted;
     }
@@ -44,7 +69,5 @@ public class Plot {
         submitted = true;
     }
 
-    public void desubmit() {
-        submitted = false;
-    }
+    public void desubmit() { submitted = false; }
 }

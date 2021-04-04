@@ -42,9 +42,14 @@ public class Plot_CMD implements CommandExecutor {
             Plot plot = Parkour.getPlotsManager().get(player.getName());
 
             // make sure they have a plot
-            if (plot != null)
-                player.teleport(plot.getSpawnLoc());
-            else
+            if (plot != null) {
+                // set pitch and yaw
+                Location loc = plot.getSpawnLoc().clone();
+                loc.setYaw(player.getLocation().getYaw());
+                loc.setPitch(player.getLocation().getPitch());
+
+                player.teleport(loc.add(0.5, 0, 0.5));
+            } else
                 player.sendMessage(Utils.translate("&cYou do not have a plot to teleport to"));
         // visit someone else
         } else if (a.length == 2 && (a[0].equalsIgnoreCase("visit") ||
@@ -70,6 +75,58 @@ public class Plot_CMD implements CommandExecutor {
         // clear stuff on plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
 
+        // trust on plot
+        } else if (a.length == 2 && (a[0].equalsIgnoreCase("trust") ||
+                                     a[0].equalsIgnoreCase("add"))) {
+
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
+            Player target = Bukkit.getPlayer(a[1]);
+
+            if (target == null) {
+                player.sendMessage(Utils.translate("&4" + target.getName() + " &cis not online!"));
+                return true;
+            }
+
+            // if they have plot
+            if (plot != null) {
+                // if they are not a trusted player
+                if (!plot.getTrustedPlayers().contains(target.getName())) {
+                    Plots_DB.addTrustedPlayer(player, target);
+                    plot.addTrustedPlayer(target);
+
+                    player.sendMessage(Utils.translate("&7You trusted &3" + target.getName() + " &7to your plot!"));
+                } else {
+                    player.sendMessage(Utils.translate("&4" + player.getName() + " &cis already trusted in your plot"));
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            }
+        // untrust from plot
+        } else if (a.length == 2 && (a[0].equalsIgnoreCase("untrust") ||
+                                     a[0].equalsIgnoreCase("remove"))) {
+
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
+            Player target = Bukkit.getPlayer(a[1]);
+
+            if (target == null) {
+                player.sendMessage(Utils.translate("&4" + target.getName() + " &cis not online!"));
+                return true;
+            }
+
+            // if they have plot
+            if (plot != null) {
+                // if they are not a trusted player
+                if (plot.getTrustedPlayers().contains(target.getName())) {
+                    Plots_DB.removeTrustedPlayer(player, target);
+                    plot.removeTrustedPlayer(target);
+
+                    player.sendMessage(Utils.translate("&7You removed &3" + target.getName() + " &7from your plot!"));
+                } else {
+                    player.sendMessage(Utils.translate("&4" + player.getName() + " &cis not trusted in your plot"));
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            }
         // clear and delete their plot data
         } else if (a.length == 1 && a[0].equalsIgnoreCase("delete")) {
             // if they are confirming, delete it
@@ -108,6 +165,8 @@ public class Plot_CMD implements CommandExecutor {
         sender.sendMessage(getHelp("clear"));
         sender.sendMessage(getHelp("home"));
         sender.sendMessage(getHelp("visit"));
+        sender.sendMessage(getHelp("trust"));
+        sender.sendMessage(getHelp("untrust"));
         sender.sendMessage(getHelp("help"));
     }
 
@@ -123,6 +182,10 @@ public class Plot_CMD implements CommandExecutor {
                 return Utils.translate("&a/plot home  &7Teleports you to your plot");
             case "visit":
                 return Utils.translate("&a/plot visit <player>  &7Visit another player's plot");
+            case "trust":
+                return Utils.translate("&a/plot trust <player>  &7Trust a player to your plot");
+            case "untrust":
+                return Utils.translate("&a/plot untrust <player>  &7Untrust a player from your plot");
             case "help":
                 return Utils.translate("&a/plot help  &7Sends this display");
         }

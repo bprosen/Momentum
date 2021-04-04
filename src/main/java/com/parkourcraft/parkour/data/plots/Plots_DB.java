@@ -69,12 +69,69 @@ public class Plots_DB {
         return null;
     }
 
+    public static List<String> getTrustedPlayers(String UUID) {
+        List<String> trustedPlayers = new ArrayList<>();
+
+        if (hasPlot(UUID)) {
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "plots",
+                    "trusted_players", " WHERE uuid='" + UUID + "'");
+
+            for (Map<String, String> result : results) {
+
+                String[] split = result.get("trusted_players").split(":");
+
+                for (String playerName : split)
+                    trustedPlayers.add(playerName);
+            }
+        }
+        return trustedPlayers;
+    }
+
+    public static void addTrustedPlayer(Player player, Player trustedPlayer) {
+
+        if (hasPlot(player.getUniqueId().toString())) {
+            List<String> trustedPlayers = getTrustedPlayers(player.getUniqueId().toString());
+
+            // add into acceptable string
+            String joinedString = trustedPlayer.getName();
+            for (String playerString : trustedPlayers)
+                joinedString += ":" + playerString;
+
+            Parkour.getDatabaseManager().run("UPDATE plots SET trusted_players='" + joinedString
+                                             + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+        }
+    }
+
+    public static void removeTrustedPlayer(Player player, Player trustedPlayer) {
+
+        if (hasPlot(player.getUniqueId().toString())) {
+            List<String> trustedPlayers = getTrustedPlayers(player.getUniqueId().toString());
+            trustedPlayers.remove(trustedPlayer.getName());
+
+            // add into acceptable string
+            String joinedString = null;
+            for (String playerString : trustedPlayers) {
+
+                // if they are last in list, do not add semicolon
+                if (trustedPlayers.get(trustedPlayers.size() - 1).equalsIgnoreCase(playerString))
+                    joinedString += playerString;
+                else
+                    joinedString += playerString + ":";
+            }
+
+            Parkour.getDatabaseManager().run("UPDATE plots SET trusted_players='" + joinedString
+                    + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+        }
+    }
+
     public static void addPlot(Player player, Location loc) {
         Parkour.getDatabaseManager().run("INSERT INTO plots " +
-                "(uuid, player_name, center_x, center_z)" +
+                "(uuid, player_name, trusted_players, center_x, center_z)" +
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
                 player.getName() + "','" +
+                "','" +
                 loc.getBlockX() + "','" +
                 loc.getBlockZ() +
                 "')"
@@ -84,5 +141,31 @@ public class Plots_DB {
     public static void removePlot(Player player) {
         Parkour.getDatabaseManager().add("DELETE FROM plots " +
                 "WHERE uuid='" + player.getUniqueId().toString() + "'");
+    }
+
+
+    public static List<String> getPlotOwnerUUIDs() {
+        // get all plots from database
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                "plots",
+                "uuid", "");
+
+        List<String> tempList = new ArrayList<>();
+        for (Map<String, String> result : results)
+            tempList.add(result.get("uuid"));
+
+        return tempList;
+    }
+
+    public static String getPlotOwnerName(String UUID) {
+        if (hasPlot(UUID)) {
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "plots",
+                    "player_name", " WHERE uuid='" + UUID + "'");
+
+            for (Map<String, String> result : results)
+                return result.get("player_name");
+        }
+        return null;
     }
 }

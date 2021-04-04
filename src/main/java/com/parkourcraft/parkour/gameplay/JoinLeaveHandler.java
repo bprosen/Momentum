@@ -56,23 +56,6 @@ public class JoinLeaveHandler implements Listener {
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
         }
-
-        // plot check and add
-        new BukkitRunnable() {
-            public void run() {
-                if (Plots_DB.hasPlot(uuid.toString())) {
-                    String locString = Plots_DB.getPlotCenter(uuid.toString());
-                    String[] locSplit = locString.split(":");
-
-                    // loc from database
-                    Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                            Double.parseDouble(locSplit[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
-                            Double.parseDouble(locSplit[1]));
-
-                    Parkour.getPlotsManager().add(player.getName(), uuid.toString(), loc);
-                }
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     @EventHandler
@@ -81,7 +64,6 @@ public class JoinLeaveHandler implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         RaceManager raceManager = Parkour.getRaceManager();
-        PlotsManager plotManager = Parkour.getPlotsManager();
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
@@ -98,10 +80,6 @@ public class JoinLeaveHandler implements Listener {
         // if left in race, end it
         if (playerStats.inRace())
             raceManager.endRace(raceManager.get(player).getOpponent(player));
-
-        // if has a plot, remove it from list
-        if (plotManager.exists(player.getName()))
-            plotManager.remove(player.getUniqueId().toString());
 
         // if left as hidden, remove them
         if (PlayerHider.containsPlayer(player))
