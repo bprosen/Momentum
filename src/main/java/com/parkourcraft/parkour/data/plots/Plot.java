@@ -63,7 +63,6 @@ public class Plot {
             Location loc = spawnLoc.clone();
             loc.setYaw(player.getLocation().getYaw());
             loc.setPitch(player.getLocation().getPitch());
-            loc.add(0.5, 0, 0.5);
             player.teleport(loc);
         }
     }

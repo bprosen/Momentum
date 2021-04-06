@@ -32,10 +32,10 @@ public class PlotsManager {
             String locString = Plots_DB.getPlotCenter(uuidString);
             String[] locSplit = locString.split(":");
 
-            // loc from database
+            // loc from database, 0.5 for center of block
             Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                    Double.parseDouble(locSplit[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
-                    Double.parseDouble(locSplit[1]));
+                    Double.parseDouble(locSplit[0]) + 0.5, Parkour.getSettingsManager().player_submitted_plot_default_y,
+                    Double.parseDouble(locSplit[1]) + 0.5);
 
             add(playerName, uuidString, loc);
         }

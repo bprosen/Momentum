@@ -80,7 +80,6 @@ public class Plot_CMD implements CommandExecutor {
                 new BukkitRunnable() {
                     public void run() {
                         plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
-                        plot.teleportOwner();
                     }
                 }.runTaskLater(Parkour.getPlugin(), 20 * 1);
             } else {
