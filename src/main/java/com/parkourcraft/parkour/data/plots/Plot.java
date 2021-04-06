@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.plots;
 
 import com.parkourcraft.parkour.Parkour;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -55,6 +56,17 @@ public class Plot {
         return spawnLoc;
     }
 
+    public void teleportOwner() {
+        Player player = Bukkit.getPlayer(ownerName);
+        // teleport player if not null
+        if (player != null) {
+            Location loc = spawnLoc.clone();
+            loc.setYaw(player.getLocation().getYaw());
+            loc.setPitch(player.getLocation().getPitch());
+            loc.add(0.5, 0, 0.5);
+            player.teleport(loc);
+        }
+    }
     public List<String> getTrustedPlayers() { return trustedPlayers; }
 
     public void addTrustedPlayer(Player player) { trustedPlayers.add(player.getName()); }

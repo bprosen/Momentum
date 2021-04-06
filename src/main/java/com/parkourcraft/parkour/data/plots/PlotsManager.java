@@ -3,11 +3,14 @@ package com.parkourcraft.parkour.data.plots;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,16 +130,49 @@ public class PlotsManager {
         Plot plot = getFromUUID(player.getUniqueId().toString());
 
         if (plot != null) {
-            // remove from cache and teleport to spawn
-            plotList.remove(plot);
-            Plots_DB.removePlot(player);
             // if they are in plot world, teleport them
             if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
                 player.teleport(Parkour.getSettingsManager().spawn_location);
 
+            // clear plot!
+            clearPlot(plot);
+
+            // remove from cache and teleport to spawn
+            plotList.remove(plot);
+            Plots_DB.removePlot(player);
             player.sendMessage(Utils.translate("&cYou have deleted your plot"));
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot!"));
+        }
+    }
+
+    public void clearPlot(Plot plot) {
+
+        WorldEdit FAWEAPI = WorldEdit.getInstance();
+
+        if (FAWEAPI != null) {
+            int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width;
+
+            double pos1X = (plot.getSpawnLoc().getBlockX() - (plotWidth / 2));
+            double pos2X = (plot.getSpawnLoc().getBlockX() + (plotWidth / 2));
+            double pos1Z = (plot.getSpawnLoc().getBlockZ() - (plotWidth / 2));
+            double pos2Z = (plot.getSpawnLoc().getBlockZ() + (plotWidth / 2));
+
+            LocalWorld world = new BukkitWorld(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world));
+
+            Vector pos1 = new Vector(pos1X, 0, pos1Z);
+            Vector pos2 = new Vector(pos2X, 256, pos2Z);
+
+            CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
+
+            try {
+                EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                editSession.setBlocks(selection, new BaseBlock(Material.AIR.getId()));
+            } catch (MaxChangedBlocksException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Parkour.getPluginLogger().info("FAWE API found null in clearPlot");
         }
     }
 

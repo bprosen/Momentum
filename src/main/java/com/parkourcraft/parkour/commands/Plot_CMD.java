@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.plots.Plots_DB;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -43,12 +44,7 @@ public class Plot_CMD implements CommandExecutor {
 
             // make sure they have a plot
             if (plot != null) {
-                // set pitch and yaw
-                Location loc = plot.getSpawnLoc().clone();
-                loc.setYaw(player.getLocation().getYaw());
-                loc.setPitch(player.getLocation().getPitch());
-
-                player.teleport(loc.add(0.5, 0, 0.5));
+                plot.teleportOwner();
             } else
                 player.sendMessage(Utils.translate("&cYou do not have a plot to teleport to"));
         // visit someone else
@@ -74,7 +70,22 @@ public class Plot_CMD implements CommandExecutor {
             }
         // clear stuff on plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
 
+            if (plot != null) {
+                Parkour.getPlotsManager().clearPlot(plot);
+                player.sendMessage(Utils.translate("&cYou have cleared your plot"));
+
+                // reset bedrock and teleport 1 second later
+                new BukkitRunnable() {
+                    public void run() {
+                        plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
+                        plot.teleportOwner();
+                    }
+                }.runTaskLater(Parkour.getPlugin(), 20 * 1);
+            } else {
+                player.sendMessage(Utils.translate("&cYou do not have a plot!"));
+            }
         // trust on plot
         } else if (a.length == 2 && (a[0].equalsIgnoreCase("trust") ||
                                      a[0].equalsIgnoreCase("add"))) {
