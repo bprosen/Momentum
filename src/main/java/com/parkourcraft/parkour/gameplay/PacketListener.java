@@ -79,17 +79,28 @@ public class PacketListener implements Listener {
                         Plot plot = Parkour.getPlotsManager().getNearestPlot(loc);
 
                         boolean doCancel = false;
+                        String reason = "";
+
                         // check if they have a plot
                         if (plot != null) {
+                            // check if their plot is submitted and they own the plot
+                            if (plot.getOwnerName().equalsIgnoreCase(player.getName())) {
+                                if (plot.isSubmitted()) {
+                                    doCancel = true;
+                                    reason = "&cYou cannot edit your plot when it has been submitted";
+                                }
                             // check if they are trusted and it is not the owner trying
-                            if (!plot.getTrustedPlayers().contains(player.getName()) &&
-                                !plot.getOwnerName().equalsIgnoreCase(player.getName()))
+                            } else if (!plot.getTrustedPlayers().contains(player.getName())) {
                                 doCancel = true;
-                        } else
+                                reason = "&cYou cannot do this here";
+                            }
+                        } else {
                             doCancel = true;
+                            reason = "&cYou cannot do this here";
+                        }
 
                         if (doCancel) {
-                            player.sendMessage(Utils.translate("&cYou cannot do this here"));
+                            player.sendMessage(Utils.translate(reason));
                             event.setCancelled(true);
                             player.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
                         }
