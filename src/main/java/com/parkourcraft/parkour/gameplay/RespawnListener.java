@@ -12,7 +12,7 @@ public class RespawnListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
 
-        Location spawn = Parkour.getSettingsManager().spawn_location;
+        Location spawn = Parkour.getLocationManager().getLobbyLocation();
 
         if (spawn != null)
             event.setRespawnLocation(spawn);

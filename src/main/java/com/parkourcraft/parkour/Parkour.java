@@ -80,7 +80,6 @@ public class Parkour extends JavaPlugin {
         // start schedulers and any settings
         Scoreboard.startScheduler(plugin);
         SpectatorHandler.startScheduler(plugin);
-        settings.loadSpawn();
         stats.addUnloadedPlayers();
 
         getLogger().info("PC-Parkour Enabled");
@@ -125,7 +124,6 @@ public class Parkour extends JavaPlugin {
         getCommand("toggleplayers").setExecutor(new PlayerToggle_CMD());
         getCommand("checkpoint").setExecutor(new Checkpoint_CMD());
         getCommand("spawn").setExecutor(new Spawn_CMD());
-        getCommand("setspawn").setExecutor(new SetSpawn_CMD());
         getCommand("practice").setExecutor(new Practice_CMD());
         getCommand("ranks").setExecutor(new Rank_CMD());
         getCommand("rankup").setExecutor(new Rankup_CMD());

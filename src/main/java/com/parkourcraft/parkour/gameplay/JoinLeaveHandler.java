@@ -29,9 +29,9 @@ public class JoinLeaveHandler implements Listener {
         Player player = event.getPlayer();
 
         if (!player.hasPlayedBefore()) {
-            Location spawn = Parkour.getSettingsManager().spawn_location;
+            Location spawn = Parkour.getLocationManager().getLobbyLocation();
             if (spawn != null) {
-                player.teleport(Parkour.getSettingsManager().spawn_location);
+                player.teleport(spawn);
                 Bukkit.broadcastMessage(Utils.translate(
                         "&a&o" + player.getDisplayName() + "&7&o joined &b&l&oParkour &7&ofor the first time"
                 ));

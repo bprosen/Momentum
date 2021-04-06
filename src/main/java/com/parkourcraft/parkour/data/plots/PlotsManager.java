@@ -132,7 +132,7 @@ public class PlotsManager {
         if (plot != null) {
             // if they are in plot world, teleport them
             if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
-                player.teleport(Parkour.getSettingsManager().spawn_location);
+                player.teleport(Parkour.getLocationManager().getLobbyLocation());
 
             // clear plot!
             clearPlot(plot);
