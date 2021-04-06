@@ -81,19 +81,22 @@ public class PacketListener implements Listener {
                         boolean doCancel = false;
                         String reason = "";
 
-                        // check if they have a plot
+                        // check if they have a plot,
+                        // only way this does not get cancelled is if they are trusted or own it
                         if (plot != null) {
                             // check if their plot is submitted and they own the plot
                             if (plot.getOwnerName().equalsIgnoreCase(player.getName())) {
+                                // if they have submitted it, cancel it
                                 if (plot.isSubmitted()) {
                                     doCancel = true;
                                     reason = "&cYou cannot edit your plot when it has been submitted";
                                 }
-                            // check if they are trusted and it is not the owner trying
+                            // check if they are not trusted, then cancel
                             } else if (!plot.getTrustedPlayers().contains(player.getName())) {
                                 doCancel = true;
                                 reason = "&cYou cannot do this here";
                             }
+                        // no nearest plot
                         } else {
                             doCancel = true;
                             reason = "&cYou cannot do this here";
@@ -102,6 +105,7 @@ public class PacketListener implements Listener {
                         if (doCancel) {
                             player.sendMessage(Utils.translate(reason));
                             event.setCancelled(true);
+                            // send block update back to player from server that intercepted the packet
                             player.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
                         }
                     }
