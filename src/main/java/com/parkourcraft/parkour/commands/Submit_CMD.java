@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.MenuManager;
+import com.parkourcraft.parkour.data.menus.Menus_YAML;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -47,8 +48,30 @@ public class Submit_CMD implements CommandExecutor {
 
                     // open submitted plots list
                     openMenu(player, "submitted-plots");
-                } else if (a.length > 2 && a[0].equalsIgnoreCase("accept")) {
-                    // do accept logic here
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
+
+                    String plotOwner = a[2];
+                    Plot targetPlot = Parkour.getPlotsManager().get(plotOwner);
+
+                    if (targetPlot != null) {
+                        if (targetPlot.isSubmitted()) {
+
+                            targetPlot.desubmit();
+                            Parkour.getPlotsManager().addPlotToMenu(targetPlot);
+                            player.sendMessage(Utils.translate("&7You accepted &4" + plotOwner + "&7's Plot"));
+
+                            Player target = Bukkit.getPlayer(plotOwner);
+
+                            if (target != null) {
+                                target.sendMessage(Utils.translate("&cYour plot has been accepted, congratulations!"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&4" + plotOwner + "&c's Plot is not submitted!"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&4" + plotOwner + " &cdoes not have a Plot"));
+                    }
+
                 } else if (a.length > 2 && a[0].equalsIgnoreCase("deny")) {
 
                     String plotOwner = a[2];
@@ -67,6 +90,8 @@ public class Submit_CMD implements CommandExecutor {
                         if (targetPlot.isSubmitted()) {
 
                             targetPlot.desubmit();
+                            player.sendMessage(Utils.translate("&cYou denied &4" + plotOwner + "&c's Plot"));
+
                             Player target = Bukkit.getPlayer(plotOwner);
 
                             if (target != null) {

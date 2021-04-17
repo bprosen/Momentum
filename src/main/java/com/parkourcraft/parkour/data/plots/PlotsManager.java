@@ -96,6 +96,10 @@ public class PlotsManager {
         return tempList;
     }
 
+    public void addPlotToMenu(Plot plot) {
+        // TODO: add plot to "submitted-plots" GUI automatically through this method
+    }
+
     // creation algorithm
     public void createPlot(Player player) {
 
