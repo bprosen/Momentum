@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
+import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.rank.Ranks_DB;
 import com.parkourcraft.parkour.data.rank.Ranks_YAML;
@@ -55,12 +56,35 @@ public class MenuItemAction {
                     || typeValue.equals("rankup-level-2")
                     || typeValue.equals("rankup-level"))
                 performLevelRankUpItem(player, menuItem);
+            else if (typeValue.equals("submit-plot"))
+                performPlotSubmission(player);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         }
 
         if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performPlotSubmission(Player player) {
+        Plot plot = Parkour.getPlotsManager().get(player.getName());
+
+        if (plot != null) {
+            if (!plot.isSubmitted()) {
+                // submit map
+                plot.submit();
+                player.closeInventory();
+
+                player.sendMessage("");
+                player.sendMessage(Utils.translate("&7You have &6submitted &7your plot! Please wait until an" +
+                                    " &6Administrator &7gets a chance to look at it. Thank you for submitting."));
+                player.sendMessage("");
+            } else {
+                player.sendMessage(Utils.translate("&cYou cannot submit a plot you already submitted"));
+            }
+        } else {
+            player.sendMessage(Utils.translate("&cYou do not have a plot"));
+        }
     }
 
     private static void performPerkItem(Player player, MenuItem menuItem) {
