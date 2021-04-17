@@ -29,29 +29,46 @@ public class Submit_CMD implements CommandExecutor {
                 if (!plot.isSubmitted()) {
 
                     // submit map!
-                    MenuManager menuManager = Parkour.getMenuManager();
-                    String menuName = "submit-plot";
-
-                    if (menuManager.exists(menuName)) {
-
-                        Inventory inventory = menuManager.getInventory(menuName, 1);
-
-                        if (inventory != null) {
-                            player.openInventory(inventory);
-                            menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
-                        } else {
-                            sender.sendMessage(Utils.translate("&cError loading the inventory"));
-                        }
-                    } else {
-                        sender.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
-                    }
+                    openMenu(player, "submit-plot");
                 } else {
                     player.sendMessage(Utils.translate("&cYou have already submitted your plot!"));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cYou do not have a plot to submit!"));
             }
+        } else {
+            // admin section
+            if (player.hasPermission("pc-parkour.admin")) {
+                // send list of plots in gui
+                if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
+
+                    // open submitted plots list
+                    openMenu(player, "submitted-plots");
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
+                    // do accept logic here
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("deny")) {
+                    // do deny logic here
+                }
+            }
         }
         return true;
+    }
+
+    private void openMenu(Player player, String menuName) {
+        MenuManager menuManager = Parkour.getMenuManager();
+
+        if (menuManager.exists(menuName)) {
+
+            Inventory inventory = menuManager.getInventory(menuName, 1);
+
+            if (inventory != null) {
+                player.openInventory(inventory);
+                menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
+            } else {
+                player.sendMessage(Utils.translate("&cError loading the inventory"));
+            }
+        } else {
+            player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
+        }
     }
 }

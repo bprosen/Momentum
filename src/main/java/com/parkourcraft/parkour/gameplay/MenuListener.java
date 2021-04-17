@@ -4,8 +4,10 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.Menu;
 import com.parkourcraft.parkour.data.menus.MenuItem;
 import com.parkourcraft.parkour.data.menus.MenuItemAction;
+import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class MenuListener implements Listener {
 
@@ -32,8 +35,26 @@ public class MenuListener implements Listener {
                         event.getSlot()
                 );
 
+                Player player = (Player) event.getWhoClicked();
+                ItemStack itemClicked = event.getCurrentItem();
+
                 if (menuItem != null)
-                    MenuItemAction.perform((Player) event.getWhoClicked(), menuItem);
+                    MenuItemAction.perform(player, menuItem);
+                // submitted plots section
+                else if (menu.getName().equals("submitted-plots") &&
+                        itemClicked.equals(Material.SKULL)) {
+
+                    String[] split = itemClicked.getItemMeta().getDisplayName().split("'");
+                    Plot plot = Parkour.getPlotsManager().get(ChatColor.stripColor(split[0]));
+
+                    if (plot != null) {
+                        player.teleport(plot.getSpawnLoc());
+                        player.sendMessage(Utils.translate("&cYou have teleported to &4" + plot.getOwnerName() + "&c's Plot"));
+                    } else {
+                        player.sendMessage(Utils.translate("&cPlot does not exist"));
+                        player.closeInventory();
+                    }
+                }
             }
         } else if (event.getWhoClicked() instanceof Player
                 && !event.getWhoClicked().isOp())

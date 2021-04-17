@@ -66,6 +66,7 @@ public class MenuItemAction {
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
+
     private static void performPlotSubmission(Player player) {
         Plot plot = Parkour.getPlotsManager().get(player.getName());
 

@@ -86,6 +86,16 @@ public class PlotsManager {
             plotList.remove(playerUUID);
     }
 
+    public List<Plot> getSubmittedPlots() {
+        List<Plot> tempList = new ArrayList<>();
+
+        for (Plot plot : plotList) {
+            if (plot.isSubmitted())
+                tempList.add(plot);
+        }
+        return tempList;
+    }
+
     // creation algorithm
     public void createPlot(Player player) {
 
