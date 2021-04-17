@@ -84,15 +84,14 @@ public class PacketListener implements Listener {
                         // check if they have a plot,
                         // only way this does not get cancelled is if they are trusted or own it
                         if (plot != null) {
-                            // check if their plot is submitted and they own the plot
-                            if (plot.getOwnerName().equalsIgnoreCase(player.getName())) {
-                                // if they have submitted it, cancel it
-                                if (plot.isSubmitted()) {
-                                    doCancel = true;
-                                    reason = "&cYou cannot edit your plot when it has been submitted";
-                                }
-                            // check if they are not trusted, then cancel
-                            } else if (!plot.getTrustedPlayers().contains(player.getName())) {
+                            // check if their plot is submitted
+                            if (plot.isSubmitted()) {
+                                doCancel = true;
+                                reason = "&cYou cannot edit your plot when it has been submitted";
+                            // check if they are not trusted and not owner, then cancel
+                            } else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) &&
+                                       !plot.getTrustedPlayers().contains(player.getName())) {
+
                                 doCancel = true;
                                 reason = "&cYou cannot do this here";
                             }
