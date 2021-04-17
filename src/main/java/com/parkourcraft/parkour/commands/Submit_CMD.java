@@ -4,11 +4,14 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+
+import java.util.Arrays;
 
 public class Submit_CMD implements CommandExecutor {
 
@@ -44,10 +47,38 @@ public class Submit_CMD implements CommandExecutor {
 
                     // open submitted plots list
                     openMenu(player, "submitted-plots");
-                } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
+                } else if (a.length > 2 && a[0].equalsIgnoreCase("accept")) {
                     // do accept logic here
-                } else if (a.length == 2 && a[0].equalsIgnoreCase("deny")) {
-                    // do deny logic here
+                } else if (a.length > 2 && a[0].equalsIgnoreCase("deny")) {
+
+                    String plotOwner = a[2];
+
+                    String[] split = Arrays.copyOfRange(a, 3, a.length);
+                    // make sure it is not too long of a reason
+                    if (split.length > 10) {
+                        player.sendMessage(Utils.translate("&7Too long of a reason! Make it &c10 words &7or under"));
+                        return true;
+                    }
+
+                    String reason = String.join(" ", split);
+
+                    Plot targetPlot = Parkour.getPlotsManager().get(plotOwner);
+                    if (targetPlot != null) {
+                        if (targetPlot.isSubmitted()) {
+
+                            targetPlot.desubmit();
+                            Player target = Bukkit.getPlayer(plotOwner);
+
+                            if (target != null) {
+                                target.sendMessage(Utils.translate("&cYour plot has been denied, try again soon!"));
+                                target.sendMessage(Utils.translate("&7With reason: &c" + reason));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&4" + plotOwner + "&c's Plot is not submitted!"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&4" + plotOwner + " &cdoes not have a Plot"));
+                    }
                 }
             }
         }
