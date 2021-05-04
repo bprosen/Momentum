@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.menus.Menus_YAML;
 import com.parkourcraft.parkour.data.plots.Plot;
+import com.parkourcraft.parkour.data.plots.Plots_DB;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -25,7 +26,7 @@ public class Submit_CMD implements CommandExecutor {
 
         Player player = (Player) sender;
         // do submit gui
-        if (a.length == 1) {
+        if (a.length == 0) {
             Plot plot = Parkour.getPlotsManager().get(player.getName());
             // they have a plot
             if (plot != null) {
@@ -50,13 +51,14 @@ public class Submit_CMD implements CommandExecutor {
                     openMenu(player, "submitted-plots");
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
 
-                    String plotOwner = a[2];
+                    String plotOwner = a[1];
                     Plot targetPlot = Parkour.getPlotsManager().get(plotOwner);
 
                     if (targetPlot != null) {
                         if (targetPlot.isSubmitted()) {
 
                             targetPlot.desubmit();
+                            Plots_DB.toggleSubmittedFromName(plotOwner);
                             Parkour.getPlotsManager().addPlotToMenu(targetPlot);
                             player.sendMessage(Utils.translate("&7You accepted &4" + plotOwner + "&7's Plot"));
 
@@ -74,9 +76,9 @@ public class Submit_CMD implements CommandExecutor {
 
                 } else if (a.length > 2 && a[0].equalsIgnoreCase("deny")) {
 
-                    String plotOwner = a[2];
+                    String plotOwner = a[1];
 
-                    String[] split = Arrays.copyOfRange(a, 3, a.length);
+                    String[] split = Arrays.copyOfRange(a, 2, a.length);
                     // make sure it is not too long of a reason
                     if (split.length > 10) {
                         player.sendMessage(Utils.translate("&7Too long of a reason! Make it &c10 words &7or under"));
@@ -90,6 +92,7 @@ public class Submit_CMD implements CommandExecutor {
                         if (targetPlot.isSubmitted()) {
 
                             targetPlot.desubmit();
+                            Plots_DB.toggleSubmittedFromName(plotOwner);
                             player.sendMessage(Utils.translate("&cYou denied &4" + plotOwner + "&c's Plot"));
 
                             Player target = Bukkit.getPlayer(plotOwner);

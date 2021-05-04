@@ -26,6 +26,7 @@ public class Plot {
         new BukkitRunnable() {
             public void run() {
                 trustedPlayers = Plots_DB.getTrustedPlayers(owner.getUniqueId().toString());
+                submitted = Plots_DB.isSubmitted(owner.getUniqueId().toString());
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
@@ -40,6 +41,7 @@ public class Plot {
         new BukkitRunnable() {
             public void run() {
                 trustedPlayers = Plots_DB.getTrustedPlayers(ownerUUID);
+                submitted = Plots_DB.isSubmitted(ownerUUID);
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }

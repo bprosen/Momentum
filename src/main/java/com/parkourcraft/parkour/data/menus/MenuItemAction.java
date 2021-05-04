@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
 import com.parkourcraft.parkour.data.levels.LevelObject;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.plots.Plot;
+import com.parkourcraft.parkour.data.plots.Plots_DB;
 import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.rank.Ranks_DB;
 import com.parkourcraft.parkour.data.rank.Ranks_YAML;
@@ -74,6 +75,8 @@ public class MenuItemAction {
             if (!plot.isSubmitted()) {
                 // submit map
                 plot.submit();
+                Plots_DB.toggleSubmitted(player.getUniqueId().toString());
+
                 player.closeInventory();
 
                 player.sendMessage("");

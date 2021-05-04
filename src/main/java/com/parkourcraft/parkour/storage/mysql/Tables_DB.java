@@ -131,6 +131,7 @@ public class Tables_DB {
                 "trusted_players TEXT NOT NULL, " +
                 "center_x INT NOT NULL, " +
                 "center_z INT NOT NULL,  " +
+                "submitted VARCHAR(5) NOT NULL, " +
                 "PRIMARY KEY (plot_id)" +
                 ")";
         database.run(sqlQuery);

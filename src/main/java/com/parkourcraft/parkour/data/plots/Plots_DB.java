@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.plots;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -29,6 +30,16 @@ public class Plots_DB {
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "plots",
                 "*", " WHERE uuid='" + UUID + "'");
+
+        if (!results.isEmpty())
+            return true;
+        return false;
+    }
+
+    public static boolean hasPlotFromName(String playerName) {
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                "plots",
+                "*", " WHERE player_name='" + playerName + "'");
 
         if (!results.isEmpty())
             return true;
@@ -127,13 +138,14 @@ public class Plots_DB {
 
     public static void addPlot(Player player, Location loc) {
         Parkour.getDatabaseManager().run("INSERT INTO plots " +
-                "(uuid, player_name, trusted_players, center_x, center_z)" +
+                "(uuid, player_name, trusted_players, center_x, center_z, submitted)" +
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
                 player.getName() + "','" +
                 "','" +
                 loc.getBlockX() + "','" +
-                loc.getBlockZ() +
+                loc.getBlockZ() + "','" +
+                "false" +
                 "')"
         );
     }
@@ -167,5 +179,47 @@ public class Plots_DB {
                 return result.get("player_name");
         }
         return null;
+    }
+
+    public static boolean isSubmitted(String UUID) {
+        boolean submitted = false;
+
+        if (hasPlot(UUID)) {
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "plots",
+                    "submitted", " WHERE uuid='" + UUID + "'");
+
+            for (Map<String, String> result : results)
+                submitted = Boolean.parseBoolean(result.get("submitted"));
+        }
+        return submitted;
+    }
+
+    public static boolean isSubmittedFromName(String playerName) {
+        boolean submitted = false;
+
+        if (hasPlotFromName(playerName)) {
+            List<Map<String, String>> results = DatabaseQueries.getResults(
+                    "plots",
+                    "submitted", " WHERE player_name='" + playerName + "'");
+
+            for (Map<String, String> result : results)
+                submitted = Boolean.parseBoolean(result.get("submitted"));
+        }
+        return submitted;
+    }
+
+    public static void toggleSubmitted(String UUID) {
+        if (hasPlot(UUID)) {
+            boolean currentlySubmitted = isSubmitted(UUID);
+            Parkour.getDatabaseManager().add("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE UUID='" + UUID + "'");
+        }
+    }
+
+    public static void toggleSubmittedFromName(String playerName) {
+        if (hasPlotFromName(playerName)) {
+            boolean currentlySubmitted = isSubmittedFromName(playerName);
+            Parkour.getDatabaseManager().add("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name='" + playerName + "'");
+        }
     }
 }
