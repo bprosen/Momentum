@@ -26,10 +26,10 @@ public class PlotsManager {
 
     public void load() {
         // loop through and add to cache
-        for (String uuidString : Plots_DB.getPlotOwnerUUIDs()) {
+        for (String uuidString : PlotsDB.getPlotOwnerUUIDs()) {
 
-            String playerName = Plots_DB.getPlotOwnerName(uuidString);
-            String locString = Plots_DB.getPlotCenter(uuidString);
+            String playerName = PlotsDB.getPlotOwnerName(uuidString);
+            String locString = PlotsDB.getPlotCenter(uuidString);
             String[] locSplit = locString.split(":");
 
             // loc from database, 0.5 for center of block
@@ -130,7 +130,7 @@ public class PlotsManager {
 
                 player.teleport(loc.clone().add(0.5, 0, 0.5));
                 // add data
-                Plots_DB.addPlot(player, loc);
+                PlotsDB.addPlot(player, loc);
                 add(player);
                 player.sendMessage(Utils.translate("&7Your &a&lPlot &7has been created!" +
                                                         " &7Type &a/plot home &7to get back!"));
@@ -153,7 +153,7 @@ public class PlotsManager {
 
             // remove from cache and teleport to spawn
             plotList.remove(plot);
-            Plots_DB.removePlot(player);
+            PlotsDB.removePlot(player);
             player.sendMessage(Utils.translate("&cYou have deleted your plot"));
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot!"));
@@ -204,7 +204,7 @@ public class PlotsManager {
                         + Parkour.getSettingsManager().player_submitted_plot_buffer_width;
 
 
-        List<String> plots = Plots_DB.getPlotCenters();
+        List<String> plots = PlotsDB.getPlotCenters();
         if (!plots.isEmpty()) {
 
             List<String> checkedLocs = new ArrayList<>();

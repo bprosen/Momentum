@@ -25,8 +25,8 @@ public class Plot {
         // run async
         new BukkitRunnable() {
             public void run() {
-                trustedPlayers = Plots_DB.getTrustedPlayers(owner.getUniqueId().toString());
-                submitted = Plots_DB.isSubmitted(owner.getUniqueId().toString());
+                trustedPlayers = PlotsDB.getTrustedPlayers(owner.getUniqueId().toString());
+                submitted = PlotsDB.isSubmitted(owner.getUniqueId().toString());
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
@@ -40,8 +40,8 @@ public class Plot {
         // run async
         new BukkitRunnable() {
             public void run() {
-                trustedPlayers = Plots_DB.getTrustedPlayers(ownerUUID);
-                submitted = Plots_DB.isSubmitted(ownerUUID);
+                trustedPlayers = PlotsDB.getTrustedPlayers(ownerUUID);
+                submitted = PlotsDB.isSubmitted(ownerUUID);
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }

@@ -2,8 +2,7 @@ package com.parkourcraft.parkour.data.races;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
-import com.parkourcraft.parkour.data.levels.Levels_YAML;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
@@ -52,7 +51,7 @@ public class RaceManager {
 
         // picks random map
         Random ran = new Random();
-        LevelObject level = Parkour.getLevelManager().get(
+        Level level = Parkour.getLevelManager().get(
                 temporaryLevelList.get(ran.nextInt(temporaryLevelList.size())
                 ));
 

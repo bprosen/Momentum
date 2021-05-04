@@ -2,7 +2,6 @@ package com.parkourcraft.parkour.data.rank;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.data.stats.Stats_DB;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -25,7 +24,7 @@ public class RanksManager {
     public void load() {
         rankList = new ArrayList<>();
 
-        for (String rankName : Ranks_YAML.getNames())
+        for (String rankName : RanksYAML.getNames())
             load(rankName);
 
         updatePlayers();
@@ -36,7 +35,7 @@ public class RanksManager {
 
         boolean exists = exists(rankName);
 
-        if (!Ranks_YAML.exists(rankName) && exists)
+        if (!RanksYAML.exists(rankName) && exists)
             remove(rankName);
         else {
             if (exists)
@@ -48,9 +47,9 @@ public class RanksManager {
 
     public void add(String rankName) {
         // get from YAML
-        String rankTitle = Ranks_YAML.getRankTitle(rankName);
-        int rankId = Ranks_YAML.getRankId(rankName);
-        double rankUpPrice = Ranks_YAML.getRankUpPrice(rankName);
+        String rankTitle = RanksYAML.getRankTitle(rankName);
+        int rankId = RanksYAML.getRankId(rankName);
+        double rankUpPrice = RanksYAML.getRankUpPrice(rankName);
 
         Rank rank = new Rank(rankName, rankTitle, rankId, rankUpPrice);
         rankList.add(rank);
@@ -101,7 +100,7 @@ public class RanksManager {
     public void remove(String rankName) {
         for (Iterator<Rank> iterator = rankList.iterator(); iterator.hasNext();) {
             if (iterator.next().getRankName().equalsIgnoreCase(rankName)) {
-                Ranks_YAML.remove(iterator.getClass().getName());
+                RanksYAML.remove(iterator.getClass().getName());
                 iterator.remove();
             }
         }
@@ -117,7 +116,7 @@ public class RanksManager {
                     for (int i = playerStats.getRank().getRankId() - 1; i >= 2; i--) {
                         if (exists(i)) {
                             playerStats.setRank(get(i));
-                            Ranks_DB.updateRank(playerStats.getPlayer().getUniqueId(), i);
+                            RanksDB.updateRank(playerStats.getPlayer().getUniqueId(), i);
                             break;
                         }
                     }
@@ -158,8 +157,8 @@ public class RanksManager {
         int newId = playerStats.getRank().getRankId() + 1;
         Rank rank = get(newId);
         playerStats.setRank(rank);
-        Ranks_DB.updateRank(player.getUniqueId(), newId);
-        Ranks_DB.updateStage(player.getUniqueId(), 1);
+        RanksDB.updateRank(player.getUniqueId(), newId);
+        RanksDB.updateStage(player.getUniqueId(), 1);
         // play sound
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
 

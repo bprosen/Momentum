@@ -1,6 +1,6 @@
 package com.parkourcraft.parkour.data.races;
 
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Level;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -9,12 +9,12 @@ public class Race {
     private Player player1;
     private Player player2;
     private boolean bet = false;
-    private LevelObject level;
+    private Level level;
     private double betAmount;
     private Location originalPlayer1Loc;
     private Location originalPlayer2Loc;
 
-    public Race(Player player1, Player player2, LevelObject level, boolean doingBet, double betAmount) {
+    public Race(Player player1, Player player2, Level level, boolean doingBet, double betAmount) {
         this.player1 = player1;
         this.player2 = player2;
         this.level = level;
@@ -59,7 +59,7 @@ public class Race {
         return bet;
     }
 
-    public LevelObject getRaceLevel() {
+    public Level getRaceLevel() {
         if (level != null)
             return level;
         return null;

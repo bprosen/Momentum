@@ -2,9 +2,8 @@ package com.parkourcraft.parkour;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketEvent;
 import com.parkourcraft.parkour.commands.*;
-import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.clans.ClansManager;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointManager;
 import com.parkourcraft.parkour.data.levels.LevelManager;
@@ -88,7 +87,7 @@ public class Parkour extends JavaPlugin {
     @Override
     public void onDisable() {
         // save and do all shutdown methods
-        Checkpoint_DB.saveAllPlayers();
+        CheckpointDB.saveAllPlayers();
         PracticeHandler.shutdown();
         SpectatorHandler.shutdown();
         // close database and unload classes
@@ -111,24 +110,24 @@ public class Parkour extends JavaPlugin {
     }
 
     private void registerCommands() {
-        getCommand("level").setExecutor(new Level_CMD());
-        getCommand("race").setExecutor(new Race_CMD());
-        getCommand("location").setExecutor(new Location_CMD());
-        getCommand("stats").setExecutor(new Stats_CMD());
-        getCommand("menu").setExecutor(new Menu_CMD());
-        getCommand("perks").setExecutor(new Perks_CMD());
-        getCommand("setarmor").setExecutor(new SetArmor_CMD());
-        getCommand("spectate").setExecutor(new Spectate_CMD());
-        getCommand("clan").setExecutor(new Clan_CMD());
-        getCommand("pc-parkour").setExecutor(new PC_Parkour_CMD());
-        getCommand("toggleplayers").setExecutor(new PlayerToggle_CMD());
-        getCommand("checkpoint").setExecutor(new Checkpoint_CMD());
-        getCommand("spawn").setExecutor(new Spawn_CMD());
-        getCommand("practice").setExecutor(new Practice_CMD());
-        getCommand("ranks").setExecutor(new Rank_CMD());
-        getCommand("rankup").setExecutor(new Rankup_CMD());
-        getCommand("plot").setExecutor(new Plot_CMD());
-        getCommand("submit").setExecutor(new Submit_CMD());
+        getCommand("level").setExecutor(new LevelCMD());
+        getCommand("race").setExecutor(new RaceCMD());
+        getCommand("location").setExecutor(new LocationCMD());
+        getCommand("stats").setExecutor(new StatsCMD());
+        getCommand("menu").setExecutor(new MenuCMD());
+        getCommand("perks").setExecutor(new PerksCMD());
+        getCommand("setarmor").setExecutor(new SetArmorCMD());
+        getCommand("spectate").setExecutor(new SpectateCMD());
+        getCommand("clan").setExecutor(new ClanCMD());
+        getCommand("pc-parkour").setExecutor(new PCParkourCMD());
+        getCommand("toggleplayers").setExecutor(new PlayerToggleCMD());
+        getCommand("checkpoint").setExecutor(new CheckpointCMD());
+        getCommand("spawn").setExecutor(new SpawnCMD());
+        getCommand("practice").setExecutor(new PracticeCMD());
+        getCommand("ranks").setExecutor(new RankCMD());
+        getCommand("rankup").setExecutor(new RankupCMD());
+        getCommand("plot").setExecutor(new PlotCMD());
+        getCommand("submit").setExecutor(new SubmitCMD());
     }
 
     private static void loadClasses() {

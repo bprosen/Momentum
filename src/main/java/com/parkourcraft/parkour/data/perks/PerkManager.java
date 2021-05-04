@@ -14,13 +14,13 @@ public class PerkManager {
     private Map<String, Integer> IDCache;
 
     public PerkManager(Plugin plugin) {
-        this.IDCache = Perks_DB.getIDCache();
+        this.IDCache = PerksDB.getIDCache();
         load();
         startScheduler(plugin);
     }
 
     public void load() {
-        for (String perkName : Perks_YAML.getNames())
+        for (String perkName : PerksYAML.getNames())
             load(perkName);
 
         Parkour.getPluginLogger().info("Perks loaded: " + perks.size());
@@ -31,9 +31,9 @@ public class PerkManager {
     private void startScheduler(Plugin plugin) {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             public void run() {
-                if (Perks_DB.syncPerkIDs()) {
-                    Parkour.getPerkManager().setIDCache(Perks_DB.getIDCache());
-                    Perks_DB.syncIDCache();
+                if (PerksDB.syncPerkIDs()) {
+                    Parkour.getPerkManager().setIDCache(PerksDB.getIDCache());
+                    PerksDB.syncIDCache();
                 }
             }
         }, 0L, 10L);
@@ -71,18 +71,18 @@ public class PerkManager {
 
     public void create(String perkName) {
         if (!exists(perkName))
-            Perks_YAML.create(perkName);
+            PerksYAML.create(perkName);
     }
 
     public void load(String perkName) {
         boolean exists = exists(perkName);
 
-        if (!Perks_YAML.exists(perkName)
+        if (!PerksYAML.exists(perkName)
                 && exists)
             remove(perkName);
         else {
             Perk perk = new Perk(perkName);
-            Perks_DB.syncIDCache(perk, IDCache);
+            PerksDB.syncIDCache(perk, IDCache);
 
             if (exists)
                 remove(perkName);
@@ -112,7 +112,7 @@ public class PerkManager {
             Long date = System.currentTimeMillis();
 
             playerStats.addPerk(perk.getName(), date);
-            Perks_DB.insertPerk(playerStats, perk, date);
+            PerksDB.insertPerk(playerStats, perk, date);
         }
     }
 

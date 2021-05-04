@@ -1,9 +1,7 @@
 package com.parkourcraft.parkour.data.clans;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
-import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.data.stats.Stats_DB;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -27,9 +25,9 @@ public class ClansManager {
     }
 
     private void load() {
-        clans = Clans_DB.getClans();
+        clans = ClansDB.getClans();
 
-        Map<Integer, List<ClanMember>> members = Clans_DB.getMembers();
+        Map<Integer, List<ClanMember>> members = ClansDB.getMembers();
 
         syncMembers(members);
     }
@@ -78,10 +76,10 @@ public class ClansManager {
         return null;
     }
 
-    public void doSplitClanReward(Clan clan, Player player, LevelObject levelObject) {
+    public void doSplitClanReward(Clan clan, Player player, Level level) {
 
         double percentage = (double) clan.getLevel() / 100;
-        double splitAmountPerMember = levelObject.getReward() * percentage;
+        double splitAmountPerMember = level.getReward() * percentage;
 
         for (ClanMember clanMember : clan.getMembers()) {
             // make sure it is not given to the completioner
@@ -93,7 +91,7 @@ public class ClansManager {
                     Parkour.getEconomy().depositPlayer(onlineMember, splitAmountPerMember);
 
                     onlineMember.sendMessage(Utils.translate("&6" + player.getName() + " &ehas completed &6" +
-                            levelObject.getFormattedTitle() + " &eand you received &6" + (percentage * 100) + "%" +
+                            level.getFormattedTitle() + " &eand you received &6" + (percentage * 100) + "%" +
                             " &eof the reward! &6($" + (int) splitAmountPerMember + ")"));
                 } else {
                     OfflinePlayer offlineMember = Bukkit.getOfflinePlayer(UUID.fromString(clanMember.getUUID()));
@@ -103,29 +101,29 @@ public class ClansManager {
         }
     }
 
-    public void doClanXPCalc(Clan clan, Player player, LevelObject levelObject) {
+    public void doClanXPCalc(Clan clan, Player player, Level level) {
         int min = Parkour.getSettingsManager().clan_calc_percent_min;
         int max = Parkour.getSettingsManager().clan_calc_percent_max;
 
         // get random percent
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
-        long clanXP = (long) (levelObject.getReward() * percent);
+        long clanXP = (long) (level.getReward() * percent);
         long totalXP = clanXP + clan.getXP();
 
         // level them up
-        if (totalXP > Clans_YAML.getLevelUpPrice(clan)) {
+        if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
 
             // left over after level up
-            long clanXPOverflow = totalXP - Clans_YAML.getLevelUpPrice(clan);
+            long clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
             int newLevel = clan.getLevel() + 1;
 
             // this is the section that will determine if they will skip any levels
-            for (int i = clan.getLevel(); i <= Clans_YAML.getMaxLevel(); i++) {
+            for (int i = clan.getLevel(); i <= ClansYAML.getMaxLevel(); i++) {
                 // this means they are still above the next level amount
-                if (clanXPOverflow >= Clans_YAML.getLevelUpPrice(newLevel)) {
+                if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel)) {
 
                     // remove from overflow and add +1 level
-                    clanXPOverflow -= Clans_YAML.getLevelUpPrice(newLevel);
+                    clanXPOverflow -= ClansYAML.getLevelUpPrice(newLevel);
                     newLevel++;
                 } else {
                     break;
@@ -143,17 +141,17 @@ public class ClansManager {
                     clanPlayer.sendMessage(Utils.translate("&eYour clan has leveled up to &6&lLevel " + newLevel));
             }
             // add rest of xp after leveling up
-            Clans_DB.setClanLevel(newLevel, clan.getID());
-            Clans_DB.setClanXP(clanXPOverflow, clan.getID());
+            ClansDB.setClanLevel(newLevel, clan.getID());
+            ClansDB.setClanXP(clanXPOverflow, clan.getID());
             clan.setXP(clanXPOverflow);
 
         } else {
 
             // otherwise add xp to cache and database
             clan.addXP(clanXP);
-            Clans_DB.setClanXP(totalXP, clan.getID());
+            ClansDB.setClanXP(totalXP, clan.getID());
 
-            long clanXPNeeded = Clans_YAML.getLevelUpPrice(clan) - clan.getXP();
+            long clanXPNeeded = ClansYAML.getLevelUpPrice(clan) - clan.getXP();
 
             for (ClanMember clanMember : clan.getMembers()) {
                 // make sure they are online
@@ -175,7 +173,7 @@ public class ClansManager {
             for (ClanMember clanMember : clan.getMembers()) {
 
                 // reset clan member in database
-                Clans_DB.resetClanMember(clanMember.getPlayerName());
+                ClansDB.resetClanMember(clanMember.getPlayerName());
 
                 Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
                 if (clanPlayer != null) {
@@ -187,7 +185,7 @@ public class ClansManager {
                 }
             }
             // remove from database and list
-            Clans_DB.removeClan(clanID);
+            ClansDB.removeClan(clanID);
             clans.remove(clan);
         }
     }
@@ -195,7 +193,7 @@ public class ClansManager {
     private void syncNewClans() {
         for (Clan clan : clans)
             if (clan.getID() == -1)
-                Clans_DB.newClan(clan);
+                ClansDB.newClan(clan);
     }
 
     private void startScheduler(Plugin plugin) {

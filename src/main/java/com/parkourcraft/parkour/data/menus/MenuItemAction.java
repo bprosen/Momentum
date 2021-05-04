@@ -2,17 +2,14 @@ package com.parkourcraft.parkour.data.menus;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.perks.Perk;
 import com.parkourcraft.parkour.data.plots.Plot;
-import com.parkourcraft.parkour.data.plots.Plots_DB;
-import com.parkourcraft.parkour.data.rank.Rank;
-import com.parkourcraft.parkour.data.rank.Ranks_DB;
-import com.parkourcraft.parkour.data.rank.Ranks_YAML;
+import com.parkourcraft.parkour.data.plots.PlotsDB;
+import com.parkourcraft.parkour.data.rank.RanksDB;
+import com.parkourcraft.parkour.data.rank.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.data.stats.Stats_DB;
-import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -75,7 +72,7 @@ public class MenuItemAction {
             if (!plot.isSubmitted()) {
                 // submit map
                 plot.submit();
-                Plots_DB.toggleSubmitted(player.getUniqueId().toString());
+                PlotsDB.toggleSubmitted(player.getUniqueId().toString());
 
                 player.closeInventory();
 
@@ -118,10 +115,10 @@ public class MenuItemAction {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         String rankName = playerStats.getRank().getRankName();
         String levelType = menuItem.getTypeValue();
-        String levelName = Ranks_YAML.getRankUpLevel(rankName, levelType);
+        String levelName = RanksYAML.getRankUpLevel(rankName, levelType);
 
         if (levelName != null) {
-            LevelObject level = Parkour.getLevelManager().get(levelName);
+            Level level = Parkour.getLevelManager().get(levelName);
             if (level != null)
                 performLevelTeleport(playerStats, player, level);
         }
@@ -129,12 +126,12 @@ public class MenuItemAction {
 
     private static void performLevelItem(Player player, MenuItem menuItem) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        LevelObject level = Parkour.getLevelManager().get(menuItem.getTypeValue());
+        Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
         performLevelTeleport(playerStats, player, level);
     }
 
-    private static void performLevelTeleport(PlayerStats playerStats, Player player, LevelObject level) {
+    private static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace()) {
             if (!level.getName().equalsIgnoreCase(playerStats.getLevel())) {
                 if (level.hasRequiredLevels(playerStats)) {
@@ -145,7 +142,7 @@ public class MenuItemAction {
 
                     // save if has checkpoint
                     if (playerStats.getCheckpoint() != null) {
-                        Checkpoint_DB.savePlayerAsync(player);
+                        CheckpointDB.savePlayerAsync(player);
                         playerStats.resetCheckpoint();
                     }
 
@@ -155,8 +152,8 @@ public class MenuItemAction {
 
                     playerStats.setLevel(level.getName());
 
-                    if (Checkpoint_DB.hasCheckpoint(player.getUniqueId(), level.getName())) {
-                        Checkpoint_DB.loadPlayer(player.getUniqueId(), level.getName());
+                    if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
+                        CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
                         Parkour.getCheckpointManager().teleportPlayer(player);
                         player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                     } else {
@@ -222,13 +219,13 @@ public class MenuItemAction {
             // remove amount
             Parkour.getEconomy().withdrawPlayer(player, playerStats.getRank().getRankUpPrice());
             // change to next stage
-            Ranks_DB.updateStage(player.getUniqueId(), 2);
+            RanksDB.updateStage(player.getUniqueId(), 2);
             playerStats.setRankUpStage(2);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
 
             String menuName;
             // open level menu
-            if (Ranks_YAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
+            if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
                 menuName = "single-level-rankup";
             else
                 menuName = "double-level-rankup";

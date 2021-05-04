@@ -20,14 +20,14 @@ public class LocationManager {
     public void load() {
         locations = new HashMap<>();
 
-        for (String locationName : Locations_YAML.getNames())
+        for (String locationName : LocationsYAML.getNames())
             load(locationName);
 
         Parkour.getPluginLogger().info("Locations loaded: " + locations.size());
     }
 
     public void load(String locationName) {
-        Location location = Locations_YAML.get(locationName);
+        Location location = LocationsYAML.get(locationName);
 
         if (location == null
                 && exists(locationName))
@@ -54,12 +54,12 @@ public class LocationManager {
     }
 
     public void save(String locationName, Location location) {
-        Locations_YAML.save(locationName, location);
+        LocationsYAML.save(locationName, location);
     }
 
     public void remove(String locationName) {
         if (exists(locationName))
-            Locations_YAML.remove(locationName);
+            LocationsYAML.remove(locationName);
     }
 
     public Location getLobbyLocation() {

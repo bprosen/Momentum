@@ -1,21 +1,17 @@
 package com.parkourcraft.parkour.data.menus;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.perks.Perk;
-import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.rank.Rank;
-import com.parkourcraft.parkour.data.rank.Ranks_YAML;
+import com.parkourcraft.parkour.data.rank.RanksYAML;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +93,7 @@ public class MenuItemFormatter {
                 itemLore.add(Utils.translate("&7Requirements"));
 
                 for (String requirement : requirements) {
-                    LevelObject level = Parkour.getLevelManager().get(requirement);
+                    Level level = Parkour.getLevelManager().get(requirement);
 
                     if (level != null)
                         itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
@@ -141,7 +137,7 @@ public class MenuItemFormatter {
     private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String levelName = menuItem.getTypeValue();
-        LevelObject level = Parkour.getLevelManager().get(levelName);
+        Level level = Parkour.getLevelManager().get(levelName);
 
         return createLevelItem(playerStats, level, menuItem, item);
     }
@@ -150,17 +146,17 @@ public class MenuItemFormatter {
     private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem) {
 
         ItemStack item = new ItemStack(menuItem.getItem());
-        String levelName = Ranks_YAML.getRankUpLevel(playerStats.getRank().getRankName(), menuItem.getTypeValue());
+        String levelName = RanksYAML.getRankUpLevel(playerStats.getRank().getRankName(), menuItem.getTypeValue());
 
         if (levelName != null) {
-            LevelObject level = Parkour.getLevelManager().get(levelName);
+            Level level = Parkour.getLevelManager().get(levelName);
 
             return createLevelItem(playerStats, level, menuItem, item);
         }
         return null;
     }
 
-    private static ItemStack createLevelItem(PlayerStats playerStats, LevelObject level, MenuItem menuItem, ItemStack item) {
+    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item) {
 
         if (level != null) {
             ItemMeta itemMeta = item.getItemMeta();
@@ -183,7 +179,7 @@ public class MenuItemFormatter {
                 itemLore.add(Utils.translate("&7Required Levels"));
 
                 for (String requiredLevelName : level.getRequiredLevels()) {
-                    LevelObject requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
+                    Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
                     if (requiredLevel != null)
                         itemLore.add(Utils.translate("&7 - " + requiredLevel.getFormattedTitle()));

@@ -1,12 +1,11 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -51,7 +50,7 @@ public class Scoreboard {
     private static void displayScoreboard(Player player) {
         List<String> board = new ArrayList<>();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        LevelObject level = Parkour.getLevelManager().get(playerStats.getLevel());
+        Level level = Parkour.getLevelManager().get(playerStats.getLevel());
 
         // Title
         board.add(Utils.translate("&c&lRenatus Network"));

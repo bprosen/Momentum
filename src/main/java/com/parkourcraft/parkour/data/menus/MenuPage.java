@@ -1,7 +1,7 @@
 package com.parkourcraft.parkour.data.menus;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -95,7 +95,7 @@ public class MenuPage {
                 return menuItem;
 
             if (menuItem.getType().equals("level")) {
-                LevelObject level = Parkour.getLevelManager().get(menuItem.getTypeValue());
+                Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
                 if (level != null
                         && level.getFormattedTitle().equals(itemTitle))

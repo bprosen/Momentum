@@ -1,9 +1,7 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
-import com.parkourcraft.parkour.data.plots.PlotsManager;
-import com.parkourcraft.parkour.data.plots.Plots_DB;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
@@ -50,8 +48,8 @@ public class JoinLeaveHandler implements Listener {
                 // run async
                 new BukkitRunnable() {
                     public void run() {
-                        if (Checkpoint_DB.hasCheckpoint(uuid, regions.get(0)))
-                            Checkpoint_DB.loadPlayer(uuid, regions.get(0));
+                        if (CheckpointDB.hasCheckpoint(uuid, regions.get(0)))
+                            CheckpointDB.loadPlayer(uuid, regions.get(0));
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
@@ -67,7 +65,7 @@ public class JoinLeaveHandler implements Listener {
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
-            Checkpoint_DB.savePlayerAsync(player);
+            CheckpointDB.savePlayerAsync(player);
 
         // if left in spectator, remove it
         if (playerStats.getPlayerToSpectate() != null)

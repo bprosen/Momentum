@@ -8,12 +8,12 @@ import java.util.*;
 
 public class LevelManager {
 
-    private List<LevelObject> levels = new ArrayList<>();
+    private List<Level> levels = new ArrayList<>();
     private Map<String, LevelData> levelDataCache;
     private String featuredLevel = null;
 
     public LevelManager(Plugin plugin) {
-        this.levelDataCache = Levels_DB.getDataCache();
+        this.levelDataCache = LevelsDB.getDataCache();
 
         load(); // Loads levels from configuration
         pickFeatured();
@@ -23,7 +23,7 @@ public class LevelManager {
     public void load() {
         levels = new ArrayList<>();
 
-        for (String levelName : Levels_YAML.getNames())
+        for (String levelName : LevelsYAML.getNames())
             load(levelName);
 
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
@@ -32,31 +32,31 @@ public class LevelManager {
     public void load(String levelName) {
         boolean exists = exists(levelName);
 
-        if (!Levels_YAML.exists(levelName) && exists)
+        if (!LevelsYAML.exists(levelName) && exists)
             remove(levelName);
         else {
-            LevelObject levelObject = new LevelObject(levelName);
-            Levels_DB.syncDataCache(levelObject, levelDataCache);
+            Level level = new Level(levelName);
+            LevelsDB.syncDataCache(level, levelDataCache);
 
             if (exists)
                 remove(levelName);
 
-            levels.add(levelObject);
+            levels.add(level);
         }
     }
 
     public void pickFeatured() {
 
-        List<LevelObject> temporaryList = new ArrayList<>();
+        List<Level> temporaryList = new ArrayList<>();
 
         // sort through all levels to make sure it does not have required levels and has more than 0 coin reward
-        for (LevelObject level : levels) {
+        for (Level level : levels) {
             if (level.getRequiredLevels().isEmpty() && level.getReward() > 0)
                 temporaryList.add(level);
         }
 
         Random ran = new Random();
-        LevelObject level = temporaryList.get(ran.nextInt(temporaryList.size()));
+        Level level = temporaryList.get(ran.nextInt(temporaryList.size()));
 
         if (level != null) {
             featuredLevel = level.getName();
@@ -64,20 +64,20 @@ public class LevelManager {
         }
     }
 
-    public LevelObject getFeaturedLevel() {
-        LevelObject levelObject = Parkour.getLevelManager().get(featuredLevel);
+    public Level getFeaturedLevel() {
+        Level level = Parkour.getLevelManager().get(featuredLevel);
 
-        if (levelObject != null)
-            return levelObject;
+        if (level != null)
+            return level;
         return null;
     }
 
     private void startScheduler(Plugin plugin) {
         new BukkitRunnable() {
             public void run() {
-                if (Levels_DB.syncLevelData()) {
-                    setLevelDataCache(Levels_DB.getDataCache());
-                    Levels_DB.syncDataCache();
+                if (LevelsDB.syncLevelData()) {
+                    setLevelDataCache(LevelsDB.getDataCache());
+                    LevelsDB.syncDataCache();
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 0, 10);
@@ -91,23 +91,23 @@ public class LevelManager {
         return levelDataCache;
     }
 
-    public LevelObject get(String levelName) {
-        for (LevelObject levelObject : levels)
-            if (levelObject.getName().equals(levelName))
-                return levelObject;
+    public Level get(String levelName) {
+        for (Level level : levels)
+            if (level.getName().equals(levelName))
+                return level;
 
         return null;
     }
 
-    public LevelObject get(int levelID) {
-        for (LevelObject levelObject : levels)
-            if (levelObject.getID() == levelID)
-                return levelObject;
+    public Level get(int levelID) {
+        for (Level level : levels)
+            if (level.getID() == levelID)
+                return level;
 
         return null;
     }
 
-    public List<LevelObject> getLevels() {
+    public List<Level> getLevels() {
         return levels;
     }
 
@@ -116,23 +116,23 @@ public class LevelManager {
     }
 
     public void remove(String levelName) {
-        for (Iterator<LevelObject> iterator = levels.iterator(); iterator.hasNext();) {
+        for (Iterator<Level> iterator = levels.iterator(); iterator.hasNext();) {
             if (iterator.next().getName().equals(levelName)) {
-                Levels_YAML.remove(iterator.getClass().getName());
+                LevelsYAML.remove(iterator.getClass().getName());
                 iterator.remove();
             }
         }
     }
 
     public void create(String levelName) {
-        Levels_YAML.create(levelName);
+        LevelsYAML.create(levelName);
     }
 
     public List<String> getNames() {
         List<String> names = new ArrayList<>();
 
-        for (LevelObject levelObject : levels)
-            names.add(levelObject.getName());
+        for (Level level : levels)
+            names.add(level.getName());
 
         return names;
     }
@@ -140,7 +140,7 @@ public class LevelManager {
     public Map<String, String> getNamesLower() {
         Map<String, String> levelNamesLower = new HashMap<>();
 
-        for (LevelObject level : levels)
+        for (Level level : levels)
             levelNamesLower.put(level.getName().toLowerCase(), level.getName());
 
         return levelNamesLower;
@@ -150,9 +150,9 @@ public class LevelManager {
 
         List<String> temporaryRaceLevelList = new ArrayList<>();
 
-        for (LevelObject levelObject : levels) {
-            if (levelObject.isRaceLevel())
-                temporaryRaceLevelList.add(levelObject.getName());
+        for (Level level : levels) {
+            if (level.isRaceLevel())
+                temporaryRaceLevelList.add(level.getName());
         }
         return temporaryRaceLevelList;
     }

@@ -24,12 +24,12 @@ public class Perk {
     }
 
     public void load() {
-        if (Perks_YAML.exists(name)) {
-            title = Perks_YAML.getTitle(name);
-            permissions = Perks_YAML.getPermissions(name);
-            requirements = Perks_YAML.getRequirements(name);
-            requiredPermissions = Perks_YAML.getRequiredPermissions(name);
-            price = Perks_YAML.getPrice(name);
+        if (PerksYAML.exists(name)) {
+            title = PerksYAML.getTitle(name);
+            permissions = PerksYAML.getPermissions(name);
+            requirements = PerksYAML.getRequirements(name);
+            requiredPermissions = PerksYAML.getRequiredPermissions(name);
+            price = PerksYAML.getPrice(name);
         }
     }
 

@@ -1,7 +1,7 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
@@ -82,7 +82,7 @@ public class InteractListener implements Listener {
 
                 if (!playerStats.inRace()) {
                     if (levelName != null) {
-                        LevelObject level = Parkour.getLevelManager().get(levelName);
+                        Level level = Parkour.getLevelManager().get(levelName);
                         if (level != null) {
 
                             // gets if they have right clicked it already, if so, cancel the task and reset them

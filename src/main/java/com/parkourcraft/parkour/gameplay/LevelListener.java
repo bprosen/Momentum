@@ -1,13 +1,11 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.checkpoints.Checkpoint_DB;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -126,7 +124,7 @@ public class LevelListener implements Listener {
             if (!regions.isEmpty()) {
 
                 // make sure the area they are spawning in is a level
-                LevelObject level = Parkour.getLevelManager().get(regions.get(0));
+                Level level = Parkour.getLevelManager().get(regions.get(0));
 
                 if (level != null && !level.getName().equalsIgnoreCase(playerStats.getLevel()))
                     Parkour.getStatsManager().get(player).setLevel(regions.get(0));
@@ -134,7 +132,7 @@ public class LevelListener implements Listener {
             } else if (playerStats.getLevel() != null) {
                 // save checkpoint if had one
                 if (playerStats.getCheckpoint() != null) {
-                    Checkpoint_DB.savePlayerAsync(player);
+                    CheckpointDB.savePlayerAsync(player);
                     playerStats.resetCheckpoint();
                 }
                 playerStats.resetLevel();

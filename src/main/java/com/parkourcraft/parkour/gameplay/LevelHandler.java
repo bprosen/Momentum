@@ -2,10 +2,10 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.LevelObject;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.data.stats.Stats_DB;
+import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
@@ -20,7 +20,7 @@ public class LevelHandler {
     static void levelCompletion(Player player, String levelName) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        LevelObject level = Parkour.getLevelManager().get(levelName);
+        Level level = Parkour.getLevelManager().get(levelName);
 
         // if playerstats and level exists
         if (playerStats != null && playerStats.getPlayerToSpectate() == null && level != null) {
@@ -55,7 +55,7 @@ public class LevelHandler {
         }
     }
 
-    private static void dolevelCompletion(PlayerStats playerStats, Player player, LevelObject level, String levelName, boolean rankUpLevel) {
+    private static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean rankUpLevel) {
 
         Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
         LevelCompletion levelCompletion = new LevelCompletion(
@@ -64,7 +64,7 @@ public class LevelHandler {
         );
 
         levelCompletion.setPlayerName(player.getName());
-        Stats_DB.insertCompletion(playerStats, level, levelCompletion);
+        StatsDB.insertCompletion(playerStats, level, levelCompletion);
         level.addCompletion(player, levelCompletion, level); // Update totalLevelCompletionsCount
 
         // Update player information
@@ -143,7 +143,7 @@ public class LevelHandler {
     }
 
     // Respawn player if checkpoint isn't there
-    static void respawnPlayer(Player player, LevelObject level) {
+    static void respawnPlayer(Player player, Level level) {
         if (level != null) {
             Location loc = level.getStartLocation();
 

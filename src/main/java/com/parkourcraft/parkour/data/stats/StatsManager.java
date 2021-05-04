@@ -34,8 +34,8 @@ public class StatsManager {
         // Leader Boards
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             public void run() {
-                Stats_DB.loadTotalCompletions();
-                Stats_DB.loadLeaderboards();
+                StatsDB.loadTotalCompletions();
+                StatsDB.loadLeaderboards();
             }
         });
     }
@@ -95,7 +95,7 @@ public class StatsManager {
         if (!running) {
             for (PlayerStats playerStats : playerStatsList) {
                 if (playerStats.getPlayerID() == -1) {
-                    Stats_DB.loadPlayerStats(playerStats);
+                    StatsDB.loadPlayerStats(playerStats);
                     Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
                 }
             }
