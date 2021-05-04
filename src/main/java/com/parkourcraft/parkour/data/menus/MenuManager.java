@@ -1,16 +1,18 @@
 package com.parkourcraft.parkour.data.menus;
 
+import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MenuManager {
 
@@ -24,7 +26,7 @@ public class MenuManager {
     public void load() {
         menuMap = new HashMap<>();
 
-        for (String menuName : Menus_YAML.getNames())
+        for (String menuName : MenusYAML.getNames())
             load(menuName);
     }
 
@@ -38,7 +40,7 @@ public class MenuManager {
     }*/
 
     public void load(String menuName) {
-        if (Menus_YAML.exists(menuName))
+        if (MenusYAML.exists(menuName))
             menuMap.put(menuName, new Menu(menuName));
     }
 
@@ -97,6 +99,54 @@ public class MenuManager {
     public void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
         if (exists(menuName))
             menuMap.get(menuName).updateInventory(player, inventory, pageNumber);
+    }
+
+    // in ONE case where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
+    public void openSubmittedPlotsGUI(Player player) {
+        Inventory inventory = getInventory("submitted-plots", 0);
+
+        if (inventory != null) {
+            List<Plot> submittedPlots = Parkour.getPlotsManager().getSubmittedPlots();
+            for (int i = 0; i < submittedPlots.size() && i < inventory.getSize() - 9; i++) {
+
+                Plot plot = submittedPlots.get(i);
+                // third byte is a player skull
+                ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+                SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+
+                final String plotOwnerName = plot.getOwnerName();
+
+                UUID targetUUID = UUID.fromString(plot.getOwnerUUID());
+                skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUUID));
+
+                skullMeta.setDisplayName(Utils.translate("&4" + plotOwnerName + "&c's Plot Submission"));
+
+                List<String> itemLore = new ArrayList<String>() {{
+                    add("");
+                    add(Utils.translate("&7Click to teleport to"));
+                    add(Utils.translate("&4" + plotOwnerName + "&c's Plot"));
+                    add("");
+                    add(Utils.translate("&7Awaiting &aaccept &7or &cdeny"));
+                    add("");
+                }};
+
+                skullMeta.setLore(itemLore);
+                item.setItemMeta(skullMeta);
+                inventory.setItem(i, item);
+            }
+            // make black glass at the bottom row
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+                ItemStack item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
+                ItemMeta itemMeta = item.getItemMeta();
+                itemMeta.setDisplayName(Utils.translate("&8Renatus Network"));
+                item.setItemMeta(itemMeta);
+
+                inventory.setItem(i, item);
+            }
+            player.openInventory(inventory);
+        } else {
+            player.sendMessage(Utils.translate("&cUnable to open inventory, null?"));
+        }
     }
 
     /*public void updateOpenInventories() {

@@ -27,12 +27,12 @@ public class Menu {
     }
 
     private void load() {
-        if (Menus_YAML.exists(name)) {
+        if (MenusYAML.exists(name)) {
 
-            title = Menus_YAML.getTitle(name);
-            pageCount = Menus_YAML.getPageCount(name);
-            updating = Menus_YAML.getUpdating(name);
-            selectItem = Menus_YAML.getSelectItem(name);
+            title = MenusYAML.getTitle(name);
+            pageCount = MenusYAML.getPageCount(name);
+            updating = MenusYAML.getUpdating(name);
+            selectItem = MenusYAML.getSelectItem(name);
 
             loadPages();
         }
@@ -40,7 +40,7 @@ public class Menu {
 
     private void loadPages() {
         for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
-            if (Menus_YAML.isSet(name, pageNumber + ""))
+            if (MenusYAML.isSet(name, pageNumber + ""))
                 pageMap.put(pageNumber, new MenuPage(this, pageNumber));
         }
     }
@@ -85,7 +85,7 @@ public class Menu {
             return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle(pageNumber));
         }
 
-        return Bukkit.createInventory(null, 9, getFormattedTitle(pageNumber));
+        return Bukkit.createInventory(null, 54, getFormattedTitle(pageNumber));
     }
 
     public void updateInventory(Player player, InventoryView inventory, int pageNumber) {

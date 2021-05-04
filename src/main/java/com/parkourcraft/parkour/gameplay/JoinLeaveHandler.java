@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
+import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
@@ -53,6 +54,15 @@ public class JoinLeaveHandler implements Listener {
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
+        }
+
+        // send message to op people that there are undecided plots
+        if (player.isOp()) {
+            List<Plot> submittedPlotList = Parkour.getPlotsManager().getSubmittedPlots();
+
+            if (!submittedPlotList.isEmpty())
+                player.sendMessage(Utils.translate("&7There are &c&l" + submittedPlotList.size() + "" +
+                                    " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
     }
 

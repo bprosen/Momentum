@@ -42,7 +42,7 @@ public class PlotCMD implements CommandExecutor {
             if (a.length == 2 && a[0].equalsIgnoreCase("submit") && a[1].equalsIgnoreCase("list")) {
 
                 // open submitted plots list
-                openMenu(player, "submitted-plots");
+                Parkour.getMenuManager().openSubmittedPlotsGUI(player);
             } else if (a.length == 3 && a[0].equalsIgnoreCase("submit") && a[1].equalsIgnoreCase("accept")) {
 
                 String plotOwner = a[2];

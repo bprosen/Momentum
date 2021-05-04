@@ -24,13 +24,13 @@ public class MenuItem {
     }
 
     private void load(Menu menu, MenuPage menuPage) {
-        item = Menus_YAML.getItem(menu.getName(), menuPage.getPageNumber(), slot);
-        title = Menus_YAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), slot);
-        type = Menus_YAML.getItemType(menu.getName(), menuPage.getPageNumber(), slot);
-        typeValue = Menus_YAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
-        lore = Menus_YAML.getItemLore(menu.getName(), menuPage.getPageNumber(), slot);
-        commands = Menus_YAML.getCommands(menu.getName(), menuPage.getPageNumber(), slot);
-        consoleCommands = Menus_YAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), slot);
+        item = MenusYAML.getItem(menu.getName(), menuPage.getPageNumber(), slot);
+        title = MenusYAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), slot);
+        type = MenusYAML.getItemType(menu.getName(), menuPage.getPageNumber(), slot);
+        typeValue = MenusYAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), slot);
+        lore = MenusYAML.getItemLore(menu.getName(), menuPage.getPageNumber(), slot);
+        commands = MenusYAML.getCommands(menu.getName(), menuPage.getPageNumber(), slot);
+        consoleCommands = MenusYAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), slot);
     }
 
     public int getSlot() {

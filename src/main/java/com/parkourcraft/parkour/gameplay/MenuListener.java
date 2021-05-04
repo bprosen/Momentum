@@ -8,6 +8,7 @@ import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,21 +39,32 @@ public class MenuListener implements Listener {
                 Player player = (Player) event.getWhoClicked();
                 ItemStack itemClicked = event.getCurrentItem();
 
-                if (menuItem != null)
+                if (menuItem != null) {
                     MenuItemAction.perform(player, menuItem);
-                // submitted plots section
-                else if (menu.getName().equals("submitted-plots") &&
-                        itemClicked.equals(Material.SKULL)) {
+                } else {
+                    // submitted plots section
+                    String submittedPlotsTitle = Parkour.getMenuManager().getMenu("submitted-plots").getFormattedTitleBase();
 
-                    String[] split = itemClicked.getItemMeta().getDisplayName().split("'");
-                    Plot plot = Parkour.getPlotsManager().get(ChatColor.stripColor(split[0]));
+                    // check if it is the right title and they clicked on a head
+                    if (menu.getFormattedTitleBase().equalsIgnoreCase(submittedPlotsTitle) &&
+                        itemClicked.getType() == Material.SKULL_ITEM) {
 
-                    if (plot != null) {
-                        player.teleport(plot.getSpawnLoc());
-                        player.sendMessage(Utils.translate("&cYou have teleported to &4" + plot.getOwnerName() + "&c's Plot"));
-                    } else {
-                        player.sendMessage(Utils.translate("&cPlot does not exist"));
+                        String[] split = itemClicked.getItemMeta().getDisplayName().split("'");
+                        Plot plot = Parkour.getPlotsManager().get(ChatColor.stripColor(split[0]));
+
                         player.closeInventory();
+
+                        if (plot != null) {
+                            // set pitch and yaw for cleaner teleport
+                            Location plotSpawn = plot.getSpawnLoc().clone();
+                            plotSpawn.setPitch(player.getLocation().getPitch());
+                            plotSpawn.setYaw(player.getLocation().getYaw());
+
+                            player.teleport(plotSpawn);
+                            player.sendMessage(Utils.translate("&cYou teleported to &4" + plot.getOwnerName() + "&c's Plot"));
+                        } else {
+                            player.sendMessage(Utils.translate("&cPlot does not exist"));
+                        }
                     }
                 }
             }

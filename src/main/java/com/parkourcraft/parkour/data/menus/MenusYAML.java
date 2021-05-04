@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Menus_YAML {
+public class MenusYAML {
 
     private static FileConfiguration menusConfig = Parkour.getConfigManager().get("menus");
 
