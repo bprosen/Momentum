@@ -52,5 +52,3 @@ commands:
   plot:
     description: "PC-Parkour Player Submitted Command"
     aliases: [plots, playersubmitted, playersubmit]
-  submit:
-    description: "PC-Parkour Player Submitted Submit Command"
