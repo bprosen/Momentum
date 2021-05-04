@@ -1,8 +1,10 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.plots.PlotsDB;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,8 +47,12 @@ public class PlotCMD implements CommandExecutor {
             // make sure they have a plot
             if (plot != null) {
                 plot.teleportOwner();
-            } else
+
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                resetPlayerLevelData(playerStats);
+            } else {
                 player.sendMessage(Utils.translate("&cYou do not have a plot to teleport to"));
+            }
         // visit someone else
         } else if (a.length == 2 && (a[0].equalsIgnoreCase("visit") ||
                                      a[0].equalsIgnoreCase("v"))) {
@@ -65,6 +71,9 @@ public class PlotCMD implements CommandExecutor {
 
                 player.teleport(loc.clone().add(0.5, 0, 0.5));
                 player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
+
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                resetPlayerLevelData(playerStats);
             } else {
                 player.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a plot"));
             }
@@ -155,6 +164,18 @@ public class PlotCMD implements CommandExecutor {
             sendHelp(sender);
         }
         return false;
+    }
+
+    private void resetPlayerLevelData(PlayerStats playerStats) {
+        if (playerStats.getLevel() != null) {
+            // save checkpoint if had one
+            if (playerStats.getCheckpoint() != null) {
+                CheckpointDB.savePlayerAsync(playerStats.getPlayer());
+                playerStats.resetCheckpoint();
+            }
+            playerStats.resetLevel();
+            playerStats.resetPracticeMode();
+        }
     }
 
     private void confirmPlayer(Player player) {
