@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.events.EventType;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
@@ -28,6 +29,10 @@ public class Level {
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
+
+    private boolean eventLevel = false;
+    private EventType eventType;
+
     private Location raceLocation1 = null;
     private Location raceLocation2 = null;
 
@@ -114,6 +119,17 @@ public class Level {
 
     public boolean isRankUpLevel() {
         return isRankUpLevel;
+    }
+
+    public boolean isEventLevel() { return eventLevel; }
+
+    public EventType getEventType() {
+        EventType event = null;
+
+        if (eventLevel)
+            event = eventType;
+
+        return event;
     }
 
     public void setRankUpLevel(boolean isRankupLevel) {
@@ -225,6 +241,10 @@ public class Level {
                 }
             }
 
+            if (LevelsYAML.isSet(name, "event")) {
+                eventLevel = true;
+                eventType = LevelsYAML.getEventType(name);
+            }
             // if level is a rankUpLevel
             if (LevelsYAML.isSet(name, "rankup-level"))
                 isRankUpLevel = LevelsYAML.getRankUpLevelSwitch(name);

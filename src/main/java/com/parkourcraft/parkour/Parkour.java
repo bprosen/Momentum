@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.commands.*;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.clans.ClansManager;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointManager;
+import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.menus.MenuManager;
@@ -47,6 +48,7 @@ public class Parkour extends JavaPlugin {
     private static RanksManager ranks;
     private static PlotsManager plots;
     private static ProtocolManager protocol;
+    private static EventManager events;
 
     @Override
     public void onEnable() {
@@ -127,6 +129,7 @@ public class Parkour extends JavaPlugin {
         getCommand("ranks").setExecutor(new RankCMD());
         getCommand("rankup").setExecutor(new RankupCMD());
         getCommand("plot").setExecutor(new PlotCMD());
+        getCommand("event").setExecutor(new EventCMD());
     }
 
     private static void loadClasses() {
@@ -143,6 +146,7 @@ public class Parkour extends JavaPlugin {
         races = new RaceManager();
         ranks = new RanksManager();
         plots = new PlotsManager();
+        events = new EventManager();
         protocol = ProtocolLibrary.getProtocolManager();
     }
 
@@ -161,6 +165,7 @@ public class Parkour extends JavaPlugin {
         database = null;
         plots = null;
         protocol = null;
+        events = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -169,7 +174,7 @@ public class Parkour extends JavaPlugin {
     }
     public static void setEconomy(Economy eco) { economy = eco; }
 
-    // All manager methods
+    // all manager methods
     public static SettingsManager getSettingsManager() {
         return settings;
     }
@@ -189,9 +194,7 @@ public class Parkour extends JavaPlugin {
     public static MenuManager getMenuManager() {
         return menus;
     }
-    public static StatsManager getStatsManager() {
-        return stats;
-    }
+    public static StatsManager getStatsManager() { return stats; }
     public static ClansManager getClansManager() {
         return clans;
     }
@@ -200,5 +203,6 @@ public class Parkour extends JavaPlugin {
     public static RaceManager getRaceManager() { return races; }
     public static RanksManager getRanksManager() { return ranks; }
     public static PlotsManager getPlotsManager() { return plots; }
+    public static EventManager getEventManager() { return events; }
     public static ProtocolManager getProtocolManager() { return protocol; }
 }

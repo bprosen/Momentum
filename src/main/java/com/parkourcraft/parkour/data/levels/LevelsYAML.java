@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.events.EventType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -159,6 +160,12 @@ public class LevelsYAML {
             }
         }
         return potionEffects;
+    }
+
+    public static EventType getEventType(String levelName) {
+        if (levelsFile.isSet(levelName + ".event"))
+            return EventType.valueOf(levelsFile.getString(levelName + ".event"));
+        return null;
     }
 
     public static void setPlayerRaceLocation(String player, String levelName, Location loc) {

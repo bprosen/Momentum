@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.events.EventType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -70,6 +71,46 @@ public class LevelManager {
         if (level != null)
             return level;
         return null;
+    }
+
+    public List<Level> getEventLevels() {
+        List<Level> tempList = new ArrayList<>();
+
+        for (Level level : levels)
+            if (level.isEventLevel())
+                tempList.add(level);
+
+        return tempList;
+    }
+
+    public List<Level> getPvPEventLevels() {
+        List<Level> tempList = new ArrayList<>();
+
+        for (Level level : getEventLevels())
+            if (level.getEventType() == EventType.PVP)
+                tempList.add(level);
+
+        return tempList;
+    }
+
+    public List<Level> getRisingWaterEventLevels() {
+        List<Level> tempList = new ArrayList<>();
+
+        for (Level level : getEventLevels())
+            if (level.getEventType() == EventType.RISING_WATER)
+                tempList.add(level);
+
+        return tempList;
+    }
+
+    public List<Level> getHalfHeartEventLevels() {
+        List<Level> tempList = new ArrayList<>();
+
+        for (Level level : getEventLevels())
+            if (level.getEventType() == EventType.HALF_HEART)
+                tempList.add(level);
+
+        return tempList;
     }
 
     private void startScheduler(Plugin plugin) {
