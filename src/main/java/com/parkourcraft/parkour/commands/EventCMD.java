@@ -78,7 +78,7 @@ public class EventCMD implements CommandExecutor {
 
             // send help
             } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
-
+                sendHelp(sender);
             }
         /*
             Player Section
@@ -99,7 +99,7 @@ public class EventCMD implements CommandExecutor {
 
         // send help
         } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
-
+            sendHelp(sender);
         }
         return false;
     }
