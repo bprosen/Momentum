@@ -71,6 +71,7 @@ public class Event {
     }
 
     public void runScheduler() {
+        // settings scheduler
         scheduler = new BukkitRunnable() {
             @Override
             public void run() {

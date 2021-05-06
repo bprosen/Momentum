@@ -124,7 +124,7 @@ public class EventCMD implements CommandExecutor {
             case "leave":
                 return Utils.translate("&b/event leave  &7Leave an active event");
             case "start":
-                return Utils.translate("&b/event start  &7Starts an event based on type");
+                return Utils.translate("&b/event start <type> &7Starts an event based on type");
             case "stop":
                 return Utils.translate("&b/event stop  &7Stops the running event");
             case "help":

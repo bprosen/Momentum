@@ -1,17 +1,35 @@
 package com.parkourcraft.parkour.data.events;
 
+import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class EventManager {
 
     private Event runningEvent;
 
+    public EventManager() {
+        startScheduler();
+    }
+
+    // scheduler to handle the next event and reminder for running event
+    public void startScheduler() {
+        // run a timer scheduler for next event
+
+        // run a timer scheduler for reminder to join running event
+    }
+
+    // method to start event
     public void startEvent(EventType eventType) {
 
     }
 
+    // method to start the timer
+    private void startTimer() {
+
+    }
+
+    // method to end event
     public void endEvent(boolean forceEnded) {
         // cancel scheduler first
         runningEvent.getScheduler().cancel();
@@ -22,7 +40,13 @@ public class EventManager {
             removeParticipant(participantPlayer);
         }
 
+        if (forceEnded) {
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage(Utils.translate("&7An event has been started! &bType &l/event join &bto join!"));
+            Bukkit.broadcastMessage("");
+        } else {
 
+        }
 
         // null the running event last
         runningEvent = null;
