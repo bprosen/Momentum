@@ -25,6 +25,7 @@ public class PlayerStats {
     private boolean inRace = false;
     private Rank rank;
     private int rankUpStage;
+    private boolean eventParticipant = false;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -275,5 +276,20 @@ public class PlayerStats {
 
     public boolean hasPerk(String perkName) {
         return perks.containsKey(perkName);
+    }
+
+    //
+    // Event Section
+    //
+    public boolean isEventParticipant() {
+        return eventParticipant;
+    }
+
+    public void joinedEvent() {
+        eventParticipant = true;
+    }
+
+    public void leftEvent() {
+        eventParticipant = false;
     }
 }

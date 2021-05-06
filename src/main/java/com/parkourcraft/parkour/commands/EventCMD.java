@@ -1,8 +1,11 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.events.EventType;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,7 +23,7 @@ public class EventCMD implements CommandExecutor {
 
         Player player = (Player) sender;
         EventManager eventManager = Parkour.getEventManager();
-
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         /*
             Admin Section
@@ -32,8 +35,26 @@ public class EventCMD implements CommandExecutor {
                 if (eventManager.isEventRunning()) {
 
                     if (eventManager.get(player.getUniqueId().toString()) == null) {
+
+                        if (playerStats.getPracticeLocation() != null) {
+
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                            return true;
+                        } else if (playerStats.getPlayerToSpectate() != null) {
+
+                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                            return true;
+                        } else if (playerStats.inRace()) {
+
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                            return true;
+                        } else if (PlayerHider.containsPlayer(player)) {
+
+                            player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
+                            return true;
+                        }
+
                         eventManager.addParticipant(player);
-                        eventManager.getRunningEvent().getLevel();
                     } else
                         player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
 
@@ -90,9 +111,28 @@ public class EventCMD implements CommandExecutor {
 
             if (eventManager.isEventRunning()) {
 
-                if (eventManager.get(player.getUniqueId().toString()) == null)
+                if (eventManager.get(player.getUniqueId().toString()) == null) {
+
+                    if (playerStats.getPracticeLocation() != null) {
+
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                        return true;
+                    } else if (playerStats.getPlayerToSpectate() != null) {
+
+                        player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                        return true;
+                    } else if (playerStats.inRace()) {
+
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                        return true;
+                    } else if (PlayerHider.containsPlayer(player)) {
+
+                        player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
+                        return true;
+                    }
+
                     eventManager.addParticipant(player);
-                else
+                } else
                     player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
 
             } else {

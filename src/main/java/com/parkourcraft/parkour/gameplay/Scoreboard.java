@@ -94,7 +94,7 @@ public class Scoreboard {
                     .getOpponent(player).getName())));
 
         // event section of scoreboard
-        } else if (eventManager.isEventRunning() && eventManager.get(player.getUniqueId().toString()) != null) {
+        } else if (playerStats.isEventParticipant()) {
 
             board.add(formatSpacing(Utils.translate("&7You are in an event!")));
             board.add(formatSpacing(Utils.translate("&aType &2&l" +

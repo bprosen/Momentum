@@ -96,7 +96,7 @@ public class JoinLeaveHandler implements Listener {
             PlayerHider.removeHiddenPlayer(player);
 
         // if event is running and they are a participant, remove
-        if (eventManager.isEventRunning() && eventManager.get(player.getUniqueId().toString()) != null)
+        if (playerStats.isEventParticipant())
             eventManager.removeParticipant(player);
     }
 }

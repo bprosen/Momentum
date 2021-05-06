@@ -1,5 +1,6 @@
 package com.parkourcraft.parkour.commands;
 
+import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
@@ -20,9 +21,11 @@ public class PlayerToggleCMD implements CommandExecutor {
             if (PlayerHider.containsPlayer(player)) {
                 PlayerHider.showPlayer(player, false);
                 player.sendMessage(Utils.translate("&aYou have turned on players"));
-            } else {
+            } else if (!Parkour.getStatsManager().get(player.getUniqueId().toString()).isEventParticipant()) {
                 PlayerHider.hidePlayer(player, false);
                 player.sendMessage(Utils.translate("&cYou have turned off players"));
+            } else {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
             }
         return true;
     }
