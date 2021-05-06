@@ -37,11 +37,11 @@ public class Event {
     public Event(EventType eventType) {
         this.eventType = eventType;
 
-        loadSettings();
+        loadGameSettings();
         runScheduler();
     }
 
-    public void loadSettings() {
+    public void loadGameSettings() {
 
         Random ran = new Random();
 
@@ -138,5 +138,7 @@ public class Event {
     public List<String> getParticipants() {
         return participants;
     }
+
+    public EventType getEventType() { return eventType; }
 }
 

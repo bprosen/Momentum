@@ -72,7 +72,7 @@ public class EventCMD implements CommandExecutor {
                                          a[0].equalsIgnoreCase("end"))) {
 
                 if (eventManager.isEventRunning())
-                    eventManager.endEvent(true);
+                    eventManager.endEvent(null,true, false);
                 else
                     player.sendMessage(Utils.translate("&cYou cannot end an event that is not running!"));
 

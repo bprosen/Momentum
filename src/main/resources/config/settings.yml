@@ -37,3 +37,7 @@ player_submitted:
   plot_width: 75
   plot_default_y: 64
   plot_buffer_width: 10
+event:
+  reminder_delay: 300
+  max_run_time: 1800
+  check_next_event_delay: 7200

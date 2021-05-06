@@ -27,6 +27,10 @@ public class SettingsManager {
     public int player_submitted_plot_default_y;
     public int player_submitted_plot_buffer_width;
 
+    public int event_reminder_delay;
+    public int max_event_run_time;
+    public int check_next_event_delay;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -50,5 +54,8 @@ public class SettingsManager {
         player_submitted_plot_width = settings.getInt("player_submitted.plot_width");
         player_submitted_plot_default_y = settings.getInt("player_submitted.plot_default_y");
         player_submitted_plot_buffer_width = settings.getInt("player_submitted.plot_buffer_width");
+        event_reminder_delay = settings.getInt("event.reminder_delay");
+        max_event_run_time = settings.getInt("event.max_run_time");
+        check_next_event_delay = settings.getInt("event.check_next_event_delay");
     }
 }

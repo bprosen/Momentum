@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -20,6 +21,7 @@ public class LevelHandler {
     static void levelCompletion(Player player, String levelName) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        EventManager eventManager = Parkour.getEventManager();
         Level level = Parkour.getLevelManager().get(levelName);
 
         // if playerstats and level exists
@@ -35,9 +37,18 @@ public class LevelHandler {
                         // if it is a race completion, end it
                         if (!playerStats.inRace()) {
                             // if level is not a rankup level, continue
-                            if (!level.isRankUpLevel())
-                                dolevelCompletion(playerStats, player, level, levelName, false);
-                            else if (playerStats.getRankUpStage() == 2)
+                            if (!level.isRankUpLevel()) {
+                                // if level is not an event level, it is guaranteed normal completion
+                                if (!level.isEventLevel())
+                                    dolevelCompletion(playerStats, player, level, levelName, false);
+                                // otherwise, if there is an event running, end!
+                                else if (eventManager.isEventRunning())
+                                    eventManager.endEvent(player, false, false);
+                                // otherwise, they are clicking the sign when the event is not running
+                                else
+                                    player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
+
+                            } else if (playerStats.getRankUpStage() == 2)
                                 dolevelCompletion(playerStats, player, level, levelName, true);
                         } else {
                             // if in race
