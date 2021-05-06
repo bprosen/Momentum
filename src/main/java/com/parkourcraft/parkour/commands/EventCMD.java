@@ -68,7 +68,7 @@ public class EventCMD implements CommandExecutor {
                 if (eventManager.isEventRunning()) {
 
                     if (eventManager.get(player.getUniqueId().toString()) != null)
-                        eventManager.removeParticipant(player);
+                        eventManager.removeParticipant(player, false);
                     else
                         player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));
 
@@ -168,7 +168,7 @@ public class EventCMD implements CommandExecutor {
             if (eventManager.isEventRunning()) {
 
                 if (eventManager.get(player.getUniqueId().toString()) != null)
-                    eventManager.removeParticipant(player);
+                    eventManager.removeParticipant(player, false);
                 else
                     player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));
 

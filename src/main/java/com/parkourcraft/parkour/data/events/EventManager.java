@@ -91,7 +91,7 @@ public class EventManager {
         maxRunTimer.cancel();
 
         // then remove all participants
-        removeAllParticipants();
+        removeAllParticipants(false);
 
         if (forceEnded) {
             Bukkit.broadcastMessage("");
@@ -155,13 +155,13 @@ public class EventManager {
         player.teleport(runningEvent.getLevel().getStartLocation());
     }
 
-    public void removeParticipant(Player player) {
+    public void removeParticipant(Player player, boolean disconnected) {
         EventParticipant eventParticipant = get(player.getUniqueId().toString());
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // reset the cache and teleport player back
-        if (CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel()))
+        if (!disconnected && CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel()))
             CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel());
 
         // do all setting changes to revert back
@@ -173,7 +173,7 @@ public class EventManager {
         participants.remove(eventParticipant);
     }
 
-    public void removeAllParticipants() {
+    public void removeAllParticipants(boolean shutdown) {
 
         List<EventParticipant> tempList = new ArrayList<>();
 
@@ -183,7 +183,7 @@ public class EventManager {
 
         // now remove so theres no concurrency problem
         for (EventParticipant participant : tempList)
-            removeParticipant(participant.getPlayer());
+            removeParticipant(participant.getPlayer(), shutdown);
     }
 
     public List<EventParticipant> getParticipants() {
@@ -206,7 +206,7 @@ public class EventManager {
 
     public void shutdown() {
         if (isEventRunning()) {
-            removeAllParticipants();
+            removeAllParticipants(true);
             runningEvent = null;
         }
     }
