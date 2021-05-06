@@ -82,6 +82,29 @@ public class EventCMD implements CommandExecutor {
                 if (!eventManager.isEventRunning()) {
                     try {
                         EventType eventType = EventType.valueOf(a[1].toUpperCase());
+
+                        // now check if there are any event levels for that type
+                        switch (eventType) {
+                            case PVP:
+                                if (Parkour.getLevelManager().getPvPEventLevels().isEmpty()) {
+                                    player.sendMessage(Utils.translate("&cThere are no levels for &4PvP Event &cavailable"));
+                                    return true;
+                                }
+                                break;
+                            case HALF_HEART:
+                                if (Parkour.getLevelManager().getHalfHeartEventLevels().isEmpty()) {
+                                    player.sendMessage(Utils.translate("&cThere are no levels for &4Half Heart Event &cavailable"));
+                                    return true;
+                                }
+                                break;
+                            case RISING_WATER:
+                                if (Parkour.getLevelManager().getRisingWaterEventLevels().isEmpty()) {
+                                    player.sendMessage(Utils.translate("&cThere are no levels for &4Rising Water Event &cavailable"));
+                                    return true;
+                                }
+                                break;
+                        }
+
                         eventManager.startEvent(eventType);
                     } catch (IllegalArgumentException e) {
                         player.sendMessage(Utils.translate("&cInvalid event type!"));

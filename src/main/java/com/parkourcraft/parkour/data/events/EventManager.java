@@ -79,7 +79,7 @@ public class EventManager {
             public void run() {
 
                 if (runningEvent != null)
-                    endEvent(null, false, true);
+                    endEvent(null,false, true);
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().max_event_run_time);
     }
@@ -90,10 +90,8 @@ public class EventManager {
         runningEvent.getScheduler().cancel();
         maxRunTimer.cancel();
 
-        // then teleport all players back to where they entered
-        for (EventParticipant participant : participants) {
-            removeParticipant(participant.getPlayer());
-        }
+        // then remove all participants
+        removeAllParticipants();
 
         if (forceEnded) {
             Bukkit.broadcastMessage("");
@@ -152,6 +150,7 @@ public class EventManager {
         EventParticipant eventParticipant = new EventParticipant(player, playerStats.getLevel());
         participants.add(eventParticipant);
         playerStats.setLevel(runningEvent.getLevel().getName());
+        playerStats.disableLevelStartTime();
         playerStats.joinedEvent();
         player.teleport(runningEvent.getLevel().getStartLocation());
     }
@@ -174,6 +173,19 @@ public class EventManager {
         participants.remove(eventParticipant);
     }
 
+    public void removeAllParticipants() {
+
+        List<EventParticipant> tempList = new ArrayList<>();
+
+        // create a DEEP copy of the list so no concurrent errors
+        for (EventParticipant eventParticipant : participants)
+            tempList.add(eventParticipant);
+
+        // now remove so theres no concurrency problem
+        for (EventParticipant participant : tempList)
+            removeParticipant(participant.getPlayer());
+    }
+
     public List<EventParticipant> getParticipants() {
         return participants;
     }
@@ -190,5 +202,12 @@ public class EventManager {
             return "Rising Water";
 
         return null;
+    }
+
+    public void shutdown() {
+        if (isEventRunning()) {
+            removeAllParticipants();
+            runningEvent = null;
+        }
     }
 }

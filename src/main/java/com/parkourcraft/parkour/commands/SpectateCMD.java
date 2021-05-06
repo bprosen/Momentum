@@ -37,30 +37,34 @@ public class SpectateCMD implements CommandExecutor {
                             PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
 
                             if (playerStats != null && playerStats.getPlayer().isOnline()) {
-                                if (playerStats.isSpectatable()) {
-                                    if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
-                                        if (playerStats.getPracticeLocation() == null) {
-                                            if (!playerStats.inRace()) {
-                                                if (!playerStats.isEventParticipant()) {
-                                                    // enable spectator mode
-                                                    SpectatorHandler.setSpectatorMode(spectatorStats, playerStats);
+                                if (!player.getName().equalsIgnoreCase(playerStats.getPlayer().getName())) {
+                                    if (playerStats.isSpectatable()) {
+                                        if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
+                                            if (playerStats.getPracticeLocation() == null) {
+                                                if (!playerStats.inRace()) {
+                                                    if (!playerStats.isEventParticipant()) {
+                                                        // enable spectator mode
+                                                        SpectatorHandler.setSpectatorMode(spectatorStats, playerStats);
 
-                                                    playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                                            spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                                        playerStats.getPlayer().sendMessage(Utils.translate("&2" +
+                                                                spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                                    } else {
+                                                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                                    }
                                                 } else {
-                                                    player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                                                 }
                                             } else {
-                                                player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                                                player.sendMessage(Utils.translate("&cYou cannot enter spectator mode while in /prac"));
                                             }
                                         } else {
-                                            player.sendMessage(Utils.translate("&cYou cannot enter spectator mode while in /prac"));
+                                            sender.sendMessage(Utils.translate("&cYou are not in the same world as &4" + a[0]));
                                         }
                                     } else {
-                                        sender.sendMessage(Utils.translate("&cYou are not in the same world as &4" + a[0]));
+                                        sender.sendMessage(Utils.translate("&cThat player cannot be spectated"));
                                     }
                                 } else {
-                                    sender.sendMessage(Utils.translate("&cThat player cannot be spectated"));
+                                    player.sendMessage(Utils.translate("&cYou cannot spectate yourself"));
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&cThere is no player online named &4" + a[0]));

@@ -27,7 +27,7 @@ public class PracticeCMD implements CommandExecutor {
                 if (player.isOnGround()) {
                     if (!playerStats.inRace()) {
                         if (playerStats.getPlayerToSpectate() == null) {
-                            if (playerStats.isEventParticipant()) {
+                            if (!playerStats.isEventParticipant()) {
                                 if (playerStats.getPracticeLocation() != null) {
                                     PracticeHandler.resetPlayer(player, true);
                                 } else {

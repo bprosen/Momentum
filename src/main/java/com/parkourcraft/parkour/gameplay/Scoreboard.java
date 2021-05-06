@@ -97,7 +97,7 @@ public class Scoreboard {
         } else if (playerStats.isEventParticipant()) {
 
             board.add(formatSpacing(Utils.translate("&7You are in an event!")));
-            board.add(formatSpacing(Utils.translate("&aType &2&l" +
+            board.add(formatSpacing(Utils.translate("&2&l" +
                                     eventManager.formatName(eventManager.getEventType()))));
 
         // level section of scoreboard
