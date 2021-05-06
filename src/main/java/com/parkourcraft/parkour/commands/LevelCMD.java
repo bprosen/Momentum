@@ -406,6 +406,7 @@ public class LevelCMD implements CommandExecutor {
                             isRankUpLevel = true;
 
                         LevelHandler.dolevelCompletion(playerStats, target, level, levelName, isRankUpLevel, true);
+                        sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + " &7Completion for &a" + target.getName()));
                     } else {
                         sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));
                     }
