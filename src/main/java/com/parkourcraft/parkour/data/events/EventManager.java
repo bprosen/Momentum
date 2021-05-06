@@ -2,17 +2,12 @@ package com.parkourcraft.parkour.data.events;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
-import com.parkourcraft.parkour.data.checkpoints.CheckpointManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.gameplay.PracticeHandler;
-import com.parkourcraft.parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

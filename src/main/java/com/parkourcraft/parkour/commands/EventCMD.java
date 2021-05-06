@@ -1,7 +1,6 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.events.EventType;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
