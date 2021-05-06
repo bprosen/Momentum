@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
+import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -72,6 +73,7 @@ public class JoinLeaveHandler implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         RaceManager raceManager = Parkour.getRaceManager();
+        EventManager eventManager = Parkour.getEventManager();
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
@@ -92,5 +94,9 @@ public class JoinLeaveHandler implements Listener {
         // if left as hidden, remove them
         if (PlayerHider.containsPlayer(player))
             PlayerHider.removeHiddenPlayer(player);
+
+        // if event is running and they are a participant, remove
+        if (eventManager.isEventRunning() && eventManager.get(player.getUniqueId().toString()) != null)
+            eventManager.removeParticipant(player);
     }
 }

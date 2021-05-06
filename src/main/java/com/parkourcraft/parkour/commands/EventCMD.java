@@ -21,6 +21,7 @@ public class EventCMD implements CommandExecutor {
         Player player = (Player) sender;
         EventManager eventManager = Parkour.getEventManager();
 
+
         /*
             Admin Section
          */
@@ -30,9 +31,10 @@ public class EventCMD implements CommandExecutor {
 
                 if (eventManager.isEventRunning()) {
 
-                    if (!eventManager.isParticipant(player))
+                    if (eventManager.get(player.getUniqueId().toString()) == null) {
                         eventManager.addParticipant(player);
-                    else
+                        eventManager.getRunningEvent().getLevel();
+                    } else
                         player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
 
                 } else {
@@ -44,7 +46,7 @@ public class EventCMD implements CommandExecutor {
 
                 if (eventManager.isEventRunning()) {
 
-                    if (eventManager.isParticipant(player))
+                    if (eventManager.get(player.getUniqueId().toString()) != null)
                         eventManager.removeParticipant(player);
                     else
                         player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));
@@ -88,7 +90,7 @@ public class EventCMD implements CommandExecutor {
 
             if (eventManager.isEventRunning()) {
 
-                if (!eventManager.isParticipant(player))
+                if (eventManager.get(player.getUniqueId().toString()) == null)
                     eventManager.addParticipant(player);
                 else
                     player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
@@ -97,6 +99,19 @@ public class EventCMD implements CommandExecutor {
                 player.sendMessage(Utils.translate("&cThere is no event running!"));
             }
 
+        } else if (a.length == 1 && (a[0].equalsIgnoreCase("leave") ||
+                                     a[0].equalsIgnoreCase("quit"))) {
+
+            if (eventManager.isEventRunning()) {
+
+                if (eventManager.get(player.getUniqueId().toString()) != null)
+                    eventManager.removeParticipant(player);
+                else
+                    player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));
+
+            } else {
+                player.sendMessage(Utils.translate("&cThere is no event running!"));
+            }
         // send help
         } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
             sendHelp(sender);

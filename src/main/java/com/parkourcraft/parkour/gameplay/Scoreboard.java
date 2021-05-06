@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
@@ -51,6 +52,7 @@ public class Scoreboard {
         List<String> board = new ArrayList<>();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+        EventManager eventManager = Parkour.getEventManager();
 
         // Title
         board.add(Utils.translate("&c&lRenatus Network"));
@@ -89,7 +91,14 @@ public class Scoreboard {
 
             board.add(formatSpacing(Utils.translate("&6You are in a race!")));
             board.add(formatSpacing(Utils.translate("&7vs. &c" + Parkour.getRaceManager().get(player)
-                                                                      .getOpponent(player).getName())));
+                    .getOpponent(player).getName())));
+
+        // event section of scoreboard
+        } else if (eventManager.isEventRunning() && eventManager.get(player.getUniqueId().toString()) != null) {
+
+            board.add(formatSpacing(Utils.translate("&7You are in an event!")));
+            board.add(formatSpacing(Utils.translate("&aType &2&l" +
+                                    eventManager.formatName(eventManager.getEventType()))));
 
         // level section of scoreboard
         } else if (level != null) {

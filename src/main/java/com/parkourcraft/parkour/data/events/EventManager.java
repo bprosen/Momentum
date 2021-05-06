@@ -1,18 +1,23 @@
 package com.parkourcraft.parkour.data.events;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class EventManager {
 
     private Event runningEvent = null;
     private BukkitTask maxRunTimer;
+    private List<EventParticipant> participants = new ArrayList<>();
 
     public EventManager() {
         startScheduler();
@@ -82,9 +87,8 @@ public class EventManager {
         maxRunTimer.cancel();
 
         // then teleport all players back to where they entered
-        for (String participant : runningEvent.getParticipants()) {
-            Player participantPlayer = Bukkit.getPlayer(participant);
-            removeParticipant(participantPlayer);
+        for (EventParticipant participant : participants) {
+            removeParticipant(participant.getPlayer());
         }
 
         if (forceEnded) {
@@ -112,34 +116,61 @@ public class EventManager {
         return runningEvent;
     }
 
+    public EventType getEventType() {
+        return runningEvent.getEventType();
+    }
+
     public boolean isEventRunning() {
         if (runningEvent != null)
             return true;
         return false;
     }
 
-    public boolean isParticipant(Player player) {
-        boolean participant = false;
+    /*
+        Event Participant Section
+     */
+    public EventParticipant get(String UUID) {
+        for (EventParticipant eventParticipant : participants)
+            if (eventParticipant.getPlayer().getUniqueId().toString().equalsIgnoreCase(UUID))
+                return eventParticipant;
 
-        if (isEventRunning() && runningEvent.isParticipant(player))
-            participant = true;
-
-        return participant;
+        return null;
     }
+
     public void addParticipant(Player player) {
-        if (!runningEvent.isParticipant(player)) {
-            runningEvent.addParticipant(player);
+        if (get(player.getUniqueId().toString()) == null) {
+
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            EventParticipant eventParticipant = new EventParticipant(player, playerStats.getLevel());
+
+            // set cache and data
+            participants.add(eventParticipant);
+            playerStats.setLevel(runningEvent.getLevel().getName());
             player.teleport(runningEvent.getLevel().getStartLocation());
         }
     }
 
     public void removeParticipant(Player player) {
-        if (runningEvent.isParticipant(player)) {
-            player.teleport(runningEvent.getOriginalLoc(player));
-            runningEvent.removeParticipant(player);
+        EventParticipant eventParticipant = get(player.getUniqueId().toString());
+
+        if (eventParticipant != null) {
+
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            // reset the cache and teleport player back
+            playerStats.setLevel(eventParticipant.getOriginalLevel());
+            player.teleport(eventParticipant.getOriginalLocation());
+
+            participants.remove(eventParticipant);
         }
     }
 
+    public List<EventParticipant> getParticipants() {
+        return participants;
+    }
+
+    /*
+        Misc Utilities
+     */
     public String formatName(EventType eventType) {
         if (eventType == EventType.PVP)
             return "PvP";
