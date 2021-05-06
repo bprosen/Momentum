@@ -33,7 +33,10 @@ public class EventManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (runningEvent == null) {
+                // check if there is enough people online and an event isnt running
+                if (runningEvent == null &&
+                    Bukkit.getOnlinePlayers().size() >= Parkour.getSettingsManager().min_players_online) {
+
                     // get random type from list
                     EventType[] eventTypes = EventType.values();
                     Random ran = new Random();

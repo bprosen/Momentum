@@ -30,6 +30,7 @@ public class SettingsManager {
     public int event_reminder_delay;
     public int max_event_run_time;
     public int check_next_event_delay;
+    public int min_players_online;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
@@ -57,5 +58,6 @@ public class SettingsManager {
         event_reminder_delay = settings.getInt("event.reminder_delay");
         max_event_run_time = settings.getInt("event.max_run_time");
         check_next_event_delay = settings.getInt("event.check_next_event_delay");
+        min_players_online = settings.getInt("event.min_players_online");
     }
 }

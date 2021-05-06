@@ -73,33 +73,41 @@ public class InteractListener implements Listener {
                 String levelName = playerStats.getLevel();
 
                 if (!playerStats.inRace()) {
-                    if (levelName != null) {
-                        Level level = Parkour.getLevelManager().get(levelName);
-                        if (level != null) {
+                    if (!playerStats.isEventParticipant()) {
+                        if (playerStats.getPlayerToSpectate() == null) {
+                            if (levelName != null) {
+                                Level level = Parkour.getLevelManager().get(levelName);
+                                if (level != null) {
 
-                            // gets if they have right clicked it already, if so, cancel the task and reset them
-                            if (confirmMap.containsKey(player.getName())) {
-                                confirmMap.get(player.getName()).cancel();
-                                confirmMap.remove(player.getName());
-                                playerStats.resetCheckpoint();
-                                playerStats.resetPracticeMode();
-                                player.teleport(level.getStartLocation());
-                            } else {
-                                // otherwise, put them in and ask them to confirm within 5 seconds
-                                player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+                                    // gets if they have right clicked it already, if so, cancel the task and reset them
+                                    if (confirmMap.containsKey(player.getName())) {
+                                        confirmMap.get(player.getName()).cancel();
+                                        confirmMap.remove(player.getName());
+                                        playerStats.resetCheckpoint();
+                                        playerStats.resetPracticeMode();
+                                        player.teleport(level.getStartLocation());
+                                    } else {
+                                        // otherwise, put them in and ask them to confirm within 5 seconds
+                                        player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
 
-                                confirmMap.put(player.getName(), new BukkitRunnable() {
-                                    public void run() {
-                                        if (confirmMap.containsKey(player.getName())) {
-                                            confirmMap.remove(player.getName());
-                                            player.sendMessage(Utils.translate("&cYou did not confirm in time"));
-                                        }
+                                        confirmMap.put(player.getName(), new BukkitRunnable() {
+                                            public void run() {
+                                                if (confirmMap.containsKey(player.getName())) {
+                                                    confirmMap.remove(player.getName());
+                                                    player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                                }
+                                            }
+                                        }.runTaskLater(Parkour.getPlugin(), 20 * 5));
                                     }
-                                }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                                }
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou are not in a level"));
                             }
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
                         }
                     } else {
-                        player.sendMessage(Utils.translate("&cYou are not in a level"));
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
