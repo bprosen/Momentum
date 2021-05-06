@@ -78,6 +78,14 @@ public class LevelHandler {
         StatsDB.insertCompletion(playerStats, level, levelCompletion);
         level.addCompletion(player, levelCompletion, level); // Update totalLevelCompletionsCount
 
+        // run commands if there is any
+        if (level.hasCommands()) {
+            for (String commandString : level.getCommands()) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                       commandString.replace("%player%", player.getName()));
+            }
+        }
+
         // Update player information
         playerStats.levelCompletion(levelName, levelCompletion);
         Parkour.getEconomy().depositPlayer(player, level.getReward());

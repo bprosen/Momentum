@@ -193,4 +193,13 @@ public class LevelsYAML {
 
         return new Location(world, x, y, z, yaw, pitch);
     }
+
+    public static List<String> getCommands(String levelName) {
+        List<String> tempList = new ArrayList<>();
+
+        if (levelsFile.isList(levelName + ".commands"))
+            tempList = levelsFile.getStringList(levelName + ".commands");
+
+        return tempList;
+    }
 }

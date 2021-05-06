@@ -38,6 +38,7 @@ public class Level {
 
     private int totalCompletionsCount = -1;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
+    private List<String> commands = new ArrayList<>();
 
     public Level(String levelName) {
         this.name = levelName;
@@ -107,6 +108,14 @@ public class Level {
 
     public int getID() {
         return ID;
+    }
+
+    public List<String> getCommands() { return commands; }
+
+    public boolean hasCommands() {
+        if (!commands.isEmpty())
+            return true;
+        return false;
     }
 
     public void setTotalCompletionsCount(int count) {
@@ -253,6 +262,7 @@ public class Level {
             broadcastCompletion = LevelsYAML.getBroadcastSetting(name);
             requiredLevels = LevelsYAML.getRequiredLevels(name);
             potionEffects = LevelsYAML.getPotionEffects(name);
+            commands = LevelsYAML.getCommands(name);
         }
     }
 
