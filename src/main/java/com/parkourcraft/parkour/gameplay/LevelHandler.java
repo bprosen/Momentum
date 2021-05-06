@@ -40,7 +40,7 @@ public class LevelHandler {
                             if (!level.isRankUpLevel()) {
                                 // if level is not an event level, it is guaranteed normal completion
                                 if (!level.isEventLevel())
-                                    dolevelCompletion(playerStats, player, level, levelName, false);
+                                    dolevelCompletion(playerStats, player, level, levelName, false, false);
                                 // otherwise, if there is an event running, end!
                                 else if (eventManager.isEventRunning())
                                     eventManager.endEvent(player, false, false);
@@ -49,7 +49,7 @@ public class LevelHandler {
                                     player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
 
                             } else if (playerStats.getRankUpStage() == 2)
-                                dolevelCompletion(playerStats, player, level, levelName, true);
+                                dolevelCompletion(playerStats, player, level, levelName, true, false);
                         } else {
                             // if in race
                             Parkour.getRaceManager().endRace(player);
@@ -66,7 +66,7 @@ public class LevelHandler {
         }
     }
 
-    private static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean rankUpLevel) {
+    public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean rankUpLevel, boolean forcedCompletion) {
 
         Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
         LevelCompletion levelCompletion = new LevelCompletion(
@@ -96,22 +96,6 @@ public class LevelHandler {
                 Parkour.getPerkManager().syncPermissions(player);
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
-
-        // run gameplay actions: teleport and messaging
-        player.teleport(level.getRespawnLocation());
-        List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());
-
-        // if area they are teleporting to is empty
-        // if not empty, make sure it is a level
-        // if not a level (like spawn), reset level
-        if (getToRegions.isEmpty())
-            playerStats.resetLevel();
-        else if (Parkour.getLevelManager().get(getToRegions.get(0)) != null)
-            playerStats.setLevel(getToRegions.get(0));
-        else
-            playerStats.resetLevel();
-
-        Parkour.getStatsManager().get(player).resetCheckpoint();
 
         if (!rankUpLevel) {
 
@@ -143,21 +127,57 @@ public class LevelHandler {
                     titleMessage
             );
 
-            // broadcast completed if it the featured level
-            if (levelName.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName())) {
-                Bukkit.broadcastMessage(Utils.translate(
-                        "&c&l" + player.getName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
-                ));
-            } else if (level.getBroadcastCompletion()) {
-                String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
+            // only broadcast if it is not a forced completion
+            if (!forcedCompletion) {
+                // broadcast completed if it the featured level
+                if (levelName.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName())) {
+                    Bukkit.broadcastMessage(Utils.translate(
+                            "&c&l" + player.getName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
+                    ));
+                } else if (level.getBroadcastCompletion()) {
+                    String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
 
-                broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
-                broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
+                    broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
+                    broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
 
-                Bukkit.broadcastMessage(broadcastMessage);
+                    Bukkit.broadcastMessage(broadcastMessage);
+                }
             }
         } else {
             Parkour.getRanksManager().doRankUp(player);
+        }
+
+        // run teleport and location management if not forced completion
+        if (!forcedCompletion) {
+            // run gameplay actions: teleport and messaging
+            player.teleport(level.getRespawnLocation());
+            List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());
+
+            // if area they are teleporting to is empty
+            // if not empty, make sure it is a level
+            // if not a level (like spawn), reset level
+            if (getToRegions.isEmpty())
+                playerStats.resetLevel();
+            else if (Parkour.getLevelManager().get(getToRegions.get(0)) != null)
+                playerStats.setLevel(getToRegions.get(0));
+            else
+                playerStats.resetLevel();
+
+            Parkour.getStatsManager().get(player).resetCheckpoint();
+        /*
+         if the level has required levels and the player does not have them,
+         then loop through and redo this method until they have them all
+         */
+        } else if (!level.hasRequiredLevels(playerStats) && !level.getRequiredLevels().isEmpty()) {
+
+            for (String requiredLevelName : level.getRequiredLevels()) {
+
+                if (playerStats.getLevelCompletionsCount(requiredLevelName) < 1) {
+                    Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
+
+                    dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, false, true);
+                }
+            }
         }
     }
 

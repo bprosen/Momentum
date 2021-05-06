@@ -2,11 +2,15 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.levels.LevelsDB;
 import com.parkourcraft.parkour.data.levels.LevelsYAML;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
+import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,7 +24,10 @@ public class LevelCMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (sender.isOp() || !(sender instanceof  Player)) {
+        if (sender.isOp() || !(sender instanceof Player)) {
+
+            LevelManager levelManager = Parkour.getLevelManager();
+
             if (a.length == 0) {
                 sendHelp(sender);
             } else {
@@ -33,14 +40,14 @@ public class LevelCMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("list")) { // subcommand: list
                     sender.sendMessage(Utils.translate("&7Levels loaded in: &2" + String.join("&7, &2",
-                                       Parkour.getLevelManager().getNames())));
+                            levelManager.getNames())));
                 } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
                     if (a.length == 2) {
                         String levelName = a[1].toLowerCase();
 
                         if (levelName.contains("'"))
                             sender.sendMessage(Utils.translate("&7Please do not use ' ..."));
-                        else if (Parkour.getLevelManager().exists(levelName))
+                        else if (levelManager.exists(levelName))
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7already exists"));
                         else {
                             LevelsYAML.create(levelName);
@@ -54,10 +61,10 @@ public class LevelCMD implements CommandExecutor {
                     if (a.length == 2) {
                         String levelName = a[1].toLowerCase();
 
-                        if (!Parkour.getLevelManager().exists(levelName))
+                        if (!levelManager.exists(levelName))
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                         else {
-                            Parkour.getLevelManager().remove(levelName);
+                            levelManager.remove(levelName);
                             sender.sendMessage(Utils.translate("&7Deleted level &2" + levelName));
                         }
                     } else {
@@ -67,14 +74,14 @@ public class LevelCMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("load")) { // subcommand: load
                     Parkour.getConfigManager().load("levels");
                     sender.sendMessage(Utils.translate("&7Loaded &2levels.yml &7from disk"));
-                    Parkour.getLevelManager().load();
+                    levelManager.load();
                     sender.sendMessage(Utils.translate("&7Loaded levels from &2levels.yml&7, &a" +
                                        Parkour.getLevelManager().getNames().size() + " &7total"));
                 } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
                     if (a.length > 1) {
                         String levelName = a[1].toLowerCase();
 
-                        if (Parkour.getLevelManager().exists(levelName)) {
+                        if (levelManager.exists(levelName)) {
                             if (a.length > 2) {
                                 String title = "";
                                 for (int i = 2; i < a.length; i++)
@@ -98,7 +105,7 @@ public class LevelCMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
                     if (a.length > 1) {
                         String levelName = a[1].toLowerCase();
-                        Level level = Parkour.getLevelManager().get(levelName);
+                        Level level = levelManager.get(levelName);
 
                         if (level != null) {
                             if (a.length == 3) {
@@ -176,7 +183,7 @@ public class LevelCMD implements CommandExecutor {
                                     String completionLocationName = levelName + "-completion";
 
                                     Parkour.getLocationManager().save(completionLocationName, playerLocation);
-                                    Parkour.getLevelManager().load(levelName);
+                                    levelManager.load(levelName);
 
                                     sender.sendMessage(Utils.translate("&7Location saved as &2" +
                                                        completionLocationName + " &7for &2" + levelName));
@@ -218,7 +225,7 @@ public class LevelCMD implements CommandExecutor {
                     if (a.length > 1) {
                         String levelName = a[1].toLowerCase();
 
-                        if (Parkour.getLevelManager().exists(levelName)) {
+                        if (levelManager.exists(levelName)) {
                             if (a.length == 3) {
                                 if (Utils.isInteger(a[2])) {
                                     LevelsYAML.setMaxCompletions(levelName, Integer.parseInt(a[2]));
@@ -242,7 +249,7 @@ public class LevelCMD implements CommandExecutor {
                     if (a.length > 1) {
                         String levelName = a[1].toLowerCase();
 
-                        if (Parkour.getLevelManager().exists(levelName)) {
+                        if (levelManager.exists(levelName)) {
                             boolean broadcastSetting = LevelsYAML.getBroadcastSetting(levelName);
 
                             LevelsYAML.setBroadcast(levelName, !broadcastSetting);
@@ -277,7 +284,7 @@ public class LevelCMD implements CommandExecutor {
                                     sender.sendMessage(Utils.translate("&7Added &2" + a[2] + " &7to required levels"));
                                 }
                             }
-                            level = Parkour.getLevelManager().get(levelName);
+                            level = levelManager.get(levelName);
                             sender.sendMessage(Utils.translate("&2" + levelName + "&7'srequired levels: &2" +
                                                String.join("&7, &2", level.getRequiredLevels())));
 
@@ -292,7 +299,7 @@ public class LevelCMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("removetime") && a.length == 3) {
 
                     String levelName = a[1].toLowerCase();
-                    Level level = Parkour.getLevelManager().get(levelName);
+                    Level level = levelManager.get(levelName);
 
                     if (Utils.isInteger(a[2])) {
 
@@ -366,8 +373,8 @@ public class LevelCMD implements CommandExecutor {
                     if (a[2].equalsIgnoreCase("player1") || a[2].equalsIgnoreCase("player2")) {
                         String levelName = a[1].toLowerCase();
 
-                        if (Parkour.getLevelManager().exists(levelName)) {
-                            if (Parkour.getLevelManager().get(levelName).isRaceLevel()) {
+                        if (levelManager.exists(levelName)) {
+                            if (levelManager.get(levelName).isRaceLevel()) {
                                 LevelsYAML.setPlayerRaceLocation(a[2], levelName, player.getLocation());
                                 player.sendMessage(Utils.translate("&cYou set the location for &4" + a[2] + " &con level &4" + levelName));
                             } else {
@@ -378,6 +385,29 @@ public class LevelCMD implements CommandExecutor {
                         }
                     } else {
                         sender.sendMessage(Utils.translate("&cPlayer must be player1 or player2"));
+                    }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("forcecompletion")) {
+                    Player target = Bukkit.getPlayer(a[1]);
+                    String levelName = a[2].toLowerCase();
+
+                    if (target == null) {
+                        sender.sendMessage(Utils.translate("&4" + target + " &cis not online!"));
+                        return true;
+                    }
+
+                    PlayerStats playerStats = Parkour.getStatsManager().get(target);
+
+                    if (levelManager.exists(levelName)) {
+
+                        Level level = levelManager.get(levelName);
+                        boolean isRankUpLevel = false;
+
+                        if (level.isRankUpLevel())
+                            isRankUpLevel = true;
+
+                        LevelHandler.dolevelCompletion(playerStats, target, level, levelName, isRankUpLevel, true);
+                    } else {
+                        sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -409,6 +439,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("modifier"));
         sender.sendMessage(getHelp("removetime"));
         sender.sendMessage(getHelp("raceset"));
+        sender.sendMessage(getHelp("forcecompletion"));
     }
 
     private static String getHelp(String cmd) {
@@ -446,6 +477,8 @@ public class LevelCMD implements CommandExecutor {
                                       "from a level's leaderboard");
             case "raceset":
                 return Utils.translate("&a/level raceset <level> <player1/player2>  &7Sets the race location for player 1 or 2");
+            case "forcecompletion":
+                return Utils.translate("&a/level forcecompletion <player> <level>  &7Force completion for player");
         }
         return "";
     }
