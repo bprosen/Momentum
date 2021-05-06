@@ -9,7 +9,9 @@ import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -189,6 +191,10 @@ public class MenuItemFormatter {
             // Personal Level Stats Section
             int levelCompletionsCount = playerStats.getLevelCompletionsCount(level.getName());
             if (levelCompletionsCount > 0) {
+                // add glow effect to all levels they have completed
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
                 itemLore.add("");
 
                 String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
