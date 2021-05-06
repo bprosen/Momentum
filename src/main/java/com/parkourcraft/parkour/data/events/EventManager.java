@@ -165,9 +165,11 @@ public class EventManager {
         if (CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel()))
             CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel());
 
+        // do all setting changes to revert back
         playerStats.setLevel(eventParticipant.getOriginalLevel());
         playerStats.leftEvent();
         player.teleport(eventParticipant.getOriginalLocation());
+        player.setHealth(20.0);
 
         participants.remove(eventParticipant);
     }

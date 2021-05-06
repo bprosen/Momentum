@@ -13,25 +13,33 @@ public class CheckpointManager {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (!playerStats.inRace()) {
+            if (!playerStats.isEventParticipant()) {
+                if (playerStats.getPlayerToSpectate() == null) {
 
-            Location loc = null;
-            /*
-             check if there is a practice location,
-             if not then check if the loc is checkpoint and
-             adjust the x and z to teleport to middle
-             */
-            if (playerStats.getPracticeLocation() != null)
-                loc = playerStats.getPracticeLocation().clone();
-            else if (playerStats.getCheckpoint() != null)
-                loc = playerStats.getCheckpoint().clone().add(0.5, 0, 0.5);
+                    Location loc = null;
+                    /*
+                     check if there is a practice location,
+                     if not then check if the loc is checkpoint and
+                     adjust the x and z to teleport to middle
+                     */
+                    if (playerStats.getPracticeLocation() != null)
+                        loc = playerStats.getPracticeLocation().clone();
+                    else if (playerStats.getCheckpoint() != null)
+                        loc = playerStats.getCheckpoint().clone().add(0.5, 0, 0.5);
 
-            if (loc != null) {
+                    if (loc != null) {
 
-                loc.setPitch(player.getLocation().getPitch());
-                loc.setYaw(player.getLocation().getYaw());
-                player.teleport(loc);
+                        loc.setPitch(player.getLocation().getPitch());
+                        loc.setYaw(player.getLocation().getYaw());
+                        player.teleport(loc);
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                }
             } else {
-                player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
             }
         } else {
             player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
