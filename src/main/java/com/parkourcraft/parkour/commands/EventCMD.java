@@ -31,32 +31,33 @@ public class EventCMD implements CommandExecutor {
             // join event
             if (a.length == 1 && a[0].equalsIgnoreCase("join")) {
 
+                // run through all the conditions that would not allow them to join
                 if (eventManager.isEventRunning()) {
-
                     if (eventManager.get(player.getUniqueId().toString()) == null) {
-
-                        if (playerStats.getPracticeLocation() != null) {
-
+                        if (playerStats.getPracticeLocation() == null) {
+                            if (playerStats.getPlayerToSpectate() == null) {
+                                if (!playerStats.inRace()) {
+                                    if (!PlayerHider.containsPlayer(player)) {
+                                        if (!eventManager.isEliminated(player)) {
+                                            eventManager.addParticipant(player);
+                                        } else {
+                                            player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
+                                        }
+                                    } else {
+                                        player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
+                                    }
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                }
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                            }
+                        } else {
                             player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-                            return true;
-                        } else if (playerStats.getPlayerToSpectate() != null) {
-
-                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
-                            return true;
-                        } else if (playerStats.inRace()) {
-
-                            player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
-                            return true;
-                        } else if (PlayerHider.containsPlayer(player)) {
-
-                            player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
-                            return true;
                         }
-
-                        eventManager.addParticipant(player);
-                    } else
+                    } else {
                         player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
-
+                    }
                 } else {
                     player.sendMessage(Utils.translate("&cThere is no event running!"));
                 }
@@ -131,36 +132,36 @@ public class EventCMD implements CommandExecutor {
         // join event
         } else if (a.length == 1 && a[0].equalsIgnoreCase("join")) {
 
+            // run through all the conditions that would not allow them to join
             if (eventManager.isEventRunning()) {
-
                 if (eventManager.get(player.getUniqueId().toString()) == null) {
-
-                    if (playerStats.getPracticeLocation() != null) {
-
+                    if (playerStats.getPracticeLocation() == null) {
+                        if (playerStats.getPlayerToSpectate() == null) {
+                            if (!playerStats.inRace()) {
+                                if (!PlayerHider.containsPlayer(player)) {
+                                    if (!eventManager.isEliminated(player)) {
+                                        eventManager.addParticipant(player);
+                                    } else {
+                                        player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
+                                    }
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
+                                }
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                        }
+                    } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-                        return true;
-                    } else if (playerStats.getPlayerToSpectate() != null) {
-
-                        player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
-                        return true;
-                    } else if (playerStats.inRace()) {
-
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
-                        return true;
-                    } else if (PlayerHider.containsPlayer(player)) {
-
-                        player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
-                        return true;
                     }
-
-                    eventManager.addParticipant(player);
-                } else
+                } else {
                     player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
-
+                }
             } else {
                 player.sendMessage(Utils.translate("&cThere is no event running!"));
             }
-
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("leave") ||
                                      a[0].equalsIgnoreCase("quit"))) {
 

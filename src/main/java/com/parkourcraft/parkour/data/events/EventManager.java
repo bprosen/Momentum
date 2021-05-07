@@ -17,6 +17,7 @@ public class EventManager {
     private Event runningEvent = null;
     private BukkitTask maxRunTimer;
     private List<EventParticipant> participants = new ArrayList<>();
+    private List<String> eliminated = new ArrayList<>();
 
     public EventManager() {
         startScheduler();
@@ -90,6 +91,8 @@ public class EventManager {
 
         // then remove all participants
         removeAllParticipants(false);
+        // clear eliminated list
+        eliminated.clear();
 
         if (forceEnded) {
             Bukkit.broadcastMessage("");
@@ -186,6 +189,24 @@ public class EventManager {
 
     public List<EventParticipant> getParticipants() {
         return participants;
+    }
+
+    public List<String> getEliminatedParticipants() {
+        return eliminated;
+    }
+
+    public boolean isEliminated(Player player) {
+        if (eliminated.contains(player.getName()))
+            return true;
+        return false;
+    }
+
+    public void addEliminated(Player player) {
+        eliminated.add(player.getName());
+    }
+
+    public void removeEliminated(Player player) {
+        eliminated.remove(player.getName());
     }
 
     /*

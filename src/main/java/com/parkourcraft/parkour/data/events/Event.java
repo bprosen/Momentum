@@ -73,7 +73,8 @@ public class Event {
                 // set all participants to 0.5 health if setting is enabled
                 if (halfAHeart && !fullHealth)
                     for (EventParticipant particpant : eventManager.getParticipants())
-                        particpant.getPlayer().setHealth(0.5);
+                        if (particpant.getPlayer().getHealth() > 0.5)
+                            particpant.getPlayer().setHealth(0.5);
 
                 // rise water by 1 y
                 if (risingWater) {
@@ -83,6 +84,7 @@ public class Event {
                 if (!halfAHeart && fullHealth)
                     for (EventParticipant particpant : eventManager.getParticipants())
                         particpant.getPlayer().setHealth(20.0);
+
             }
         }.runTaskTimer(Parkour.getPlugin(), taskDelay, taskDelay);
     }
