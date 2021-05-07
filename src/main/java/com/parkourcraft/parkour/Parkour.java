@@ -111,6 +111,7 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new RespawnListener(), this);
         getServer().getPluginManager().registerEvents(new PacketListener(), this);
+        getServer().getPluginManager().registerEvents(new DamageListener(), this);
     }
 
     private void registerCommands() {

@@ -42,3 +42,4 @@ event:
   max_run_time: 1800
   check_next_event_delay: 7200
   min_players_online: 5
+  anvil_spawn_percentage: 0.9

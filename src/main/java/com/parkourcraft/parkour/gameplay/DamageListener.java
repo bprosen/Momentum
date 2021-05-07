@@ -8,31 +8,30 @@ import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public class DamageListener implements Listener {
 
     @EventHandler
-    public void onDamagePlayer(EntityDamageByEntityEvent event) {
+    public void onDamagePlayer(EntityDamageEvent event) {
 
-        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-
-            Player damager = (Player) event.getDamager();
-            Player victim = (Player) event.getEntity();
+        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
 
             EventManager eventManager = Parkour.getEventManager();
 
             // only run code if event is running and type HALF_HEART
             if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.HALF_HEART) {
 
-                PlayerStats damagerStats = Parkour.getStatsManager().get(damager.getUniqueId().toString());
+                Player victim = (Player) event.getEntity();
                 PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
 
+                // cancel damage event just for safety
+                event.setCancelled(true);
                 // only run code if they are both participants, therefore the victim is eliminated
-                if (victimStats.isEventParticipant() && damagerStats.isEventParticipant()) {
+                if (victimStats.isEventParticipant()) {
 
-                    // then cancel and remove
-                    event.setCancelled(true);
+                    // then cancel and remove, and do firework
+                    eventManager.doFireworkExplosion(victim.getLocation());
                     eventManager.removeParticipant(victim, false);
                     eventManager.addEliminated(victim);
                     victim.sendMessage(Utils.translate("&7You were hit and got &beliminated out &7of the event!"));

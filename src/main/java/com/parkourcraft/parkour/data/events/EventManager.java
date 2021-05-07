@@ -5,7 +5,12 @@ import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
@@ -191,7 +196,7 @@ public class EventManager {
         return participants;
     }
 
-    public List<String> getEliminatedParticipants() {
+    public List<String> getEliminated() {
         return eliminated;
     }
 
@@ -207,6 +212,32 @@ public class EventManager {
 
     public void removeEliminated(Player player) {
         eliminated.remove(player.getName());
+    }
+
+    public void doFireworkExplosion(Location location) {
+
+        Firework firework = location.getWorld().spawn(location, Firework.class);
+        FireworkMeta meta = firework.getFireworkMeta();
+
+        meta.clearEffects();
+
+        // build the firework and then set the new one
+        FireworkEffect effect = FireworkEffect.builder()
+                .flicker(false)
+                .trail(false)
+                .with(FireworkEffect.Type.BURST)
+                .withColor(Color.RED)
+                .withFade(Color.RED)
+                .build();
+
+        meta.addEffect(effect);
+        firework.setFireworkMeta(meta);
+
+        new BukkitRunnable() {
+            public void run() {
+                firework.detonate();
+            }
+        }.runTaskLater(Parkour.getPlugin(), 1);
     }
 
     /*
@@ -225,6 +256,7 @@ public class EventManager {
 
     public void shutdown() {
         if (isEventRunning()) {
+            runningEvent.getScheduler().cancel();
             removeAllParticipants(true);
             runningEvent = null;
         }

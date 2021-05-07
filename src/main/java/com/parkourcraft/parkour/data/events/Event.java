@@ -2,16 +2,29 @@ package com.parkourcraft.parkour.data.events;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.FallingSand;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Event {
 
     private EventType eventType;
     private BukkitTask scheduler;
     private Level eventLevel;
+    private ProtectedRegion levelRegion;
 
     /*
         Game Settings
@@ -24,7 +37,7 @@ public class Event {
     /*
         Settings for Rising Water
      */
-    private int startingY;
+    private int currentY;
 
     public Event(EventType eventType) {
         this.eventType = eventType;
@@ -47,7 +60,7 @@ public class Event {
                 break;
             case HALF_HEART:
                 halfAHeart = true;
-                taskDelay = 1;
+                taskDelay = 5;
 
                 List<Level> halfHeartLevels = Parkour.getLevelManager().getHalfHeartEventLevels();
                 eventLevel = halfHeartLevels.get(ran.nextInt(halfHeartLevels.size()));
@@ -58,8 +71,11 @@ public class Event {
 
                 List<Level> risingWaterLevels = Parkour.getLevelManager().getRisingWaterEventLevels();
                 eventLevel = risingWaterLevels.get(ran.nextInt(risingWaterLevels.size()));
+                currentY = eventLevel.getStartLocation().getBlockY() - 10;
                 break;
         }
+        // get level region
+        levelRegion = WorldGuard.getRegion(eventLevel.getStartLocation());
     }
 
     public void runScheduler() {
@@ -71,20 +87,55 @@ public class Event {
             public void run() {
 
                 // set all participants to 0.5 health if setting is enabled
-                if (halfAHeart && !fullHealth)
-                    for (EventParticipant particpant : eventManager.getParticipants())
-                        if (particpant.getPlayer().getHealth() > 0.5)
-                            particpant.getPlayer().setHealth(0.5);
+                if (halfAHeart) {
+                    for (EventParticipant participant : eventManager.getParticipants()) {
+
+                        if (participant.getPlayer().getHealth() > 0.5)
+                            participant.getPlayer().setHealth(0.5);
+
+                    }
+
+                    // variables for the region's bounds
+                    BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();
+                    BlockVector minPoint = levelRegion.getMinimumPoint().toBlockPoint();
+                    int minX = minPoint.getBlockX();
+                    int maxX = maxPoint.getBlockX();
+                    int minZ = minPoint.getBlockZ();
+                    int maxZ = maxPoint.getBlockZ();
+
+                    for (int i = minX; i <= maxX; i++) {
+                        for (int j = minZ; j <= maxZ; j++) {
+                            // get percent from 0 to 101
+                            double percent = ThreadLocalRandom.current().nextDouble(0, 101);
+
+                            // if the percent is less than the value, then spawn the anvil at i (x) and j (y)
+                            if (percent <= Parkour.getSettingsManager().anvil_spawn_percentage) {
+
+                                World world = eventLevel.getStartLocation().getWorld();
+                                Location spawnLocation = new Location(
+                                        world,
+                                        i,
+                                        eventLevel.getStartLocation().getBlockY() + 40,
+                                        j);
+
+                                ItemStack itemStack = new ItemStack(Material.ANVIL);
+                                FallingBlock fallingBlock = world.spawnFallingBlock(spawnLocation, itemStack.getData());
+                                fallingBlock.setDropItem(false);
+                                fallingBlock.setHurtEntities(true);
+                            }
+                        }
+                    }
+                }
 
                 // rise water by 1 y
                 if (risingWater) {
 
                 }
 
-                if (!halfAHeart && fullHealth)
+                if (fullHealth) {
                     for (EventParticipant particpant : eventManager.getParticipants())
                         particpant.getPlayer().setHealth(20.0);
-
+                }
             }
         }.runTaskTimer(Parkour.getPlugin(), taskDelay, taskDelay);
     }

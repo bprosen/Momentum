@@ -48,15 +48,22 @@ public class SpawnCMD implements CommandExecutor {
         Location loc = Parkour.getLocationManager().getLobbyLocation();
 
         if (loc != null) {
-            player.teleport(loc);
+
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (playerStats.getCheckpoint() != null) {
-                CheckpointDB.savePlayerAsync(player);
-                playerStats.resetCheckpoint();
+            if (!playerStats.isEventParticipant()) {
+
+                player.teleport(loc);
+
+                if (playerStats.getCheckpoint() != null) {
+                    CheckpointDB.savePlayerAsync(player);
+                    playerStats.resetCheckpoint();
+                }
+                playerStats.resetPracticeMode();
+                playerStats.resetLevel();
+            } else {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
             }
-            playerStats.resetPracticeMode();
-            playerStats.resetLevel();
         } else {
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
         }
