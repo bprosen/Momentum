@@ -150,8 +150,10 @@ public class EventManager {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // save checkpoint
-        if (playerStats.getCheckpoint() != null)
+        if (playerStats.getCheckpoint() != null) {
             CheckpointDB.savePlayerAsync(player);
+            playerStats.resetCheckpoint();
+        }
 
         EventParticipant eventParticipant = new EventParticipant(player, playerStats.getLevel());
         participants.add(eventParticipant);

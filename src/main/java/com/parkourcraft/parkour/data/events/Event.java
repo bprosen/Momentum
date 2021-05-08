@@ -5,12 +5,10 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.FallingSand;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -60,7 +58,7 @@ public class Event {
                 break;
             case HALF_HEART:
                 halfAHeart = true;
-                taskDelay = 5;
+                taskDelay = 15;
 
                 List<Level> halfHeartLevels = Parkour.getLevelManager().getHalfHeartEventLevels();
                 eventLevel = halfHeartLevels.get(ran.nextInt(halfHeartLevels.size()));
@@ -86,55 +84,58 @@ public class Event {
             @Override
             public void run() {
 
-                // set all participants to 0.5 health if setting is enabled
-                if (halfAHeart) {
-                    for (EventParticipant participant : eventManager.getParticipants()) {
+                // dont do scheduler if nobody is playing
+                if (!eventManager.getParticipants().isEmpty()) {
+                    // set all participants to 0.5 health if setting is enabled
+                    if (halfAHeart) {
+                        for (EventParticipant participant : eventManager.getParticipants()) {
 
-                        if (participant.getPlayer().getHealth() > 0.5)
-                            participant.getPlayer().setHealth(0.5);
+                            if (participant.getPlayer().getHealth() > 0.5)
+                                participant.getPlayer().setHealth(0.5);
 
-                    }
+                        }
 
-                    // variables for the region's bounds
-                    BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();
-                    BlockVector minPoint = levelRegion.getMinimumPoint().toBlockPoint();
-                    int minX = minPoint.getBlockX();
-                    int maxX = maxPoint.getBlockX();
-                    int minZ = minPoint.getBlockZ();
-                    int maxZ = maxPoint.getBlockZ();
+                        // variables for the region's bounds
+                        BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();
+                        BlockVector minPoint = levelRegion.getMinimumPoint().toBlockPoint();
+                        int minX = minPoint.getBlockX();
+                        int maxX = maxPoint.getBlockX();
+                        int minZ = minPoint.getBlockZ();
+                        int maxZ = maxPoint.getBlockZ();
 
-                    for (int i = minX; i <= maxX; i++) {
-                        for (int j = minZ; j <= maxZ; j++) {
-                            // get percent from 0 to 101
-                            double percent = ThreadLocalRandom.current().nextDouble(0, 101);
+                        for (int i = minX; i <= maxX; i++) {
+                            for (int j = minZ; j <= maxZ; j++) {
+                                // get percent from 0 to 101
+                                double percent = ThreadLocalRandom.current().nextDouble(0, 101);
 
-                            // if the percent is less than the value, then spawn the anvil at i (x) and j (y)
-                            if (percent <= Parkour.getSettingsManager().anvil_spawn_percentage) {
+                                // if the percent is less than the value, then spawn the anvil at i (x) and j (y)
+                                if (percent <= Parkour.getSettingsManager().anvil_spawn_percentage) {
 
-                                World world = eventLevel.getStartLocation().getWorld();
-                                Location spawnLocation = new Location(
-                                        world,
-                                        i,
-                                        eventLevel.getStartLocation().getBlockY() + 40,
-                                        j);
+                                    World world = eventLevel.getStartLocation().getWorld();
+                                    Location spawnLocation = new Location(
+                                            world,
+                                            i,
+                                            eventLevel.getStartLocation().getBlockY() + 60,
+                                            j);
 
-                                ItemStack itemStack = new ItemStack(Material.ANVIL);
-                                FallingBlock fallingBlock = world.spawnFallingBlock(spawnLocation, itemStack.getData());
-                                fallingBlock.setDropItem(false);
-                                fallingBlock.setHurtEntities(true);
+                                    ItemStack itemStack = new ItemStack(Material.ANVIL);
+                                    FallingBlock fallingBlock = world.spawnFallingBlock(spawnLocation, itemStack.getData());
+                                    fallingBlock.setDropItem(false);
+                                    fallingBlock.setHurtEntities(true);
+                                }
                             }
                         }
                     }
-                }
 
-                // rise water by 1 y
-                if (risingWater) {
+                    // rise water by 1 y
+                    if (risingWater) {
 
-                }
+                    }
 
-                if (fullHealth) {
-                    for (EventParticipant particpant : eventManager.getParticipants())
-                        particpant.getPlayer().setHealth(20.0);
+                    if (fullHealth) {
+                        for (EventParticipant particpant : eventManager.getParticipants())
+                            particpant.getPlayer().setHealth(20.0);
+                    }
                 }
             }
         }.runTaskTimer(Parkour.getPlugin(), taskDelay, taskDelay);
