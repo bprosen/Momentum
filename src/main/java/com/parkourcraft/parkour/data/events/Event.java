@@ -115,7 +115,8 @@ public class Event {
                                     Location spawnLocation = new Location(
                                             world,
                                             i,
-                                            eventLevel.getStartLocation().getBlockY() + 60,
+                                            eventLevel.getStartLocation().getBlockY() +
+                                            Parkour.getSettingsManager().anvil_spawn_y_above_start_y,
                                             j);
 
                                     ItemStack itemStack = new ItemStack(Material.ANVIL);

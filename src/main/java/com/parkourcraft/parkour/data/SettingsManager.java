@@ -32,6 +32,7 @@ public class SettingsManager {
     public int check_next_event_delay;
     public int min_players_online;
     public double anvil_spawn_percentage;
+    public int anvil_spawn_y_above_start_y;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
@@ -61,5 +62,6 @@ public class SettingsManager {
         check_next_event_delay = settings.getInt("event.check_next_event_delay");
         min_players_online = settings.getInt("event.min_players_online");
         anvil_spawn_percentage = settings.getDouble("event.anvil_spawn_percentage");
+        anvil_spawn_y_above_start_y = settings.getInt("event.anvil_spawn_y_above_start_y");
     }
 }
