@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.rank.RanksManager;
 import com.parkourcraft.parkour.data.rank.RanksDB;
 import com.parkourcraft.parkour.data.rank.RanksYAML;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -146,6 +147,11 @@ public class RankCMD implements CommandExecutor {
     private void sendRank(Player player) {
         player.sendMessage(Utils.translate("&cYou are &6" +
                 Parkour.getStatsManager().get(player).getRank().getRankTitle()));
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
+
+        if (playerStats.getPrestiges() > 0)
+            player.sendMessage(Utils.translate("&cYou have prestiged &6" + playerStats.getPrestiges() + " times"));
     }
 
     private void sendAdminHelp(Player player) {
