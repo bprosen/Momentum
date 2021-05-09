@@ -175,6 +175,11 @@ public class RanksManager {
         // dont need to update stage as they will never hit stage 2 in max rank
         RanksDB.updateRank(player.getUniqueId(), 1);
 
+        // now add prestige to stats and database
+        playerStats.addPrestige();
+        Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + playerStats.getPrestiges() +
+                                         " WHERE uuid='" + player.getUniqueId().toString() + "'");
+
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has just &6&lPRESTIGED"));

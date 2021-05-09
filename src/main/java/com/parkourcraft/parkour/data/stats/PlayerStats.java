@@ -24,6 +24,7 @@ public class PlayerStats {
     private Location spectateSpawn = null;
     private boolean inRace = false;
     private Rank rank;
+    private int prestiges = 0;
     private int rankUpStage;
     private boolean eventParticipant = false;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
@@ -170,6 +171,11 @@ public class PlayerStats {
         return rankUpStage;
     }
 
+    public int getPrestiges() { return prestiges; }
+
+    public void addPrestige() { prestiges += 1; }
+
+    public void setPrestiges(int prestiges) { this.prestiges = prestiges; }
     //
     // Practice Mode Section
     //
