@@ -137,15 +137,20 @@ public class RankCMD implements CommandExecutor {
                     if (Utils.isInteger(a[2])) {
 
                         int newPrestige = Integer.parseInt(a[2]);
-                        // update ingame cache if theyre online
-                        if (victim != null) {
-                            PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
-                            victimStats.setPrestiges(newPrestige);
-                        }
-                        // update in db
-                        RanksDB.updatePrestiges(a[1], newPrestige);
-                        player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's Prestiges to &6" + newPrestige));
 
+                        if (newPrestige >= 0) {
+                            // update ingame cache if theyre online
+                            if (victim != null) {
+                                PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
+                                victimStats.setPrestiges(newPrestige);
+                            }
+                            // update in db
+                            RanksDB.updatePrestiges(a[1], newPrestige);
+                            player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's Prestiges to &6" + newPrestige));
+
+                        } else {
+                            player.sendMessage(Utils.translate("&cDon't try to set someone into the negatives please :)"));
+                        }
                     } else {
                         player.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
                     }

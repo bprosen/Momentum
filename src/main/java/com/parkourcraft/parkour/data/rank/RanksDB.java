@@ -31,12 +31,14 @@ public class RanksDB {
         Parkour.getDatabaseManager().add(query);
     }
 
+    // from UUID method
     public static void updatePrestiges(UUID uuid, int newAmount) {
 
         Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + newAmount +
                 " WHERE uuid='" + uuid.toString() + "'");
     }
 
+    // from playerName method
     public static void updatePrestiges(String playerName, int newAmount) {
         Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + newAmount +
                 " WHERE player_name='" + playerName + "'");
