@@ -133,6 +133,7 @@ public class Parkour extends JavaPlugin {
         getCommand("rankup").setExecutor(new RankupCMD());
         getCommand("plot").setExecutor(new PlotCMD());
         getCommand("event").setExecutor(new EventCMD());
+        getCommand("prestige").setExecutor(new PrestigeCMD());
     }
 
     private static void loadClasses() {

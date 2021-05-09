@@ -54,3 +54,5 @@ commands:
     aliases: [plots, playersubmitted, playersubmit]
   event:
     description: "PC-Parkour Events Command"
+  prestige:
+    description: "PC-Parkour Prestige Command"

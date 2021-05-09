@@ -167,8 +167,38 @@ public class RanksManager {
         Bukkit.broadcastMessage("");
     }
 
+    public void doPrestige(Player player) {
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        Rank defaultRank = get(1);
+        // update cache and database
+        playerStats.setRank(defaultRank);
+        // dont need to update stage as they will never hit stage 2 in max rank
+        RanksDB.updateRank(player.getUniqueId(), 1);
+
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has just &6&lPRESTIGED"));
+        Bukkit.broadcastMessage("");
+    }
+
     public List<Rank> getRankList() {
         return rankList;
     }
 
+    public boolean isMaxRank(Rank rank) {
+        if (rank.getRankId() == getMaxRank().getRankId())
+            return true;
+        return false;
+    }
+
+    public Rank getMaxRank() {
+
+        Rank currentMax = null;
+
+        for (Rank rank : getRankList()) {
+            if (currentMax == null || currentMax.getRankId() < rank.getRankId())
+                currentMax = rank;
+        }
+        return currentMax;
+    }
 }
