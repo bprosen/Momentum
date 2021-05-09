@@ -51,21 +51,21 @@ public class Event {
         switch (eventType) {
             case PVP:
                 fullHealth = true;
-                taskDelay = 1;
+                taskDelay = Parkour.getSettingsManager().pvp_event_task_delay;
 
                 List<Level> pvpLevels = Parkour.getLevelManager().getPvPEventLevels();
                 eventLevel = pvpLevels.get(ran.nextInt(pvpLevels.size()));
                 break;
             case HALF_HEART:
                 halfAHeart = true;
-                taskDelay = 15;
+                taskDelay = Parkour.getSettingsManager().half_heart_event_task_delay;
 
                 List<Level> halfHeartLevels = Parkour.getLevelManager().getHalfHeartEventLevels();
                 eventLevel = halfHeartLevels.get(ran.nextInt(halfHeartLevels.size()));
                 break;
             case RISING_WATER:
                 risingWater = true;
-                taskDelay = 100;
+                taskDelay = Parkour.getSettingsManager().rising_water_event_task_delay;
 
                 List<Level> risingWaterLevels = Parkour.getLevelManager().getRisingWaterEventLevels();
                 eventLevel = risingWaterLevels.get(ran.nextInt(risingWaterLevels.size()));

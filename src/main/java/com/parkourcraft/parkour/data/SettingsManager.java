@@ -33,6 +33,9 @@ public class SettingsManager {
     public int min_players_online;
     public double anvil_spawn_percentage;
     public int anvil_spawn_y_above_start_y;
+    public int pvp_event_task_delay;
+    public int half_heart_event_task_delay;
+    public int rising_water_event_task_delay;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
@@ -63,5 +66,8 @@ public class SettingsManager {
         min_players_online = settings.getInt("event.min_players_online");
         anvil_spawn_percentage = settings.getDouble("event.anvil_spawn_percentage");
         anvil_spawn_y_above_start_y = settings.getInt("event.anvil_spawn_y_above_start_y");
+        pvp_event_task_delay = settings.getInt("event.task_delay.pvp");
+        half_heart_event_task_delay = settings.getInt("event.task_delay.half_heart");
+        rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
     }
 }

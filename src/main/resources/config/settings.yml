@@ -44,3 +44,7 @@ event:
   min_players_online: 5
   anvil_spawn_percentage: 0.9
   anvil_spawn_y_above_start_y: 40
+  task_delay:
+    pvp: 5
+    half_heart: 15
+    rising_water: 100
