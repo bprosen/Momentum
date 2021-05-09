@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.perks.PerksDB;
 import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -102,6 +103,19 @@ public class StatsDB {
                 ;
 
         Parkour.getDatabaseManager().add(query);
+    }
+
+    public static boolean isPlayerInDatabase(String playerName) {
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "players",
+                "uuid",
+                " WHERE player_name='" + playerName + "'"
+        );
+
+        if (!playerResults.isEmpty())
+            return true;
+        return false;
     }
 
     /*

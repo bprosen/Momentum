@@ -177,8 +177,7 @@ public class RanksManager {
 
         // now add prestige to stats and database
         playerStats.addPrestige();
-        Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + playerStats.getPrestiges() +
-                                         " WHERE uuid='" + player.getUniqueId().toString() + "'");
+        RanksDB.updatePrestiges(player.getUniqueId(), playerStats.getPrestiges());
 
         // add an s if its not one because im OCD with this
         String endingString = "time";

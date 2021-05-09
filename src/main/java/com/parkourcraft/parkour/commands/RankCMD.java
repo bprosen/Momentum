@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.rank.RanksManager;
 import com.parkourcraft.parkour.data.rank.RanksDB;
 import com.parkourcraft.parkour.data.rank.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -128,6 +129,29 @@ public class RankCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&cYou cannot set a stage that does not exist (1 or 2 only)"));
                     }
                 }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("setprestiges")) {
+                // check if they have joined parkour
+                if (StatsDB.isPlayerInDatabase(a[1])) {
+
+                    Player victim = Bukkit.getPlayer(a[1]);
+                    if (Utils.isInteger(a[2])) {
+
+                        int newPrestige = Integer.parseInt(a[2]);
+                        // update ingame cache if theyre online
+                        if (victim != null) {
+                            PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
+                            victimStats.setPrestiges(newPrestige);
+                        }
+                        // update in db
+                        RanksDB.updatePrestiges(a[1], newPrestige);
+                        player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's Prestiges to &6" + newPrestige));
+
+                    } else {
+                        player.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&4" + a[1] + " &cdoes not exist in database!"));
+                }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
                 sendAdminHelp(player);
             } else {
@@ -171,6 +195,7 @@ public class RankCMD implements CommandExecutor {
         player.sendMessage(getHelp("remove"));
         player.sendMessage(getHelp("set"));
         player.sendMessage(getHelp("setstage"));
+        player.sendMessage(getHelp("setprestiges"));
     }
 
     private void sendPlayerHelp(Player player) {
@@ -193,6 +218,8 @@ public class RankCMD implements CommandExecutor {
                 return Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank");
             case "setstage":
                 return Utils.translate("&c/ranks setstage <player> <stage>  &7Sets players stage in rankup (1/2)");
+            case "setprestiges":
+                return Utils.translate("&c/ranks setprestiges <player> <amount>  &7Sets players prestiges from database and cache");
             case "help":
                 return Utils.translate("&c/ranks help  &7Displays this page");
             case "":
