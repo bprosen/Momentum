@@ -176,6 +176,7 @@ public class PlayerStats {
     public void addPrestige() { prestiges += 1; }
 
     public void setPrestiges(int prestiges) { this.prestiges = prestiges; }
+
     //
     // Practice Mode Section
     //

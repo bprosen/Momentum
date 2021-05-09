@@ -182,7 +182,8 @@ public class RanksManager {
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has just &6&lPRESTIGED"));
+        Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has just &6&lPRESTIGED&7!" +
+                                                     " &cPrestiges - &4" + playerStats.getPrestiges()));
         Bukkit.broadcastMessage("");
     }
 
