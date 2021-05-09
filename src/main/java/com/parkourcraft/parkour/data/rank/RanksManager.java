@@ -180,10 +180,16 @@ public class RanksManager {
         Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + playerStats.getPrestiges() +
                                          " WHERE uuid='" + player.getUniqueId().toString() + "'");
 
+        // add an s if its not one because im OCD with this
+        String endingString = "time";
+        if (playerStats.getPrestiges() > 1)
+            endingString += "s";
+
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has just &6&lPRESTIGED&7!" +
-                                                     " &cPrestiges - &4" + playerStats.getPrestiges()));
+                                                     " &7They have prestiged &6" +
+                                                     playerStats.getPrestiges() + " " + endingString + "!"));
         Bukkit.broadcastMessage("");
     }
 

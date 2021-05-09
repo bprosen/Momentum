@@ -150,8 +150,15 @@ public class RankCMD implements CommandExecutor {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
 
-        if (playerStats.getPrestiges() > 0)
-            player.sendMessage(Utils.translate("&cYou have prestiged &6" + playerStats.getPrestiges() + " times"));
+        if (playerStats.getPrestiges() > 0) {
+
+            // add an s if its not one because im OCD with this
+            String endingString = "time";
+            if (playerStats.getPrestiges() > 1)
+                endingString += "s";
+
+            player.sendMessage(Utils.translate("&cYou have prestiged &6" + playerStats.getPrestiges() + " " + endingString));
+        }
     }
 
     private void sendAdminHelp(Player player) {
