@@ -193,14 +193,7 @@ public class PlotCMD implements CommandExecutor {
 
         if (plot != null) {
             Parkour.getPlotsManager().clearPlot(plot);
-            player.sendMessage(Utils.translate("&cYou have cleared your plot"));
-
-            // reset bedrock and teleport 1 second later
-            new BukkitRunnable() {
-                public void run() {
-                    plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
-                }
-            }.runTaskLater(Parkour.getPlugin(), 20 * 1);
+            player.sendMessage(Utils.translate("&aYou cleared your plot!"));
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot!"));
         }

@@ -94,6 +94,19 @@ public class PacketListener implements Listener {
 
                                 doCancel = true;
                                 reason = "&cYou cannot do this here";
+                            // this means they edited a block within 2 above the spawn bedrock
+                            } else if (packet.getType() == PacketType.Play.Client.USE_ITEM &&
+                                      (loc.getBlockY() > plot.getSpawnLoc().getBlockY() + 2 ||
+                                      loc.getBlockY() < plot.getSpawnLoc().getBlockY() - 2)) {
+
+                                doCancel = true;
+                                reason = "&cYou cannot build that close on the top of the spawn block!";
+                            // this means cancel if they are trying to break the spawn block
+                            } else if (packet.getType() == PacketType.Play.Client.BLOCK_DIG &&
+                                      loc.equals(plot.getSpawnLoc())) {
+
+                                doCancel = true;
+                                reason = "&cYou cannot break the spawn bedrock";
                             }
                         // no nearest plot
                         } else {

@@ -185,12 +185,20 @@ public class PlotsManager {
 
             Vector pos1 = new Vector(pos1X, 0, pos1Z);
             Vector pos2 = new Vector(pos2X, 256, pos2Z);
+            Vector spawnVector = new Vector(plot.getSpawnLoc().getBlockX(),
+                                            plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlockY(),
+                                            plot.getSpawnLoc().getBlockZ());
 
             CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
 
             try {
                 EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                editSession.setFastMode(true);
                 editSession.setBlocks(selection, new BaseBlock(Material.AIR.getId()));
+                editSession.flushQueue();
+                editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
+                editSession.flushQueue();
+                editSession.setFastMode(false);
             } catch (MaxChangedBlocksException e) {
                 e.printStackTrace();
             }
