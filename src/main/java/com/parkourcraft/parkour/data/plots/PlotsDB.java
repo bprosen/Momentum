@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.plots;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -221,5 +222,14 @@ public class PlotsDB {
             boolean currentlySubmitted = isSubmittedFromName(playerName);
             Parkour.getDatabaseManager().add("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name='" + playerName + "'");
         }
+    }
+
+    public static void updatePlayerName(String newPlayerName, String UUID) {
+        String query = "UPDATE plots SET " +
+                "player_name='" + newPlayerName + "' " +
+                "WHERE UUID='" + UUID + "'"
+                ;
+
+        Parkour.getDatabaseManager().add(query);
     }
 }

@@ -10,11 +10,13 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class PlotsManager {
 
@@ -31,6 +33,13 @@ public class PlotsManager {
             String playerName = PlotsDB.getPlotOwnerName(uuidString);
             String locString = PlotsDB.getPlotCenter(uuidString);
             String[] locSplit = locString.split(":");
+
+            // get offline player object and update in db if their name changed
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuidString));
+            if (!offlinePlayer.getName().equalsIgnoreCase(playerName)) {
+                PlotsDB.updatePlayerName(offlinePlayer.getName(), uuidString);
+                playerName = offlinePlayer.getName();
+            }
 
             // loc from database, 0.5 for center of block
             Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
