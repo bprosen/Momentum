@@ -180,8 +180,8 @@ public class LevelManager {
         LevelsYAML.create(levelName);
     }
 
-    public List<String> getNames() {
-        List<String> names = new ArrayList<>();
+    public Set<String> getNames() {
+        Set<String> names = new HashSet<>();
 
         for (Level level : levels)
             names.add(level.getName());
