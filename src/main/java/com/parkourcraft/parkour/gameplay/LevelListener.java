@@ -64,18 +64,20 @@ public class LevelListener implements Listener {
 
             if (levelName != null) {
                 if (playerStats.getPracticeLocation() == null) {
-                    if (playerStats.getCheckpoint() != null) {
+                    if (playerStats.getPlayerToSpectate() == null) {
+                        if (playerStats.getCheckpoint() != null) {
 
-                        int blockX = playerStats.getCheckpoint().getBlockX();
-                        int blockZ = playerStats.getCheckpoint().getBlockZ();
+                            int blockX = playerStats.getCheckpoint().getBlockX();
+                            int blockZ = playerStats.getCheckpoint().getBlockZ();
 
-                        if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
+                            if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
+                                playerStats.setCheckpoint(block.getLocation());
+                                player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
+                            }
+                        } else {
                             playerStats.setCheckpoint(block.getLocation());
                             player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
                         }
-                    } else {
-                        playerStats.setCheckpoint(block.getLocation());
-                        player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
                     }
                 }
             }
