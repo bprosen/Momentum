@@ -29,6 +29,8 @@ public class MenuItemFormatter {
             // make coin rankup menu for /rankup if in stage 1
             if (menuItem.getTypeValue().equals("coin-rankup"))
                 return getRankUp(playerStats, menuItem);
+            else if (menuItem.getTypeValue().equals("featured-level"))
+                return getFeaturedLevel(menuItem);
             // make levels for /rankup if in stage 2
             else if (menuItem.getTypeValue().equals("rankup-level-1")
                     || menuItem.getTypeValue().equals("rankup-level-2")
@@ -141,9 +143,41 @@ public class MenuItemFormatter {
         String levelName = menuItem.getTypeValue();
         Level level = Parkour.getLevelManager().get(levelName);
 
-        return createLevelItem(playerStats, level, menuItem, item);
+        // make it the featured in normal gui section too for consistency
+        if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
+            return getFeaturedLevel(menuItem);
+        else
+            return createLevelItem(playerStats, level, menuItem, item);
     }
 
+    // create a slightly different level item for featured level in gui
+    private static ItemStack getFeaturedLevel(MenuItem menuItem) {
+        Level featuredLevel = Parkour.getLevelManager().getFeaturedLevel();
+        ItemStack levelItem = menuItem.getItem();
+
+        if (featuredLevel != null) {
+            ItemMeta itemMeta = levelItem.getItemMeta();
+
+            // Existing Lore Section
+            List<String> itemLore = new ArrayList<>();
+
+            // Item Title Section
+            String formattedTitle = Utils.translate("&cFeatured &7- " + featuredLevel.getFormattedTitle());
+            itemMeta.setDisplayName(formattedTitle);
+
+            // Click To Go and Reward Section
+            itemLore.add(Utils.translate("&7Click to go to " + featuredLevel.getFormattedTitle()
+                    .replace("&l", "").replace("&o", "")));
+            itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(
+                                 featuredLevel.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)
+                                        + "&r &6" + Utils.formatNumber(featuredLevel.getReward()) + " &6Coin &7Reward"));
+
+            // Sections over
+            itemMeta.setLore(itemLore);
+            levelItem.setItemMeta(itemMeta);
+        }
+        return levelItem;
+    }
 
     private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem) {
 

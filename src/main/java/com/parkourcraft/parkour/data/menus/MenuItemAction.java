@@ -56,6 +56,11 @@ public class MenuItemAction {
                 performLevelRankUpItem(player, menuItem);
             else if (typeValue.equals("submit-plot"))
                 performPlotSubmission(player);
+            // dont need to get from stats and can skip performLevelItem
+            else if (typeValue.equals("featured-level"))
+                performLevelTeleport(Parkour.getStatsManager().get(player.getUniqueId().toString()),
+                        player,
+                        Parkour.getLevelManager().getFeaturedLevel());
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         }

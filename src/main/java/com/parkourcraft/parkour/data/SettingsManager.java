@@ -7,6 +7,7 @@ public class SettingsManager {
 
     public String levels_message_completion;
     public String levels_message_broadcast;
+    public double featured_level_reward_multiplier;
 
     public String signs_first_line;
     public String signs_second_line_completion;
@@ -71,5 +72,6 @@ public class SettingsManager {
         half_heart_event_task_delay = settings.getInt("event.task_delay.half_heart");
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
+        featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
     }
 }
