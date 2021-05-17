@@ -2,6 +2,11 @@ package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventType;
+import com.parkourcraft.parkour.data.menus.Menu;
+import com.parkourcraft.parkour.data.menus.MenuItem;
+import com.parkourcraft.parkour.data.menus.MenuPage;
+import com.parkourcraft.parkour.data.menus.MenusYAML;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -50,8 +55,11 @@ public class LevelManager {
 
         List<Level> temporaryList = new ArrayList<>();
 
-        // sort through all levels to make sure it does not have required levels and has more than 0 coin reward
-        for (Level level : levels) {
+        /*
+           sort through all levels that are in menus
+           to make sure it does not have required levels and has more than 0 coin reward
+         */
+        for (Level level : getLevelsInMenus()) {
             if (level.getRequiredLevels().isEmpty() && level.getReward() > 0)
                 temporaryList.add(level);
         }
@@ -65,6 +73,50 @@ public class LevelManager {
             level.setReward((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier));
             Parkour.getPluginLogger().info("Featured Level: " + level.getName());
         }
+    }
+
+    /*
+        this method first loops through the menus in config, then the pages, then the items, to find ALL levels that
+        originate from the GUI so no featured level is picked from something like ascendance, etc
+     */
+    public Set<Level> getLevelsInMenus() {
+
+        Set<Level> temporaryList = new HashSet<>();
+
+        // first loop through each menu
+        for (String menuName : MenusYAML.getNames()) {
+            Menu menu = Parkour.getMenuManager().getMenu(menuName);
+            // null check menu
+            if (menu != null) {
+                // then loop through each page in the menu
+                for (int i = 1; i <= menu.getPageCount(); i++) {
+
+                    MenuPage menuPage = menu.getPage(i);
+                    // null check the page
+                    if (menuPage != null) {
+                        // finally, loop through each item in the gui
+                        for (int j = 0; j < (menuPage.getRowCount() * 9); j++) {
+                            MenuItem menuItem = menuPage.getMenuItem(j);
+
+                            // null check the item
+                            if (menuItem != null) {
+                                // then check if the item is a level type, if so, add to list
+                                if (menuItem.getType().equalsIgnoreCase("level")) {
+                                    Level menuLevel = get(menuItem.getTypeValue());
+
+                                    // last step! null check level
+                                    if (menuLevel != null)
+                                        temporaryList.add(menuLevel);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Parkour.getPluginLogger().info("Null Menu on getLevelsInMenus()");
+            }
+        }
+        return temporaryList;
     }
 
     public Level getFeaturedLevel() {

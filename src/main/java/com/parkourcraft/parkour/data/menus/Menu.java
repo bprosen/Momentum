@@ -45,6 +45,13 @@ public class Menu {
         }
     }
 
+    public MenuPage getPage(int pageNumber) {
+        MenuPage menuPage = pageMap.get(pageNumber);
+
+        if (menuPage != null)
+            return menuPage;
+        return null;
+    }
     public String getName() {
         return name;
     }

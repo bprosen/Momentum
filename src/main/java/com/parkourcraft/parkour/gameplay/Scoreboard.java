@@ -103,19 +103,32 @@ public class Scoreboard {
         // level section of scoreboard
         } else if (level != null) {
 
+            String rewardString;
+
+            // add title and adjust rewardstring if it is a featured level
+            if (level.isFeaturedLevel()) {
+                board.add(formatSpacing(Utils.translate("&dFeatured Level")));
+
+                // proper cast
+                rewardString = Utils.translate("&c&m" +
+                        ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
+                        "&6 " + level.getReward());
+            } else {
+                rewardString = Utils.translate("&6" + level.getReward());
+            }
+
             String title = level.getFormattedTitle();
             board.add(formatSpacing(title));
-
-            String reward = Utils.translate("&6" + level.getReward());
-            board.add(formatSpacing(reward));
+            board.add(formatSpacing(rewardString));
 
             if (playerStats != null && playerStats.getLevelStartTime() > 0) {
                 double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
                 String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
                 board.add(formatSpacing(timing));
-            } else
+            } else {
                 board.add(formatSpacing(Utils.translate("&7-")));
+            }
         }
         ScoreboardUtil.unrankedSidebarDisplay(player, board.toArray(new String[board.size()]));
     }

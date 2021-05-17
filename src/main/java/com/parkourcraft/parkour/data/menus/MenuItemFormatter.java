@@ -30,7 +30,7 @@ public class MenuItemFormatter {
             if (menuItem.getTypeValue().equals("coin-rankup"))
                 return getRankUp(playerStats, menuItem);
             else if (menuItem.getTypeValue().equals("featured-level"))
-                return getFeaturedLevel(menuItem);
+                return getFeaturedLevel(playerStats, menuItem);
             // make levels for /rankup if in stage 2
             else if (menuItem.getTypeValue().equals("rankup-level-1")
                     || menuItem.getTypeValue().equals("rankup-level-2")
@@ -143,15 +143,18 @@ public class MenuItemFormatter {
         String levelName = menuItem.getTypeValue();
         Level level = Parkour.getLevelManager().get(levelName);
 
-        // make it the featured in normal gui section too for consistency
-        if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
-            return getFeaturedLevel(menuItem);
-        else
-            return createLevelItem(playerStats, level, menuItem, item);
+        if (level != null) {
+            // make it the featured in normal gui section too for consistency
+            if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
+                return getFeaturedLevel(playerStats, menuItem);
+            else
+                return createLevelItem(playerStats, level, menuItem, item);
+        }
+        return item;
     }
 
     // create a slightly different level item for featured level in gui
-    private static ItemStack getFeaturedLevel(MenuItem menuItem) {
+    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem) {
         Level featuredLevel = Parkour.getLevelManager().getFeaturedLevel();
         ItemStack levelItem = menuItem.getItem();
 

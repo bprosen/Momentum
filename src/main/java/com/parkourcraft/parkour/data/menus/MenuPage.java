@@ -39,11 +39,11 @@ public class MenuPage {
                     menuItem));
     }
 
-    int getPageNumber() {
+    public int getPageNumber() {
         return pageNumber;
     }
 
-    int getRowCount() {
+    public int getRowCount() {
         return rowCount;
     }
 

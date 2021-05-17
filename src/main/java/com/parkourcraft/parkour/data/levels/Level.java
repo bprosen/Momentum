@@ -294,6 +294,12 @@ public class Level {
         return raceLevel;
     }
 
+    public boolean isFeaturedLevel() {
+        if (name.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName()))
+            return true;
+        return false;
+    }
+
     public boolean hasValidRaceLocations() {
         if (LevelsYAML.isSet(name, "race.player1-loc") && LevelsYAML.isSet(name, "race.player2-loc"))
             return true;

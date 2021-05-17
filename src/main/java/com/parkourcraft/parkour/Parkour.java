@@ -142,11 +142,11 @@ public class Parkour extends JavaPlugin {
         locations = new LocationManager();
         checkpoint = new CheckpointManager();
         database = new DatabaseManager(plugin);
+        menus = new MenuManager();
         levels = new LevelManager(plugin);
         perks = new PerkManager(plugin);
         stats = new StatsManager(plugin);
         clans = new ClansManager(plugin);
-        menus = new MenuManager();
         races = new RaceManager();
         ranks = new RanksManager();
         plots = new PlotsManager();
