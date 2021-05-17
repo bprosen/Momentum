@@ -26,6 +26,7 @@ public class SettingsManager {
     public int player_submitted_plot_width;
     public int player_submitted_plot_default_y;
     public int player_submitted_plot_buffer_width;
+    public String minimum_rank_for_plot_creation;
 
     public int event_reminder_delay;
     public int max_event_run_time;
@@ -69,5 +70,6 @@ public class SettingsManager {
         pvp_event_task_delay = settings.getInt("event.task_delay.pvp");
         half_heart_event_task_delay = settings.getInt("event.task_delay.half_heart");
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
+        minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
     }
 }

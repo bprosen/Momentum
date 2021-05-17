@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.plots.PlotsDB;
+import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -102,8 +103,8 @@ public class PlotCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&4" + plotOwner + " &cdoes not have a Plot"));
                 }
             } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
-                    Parkour.getPlotsManager().createPlot(player);
-                    // teleport to plot
+                createPlot(player);
+                // teleport to plot
             } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") ||
                                          a[0].equalsIgnoreCase("teleport") ||
                                          a[0].equalsIgnoreCase("h"))) {
@@ -149,7 +150,7 @@ public class PlotCMD implements CommandExecutor {
             sendHelp(sender);
         // do create algorithm after
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
-            Parkour.getPlotsManager().createPlot(player);
+            createPlot(player);
         // teleport to plot
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") ||
                                      a[0].equalsIgnoreCase("teleport") ||
@@ -186,6 +187,18 @@ public class PlotCMD implements CommandExecutor {
             sendHelp(sender);
         }
         return false;
+    }
+
+    private void createPlot(Player player) {
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
+        Rank minimumRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().minimum_rank_for_plot_creation);
+
+        if (playerStats.getRank().getRankId() >= minimumRank.getRankId()) {
+            Parkour.getPlotsManager().createPlot(player);
+        } else {
+            player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getRankTitle() + " &7to create a &aPlot"));
+        }
     }
 
     private void clearPlot(Player player) {

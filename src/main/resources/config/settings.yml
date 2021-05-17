@@ -37,6 +37,7 @@ player_submitted:
   plot_width: 75
   plot_default_y: 64
   plot_buffer_width: 10
+  minimum_rank_for_plot_creation: "novice-i"
 event:
   reminder_delay: 300
   max_run_time: 1800
