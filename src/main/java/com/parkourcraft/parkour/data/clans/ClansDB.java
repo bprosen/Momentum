@@ -6,15 +6,12 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.ChatColor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClansDB {
 
-    static List<Clan> getClans() {
-        List<Clan> clans = new ArrayList<>();
+    static Set<Clan> getClans() {
+        Set<Clan> clans = new HashSet<>();
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",

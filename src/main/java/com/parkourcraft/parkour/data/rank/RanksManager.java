@@ -8,21 +8,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RanksManager {
 
-    private static List<Rank> rankList = new ArrayList<>();
+    private static Set<Rank> rankList = new HashSet<>();
 
     public RanksManager() {
         load();
     }
 
     public void load() {
-        rankList = new ArrayList<>();
+        rankList = new HashSet<>();
 
         for (String rankName : RanksYAML.getNames())
             load(rankName);
@@ -79,8 +76,8 @@ public class RanksManager {
         return (get(rankId) != null);
     }
 
-    public List<String> getNames() {
-        List<String> tempList = new ArrayList<>();
+    public Set<String> getNames() {
+        Set<String> tempList = new HashSet<>();
 
         for (Rank rank : rankList)
             tempList.add(rank.getRankName());
@@ -88,8 +85,8 @@ public class RanksManager {
         return tempList;
     }
 
-    public List<Integer> getIDs() {
-        List<Integer> tempList = new ArrayList<>();
+    public Set<Integer> getIDs() {
+        Set<Integer> tempList = new HashSet<>();
 
         for (Rank rank : rankList)
             tempList.add(rank.getRankId());
@@ -192,7 +189,7 @@ public class RanksManager {
         Bukkit.broadcastMessage("");
     }
 
-    public List<Rank> getRankList() {
+    public Set<Rank> getRankList() {
         return rankList;
     }
 

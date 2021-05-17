@@ -13,13 +13,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class RaceManager {
 
-    private List<Race> runningRaceList = new ArrayList<>();
+    private Set<Race> runningRaceList = new HashSet<>();
 
     public void startRace(Player player1, Player player2, boolean bet, double betAmount) {
 
@@ -213,7 +211,7 @@ public class RaceManager {
         return null;
     }
 
-    public List<Race> getRaces() {
+    public Set<Race> getRaces() {
         return runningRaceList;
     }
 }

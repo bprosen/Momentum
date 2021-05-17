@@ -10,7 +10,7 @@ import java.util.*;
 
 public class PerkManager {
 
-    private List<Perk> perks = new ArrayList<>();
+    private Set<Perk> perks = new HashSet<>();
     private Map<String, Integer> IDCache;
 
     public PerkManager(Plugin plugin) {
@@ -55,7 +55,7 @@ public class PerkManager {
         return null;
     }
 
-    public List<Perk> getPerks() {
+    public Set<Perk> getPerks() {
         return perks;
     }
 

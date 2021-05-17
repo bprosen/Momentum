@@ -13,16 +13,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
 
 public class EventManager {
 
     private Event runningEvent = null;
     private BukkitTask maxRunTimer;
-    private List<EventParticipant> participants = new ArrayList<>();
-    private List<String> eliminated = new ArrayList<>();
+    private Set<EventParticipant> participants = new HashSet<>();
+    private Set<String> eliminated = new HashSet<>();
 
     public EventManager() {
         startScheduler();
@@ -194,11 +193,11 @@ public class EventManager {
             removeParticipant(participant.getPlayer(), shutdown);
     }
 
-    public List<EventParticipant> getParticipants() {
+    public Set<EventParticipant> getParticipants() {
         return participants;
     }
 
-    public List<String> getEliminated() {
+    public Set<String> getEliminated() {
         return eliminated;
     }
 

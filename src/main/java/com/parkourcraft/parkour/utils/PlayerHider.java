@@ -4,10 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class PlayerHider {
 
-    private static HashSet<String> hiddenPlayers = new HashSet<>();
+    private static Set<String> hiddenPlayers = new HashSet<>();
 
     public static void hidePlayer(Player player, boolean spectator) {
         hiddenPlayers.add(player.getName());

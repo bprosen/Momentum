@@ -8,15 +8,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ClansManager {
 
-    private List<Clan> clans = new ArrayList<>();
+    private Set<Clan> clans = new HashSet<>();
 
     public ClansManager(Plugin plugin) {
         load();

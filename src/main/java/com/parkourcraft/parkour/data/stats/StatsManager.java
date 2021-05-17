@@ -10,7 +10,7 @@ import java.util.*;
 public class StatsManager {
 
     private boolean running = false;
-    private List<PlayerStats> playerStatsList = new ArrayList<>();
+    private Set<PlayerStats> playerStatsList = new HashSet<>();
 
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
@@ -56,7 +56,7 @@ public class StatsManager {
         return null;
     }
 
-    public List<PlayerStats> getPlayerStats() {
+    public Set<PlayerStats> getPlayerStats() {
         return playerStatsList;
     }
 
@@ -118,7 +118,7 @@ public class StatsManager {
         if (playerStatsList.isEmpty())
             return;
 
-        List<PlayerStats> removeList = new ArrayList<>();
+        Set<PlayerStats> removeList = new HashSet<>();
 
         for (PlayerStats playerStats : playerStatsList)
             if (!playerStats.getPlayer().isOnline())

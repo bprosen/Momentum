@@ -9,7 +9,7 @@ import java.util.*;
 
 public class LevelManager {
 
-    private List<Level> levels = new ArrayList<>();
+    private Set<Level> levels = new HashSet<>();
     private Map<String, LevelData> levelDataCache;
     private String featuredLevel = null;
 
@@ -22,7 +22,7 @@ public class LevelManager {
     }
 
     public void load() {
-        levels = new ArrayList<>();
+        levels = new HashSet<>();
 
         for (String levelName : LevelsYAML.getNames())
             load(levelName);
@@ -113,6 +113,17 @@ public class LevelManager {
         return tempList;
     }
 
+    public List<String> getRaceLevels() {
+
+        List<String> temporaryRaceLevelList = new ArrayList<>();
+
+        for (Level level : levels) {
+            if (level.isRaceLevel())
+                temporaryRaceLevelList.add(level.getName());
+        }
+        return temporaryRaceLevelList;
+    }
+
     private void startScheduler(Plugin plugin) {
         new BukkitRunnable() {
             public void run() {
@@ -148,7 +159,7 @@ public class LevelManager {
         return null;
     }
 
-    public List<Level> getLevels() {
+    public Set<Level> getLevels() {
         return levels;
     }
 
@@ -185,16 +196,5 @@ public class LevelManager {
             levelNamesLower.put(level.getName().toLowerCase(), level.getName());
 
         return levelNamesLower;
-    }
-
-    public List<String> getRaceLevels() {
-
-        List<String> temporaryRaceLevelList = new ArrayList<>();
-
-        for (Level level : levels) {
-            if (level.isRaceLevel())
-                temporaryRaceLevelList.add(level.getName());
-        }
-        return temporaryRaceLevelList;
     }
 }

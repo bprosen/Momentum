@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -13,14 +14,11 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlotsManager {
 
-    private List<Plot> plotList = new ArrayList<>();
+    private Set<Plot> plotList = new HashSet<>();
 
     public PlotsManager() {
         load();
@@ -86,7 +84,7 @@ public class PlotsManager {
         return (get(playerName) != null);
     }
 
-    public List<Plot> getPlots() {
+    public Set<Plot> getPlots() {
         return plotList;
     }
 
@@ -95,6 +93,7 @@ public class PlotsManager {
             plotList.remove(playerUUID);
     }
 
+    // this needs to be a list due to #get(int)
     public List<Plot> getSubmittedPlots() {
         List<Plot> tempList = new ArrayList<>();
 
