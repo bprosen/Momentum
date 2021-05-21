@@ -20,6 +20,11 @@ signs:
     completion: "To redeem"
     spawn: "To return to"
 
+setup-sword:
+  type: IRON_SWORD
+  title: "&cSetup Sword"
+  hotbar_slot: 1
+
 clans:
   max_members: 5
   split_reward_min_needed: 300

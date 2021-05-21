@@ -59,3 +59,6 @@ commands:
   rate:
     description: "PC-Parkour Rate Command"
     aliases: [ratelevel, levelrate]
+  sword:
+    description: "PC-Parkour Sword Command"
+    aliases: [setup, setupsword]

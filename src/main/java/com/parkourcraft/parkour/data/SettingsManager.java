@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class SettingsManager {
@@ -39,6 +40,10 @@ public class SettingsManager {
     public int half_heart_event_task_delay;
     public int rising_water_event_task_delay;
 
+    public Material sword_type;
+    public String sword_title;
+    public int sword_hotbar_slot;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -73,5 +78,8 @@ public class SettingsManager {
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
+        sword_title = settings.getString("setup-sword.title");
+        sword_type = Material.matchMaterial(settings.getString("setup-sword.type"));
+        sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
     }
 }
