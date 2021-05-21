@@ -119,11 +119,14 @@ public class LevelHandler {
             if (elapsedTime > 0L && elapsedTime < 8388607L)
                 titleMessage += Utils.translate("&7 in &2" + time);
 
+            String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                    + level.getName() + " (rating from 0-5)");
+
             player.sendMessage(messageFormatted);
             TitleAPI.sendTitle(
-                    player, 10, 40, 10,
-                    "",
-                    titleMessage
+                    player, 10, 60, 10,
+                    titleMessage,
+                    subTitleMessage
             );
 
             // only broadcast if it is not a forced completion

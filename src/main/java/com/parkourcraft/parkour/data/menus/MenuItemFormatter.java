@@ -30,7 +30,7 @@ public class MenuItemFormatter {
             if (menuItem.getTypeValue().equals("coin-rankup"))
                 return getRankUp(playerStats, menuItem);
             else if (menuItem.getTypeValue().equals("featured-level"))
-                return getFeaturedLevel(playerStats, menuItem);
+                return getFeaturedLevel(menuItem);
             // make levels for /rankup if in stage 2
             else if (menuItem.getTypeValue().equals("rankup-level-1")
                     || menuItem.getTypeValue().equals("rankup-level-2")
@@ -146,7 +146,7 @@ public class MenuItemFormatter {
         if (level != null) {
             // make it the featured in normal gui section too for consistency
             if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
-                return getFeaturedLevel(playerStats, menuItem);
+                return getFeaturedLevel(menuItem);
             else
                 return createLevelItem(playerStats, level, menuItem, item);
         }
@@ -154,7 +154,7 @@ public class MenuItemFormatter {
     }
 
     // create a slightly different level item for featured level in gui
-    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem) {
+    private static ItemStack getFeaturedLevel(MenuItem menuItem) {
         Level featuredLevel = Parkour.getLevelManager().getFeaturedLevel();
         ItemStack levelItem = menuItem.getItem();
 
@@ -174,6 +174,11 @@ public class MenuItemFormatter {
             itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(
                                  featuredLevel.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)
                                         + "&r &6" + Utils.formatNumber(featuredLevel.getReward()) + " &6Coin &7Reward"));
+            // only show rating if above 5
+            if (featuredLevel.getRatingsCount() >= 5) {
+                itemLore.add(Utils.translate("  &6" + featuredLevel.getRating() + " &7Rating"));
+                itemLore.add(Utils.translate("    &7Out of &e" + featuredLevel.getRatingsCount() + " &7ratings"));
+            }
 
             // Sections over
             itemMeta.setLore(itemLore);
@@ -211,6 +216,12 @@ public class MenuItemFormatter {
             itemLore.add(Utils.translate("&7Click to go to " + formattedTitle
                     .replace("&l", "").replace("&o", "")));
             itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
+
+            // only show rating if above 5
+            if (level.getRatingsCount() >= 5) {
+                itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
+                itemLore.add(Utils.translate("    &7Out of &e" + level.getRatingsCount() + " &7ratings"));
+            }
 
             // Required Levels Section
             if (level.getRequiredLevels().size() > 0) {

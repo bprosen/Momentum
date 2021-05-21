@@ -1,14 +1,13 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.Level;
-import com.parkourcraft.parkour.data.levels.LevelManager;
-import com.parkourcraft.parkour.data.levels.LevelsDB;
-import com.parkourcraft.parkour.data.levels.LevelsYAML;
+import com.parkourcraft.parkour.data.levels.*;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.parkourcraft.parkour.gameplay.LevelHandler;
+import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
+import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.Map;
 
 public class LevelCMD implements CommandExecutor {
 
@@ -410,6 +410,84 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));
                     }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("addrating")) {
+
+                    if (!(sender instanceof Player)) {
+                        return true;
+                    }
+
+                    Player player = (Player) sender;
+
+                    String levelName = a[1].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        if (Utils.isInteger(a[2])) {
+
+                            int rating = Integer.parseInt(a[2]);
+
+                            if (rating <= 5 && rating >= 0) {
+                                level.addRatingAndCalc(rating);
+                                RatingDB.addRating(player, level, rating);
+                                sender.sendMessage(Utils.translate("&7You added a rating of &4" + rating
+                                        + " &7to &cLevel &a" + level.getFormattedTitle()));
+                            } else {
+                                sender.sendMessage(Utils.translate("&cRating has to be between &40-5"));
+                            }
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("removerating")) {
+
+                    String levelName = a[1].toLowerCase();
+                    String playerName = a[2];
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        if (RatingDB.hasRatedLevelFromName(playerName, level.getID())) {
+
+                            List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
+                                    "ratings",
+                                    "rating",
+                                    " WHERE player_name='" + playerName + "' AND level_id=" + level.getID()
+                            );
+
+                            // loop through and remove, then remove all from database
+                            for (Map<String, String> ratingResult : ratingResults)
+                                level.removeRatingAndCalc(Integer.parseInt(ratingResult.get("rating")));
+
+                            Parkour.getDatabaseManager().add("DELETE FROM ratings WHERE level_id=" + level.getID()
+                                    + " AND player_name='" + playerName + "'");
+
+                            sender.sendMessage(Utils.translate("&cYou removed &4" + playerName + " &crating from &7" + level.getFormattedTitle()));
+
+                        } else {
+                            sender.sendMessage(Utils.translate("&4" + playerName + " &chas not rated &4" + levelName));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("hasrated")) {
+                    String levelName = a[1].toLowerCase();
+                    String playerName = a[2];
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+
+                        if (RatingDB.hasRatedLevelFromName(playerName, level.getID()))
+
+                            sender.sendMessage(Utils.translate("&c" + playerName + " &7has rated &c" +
+                                    level.getFormattedTitle() + " &7with a &6" +
+                                    RatingDB.getRatingFromName(playerName, level.getID())));
+
+                        else
+
+                            sender.sendMessage(Utils.translate("&c" + playerName + " &7has not rated &c" +
+                                    level.getFormattedTitle()));
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
@@ -441,6 +519,9 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("removetime"));
         sender.sendMessage(getHelp("raceset"));
         sender.sendMessage(getHelp("forcecompletion"));
+        sender.sendMessage(getHelp("addrating"));
+        sender.sendMessage(getHelp("removerating"));
+        sender.sendMessage(getHelp("hasrated"));
     }
 
     private static String getHelp(String cmd) {
@@ -480,6 +561,12 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level raceset <level> <player1/player2>  &7Sets the race location for player 1 or 2");
             case "forcecompletion":
                 return Utils.translate("&a/level forcecompletion <player> <level>  &7Force completion for player");
+            case "addrating":
+                return Utils.translate("&a/level addrating <level> <rating (0-5)>  &7Adds a rating to a level (ADMIN WAY NOT /rate)");
+            case "removerating":
+                return Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name");
+            case "hasrated":
+                return Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating");
         }
         return "";
     }

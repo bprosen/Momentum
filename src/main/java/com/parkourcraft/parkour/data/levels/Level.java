@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ public class Level {
     private String name;
     private String title;
     private int reward = 0;
+    private float rating;
+    private int ratingsCount;
     private Location startLocation;
     private Location respawnLocation;
     private String message;
@@ -108,6 +111,44 @@ public class Level {
 
     public int getID() {
         return ID;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public int getRatingsCount() { return ratingsCount; }
+
+    public void setRatingsCount(int ratingsCount) { this.ratingsCount = ratingsCount; }
+
+    public void addRatingAndCalc(int rating) {
+
+        // run new average = old average + (new rating + old average) / new count formula
+        double newAverageRating = this.rating + (rating - this.rating) / (ratingsCount + 1);
+        double newAmount = Double.valueOf(new BigDecimal(newAverageRating).toPlainString());
+        // this makes it seperate digits by commands and .2 means round decimal by 2 places
+        this.rating = Float.parseFloat(String.format("%,.2f", newAmount));
+        ratingsCount += 1;
+    }
+
+    public void removeRatingAndCalc(int rating) {
+
+        if (ratingsCount - 1 <= 0) {
+            this.rating = 0.00f;
+            this.ratingsCount = 0;
+
+        } else {
+            // run new average = old average + (new rating + old average) / new count formula
+            double newAverageRating = this.rating + (rating - this.rating) / (ratingsCount - 1);
+            double newAmount = Double.valueOf(new BigDecimal(newAverageRating).toPlainString());
+            // this makes it seperate digits by commands and .2 means round decimal by 2 places
+            this.rating = Float.parseFloat(String.format("%,.2f", newAmount));
+            ratingsCount -= 1;
+        }
     }
 
     public List<String> getCommands() { return commands; }

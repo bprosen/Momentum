@@ -25,7 +25,9 @@ public class LevelsDB {
                     new LevelData(
                             Integer.parseInt(levelResult.get("level_id")),
                             Integer.parseInt(levelResult.get("reward")),
-                            Integer.parseInt(levelResult.get("score_modifier"))
+                            Integer.parseInt(levelResult.get("score_modifier")),
+                            RatingDB.getAverageRating(Integer.parseInt(levelResult.get("level_id"))),
+                            RatingDB.getTotalRatings(Integer.parseInt(levelResult.get("level_id")))
                     )
             );
 
@@ -46,6 +48,8 @@ public class LevelsDB {
             level.setID(levelData.getID());
             level.setReward(levelData.getReward());
             level.setScoreModifier(levelData.getScoreModifier());
+            level.setRating(levelData.getRating());
+            level.setRatingsCount(levelData.getRatingsCount());
         }
     }
 
@@ -98,6 +102,4 @@ public class LevelsDB {
 
         Parkour.getDatabaseManager().add(query);
     }
-
-
 }

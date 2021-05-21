@@ -56,3 +56,6 @@ commands:
     description: "PC-Parkour Events Command"
   prestige:
     description: "PC-Parkour Prestige Command"
+  rate:
+    description: "PC-Parkour Rate Command"
+    aliases: [ratelevel, levelrate]

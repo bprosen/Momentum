@@ -34,6 +34,9 @@ public class TablesDB {
 
         if (!tableNames.contains("plots"))
             createPlots(database);
+
+        if (!tableNames.contains("ratings"))
+            createRatings(database);
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -147,6 +150,17 @@ public class TablesDB {
                 "x INT NOT NULL, " +
                 "y INT NOT NULL, " +
                 "z INT NOT NULL" +
+                ")";
+
+        database.run(sqlQuery);
+    }
+
+    private static void createRatings(DatabaseManager database) {
+        String sqlQuery = "CREATE TABLE ratings(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "player_name VARCHAR(16) NOT NULL, " +
+                "level_id INT NOT NULL, " +
+                "rating TINYINT NOT NULL" +
                 ")";
 
         database.run(sqlQuery);

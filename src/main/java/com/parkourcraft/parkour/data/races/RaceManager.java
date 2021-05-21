@@ -185,6 +185,7 @@ public class RaceManager {
                 loser.teleport(raceObject.getOriginalPlayer1Loc());
                 winner.teleport(raceObject.getOriginalPlayer2Loc());
             }
+
             PlayerStats winnerStats = Parkour.getStatsManager().get(winner);
             PlayerStats loserStats = Parkour.getStatsManager().get(loser);
             winnerStats.endedRace();
