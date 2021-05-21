@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.menus.Menu;
 import com.parkourcraft.parkour.data.menus.MenuItem;
 import com.parkourcraft.parkour.data.menus.MenuPage;
 import com.parkourcraft.parkour.data.menus.MenusYAML;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -16,12 +17,14 @@ public class LevelManager {
 
     private Set<Level> levels = new HashSet<>();
     private Map<String, LevelData> levelDataCache;
+    private Set<Level> levelsInMenus = new HashSet<>();
     private String featuredLevel = null;
 
     public LevelManager(Plugin plugin) {
         this.levelDataCache = LevelsDB.getDataCache();
 
         load(); // Loads levels from configuration
+        loadLevelsInMenus();
         pickFeatured();
         startScheduler(plugin);
     }
@@ -79,9 +82,10 @@ public class LevelManager {
         this method first loops through the menus in config, then the pages, then the items, to find ALL levels that
         originate from the GUI so no featured level is picked from something like ascendance, etc
      */
-    public Set<Level> getLevelsInMenus() {
+    public void loadLevelsInMenus() {
 
-        Set<Level> temporaryList = new HashSet<>();
+        // clear for each time its loaded, just in case
+        levelsInMenus.clear();
 
         // first loop through each menu
         for (String menuName : MenusYAML.getNames()) {
@@ -106,7 +110,7 @@ public class LevelManager {
 
                                     // last step! null check level
                                     if (menuLevel != null)
-                                        temporaryList.add(menuLevel);
+                                        levelsInMenus.add(menuLevel);
                                 }
                             }
                         }
@@ -116,7 +120,10 @@ public class LevelManager {
                 Parkour.getPluginLogger().info("Null Menu on getLevelsInMenus()");
             }
         }
-        return temporaryList;
+    }
+
+    public Set<Level> getLevelsInMenus() {
+        return levelsInMenus;
     }
 
     public Level getFeaturedLevel() {
@@ -187,6 +194,23 @@ public class LevelManager {
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 0, 10);
+
+        // update player count in levels every 60 seconds
+        new BukkitRunnable() {
+            public void run() {
+
+                // loop through levels then all players online to determine how many are in each level
+                for (Level level : levelsInMenus) {
+                    int amountInLevel = 0;
+                    for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+
+                        if (playerStats.getLevel().equalsIgnoreCase(level.getName()))
+                            amountInLevel++;
+                    }
+                    level.setPlayersInLevel(amountInLevel);
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
     }
 
     void setLevelDataCache(Map<String, LevelData> levelDataCache) {

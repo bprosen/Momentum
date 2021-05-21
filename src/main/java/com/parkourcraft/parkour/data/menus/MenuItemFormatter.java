@@ -166,11 +166,15 @@ public class MenuItemFormatter {
 
             // Item Title Section
             String formattedTitle = Utils.translate("&cFeatured &7- " + featuredLevel.getFormattedTitle());
+            if (featuredLevel.getPlayersInLevel() > 0)
+                formattedTitle += Utils.translate(" &7(" + featuredLevel.getPlayersInLevel() + " Playing)");
+
             itemMeta.setDisplayName(formattedTitle);
 
             // Click To Go and Reward Section
             itemLore.add(Utils.translate("&7Click to go to " + featuredLevel.getFormattedTitle()
                     .replace("&l", "").replace("&o", "")));
+
             itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(
                                  featuredLevel.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)
                                         + "&r &6" + Utils.formatNumber(featuredLevel.getReward()) + " &6Coin &7Reward"));
@@ -210,11 +214,15 @@ public class MenuItemFormatter {
 
             // Item Title Section
             String formattedTitle = level.getFormattedTitle();
+            if (level.getPlayersInLevel() > 0)
+                formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
+
             itemMeta.setDisplayName(formattedTitle);
 
             // Click To Go and Reward Section
-            itemLore.add(Utils.translate("&7Click to go to " + formattedTitle
+            itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()
                     .replace("&l", "").replace("&o", "")));
+
             itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
 
             // only show rating if above 5

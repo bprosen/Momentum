@@ -24,6 +24,7 @@ public class Level {
     private Location respawnLocation;
     private String message;
     private int maxCompletions;
+    private int playersInLevel = 0;
     private boolean broadcastCompletion;
     private List<String> requiredLevels;
     private int ID = -1;
@@ -67,6 +68,10 @@ public class Level {
     public int getReward() {
         return reward;
     }
+
+    public int getPlayersInLevel() { return playersInLevel; }
+
+    public void setPlayersInLevel(int playersInLevel) { this.playersInLevel = playersInLevel; }
 
     public Location getStartLocation() {
         return startLocation;
