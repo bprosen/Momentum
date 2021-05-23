@@ -201,15 +201,17 @@ public class LevelManager {
 
                 // loop through levels then all players online to determine how many are in each level
                 for (Level level : levelsInMenus) {
-                    int amountInLevel = 0;
-                    for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+                    if (level != null) {
+                        int amountInLevel = 0;
+                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
 
-                        if (playerStats != null &&
-                            playerStats.getLevel() != null &&
-                            playerStats.getLevel().equalsIgnoreCase(level.getName()))
-                            amountInLevel++;
+                            if (playerStats != null &&
+                                    playerStats.getLevel() != null &&
+                                    playerStats.getLevel().equalsIgnoreCase(level.getName()))
+                                amountInLevel++;
+                        }
+                        level.setPlayersInLevel(amountInLevel);
                     }
-                    level.setPlayersInLevel(amountInLevel);
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
