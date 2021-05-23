@@ -204,7 +204,9 @@ public class LevelManager {
                     int amountInLevel = 0;
                     for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
 
-                        if (playerStats.getLevel().equalsIgnoreCase(level.getName()))
+                        if (playerStats != null &&
+                            playerStats.getLevel() != null &&
+                            playerStats.getLevel().equalsIgnoreCase(level.getName()))
                             amountInLevel++;
                     }
                     level.setPlayersInLevel(amountInLevel);
