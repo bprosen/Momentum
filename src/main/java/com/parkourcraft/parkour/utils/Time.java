@@ -91,14 +91,18 @@ public class Time {
         return time;
     }
 
-    public static String elapsedShortened(long milliseconds) {
+    public static String elapsedShortened(long milliseconds, boolean includeSeconds) {
         long seconds = milliseconds / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
         long days = hours / 24;
         long months = days / 30;
         long years = months / 12;
+
         String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m ";
+        if (includeSeconds)
+            time += seconds % 60 + "s";
+
         if (years == 0L)
             time = time.replace("0Y ", "");
         if (months % 12 == 0L)
@@ -109,6 +113,9 @@ public class Time {
             time = time.replace("0h ", "");
         if (minutes % 60 == 0L)
             time = time.replace("0m ", "");
+        if (includeSeconds && seconds % 60 == 0L)
+            time = time.replace("0s", "");
+
         return time;
     }
 

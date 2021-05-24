@@ -270,10 +270,10 @@ public class MenuItemFormatter {
 
                     // this makes it so it will not have " ago" if they just completed it
                     String timeSinceString;
-                    if (Time.elapsedShortened(timeSince).equalsIgnoreCase(""))
+                    if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
                         timeSinceString = Utils.translate("   &7Just now");
                     else
-                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince) + "ago");
+                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
 
                     itemLore.add(timeSinceString);
                 }

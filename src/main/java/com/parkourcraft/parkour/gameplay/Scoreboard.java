@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
@@ -99,6 +100,9 @@ public class Scoreboard {
             board.add(formatSpacing(Utils.translate("&7You are in an event!")));
             board.add(formatSpacing(Utils.translate("&2&l" +
                                     eventManager.formatName(eventManager.getEventType()))));
+            board.add("");
+            board.add(formatSpacing(Utils.translate("&6&lTime Left")));
+            board.add(formatSpacing(Utils.translate("&e" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
 
         // level section of scoreboard
         } else if (level != null) {

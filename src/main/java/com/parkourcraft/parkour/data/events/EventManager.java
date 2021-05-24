@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.data.events;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
@@ -25,6 +26,8 @@ public class EventManager {
     private BukkitTask maxRunTimer;
     private Set<EventParticipant> participants = new HashSet<>();
     private Set<String> eliminated = new HashSet<>();
+    // start millis according to system
+    private long startTime = 0L;
 
     public EventManager() {
         startScheduler();
@@ -68,6 +71,7 @@ public class EventManager {
     // method to start event
     public void startEvent(EventType eventType) {
         runningEvent = new Event(eventType);
+        startTime = System.currentTimeMillis();
 
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
@@ -318,6 +322,11 @@ public class EventManager {
             return "Rising Water";
 
         return null;
+    }
+
+    public long getTimeLeftMillis() {
+        long futureEndTime = startTime + (Parkour.getSettingsManager().max_event_run_time * 1000);
+        return futureEndTime - System.currentTimeMillis();
     }
 
     public void shutdown() {
