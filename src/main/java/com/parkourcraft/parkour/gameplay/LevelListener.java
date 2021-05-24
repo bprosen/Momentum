@@ -2,6 +2,8 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
+import com.parkourcraft.parkour.data.events.EventManager;
+import com.parkourcraft.parkour.data.events.EventType;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
@@ -34,8 +36,19 @@ public class LevelListener implements Listener {
             if (levelName != null) {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                EventManager eventManager = Parkour.getEventManager();
 
-                if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                // if they are participant and fall into water, eliminate them
+                if (eventManager.isEventRunning() &&
+                    playerStats.isEventParticipant() &&
+                    eventManager.getEventType() == EventType.RISING_WATER) {
+
+                    eventManager.doFireworkExplosion(player.getLocation());
+                    eventManager.removeParticipant(player, false);
+                    eventManager.addEliminated(player);
+                    player.sendMessage(Utils.translate("&7You fell in water and got &beliminated out &7of the event!"));
+
+                } else if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
                     Parkour.getCheckpointManager().teleportPlayer(player);
                 else
                     LevelHandler.respawnPlayer(player, Parkour.getLevelManager().get(levelName));

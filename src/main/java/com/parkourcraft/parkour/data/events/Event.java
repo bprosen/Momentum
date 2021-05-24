@@ -3,8 +3,12 @@ package com.parkourcraft.parkour.data.events;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,8 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Event {
@@ -35,7 +41,7 @@ public class Event {
     /*
         Settings for Rising Water
      */
-    private int currentY;
+    private int currentWaterY;
 
     public Event(EventType eventType) {
         this.eventType = eventType;
@@ -69,7 +75,7 @@ public class Event {
 
                 List<Level> risingWaterLevels = Parkour.getLevelManager().getRisingWaterEventLevels();
                 eventLevel = risingWaterLevels.get(ran.nextInt(risingWaterLevels.size()));
-                currentY = eventLevel.getStartLocation().getBlockY() - 10;
+                currentWaterY = eventLevel.getStartLocation().getBlockY() - 10;
                 break;
         }
         // get level region
@@ -131,12 +137,53 @@ public class Event {
                     // rise water by 1 y
                     if (risingWater) {
 
+                        // add another layer of water
+                        BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();
+                        BlockVector minPoint = levelRegion.getMinimumPoint().toBlockPoint();
+                        int minX = minPoint.getBlockX();
+                        int maxX = maxPoint.getBlockX();
+                        int minZ = minPoint.getBlockZ();
+                        int maxZ = maxPoint.getBlockZ();
+
+                        WorldEdit FAWEAPI = WorldEdit.getInstance();
+
+                        if (FAWEAPI != null) {
+
+                            LocalWorld world = new BukkitWorld(eventLevel.getStartLocation().getWorld());
+
+                            Vector pos1 = new Vector(minX, currentWaterY, minZ);
+                            Vector pos2 = new Vector(maxX, currentWaterY, maxZ);
+                            CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
+
+                            try {
+                                // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
+                                EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                                editSession.setFastMode(true);
+
+                                // create single base block set for replace
+                                Set<BaseBlock> baseBlockSet = new HashSet<BaseBlock>() {{
+                                    add(new BaseBlock(Material.AIR.getId()));
+                                }};
+
+                                editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.WATER.getId()));
+                                editSession.flushQueue();
+                                editSession.setFastMode(false);
+                            } catch (MaxChangedBlocksException e) {
+                                e.printStackTrace();
+                            }
+                            currentWaterY++;
+                        } else {
+                            Parkour.getPluginLogger().info("FAWE API found null in Event runScheduler");
+                        }
                     }
 
                     if (fullHealth) {
                         for (EventParticipant particpant : eventManager.getParticipants())
                             particpant.getPlayer().setHealth(20.0);
                     }
+                // if nobody is playing and spawn is filled (rising water event), there is no way for anyone to beat it!
+                } else if (eventManager.isStartCoveredInWater()) {
+                    eventManager.endEvent(null, false, true);
                 }
             }
         }.runTaskTimer(Parkour.getPlugin(), taskDelay, taskDelay);
@@ -151,5 +198,7 @@ public class Event {
     }
 
     public EventType getEventType() { return eventType; }
+
+    public ProtectedRegion getLevelRegion() { return levelRegion; }
 }
 

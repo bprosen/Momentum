@@ -6,6 +6,8 @@ import com.parkourcraft.parkour.data.events.EventType;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -39,6 +41,14 @@ public class EventCMD implements CommandExecutor {
                                 if (!playerStats.inRace()) {
                                     if (!PlayerHider.containsPlayer(player)) {
                                         if (!eventManager.isEliminated(player)) {
+
+                                            // run a check if the event is rising water to see if where they would spawn has been covered by water
+                                            if (eventManager.isStartCoveredInWater()) {
+                                                player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
+                                                                                        "&cTherefore you cannot join this event"));
+                                                return true;
+                                            }
+
                                             eventManager.addParticipant(player);
                                         } else {
                                             player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));

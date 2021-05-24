@@ -4,9 +4,12 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import org.bukkit.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -97,6 +100,8 @@ public class EventManager {
         removeAllParticipants(false);
         // clear eliminated list
         eliminated.clear();
+        // clear all water if it was the rising water event
+        clearWater();
 
         if (forceEnded) {
             Bukkit.broadcastMessage("");
@@ -241,6 +246,66 @@ public class EventManager {
         }.runTaskLater(Parkour.getPlugin(), 1);
     }
 
+    private void clearWater() {
+
+        if (isEventRunning() &&
+            runningEvent.getLevel() != null &&
+            runningEvent.getLevelRegion() != null &&
+            runningEvent.getEventType() == EventType.RISING_WATER) {
+
+            BlockVector maxPoint = runningEvent.getLevelRegion().getMaximumPoint().toBlockPoint();
+            BlockVector minPoint = runningEvent.getLevelRegion().getMinimumPoint().toBlockPoint();
+            int minX = minPoint.getBlockX();
+            int maxX = maxPoint.getBlockX();
+            int minZ = minPoint.getBlockZ();
+            int maxZ = maxPoint.getBlockZ();
+
+            WorldEdit FAWEAPI = WorldEdit.getInstance();
+
+            if (FAWEAPI != null) {
+
+                LocalWorld world = new BukkitWorld(runningEvent.getLevel().getStartLocation().getWorld());
+                Vector pos1 = new Vector(minX, 0, minZ);
+                Vector pos2 = new Vector(maxX, 255, maxZ);
+                CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
+
+                try {
+                    // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
+                    EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                    editSession.setFastMode(true);
+
+                    // create single base block set for replace
+                    Set<BaseBlock> baseBlockSet = new HashSet<BaseBlock>() {{ add(new BaseBlock(Material.WATER.getId())); }};
+
+                    editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.AIR.getId()));
+                    editSession.flushQueue();
+                    editSession.setFastMode(false);
+                } catch (MaxChangedBlocksException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Parkour.getPluginLogger().info("FAWE API found null in Event clearWater()");
+            }
+        }
+    }
+
+    public boolean isStartCoveredInWater() {
+
+        boolean isCovered = false;
+
+        if (isEventRunning() &&
+            runningEvent.getLevel() != null &&
+            runningEvent.getEventType() == EventType.RISING_WATER) {
+
+            Location startLoc = getRunningEvent().getLevel().getStartLocation();
+
+            if (startLoc.clone().getBlock().getType() == Material.WATER ||
+                startLoc.clone().add(0, 1, 0).getBlock().getType() == Material.WATER)
+                isCovered = true;
+        }
+        return isCovered;
+    }
+
     /*
         Misc Utilities
      */
@@ -259,6 +324,7 @@ public class EventManager {
         if (isEventRunning()) {
             runningEvent.getScheduler().cancel();
             removeAllParticipants(true);
+            clearWater();
             runningEvent = null;
         }
     }
