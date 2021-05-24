@@ -24,6 +24,7 @@ public class EventManager {
 
     private Event runningEvent = null;
     private BukkitTask maxRunTimer;
+    private BukkitTask reminderTimer;
     private Set<EventParticipant> participants = new HashSet<>();
     private Set<String> eliminated = new HashSet<>();
     // start millis according to system
@@ -53,19 +54,6 @@ public class EventManager {
             }
         }.runTaskTimer(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().check_next_event_delay,
                                            20 * Parkour.getSettingsManager().check_next_event_delay);
-        // run a timer scheduler for reminder to join running event
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (runningEvent != null) {
-                    Bukkit.broadcastMessage("");
-                    Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
-                            " Event &7is still running! Type &b/event join &7to join!"));
-                    Bukkit.broadcastMessage("");
-                }
-            }
-        }.runTaskTimer(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().event_reminder_delay,
-                                           20 * Parkour.getSettingsManager().event_reminder_delay);
     }
 
     // method to start event
@@ -79,11 +67,11 @@ public class EventManager {
         Bukkit.broadcastMessage("");
 
         // start max time timer
-        startTimer();
+        startTimers();
     }
 
     // method to start the timer
-    private void startTimer() {
+    private void startTimers() {
         maxRunTimer = new BukkitRunnable() {
             @Override
             public void run() {
@@ -92,6 +80,25 @@ public class EventManager {
                     endEvent(null,false, true);
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().max_event_run_time);
+
+        // run a timer scheduler for reminder to join running event
+        reminderTimer = new BukkitRunnable() {
+            @Override
+            public void run() {
+                long endTimeMillis = startTime + (Parkour.getSettingsManager().max_event_run_time * 1000);
+
+                // if the event is running and the end time will be in sync to when the reminder broadcast is, dont do it
+                if (runningEvent != null &&
+                   (endTimeMillis - (20 * 1000 * Parkour.getSettingsManager().event_reminder_delay)) < System.currentTimeMillis()) {
+
+                    Bukkit.broadcastMessage("");
+                    Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
+                            " Event &7is still running! Type &b/event join &7to join!"));
+                    Bukkit.broadcastMessage("");
+                }
+            }
+        }.runTaskTimer(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().event_reminder_delay,
+                                           20 * Parkour.getSettingsManager().event_reminder_delay);
     }
 
     // method to end event
@@ -99,6 +106,7 @@ public class EventManager {
         // cancel schedulers first
         runningEvent.getScheduler().cancel();
         maxRunTimer.cancel();
+        reminderTimer.cancel();
 
         // then remove all participants
         removeAllParticipants(false);
