@@ -178,6 +178,10 @@ public class MenuItemFormatter {
             itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(
                                  featuredLevel.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)
                                         + "&r &6" + Utils.formatNumber(featuredLevel.getReward()) + " &6Coin &7Reward"));
+
+            if (featuredLevel.getTotalCompletionsCount() > 0)
+                itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(featuredLevel.getTotalCompletionsCount()) + " &7Completions"));
+
             // only show rating if above 5
             if (featuredLevel.getRatingsCount() >= 5) {
                 itemLore.add(Utils.translate("  &6" + featuredLevel.getRating() + " &7Rating"));
@@ -224,6 +228,9 @@ public class MenuItemFormatter {
                     .replace("&l", "").replace("&o", "")));
 
             itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
+
+            if (level.getTotalCompletionsCount() > 0)
+                itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + " &7Completions"));
 
             // only show rating if above 5
             if (level.getRatingsCount() >= 5) {
@@ -278,6 +285,7 @@ public class MenuItemFormatter {
                     itemLore.add(timeSinceString);
                 }
             }
+
             // Sections over
             itemMeta.setLore((itemLore));
             item.setItemMeta(itemMeta);
