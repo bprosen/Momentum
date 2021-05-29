@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.perks.PerksDB;
 import com.parkourcraft.parkour.data.rank.Rank;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -173,6 +174,21 @@ public class StatsDB {
             Level level = Parkour.getLevelManager().get(levelResult.get("level_name"));
 
             if (level != null)
+                level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
+        }
+    }
+
+    // can run complete async, only when all levels are loaded
+    public static void loadTotalCompletions(Level level) {
+
+        if (level != null) {
+            List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                    "completions",
+                    "COUNT(*) AS total_completions",
+                    " WHERE level_id='" + level.getID() + "'"
+            );
+
+            for (Map<String, String> levelResult : levelsResults)
                 level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
         }
     }

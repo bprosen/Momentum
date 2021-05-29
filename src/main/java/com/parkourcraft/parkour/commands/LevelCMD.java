@@ -77,6 +77,16 @@ public class LevelCMD implements CommandExecutor {
                     levelManager.load();
                     sender.sendMessage(Utils.translate("&7Loaded levels from &2levels.yml&7, &a" +
                                        Parkour.getLevelManager().getNames().size() + " &7total"));
+
+                    // load total completions and leaderboards in async
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            StatsDB.loadTotalCompletions();
+                            StatsDB.loadLeaderboards();
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
+
                 } else if (a[0].equalsIgnoreCase("title")) { //subcommand: title
                     if (a.length > 1) {
                         String levelName = a[1].toLowerCase();
@@ -488,6 +498,22 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("togglewater")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+
+                        if (level.doesLiquidResetPlayer())
+                            sender.sendMessage(Utils.translate("&7You toggled off liquid resetting players for level &c" + level.getFormattedTitle()));
+                        else
+                            sender.sendMessage(Utils.translate("&7You have toggled on liquid resetting players for level &c" + level.getFormattedTitle()));
+
+                        level.toggleLiquidReset();
+                        LevelsYAML.toggleWaterReset(levelName);
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
@@ -522,6 +548,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("addrating"));
         sender.sendMessage(getHelp("removerating"));
         sender.sendMessage(getHelp("hasrated"));
+        sender.sendMessage(getHelp("togglewater"));
     }
 
     private static String getHelp(String cmd) {
@@ -567,6 +594,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name");
             case "hasrated":
                 return Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating");
+            case "togglewater":
+                return Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level");
         }
         return "";
     }

@@ -31,6 +31,7 @@ public class Level {
     private int ID = -1;
     private int scoreModifier = 1;
     private boolean isRankUpLevel = false;
+    private boolean liquidResetPlayer = true;
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
@@ -85,6 +86,10 @@ public class Level {
     public String getMessage() {
         return message;
     }
+
+    public void toggleLiquidReset() { liquidResetPlayer = !liquidResetPlayer; }
+
+    public boolean doesLiquidResetPlayer() { return liquidResetPlayer; }
 
     public String getFormattedMessage(PlayerStats playerStats) {
         if (message != null) {
@@ -310,6 +315,7 @@ public class Level {
             requiredLevels = LevelsYAML.getRequiredLevels(name);
             potionEffects = LevelsYAML.getPotionEffects(name);
             commands = LevelsYAML.getCommands(name);
+            liquidResetPlayer = LevelsYAML.getLiquidResetSetting(name);
         }
     }
 

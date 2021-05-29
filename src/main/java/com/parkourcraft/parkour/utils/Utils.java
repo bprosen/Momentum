@@ -1,13 +1,7 @@
 package com.parkourcraft.parkour.utils;
 
-import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.stats.PlayerStats;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 

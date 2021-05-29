@@ -48,10 +48,17 @@ public class LevelListener implements Listener {
                     eventManager.addEliminated(player);
                     player.sendMessage(Utils.translate("&7You fell in water and got &beliminated out &7of the event!"));
 
-                } else if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                    Parkour.getCheckpointManager().teleportPlayer(player);
-                else
-                    LevelHandler.respawnPlayer(player, Parkour.getLevelManager().get(levelName));
+                } else {
+                    Level level = Parkour.getLevelManager().get(levelName);
+
+                    if (level != null && level.doesLiquidResetPlayer()) {
+
+                        if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                            Parkour.getCheckpointManager().teleportPlayer(player);
+                        else
+                            LevelHandler.respawnPlayer(player, level);
+                    }
+                }
             }
         }
     }

@@ -2,12 +2,14 @@ package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventType;
+import com.parkourcraft.parkour.data.stats.StatsDB;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,17 @@ public class LevelsYAML {
     public static void commit(String levelName) {
         Parkour.getConfigManager().save("levels");
         Parkour.getLevelManager().load(levelName);
+
+        // run total completions and leaderboard regen in async
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Level level = Parkour.getLevelManager().get(levelName);
+
+                StatsDB.loadTotalCompletions(level);
+                StatsDB.loadLeaderboard(level);
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     public static boolean exists(String levelName) {
@@ -56,6 +69,17 @@ public class LevelsYAML {
     public static void setTitle(String levelName, String title) {
         if (exists(levelName)) {
             levelsFile.set(levelName + ".title", title);
+
+            commit(levelName);
+        }
+    }
+
+    public static void toggleWaterReset(String levelName) {
+        if (exists(levelName)) {
+            if (isSet(levelName, "liquids-reset-players"))
+                levelsFile.set(levelName + ".liquids-reset-players", null);
+            else
+                levelsFile.set(levelName + ".liquids-reset-players", false);
 
             commit(levelName);
         }
@@ -138,6 +162,13 @@ public class LevelsYAML {
             return levelsFile.getBoolean(levelName + ".broadcast_completion");
 
         return false;
+    }
+
+    public static boolean getLiquidResetSetting(String levelName) {
+        // WE WANT DEFAULT TO BE TRUE!
+        if (isSet(levelName, "liquids-reset-players"))
+            return false;
+        return true;
     }
 
     public static List<PotionEffect> getPotionEffects(String levelName) {
