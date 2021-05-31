@@ -55,3 +55,5 @@ event:
     pvp: 5
     half_heart: 15
     rising_water: 100
+infinitepk:
+  max_leaderboard_size: 10

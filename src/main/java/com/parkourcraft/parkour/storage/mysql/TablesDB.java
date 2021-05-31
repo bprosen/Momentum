@@ -65,6 +65,7 @@ public class TablesDB {
                 "rank_id INT DEFAULT 1," +
                 "rankup_stage BIT default 1," +
                 "rank_prestiges TINYINT default 0," +
+                "infinitepk_score INT default 0," +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

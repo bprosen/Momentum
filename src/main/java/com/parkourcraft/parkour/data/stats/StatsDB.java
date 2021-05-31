@@ -27,7 +27,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges",
+                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -63,6 +63,9 @@ public class StatsDB {
                 // add +1 so it is normal stage 1/2 out of database
                 int rankUpStage = Integer.parseInt(playerResult.get("rankup_stage")) + 1;
                 playerStats.setRankUpStage(rankUpStage);
+
+                int infinitePKScore = Integer.parseInt(playerResult.get("infinitepk_score"));
+                playerStats.setInfinitePKScore(infinitePKScore);
             }
         } else {
             insertPlayerID(playerStats);

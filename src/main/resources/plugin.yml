@@ -62,3 +62,6 @@ commands:
   sword:
     description: "PC-Parkour Sword Command"
     aliases: [setup, setupsword]
+  infinite:
+    description: "PC-Parkour InfinitePK Command"
+    aliases: [infinitepk, endless, endlesspk]

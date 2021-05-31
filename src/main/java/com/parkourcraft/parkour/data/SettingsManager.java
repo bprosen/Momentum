@@ -44,6 +44,8 @@ public class SettingsManager {
     public String sword_title;
     public int sword_hotbar_slot;
 
+    public int max_infinitepk_leaderboard_size;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -81,5 +83,6 @@ public class SettingsManager {
         sword_title = settings.getString("setup-sword.title");
         sword_type = Material.matchMaterial(settings.getString("setup-sword.type"));
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
+        max_infinitepk_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
     }
 }

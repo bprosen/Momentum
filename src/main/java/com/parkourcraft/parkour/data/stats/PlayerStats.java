@@ -26,6 +26,7 @@ public class PlayerStats {
     private Rank rank;
     private int prestiges = 0;
     private int rankUpStage;
+    private int infinitePKScore;
     private boolean eventParticipant = false;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
@@ -143,6 +144,17 @@ public class PlayerStats {
 
     public PlayerStats getPlayerToSpectate() {
         return playerToSpectate;
+    }
+
+    //
+    // InfinitePK Section
+    //
+    public void setInfinitePKScore(int infinitePKScore) {
+        this.infinitePKScore = infinitePKScore;
+    }
+
+    public int getInfinitePKScore() {
+        return infinitePKScore;
     }
 
     //
