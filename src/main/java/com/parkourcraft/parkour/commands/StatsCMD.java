@@ -23,17 +23,19 @@ public class StatsCMD implements CommandExecutor {
             // infinite pk lb
             if (a.length == 1 && a[0].equalsIgnoreCase("infinite")) {
 
-                Set<InfinitePKLBPosition> leaderboard = Parkour.getInfinitePKManager().getLeaderboard();
-
-                if (!leaderboard.isEmpty()) {
+                if (!Parkour.getInfinitePKManager().getLeaderboard().isEmpty()) {
                     sender.sendMessage(Utils.translate("&5Infinite Parkour &7Leaderboard"));
 
-                    for (InfinitePKLBPosition lbPosition : leaderboard) {
+                    for (int i = 1; i <= Parkour.getSettingsManager().max_infinitepk_leaderboard_size; i++) {
 
-                        sender.sendMessage(Utils.translate(" &7" +
-                                lbPosition.getPosition() + " &5" +
-                                Utils.formatNumber(lbPosition.getScore()) + " &d" +
-                                lbPosition.getName()));
+                        InfinitePKLBPosition lbPosition = Parkour.getInfinitePKManager().getLeaderboardPosition(i);
+
+                        if (lbPosition != null) {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                    lbPosition.getPosition() + " &5" +
+                                    Utils.formatNumber(lbPosition.getScore()) + " &d" +
+                                    lbPosition.getName()));
+                        }
                     }
 
                     if (sender instanceof Player) {

@@ -31,10 +31,10 @@ public class InfinitePKManager {
             @Override
             public void run() {
                 for (InfinitePK infinitePK : participants)
-                    if (infinitePK.getPlayer().getLocation().getBlockY() < (infinitePK.getCurrentBlockLoc().getBlockY() - 2))
+                    if (infinitePK.getPlayer().getLocation().getBlockY() <= (infinitePK.getCurrentBlockLoc().getBlockY() - 2))
                         endPK(infinitePK.getPlayer());
             }
-        }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20 * 3);
+        }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20);
     }
 
     public void startPK(Player player) {
@@ -76,10 +76,19 @@ public class InfinitePKManager {
                                    " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score)));
 
                 updateScore(player.getName(), score);
+
+                // load leaderboard if they have a lb position
+                if (scoreWillBeLB(score) || leaderboard.size() < Parkour.getSettingsManager().max_infinitepk_leaderboard_size)
+                    InfinitePKDB.loadLeaderboard();
             } else {
                 player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
                                                         "&7Your best is &d" + playerStats.getInfinitePKScore()));
             }
+
+            // clear blocks
+            infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
+            infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
+            infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
 
             participants.remove(infinitePK);
             playerStats.toggleInfinitePK();
@@ -129,7 +138,7 @@ public class InfinitePKManager {
         if (isLBPosition(playerName))
             getLeaderboardPosition(playerName).setScore(score);
 
-        Parkour.getDatabaseManager().add(
+        Parkour.getDatabaseManager().run(
                 "UPDATE players SET infinitepk_score=" + score + " WHERE player_name='" + playerName + "'"
         );
     }
@@ -161,7 +170,7 @@ public class InfinitePKManager {
                 infinitePK.getCurrentBlockLoc().getBlock().setType(Material.QUARTZ_BLOCK);
                 infinitePK.getPressutePlateLoc().getBlock().setType(Material.IRON_PLATE);
 
-                newLocation.getWorld().spawnParticle(Particle.CLOUD, newLocation.getX(), newLocation.getY(), newLocation.getZ(), 50);
+                newLocation.getWorld().spawnParticle(Particle.CLOUD, newLocation.getX(), newLocation.getY(), newLocation.getZ(), 25);
             }
         }
     }
@@ -241,8 +250,9 @@ public class InfinitePKManager {
 
     public boolean isLocInCurrentBlocks(Location loc) {
         for (InfinitePK infinitePK : participants)
-            if (infinitePK.getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
-                infinitePK.getCurrentBlockLoc().getBlockZ() == loc.getBlockZ())
+            if ((infinitePK.getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
+                infinitePK.getCurrentBlockLoc().getBlockZ() == loc.getBlockZ()) ||
+                loc.getBlock().getType() != Material.AIR)
                 return true;
 
         return false;
@@ -269,6 +279,18 @@ public class InfinitePKManager {
             if (infinitePKLBPosition.getName().equalsIgnoreCase(playerName))
                 return true;
 
+        return false;
+    }
+
+    public boolean scoreWillBeLB(int score) {
+        int lowestScore = 0;
+        // gets lowest score
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+            if (lowestScore == 0 || infinitePKLBPosition.getScore() < lowestScore)
+                lowestScore = infinitePKLBPosition.getScore();
+
+        if (lowestScore < score)
+            return true;
         return false;
     }
 

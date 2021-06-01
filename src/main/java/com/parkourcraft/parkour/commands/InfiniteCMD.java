@@ -5,9 +5,7 @@ import com.parkourcraft.parkour.data.infinite.InfinitePKDB;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -71,6 +69,7 @@ public class InfiniteCMD implements CommandExecutor {
                     int score = Integer.parseInt(a[2]);
 
                     infinitePKManager.updateScore(a[1], score);
+                    InfinitePKDB.loadLeaderboard(); // load lb
                     player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's score to &6" + score));
                 } else {
                     player.sendMessage(Utils.translate("&c" + a[1] + " &7has not joined the server yet"));
