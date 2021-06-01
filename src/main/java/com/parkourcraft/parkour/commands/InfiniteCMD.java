@@ -69,18 +69,8 @@ public class InfiniteCMD implements CommandExecutor {
                 if (InfinitePKDB.hasScore(a[1])) {
                     int score = Integer.parseInt(a[2]);
 
-                    PlayerStats targetStats = Parkour.getStatsManager().getByNameIgnoreCase(a[1]);
-                    if (targetStats != null)
-                        targetStats.setInfinitePKScore(score);
-
-                    Parkour.getDatabaseManager().add(
-                            "UPDATE players SET infinitepk_score=" + score + " WHERE player_name='" + a[1] + "'"
-                    );
-
+                    infinitePKManager.updateScore(a[1], score);
                     player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's score to &6" + score));
-
-                    if (infinitePKManager.isLBPosition(a[1]))
-                        InfinitePKDB.loadLeaderboard();
                 } else {
                     player.sendMessage(Utils.translate("&c" + a[1] + " &7has not joined the server yet"));
                 }

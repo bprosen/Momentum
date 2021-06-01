@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.infinite;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 
 import java.util.*;
 
@@ -30,6 +31,35 @@ public class InfinitePKManager {
 
         if (infinitePK != null)
             participants.remove(infinitePK);
+    }
+
+    public boolean isBestScore(String playerName, int score) {
+
+        boolean isBest = false;
+
+        // it will first check if they have a score (exist), then it will check if their gotten score is better
+        if (InfinitePKDB.hasScore(playerName)) {
+            int currentBestScore = InfinitePKDB.getScoreFromName(playerName);
+
+            if (score > currentBestScore)
+                isBest = true;
+        }
+        return isBest;
+    }
+
+    // method to update their score in all 3 possible placed
+    public void updateScore(String playerName, int score) {
+        PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(playerName);
+
+        if (playerStats != null)
+            playerStats.setInfinitePKScore(score);
+
+        if (isLBPosition(playerName))
+            getLeaderboardPosition(playerName).setScore(score);
+
+        Parkour.getDatabaseManager().add(
+                "UPDATE players SET infinitepk_score=" + score + " WHERE player_name='" + playerName + "'"
+        );
     }
 
     public InfinitePKLBPosition getLeaderboardPosition(int position) {

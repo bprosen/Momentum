@@ -16,6 +16,8 @@ public class InfinitePKLBPosition {
 
     public int getScore() { return score; }
 
+    public void setScore(int score) { this.score = score; }
+
     public String getUUID() { return playerUUID; }
 
     public String getName() { return playerName; }

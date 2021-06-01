@@ -71,7 +71,7 @@ public class StatsCMD implements CommandExecutor {
 
                     sender.sendMessage(outOfMessage);
                 } else {
-                    sender.sendMessage(Utils.translate("&&No level named '&c" + levelName + "&7' exists"));
+                    sender.sendMessage(Utils.translate("&7No level named '&c" + levelName + "&7' exists"));
                 }
             }
         } else if (sender instanceof Player) {

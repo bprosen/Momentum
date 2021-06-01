@@ -17,6 +17,8 @@ public class InfinitePKDB {
             public void run() {
 
                 Set<InfinitePKLBPosition> leaderboard = Parkour.getInfinitePKManager().getLeaderboard();
+                leaderboard.clear();
+
                 List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
                        "players",
                         "uuid, player_name, infinitepk_score",
