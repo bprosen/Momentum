@@ -6,6 +6,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class InfinitePKDB {
 
@@ -15,13 +16,20 @@ public class InfinitePKDB {
             @Override
             public void run() {
 
-                LinkedHashMap<String, Integer> leaderboard = Parkour.getInfinitePKManager().getLeaderboard();
-                List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "uuid, infinitepk_score",
+                Set<InfinitePKLBPosition> leaderboard = Parkour.getInfinitePKManager().getLeaderboard();
+                List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "uuid, player_name, infinitepk_score",
                         " ORDER BY infinitepk_score DESC" +
-                                " LIMIT " + leaderboard.size());
+                                " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
-                for (Map<String, String> scoreResult : scoreResults)
-                    leaderboard.put(scoreResult.get("uuid"), Integer.parseInt(scoreResult.get("infinitepk_score")));
+                for (Map<String, String> scoreResult : scoreResults) {
+                    leaderboard.add(
+                            new InfinitePKLBPosition(
+                                    scoreResult.get("uuid"),
+                                    scoreResult.get("player_name"),
+                                    Integer.parseInt("infinitepk_score"),
+                                    leaderboard.size() + 1)
+                    );
+                }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
@@ -50,8 +58,8 @@ public class InfinitePKDB {
         List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "infinitepk_score",
                 " WHERE player_name='" + playerName + "'");
 
-        if (!scoreResults.isEmpty() || Integer.parseInt(scoreResults.get(0).get("infinitepk_score")) > 0)
-            return true;
-        return false;
+        if (scoreResults.isEmpty())
+            return false;
+        return true;
     }
 }

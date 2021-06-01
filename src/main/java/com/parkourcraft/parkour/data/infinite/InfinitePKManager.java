@@ -1,16 +1,13 @@
 package com.parkourcraft.parkour.data.infinite;
 
 import com.parkourcraft.parkour.Parkour;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.*;
 
 public class InfinitePKManager {
 
     private Set<InfinitePK> participants = new HashSet<>();
-    private LinkedHashMap<String, Integer> leaderboard = new LinkedHashMap<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
+    private Set<InfinitePKLBPosition> leaderboard = new HashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
     public InfinitePKManager() {
         InfinitePKDB.loadLeaderboard();
@@ -35,11 +32,31 @@ public class InfinitePKManager {
             participants.remove(infinitePK);
     }
 
-    public int getLeaderboardScore(String placementUUID) {
-        return leaderboard.get(placementUUID);
+    public InfinitePKLBPosition getLeaderboardPosition(int position) {
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+            if (infinitePKLBPosition.getPosition() == position)
+                return infinitePKLBPosition;
+
+        return null;
     }
 
-    public LinkedHashMap<String, Integer> getLeaderboard() {
+    public InfinitePKLBPosition getLeaderboardPosition(String playerName) {
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+            if (infinitePKLBPosition.getName().equalsIgnoreCase(playerName))
+                return infinitePKLBPosition;
+
+        return null;
+    }
+
+    public boolean isLBPosition(String playerName) {
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+            if (infinitePKLBPosition.getName().equalsIgnoreCase(playerName))
+                return true;
+
+        return false;
+    }
+
+    public Set<InfinitePKLBPosition> getLeaderboard() {
         return leaderboard;
     }
 
