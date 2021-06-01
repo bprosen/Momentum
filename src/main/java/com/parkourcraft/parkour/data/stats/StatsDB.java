@@ -197,9 +197,9 @@ public class StatsDB {
     }
 
     public static void loadLeaderboards() {
-        for (Level level : Parkour.getLevelManager().getLevels()) {
-            if (level != null)
-                loadLeaderboard(level);
+        for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet()) {
+            if (entry.getValue() != null)
+                loadLeaderboard(entry.getValue());
         }
     }
 

@@ -109,7 +109,7 @@ public class Scoreboard {
 
             board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
             board.add(formatSpacing(Utils.translate("&7Score &d" + Parkour.getInfinitePKManager().get(
-                                                                        player.getUniqueId().toString()).getScore())
+                                                                        player.getName()).getScore())
                                                                         ));
 
         // level section of scoreboard

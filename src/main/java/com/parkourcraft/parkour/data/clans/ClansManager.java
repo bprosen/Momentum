@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ClansManager {
 
-    private Set<Clan> clans = new HashSet<>();
+    private HashMap<Integer, Clan> clans = new HashMap<>();
 
     public ClansManager(Plugin plugin) {
         load();
@@ -40,7 +40,7 @@ public class ClansManager {
     }
 
     public void add(Clan clan) {
-        clans.add(clan);
+        clans.put(clan.getID(), clan);
     }
 
     public void addMember(int clanID, ClanMember clanMember) {
@@ -51,24 +51,17 @@ public class ClansManager {
     }
 
     public void removeClan(int clanID) {
-        Clan clan = get(clanID);
-
-        if (clan != null)
-            clans.remove(clan);
+        clans.remove(clanID);
     }
 
     public Clan get(int clanID) {
-        for (Clan clan : clans)
-            if (clan.getID() == clanID)
-                return clan;
-
-        return null;
+        return clans.get(clanID);
     }
 
     public Clan get(String clanTag) {
-        for (Clan clan : clans)
-            if (clan.getTag().equalsIgnoreCase(clanTag))
-                return clan;
+        for (Map.Entry<Integer, Clan> entry : clans.entrySet())
+            if (entry.getValue().getTag().equalsIgnoreCase(clanTag))
+                return entry.getValue();
 
         return null;
     }
@@ -188,9 +181,9 @@ public class ClansManager {
     }
 
     private void syncNewClans() {
-        for (Clan clan : clans)
-            if (clan.getID() == -1)
-                ClansDB.newClan(clan);
+        for (Map.Entry<Integer, Clan> entry : clans.entrySet())
+            if (entry.getKey() == -1)
+                ClansDB.newClan(entry.getValue());
     }
 
     private void startScheduler(Plugin plugin) {

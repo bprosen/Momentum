@@ -7,11 +7,10 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LocationManager {
 
-    private Map<String, Location> locations;
+    private HashMap<String, Location> locations;
 
     public LocationManager() {
         load();
@@ -29,8 +28,7 @@ public class LocationManager {
     public void load(String locationName) {
         Location location = LocationsYAML.get(locationName);
 
-        if (location == null
-                && exists(locationName))
+        if (location == null && exists(locationName))
             locations.remove(locationName);
         else
             locations.put(locationName, location);

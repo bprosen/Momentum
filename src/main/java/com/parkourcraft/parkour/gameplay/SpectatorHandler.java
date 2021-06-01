@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Map;
+
 public class SpectatorHandler {
 
     public static void startScheduler(Plugin plugin) {
@@ -72,7 +74,10 @@ public class SpectatorHandler {
     }
 
     public static void updateSpectators() {
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
+
+            PlayerStats playerStats = entry.getValue();
+
             if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
                 updateSpectator(playerStats);
         }
@@ -90,7 +95,9 @@ public class SpectatorHandler {
     }
 
     public static void shutdown() {
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
+            
+            PlayerStats playerStats = entry.getValue();
             if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
                 removeSpectatorMode(playerStats);
         }

@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class PerksDB {
 
-    static Map<String, Integer> getIDCache() {
-        Map<String, Integer> IDCache = new HashMap<>();
+    static HashMap<String, Integer> getIDCache() {
+        HashMap<String, Integer> IDCache = new HashMap<>();
 
         List<Map<String, String>> perkResults = DatabaseQueries.getResults(
                 "perks",
@@ -32,8 +32,8 @@ public class PerksDB {
     }
 
     static void syncIDCache() {
-        for (Perk perk : Parkour.getPerkManager().getPerks())
-            syncIDCache(perk, Parkour.getPerkManager().getIDCache());
+        for (Map.Entry<String, Perk> entry: Parkour.getPerkManager().getPerks().entrySet())
+            syncIDCache(entry.getValue(), Parkour.getPerkManager().getIDCache());
     }
 
     static void syncIDCache(Perk perk, Map<String, Integer> IDCache) {
@@ -44,7 +44,9 @@ public class PerksDB {
     static boolean syncPerkIDs() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (Perk perk : Parkour.getPerkManager().getPerks())
+        for (Map.Entry<String, Perk> entry : Parkour.getPerkManager().getPerks().entrySet()) {
+            Perk perk = entry.getValue();
+
             if (perk.getID() == -1)
                 insertQueries.add(
                         "INSERT INTO perks " +
@@ -52,6 +54,7 @@ public class PerksDB {
                                 " VALUES " +
                                 "('" + perk.getName() + "')"
                 );
+        }
 
         if (insertQueries.size() > 0) {
             String finalQuery = "";

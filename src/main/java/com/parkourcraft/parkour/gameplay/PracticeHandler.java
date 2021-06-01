@@ -5,11 +5,14 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+
 public class PracticeHandler {
 
     public static void shutdown() {
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
 
+            PlayerStats playerStats = entry.getValue();
             if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPracticeLocation() != null) {
                 playerStats.getPlayer().teleport(playerStats.getPracticeLocation());
                 playerStats.resetPracticeMode();

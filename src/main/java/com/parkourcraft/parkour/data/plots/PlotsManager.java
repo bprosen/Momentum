@@ -18,7 +18,7 @@ import java.util.*;
 
 public class PlotsManager {
 
-    private Set<Plot> plotList = new HashSet<>();
+    private HashMap<String, Plot> plotList = new HashMap<>();
 
     public PlotsManager() {
         load();
@@ -50,56 +50,40 @@ public class PlotsManager {
     }
     // player param version
     public void add(Player player) {
-        Plot rank = new Plot(player, player.getLocation());
-        plotList.add(rank);
+        Plot plot = new Plot(player, player.getLocation());
+        plotList.put(player.getName(), plot);
     }
 
     // string ver
     public void add(String playerName, String playerUUID, Location spawnLoc) {
-        Plot rank = new Plot(playerName, playerUUID, spawnLoc);
-        plotList.add(rank);
+        Plot plot = new Plot(playerName, playerUUID, spawnLoc);
+        plotList.put(playerName, plot);
     }
 
     public Plot get(String playerName) {
-        for (Plot plot : plotList)
-            if (plot.getOwnerName().equalsIgnoreCase(playerName))
-                return plot;
-
-        return null;
-    }
-
-    public Plot getFromUUID(String playerUUID) {
-        for (Plot plot : plotList)
-            if (plot.getOwnerUUID().equalsIgnoreCase(playerUUID))
-                return plot;
-
-        return null;
-    }
-
-    public boolean existsFromUUID(String playerUUID) {
-        return (getFromUUID(playerUUID) != null);
+        return plotList.get(playerName);
     }
 
     public boolean exists(String playerName) {
         return (get(playerName) != null);
     }
 
-    public Set<Plot> getPlots() {
+    public HashMap<String, Plot> getPlots() {
         return plotList;
     }
 
-    public void remove(String playerUUID) {
-        if (existsFromUUID(playerUUID))
-            plotList.remove(playerUUID);
+    public void remove(String playerName) {
+        if (exists(playerName))
+            plotList.remove(playerName);
     }
 
     // this needs to be a list due to #get(int)
     public List<Plot> getSubmittedPlots() {
         List<Plot> tempList = new ArrayList<>();
 
-        for (Plot plot : plotList) {
-            if (plot.isSubmitted())
-                tempList.add(plot);
+        for (Map.Entry<String, Plot> entry : plotList.entrySet()) {
+            if (entry.getValue().isSubmitted())
+                tempList.add(entry.getValue());
         }
         return tempList;
     }
@@ -149,7 +133,7 @@ public class PlotsManager {
 
     public void deletePlot(Player player) {
 
-        Plot plot = getFromUUID(player.getUniqueId().toString());
+        Plot plot = get(player.getName());
 
         if (plot != null) {
             // if they are in plot world, teleport them
@@ -306,9 +290,9 @@ public class PlotsManager {
     public Plot getNearestPlot(Location loc) {
 
         Plot nearestPlot = null;
-        for (Plot plot : plotList) {
-            if (blockInPlot(loc, plot)) {
-                nearestPlot = plot;
+        for (Map.Entry<String, Plot> entry : plotList.entrySet()) {
+            if (blockInPlot(loc, entry.getValue())) {
+                nearestPlot = entry.getValue();
                 break;
             }
         }

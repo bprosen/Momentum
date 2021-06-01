@@ -5,7 +5,6 @@ import com.parkourcraft.parkour.data.SettingsManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class InfinitePKManager {
 
-    private Set<InfinitePK> participants = new HashSet<>();
+    private HashMap<String, InfinitePK> participants = new HashMap<>();
     private Set<InfinitePKLBPosition> leaderboard = new HashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
     public InfinitePKManager() {
@@ -30,9 +29,12 @@ public class InfinitePKManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (InfinitePK infinitePK : participants)
-                    if (infinitePK.getPlayer().getLocation().getBlockY() <= (infinitePK.getCurrentBlockLoc().getBlockY() - 2))
-                        endPK(infinitePK.getPlayer());
+
+                if (!participants.isEmpty()) {
+                    for (Map.Entry<String, InfinitePK> entry : participants.entrySet())
+                        if (entry.getValue().getPlayer().getLocation().getBlockY() <= (entry.getValue().getCurrentBlockLoc().getBlockY() - 2))
+                            endPK(entry.getValue().getPlayer());
+                }
             }
         }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20);
     }
@@ -44,7 +46,7 @@ public class InfinitePKManager {
 
         // create cache
         InfinitePK infinitePK = new InfinitePK(player);
-        participants.add(infinitePK);
+        participants.put(player.getName(), infinitePK);
         infinitePK.setCurrentBlockLoc(startingLoc);
 
         // prepare block and teleport
@@ -62,8 +64,10 @@ public class InfinitePKManager {
 
     public void endPK(Player player) {
 
-        InfinitePK infinitePK = get(player.getUniqueId().toString());
+        InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null) {
+
+            participants.remove(player.getName());
 
             player.teleport(infinitePK.getOriginalLoc());
             int score = infinitePK.getScore();
@@ -89,29 +93,16 @@ public class InfinitePKManager {
             infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
             infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
             infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
-
-            participants.remove(infinitePK);
             playerStats.toggleInfinitePK();
         }
     }
 
-    public InfinitePK get(String UUID) {
-        for (InfinitePK participant : participants)
-            if (participant.getUUID().equalsIgnoreCase(UUID))
-                return participant;
-
-        return null;
+    public InfinitePK get(String playerName) {
+        return participants.get(playerName);
     }
 
-    public void add(InfinitePK infinitePK) {
-        participants.add(infinitePK);
-    }
-
-    public void remove(String UUID) {
-        InfinitePK infinitePK = get(UUID);
-
-        if (infinitePK != null)
-            participants.remove(infinitePK);
+    public void remove(String playerName) {
+        participants.remove(playerName);
     }
 
     public boolean isBestScore(String playerName, int score) {
@@ -144,7 +135,7 @@ public class InfinitePKManager {
     }
 
     public void doNextJump(Player player, boolean startingJump) {
-        InfinitePK infinitePK = get(player.getUniqueId().toString());
+        InfinitePK infinitePK = get(player.getName());
 
         if (infinitePK != null) {
 
@@ -170,7 +161,7 @@ public class InfinitePKManager {
                 infinitePK.getCurrentBlockLoc().getBlock().setType(Material.QUARTZ_BLOCK);
                 infinitePK.getPressutePlateLoc().getBlock().setType(Material.IRON_PLATE);
 
-                newLocation.getWorld().spawnParticle(Particle.CLOUD, newLocation.getX(), newLocation.getY(), newLocation.getZ(), 25);
+                newLocation.getWorld().spawnParticle(Particle.CLOUD, newLocation.getX(), newLocation.getY(), newLocation.getZ(), 15);
             }
         }
     }
@@ -249,9 +240,9 @@ public class InfinitePKManager {
     }
 
     public boolean isLocInCurrentBlocks(Location loc) {
-        for (InfinitePK infinitePK : participants)
-            if ((infinitePK.getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
-                infinitePK.getCurrentBlockLoc().getBlockZ() == loc.getBlockZ()) ||
+        for (Map.Entry<String, InfinitePK> entry : participants.entrySet())
+            if ((entry.getValue().getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
+                entry.getValue().getCurrentBlockLoc().getBlockZ() == loc.getBlockZ()) ||
                 loc.getBlock().getType() != Material.AIR)
                 return true;
 
@@ -298,7 +289,7 @@ public class InfinitePKManager {
         return leaderboard;
     }
 
-    public Set<InfinitePK> getParticipants() {
+    public HashMap<String, InfinitePK> getParticipants() {
         return participants;
     }
 }

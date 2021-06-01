@@ -10,7 +10,7 @@ import java.util.*;
 public class StatsManager {
 
     private boolean running = false;
-    private Set<PlayerStats> playerStatsList = new HashSet<>();
+    private HashMap<String, PlayerStats> playerStatsList = new HashMap<>();
 
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
@@ -41,62 +41,53 @@ public class StatsManager {
     }
 
     public PlayerStats get(String UUID) {
-        for (PlayerStats playerStats : playerStatsList)
+        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet()) {
+            PlayerStats playerStats = entry.getValue();
+
             if (playerStats.getUUID().equals(UUID))
                 return playerStats;
+        }
 
         return null;
     }
 
-    public PlayerStats get(int playerID) {
+    /*public PlayerStats get(int playerID) {
         for (PlayerStats playerStats : playerStatsList)
             if (playerStats.getPlayerID() == playerID)
                 return playerStats;
 
         return null;
-    }
+    }*/
 
-    public Set<PlayerStats> getPlayerStats() {
+    public HashMap<String, PlayerStats> getPlayerStats() {
         return playerStatsList;
     }
 
-    public PlayerStats getByName(String playerName) {
-        for (PlayerStats playerStats : playerStatsList)
-            if (playerStats.getPlayerName().equals(playerName))
-                return playerStats;
-
-        return null;
-    }
-
     public PlayerStats getByNameIgnoreCase(String playerName) {
-        for (PlayerStats playerStats : playerStatsList)
-            if (playerStats.getPlayerName().equalsIgnoreCase(playerName))
-                return playerStats;
-
-        return null;
+        return playerStatsList.get(playerName);
     }
 
     public PlayerStats get(Player player) {
-        return get(player.getUniqueId().toString());
+        return playerStatsList.get(player.getName());
     }
 
-    public boolean exists(String UUID) {
-        return get(UUID) != null;
+    public boolean exists(String playerName) {
+        return getByNameIgnoreCase(playerName) != null;
     }
 
     public void add(Player player) {
         if (!exists(player.getUniqueId().toString())) {
             PlayerStats playerStats = new PlayerStats(player);
-            playerStatsList.add(playerStats);
+            playerStatsList.put(player.getName(), playerStats);
         }
     }
 
     private void loadUnloadedStats() {
         if (!running) {
-            for (PlayerStats playerStats : playerStatsList) {
-                if (playerStats.getPlayerID() == -1) {
-                    StatsDB.loadPlayerStats(playerStats);
-                    Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
+            for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet()) {
+                if (entry.getValue().getPlayerID() == -1) {
+                    StatsDB.loadPlayerStats(entry.getValue());
+                    Parkour.getPerkManager().syncPermissions(entry.getValue().getPlayer());
                 }
             }
             running = false;
@@ -120,12 +111,11 @@ public class StatsManager {
 
         Set<PlayerStats> removeList = new HashSet<>();
 
-        for (PlayerStats playerStats : playerStatsList)
-            if (!playerStats.getPlayer().isOnline())
-                removeList.add(playerStats);
+        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
+            if (!entry.getValue().getPlayer().isOnline())
+                removeList.add(entry.getValue());
 
         for (PlayerStats playerStats : removeList)
             remove(playerStats);
     }
-
 }

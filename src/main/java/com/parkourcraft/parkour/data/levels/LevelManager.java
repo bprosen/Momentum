@@ -15,7 +15,7 @@ import java.util.*;
 
 public class LevelManager {
 
-    private Set<Level> levels = new HashSet<>();
+    private HashMap<String, Level> levels = new HashMap<>();
     private Map<String, LevelData> levelDataCache;
     private Set<Level> levelsInMenus = new HashSet<>();
     private String featuredLevel = null;
@@ -30,7 +30,7 @@ public class LevelManager {
     }
 
     public void load() {
-        levels = new HashSet<>();
+        levels = new HashMap<>();
 
         for (String levelName : LevelsYAML.getNames())
             load(levelName);
@@ -50,7 +50,7 @@ public class LevelManager {
             if (exists)
                 remove(levelName);
 
-            levels.add(level);
+            levels.put(levelName, level);
         }
     }
 
@@ -137,9 +137,9 @@ public class LevelManager {
     public List<Level> getEventLevels() {
         List<Level> tempList = new ArrayList<>();
 
-        for (Level level : levels)
-            if (level.isEventLevel())
-                tempList.add(level);
+        for (Map.Entry<String, Level> entry : levels.entrySet())
+            if (entry.getValue().isEventLevel())
+                tempList.add(entry.getValue());
 
         return tempList;
     }
@@ -178,9 +178,9 @@ public class LevelManager {
 
         List<String> temporaryRaceLevelList = new ArrayList<>();
 
-        for (Level level : levels) {
-            if (level.isRaceLevel())
-                temporaryRaceLevelList.add(level.getName());
+        for (Map.Entry<String, Level> entry : levels.entrySet()) {
+            if (entry.getValue().isRaceLevel())
+                temporaryRaceLevelList.add(entry.getValue().getName());
         }
         return temporaryRaceLevelList;
     }
@@ -203,8 +203,9 @@ public class LevelManager {
                 for (Level level : levelsInMenus) {
                     if (level != null) {
                         int amountInLevel = 0;
-                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+                        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
 
+                            PlayerStats playerStats = entry.getValue();
                             if (playerStats != null &&
                                     playerStats.getLevel() != null &&
                                     playerStats.getLevel().equalsIgnoreCase(level.getName()))
@@ -226,22 +227,18 @@ public class LevelManager {
     }
 
     public Level get(String levelName) {
-        for (Level level : levels)
-            if (level.getName().equals(levelName))
-                return level;
-
-        return null;
+        return levels.get(levelName);
     }
 
     public Level get(int levelID) {
-        for (Level level : levels)
-            if (level.getID() == levelID)
-                return level;
+        for (Map.Entry<String, Level> entry : levels.entrySet())
+            if (entry.getValue().getID() == levelID)
+                return entry.getValue();
 
         return null;
     }
 
-    public Set<Level> getLevels() {
+    public HashMap<String, Level> getLevels() {
         return levels;
     }
 
@@ -250,7 +247,7 @@ public class LevelManager {
     }
 
     public void remove(String levelName) {
-        for (Iterator<Level> iterator = levels.iterator(); iterator.hasNext();) {
+        for (Iterator<Level> iterator = levels.values().iterator(); iterator.hasNext();) {
             if (iterator.next().getName().equals(levelName)) {
                 LevelsYAML.remove(iterator.getClass().getName());
                 iterator.remove();
@@ -263,20 +260,6 @@ public class LevelManager {
     }
 
     public Set<String> getNames() {
-        Set<String> names = new HashSet<>();
-
-        for (Level level : levels)
-            names.add(level.getName());
-
-        return names;
-    }
-
-    public Map<String, String> getNamesLower() {
-        Map<String, String> levelNamesLower = new HashMap<>();
-
-        for (Level level : levels)
-            levelNamesLower.put(level.getName().toLowerCase(), level.getName());
-
-        return levelNamesLower;
+        return levels.keySet();
     }
 }

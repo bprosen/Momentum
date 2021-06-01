@@ -12,14 +12,14 @@ import java.util.*;
 
 public class RanksManager {
 
-    private static Set<Rank> rankList = new HashSet<>();
+    private static HashMap<String, Rank> rankList = new HashMap<>();
 
     public RanksManager() {
         load();
     }
 
     public void load() {
-        rankList = new HashSet<>();
+        rankList = new HashMap<>();
 
         for (String rankName : RanksYAML.getNames())
             load(rankName);
@@ -49,23 +49,19 @@ public class RanksManager {
         double rankUpPrice = RanksYAML.getRankUpPrice(rankName);
 
         Rank rank = new Rank(rankName, rankTitle, rankId, rankUpPrice);
-        rankList.add(rank);
+        rankList.put(rankName, rank);
     }
 
     public Rank get(int rankId) {
-        for (Rank rank : rankList)
-            if (rank.getRankId() == rankId)
-                return rank;
+        for (Map.Entry<String, Rank> entry : rankList.entrySet())
+            if (entry.getValue().getRankId() == rankId)
+                return entry.getValue();
 
         return null;
     }
 
     public Rank get(String rankName) {
-        for (Rank rank : rankList)
-            if (rank.getRankName().equalsIgnoreCase(rankName))
-                return rank;
-
-        return null;
+        return rankList.get(rankName);
     }
 
     public boolean exists(String rankName) {
@@ -77,25 +73,20 @@ public class RanksManager {
     }
 
     public Set<String> getNames() {
-        Set<String> tempList = new HashSet<>();
-
-        for (Rank rank : rankList)
-            tempList.add(rank.getRankName());
-
-        return tempList;
+        return rankList.keySet();
     }
 
     public Set<Integer> getIDs() {
         Set<Integer> tempList = new HashSet<>();
 
-        for (Rank rank : rankList)
-            tempList.add(rank.getRankId());
+        for (Map.Entry<String, Rank> entry : rankList.entrySet())
+            tempList.add(entry.getValue().getRankId());
 
         return tempList;
     }
 
     public void remove(String rankName) {
-        for (Iterator<Rank> iterator = rankList.iterator(); iterator.hasNext();) {
+        for (Iterator<Rank> iterator = rankList.values().iterator(); iterator.hasNext();) {
             if (iterator.next().getRankName().equalsIgnoreCase(rankName)) {
                 RanksYAML.remove(iterator.getClass().getName());
                 iterator.remove();
@@ -105,7 +96,10 @@ public class RanksManager {
 
     public void resetPlayersInRank(Rank rank) {
 
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
+
+            PlayerStats playerStats = entry.getValue();
+
             if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
 
                 // if in rank, then delete from database and lower rank by 1
@@ -125,8 +119,9 @@ public class RanksManager {
     public void updatePlayers() {
 
         // update online players ranks
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats()) {
+        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
 
+            PlayerStats playerStats = entry.getValue();
             if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
 
                 List<Map<String, String>> playerResults = DatabaseQueries.getResults(
@@ -189,7 +184,7 @@ public class RanksManager {
         Bukkit.broadcastMessage("");
     }
 
-    public Set<Rank> getRankList() {
+    public HashMap<String, Rank> getRankList() {
         return rankList;
     }
 
@@ -203,9 +198,9 @@ public class RanksManager {
 
         Rank currentMax = null;
 
-        for (Rank rank : getRankList()) {
-            if (currentMax == null || currentMax.getRankId() < rank.getRankId())
-                currentMax = rank;
+        for (Map.Entry<String, Rank> entry : getRankList().entrySet()) {
+            if (currentMax == null || currentMax.getRankId() < entry.getValue().getRankId())
+                currentMax = entry.getValue();
         }
         return currentMax;
     }

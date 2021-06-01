@@ -112,7 +112,7 @@ public class LevelListener implements Listener {
                 block.setType(Material.AIR);
 
                 // prevent double clicking
-                InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getUniqueId().toString());
+                InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getName());
 
                 if (infinitePK.getPressutePlateLoc().getBlockX() == block.getLocation().getBlockX() &&
                     infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ())

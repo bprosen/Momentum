@@ -16,7 +16,7 @@ import java.util.*;
 
 public class MenuManager {
 
-    private Map<String, Menu> menuMap = new HashMap<>();
+    private HashMap<String, Menu> menuMap = new HashMap<>();
 
     public MenuManager() {
         load();

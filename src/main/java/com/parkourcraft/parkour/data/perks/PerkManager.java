@@ -10,8 +10,8 @@ import java.util.*;
 
 public class PerkManager {
 
-    private Set<Perk> perks = new HashSet<>();
-    private Map<String, Integer> IDCache;
+    private HashMap<String, Perk> perks = new HashMap<>();
+    private HashMap<String, Integer> IDCache;
 
     public PerkManager(Plugin plugin) {
         this.IDCache = PerksDB.getIDCache();
@@ -39,7 +39,7 @@ public class PerkManager {
         }, 0L, 10L);
     }
 
-    public void setIDCache(Map<String, Integer> IDCache) {
+    public void setIDCache(HashMap<String, Integer> IDCache) {
         this.IDCache = IDCache;
     }
 
@@ -48,14 +48,10 @@ public class PerkManager {
     }
 
     public Perk get(String perkName) {
-        for (Perk perk : perks)
-            if (perk.getName().equals(perkName))
-                return perk;
-
-        return null;
+        return perks.get(perkName);
     }
 
-    public Set<Perk> getPerks() {
+    public HashMap<String, Perk> getPerks() {
         return perks;
     }
 
@@ -64,7 +60,7 @@ public class PerkManager {
     }
 
     public void remove(String perkName) {
-        for (Iterator<Perk> iterator = perks.iterator(); iterator.hasNext();)
+        for (Iterator<Perk> iterator = perks.values().iterator(); iterator.hasNext();)
             if (iterator.next().getName().equals(perkName))
                 iterator.remove();
     }
@@ -87,17 +83,17 @@ public class PerkManager {
             if (exists)
                 remove(perkName);
 
-            perks.add(perk);
+            perks.put(perkName, perk);
         }
     }
 
     public void syncPermissions(Player player) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        for (Perk perk : perks) {
-            boolean hasRequirements = perk.hasRequirements(playerStats, player);
+        for (Map.Entry<String, Perk> entry : perks.entrySet()) {
+            boolean hasRequirements = entry.getValue().hasRequirements(playerStats, player);
 
-            for (String permission : perk.getPermissions())
+            for (String permission : entry.getValue().getPermissions())
                 player.addAttachment(Parkour.getPlugin(), permission, hasRequirements);
         }
     }

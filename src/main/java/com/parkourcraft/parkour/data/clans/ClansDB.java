@@ -10,8 +10,8 @@ import java.util.*;
 
 public class ClansDB {
 
-    static Set<Clan> getClans() {
-        Set<Clan> clans = new HashSet<>();
+    static HashMap<Integer, Clan> getClans() {
+        HashMap<Integer, Clan> clans = new HashMap<>();
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",
@@ -20,7 +20,7 @@ public class ClansDB {
         );
 
         for (Map<String, String> result : results)
-            clans.add(
+            clans.put(Integer.parseInt(result.get("clan_id")),
                     new Clan(
                             Integer.parseInt(result.get("clan_id")),
                             result.get("clan_tag"),
@@ -74,7 +74,7 @@ public class ClansDB {
         for (Map<String, String> result : results)
             clan.setID(Integer.parseInt(result.get("clan_id")));
 
-        PlayerStats owner = Parkour.getStatsManager().get(clan.getOwnerID());
+        PlayerStats owner = Parkour.getStatsManager().get(clan.getOwner().getUUID());
 
         if (owner != null) {
             clan.addMember(new ClanMember(owner.getPlayerID(), owner.getUUID(), owner.getPlayer().getName()));

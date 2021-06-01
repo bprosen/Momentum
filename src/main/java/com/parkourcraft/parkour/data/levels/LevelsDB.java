@@ -37,8 +37,8 @@ public class LevelsDB {
     }
 
     static void syncDataCache() {
-        for (Level level : Parkour.getLevelManager().getLevels())
-            syncDataCache(level, Parkour.getLevelManager().getLevelDataCache());
+        for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet())
+            syncDataCache(entry.getValue(), Parkour.getLevelManager().getLevelDataCache());
     }
 
     static void syncDataCache(Level level, Map<String, LevelData> levelDataCache) {
@@ -56,13 +56,13 @@ public class LevelsDB {
     static boolean syncLevelData() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (Level level : Parkour.getLevelManager().getLevels())
-            if (!Parkour.getLevelManager().getLevelDataCache().containsKey(level.getName()))
+        for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet())
+            if (!Parkour.getLevelManager().getLevelDataCache().containsKey(entry.getValue().getName()))
                 insertQueries.add(
                         "INSERT INTO levels " +
                                 "(level_name)" +
                                 " VALUES " +
-                                "('" + level.getName() + "')"
+                                "('" + entry.getValue().getName() + "')"
                 );
 
         if (insertQueries.size() > 0) {
