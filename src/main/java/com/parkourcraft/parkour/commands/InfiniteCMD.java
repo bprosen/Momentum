@@ -46,14 +46,18 @@ public class InfiniteCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&7You have yet to play &6Infinite Parkour &7(score of 0)"));
             // leaderboard
             } else if (a.length == 3 && a[1].equalsIgnoreCase("lb")) {
+
                 if (Utils.isInteger(a[2])) {
                     int position = Integer.parseInt(a[2]);
                     InfinitePKLBPosition lbPosition = infinitePKManager.getLeaderboardPosition(position);
 
-                    if (lbPosition != null)
+                    if (lbPosition != null) {
                         player.sendMessage(Utils.translate(
                                 "&c" + lbPosition.getName() + " &7is at &6Spot " + lbPosition.getPosition() + " &7with a score of &6" + lbPosition.getScore())
                         );
+                    } else {
+                        player.sendMessage(Utils.translate("&7Something went wrong... invalid position &6" + position));
+                    }
                 } else {
                     player.sendMessage(Utils.translate("&c" + a[2] + " &7is not a position on the leaderboard! (1-10)"));
                 }
@@ -65,7 +69,7 @@ public class InfiniteCMD implements CommandExecutor {
                 if (InfinitePKDB.hasScore(a[1])) {
                     int score = Integer.parseInt(a[2]);
 
-                    PlayerStats targetStats = Parkour.getStatsManager().get(a[1]);
+                    PlayerStats targetStats = Parkour.getStatsManager().getByNameIgnoreCase(a[1]);
                     if (targetStats != null)
                         targetStats.setInfinitePKScore(score);
 

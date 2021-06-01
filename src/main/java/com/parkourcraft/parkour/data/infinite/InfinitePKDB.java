@@ -17,8 +17,11 @@ public class InfinitePKDB {
             public void run() {
 
                 Set<InfinitePKLBPosition> leaderboard = Parkour.getInfinitePKManager().getLeaderboard();
-                List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "uuid, player_name, infinitepk_score",
-                        " ORDER BY infinitepk_score DESC" +
+                List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
+                       "players",
+                        "uuid, player_name, infinitepk_score",
+                       " WHERE infinitepk_score > 0" +
+                                " ORDER BY infinitepk_score DESC" +
                                 " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
                 for (Map<String, String> scoreResult : scoreResults) {
@@ -26,7 +29,7 @@ public class InfinitePKDB {
                             new InfinitePKLBPosition(
                                     scoreResult.get("uuid"),
                                     scoreResult.get("player_name"),
-                                    Integer.parseInt("infinitepk_score"),
+                                    Integer.parseInt(scoreResult.get("infinitepk_score")),
                                     leaderboard.size() + 1)
                     );
                 }
