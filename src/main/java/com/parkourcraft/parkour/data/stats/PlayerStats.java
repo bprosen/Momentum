@@ -26,7 +26,8 @@ public class PlayerStats {
     private Rank rank;
     private int prestiges = 0;
     private int rankUpStage;
-    private int infinitePKScore;
+    private int infinitePKScore = 0;
+    private boolean inInfinitePK = false;
     private boolean eventParticipant = false;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
@@ -155,6 +156,14 @@ public class PlayerStats {
 
     public int getInfinitePKScore() {
         return infinitePKScore;
+    }
+
+    public void toggleInfinitePK() {
+        inInfinitePK = !inInfinitePK;
+    }
+
+    public boolean isInInfinitePK() {
+        return inInfinitePK;
     }
 
     //

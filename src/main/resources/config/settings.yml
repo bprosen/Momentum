@@ -57,3 +57,7 @@ event:
     rising_water: 100
 infinitepk:
   max_leaderboard_size: 10
+  max_x: 100
+  max_y: 200
+  max_z: 100
+  starting_y: 150

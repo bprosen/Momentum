@@ -6,12 +6,14 @@ import org.bukkit.entity.Player;
 public class InfinitePK {
 
     private Player player;
-    private Location currentBlockLoc;
+    private Location originalLoc;
+    private Location currentBlockLoc = null;
+    private Location lastBlockLoc = null;
     private int score = 0;
 
     public InfinitePK(Player player) {
         this.player = player;
-        this.currentBlockLoc = player.getLocation();
+        this.originalLoc = player.getLocation();
     }
 
     public Player getPlayer() {
@@ -46,11 +48,22 @@ public class InfinitePK {
         return score;
     }
 
-    public void updateCurrentBlockLoc(Location loc) {
+    public void updateBlockLoc(Location loc) {
+        this.lastBlockLoc = currentBlockLoc;
         this.currentBlockLoc = loc;
     }
+
+    public void setCurrentBlockLoc(Location currentBlockLoc) {
+        this.currentBlockLoc = currentBlockLoc;
+    }
+
+    public Location getOriginalLoc() { return originalLoc; }
+
+    public Location getLastBlockLoc() { return lastBlockLoc; }
 
     public Location getCurrentBlockLoc() {
         return currentBlockLoc;
     }
+
+    public Location getPressutePlateLoc() { return currentBlockLoc.clone().add(0, 1, 0); }
 }

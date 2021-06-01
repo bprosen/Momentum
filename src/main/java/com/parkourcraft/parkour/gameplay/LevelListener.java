@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.events.EventType;
+import com.parkourcraft.parkour.data.infinite.InfinitePK;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
@@ -103,8 +104,20 @@ public class LevelListener implements Listener {
             }
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.IRON_PLATE)) {
             // end if in race
-            if (Parkour.getStatsManager().get(player).inRace()) {
+
+            if (playerStats.inRace())
                 Parkour.getRaceManager().endRace(player);
+            else if (playerStats.isInInfinitePK()) {
+
+                block.setType(Material.AIR);
+
+                // prevent double clicking
+                InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getUniqueId().toString());
+
+                if (infinitePK.getPressutePlateLoc().getBlockX() == block.getLocation().getBlockX() &&
+                    infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ())
+
+                Parkour.getInfinitePKManager().doNextJump(player, false);
             }
         }
     }

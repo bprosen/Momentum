@@ -1,5 +1,6 @@
 package com.parkourcraft.parkour.data;
 
+import com.parkourcraft.parkour.Parkour;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -45,6 +46,10 @@ public class SettingsManager {
     public int sword_hotbar_slot;
 
     public int max_infinitepk_leaderboard_size;
+    public int max_infinitepk_x;
+    public int max_infinitepk_y;
+    public int max_infinitepk_z;
+    public int infinitepk_starting_y;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
@@ -84,5 +89,9 @@ public class SettingsManager {
         sword_type = Material.matchMaterial(settings.getString("setup-sword.type"));
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         max_infinitepk_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
+        max_infinitepk_x = settings.getInt("infinitepk.max_x");
+        max_infinitepk_y = settings.getInt("infinitepk.max_y");
+        max_infinitepk_z = settings.getInt("infinitepk.max_z");
+        infinitepk_starting_y = settings.getInt("infinitepk.starting_y");
     }
 }

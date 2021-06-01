@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.infinite.InfinitePKDB;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -76,6 +77,30 @@ public class InfiniteCMD implements CommandExecutor {
                 }
             } else {
                 player.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer"));
+            }
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
+
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            if (!playerStats.isInInfinitePK()) {
+                if (playerStats.getPlayerToSpectate() == null) {
+                    if (!playerStats.isEventParticipant()) {
+                        if (!playerStats.inRace()) {
+                            if (playerStats.getPracticeLocation() == null) {
+                                infinitePKManager.startPK(player);
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while you are in a race"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou cannot do this while you are in an event"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while you are spectating"));
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou are already in infinite parkour"));
             }
         } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
             sendHelp(player);

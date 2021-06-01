@@ -104,6 +104,14 @@ public class Scoreboard {
             board.add(formatSpacing(Utils.translate("&6&lTime Left")));
             board.add(formatSpacing(Utils.translate("&e" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
 
+        // infinite parkour section of scoreboard
+        } else if (playerStats.isInInfinitePK()) {
+
+            board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
+            board.add(formatSpacing(Utils.translate("&7Score &d" + Parkour.getInfinitePKManager().get(
+                                                                        player.getUniqueId().toString()).getScore())
+                                                                        ));
+
         // level section of scoreboard
         } else if (level != null) {
 
