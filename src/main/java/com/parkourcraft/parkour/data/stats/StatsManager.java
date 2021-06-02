@@ -51,13 +51,13 @@ public class StatsManager {
         return null;
     }
 
-    /*public PlayerStats get(int playerID) {
-        for (PlayerStats playerStats : playerStatsList)
-            if (playerStats.getPlayerID() == playerID)
-                return playerStats;
+    public PlayerStats get(int playerID) {
+        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
+            if (entry.getValue().getPlayerID() == playerID)
+                return entry.getValue();
 
         return null;
-    }*/
+    }
 
     public HashMap<String, PlayerStats> getPlayerStats() {
         return playerStatsList;

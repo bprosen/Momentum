@@ -35,8 +35,8 @@ public class ClansDB {
         return clans;
     }
 
-    static Map<Integer, List<ClanMember>> getMembers() {
-        Map<Integer, List<ClanMember>> members = new HashMap<>();
+    static HashMap<Integer, List<ClanMember>> getMembers() {
+        HashMap<Integer, List<ClanMember>> members = new HashMap<>();
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "players",
@@ -74,7 +74,7 @@ public class ClansDB {
         for (Map<String, String> result : results)
             clan.setID(Integer.parseInt(result.get("clan_id")));
 
-        PlayerStats owner = Parkour.getStatsManager().get(clan.getOwner().getUUID());
+        PlayerStats owner = Parkour.getStatsManager().getByNameIgnoreCase(clan.getOwner().getPlayerName());
 
         if (owner != null) {
             clan.addMember(new ClanMember(owner.getPlayerID(), owner.getUUID(), owner.getPlayer().getName()));

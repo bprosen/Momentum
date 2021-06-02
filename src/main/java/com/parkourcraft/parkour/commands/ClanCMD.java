@@ -426,7 +426,7 @@ public class ClanCMD implements CommandExecutor {
                                                + Parkour.getSettingsManager().clans_tag_length_max + " &ccharacters"));
             return false;
         } else if (Parkour.getClansManager().get(clanTag) != null) {
-            sender.sendMessage(Utils.translate("&cThe Clan Tag '&4" + clanTag + " &c' is already taken"));
+            sender.sendMessage(Utils.translate("&cThe Clan Tag '&4" + clanTag + "&c' is already taken"));
             return false;
         } else {
             return true;

@@ -24,7 +24,7 @@ public class ClansManager {
     private void load() {
         clans = ClansDB.getClans();
 
-        Map<Integer, List<ClanMember>> members = ClansDB.getMembers();
+        HashMap<Integer, List<ClanMember>> members = ClansDB.getMembers();
 
         syncMembers(members);
     }
