@@ -4,14 +4,13 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.ChatColor;
 
 import java.util.*;
 
 public class ClansDB {
 
-    static HashMap<Integer, Clan> getClans() {
-        HashMap<Integer, Clan> clans = new HashMap<>();
+    static HashMap<String, Clan> getClans() {
+        HashMap<String, Clan> clans = new HashMap<>();
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",
@@ -20,7 +19,7 @@ public class ClansDB {
         );
 
         for (Map<String, String> result : results)
-            clans.put(Integer.parseInt(result.get("clan_id")),
+            clans.put(result.get("clan_tag"),
                     new Clan(
                             Integer.parseInt(result.get("clan_id")),
                             result.get("clan_tag"),
@@ -74,7 +73,7 @@ public class ClansDB {
         for (Map<String, String> result : results)
             clan.setID(Integer.parseInt(result.get("clan_id")));
 
-        PlayerStats owner = Parkour.getStatsManager().getByNameIgnoreCase(clan.getOwner().getPlayerName());
+        PlayerStats owner = Parkour.getStatsManager().get(clan.getOwnerID());
 
         if (owner != null) {
             clan.addMember(new ClanMember(owner.getPlayerID(), owner.getUUID(), owner.getPlayer().getName()));
@@ -84,6 +83,8 @@ public class ClansDB {
             if (owner.getPlayer() != null && owner.getPlayer().isOnline())
                 owner.getPlayer().sendMessage(Utils.translate("&7Successfully created your Clan called &3"
                         + clan.getTag()));
+
+
         }
     }
 

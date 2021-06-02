@@ -80,12 +80,9 @@ public class Clan {
     }
 
     public ClanMember getOwner() {
-        for (ClanMember member : members) {
-            Bukkit.broadcastMessage(member.getPlayerName());
-            if (member.getPlayerID() == ownerID) {
+        for (ClanMember member : members)
+            if (member.getPlayerID() == ownerID)
                 return member;
-            }
-        }
 
         return null;
     }

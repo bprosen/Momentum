@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ClansManager {
 
-    private HashMap<Integer, Clan> clans = new HashMap<>();
+    private HashMap<String, Clan> clans = new HashMap<>();
 
     public ClansManager(Plugin plugin) {
         load();
@@ -40,7 +40,7 @@ public class ClansManager {
     }
 
     public void add(Clan clan) {
-        clans.put(clan.getID(), clan);
+        clans.put(clan.getTag(), clan);
     }
 
     public void addMember(int clanID, ClanMember clanMember) {
@@ -55,15 +55,15 @@ public class ClansManager {
     }
 
     public Clan get(int clanID) {
-        return clans.get(clanID);
-    }
-
-    public Clan get(String clanTag) {
-        for (Map.Entry<Integer, Clan> entry : clans.entrySet())
-            if (entry.getValue().getTag().equalsIgnoreCase(clanTag))
+        for (Map.Entry<String, Clan> entry : clans.entrySet())
+            if (entry.getValue().getID() == clanID)
                 return entry.getValue();
 
         return null;
+    }
+
+    public Clan get(String clanTag) {
+        return clans.get(clanTag);
     }
 
     public void doSplitClanReward(Clan clan, Player player, Level level) {
@@ -155,7 +155,7 @@ public class ClansManager {
         }
     }
 
-    public void deleteClan(int clanID) {
+    public void deleteClan(int clanID, boolean messageMembers) {
         Clan clan = get(clanID);
 
         if (clan != null) {
@@ -167,8 +167,11 @@ public class ClansManager {
 
                 Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
                 if (clanPlayer != null) {
-                    clanPlayer.sendMessage(Utils.translate("&6&l" + clan.getOwner().getPlayerName() +
-                            " &ehas disbanded your &6&lClan &6" + clan.getTag()));
+
+                    if (messageMembers) {
+                        clanPlayer.sendMessage(Utils.translate("&6&l" + clan.getOwner().getPlayerName() +
+                                " &ehas disbanded your &6&lClan &6" + clan.getTag()));
+                    }
 
                     // reset data on the players
                     Parkour.getStatsManager().get(clanPlayer).resetClan();
@@ -176,13 +179,13 @@ public class ClansManager {
             }
             // remove from database and list
             ClansDB.removeClan(clanID);
-            clans.remove(clan);
+            clans.remove(clan.getTag());
         }
     }
 
     private void syncNewClans() {
-        for (Map.Entry<Integer, Clan> entry : clans.entrySet())
-            if (entry.getKey() == -1)
+        for (Map.Entry<String, Clan> entry : clans.entrySet())
+            if (entry.getValue().getID() == -1)
                 ClansDB.newClan(entry.getValue());
     }
 

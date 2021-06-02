@@ -23,7 +23,6 @@ public class ClanCMD implements CommandExecutor {
         if (a.length > 0) {
             if (a[0].equalsIgnoreCase("stats")) {
 
-                String clanName = "";
                 Clan targetClan;
 
                 // this is what allows "/clan stats" to do self check
@@ -74,7 +73,7 @@ public class ClanCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate(onlineString));
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan!"));
+                    sender.sendMessage(Utils.translate("&4" + a[1] + " &cis not a clan!"));
                 }
             } else if (sender instanceof Player) {
                 // Sub commands here cannot be ran by non-players
@@ -369,7 +368,7 @@ public class ClanCMD implements CommandExecutor {
                     if (clan != null) {
                         if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
                             // delete clan
-                            Parkour.getClansManager().deleteClan(clan.getID());
+                            Parkour.getClansManager().deleteClan(clan.getID(), true);
                         } else {
                             player.sendMessage(Utils.translate("&cYou cannot disband a clan you are not owner of"));
                         }
@@ -389,7 +388,7 @@ public class ClanCMD implements CommandExecutor {
                             playerStats.resetClan();
                             player.sendMessage(Utils.translate("&eYou have left your clan"));
 
-                        // if not only one, make sure they are not the owner
+                            // if not only one, make sure they are not the owner
                         } else if (!clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
 
                             ClansDB.resetClanMember(player.getName());
@@ -403,6 +402,17 @@ public class ClanCMD implements CommandExecutor {
                     } else {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
                     }
+                } else if (player.hasPermission("pc-parkour.admin") && (a.length == 2 && a[0].equalsIgnoreCase("delete"))) {
+
+                    Clan targetClan = Parkour.getClansManager().get(a[1]);
+
+                    if (targetClan != null) {
+                        // remove from cache and db
+                        Parkour.getClansManager().deleteClan(targetClan.getID(), false);
+                        player.sendMessage(Utils.translate("&7You have deleted &c" + a[1] + " &7from the database"));
+                    } else {
+                        player.sendMessage(Utils.translate("&7Clan &c" + a[1] + " &7does not exist"));
+                    }
                 } else {
                     // Unknown argument
                     sendHelp(sender);
@@ -411,7 +421,7 @@ public class ClanCMD implements CommandExecutor {
                 sender.sendMessage(Utils.translate("&cMost clan commands can only be run in-game"));
             }
         } else {
-                sendHelp(sender);
+            sendHelp(sender);
         }
         return true;
     }
@@ -466,6 +476,7 @@ public class ClanCMD implements CommandExecutor {
             if (player.hasPermission("pc-parkour.admin")) {
                 sender.sendMessage(getHelp("setlevel"));
                 sender.sendMessage(getHelp("setxp"));
+                sender.sendMessage(getHelp("delete"));
             }
         }
     }
@@ -494,6 +505,8 @@ public class ClanCMD implements CommandExecutor {
                 return Utils.translate("&3/clan setxp <clan> <xp>  &7Sets clan XP");
             case "setlevel":
                 return Utils.translate("&3/clan setlevel <clan> <level>  &7Sets clan level");
+            case "delete":
+                return Utils.translate("&3/clan delete <clan>  &7Deletes the clan");
         }
         return "";
     }
