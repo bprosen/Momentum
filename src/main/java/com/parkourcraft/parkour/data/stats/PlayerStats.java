@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.data.stats;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.rank.Rank;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -247,7 +248,8 @@ public class PlayerStats {
             if (!levelCompletionsMap.containsKey(levelName))
                 levelCompletionsMap.put(levelName, new ArrayList<>());
 
-            levelCompletionsMap.get(levelName).add(levelCompletion);
+            if (levelCompletionsMap.get(levelName) != null)
+                levelCompletionsMap.get(levelName).add(levelCompletion);
         }
     }
 
