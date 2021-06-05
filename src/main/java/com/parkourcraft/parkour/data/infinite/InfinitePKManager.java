@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.SettingsManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,11 +33,11 @@ public class InfinitePKManager {
 
                 if (!participants.isEmpty()) {
                     for (Map.Entry<String, InfinitePK> entry : participants.entrySet())
-                        if (entry.getValue().getPlayer().getLocation().getBlockY() <= (entry.getValue().getCurrentBlockLoc().getBlockY() - 2))
+                        if (entry.getValue().getPlayer().getLocation().getBlockY() < (entry.getValue().getCurrentBlockLoc().getBlockY() - 20))
                             endPK(entry.getValue().getPlayer());
                 }
             }
-        }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20);
+        }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20 * 2);
     }
 
     public void startPK(Player player) {
@@ -140,7 +141,7 @@ public class InfinitePKManager {
         if (infinitePK != null) {
 
             // go back if in any current blocks
-            Location newLocation = findNextBlockSpawn(infinitePK.getCurrentBlockLoc());
+            Location newLocation = findNextBlockSpawn(infinitePK.getCurrentBlockLoc(), infinitePK);
             if (isLocInCurrentBlocks(newLocation)) {
                 doNextJump(player, startingJump);
             } else {
@@ -166,43 +167,114 @@ public class InfinitePKManager {
         }
     }
 
-    public Location findNextBlockSpawn(Location oldLocation) {
+    public Location findNextBlockSpawn(Location oldLocation, InfinitePK infinitePK) {
 
         LocationManager locationManager = Parkour.getLocationManager();
         SettingsManager settingsManager = Parkour.getSettingsManager();
+        InfinitePKDirection directionType = infinitePK.getDirectionType();
 
-        // this is really -2 to 0, but due to rounding it has to be -3 to 1
-        int yMax = 2;
-        if (oldLocation.getBlockY() > Parkour.getSettingsManager().max_infinitepk_y)
-            yMax--;
+        int xMin = 2, zMin = 2, yMin = -1;
+        int xMax = 5, zMax = 5, yMax = 2;
 
-        int yIncrease = ThreadLocalRandom.current().nextInt(-1, yMax);
+        /*
+         flip max/min if backwards/forwards and it is not already in negatives/positives (simple < check)
+         xMin becomes xMax, etc
+         */
+        if (directionType == InfinitePKDirection.BACKWARDS && xMin > 0) {
+            // make a copy so we do not access already changed values (xMin and zMin)
+            int copyMinX = xMin;
+            int copyMinZ = zMin;
 
-        int xMax = 4, zMax = 4;
-
-        // if the block will be 1 above, need to remove 1 from max
-        if (yIncrease > 0) {
-            xMax--;
-            zMax--;
+            xMin = xMax * -1;
+            xMax = copyMinX * -1;
+            zMin = zMax * -1;
+            zMax = copyMinZ * -1;
         }
 
-        int zIncrease = ThreadLocalRandom.current().nextInt(1, zMax + 1);
-        int xIncrease = ThreadLocalRandom.current().nextInt(1, xMax + 1);
+        // get random increase
+        int zIncrease = ThreadLocalRandom.current().nextInt(zMin, zMax);
+        int xIncrease = ThreadLocalRandom.current().nextInt(xMin, xMax);
 
-        // if they are both at max, remove one at random (50 50 chance)
-        if (xIncrease == xMax && zIncrease == zMax) {
-            if (ThreadLocalRandom.current().nextInt(0, 101) > 50)
+        // since random does not go to bound (6 becomes 5, need to make these real variables to mimic depending on direction)
+        int realMaxX, realMaxZ;
+        if (directionType == InfinitePKDirection.FORWARDS) {
+            realMaxX = xMax++;
+            realMaxZ = zMax++;
+        } else {
+            realMaxX = xMin--;
+            realMaxZ = zMin--;
+        }
+
+        /*
+            below is a section that handles certain cases of impossible jumps, like 4 + 1, 4 by 4, etc
+         */
+        if (xIncrease == realMaxX) {
+            // remove 1 from y
+            if (yMax > 1)
+                yMax--;
+
+            // adjust z in special case of both being max
+            if (zIncrease != realMaxZ) {
+                if (directionType == InfinitePKDirection.BACKWARDS && zIncrease < -2)
+                    zIncrease += 2;
+                else if (zIncrease > 2)
+                    zIncrease -= 2;
+            } else {
+                Bukkit.broadcastMessage("max length z and x");
+                if (directionType == InfinitePKDirection.BACKWARDS)
+                    zIncrease += 3;
+                else
+                    zIncrease -= 3;
+            }
+        } else if (zIncrease == realMaxZ) {
+            // remove 1 from y
+            if (yMax > 1)
+                yMax--;
+
+            // adjust x in special case of both being max
+            if (xIncrease != realMaxX) {
+                if (directionType == InfinitePKDirection.BACKWARDS && xIncrease < -2)
+                    xIncrease += 2;
+                else if (xIncrease > 2)
+                    xIncrease -= 2;
+            } else {
+                Bukkit.broadcastMessage("max length x and z");
+                if (directionType == InfinitePKDirection.BACKWARDS)
+                    zIncrease += 3;
+                else
+                    zIncrease -= 3;
+            }
+
+        }
+
+        // if too high, reduce max by 1 if it is already above 0
+        if (oldLocation.getBlockY() > Parkour.getSettingsManager().max_infinitepk_y && yMax > 1)
+            yMax--;
+
+        int yIncrease = ThreadLocalRandom.current().nextInt(yMin, yMax);
+
+        // if the block will be 1 above, need to remove/add 1 from max/min depending on direction if x and z increase is 3
+        if (yIncrease > 0) {
+            if (directionType == InfinitePKDirection.BACKWARDS) {
+                if (xIncrease < -2 && zIncrease < -2) {
+                    xIncrease++;
+                    zIncrease++;
+                }
+            } else if (xIncrease > 2 && zIncrease > 2) {
                 xIncrease--;
-            else
                 zIncrease--;
+            }
         }
 
         // run through maxes, and flip if they hit it
-        if ((oldLocation.getX() + xIncrease) >= (locationManager.getLobbyLocation().getBlockX() + settingsManager.max_infinitepk_x))
+        if (((oldLocation.getX() + xIncrease) >= (locationManager.getLobbyLocation().getBlockX() + settingsManager.max_infinitepk_x)) ||
+             (oldLocation.getZ() + zIncrease) >= (locationManager.getLobbyLocation().getBlockZ() + settingsManager.max_infinitepk_z)) {
             xIncrease *= -1;
-
-        if ((oldLocation.getZ() + zIncrease) >= (locationManager.getLobbyLocation().getBlockZ() + settingsManager.max_infinitepk_z))
             zIncrease *= -1;
+
+            // flip enum
+            infinitePK.flipDirectionType();
+        }
 
         Location newLocation = new Location(oldLocation.getWorld(),
                                          oldLocation.getX() + xIncrease,
