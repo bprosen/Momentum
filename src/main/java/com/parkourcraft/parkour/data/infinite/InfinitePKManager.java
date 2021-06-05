@@ -33,8 +33,8 @@ public class InfinitePKManager {
 
                 if (!participants.isEmpty()) {
                     for (Map.Entry<String, InfinitePK> entry : participants.entrySet())
-                        if (entry.getValue().getPlayer().getLocation().getBlockY() < (entry.getValue().getCurrentBlockLoc().getBlockY() - 20))
-                            endPK(entry.getValue().getPlayer());
+                        if (entry.getValue().getPlayer().getLocation().getBlockY() < (entry.getValue().getCurrentBlockLoc().getBlockY() - 2))
+                            endPK(entry.getValue().getPlayer(), false);
                 }
             }
         }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20 * 2);
@@ -63,7 +63,7 @@ public class InfinitePKManager {
         Parkour.getStatsManager().get(player).toggleInfinitePK();
     }
 
-    public void endPK(Player player) {
+    public void endPK(Player player, boolean disconnected) {
 
         InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null) {
@@ -76,20 +76,22 @@ public class InfinitePKManager {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (isBestScore(player.getName(), score)) {
-                player.sendMessage(Utils.translate("&7You have beaten your best &d(" +
-                                   Utils.formatNumber(playerStats.getInfinitePKScore()) + ")" +
-                                   " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score)));
+                // if they disconnected
+                if (!disconnected) {
+                    player.sendMessage(Utils.translate("&7You have beaten your best &d(" +
+                            Utils.formatNumber(playerStats.getInfinitePKScore()) + ")" +
+                            " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score)));
+                }
 
                 updateScore(player.getName(), score);
 
                 // load leaderboard if they have a lb position
                 if (scoreWillBeLB(score) || leaderboard.size() < Parkour.getSettingsManager().max_infinitepk_leaderboard_size)
                     InfinitePKDB.loadLeaderboard();
-            } else {
+            } else if (!disconnected) {
                 player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
-                                                        "&7Your best is &d" + playerStats.getInfinitePKScore()));
+                        "&7Your best is &d" + playerStats.getInfinitePKScore()));
             }
-
             // clear blocks
             infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
             infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
@@ -220,7 +222,6 @@ public class InfinitePKManager {
                 else if (zIncrease > 2)
                     zIncrease -= 2;
             } else {
-                Bukkit.broadcastMessage("max length z and x");
                 if (directionType == InfinitePKDirection.BACKWARDS)
                     zIncrease += 3;
                 else
@@ -238,7 +239,6 @@ public class InfinitePKManager {
                 else if (xIncrease > 2)
                     xIncrease -= 2;
             } else {
-                Bukkit.broadcastMessage("max length x and z");
                 if (directionType == InfinitePKDirection.BACKWARDS)
                     zIncrease += 3;
                 else
@@ -355,6 +355,11 @@ public class InfinitePKManager {
         if (lowestScore < score)
             return true;
         return false;
+    }
+
+    public void shutdown() {
+        for (Map.Entry<String, InfinitePK> infinitePKEntry : participants.entrySet())
+            endPK(infinitePKEntry.getValue().getPlayer(), true);
     }
 
     public Set<InfinitePKLBPosition> getLeaderboard() {

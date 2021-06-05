@@ -94,6 +94,7 @@ public class Parkour extends JavaPlugin {
         CheckpointDB.saveAllPlayers();
         PracticeHandler.shutdown();
         SpectatorHandler.shutdown();
+        infinite.shutdown();
         events.shutdown();
 
         // close database and unload classes
