@@ -81,9 +81,9 @@ public class PlotsManager {
     public List<Plot> getSubmittedPlots() {
         List<Plot> tempList = new ArrayList<>();
 
-        for (Map.Entry<String, Plot> entry : plotList.entrySet()) {
-            if (entry.getValue().isSubmitted())
-                tempList.add(entry.getValue());
+        for (Plot plot : plotList.values()) {
+            if (plot.isSubmitted())
+                tempList.add(plot);
         }
         return tempList;
     }
@@ -290,9 +290,9 @@ public class PlotsManager {
     public Plot getNearestPlot(Location loc) {
 
         Plot nearestPlot = null;
-        for (Map.Entry<String, Plot> entry : plotList.entrySet()) {
-            if (blockInPlot(loc, entry.getValue())) {
-                nearestPlot = entry.getValue();
+        for (Plot plot : plotList.values()) {
+            if (blockInPlot(loc, plot)) {
+                nearestPlot = plot;
                 break;
             }
         }

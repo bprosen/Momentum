@@ -53,9 +53,9 @@ public class RanksManager {
     }
 
     public Rank get(int rankId) {
-        for (Map.Entry<String, Rank> entry : rankList.entrySet())
-            if (entry.getValue().getRankId() == rankId)
-                return entry.getValue();
+        for (Rank rank : rankList.values())
+            if (rank.getRankId() == rankId)
+                return rank;
 
         return null;
     }
@@ -79,8 +79,8 @@ public class RanksManager {
     public Set<Integer> getIDs() {
         Set<Integer> tempList = new HashSet<>();
 
-        for (Map.Entry<String, Rank> entry : rankList.entrySet())
-            tempList.add(entry.getValue().getRankId());
+        for (Rank rank : rankList.values())
+            tempList.add(rank.getRankId());
 
         return tempList;
     }
@@ -96,20 +96,16 @@ public class RanksManager {
 
     public void resetPlayersInRank(Rank rank) {
 
-        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
+            // if in rank, then delete from database and lower rank by 1
+            if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline() &&
+                playerStats.getRank().getRankId() == rank.getRankId()) {
 
-            PlayerStats playerStats = entry.getValue();
-
-            if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
-
-                // if in rank, then delete from database and lower rank by 1
-                if (playerStats.getRank().getRankId() == rank.getRankId()) {
-                    for (int i = playerStats.getRank().getRankId() - 1; i >= 2; i--) {
-                        if (exists(i)) {
-                            playerStats.setRank(get(i));
-                            RanksDB.updateRank(playerStats.getPlayer().getUniqueId(), i);
-                            break;
-                        }
+                for (int i = playerStats.getRank().getRankId() - 1; i >= 2; i--) {
+                    if (exists(i)) {
+                        playerStats.setRank(get(i));
+                        RanksDB.updateRank(playerStats.getPlayer().getUniqueId(), i);
+                        break;
                     }
                 }
             }
@@ -119,9 +115,8 @@ public class RanksManager {
     public void updatePlayers() {
 
         // update online players ranks
-        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
 
-            PlayerStats playerStats = entry.getValue();
             if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
 
                 List<Map<String, String>> playerResults = DatabaseQueries.getResults(
@@ -198,9 +193,9 @@ public class RanksManager {
 
         Rank currentMax = null;
 
-        for (Map.Entry<String, Rank> entry : getRankList().entrySet()) {
-            if (currentMax == null || currentMax.getRankId() < entry.getValue().getRankId())
-                currentMax = entry.getValue();
+        for (Rank rank : rankList.values()) {
+            if (currentMax == null || currentMax.getRankId() < rank.getRankId())
+                currentMax = rank;
         }
         return currentMax;
     }

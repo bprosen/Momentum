@@ -142,7 +142,7 @@ public class ClanCMD implements CommandExecutor {
 
                         int playerBalance = (int) Parkour.getEconomy().getBalance(player);
 
-                        if (playerBalance > Parkour.getSettingsManager().clans_price_create) {
+                        if (playerBalance >= Parkour.getSettingsManager().clans_price_create) {
                             if (a.length > 1) {
                                 String clanTag = a[1];
 

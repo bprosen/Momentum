@@ -90,10 +90,10 @@ public class PerkManager {
     public void syncPermissions(Player player) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        for (Map.Entry<String, Perk> entry : perks.entrySet()) {
-            boolean hasRequirements = entry.getValue().hasRequirements(playerStats, player);
+        for (Perk perk : perks.values()) {
+            boolean hasRequirements = perk.hasRequirements(playerStats, player);
 
-            for (String permission : entry.getValue().getPermissions())
+            for (String permission : perk.getPermissions())
                 player.addAttachment(Parkour.getPlugin(), permission, hasRequirements);
         }
     }
@@ -111,5 +111,4 @@ public class PerkManager {
             PerksDB.insertPerk(playerStats, perk, date);
         }
     }
-
 }

@@ -55,9 +55,9 @@ public class ClansManager {
     }
 
     public Clan get(int clanID) {
-        for (Map.Entry<String, Clan> entry : clans.entrySet())
-            if (entry.getValue().getID() == clanID)
-                return entry.getValue();
+        for (Clan clan : clans.values())
+            if (clan.getID() == clanID)
+                return clan;
 
         return null;
     }
@@ -184,9 +184,9 @@ public class ClansManager {
     }
 
     private void syncNewClans() {
-        for (Map.Entry<String, Clan> entry : clans.entrySet())
-            if (entry.getValue().getID() == -1)
-                ClansDB.newClan(entry.getValue());
+        for (Clan clan : clans.values())
+            if (clan.getID() == -1)
+                ClansDB.newClan(clan);
     }
 
     private void startScheduler(Plugin plugin) {

@@ -310,12 +310,11 @@ public class InfinitePKManager {
     }
 
     public boolean isLocInCurrentBlocks(Location loc) {
-        for (Map.Entry<String, InfinitePK> entry : participants.entrySet())
-            if ((entry.getValue().getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
-                entry.getValue().getCurrentBlockLoc().getBlockZ() == loc.getBlockZ()) ||
+        for (InfinitePK infinitePK : participants.values())
+            if ((infinitePK.getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
+                infinitePK.getCurrentBlockLoc().getBlockZ() == loc.getBlockZ()) ||
                 loc.getBlock().getType() != Material.AIR)
                 return true;
-
         return false;
     }
 
@@ -356,8 +355,8 @@ public class InfinitePKManager {
     }
 
     public void shutdown() {
-        for (Map.Entry<String, InfinitePK> infinitePKEntry : participants.entrySet())
-            endPK(infinitePKEntry.getValue().getPlayer(), true);
+        for (InfinitePK infinitePK : participants.values())
+            endPK(infinitePK.getPlayer(), true);
     }
 
     public Set<InfinitePKLBPosition> getLeaderboard() {

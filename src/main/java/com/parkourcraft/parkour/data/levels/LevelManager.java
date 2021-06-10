@@ -127,7 +127,7 @@ public class LevelManager {
     }
 
     public Level getFeaturedLevel() {
-        Level level = Parkour.getLevelManager().get(featuredLevel);
+        Level level = get(featuredLevel);
 
         if (level != null)
             return level;
@@ -137,9 +137,9 @@ public class LevelManager {
     public List<Level> getEventLevels() {
         List<Level> tempList = new ArrayList<>();
 
-        for (Map.Entry<String, Level> entry : levels.entrySet())
-            if (entry.getValue().isEventLevel())
-                tempList.add(entry.getValue());
+        for (Level level : levels.values())
+            if (level.isEventLevel())
+                tempList.add(level);
 
         return tempList;
     }
@@ -178,9 +178,9 @@ public class LevelManager {
 
         List<String> temporaryRaceLevelList = new ArrayList<>();
 
-        for (Map.Entry<String, Level> entry : levels.entrySet()) {
-            if (entry.getValue().isRaceLevel())
-                temporaryRaceLevelList.add(entry.getValue().getName());
+        for (Level level : levels.values()) {
+            if (level.isRaceLevel())
+                temporaryRaceLevelList.add(level.getName());
         }
         return temporaryRaceLevelList;
     }
@@ -203,9 +203,8 @@ public class LevelManager {
                 for (Level level : levelsInMenus) {
                     if (level != null) {
                         int amountInLevel = 0;
-                        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
+                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
 
-                            PlayerStats playerStats = entry.getValue();
                             if (playerStats != null &&
                                     playerStats.getLevel() != null &&
                                     playerStats.getLevel().equalsIgnoreCase(level.getName()))
@@ -231,9 +230,9 @@ public class LevelManager {
     }
 
     public Level get(int levelID) {
-        for (Map.Entry<String, Level> entry : levels.entrySet())
-            if (entry.getValue().getID() == levelID)
-                return entry.getValue();
+        for (Level level : levels.values())
+            if (level.getID() == levelID)
+                return level;
 
         return null;
     }

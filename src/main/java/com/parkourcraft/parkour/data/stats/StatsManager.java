@@ -41,20 +41,17 @@ public class StatsManager {
     }
 
     public PlayerStats get(String UUID) {
-        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet()) {
-            PlayerStats playerStats = entry.getValue();
-
+        for (PlayerStats playerStats : playerStatsList.values())
             if (playerStats.getUUID().equals(UUID))
                 return playerStats;
-        }
 
         return null;
     }
 
     public PlayerStats get(int playerID) {
-        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
-            if (entry.getValue().getPlayerID() == playerID)
-                return entry.getValue();
+        for (PlayerStats playerStats : playerStatsList.values())
+            if (playerStats.getPlayerID() == playerID)
+                return playerStats;
 
         return null;
     }
@@ -84,10 +81,10 @@ public class StatsManager {
 
     private void loadUnloadedStats() {
         if (!running) {
-            for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet()) {
-                if (entry.getValue().getPlayerID() == -1) {
-                    StatsDB.loadPlayerStats(entry.getValue());
-                    Parkour.getPerkManager().syncPermissions(entry.getValue().getPlayer());
+            for (PlayerStats playerStats : playerStatsList.values()) {
+                if (playerStats.getPlayerID() == -1) {
+                    StatsDB.loadPlayerStats(playerStats);
+                    Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
                 }
             }
             running = false;
@@ -111,9 +108,9 @@ public class StatsManager {
 
         Set<PlayerStats> removeList = new HashSet<>();
 
-        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
-            if (!entry.getValue().getPlayer().isOnline())
-                removeList.add(entry.getValue());
+        for (PlayerStats playerStats : playerStatsList.values())
+            if (!playerStats.getPlayer().isOnline())
+                removeList.add(playerStats);
 
         for (PlayerStats playerStats : removeList)
             remove(playerStats);
