@@ -31,11 +31,9 @@ public class InfinitePKManager {
             @Override
             public void run() {
 
-                if (!participants.isEmpty()) {
-                    for (Map.Entry<String, InfinitePK> entry : participants.entrySet())
-                        if (entry.getValue().getPlayer().getLocation().getBlockY() < (entry.getValue().getCurrentBlockLoc().getBlockY() - 2))
-                            endPK(entry.getValue().getPlayer(), false);
-                }
+                for (InfinitePK infinitePK : participants.values())
+                    if (infinitePK.getPlayer().getLocation().getBlockY() < (infinitePK.getCurrentBlockLoc().getBlockY() - 2))
+                        endPK(infinitePK.getPlayer(), false);
             }
         }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20 * 2);
     }
