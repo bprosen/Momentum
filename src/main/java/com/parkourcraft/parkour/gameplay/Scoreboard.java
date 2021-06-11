@@ -23,7 +23,7 @@ public class Scoreboard {
             public void run() {
                 displayScoreboards();
             }
-        }, 20L, 4L);
+        }, 20L, 10L);
     }
 
     private static String getSpaces(int length) {
