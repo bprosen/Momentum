@@ -37,7 +37,6 @@ public class JoinLeaveHandler implements Listener {
                 ));
             }
         }
-        UUID uuid = player.getUniqueId();
         Parkour.getStatsManager().add(player);
         PlayerHider.hideHiddenPlayersFromJoined(player);
 
@@ -46,6 +45,8 @@ public class JoinLeaveHandler implements Listener {
             // make sure the area they are spawning in is a level
             if (Parkour.getLevelManager().get(regions.get(0)) != null) {
                 Parkour.getStatsManager().get(player).setLevel(regions.get(0));
+
+                UUID uuid = player.getUniqueId();
 
                 // run async
                 new BukkitRunnable() {

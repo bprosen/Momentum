@@ -111,6 +111,8 @@ public class Scoreboard {
             board.add(formatSpacing(Utils.translate("&7Score &d" + Parkour.getInfinitePKManager().get(
                                                                         player.getName()).getScore())
                                                                         ));
+            if (playerStats.getInfinitePKScore() > 0)
+                board.add(formatSpacing(Utils.translate("&7Best &d" + playerStats.getInfinitePKScore())));
 
         // level section of scoreboard
         } else if (level != null) {
