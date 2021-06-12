@@ -108,11 +108,13 @@ public class Scoreboard {
         } else if (playerStats.isInInfinitePK()) {
 
             board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
-            board.add(formatSpacing(Utils.translate("&7Score &d" + Parkour.getInfinitePKManager().get(
-                                                                        player.getName()).getScore())
-                                                                        ));
+
+            // add best if they have one
+            String scoreString = "&7Score &d" + Parkour.getInfinitePKManager().get(player.getName()).getScore();
             if (playerStats.getInfinitePKScore() > 0)
-                board.add(formatSpacing(Utils.translate("&7Best &d" + playerStats.getInfinitePKScore())));
+                scoreString += " &7(&dBest " + playerStats.getInfinitePKScore() + "&7)";
+
+            board.add(formatSpacing(Utils.translate(scoreString)));
 
         // level section of scoreboard
         } else if (level != null) {
