@@ -91,19 +91,10 @@ public class LevelListener implements Listener {
                             int blockX = playerStats.getCheckpoint().getBlockX();
                             int blockZ = playerStats.getCheckpoint().getBlockZ();
 
-                            if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
-                                playerStats.setCheckpoint(block.getLocation());
-
-                                String msgString = "&eYour checkpoint has been set";
-                                if (playerStats.getLevelStartTime() > 0) {
-                                    double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-                                    msgString += " &7- &6" + (Math.round((timeElapsed / 1000) * 10) / 10.0) + "&es";
-                                }
-                                player.sendMessage(Utils.translate(msgString));
-                            }
+                            if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ()))
+                                setCheckpoint(player, playerStats, block.getLocation());
                         } else {
-                            playerStats.setCheckpoint(block.getLocation());
-                            player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
+                            setCheckpoint(player, playerStats, block.getLocation());
                         }
                     }
                 }
@@ -126,6 +117,17 @@ public class LevelListener implements Listener {
                 Parkour.getInfinitePKManager().doNextJump(player, false);
             }
         }
+    }
+
+    private void setCheckpoint(Player player, PlayerStats playerStats, Location location) {
+        playerStats.setCheckpoint(location);
+
+        String msgString = "&eYour checkpoint has been set";
+        if (playerStats.getLevelStartTime() > 0) {
+            double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+            msgString += " &7- &6" + (timeElapsed / 1000.0) + "s";
+        }
+        player.sendMessage(Utils.translate(msgString));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
