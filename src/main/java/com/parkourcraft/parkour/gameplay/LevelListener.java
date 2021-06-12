@@ -93,7 +93,13 @@ public class LevelListener implements Listener {
 
                             if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ())) {
                                 playerStats.setCheckpoint(block.getLocation());
-                                player.sendMessage(Utils.translate("&eYour checkpoint has been set"));
+
+                                String msgString = "&eYour checkpoint has been set";
+                                if (playerStats.getLevelStartTime() > 0) {
+                                    double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+                                    msgString += " &7- &6" + (Math.round((timeElapsed / 1000) * 10) / 10.0) + "&es";
+                                }
+                                player.sendMessage(Utils.translate(msgString));
                             }
                         } else {
                             playerStats.setCheckpoint(block.getLocation());
