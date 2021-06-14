@@ -30,6 +30,7 @@ public class PlayerStats {
     private int infinitePKScore = 0;
     private boolean inInfinitePK = false;
     private boolean eventParticipant = false;
+    private long totalLevelCompletions = 0;
     private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
@@ -116,6 +117,10 @@ public class PlayerStats {
     public long getLevelStartTime() {
         return levelStartTime;
     }
+
+    public long getTotalLevelCompletions() { return totalLevelCompletions; }
+
+    public void setTotalLevelCompletions(long totalLevelCompletions) { this.totalLevelCompletions = totalLevelCompletions; }
 
     //
     // Spectator Section

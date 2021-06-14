@@ -61,3 +61,8 @@ infinitepk:
   max_y: 200
   max_z: 100
   starting_y: 150
+completions:
+  global_level_completions_leaderboard:
+    max_size: 10
+  global_personal_completions_leaderboard:
+    max_size: 10

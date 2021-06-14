@@ -78,6 +78,13 @@ public class LevelsDB {
         return false;
     }
 
+    public static long getGlobalCompletions() {
+        List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
+                "COUNT(*) AS total_completions", "");
+
+        return Long.parseLong(globalResults.get(0).get("total_completions"));
+    }
+
     public static void updateReward(Level level) {
         String query = "UPDATE levels SET " +
                 "reward=" + level.getReward() + " " +

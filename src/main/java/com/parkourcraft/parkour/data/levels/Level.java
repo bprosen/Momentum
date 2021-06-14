@@ -18,7 +18,6 @@ public class Level {
     private String name;
     private String title;
     private int reward = 0;
-    private int totalCompletions;
     private float rating;
     private int ratingsCount;
     private Location startLocation;

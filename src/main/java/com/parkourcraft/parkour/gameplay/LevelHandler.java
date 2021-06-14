@@ -75,6 +75,7 @@ public class LevelHandler {
 
         levelCompletion.setPlayerName(player.getName());
         StatsDB.insertCompletion(playerStats, level, levelCompletion);
+        Parkour.getLevelManager().addTotalLevelCompletion();
         level.addCompletion(player, levelCompletion, level); // Update totalLevelCompletionsCount
 
         // run commands if there is any

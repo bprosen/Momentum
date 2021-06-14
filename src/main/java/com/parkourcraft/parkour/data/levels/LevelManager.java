@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.menus.MenuItem;
 import com.parkourcraft.parkour.data.menus.MenuPage;
 import com.parkourcraft.parkour.data.menus.MenusYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsDB;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,6 +20,9 @@ public class LevelManager {
     private Map<String, LevelData> levelDataCache;
     private Set<Level> levelsInMenus = new HashSet<>();
     private String featuredLevel = null;
+    private long totalLevelCompletions;
+    private LinkedHashSet<Level> globalLevelCompletionsLB = new LinkedHashSet<>
+            (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
 
     public LevelManager(Plugin plugin) {
         this.levelDataCache = LevelsDB.getDataCache();
@@ -26,6 +30,7 @@ public class LevelManager {
         load(); // Loads levels from configuration
         loadLevelsInMenus();
         pickFeatured();
+        totalLevelCompletions = LevelsDB.getGlobalCompletions();
         startScheduler(plugin);
     }
 
@@ -235,6 +240,41 @@ public class LevelManager {
                 return level;
 
         return null;
+    }
+
+    public long getTotalLevelCompletions() { return totalLevelCompletions; }
+
+    public void addTotalLevelCompletion() { totalLevelCompletions++; }
+
+    /*
+        section for global LEVEL completions (level, not personal based)
+    */
+    public boolean isGlobalLevelCompletionsLBSpot(Level level) {
+        return globalLevelCompletionsLB.contains(level);
+    }
+
+    public LinkedHashSet<Level> getGlobalLevelCompletionsLB() {
+        return globalLevelCompletionsLB;
+    }
+
+    public void loadGlobalLevelCompletionsLB() {
+        Level highestLevel = null;
+        Set<String> addedLevels = new HashSet<>();
+        int lbSize = 0;
+
+        while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
+
+            for (Level level : levels.values()) {
+                if (highestLevel == null)
+                    highestLevel = level;
+                else if (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount())
+                    highestLevel = level;
+            }
+            globalLevelCompletionsLB.add(highestLevel);
+            addedLevels.add(highestLevel.getName());
+            highestLevel = null;
+            lbSize++;
+        }
     }
 
     public HashMap<String, Level> getLevels() {

@@ -11,9 +11,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class StatsCMD implements CommandExecutor {
 
@@ -45,6 +43,29 @@ public class StatsCMD implements CommandExecutor {
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&cNo infinite leaderboard positions found"));
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("levels")) {
+
+                LinkedHashSet<Level> globalLevelCompletionsLB = Parkour.getLevelManager().getGlobalLevelCompletionsLB();
+
+                if (!globalLevelCompletionsLB.isEmpty()) {
+
+                    sender.sendMessage(Utils.translate("&4Global Level Completions &7Leaderboard"));
+
+                    int lbPositionNum = 1;
+                    for (Level lbPosition : globalLevelCompletionsLB) {
+
+                        if (lbPosition != null) {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                    lbPositionNum + " &4" +
+                                    Utils.shortStyleNumber(lbPosition.getTotalCompletionsCount()) + " &c" +
+                                    lbPosition.getFormattedTitle()));
+                            lbPositionNum++;
+                        }
+                    }
+                    sender.sendMessage(Utils.translate("&7Global Completions &c" + Utils.formatNumber(Parkour.getLevelManager().getTotalLevelCompletions())));
+                } else {
+                    sender.sendMessage(Utils.translate("&cLevels leaderboard not loaded fully"));
                 }
             // level lb
             } else {

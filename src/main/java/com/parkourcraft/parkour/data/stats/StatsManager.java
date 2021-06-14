@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.levels.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -11,6 +12,8 @@ public class StatsManager {
 
     private boolean running = false;
     private HashMap<String, PlayerStats> playerStatsList = new HashMap<>();
+    private LinkedHashMap<String, Integer> globalPersonalCompletionsLB = new LinkedHashMap<>
+            (Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
 
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
@@ -36,6 +39,7 @@ public class StatsManager {
             public void run() {
                 StatsDB.loadTotalCompletions();
                 StatsDB.loadLeaderboards();
+                Parkour.getLevelManager().loadGlobalLevelCompletionsLB(); // we MUST load this after leaderboards
             }
         });
     }
@@ -99,6 +103,10 @@ public class StatsManager {
 
     public void remove(PlayerStats playerStats) {
         playerStatsList.remove(playerStats);
+    }
+
+    public LinkedHashMap<String, Integer> getGlobalPersonalCompletionsLB() {
+        return globalPersonalCompletionsLB;
     }
 
     public void clean() {

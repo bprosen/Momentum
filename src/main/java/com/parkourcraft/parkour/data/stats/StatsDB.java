@@ -66,6 +66,9 @@ public class StatsDB {
 
                 int infinitePKScore = Integer.parseInt(playerResult.get("infinitepk_score"));
                 playerStats.setInfinitePKScore(infinitePKScore);
+
+                // set total completions count
+                playerStats.setTotalLevelCompletions(getPersonalGlobalCompletions(playerStats.getPlayerID()));
             }
         } else {
             insertPlayerID(playerStats);
@@ -241,5 +244,12 @@ public class StatsDB {
                         levelCompletions.remove(levelCompletion);
         }
         level.setLeaderboardCache(levelCompletions);
+    }
+
+    public static long getPersonalGlobalCompletions(int playerID) {
+        List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
+                "COUNT(*) AS total_completions", " WHERE player_id=" + playerID);
+
+        return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
 }
