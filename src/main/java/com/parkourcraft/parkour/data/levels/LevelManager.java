@@ -220,6 +220,14 @@ public class LevelManager {
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
+
+        // update global level completions lb every 3 minutes
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadGlobalLevelCompletionsLB();
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 180, 20 * 180);
     }
 
     void setLevelDataCache(Map<String, LevelData> levelDataCache) {
@@ -258,22 +266,27 @@ public class LevelManager {
     }
 
     public void loadGlobalLevelCompletionsLB() {
-        Level highestLevel = null;
-        Set<String> addedLevels = new HashSet<>();
-        int lbSize = 0;
+        try {
+            globalLevelCompletionsLB.clear();
 
-        while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
+            Level highestLevel = null;
+            Set<String> addedLevels = new HashSet<>();
+            int lbSize = 0;
 
-            for (Level level : levels.values()) {
-                if (highestLevel == null)
-                    highestLevel = level;
-                else if (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount())
-                    highestLevel = level;
+            while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
+
+                for (Level level : levels.values()) {
+                    if (highestLevel == null ||
+                            (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount()))
+                        highestLevel = level;
+                }
+                globalLevelCompletionsLB.add(highestLevel);
+                addedLevels.add(highestLevel.getName());
+                highestLevel = null;
+                lbSize++;
             }
-            globalLevelCompletionsLB.add(highestLevel);
-            addedLevels.add(highestLevel.getName());
-            highestLevel = null;
-            lbSize++;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

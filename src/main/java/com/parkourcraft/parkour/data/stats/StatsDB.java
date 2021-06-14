@@ -27,7 +27,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score",
+                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -68,7 +68,8 @@ public class StatsDB {
                 playerStats.setInfinitePKScore(infinitePKScore);
 
                 // set total completions count
-                playerStats.setTotalLevelCompletions(getPersonalGlobalCompletions(playerStats.getPlayerID()));
+                int completions = Integer.parseInt(playerResult.get("level_completions"));
+                playerStats.setTotalLevelCompletions(completions);
             }
         } else {
             insertPlayerID(playerStats);
@@ -160,8 +161,21 @@ public class StatsDB {
                         "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
                         ")"
         );
+
+        int totalCompletions = getTotalCompletions(playerStats.getPlayerName());
+        if (totalCompletions > -1)
+            Parkour.getDatabaseManager().add("UPDATE players SET level_completions=" + (totalCompletions + 1) + " WHERE player_name='" + playerStats.getPlayerName() + "'");
     }
 
+    public static int getTotalCompletions(String playerName) {
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults("players", "level_completions", " WHERE player_name='" + playerName + "'");
+
+        for (Map<String, String> playerResult : playerResults)
+            return Integer.parseInt(playerResult.get("level_completions"));
+
+        return -1;
+    }
     /*
      * Leader Board Section
      */
@@ -247,9 +261,9 @@ public class StatsDB {
     }
 
     public static long getPersonalGlobalCompletions(int playerID) {
-        List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
-                "COUNT(*) AS total_completions", " WHERE player_id=" + playerID);
+        List<Map<String, String>> globalResults = DatabaseQueries.getResults("players",
+                "completions", " WHERE player_id=" + playerID);
 
-        return Long.parseLong(globalResults.get(0).get("total_completions"));
+        return Integer.parseInt(globalResults.get(0).get("completions"));
     }
 }

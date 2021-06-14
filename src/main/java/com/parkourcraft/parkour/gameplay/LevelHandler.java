@@ -4,9 +4,11 @@ import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
+import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
@@ -67,6 +69,8 @@ public class LevelHandler {
 
     public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean rankUpLevel, boolean forcedCompletion) {
 
+        LevelManager levelManager = Parkour.getLevelManager();
+
         Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
         LevelCompletion levelCompletion = new LevelCompletion(
                 System.currentTimeMillis(),
@@ -74,8 +78,9 @@ public class LevelHandler {
         );
 
         levelCompletion.setPlayerName(player.getName());
+        playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
         StatsDB.insertCompletion(playerStats, level, levelCompletion);
-        Parkour.getLevelManager().addTotalLevelCompletion();
+        levelManager.addTotalLevelCompletion();
         level.addCompletion(player, levelCompletion, level); // Update totalLevelCompletionsCount
 
         // run commands if there is any

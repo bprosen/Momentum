@@ -2,10 +2,13 @@ package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class StatsManager {
@@ -21,27 +24,36 @@ public class StatsManager {
 
     private void startScheduler(Plugin plugin) {
         // Loads unloaded PlayersStats
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+        new BukkitRunnable() {
             public void run() {
                 loadUnloadedStats();
             }
-        }, 10L, 4L);
+        }.runTaskTimerAsynchronously(plugin, 10L, 4L);
 
         // Garbage collection for offline players
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        new BukkitRunnable() {
             public void run() {
                 clean();
             }
-        }, 0L, 10L);
+        }.runTaskTimer(plugin, 0L, 10L);
 
         // Leader Boards
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+        new BukkitRunnable() {
             public void run() {
                 StatsDB.loadTotalCompletions();
                 StatsDB.loadLeaderboards();
                 Parkour.getLevelManager().loadGlobalLevelCompletionsLB(); // we MUST load this after leaderboards
+                loadGlobalPersonalCompletionsLB();
             }
-        });
+        }.runTaskAsynchronously(plugin);
+
+        // run personal lb load every 3 mins in async
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadGlobalPersonalCompletionsLB();
+            }
+        }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
     }
 
     public PlayerStats get(String UUID) {
@@ -103,6 +115,23 @@ public class StatsManager {
 
     public void remove(PlayerStats playerStats) {
         playerStatsList.remove(playerStats);
+    }
+
+    public void loadGlobalPersonalCompletionsLB() {
+        try {
+            globalPersonalCompletionsLB.clear();
+
+            // find the highest top 10 completion stat
+            List<Map<String, String>> playerCompletions = DatabaseQueries.getResults("players", "player_name, level_completions",
+                    " ORDER BY level_completions DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
+
+                for (Map<String, String> playerCompletionStat : playerCompletions)
+                    // add playername to completion in map
+                    globalPersonalCompletionsLB.put(playerCompletionStat.get("player_name"),
+                                                    Integer.parseInt(playerCompletionStat.get("level_completions")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public LinkedHashMap<String, Integer> getGlobalPersonalCompletionsLB() {

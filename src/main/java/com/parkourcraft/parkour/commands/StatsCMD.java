@@ -50,7 +50,7 @@ public class StatsCMD implements CommandExecutor {
 
                 if (!globalLevelCompletionsLB.isEmpty()) {
 
-                    sender.sendMessage(Utils.translate("&4Global Level Completions &7Leaderboard"));
+                    sender.sendMessage(Utils.translate("&4Level Completions &7Leaderboard"));
 
                     int lbPositionNum = 1;
                     for (Level lbPosition : globalLevelCompletionsLB) {
@@ -66,6 +66,35 @@ public class StatsCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&7Global Completions &c" + Utils.formatNumber(Parkour.getLevelManager().getTotalLevelCompletions())));
                 } else {
                     sender.sendMessage(Utils.translate("&cLevels leaderboard not loaded fully"));
+                }
+            // players
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("players")) {
+
+                LinkedHashMap<String, Integer> globalPersonalCompletionsLB = Parkour.getStatsManager().getGlobalPersonalCompletionsLB();
+
+                if (!globalPersonalCompletionsLB.isEmpty()) {
+
+                    sender.sendMessage(Utils.translate("&3Player Completions &7Leaderboard"));
+
+                    int lbPositionNum = 1;
+                    for (Map.Entry<String, Integer> entry : globalPersonalCompletionsLB.entrySet()) {
+
+                        if (entry != null) {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                    lbPositionNum + " &3" +
+                                    Utils.shortStyleNumber(entry.getValue()) + " &b" +
+                                    entry.getKey()));
+                            lbPositionNum++;
+                        }
+                    }
+                    // if player, send personal total
+                    if (sender instanceof Player) {
+                        Player player = (Player) sender;
+                        sender.sendMessage(Utils.translate("&7Your total &b" + Utils.formatNumber(
+                                Parkour.getStatsManager().get(player).getTotalLevelCompletions())));
+                    }
+                } else {
+                    sender.sendMessage(Utils.translate("&cPlayers leaderboard not loaded fully"));
                 }
             // level lb
             } else {
