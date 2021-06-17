@@ -66,3 +66,6 @@ completions:
     max_size: 10
   global_personal_completions_leaderboard:
     max_size: 10
+prestiges:
+  max_multiplier: 1.25
+  multiplier_per_prestige: 0.05

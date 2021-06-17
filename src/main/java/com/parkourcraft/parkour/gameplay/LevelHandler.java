@@ -93,8 +93,18 @@ public class LevelHandler {
 
         // Update player information
         playerStats.levelCompletion(levelName, levelCompletion);
-        Parkour.getEconomy().depositPlayer(player, level.getReward());
 
+        // give higher reward if prestiged
+        int prestiges = playerStats.getPrestiges();
+        if (prestiges > 0) {
+
+            double newPercentage = Math.min(1.0 + ((5.0 * prestiges) / 100.0), Parkour.getSettingsManager().max_prestige_multiplier);
+            int newReward = (int) (level.getReward() * newPercentage);
+
+            // TODO: give reward and then show in the menu/on scoreboard
+        } else {
+            Parkour.getEconomy().depositPlayer(player, level.getReward());
+        }
         // This can be run in async, stops BIG sync loads and main thread pauses onCompletion
         new BukkitRunnable() {
             public void run() {

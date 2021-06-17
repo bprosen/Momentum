@@ -54,6 +54,9 @@ public class SettingsManager {
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
 
+    public double max_prestige_multiplier;
+    public double prestige_multiplier_per_prestige;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -98,5 +101,7 @@ public class SettingsManager {
         infinitepk_starting_y = settings.getInt("infinitepk.starting_y");
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
+        max_prestige_multiplier = settings.getDouble("prestiges.max_multiplier");
+        prestige_multiplier_per_prestige = settings.getDouble("prestiges.multiplier_per_prestige");
     }
 }
