@@ -95,7 +95,14 @@ public class Level {
             String returnMessage = Utils.translate(message);
 
             returnMessage = returnMessage.replace("%title%", getFormattedTitle());
-            returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
+
+            if (playerStats.getPrestiges() > 0)
+                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
+                        Utils.formatNumber(reward) + "&6 " +
+                        Utils.formatNumber(reward * playerStats.getPrestigeMultiplier())));
+            else
+                returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
+
             returnMessage = returnMessage.replace(
                     "%completions%",
                     Integer.toString(playerStats.getLevelCompletionsCount(name))

@@ -37,6 +37,7 @@ public class JoinLeaveHandler implements Listener {
                 ));
             }
         }
+
         Parkour.getStatsManager().add(player);
         PlayerHider.hideHiddenPlayersFromJoined(player);
 

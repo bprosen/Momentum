@@ -159,6 +159,8 @@ public class RanksManager {
         Rank defaultRank = get(1);
         // update cache and database
         playerStats.setRank(defaultRank);
+        // update prestige multiplier
+        playerStats.setPrestigeMultiplier(playerStats.getPrestigeMultiplier() + (Parkour.getSettingsManager().prestige_multiplier_per_prestige / 100));
         // dont need to update stage as they will never hit stage 2 in max rank
         RanksDB.updateRank(player.getUniqueId(), 1);
 

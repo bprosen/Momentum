@@ -227,7 +227,11 @@ public class MenuItemFormatter {
             itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()
                     .replace("&l", "").replace("&o", "")));
 
-            itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
+            if (playerStats.getPrestiges() > 0)
+                itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
+                             Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier()) + " Coin &7Reward"));
+              else
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
 
             if (level.getTotalCompletionsCount() > 0)
                 itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + " &7Completions"));

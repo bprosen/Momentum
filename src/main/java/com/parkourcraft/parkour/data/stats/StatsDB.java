@@ -70,6 +70,18 @@ public class StatsDB {
                 // set total completions count
                 int completions = Integer.parseInt(playerResult.get("level_completions"));
                 playerStats.setTotalLevelCompletions(completions);
+
+                // set multiplier percentage
+                if (playerStats.getPrestiges() > 0) {
+                    double newPercentage = prestiges * 5;
+
+                    if (newPercentage >= Parkour.getSettingsManager().max_prestige_multiplier)
+                        newPercentage = Parkour.getSettingsManager().max_prestige_multiplier;
+
+                    double newMultiplier = 1.00 + (newPercentage / 100);
+
+                    playerStats.setPrestigeMultiplier(newMultiplier);
+                }
             }
         } else {
             insertPlayerID(playerStats);

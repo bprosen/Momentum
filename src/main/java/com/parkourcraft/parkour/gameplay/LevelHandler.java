@@ -94,17 +94,6 @@ public class LevelHandler {
         // Update player information
         playerStats.levelCompletion(levelName, levelCompletion);
 
-        // give higher reward if prestiged
-        int prestiges = playerStats.getPrestiges();
-        if (prestiges > 0) {
-
-            double newPercentage = Math.min(1.0 + ((5.0 * prestiges) / 100.0), Parkour.getSettingsManager().max_prestige_multiplier);
-            int newReward = (int) (level.getReward() * newPercentage);
-
-            // TODO: give reward and then show in the menu/on scoreboard
-        } else {
-            Parkour.getEconomy().depositPlayer(player, level.getReward());
-        }
         // This can be run in async, stops BIG sync loads and main thread pauses onCompletion
         new BukkitRunnable() {
             public void run() {
@@ -122,6 +111,15 @@ public class LevelHandler {
                 // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
                 if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
                     Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
+            }
+
+            // give higher reward if prestiged
+            int prestiges = playerStats.getPrestiges();
+            if (prestiges > 0) {
+                int newReward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
+                Parkour.getEconomy().depositPlayer(player, newReward);
+            } else {
+                Parkour.getEconomy().depositPlayer(player, level.getReward());
             }
 
             String messageFormatted = level.getFormattedMessage(playerStats);
@@ -148,7 +146,7 @@ public class LevelHandler {
             // only broadcast if it is not a forced completion
             if (!forcedCompletion) {
                 // broadcast completed if it the featured level
-                if (levelName.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName())) {
+                if (level.isFeaturedLevel()) {
                     Bukkit.broadcastMessage(Utils.translate(
                             "&c&l" + player.getName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
                     ));

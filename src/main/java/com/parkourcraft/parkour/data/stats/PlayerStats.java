@@ -26,6 +26,7 @@ public class PlayerStats {
     private boolean inRace = false;
     private Rank rank;
     private int prestiges = 0;
+    private double prestigeMultiplier = 1.00;
     private int rankUpStage;
     private int infinitePKScore = 0;
     private boolean inInfinitePK = false;
@@ -203,6 +204,10 @@ public class PlayerStats {
     public void addPrestige() { prestiges += 1; }
 
     public void setPrestiges(int prestiges) { this.prestiges = prestiges; }
+
+    public double getPrestigeMultiplier() { return prestigeMultiplier; }
+
+    public void setPrestigeMultiplier(double prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
 
     //
     // Practice Mode Section

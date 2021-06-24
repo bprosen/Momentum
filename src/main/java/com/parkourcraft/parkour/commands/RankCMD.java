@@ -143,6 +143,17 @@ public class RankCMD implements CommandExecutor {
                             if (victim != null) {
                                 PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
                                 victimStats.setPrestiges(newPrestige);
+
+                                if (victimStats.getPrestiges() > 0) {
+                                    double prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * victimStats.getPrestiges();
+
+                                    if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
+                                        prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
+
+                                    prestigeMultiplier = 1.00 + (prestigeMultiplier / 100);
+
+                                    victimStats.setPrestigeMultiplier(prestigeMultiplier);
+                                }
                             }
                             // update in db
                             RanksDB.updatePrestiges(a[1], newPrestige);
