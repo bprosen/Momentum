@@ -10,6 +10,7 @@ import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +20,12 @@ public class Scoreboard {
     private static int boardWidth = 23;
 
     public static void startScheduler(Plugin plugin) {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        new BukkitRunnable() {
+            @Override
             public void run() {
                 displayScoreboards();
             }
-        }, 20L, 10L);
+        }.runTaskTimerAsynchronously(plugin, 20, 10);
     }
 
     private static String getSpaces(int length) {
@@ -45,111 +47,120 @@ public class Scoreboard {
     }
 
     public static void displayScoreboards() {
-        for (Player player : Bukkit.getOnlinePlayers())
-            displayScoreboard(player);
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+            displayScoreboard(playerStats);
     }
 
-    private static void displayScoreboard(Player player) {
-        List<String> board = new ArrayList<>();
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        Level level = Parkour.getLevelManager().get(playerStats.getLevel());
-        EventManager eventManager = Parkour.getEventManager();
+    private static void displayScoreboard(PlayerStats playerStats) {
+        if (playerStats != null && playerStats.getPlayer() != null) {
 
-        // Title
-        board.add(Utils.translate("&c&lRenatus Network"));
+            List<String> board = new ArrayList<>();
+            Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+            EventManager eventManager = Parkour.getEventManager();
 
-        board.add(Utils.translate("&7"));
+            // Title
+            board.add(Utils.translate("&c&lRenatus Network"));
 
-        String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(player));
-        board.add(coinBalance);
+            board.add(Utils.translate("&7"));
 
-        if (playerStats.getRank() != null) {
-            String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
-            board.add(rankString);
-        }
+            String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(playerStats.getPlayer()));
+            board.add(coinBalance);
 
-        if (playerStats.getClan() != null) {
-            String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
-            board.add(clanString);
-        }
+            if (playerStats.getRank() != null) {
+                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
+                board.add(rankString);
+            }
 
-        board.add(formatSpacing(Utils.translate("&7")));
+            if (playerStats.getClan() != null) {
+                String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
+                board.add(clanString);
+            }
 
-        // spectator section of scoreboard
-        if (playerStats.getPlayerToSpectate() != null) {
+            board.add(formatSpacing(Utils.translate("&7")));
 
-            board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getPlayerName())));
-            board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
+            // spectator section of scoreboard
+            if (playerStats.getPlayerToSpectate() != null) {
 
-        // practice section of scoreboard
-        } else if (playerStats.getPracticeLocation() != null) {
+                board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getPlayerName())));
+                board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
 
-            board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
-            board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
+                // practice section of scoreboard
+            } else if (playerStats.getPracticeLocation() != null) {
 
-        // race section of scoreboard
-        } else if (playerStats.inRace()) {
+                board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
+                board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
 
-            board.add(formatSpacing(Utils.translate("&6You are in a race!")));
-            board.add(formatSpacing(Utils.translate("&7vs. &c" + Parkour.getRaceManager().get(player)
-                    .getOpponent(player).getName())));
+                // race section of scoreboard
+            } else if (playerStats.inRace()) {
 
-        // event section of scoreboard
-        } else if (playerStats.isEventParticipant()) {
+                board.add(formatSpacing(Utils.translate("&6You are in a race!")));
+                board.add(formatSpacing(Utils.translate("&7vs. &c" + Parkour.getRaceManager().get(playerStats.getPlayer())
+                        .getOpponent(playerStats.getPlayer()).getName())));
 
-            board.add(formatSpacing(Utils.translate("&7You are in an event!")));
-            board.add(formatSpacing(Utils.translate("&2&l" +
-                                    eventManager.formatName(eventManager.getEventType()))));
-            board.add("");
-            board.add(formatSpacing(Utils.translate("&6&lTime Left")));
-            board.add(formatSpacing(Utils.translate("&e" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
+                // event section of scoreboard
+            } else if (playerStats.isEventParticipant()) {
 
-        // infinite parkour section of scoreboard
-        } else if (playerStats.isInInfinitePK()) {
+                board.add(formatSpacing(Utils.translate("&7You are in an event!")));
+                board.add(formatSpacing(Utils.translate("&2&l" +
+                        eventManager.formatName(eventManager.getEventType()))));
+                board.add("");
+                board.add(formatSpacing(Utils.translate("&6&lTime Left")));
+                board.add(formatSpacing(Utils.translate("&e" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
 
-            board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
+                // infinite parkour section of scoreboard
+            } else if (playerStats.isInInfinitePK()) {
 
-            // add best if they have one
-            String scoreString = "&7Score &d" + Parkour.getInfinitePKManager().get(player.getName()).getScore();
-            if (playerStats.getInfinitePKScore() > 0)
-                scoreString += " &7(&dBest " + playerStats.getInfinitePKScore() + "&7)";
+                board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
 
-            board.add(formatSpacing(Utils.translate(scoreString)));
+                // add best if they have one
+                String scoreString = "&7Score &d" + Parkour.getInfinitePKManager().get(playerStats.getPlayerName()).getScore();
+                if (playerStats.getInfinitePKScore() > 0)
+                    scoreString += " &7(&dBest " + playerStats.getInfinitePKScore() + "&7)";
 
-        // level section of scoreboard
-        } else if (level != null) {
+                board.add(formatSpacing(Utils.translate(scoreString)));
 
-            String rewardString;
+                // level section of scoreboard
+            } else if (level != null) {
 
-            // add title and adjust rewardstring if it is a featured level
-            if (level.isFeaturedLevel()) {
-                board.add(formatSpacing(Utils.translate("&dFeatured Level")));
+                String rewardString;
 
-                // proper cast
-                rewardString = Utils.translate("&c&m" +
-                        ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
-                        "&6 " + level.getReward());
+                // add title and adjust rewardstring if it is a featured level
+                if (level.isFeaturedLevel()) {
+                    board.add(formatSpacing(Utils.translate("&dFeatured Level")));
 
-            } else if (playerStats.getPrestiges() > 0)
+                    // proper cast
+                    rewardString = Utils.translate("&c&m" +
+                            ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
+                            "&6 " + level.getReward());
+
+                } else if (playerStats.getPrestiges() > 0)
                     rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
                 else
                     rewardString = Utils.translate("&6" + level.getReward());
 
 
-            String title = level.getFormattedTitle();
-            board.add(formatSpacing(title));
-            board.add(formatSpacing(rewardString));
+                String title = level.getFormattedTitle();
+                board.add(formatSpacing(title));
+                board.add(formatSpacing(rewardString));
 
-            if (playerStats != null && playerStats.getLevelStartTime() > 0) {
-                double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+                if (playerStats.getLevelStartTime() > 0) {
+                    double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
-                board.add(formatSpacing(timing));
-            } else {
-                board.add(formatSpacing(Utils.translate("&7-")));
+                    String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                    board.add(formatSpacing(timing));
+                } else {
+                    board.add(formatSpacing(Utils.translate("&7-")));
+                }
             }
-        }
-        ScoreboardUtil.unrankedSidebarDisplay(player, board.toArray(new String[board.size()]));
-    }
 
+            // now run in sync to have proper scoreboard creation
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (playerStats != null && playerStats.getPlayer() != null)
+                        ScoreboardUtil.unrankedSidebarDisplay(playerStats.getPlayer(), board.toArray(new String[board.size()]));
+                }
+            }.runTask(Parkour.getPlugin());
+        }
+    }
 }
