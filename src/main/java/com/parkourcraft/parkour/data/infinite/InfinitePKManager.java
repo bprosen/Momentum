@@ -66,8 +66,6 @@ public class InfinitePKManager {
         InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null) {
 
-            participants.remove(player.getName());
-
             player.teleport(infinitePK.getOriginalLoc());
             int score = infinitePK.getScore();
 
@@ -90,11 +88,12 @@ public class InfinitePKManager {
                 player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
                         "&7Your best is &d" + playerStats.getInfinitePKScore()));
             }
-            // clear blocks
+            // clear blocks and reset data
             infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
             infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
             infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
             playerStats.toggleInfinitePK();
+            participants.remove(player.getName());
         }
     }
 
