@@ -7,8 +7,6 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,6 +18,10 @@ public class Scoreboard {
     private static int boardWidth = 23;
 
     public static void startScheduler(Plugin plugin) {
+        /*
+            we can run the heaviest part when under stress in async,
+            the stats display, but have to still run scoreboard creation in sync
+         */
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -58,19 +60,19 @@ public class Scoreboard {
             Level level = Parkour.getLevelManager().get(playerStats.getLevel());
             EventManager eventManager = Parkour.getEventManager();
 
-            // Title
             board.add(Utils.translate("&c&lRenatus Network"));
-
             board.add(Utils.translate("&7"));
 
             String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(playerStats.getPlayer()));
             board.add(coinBalance);
 
+            // if they have a rank, show it
             if (playerStats.getRank() != null) {
                 String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
                 board.add(rankString);
             }
 
+            // if they have a clan, show it
             if (playerStats.getClan() != null) {
                 String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
                 board.add(clanString);
