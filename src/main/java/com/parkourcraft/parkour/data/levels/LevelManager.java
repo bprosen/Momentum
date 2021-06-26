@@ -320,7 +320,7 @@ public class LevelManager {
 
             // loop through and reset if applicable
             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                if (playerStats.getLevel().equalsIgnoreCase(levelName)) {
+                if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName)) {
                     playerStats.resetLevel();
 
                     if (playerStats.getPracticeLocation() != null)

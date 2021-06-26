@@ -28,8 +28,10 @@ public class LevelsYAML {
             public void run() {
                 Level level = Parkour.getLevelManager().get(levelName);
 
-                StatsDB.loadTotalCompletions(level);
-                StatsDB.loadLeaderboard(level);
+                if (level != null) {
+                    StatsDB.loadTotalCompletions(level);
+                    StatsDB.loadLeaderboard(level);
+                }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
