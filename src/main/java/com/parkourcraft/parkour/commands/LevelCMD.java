@@ -535,6 +535,11 @@ public class LevelCMD implements CommandExecutor {
                             levelManager.getLevelDataCache().remove(levelName);
                             levelManager.getLevelDataCache().put(newLevelName, levelData);
 
+                            // update all stats for online players
+                            for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+                                if (playerStats.getLevel().equalsIgnoreCase(levelName))
+                                    playerStats.setLevel(newLevelName);
+
                             sender.sendMessage(Utils.translate("&cYou have renamed &4" + levelName + " &cto &4" + newLevelName));
                         } else {
                             sender.sendMessage(Utils.translate("&4" + newLevelName + " &calready exists"));

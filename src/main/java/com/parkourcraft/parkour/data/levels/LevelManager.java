@@ -318,6 +318,18 @@ public class LevelManager {
             Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" + level.getID());
             Parkour.getDatabaseManager().add("DELETE FROM ratings WHERE level_id=" + level.getID());
 
+            // loop through and reset if applicable
+            for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+                if (playerStats.getLevel().equalsIgnoreCase(levelName)) {
+                    playerStats.resetLevel();
+
+                    if (playerStats.getPracticeLocation() != null)
+                        playerStats.resetPracticeMode();
+
+                    if (playerStats.getCheckpoint() != null)
+                        playerStats.resetCheckpoint();
+                }
+
             levels.remove(levelName);
         }
     }
