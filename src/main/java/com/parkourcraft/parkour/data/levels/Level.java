@@ -313,8 +313,8 @@ public class Level {
                 // this checks if player1 and player2 has locations
                 raceLevel = true;
 
-                if (LevelsYAML.isSet(name, "race.player1-loc") &&
-                    LevelsYAML.isSet(name, "race.player2-loc")) {
+                if (LevelsYAML.isSet(name, "race.player1_loc") &&
+                    LevelsYAML.isSet(name, "race.player2_loc")) {
 
                     raceLocation1 = LevelsYAML.getPlayerRaceLocation("player1", name);
                     raceLocation2 = LevelsYAML.getPlayerRaceLocation("player2", name);

@@ -218,13 +218,13 @@ public class LevelsYAML {
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
 
-        levelsFile.set(levelName + ".race." + player + "-loc", world + ":" + x + ":" + y + ":" + z + ":" + yaw + ":" + pitch);
+        levelsFile.set(levelName + ".race." + player + "_loc", world + ":" + x + ":" + y + ":" + z + ":" + yaw + ":" + pitch);
         commit(levelName);
     }
 
     public static Location getPlayerRaceLocation(String player, String levelName) {
 
-        String[] locStringSplit = levelsFile.getString(levelName + ".race." + player + "-loc").split(":");
+        String[] locStringSplit = levelsFile.getString(levelName + ".race." + player + "_loc").split(":");
         World world = Bukkit.getWorld(locStringSplit[0]);
         double x = Double.parseDouble(locStringSplit[1]);
         double y = Double.parseDouble(locStringSplit[2]);
