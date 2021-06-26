@@ -39,7 +39,7 @@ public class LevelsYAML {
     }
 
     public static List<String> getNames() {
-        return new ArrayList<String>(levelsFile.getKeys(false));
+        return new ArrayList<>(levelsFile.getKeys(false));
     }
 
     public static void renameLevel(String levelName, String newLevelName) {
@@ -80,10 +80,10 @@ public class LevelsYAML {
 
     public static void toggleWaterReset(String levelName) {
         if (exists(levelName)) {
-            if (isSet(levelName, "liquids-reset-players"))
-                levelsFile.set(levelName + ".liquids-reset-players", null);
+            if (isSet(levelName, "liquids_reset_players"))
+                levelsFile.set(levelName + ".liquids_reset_players", null);
             else
-                levelsFile.set(levelName + ".liquids-reset-players", false);
+                levelsFile.set(levelName + ".liquids_reset_players", false);
 
             commit(levelName);
         }
@@ -138,8 +138,8 @@ public class LevelsYAML {
     }
 
     public static boolean getRankUpLevelSwitch(String levelName) {
-        if (levelsFile.isSet(levelName + ".rankup-level"))
-            return levelsFile.getBoolean(levelName + ".rankup-level");
+        if (levelsFile.isSet(levelName + ".rankup_level"))
+            return levelsFile.getBoolean(levelName + ".rankup_level");
         return false;
     }
 
@@ -170,7 +170,7 @@ public class LevelsYAML {
 
     public static boolean getLiquidResetSetting(String levelName) {
         // WE WANT DEFAULT TO BE TRUE!
-        if (isSet(levelName, "liquids-reset-players"))
+        if (isSet(levelName, "liquids_reset_players"))
             return false;
         return true;
     }
@@ -178,13 +178,13 @@ public class LevelsYAML {
     public static List<PotionEffect> getPotionEffects(String levelName) {
         List<PotionEffect> potionEffects = new ArrayList<>();
 
-        if (isSection(levelName, "potion-effects")) {
+        if (isSection(levelName, "potion_effects")) {
             for (int i = 1;; i++) {
-                if (isSection(levelName, "potion-effects." + i)) {
+                if (isSection(levelName, "potion_effects." + i)) {
 
-                    String potionType = levelsFile.getString(levelName + ".potion-effects." + i + ".type");
-                    int amplifier = levelsFile.getInt(levelName + ".potion-effects." + i + ".amplifier");
-                    int duration = levelsFile.getInt(levelName + ".potion-effects." + i + ".duration");
+                    String potionType = levelsFile.getString(levelName + ".potion_effects." + i + ".type");
+                    int amplifier = levelsFile.getInt(levelName + ".potion_effects." + i + ".amplifier");
+                    int duration = levelsFile.getInt(levelName + ".potion_effects." + i + ".duration");
 
                     potionEffects.add(
                             new PotionEffect(
@@ -195,6 +195,12 @@ public class LevelsYAML {
             }
         }
         return potionEffects;
+    }
+
+    public static String getRequiredPermissionNode(String levelName) {
+        if (levelsFile.isSet(levelName + ".required_permission_node"))
+            return levelsFile.getString(levelName + ".required_permission_node");
+        return null;
     }
 
     public static EventType getEventType(String levelName) {

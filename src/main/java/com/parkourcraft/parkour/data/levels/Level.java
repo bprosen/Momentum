@@ -26,6 +26,7 @@ public class Level {
     private int maxCompletions;
     private int playersInLevel = 0;
     private boolean broadcastCompletion;
+    private String requiredPermissionNode = null;
     private List<String> requiredLevels;
     private int ID = -1;
     private int scoreModifier = 1;
@@ -114,6 +115,16 @@ public class Level {
         }
 
         return "";
+    }
+
+    public boolean hasPermissionNode() {
+        if (requiredPermissionNode != null)
+            return true;
+        return false;
+    }
+
+    public String getRequiredPermissionNode() {
+        return requiredPermissionNode;
     }
 
     public int getMaxCompletions() {
@@ -314,16 +325,15 @@ public class Level {
                 eventLevel = true;
                 eventType = LevelsYAML.getEventType(name);
             }
-            // if level is a rankUpLevel
-            if (LevelsYAML.isSet(name, "rankup-level"))
-                isRankUpLevel = LevelsYAML.getRankUpLevelSwitch(name);
 
+            isRankUpLevel = LevelsYAML.getRankUpLevelSwitch(name);
             maxCompletions = LevelsYAML.getMaxCompletions(name);
             broadcastCompletion = LevelsYAML.getBroadcastSetting(name);
             requiredLevels = LevelsYAML.getRequiredLevels(name);
             potionEffects = LevelsYAML.getPotionEffects(name);
             commands = LevelsYAML.getCommands(name);
             liquidResetPlayer = LevelsYAML.getLiquidResetSetting(name);
+            requiredPermissionNode = LevelsYAML.getRequiredPermissionNode(name);
         }
     }
 
