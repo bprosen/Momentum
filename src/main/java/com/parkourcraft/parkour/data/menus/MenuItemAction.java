@@ -178,6 +178,9 @@ public class MenuItemAction {
                             "",
                             level.getFormattedTitle()
                     );
+                } else {
+                    player.closeInventory();
+                    player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
                 }
             } else {
                 player.closeInventory();
