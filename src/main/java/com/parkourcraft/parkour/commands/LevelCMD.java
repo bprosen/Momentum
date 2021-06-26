@@ -515,7 +515,7 @@ public class LevelCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("rename")) {
-                    String levelName = a[1].toLowerCase();
+                    String levelName = a[1];
                     String newLevelName = a[2].toLowerCase();
                     Level level = levelManager.get(levelName);
 
@@ -537,7 +537,7 @@ public class LevelCMD implements CommandExecutor {
 
                             // update all stats for online players
                             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                                if (playerStats.getLevel().equalsIgnoreCase(levelName))
+                                if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName))
                                     playerStats.setLevel(newLevelName);
 
                             sender.sendMessage(Utils.translate("&cYou have renamed &4" + levelName + " &cto &4" + newLevelName));

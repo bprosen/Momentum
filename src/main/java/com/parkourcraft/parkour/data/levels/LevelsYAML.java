@@ -6,13 +6,14 @@ import com.parkourcraft.parkour.data.stats.StatsDB;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class LevelsYAML {
 
@@ -45,7 +46,18 @@ public class LevelsYAML {
     }
 
     public static void renameLevel(String levelName, String newLevelName) {
-        levelsFile.set(levelName, newLevelName);
+        HashMap<String, Object> pathList = new HashMap<>();
+
+        for (String string : levelsFile.getConfigurationSection(levelName).getKeys(true))
+            if (!levelsFile.isConfigurationSection(levelName + "." + string))
+                pathList.put(string, levelsFile.get(levelName + "." + string));
+
+        levelsFile.set(levelName, null);
+
+        for (Map.Entry<String, Object> entry : pathList.entrySet())
+            levelsFile.set(newLevelName + "." + entry.getKey(), entry.getValue());
+
+        commit(newLevelName);
     }
 
     public static boolean isSet(String levelName, String valueName) {
