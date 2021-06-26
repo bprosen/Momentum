@@ -78,6 +78,14 @@ public class LevelsDB {
         return false;
     }
 
+    public static void updateName(String levelName, String newLevelName) {
+        String query = "UPDATE levels SET " +
+                "level_name='" + newLevelName + "' WHERE " +
+                "level_name='" + levelName + "'";
+
+        Parkour.getDatabaseManager().add(query);
+    }
+
     public static long getGlobalCompletions() {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
                 "COUNT(*) AS total_completions", "");

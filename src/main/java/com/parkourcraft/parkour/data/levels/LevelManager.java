@@ -211,8 +211,8 @@ public class LevelManager {
                         for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
 
                             if (playerStats != null &&
-                                    playerStats.getLevel() != null &&
-                                    playerStats.getLevel().equalsIgnoreCase(level.getName()))
+                                playerStats.getLevel() != null &&
+                                playerStats.getLevel().equalsIgnoreCase(level.getName()))
                                 amountInLevel++;
                         }
                         level.setPlayersInLevel(amountInLevel);
@@ -230,11 +230,11 @@ public class LevelManager {
         }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 180, 20 * 180);
     }
 
-    void setLevelDataCache(Map<String, LevelData> levelDataCache) {
+    public void setLevelDataCache(Map<String, LevelData> levelDataCache) {
         this.levelDataCache = levelDataCache;
     }
 
-    Map<String, LevelData> getLevelDataCache() {
+    public Map<String, LevelData> getLevelDataCache() {
         return levelDataCache;
     }
 
@@ -277,7 +277,7 @@ public class LevelManager {
 
                 for (Level level : levels.values()) {
                     if (highestLevel == null ||
-                            (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount()))
+                       (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount()))
                         highestLevel = level;
                 }
                 globalLevelCompletionsLB.add(highestLevel);
@@ -299,11 +299,19 @@ public class LevelManager {
     }
 
     public void remove(String levelName) {
-        for (Iterator<Level> iterator = levels.values().iterator(); iterator.hasNext();) {
-            if (iterator.next().getName().equals(levelName)) {
-                LevelsYAML.remove(iterator.getClass().getName());
-                iterator.remove();
+        boolean foundLevel = false;
+
+        for (String name : levels.keySet()) {
+            if (name.equals(levelName)) {
+                foundLevel = true;
+                break;
             }
+        }
+        // once level found, remove from config, db and cache
+        if (foundLevel) {
+            LevelsYAML.remove(levelName);
+            Parkour.getDatabaseManager().add("DELETE FROM levels WHERE level_name='" + levelName + "'");
+            levels.remove(levelName);
         }
     }
 

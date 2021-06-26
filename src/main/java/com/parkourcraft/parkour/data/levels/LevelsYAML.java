@@ -42,6 +42,10 @@ public class LevelsYAML {
         return new ArrayList<String>(levelsFile.getKeys(false));
     }
 
+    public static void renameLevel(String levelName, String newLevelName) {
+        levelsFile.set(levelName, newLevelName);
+    }
+
     public static boolean isSet(String levelName, String valueName) {
         return levelsFile.isSet(levelName + "." + valueName);
     }

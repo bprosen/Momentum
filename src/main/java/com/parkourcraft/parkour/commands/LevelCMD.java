@@ -514,6 +514,34 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("rename")) {
+                    String levelName = a[1].toLowerCase();
+                    String newLevelName = a[2].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        if (!levelManager.exists(newLevelName)) {
+                            // update in yaml and db
+                            LevelsDB.updateName(levelName, newLevelName);
+                            LevelsYAML.renameLevel(levelName, newLevelName);
+
+                            // update in level cache
+                            level.setName(newLevelName);
+                            levelManager.getLevels().remove(levelName);
+                            levelManager.getLevels().put(newLevelName, level);
+
+                            // update in leveldata cache
+                            LevelData levelData = levelManager.getLevelDataCache().get(levelName);
+                            levelManager.getLevelDataCache().remove(levelName);
+                            levelManager.getLevelDataCache().put(newLevelName, levelData);
+
+                            sender.sendMessage(Utils.translate("&cYou have renamed &4" + levelName + " &cto &4" + newLevelName));
+                        } else {
+                            sender.sendMessage(Utils.translate("&4" + newLevelName + " &calready exists"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
@@ -549,6 +577,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("removerating"));
         sender.sendMessage(getHelp("hasrated"));
         sender.sendMessage(getHelp("togglewater"));
+        sender.sendMessage(getHelp("rename"));
     }
 
     private static String getHelp(String cmd) {
@@ -596,6 +625,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating");
             case "togglewater":
                 return Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level");
+            case "rename":
+                return Utils.translate("&a/level rename <level> <newLevelName>  &7Renames a level's name to a new name");
         }
         return "";
     }
