@@ -309,8 +309,15 @@ public class LevelManager {
         }
         // once level found, remove from config, db and cache
         if (foundLevel) {
+            Level level = get(levelName);
+
             LevelsYAML.remove(levelName);
+            // remove from levels, checkpoints, ratings and completions to clean up database
             Parkour.getDatabaseManager().add("DELETE FROM levels WHERE level_name='" + levelName + "'");
+            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");
+            Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" + level.getID());
+            Parkour.getDatabaseManager().add("DELETE FROM ratings WHERE level_id=" + level.getID());
+
             levels.remove(levelName);
         }
     }
