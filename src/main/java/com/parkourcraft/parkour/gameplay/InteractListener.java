@@ -13,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
@@ -85,6 +86,15 @@ public class InteractListener implements Listener {
                                         confirmMap.remove(player.getName());
                                         playerStats.resetCheckpoint();
                                         playerStats.resetPracticeMode();
+
+                                        if (!level.getPotionEffects().isEmpty()) {
+                                            for (PotionEffect potionEffect : player.getActivePotionEffects())
+                                                player.removePotionEffect(potionEffect.getType());
+
+                                            for (PotionEffect potionEffect : level.getPotionEffects())
+                                                player.addPotionEffect(potionEffect);
+                                        }
+
                                         player.teleport(level.getStartLocation());
                                     } else {
                                         // otherwise, put them in and ask them to confirm within 5 seconds

@@ -131,25 +131,19 @@ public class PlotsManager {
         });
     }
 
-    public void deletePlot(Player player) {
+    public void deletePlot(Plot plot) {
 
-        Plot plot = get(player.getName());
+        Player owner = Bukkit.getPlayer(plot.getOwnerName());
+        // if they are in plot world, teleport them
+        if (owner != null && owner.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+            owner.teleport(Parkour.getLocationManager().getLobbyLocation());
 
-        if (plot != null) {
-            // if they are in plot world, teleport them
-            if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
-                player.teleport(Parkour.getLocationManager().getLobbyLocation());
+        // clear plot!
+        clearPlot(plot);
 
-            // clear plot!
-            clearPlot(plot);
-
-            // remove from cache and teleport to spawn
-            plotList.remove(plot);
-            PlotsDB.removePlot(player);
-            player.sendMessage(Utils.translate("&cYou have deleted your plot"));
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have a plot!"));
-        }
+        // remove from cache and teleport to spawn
+        plotList.remove(plot);
+        PlotsDB.removePlot(plot.getOwnerUUID());
     }
 
     public void clearPlot(Plot plot) {

@@ -47,16 +47,6 @@ public class PlotsDB {
         return false;
     }
 
-    public static boolean playerNameHasPlot(String playerName) {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
-                "plots",
-                "*", " WHERE player_name='" + playerName + "'");
-
-        if (!results.isEmpty())
-            return true;
-        return false;
-    }
-
     public static String getPlotCenter(String UUID) {
         if (hasPlot(UUID)) {
             List<Map<String, String>> results = DatabaseQueries.getResults(
@@ -70,7 +60,7 @@ public class PlotsDB {
     }
 
     public static String getPlotCenterFromName(String playerName) {
-        if (playerNameHasPlot(playerName)) {
+        if (hasPlotFromName(playerName)) {
             List<Map<String, String>> results = DatabaseQueries.getResults(
                     "plots",
                     "center_x, center_z", " WHERE player_name='" + playerName + "'");
@@ -151,9 +141,9 @@ public class PlotsDB {
         );
     }
 
-    public static void removePlot(Player player) {
+    public static void removePlot(String UUID) {
         Parkour.getDatabaseManager().add("DELETE FROM plots " +
-                "WHERE uuid='" + player.getUniqueId().toString() + "'");
+                "WHERE uuid='" + UUID + "'");
     }
 
 

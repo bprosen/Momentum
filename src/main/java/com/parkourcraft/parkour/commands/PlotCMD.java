@@ -116,8 +116,18 @@ public class PlotCMD implements CommandExecutor {
 
                 visitPlot(player, a);
                 // clear stuff on plot
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
-                clearPlot(player);
+            } else if (a.length >= 1 && a[0].equalsIgnoreCase("clear")) {
+
+                // if 1, then its themself
+                if (a.length == 1) {
+                    Plot plot = Parkour.getPlotsManager().get(player.getName());
+                    clearPlot(plot, false, player);
+                // if 2 then its a target
+                } else if (a.length == 2) {
+                    Plot targetPlot = Parkour.getPlotsManager().get(a[1]);
+                    clearPlot(targetPlot, true, player);
+                }
+
                 // trust on plot
             } else if (a.length == 2 && (a[0].equalsIgnoreCase("trust") ||
                                          a[0].equalsIgnoreCase("add"))) {
@@ -129,8 +139,18 @@ public class PlotCMD implements CommandExecutor {
 
                 untrustPlayer(player, a);
             // clear and delete their plot data
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("delete")) {
-                deletePlot(player);
+            } else if (a.length >= 1 && a[0].equalsIgnoreCase("delete")) {
+
+                // if 1, then its themself
+                if (a.length == 1) {
+                    Plot plot = Parkour.getPlotsManager().get(player.getName());
+                    deletePlot(plot, false, player);
+                    // if 2 then its a target
+                } else if (a.length == 2) {
+                    Plot targetPlot = Parkour.getPlotsManager().get(a[1]);
+                    deletePlot(targetPlot, true, player);
+                }
+
             // submit your plot
             } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
                 submitPlot(player);
@@ -164,7 +184,9 @@ public class PlotCMD implements CommandExecutor {
             visitPlot(player, a);
         // clear stuff on plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
-            clearPlot(player);
+
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
+            clearPlot(plot, false, player);
         // trust on plot
         } else if (a.length == 2 && (a[0].equalsIgnoreCase("trust") ||
                                      a[0].equalsIgnoreCase("add"))) {
@@ -177,7 +199,8 @@ public class PlotCMD implements CommandExecutor {
             untrustPlayer(player, a);
         // clear and delete their plot data
         } else if (a.length == 1 && a[0].equalsIgnoreCase("delete")) {
-            deletePlot(player);
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
+            deletePlot(plot, false, player);
         // submit your plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
             submitPlot(player);
@@ -201,28 +224,44 @@ public class PlotCMD implements CommandExecutor {
         }
     }
 
-    private void clearPlot(Player player) {
-        Plot plot = Parkour.getPlotsManager().get(player.getName());
+    private void clearPlot(Plot targetPlot, boolean forceCleared, Player player) {
 
-        if (plot != null) {
-            Parkour.getPlotsManager().clearPlot(plot);
-            player.sendMessage(Utils.translate("&aYou cleared your plot!"));
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have a plot!"));
-        }
+        if (targetPlot != null) {
+            Parkour.getPlotsManager().clearPlot(targetPlot);
+            if (!forceCleared)
+                player.sendMessage(Utils.translate("&aYou cleared your plot!"));
+            else
+                player.sendMessage(Utils.translate("&aYou cleared &2" + targetPlot.getOwnerName() + "&a's Plot"));
+        } else if (!forceCleared)
+            player.sendMessage(Utils.translate("&cYou do not have a Plot"));
+        else
+            player.sendMessage(Utils.translate("&aThey do not have a Plot"));
     }
 
-    private void deletePlot(Player player) {
-        // if they are confirming, delete it
-        if (confirmMap.containsKey(player.getName())) {
-            confirmMap.get(player.getName()).cancel();
-            confirmMap.remove(player.getName());
-            Parkour.getPlotsManager().deletePlot(player);
-            // otherwise ask them to confirm it
-        } else {
-            confirmPlayer(player);
-            player.sendMessage(Utils.translate("&cAre you sure? &7Type &c/plot delete &7again within 30 seconds to confirm"));
-        }
+    private void deletePlot(Plot targetPlot, boolean forceCleared, Player player) {
+
+        if (targetPlot != null) {
+            // if they are confirming, delete it
+            if (confirmMap.containsKey(player.getName())) {
+                confirmMap.get(player.getName()).cancel();
+                confirmMap.remove(player.getName());
+
+                Parkour.getPlotsManager().deletePlot(targetPlot);
+                if (!forceCleared)
+                    player.sendMessage(Utils.translate("&aYou deleted your plot!"));
+                else
+                    player.sendMessage(Utils.translate("&aYou deleted &2" + targetPlot.getOwnerName() + "&a's Plot"));
+
+                // otherwise ask them to confirm it
+            } else {
+                confirmPlayer(player);
+                player.sendMessage(Utils.translate("&cAre you sure? &7Type &c/plot delete &7again within 30 seconds to confirm"));
+            }
+        } else if (!forceCleared)
+            player.sendMessage(Utils.translate("&cYou do not have a Plot"));
+        else
+            player.sendMessage(Utils.translate("&aThey do not have a Plot"));
+
     }
 
     private void untrustPlayer(Player player, String[] a) {
@@ -277,7 +316,7 @@ public class PlotCMD implements CommandExecutor {
 
     private void visitPlot(Player player, String[] a) {
         String playerName = a[1];
-        if (PlotsDB.playerNameHasPlot(playerName)) {
+        if (PlotsDB.hasPlotFromName(playerName)) {
             String targetLoc = PlotsDB.getPlotCenterFromName(playerName);
             String[] split = targetLoc.split(":");
 
