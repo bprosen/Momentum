@@ -60,6 +60,20 @@ public class LocationManager {
             LocationsYAML.remove(locationName);
     }
 
+    public boolean hasCompletionLocation(String levelName) {
+        if (exists(levelName + "-completion"))
+            return true;
+        return false;
+    }
+
+    public boolean hasSpawnLocation(String levelName) {
+        if (exists(levelName + "-spawn"))
+            return true;
+        return false;
+    }
+
+    public HashMap<String, Location> getLocations() { return locations; }
+
     public Location getLobbyLocation() {
         return get("spawn");
     }

@@ -6,8 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class LocationsYAML {
 
@@ -40,6 +39,39 @@ public class LocationsYAML {
         }
 
         return null;
+    }
+
+    public static void renameLocation(String locationName, String newLocationName) {
+
+        String ogLocationName = locationName;
+        String ogNewLocationName = newLocationName;
+
+        Set<String> pathTypes = new HashSet<String>() {{
+            add("-spawn");
+            add("-completion");
+        }};
+
+        for (String pathType : pathTypes) {
+            if (locationsFile.isConfigurationSection(locationName + pathType)) {
+
+                locationName += pathType;
+                newLocationName += pathType;
+
+                HashMap<String, Object> pathList = new HashMap<>();
+
+                for (String string : locationsFile.getConfigurationSection(locationName).getKeys(true))
+                    if (!locationsFile.isConfigurationSection(locationName + "." + string))
+                        pathList.put(string, locationsFile.get(locationName + "." + string));
+
+                locationsFile.set(locationName, null);
+
+                for (Map.Entry<String, Object> entry : pathList.entrySet())
+                    locationsFile.set(newLocationName + "." + entry.getKey(), entry.getValue());
+            }
+            locationName = ogLocationName;
+            newLocationName = ogNewLocationName;
+        }
+        commit(newLocationName);
     }
 
     public static void save(String locationName, Location location) {

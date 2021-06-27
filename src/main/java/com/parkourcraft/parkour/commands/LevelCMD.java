@@ -2,6 +2,8 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.*;
+import com.parkourcraft.parkour.data.locations.LocationManager;
+import com.parkourcraft.parkour.data.locations.LocationsYAML;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
@@ -524,6 +526,7 @@ public class LevelCMD implements CommandExecutor {
                             // update in yaml and db
                             LevelsDB.updateName(levelName, newLevelName);
                             LevelsYAML.renameLevel(levelName, newLevelName);
+                            LocationsYAML.renameLocation(levelName, newLevelName);
 
                             // update in level cache
                             level.setName(newLevelName);
@@ -534,6 +537,17 @@ public class LevelCMD implements CommandExecutor {
                             LevelData levelData = levelManager.getLevelDataCache().get(levelName);
                             levelManager.getLevelDataCache().remove(levelName);
                             levelManager.getLevelDataCache().put(newLevelName, levelData);
+
+                            // remove and add from location cache
+                            LocationManager locationManager = Parkour.getLocationManager();
+                            if (locationManager.hasCompletionLocation(levelName)) {
+                                locationManager.getLocations().remove(levelName + "-completion");
+                                locationManager.load(newLevelName + "-completion");
+                            }
+                            if (locationManager.hasSpawnLocation(levelName)) {
+                                locationManager.getLocations().remove(levelName + "-spawn");
+                                locationManager.load(newLevelName + "-spawn");
+                            }
 
                             // update all stats for online players
                             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
