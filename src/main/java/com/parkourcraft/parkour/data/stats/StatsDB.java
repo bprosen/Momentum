@@ -16,7 +16,6 @@ public class StatsDB {
     /*
      * Player Stats Section
      */
-
     public static void loadPlayerStats(PlayerStats playerStats) {
         loadPlayerID(playerStats);
         loadCompletions(playerStats);
@@ -138,10 +137,25 @@ public class StatsDB {
         return false;
     }
 
+    public static int getPlayerID(String playerName) {
+
+        int playerID = -1;
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "players",
+                "player_id",
+                " WHERE player_name='" + playerName + "'"
+        );
+
+        for (Map<String, String> playerResult : playerResults)
+            playerID = Integer.parseInt(playerResult.get("player_id"));
+
+        return playerID;
+    }
+
     /*
      * Completions Section
      */
-
     private static void loadCompletions(PlayerStats playerStats) {
         List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                 "completions",
@@ -188,10 +202,16 @@ public class StatsDB {
 
         return -1;
     }
+
+    public static void removeCompletions(int playerID, int levelID) {
+
+        String query = "DELETE FROM completions WHERE player_id=" + playerID + " AND level_id=" + levelID;
+
+        Parkour.getDatabaseManager().add(query);
+    }
     /*
      * Leader Board Section
      */
-
     public static void loadTotalCompletions() {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "completions",

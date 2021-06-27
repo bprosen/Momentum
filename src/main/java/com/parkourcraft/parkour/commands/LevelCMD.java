@@ -561,6 +561,23 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletion")) {
+                    String playerName = a[1];
+                    String levelName = a[2].toLowerCase();
+
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        int playerID = StatsDB.getPlayerID(playerName);
+                        if (playerID > -1) {
+                            StatsDB.removeCompletions(playerID, level.getID());
+                            sender.sendMessage(Utils.translate("&cYou removed all of &4" + playerName + "&c's completions for &4" + levelName));
+                        } else {
+                            sender.sendMessage(Utils.translate("&4" + playerName + " &chas not joined the server"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
@@ -597,6 +614,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("hasrated"));
         sender.sendMessage(getHelp("togglewater"));
         sender.sendMessage(getHelp("rename"));
+        sender.sendMessage(getHelp("delcompletion"));
     }
 
     private static String getHelp(String cmd) {
@@ -646,6 +664,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level");
             case "rename":
                 return Utils.translate("&a/level rename <level> <newLevelName>  &7Renames a level's name to a new name");
+            case "delcompletion":
+                return Utils.translate("&a/level delcompletion <player> <levelName>  &7Deletes ALL the completions of a player for a level");
         }
         return "";
     }
