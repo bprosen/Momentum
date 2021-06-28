@@ -49,6 +49,8 @@ public class MenuItem {
         return typeValue;
     }
 
+    public void setTypeValue(String newTypeValue) { typeValue = newTypeValue; }
+
     public String getFormattedTitle() {
         return ChatColor.translateAlternateColorCodes('&', title);
     }

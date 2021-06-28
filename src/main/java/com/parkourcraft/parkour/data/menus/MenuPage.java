@@ -68,5 +68,5 @@ public class MenuPage {
         return null;
     }
 
-
+    public Map<Integer, MenuItem> getPageItemsMap() { return pageItemsMap; }
 }

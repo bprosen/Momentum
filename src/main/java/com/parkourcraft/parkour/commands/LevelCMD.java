@@ -549,6 +549,14 @@ public class LevelCMD implements CommandExecutor {
                                 locationManager.load(newLevelName + "-spawn");
                             }
 
+                            // run this in async, heavy task and can be in async
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Parkour.getMenuManager().renameLevel(levelName, newLevelName);
+                                }
+                            }.runTaskAsynchronously(Parkour.getPlugin());
+
                             // update all stats for online players
                             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
                                 if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName))

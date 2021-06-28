@@ -1,6 +1,8 @@
 package com.parkourcraft.parkour.data.menus;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -99,6 +101,34 @@ public class MenuManager {
     public void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
         if (exists(menuName))
             menuMap.get(menuName).updateInventory(player, inventory, pageNumber);
+    }
+
+    public void renameLevel(String oldLevelName, String newLevelName) {
+
+        // variables once it has been found
+        Menu correctMenu = null;
+        MenuPage correctMenuPage = null;
+        MenuItem correctMenuItem = null;
+
+        // outer loop for menus
+        outer: for (Menu menu : menuMap.values())
+            // outer loop for menu pages
+            for (MenuPage menuPage : menu.getPageMap().values())
+                // inner loop for menu items in pages
+                for (MenuItem menuItem : menuPage.getPageItemsMap().values())
+                    // check if they are equal, if so, break outer loop
+                    if (menuItem.getTypeValue().equalsIgnoreCase(oldLevelName)) {
+                        correctMenu = menu;
+                        correctMenuPage = menuPage;
+                        correctMenuItem = menuItem;
+                        break outer;
+                    }
+
+        // now null check them all
+        if (correctMenu != null && correctMenuPage != null && correctMenuItem != null) {
+            correctMenuItem.setTypeValue(newLevelName);
+            MenusYAML.setItemType(correctMenu.getName(), correctMenuPage.getPageNumber(), correctMenuItem.getSlot(), oldLevelName, newLevelName);
+        }
     }
 
     // in ONE case where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus

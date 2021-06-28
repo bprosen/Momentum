@@ -74,6 +74,19 @@ public class MenusYAML {
         return 1;
     }
 
+    public static void setItemType(String menuName, int pageNumber, int itemSlot, String oldValue, String newValue) {
+        String itemPath = menuName + "." + pageNumber + "." + itemSlot;
+
+        for (String string : menusConfig.getConfigurationSection(itemPath).getKeys(true))
+            // found it
+            if (menusConfig.getString(itemPath + "." + string).equalsIgnoreCase(oldValue)) {
+                menusConfig.set(itemPath + "." + string, newValue);
+                break;
+            }
+
+        Parkour.getConfigManager().save("menus");
+    }
+
     public static String getItemType(String menuName, int pageNumber, int itemSlot) {
         String itemPath = pageNumber + "." + itemSlot;
 

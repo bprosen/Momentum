@@ -114,4 +114,5 @@ public class Menu {
         return null;
     }
 
+    public Map<Integer, MenuPage> getPageMap() { return pageMap; }
 }
