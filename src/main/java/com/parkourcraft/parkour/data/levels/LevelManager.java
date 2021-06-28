@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventType;
+import com.parkourcraft.parkour.data.locations.LocationsYAML;
 import com.parkourcraft.parkour.data.menus.Menu;
 import com.parkourcraft.parkour.data.menus.MenuItem;
 import com.parkourcraft.parkour.data.menus.MenuPage;
@@ -312,6 +313,8 @@ public class LevelManager {
             Level level = get(levelName);
 
             LevelsYAML.remove(levelName);
+            LocationsYAML.remove(levelName + "-spawn");
+            LocationsYAML.remove(levelName + "-completion");
             // remove from levels, checkpoints, ratings and completions to clean up database
             Parkour.getDatabaseManager().add("DELETE FROM levels WHERE level_name='" + levelName + "'");
             Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");

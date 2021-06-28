@@ -61,7 +61,7 @@ public class LevelCMD implements CommandExecutor {
                     }
                 } else if (a[0].equalsIgnoreCase("delete")) { // subcommand: delete
                     if (a.length == 2) {
-                        String levelName = a[1].toLowerCase();
+                        String levelName = a[1];
 
                         if (!levelManager.exists(levelName))
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));

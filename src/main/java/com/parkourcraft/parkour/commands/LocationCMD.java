@@ -78,6 +78,12 @@ public class LocationCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&cThis command must be run in-game"));
                     }
+                } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
+                    Parkour.getConfigManager().load("locations");
+                    sender.sendMessage(Utils.translate("&7Loaded &2locations.yml &7from disk"));
+                    Parkour.getLocationManager().load();
+                    sender.sendMessage(Utils.translate("&7Loaded locations from &2locations.yml&7, &a" +
+                            Parkour.getLocationManager().getNames().size() + " &7total"));
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
@@ -95,6 +101,7 @@ public class LocationCMD implements CommandExecutor {
         sender.sendMessage(getHelp("list"));
         sender.sendMessage(getHelp("set"));
         sender.sendMessage(getHelp("del"));
+        sender.sendMessage(getHelp("load"));
     }
 
     private static String getHelp(String cmd) {
@@ -106,6 +113,8 @@ public class LocationCMD implements CommandExecutor {
             return Utils.translate("&2/loc set <location>  &7Sets location from your current position");
         else if (cmd.equalsIgnoreCase("del"))
             return Utils.translate("&2/loc del <location>  &7Deletes location");
+        else if (cmd.equalsIgnoreCase("load"))
+            return Utils.translate("&2/loc load  &7Loads from disk");
         return "";
     }
 }
