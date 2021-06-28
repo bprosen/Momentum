@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class LevelsDB {
 
-    static Map<String, LevelData> getDataCache() {
+    public static Map<String, LevelData> getDataCache() {
         Map<String, LevelData> levelData = new HashMap<>();
 
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
@@ -36,12 +36,12 @@ public class LevelsDB {
         return levelData;
     }
 
-    static void syncDataCache() {
+    public static void syncDataCache() {
         for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet())
             syncDataCache(entry.getValue(), Parkour.getLevelManager().getLevelDataCache());
     }
 
-    static void syncDataCache(Level level, Map<String, LevelData> levelDataCache) {
+    public static void syncDataCache(Level level, Map<String, LevelData> levelDataCache) {
         LevelData levelData = levelDataCache.get(level.getName());
 
         if (levelData != null) {
@@ -53,7 +53,7 @@ public class LevelsDB {
         }
     }
 
-    static boolean syncLevelData() {
+    public static boolean syncLevelData() {
         List<String> insertQueries = new ArrayList<>();
 
         for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet())

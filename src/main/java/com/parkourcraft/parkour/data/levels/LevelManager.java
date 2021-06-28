@@ -199,7 +199,7 @@ public class LevelManager {
                     LevelsDB.syncDataCache();
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 0, 10);
+        }.runTaskTimerAsynchronously(plugin, 60 * 20, 10);
 
         // update player count in levels every 60 seconds
         new BukkitRunnable() {
