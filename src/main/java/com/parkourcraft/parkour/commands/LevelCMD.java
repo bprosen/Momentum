@@ -523,46 +523,50 @@ public class LevelCMD implements CommandExecutor {
 
                     if (level != null) {
                         if (!levelManager.exists(newLevelName)) {
-                            // update in yaml and db
-                            LevelsDB.updateName(levelName, newLevelName);
-                            LevelsYAML.renameLevel(levelName, newLevelName);
-                            LocationsYAML.renameLocation(levelName, newLevelName);
+                            if (!levelName.contains("'")) {
+                                // update in yaml and db
+                                LevelsDB.updateName(levelName, newLevelName);
+                                LevelsYAML.renameLevel(levelName, newLevelName);
+                                LocationsYAML.renameLocation(levelName, newLevelName);
 
-                            // update in level cache
-                            level.setName(newLevelName);
-                            levelManager.getLevels().remove(levelName);
-                            levelManager.getLevels().put(newLevelName, level);
+                                // update in level cache
+                                level.setName(newLevelName);
+                                levelManager.getLevels().remove(levelName);
+                                levelManager.getLevels().put(newLevelName, level);
 
-                            // update in leveldata cache
-                            LevelData levelData = levelManager.getLevelDataCache().get(levelName);
-                            levelManager.getLevelDataCache().remove(levelName);
-                            levelManager.getLevelDataCache().put(newLevelName, levelData);
+                                // update in leveldata cache
+                                LevelData levelData = levelManager.getLevelDataCache().get(levelName);
+                                levelManager.getLevelDataCache().remove(levelName);
+                                levelManager.getLevelDataCache().put(newLevelName, levelData);
 
-                            // remove and add from location cache
-                            LocationManager locationManager = Parkour.getLocationManager();
-                            if (locationManager.hasCompletionLocation(levelName)) {
-                                locationManager.getLocations().remove(levelName + "-completion");
-                                locationManager.load(newLevelName + "-completion");
-                            }
-                            if (locationManager.hasSpawnLocation(levelName)) {
-                                locationManager.getLocations().remove(levelName + "-spawn");
-                                locationManager.load(newLevelName + "-spawn");
-                            }
-
-                            // run this in async, heavy task and can be in async
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    Parkour.getMenuManager().renameLevel(levelName, newLevelName);
+                                // remove and add from location cache
+                                LocationManager locationManager = Parkour.getLocationManager();
+                                if (locationManager.hasCompletionLocation(levelName)) {
+                                    locationManager.getLocations().remove(levelName + "-completion");
+                                    locationManager.load(newLevelName + "-completion");
                                 }
-                            }.runTaskAsynchronously(Parkour.getPlugin());
+                                if (locationManager.hasSpawnLocation(levelName)) {
+                                    locationManager.getLocations().remove(levelName + "-spawn");
+                                    locationManager.load(newLevelName + "-spawn");
+                                }
 
-                            // update all stats for online players
-                            for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                                if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName))
-                                    playerStats.setLevel(newLevelName);
+                                // run this in async, heavy task and can be in async
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        Parkour.getMenuManager().renameLevel(levelName, newLevelName);
+                                    }
+                                }.runTaskAsynchronously(Parkour.getPlugin());
 
-                            sender.sendMessage(Utils.translate("&cYou have renamed &4" + levelName + " &cto &4" + newLevelName));
+                                // update all stats for online players
+                                for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+                                    if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName))
+                                        playerStats.setLevel(newLevelName);
+
+                                sender.sendMessage(Utils.translate("&cYou have renamed &4" + levelName + " &cto &4" + newLevelName));
+                            } else {
+                                sender.sendMessage(Utils.translate("&7Please do not use ' ..."));
+                            }
                         } else {
                             sender.sendMessage(Utils.translate("&4" + newLevelName + " &calready exists"));
                         }
