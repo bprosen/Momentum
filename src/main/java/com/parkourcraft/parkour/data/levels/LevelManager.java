@@ -48,13 +48,13 @@ public class LevelManager {
         boolean exists = exists(levelName);
 
         if (!LevelsYAML.exists(levelName) && exists)
-            remove(levelName);
+            levels.remove(levelName);
         else {
             Level level = new Level(levelName);
             LevelsDB.syncDataCache(level, levelDataCache);
 
             if (exists)
-                remove(levelName);
+                levels.remove(levelName);
 
             levels.put(levelName, level);
         }
