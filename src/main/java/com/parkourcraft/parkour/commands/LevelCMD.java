@@ -523,7 +523,7 @@ public class LevelCMD implements CommandExecutor {
 
                     if (level != null) {
                         if (!levelManager.exists(newLevelName)) {
-                            if (!levelName.contains("'")) {
+                            if (!newLevelName.contains("'")) {
                                 // update in yaml and db
                                 LevelsDB.updateName(levelName, newLevelName);
                                 LevelsYAML.renameLevel(levelName, newLevelName);
