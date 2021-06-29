@@ -101,7 +101,7 @@ public class LevelCMD implements CommandExecutor {
                                 title = title.trim();
 
                                 LevelsYAML.setTitle(levelName, title);
-                                sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's title to &2title"));
+                                sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's title to &2" + title));
                             } else {
                                 sender.sendMessage(Utils.translate("&2" + levelName + " &7's current title: &2" +
                                                    LevelsYAML.getTitle(levelName)));
