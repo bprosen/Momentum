@@ -4,8 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class SettingsManager {
@@ -13,6 +11,7 @@ public class SettingsManager {
     public String levels_message_completion;
     public String levels_message_broadcast;
     public double featured_level_reward_multiplier;
+    public int max_rated_levels_leaderboard_size;
 
     public String signs_first_line;
     public String signs_second_line_completion;
@@ -112,5 +111,6 @@ public class SettingsManager {
         max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");
         max_prestige_multiplier = settings.getDouble("prestiges.max_multiplier");
         prestige_multiplier_per_prestige = settings.getDouble("prestiges.multiplier_per_prestige");
+        max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
     }
 }

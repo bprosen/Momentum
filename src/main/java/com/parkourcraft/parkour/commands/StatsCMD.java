@@ -119,6 +119,29 @@ public class StatsCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&cClans leaderboard not loaded fully"));
                 }
+            // top rated lb
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("toprated")) {
+
+                LinkedHashSet<Level> topRatedLB = Parkour.getLevelManager().getTopRatedLevelsLB();
+
+                if (!topRatedLB.isEmpty()) {
+
+                    sender.sendMessage(Utils.translate("&9&lTop Rated Levels &7Leaderboard"));
+
+                    int lbPositionNum = 1;
+                    for (Level level : topRatedLB) {
+
+                        if (level != null) {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                               lbPositionNum + " &9" +
+                                               level.getRating() + " &1" +
+                                               level.getName()));
+                            lbPositionNum++;
+                        }
+                    }
+                } else {
+                    sender.sendMessage(Utils.translate("&cTop Rated leaderboard not fully loaded"));
+                }
             // level lb
             } else {
 

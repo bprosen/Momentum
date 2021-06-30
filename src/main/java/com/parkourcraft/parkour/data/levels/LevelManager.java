@@ -25,6 +25,8 @@ public class LevelManager {
     private long totalLevelCompletions;
     private LinkedHashSet<Level> globalLevelCompletionsLB = new LinkedHashSet<>
             (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
+    private LinkedHashSet<Level> topRatedLevelsLB = new LinkedHashSet<>
+            (Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
 
     public LevelManager(Plugin plugin) {
         this.levelDataCache = LevelsDB.getDataCache();
@@ -59,6 +61,47 @@ public class LevelManager {
 
             levels.put(levelName, level);
         }
+    }
+
+    private void startScheduler(Plugin plugin) {
+        new BukkitRunnable() {
+            public void run() {
+                if (LevelsDB.syncLevelData()) {
+                    setLevelDataCache(LevelsDB.getDataCache());
+                    LevelsDB.syncDataCache();
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 60 * 20, 10);
+
+        // update player count in levels every 60 seconds
+        new BukkitRunnable() {
+            public void run() {
+
+                // loop through levels then all players online to determine how many are in each level
+                for (Level level : levelsInMenus) {
+                    if (level != null) {
+                        int amountInLevel = 0;
+                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
+
+                            if (playerStats != null &&
+                                    playerStats.getLevel() != null &&
+                                    playerStats.getLevel().equalsIgnoreCase(level.getName()))
+                                amountInLevel++;
+                        }
+                        level.setPlayersInLevel(amountInLevel);
+                    }
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
+
+        // update global level completions and top rated completions lb every 3 minutes
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadGlobalLevelCompletionsLB();
+                loadTopRatedLevelsLB();
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 180, 20 * 180);
     }
 
     public void pickFeatured() {
@@ -192,46 +235,6 @@ public class LevelManager {
         return temporaryRaceLevelList;
     }
 
-    private void startScheduler(Plugin plugin) {
-        new BukkitRunnable() {
-            public void run() {
-                if (LevelsDB.syncLevelData()) {
-                    setLevelDataCache(LevelsDB.getDataCache());
-                    LevelsDB.syncDataCache();
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 60 * 20, 10);
-
-        // update player count in levels every 60 seconds
-        new BukkitRunnable() {
-            public void run() {
-
-                // loop through levels then all players online to determine how many are in each level
-                for (Level level : levelsInMenus) {
-                    if (level != null) {
-                        int amountInLevel = 0;
-                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
-
-                            if (playerStats != null &&
-                                playerStats.getLevel() != null &&
-                                playerStats.getLevel().equalsIgnoreCase(level.getName()))
-                                amountInLevel++;
-                        }
-                        level.setPlayersInLevel(amountInLevel);
-                    }
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
-
-        // update global level completions lb every 3 minutes
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                loadGlobalLevelCompletionsLB();
-            }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 180, 20 * 180);
-    }
-
     public void setLevelDataCache(Map<String, LevelData> levelDataCache) {
         this.levelDataCache = levelDataCache;
     }
@@ -255,6 +258,37 @@ public class LevelManager {
     public long getTotalLevelCompletions() { return totalLevelCompletions; }
 
     public void addTotalLevelCompletion() { totalLevelCompletions++; }
+
+    // top rated levels lb
+    public void loadTopRatedLevelsLB() {
+        try {
+
+            LinkedHashSet<Level> temporaryLB = new LinkedHashSet<>();
+            Level highestLevel = null;
+            Set<String> addedLevels = new HashSet<>();
+            int lbSize = 0;
+
+            while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
+                for (Level level : levels.values())
+                    if (highestLevel == null ||
+                        (!addedLevels.contains(level.getName()) && level.getRating() > highestLevel.getRating()) &&
+                        level.getRatingsCount() >= 5)
+                        highestLevel = level;
+
+                temporaryLB.add(highestLevel);
+                addedLevels.add(highestLevel.getName());
+                highestLevel = null;
+                lbSize++;
+            }
+            // quickly swap
+            topRatedLevelsLB.clear();
+            topRatedLevelsLB.addAll(temporaryLB);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public LinkedHashSet<Level> getTopRatedLevelsLB() { return topRatedLevelsLB; }
 
     /*
         section for global LEVEL completions (level, not personal based)
