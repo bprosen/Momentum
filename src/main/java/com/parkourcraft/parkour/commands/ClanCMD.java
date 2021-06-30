@@ -52,17 +52,18 @@ public class ClanCMD implements CommandExecutor {
                     // send stats
                     sender.sendMessage(Utils.translate("&6&l" + targetClan.getTag() + "&e's Stats"));
                     sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
-                    sender.sendMessage(Utils.translate("  &cClan XP &4" + Utils.formatNumber(targetClan.getXP())));
+                    sender.sendMessage(Utils.translate("  &cTotal Clan XP &4" + Utils.shortStyleNumber(targetClan.getTotalGainedXP())));
 
                     // if max level, dont send needed to level up
                     if (!targetClan.isMaxLevel()) {
                         long clanXPNeeded = ClansYAML.getLevelUpPrice(targetClan) - targetClan.getXP();
 
+                        sender.sendMessage(Utils.translate("  &cClan XP for Level &4" + Utils.formatNumber(targetClan.getXP())));
                         sender.sendMessage(Utils.translate("  &cXP to Level Up"));
                         sender.sendMessage(Utils.translate("    &4" + Utils.formatNumber(clanXPNeeded)));
-                        sender.sendMessage("");
                     }
 
+                    sender.sendMessage("");
                     sender.sendMessage(Utils.translate( "&6Members &e" + targetClan.getMembers().size()));
 
                     for (ClanMember clanMember : targetClan.getMembers()) {
@@ -90,8 +91,8 @@ public class ClanCMD implements CommandExecutor {
 
                     if (player.hasPermission("pc-parkour.admin")) {
                         String clanName = a[1];
-                        if (Utils.isLong(a[2])) {
-                            Long newXp = Long.parseLong(a[2]);
+                        if (Utils.isInteger(a[2])) {
+                            int newXp = Integer.parseInt(a[2]);
 
                             Clan targetClan = Parkour.getClansManager().get(clanName);
                             if (targetClan != null) {
@@ -102,6 +103,35 @@ public class ClanCMD implements CommandExecutor {
                                     ClansDB.setClanXP(newXp, targetClan.getID());
                                     player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
                                             " XP to &6" + newXp));
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou cannot set negative xp!"));
+                                }
+                            } else {
+                                player.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate(""));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                    }
+                // set total gained xp
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("settotalxp")) {
+
+                    if (player.hasPermission("pc-parkour.admin")) {
+                        String clanName = a[1];
+                        if (Utils.isLong(a[2])) {
+                            long newXP = Long.parseLong(a[2]);
+
+                            Clan targetClan = Parkour.getClansManager().get(clanName);
+                            if (targetClan != null) {
+                                // make sure it is not negative xp
+                                if (newXP > 0) {
+                                    targetClan.setTotalGainedXP(newXP);
+                                    // update in db
+                                    ClansDB.setTotalGainedClanXP(newXP, targetClan.getID());
+                                    player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
+                                            " Total XP to &6" + newXP));
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot set negative xp!"));
                                 }
@@ -153,7 +183,7 @@ public class ClanCMD implements CommandExecutor {
 
                                 if (clanTagRequirements(clanTag, sender)) {
                                     Parkour.getEconomy().withdrawPlayer(player, Parkour.getSettingsManager().clans_price_create);
-                                    Parkour.getClansManager().add(new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0));
+                                    Parkour.getClansManager().add(new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0));
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&cNo clan tag specified"));
@@ -481,6 +511,7 @@ public class ClanCMD implements CommandExecutor {
             if (player.hasPermission("pc-parkour.admin")) {
                 sender.sendMessage(getHelp("setlevel"));
                 sender.sendMessage(getHelp("setxp"));
+                sender.sendMessage(getHelp("settotalxp"));
                 sender.sendMessage(getHelp("delete"));
             }
         }
@@ -512,6 +543,8 @@ public class ClanCMD implements CommandExecutor {
                 return Utils.translate("&3/clan setlevel <clan> <level>  &7Sets clan level");
             case "delete":
                 return Utils.translate("&3/clan delete <clan>  &7Deletes the clan");
+            case "settotalxp":
+                return Utils.translate("&3/clan settotalxp <clans>  &7Sets total XP of a clan");
         }
         return "";
     }

@@ -21,15 +21,15 @@ public class ClansYAML {
         return clansConfig.isSet(rankName + "." + valuePath);
     }
 
-    public static long getLevelUpPrice(Clan clan) {
+    public static int getLevelUpPrice(Clan clan) {
         if (isSection("clans." + clan.getLevel()))
-            return clansConfig.getLong("clans." + clan.getLevel() + ".xp-needed");
+            return clansConfig.getInt("clans." + clan.getLevel() + ".xp-needed");
         return 0;
     }
 
-    public static long getLevelUpPrice(int level) {
+    public static int getLevelUpPrice(int level) {
         if (isSection("clans." + level))
-            return clansConfig.getLong("clans." + level + ".xp-needed");
+            return clansConfig.getInt("clans." + level + ".xp-needed");
         return 0;
     }
 

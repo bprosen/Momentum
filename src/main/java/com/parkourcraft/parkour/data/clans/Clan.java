@@ -1,7 +1,5 @@
 package com.parkourcraft.parkour.data.clans;
 
-import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,17 +9,19 @@ public class Clan {
     private String tag;
     private int ownerID;
     private int clanLevel;
-    private long clanXP;
+    private int clanXP;
+    private long totalGainedXP;
 
     private List<ClanMember> members = new ArrayList<>(); // Does not include the owner
     private List<String> invitedUUIDs = new ArrayList<>();
 
-    public Clan(int clanID, String clanTag, int clanOwnerID, int clanLevel, long clanXP) {
+    public Clan(int clanID, String clanTag, int clanOwnerID, int clanLevel, int clanXP, long totalGainedXP) {
         this.ID = clanID;
         this.tag = clanTag;
         this.ownerID = clanOwnerID;
         this.clanLevel = clanLevel;
         this.clanXP = clanXP;
+        this.totalGainedXP = totalGainedXP;
     }
 
     public void setID(int clanID) {
@@ -42,13 +42,17 @@ public class Clan {
 
     public int getLevel() { return clanLevel; }
 
-    public long getXP() { return clanXP; }
+    public int getXP() { return clanXP; }
 
     public void resetXP() {
         clanXP = 0;
     }
 
-    public void setXP(long clanXP) { this.clanXP = clanXP; }
+    public void setXP(int clanXP) { this.clanXP = clanXP; }
+
+    public void setTotalGainedXP(long totalGainedXP) { this.totalGainedXP = totalGainedXP; }
+
+    public long getTotalGainedXP() { return totalGainedXP; }
 
     public void addXP(long clanXP) { this.clanXP += clanXP; }
 

@@ -101,6 +101,7 @@ public class TablesDB {
                 "clan_tag VARCHAR(7) NOT NULL, " +
                 "clan_level SMALLINT NOT NULL, " +
                 "clan_xp INT NOT NULL, " +
+                "total_gained_xp BIGINT NOT NULL, " +
                 "owner_player_id INT NOT NULL, " +
                 "PRIMARY KEY (clan_id)" +
                 ")";

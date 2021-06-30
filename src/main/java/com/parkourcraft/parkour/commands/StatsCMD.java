@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
@@ -96,6 +97,28 @@ public class StatsCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&cPlayers leaderboard not loaded fully"));
                 }
+            // clans lb
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("clans")) {
+
+                LinkedHashSet<Clan> clansLB = Parkour.getClansManager().getLeaderboard();
+
+                if (!clansLB.isEmpty()) {
+
+                    sender.sendMessage(Utils.translate("&6Clan Total XP &7Leaderboard"));
+                    int lbPositionNum = 1;
+                    for (Clan clan : clansLB) {
+
+                        if (clan != null && clan.getOwner().getPlayerName() != null) {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                    lbPositionNum + " &6" +
+                                    Utils.shortStyleNumber(clan.getTotalGainedXP()) + " &e" +
+                                    clan.getTag() + " &6(" + clan.getOwner().getPlayerName() + ")"));
+                            lbPositionNum++;
+                        }
+                    }
+                } else {
+                    sender.sendMessage(Utils.translate("&cClans leaderboard not loaded fully"));
+                }
             // level lb
             } else {
 
@@ -150,7 +173,7 @@ public class StatsCMD implements CommandExecutor {
                 }
             }
         } else {
-            sender.sendMessage(Utils.translate("&2/stats <level> &7 View a level's stats"));
+            sender.sendMessage(Utils.translate("&2/stats <infinite/levels/players/clans/levelName> &7View stats"));
         }
         return true;
     }

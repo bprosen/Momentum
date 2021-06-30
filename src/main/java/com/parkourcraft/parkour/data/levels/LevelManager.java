@@ -9,6 +9,7 @@ import com.parkourcraft.parkour.data.menus.MenuPage;
 import com.parkourcraft.parkour.data.menus.MenusYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
+import com.sk89q.minecraft.util.commands.Link;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -268,24 +269,27 @@ public class LevelManager {
 
     public void loadGlobalLevelCompletionsLB() {
         try {
-            globalLevelCompletionsLB.clear();
 
+            LinkedHashSet<Level> temporaryLB = new LinkedHashSet<>();
             Level highestLevel = null;
             Set<String> addedLevels = new HashSet<>();
             int lbSize = 0;
 
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
 
-                for (Level level : levels.values()) {
+                for (Level level : levels.values())
                     if (highestLevel == null ||
                        (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount()))
                         highestLevel = level;
-                }
-                globalLevelCompletionsLB.add(highestLevel);
+
+                temporaryLB.add(highestLevel);
                 addedLevels.add(highestLevel.getName());
                 highestLevel = null;
                 lbSize++;
             }
+            // quickly swap
+            globalLevelCompletionsLB.clear();
+            globalLevelCompletionsLB.addAll(temporaryLB);
         } catch (Exception e) {
             e.printStackTrace();
         }

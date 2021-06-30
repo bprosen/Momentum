@@ -14,7 +14,7 @@ public class ClansDB {
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",
-                "clan_id, clan_tag, owner_player_id, clan_level, clan_xp",
+                "clan_id, clan_tag, owner_player_id, clan_level, clan_xp, total_gained_xp",
                 ""
         );
 
@@ -25,7 +25,8 @@ public class ClansDB {
                             result.get("clan_tag"),
                             Integer.parseInt(result.get("owner_player_id")),
                             Integer.parseInt(result.get("clan_level")),
-                            Long.parseLong(result.get("clan_xp"))
+                            Integer.parseInt(result.get("clan_xp")),
+                            Long.parseLong(result.get("total_gained_xp"))
                     )
             );
 
@@ -91,20 +92,27 @@ public class ClansDB {
     public static void insertClan(Clan clan) {
         Parkour.getDatabaseManager().run(
                 "INSERT INTO clans " +
-                        "(clan_tag, owner_player_id, clan_level, clan_xp)" +
+                        "(clan_tag, owner_player_id, clan_level, clan_xp, total_gained_xp)" +
                         " VALUES " +
                         "('" +
                         clan.getTag() + "', " +
                         clan.getOwnerID() + ", " +
                         clan.getLevel() + ", " +
-                        clan.getXP() +
+                        clan.getXP() + ", " +
+                        clan.getTotalGainedXP() +
                         ")"
         );
     }
 
-    public static void setClanXP(long clanXP, int clanID) {
+    public static void setClanXP(int clanXP, int clanID) {
         Parkour.getDatabaseManager().add("UPDATE clans SET " +
                 "clan_xp=" + clanXP +
+                " WHERE clan_id=" + clanID);
+    }
+
+    public static void setTotalGainedClanXP(long totalGainedClanXP, int clanID) {
+        Parkour.getDatabaseManager().add("UPDATE clans SET " +
+                "total_gained_xp=" + totalGainedClanXP +
                 " WHERE clan_id=" + clanID);
     }
 

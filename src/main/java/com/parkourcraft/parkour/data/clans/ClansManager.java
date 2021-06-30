@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -14,6 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ClansManager {
 
     private HashMap<String, Clan> clans = new HashMap<>();
+    private LinkedHashSet<Clan> clansLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
 
     public ClansManager(Plugin plugin) {
         load();
@@ -66,6 +68,36 @@ public class ClansManager {
         return clans.get(clanTag);
     }
 
+    public LinkedHashSet<Clan> getLeaderboard() { return clansLeaderboard; }
+
+    public void loadLeaderboard() {
+        try {
+
+            Clan highestXPClan = null;
+            Set<Clan> alreadyAddedClans = new HashSet<>();
+            LinkedHashSet<Clan> temporaryClanLB = new LinkedHashSet<>();
+            int lbSize = 0;
+
+            while (Parkour.getSettingsManager().max_clans_leaderboard_size > lbSize) {
+                // loop through and make sure they are not already added, and higher than previous
+                for (Clan clan : clans.values())
+                    if (!alreadyAddedClans.contains(clan) &&
+                        (highestXPClan == null || clan.getTotalGainedXP() > highestXPClan.getTotalGainedXP()))
+                        highestXPClan = clan;
+
+                temporaryClanLB.add(highestXPClan);
+                alreadyAddedClans.add(highestXPClan);
+                highestXPClan = null;
+                lbSize++;
+            }
+            // clear and then add all from temporary (fast swap)
+            clansLeaderboard.clear();
+            clansLeaderboard.addAll(temporaryClanLB);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void doSplitClanReward(Clan clan, Player player, Level level) {
 
         double percentage = (double) clan.getLevel() / 100;
@@ -97,8 +129,8 @@ public class ClansManager {
 
         // get random percent
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
-        long clanXP = (long) (level.getReward() * percent);
-        long totalXP = clanXP + clan.getXP();
+        int clanXP = (int) (level.getReward() * percent);
+        int totalXP = clanXP + clan.getXP();
 
         // if max level, keep calculating xp
         if (clan.isMaxLevel()) {
@@ -106,13 +138,13 @@ public class ClansManager {
             ClansDB.setClanXP(totalXP, clan.getID());
             sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
                                 Utils.formatNumber(clanXP) + " &eXP for your clan!" +
-                                " Total XP &6&l" + Utils.formatNumber(clan.getXP()));
+                                " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()));
 
         // level them up
         } else if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
 
             // left over after level up
-            long clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
+            int clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
             int newLevel = clan.getLevel() + 1;
 
             // this is the section that will determine if they will skip any levels
@@ -148,6 +180,9 @@ public class ClansManager {
                     Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
                     Utils.formatNumber(clanXPNeeded) + "&c)");
         }
+        // update total gained xp
+        ClansDB.setTotalGainedClanXP(clan.getTotalGainedXP() + clanXP, clan.getID());
+        clan.setTotalGainedXP(clan.getTotalGainedXP() + clanXP);
     }
 
     public void deleteClan(int clanID, boolean messageMembers) {
@@ -195,10 +230,19 @@ public class ClansManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+        new BukkitRunnable() {
+            @Override
             public void run() {
                 syncNewClans();
             }
-        }, 0L, 5L);
+        }.runTaskTimerAsynchronously(plugin, 0, 5);
+
+        // load clans leaderboard in async every 3 minutes
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadLeaderboard();
+            }
+        }.runTaskTimerAsynchronously(plugin, 20 * 10, 20 * 180);
     }
 }

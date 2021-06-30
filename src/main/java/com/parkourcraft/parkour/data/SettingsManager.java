@@ -1,9 +1,12 @@
 package com.parkourcraft.parkour.data;
 
-import com.parkourcraft.parkour.Parkour;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 public class SettingsManager {
 
@@ -24,6 +27,7 @@ public class SettingsManager {
     public int clan_calc_percent_max;
     public int clan_calc_level_reward_needed;
     public int clan_split_reward_min_needed;
+    public List<String> blocked_clan_names = new ArrayList<>();
 
     public String player_submitted_world;
     public int player_submitted_plot_width;
@@ -54,6 +58,7 @@ public class SettingsManager {
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
+    public int max_clans_leaderboard_size;
 
     public double max_prestige_multiplier;
     public double prestige_multiplier_per_prestige;
@@ -77,6 +82,7 @@ public class SettingsManager {
         clan_calc_percent_max = settings.getInt("clans.clan_xp_calc.max-percent");
         clan_calc_level_reward_needed = settings.getInt("clans.clan_xp_calc.level-reward-needed");
         clan_split_reward_min_needed = settings.getInt("clans.split_reward_min_needed");
+        blocked_clan_names = settings.getStringList("clans.blocked_clan_names");
         player_submitted_world = settings.getString("player_submitted.world");
         player_submitted_plot_width = settings.getInt("player_submitted.plot_width");
         player_submitted_plot_default_y = settings.getInt("player_submitted.plot_default_y");
@@ -103,6 +109,7 @@ public class SettingsManager {
         infinitepk_starting_y = settings.getInt("infinitepk.starting_y");
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
+        max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");
         max_prestige_multiplier = settings.getDouble("prestiges.max_multiplier");
         prestige_multiplier_per_prestige = settings.getDouble("prestiges.multiplier_per_prestige");
     }

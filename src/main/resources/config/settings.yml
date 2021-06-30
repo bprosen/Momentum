@@ -28,6 +28,7 @@ setup-sword:
 clans:
   max_members: 5
   split_reward_min_needed: 300
+  max_leaderboard_size: 10
   price:
     create: 10000
     tag: 1000
@@ -38,6 +39,27 @@ clans:
     level-reward-needed: 100
     min-percent: 10
     max-percent: 25
+  blocked_clan_names:
+    - "nigger"
+    - "nigga"
+    - "nigg"
+    - "ni99a"
+    - "ni99er"
+    - "n!99er"
+    - "n!99a"
+    - "retard"
+    - "retarded"
+    - "fag"
+    - "faggot"
+    - "fagg0t"
+    - "coon"
+    - "nibba"
+    - "beaner"
+    - "nazi"
+    - "hitler"
+    - "n1gger"
+    - "nigg"
+    - "chink"
 player_submitted:
   world: ""
   plot_width: 75
