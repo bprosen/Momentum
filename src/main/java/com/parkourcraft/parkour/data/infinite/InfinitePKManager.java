@@ -249,10 +249,8 @@ public class InfinitePKManager {
             yMax--;
 
         // if they are going to be below the min, set to 0 instead
-        if (yMin < 0 && (oldLocation.getBlockY() - yMin <= Parkour.getSettingsManager().min_infinitepk_y)) {
-            Bukkit.broadcastMessage("set to 0 due to too low y");
+        if (yMin < 0 && (oldLocation.getBlockY() - yMin <= Parkour.getSettingsManager().min_infinitepk_y))
             yMin = 0;
-        }
 
         int yIncrease = ThreadLocalRandom.current().nextInt(yMin, yMax);
 
