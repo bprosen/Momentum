@@ -50,6 +50,7 @@ public class SettingsManager {
     public int max_infinitepk_y;
     public int max_infinitepk_z;
     public int infinitepk_starting_y;
+    public int min_infinitepk_y;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -98,6 +99,7 @@ public class SettingsManager {
         max_infinitepk_x = settings.getInt("infinitepk.max_x");
         max_infinitepk_y = settings.getInt("infinitepk.max_y");
         max_infinitepk_z = settings.getInt("infinitepk.max_z");
+        min_infinitepk_y = settings.getInt("infinitepk.min_y");
         infinitepk_starting_y = settings.getInt("infinitepk.starting_y");
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");

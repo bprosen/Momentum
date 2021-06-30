@@ -248,6 +248,10 @@ public class InfinitePKManager {
         if (oldLocation.getBlockY() > Parkour.getSettingsManager().max_infinitepk_y && yMax > 1)
             yMax--;
 
+        // if they are going to be below the min, set to 0 instead
+        if (yMin < 0 && (oldLocation.getBlockY() - yMin <= Parkour.getSettingsManager().min_infinitepk_y))
+            yMin = 0;
+
         int yIncrease = ThreadLocalRandom.current().nextInt(yMin, yMax);
 
         // if the block will be 1 above, need to remove/add 1 from max/min depending on direction if x and z increase is 3

@@ -58,9 +58,10 @@ event:
 infinitepk:
   max_leaderboard_size: 10
   max_x: 100
-  max_y: 200
+  max_y: 240
+  min_y: 200
   max_z: 100
-  starting_y: 150
+  starting_y: 220
 completions:
   global_level_completions_leaderboard:
     max_size: 10
