@@ -26,7 +26,13 @@ public class InfinitePKDB {
                                 " ORDER BY infinitepk_score DESC" +
                                 " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
-                for (Map<String, String> scoreResult : scoreResults) {
+                outer: for (Map<String, String> scoreResult : scoreResults) {
+
+                    // quick loop to make sure there are no duplicates
+                    for (InfinitePKLBPosition infinitePK : leaderboard)
+                        if (infinitePK.getName().equalsIgnoreCase(scoreResult.get("player_name")))
+                            continue outer;
+
                     leaderboard.add(
                             new InfinitePKLBPosition(
                                     scoreResult.get("uuid"),
