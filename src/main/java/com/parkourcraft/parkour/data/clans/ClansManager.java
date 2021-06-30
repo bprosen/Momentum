@@ -100,8 +100,16 @@ public class ClansManager {
         long clanXP = (long) (level.getReward() * percent);
         long totalXP = clanXP + clan.getXP();
 
+        // if max level, keep calculating xp
+        if (clan.isMaxLevel()) {
+            clan.addXP(clanXP);
+            ClansDB.setClanXP(totalXP, clan.getID());
+            sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
+                                Utils.formatNumber(clanXP) + " &eXP for your clan!" +
+                                " Total XP &6&l" + Utils.formatNumber(clan.getXP()));
+
         // level them up
-        if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
+        } else if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
 
             // left over after level up
             long clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
@@ -119,22 +127,15 @@ public class ClansManager {
                     break;
                 }
             }
-
             clan.setLevel(newLevel);
+            sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel);
 
-            // send announcement to all online clan members
-            for (ClanMember clanMember : clan.getMembers()) {
-                // make sure they are online
-                Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
-
-                if (clanPlayer != null)
-                    clanPlayer.sendMessage(Utils.translate("&eYour clan has leveled up to &6&lLevel " + newLevel));
-            }
             // add rest of xp after leveling up
             ClansDB.setClanLevel(newLevel, clan.getID());
             ClansDB.setClanXP(clanXPOverflow, clan.getID());
             clan.setXP(clanXPOverflow);
 
+        // add xp to clan
         } else {
 
             // otherwise add xp to cache and database
@@ -143,15 +144,9 @@ public class ClansManager {
 
             long clanXPNeeded = ClansYAML.getLevelUpPrice(clan) - clan.getXP();
 
-            for (ClanMember clanMember : clan.getMembers()) {
-                // make sure they are online
-                Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
-
-                if (clanPlayer != null)
-                    clanPlayer.sendMessage(Utils.translate("&6" + player.getName() + " &ehas gained &6&l" +
-                            Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
-                            Utils.formatNumber(clanXPNeeded) + "&c)"));
-            }
+            sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
+                    Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
+                    Utils.formatNumber(clanXPNeeded) + "&c)");
         }
     }
 
@@ -180,6 +175,16 @@ public class ClansManager {
             // remove from database and list
             ClansDB.removeClan(clanID);
             clans.remove(clan.getTag());
+        }
+    }
+
+    public void sendMessageToMembers(Clan clan, String msg) {
+        for (ClanMember clanMember : clan.getMembers()) {
+            // make sure they are online
+            Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+
+            if (clanPlayer != null)
+                clanPlayer.sendMessage(Utils.translate(msg));
         }
     }
 

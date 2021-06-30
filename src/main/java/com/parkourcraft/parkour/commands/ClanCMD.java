@@ -49,15 +49,20 @@ public class ClanCMD implements CommandExecutor {
 
                 if (targetClan != null) {
 
-                    long clanXPNeeded = ClansYAML.getLevelUpPrice(targetClan) - targetClan.getXP();
-
                     // send stats
                     sender.sendMessage(Utils.translate("&6&l" + targetClan.getTag() + "&e's Stats"));
                     sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
                     sender.sendMessage(Utils.translate("  &cClan XP &4" + Utils.formatNumber(targetClan.getXP())));
-                    sender.sendMessage(Utils.translate("  &cXP to Level Up"));
-                    sender.sendMessage(Utils.translate("    &4" + Utils.formatNumber(clanXPNeeded)));
-                    sender.sendMessage("");
+
+                    // if max level, dont send needed to level up
+                    if (!targetClan.isMaxLevel()) {
+                        long clanXPNeeded = ClansYAML.getLevelUpPrice(targetClan) - targetClan.getXP();
+
+                        sender.sendMessage(Utils.translate("  &cXP to Level Up"));
+                        sender.sendMessage(Utils.translate("    &4" + Utils.formatNumber(clanXPNeeded)));
+                        sender.sendMessage("");
+                    }
+
                     sender.sendMessage(Utils.translate( "&6Members &e" + targetClan.getMembers().size()));
 
                     for (ClanMember clanMember : targetClan.getMembers()) {

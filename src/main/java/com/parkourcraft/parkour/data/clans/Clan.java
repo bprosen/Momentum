@@ -49,7 +49,14 @@ public class Clan {
     }
 
     public void setXP(long clanXP) { this.clanXP = clanXP; }
+
     public void addXP(long clanXP) { this.clanXP += clanXP; }
+
+    public boolean isMaxLevel() {
+        if (clanLevel >= ClansYAML.getMaxLevel())
+            return true;
+        return false;
+    }
 
     public void setLevel(int level) {
         clanLevel = level;
