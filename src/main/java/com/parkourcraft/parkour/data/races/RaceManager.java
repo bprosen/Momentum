@@ -197,11 +197,21 @@ public class RaceManager {
             // update winner wins
             winnerStats.endedRace();
             winnerStats.setRaceWins(winnerStats.getRaceWins() + 1);
+
+            // set winner race win rate
+            if (winnerStats.getRaceLosses() > 0)
+                winnerStats.setRaceWinRate(Float.parseFloat(Utils.formatNumber((double) winnerStats.getRaceWins() / winnerStats.getRaceLosses())));
+            else
+                winnerStats.setRaceWinRate(winnerStats.getRaceWins());
+
             RaceDB.updateRaceWins(winnerStats.getUUID(), winnerStats.getRaceWins());
 
             // update loser losses
             loserStats.endedRace();
             loserStats.setRaceLosses(loserStats.getRaceLosses() + 1);
+            // set loser race win rate (will be > 0, so no need to check)
+            loserStats.setRaceWinRate(Float.parseFloat(Utils.formatNumber((double) loserStats.getRaceWins() / loserStats.getRaceLosses())));
+
             RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
 
             List<String> winnerRegions = WorldGuard.getRegions(winner.getLocation());

@@ -105,12 +105,10 @@ public class Scoreboard {
                 board.add("");
 
                 // add wins, losses, winrate
-                board.add(formatSpacing(Utils.translate("&6&lWins vs. &e" +
-                        Utils.shortStyleNumber(playerStats.getRaceWins()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceWins()))));
-                board.add(formatSpacing(Utils.translate("&6&lLosses vs. &e" +
-                        Utils.shortStyleNumber(playerStats.getRaceLosses()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceLosses()))));
-                board.add(formatSpacing(Utils.translate("&6&lWin Rate vs. &e" +
-                        Utils.shortStyleNumber(playerStats.getRaceWinRate()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceWinRate()))));
+                board.add(formatSpacing(Utils.translate("&6Your W/L &e" +
+                        Utils.shortStyleNumber(playerStats.getRaceWins()) + "/" + Utils.shortStyleNumber(playerStats.getRaceLosses()))));
+                board.add(formatSpacing(Utils.translate("&6Their W/L &e" +
+                        Utils.shortStyleNumber(opponentStats.getRaceWins()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceLosses()))));
 
 
                 // event section of scoreboard
