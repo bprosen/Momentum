@@ -509,9 +509,13 @@ public class LevelCMD implements CommandExecutor {
                             HashMap<Integer, List<String>> ratings = RatingDB.getAllLevelRaters(level.getID());
 
                             if (!ratings.isEmpty()) {
+
+                                sender.sendMessage(Utils.translate("&2" + level.getFormattedTitle() + "&7's Ratings"));
+                                int totalRatings = 0;
+
                                 // loop through list
                                 for (Map.Entry<Integer, List<String>> entry : ratings.entrySet()) {
-                                    String msg = "&2" + entry.getKey() + " &7-";
+                                    String msg = " &2" + entry.getKey() + " &7-";
                                     // loop through names
                                     for (String playerName : entry.getValue()) {
                                         if (!entry.getValue().get(entry.getValue().size() - 1).equalsIgnoreCase(playerName))
@@ -519,9 +523,12 @@ public class LevelCMD implements CommandExecutor {
                                         else
                                             // no comma if last one
                                             msg += " &a" + playerName;
+
+                                        totalRatings++;
                                     }
                                     sender.sendMessage(Utils.translate(msg));
                                 }
+                                sender.sendMessage(Utils.translate("&a" + totalRatings + " &7Ratings"));
                             } else {
                                 sender.sendMessage(Utils.translate("&cNobody has rated this level"));
                             }
@@ -535,7 +542,11 @@ public class LevelCMD implements CommandExecutor {
                                     List<String> ratings = RatingDB.getSpecificLevelRaters(level.getID(), rating);
                                     // if it is empty
                                     if (!ratings.isEmpty()) {
-                                        String msg = "&2" + ratings + " &7-";
+
+                                        sender.sendMessage(Utils.translate("&7Users who rated &2" +
+                                                                level.getFormattedTitle() + " &7a &a" + rating));
+
+                                        String msg = " &2" + rating + " &7-";
 
                                         for (String playerName : ratings) {
                                             if (!ratings.get(ratings.size() - 1).equalsIgnoreCase(playerName))
@@ -545,8 +556,9 @@ public class LevelCMD implements CommandExecutor {
                                                 msg += " &a" + playerName;
                                         }
                                         sender.sendMessage(Utils.translate(msg));
+                                        sender.sendMessage(Utils.translate("&a" + ratings.size() + " &7Ratings"));
                                     } else {
-                                        sender.sendMessage(Utils.translate("&cNobody has rated this level"));
+                                        sender.sendMessage(Utils.translate("&cNobody has rated this level a " + rating));
                                     }
                                 } else {
                                     sender.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));

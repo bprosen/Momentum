@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.levels;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
@@ -84,7 +85,6 @@ public class RatingDB {
                 names.add(ratingResult.get("player_name"));
 
             ratings.put(i, names);
-            names.clear();
         }
         return ratings;
     }
