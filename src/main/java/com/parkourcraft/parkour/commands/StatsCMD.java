@@ -175,7 +175,7 @@ public class StatsCMD implements CommandExecutor {
                         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
                         sender.sendMessage(Utils.translate("&7Your Wins/Win Rate &8" +
                                 Utils.formatNumber(playerStats.getRaceWins()) + "&7/&8" +
-                                Utils.formatDecimal(playerStats.getRaceWinRate())));
+                                playerStats.getRaceWinRate()));
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&cNo race leaderboard positions found or not loaded yet"));
