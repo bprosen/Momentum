@@ -226,6 +226,17 @@ public class RaceManager {
 
             RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
 
+            // load leaderboard if they will have a lb position
+            if (scoreWillBeLB(winnerStats.getRaceWins()) ||
+                raceLeaderboard.size() < Parkour.getSettingsManager().max_race_leaderboard_size) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        loadLeaderboard();
+                    }
+                }.runTaskAsynchronously(Parkour.getPlugin());
+            }
+
             List<String> winnerRegions = WorldGuard.getRegions(winner.getLocation());
             List<String> loserRegions = WorldGuard.getRegions(loser.getLocation());
             if (!winnerRegions.isEmpty())
@@ -273,6 +284,18 @@ public class RaceManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean scoreWillBeLB(int score) {
+        int lowestWins = 0;
+        // gets lowest score
+        for (RaceLBPosition raceLBPosition : raceLeaderboard)
+            if (lowestWins == 0 || raceLBPosition.getWins() < lowestWins)
+                lowestWins = raceLBPosition.getWins();
+
+        if (lowestWins < score)
+            return true;
+        return false;
     }
 
     public Race get(Player player) {

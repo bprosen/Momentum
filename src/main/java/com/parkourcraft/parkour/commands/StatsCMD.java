@@ -157,7 +157,7 @@ public class StatsCMD implements CommandExecutor {
                         if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     position + " &8" +
-                                    lbPosition.getWins() + " &7" +
+                                    lbPosition.getWins() + " Wins &7" +
                                     lbPosition.getName() + " &8(" +
                                     lbPosition.getWinRate() + ")"));
                         }
@@ -167,7 +167,7 @@ public class StatsCMD implements CommandExecutor {
                     if (sender instanceof Player) {
                         Player player = (Player) sender;
                         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
-                        sender.sendMessage(Utils.translate("&7Your Total Wins/Win Rate &8" +
+                        sender.sendMessage(Utils.translate("&7Your Wins/Win Rate &8" +
                                 Utils.formatNumber(playerStats.getRaceWins()) + "&7/&8" +
                                 Utils.formatDecimal(playerStats.getRaceWinRate())));
                     }
