@@ -26,16 +26,15 @@ public class StatsCMD implements CommandExecutor {
                 if (!Parkour.getInfinitePKManager().getLeaderboard().isEmpty()) {
                     sender.sendMessage(Utils.translate("&5Infinite Parkour &7Leaderboard"));
 
-                    for (int i = 1; i <= Parkour.getSettingsManager().max_infinitepk_leaderboard_size; i++) {
-
-                        InfinitePKLBPosition lbPosition = Parkour.getInfinitePKManager().getLeaderboardPosition(i);
-
+                    int position = 1;
+                    for (InfinitePKLBPosition lbPosition : Parkour.getInfinitePKManager().getLeaderboard()) {
                         if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    lbPosition.getPosition() + " &5" +
+                                    position + " &5" +
                                     Utils.formatNumber(lbPosition.getScore()) + " &d" +
                                     lbPosition.getName()));
                         }
+                        position++;
                     }
 
                     if (sender instanceof Player) {

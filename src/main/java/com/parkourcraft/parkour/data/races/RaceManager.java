@@ -2,8 +2,10 @@ package com.parkourcraft.parkour.data.races;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
@@ -18,6 +20,11 @@ import java.util.*;
 public class RaceManager {
 
     private Set<Race> runningRaceList = new HashSet<>();
+    private LinkedHashSet<RaceLBPosition> raceLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_race_leaderboard_size);
+
+    public RaceManager() {
+        loadLeaderboard();
+    }
 
     public void startRace(Player player1, Player player2, boolean bet, double betAmount) {
 
@@ -227,6 +234,42 @@ public class RaceManager {
         }
     }
 
+    public void loadLeaderboard() {
+        try {
+
+            LinkedHashSet<RaceLBPosition> leaderboard = getRaceLeaderboard();
+            leaderboard.clear();
+
+            List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
+                    "players",
+                    "player_name, race_wins, race_losses",
+                    " WHERE race_wins > 0" +
+                            " ORDER BY race_wins DESC" +
+                            " LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
+
+            outer: for (Map<String, String> scoreResult : scoreResults) {
+
+                // quick loop to make sure there are no duplicates
+                for (RaceLBPosition raceLBPosition : leaderboard)
+                    if (raceLBPosition.getName().equalsIgnoreCase(scoreResult.get("player_name")))
+                        continue outer;
+
+                int wins = Integer.parseInt(scoreResult.get("race_wins"));
+                int losses = Integer.parseInt(scoreResult.get("race_losses"));
+                float winRate = Float.parseFloat(Utils.formatNumber((double) wins / losses));
+
+                leaderboard.add(
+                        new RaceLBPosition(
+                                scoreResult.get("player_name"),
+                                wins,
+                                winRate)
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public Race get(Player player) {
         for (Race race : runningRaceList)
             if (race.getPlayer1().equals(player) || race.getPlayer2().equals(player))
@@ -238,4 +281,6 @@ public class RaceManager {
     public Set<Race> getRaces() {
         return runningRaceList;
     }
+
+    public LinkedHashSet<RaceLBPosition> getRaceLeaderboard() { return raceLeaderboard; }
 }

@@ -10,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class InfiniteCMD implements CommandExecutor {
 
@@ -48,11 +49,11 @@ public class InfiniteCMD implements CommandExecutor {
 
                 if (Utils.isInteger(a[2])) {
                     int position = Integer.parseInt(a[2]);
-                    InfinitePKLBPosition lbPosition = infinitePKManager.getLeaderboardPosition(position);
+                    InfinitePKLBPosition lbPosition = (InfinitePKLBPosition) infinitePKManager.getLeaderboard().toArray()[position];
 
                     if (lbPosition != null) {
                         player.sendMessage(Utils.translate(
-                                "&c" + lbPosition.getName() + " &7is at &6Spot " + lbPosition.getPosition() + " &7with a score of &6" + lbPosition.getScore())
+                                "&c" + lbPosition.getName() + " &7is at &6Spot " + position + " &7with a score of &6" + lbPosition.getScore())
                         );
                     } else {
                         player.sendMessage(Utils.translate("&7Something went wrong... invalid position &6" + position));
@@ -69,7 +70,14 @@ public class InfiniteCMD implements CommandExecutor {
                     int score = Integer.parseInt(a[2]);
 
                     infinitePKManager.updateScore(a[1], score);
-                    InfinitePKDB.loadLeaderboard(); // load lb
+                    // can run in async
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            infinitePKManager.loadLeaderboard();
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin()); // load lb
+
                     player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's score to &6" + score));
                 } else {
                     player.sendMessage(Utils.translate("&c" + a[1] + " &7has not joined the server yet"));

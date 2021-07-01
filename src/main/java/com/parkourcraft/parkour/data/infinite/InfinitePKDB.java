@@ -10,41 +10,6 @@ import java.util.Set;
 
 public class InfinitePKDB {
 
-    public static void loadLeaderboard() {
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-
-                Set<InfinitePKLBPosition> leaderboard = Parkour.getInfinitePKManager().getLeaderboard();
-                leaderboard.clear();
-
-                List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
-                       "players",
-                        "uuid, player_name, infinitepk_score",
-                       " WHERE infinitepk_score > 0" +
-                                " ORDER BY infinitepk_score DESC" +
-                                " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
-
-                outer: for (Map<String, String> scoreResult : scoreResults) {
-
-                    // quick loop to make sure there are no duplicates
-                    for (InfinitePKLBPosition infinitePK : leaderboard)
-                        if (infinitePK.getName().equalsIgnoreCase(scoreResult.get("player_name")))
-                            continue outer;
-
-                    leaderboard.add(
-                            new InfinitePKLBPosition(
-                                    scoreResult.get("uuid"),
-                                    scoreResult.get("player_name"),
-                                    Integer.parseInt(scoreResult.get("infinitepk_score")),
-                                    leaderboard.size() + 1)
-                    );
-                }
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
-    }
-
     public static int getScore(String playerUUID) {
         List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "infinitepk_score",
                                         " WHERE uuid='" + playerUUID + "'");

@@ -93,3 +93,5 @@ completions:
 prestiges:
   max_multiplier: 25
   multiplier_per_prestige: 5
+races:
+  max_leaderboard_size: 10

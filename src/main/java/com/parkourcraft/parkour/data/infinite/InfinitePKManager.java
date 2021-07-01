@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.SettingsManager;
 import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,10 +17,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class InfinitePKManager {
 
     private HashMap<String, InfinitePK> participants = new HashMap<>();
-    private Set<InfinitePKLBPosition> leaderboard = new HashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
+    private LinkedHashSet<InfinitePKLBPosition> leaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
     public InfinitePKManager() {
-        InfinitePKDB.loadLeaderboard();
         startScheduler();
     }
 
@@ -34,6 +34,13 @@ public class InfinitePKManager {
                         endPK(infinitePK.getPlayer(), false);
             }
         }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20 * 2);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadLeaderboard();
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     public void startPK(Player player) {
@@ -80,8 +87,14 @@ public class InfinitePKManager {
                 updateScore(player.getName(), score);
 
                 // load leaderboard if they have a lb position
-                if (scoreWillBeLB(score) || leaderboard.size() < Parkour.getSettingsManager().max_infinitepk_leaderboard_size)
-                    InfinitePKDB.loadLeaderboard();
+                if (scoreWillBeLB(score) || leaderboard.size() < Parkour.getSettingsManager().max_infinitepk_leaderboard_size) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            loadLeaderboard();
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
+                }
             } else if (!disconnected) {
                 player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
                         "&7Your best is &d" + playerStats.getInfinitePKScore()));
@@ -310,6 +323,39 @@ public class InfinitePKManager {
         return null;
     }
 
+    public void loadLeaderboard() {
+        try {
+
+            LinkedHashSet<InfinitePKLBPosition> leaderboard = getLeaderboard();
+            leaderboard.clear();
+
+            List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
+                    "players",
+                    "uuid, player_name, infinitepk_score",
+                    " WHERE infinitepk_score > 0" +
+                            " ORDER BY infinitepk_score DESC" +
+                            " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
+
+            outer: for (Map<String, String> scoreResult : scoreResults) {
+
+                // quick loop to make sure there are no duplicates
+                for (InfinitePKLBPosition infinitePK : leaderboard)
+                    if (infinitePK.getName().equalsIgnoreCase(scoreResult.get("player_name")))
+                        continue outer;
+
+                leaderboard.add(
+                        new InfinitePKLBPosition(
+                                scoreResult.get("uuid"),
+                                scoreResult.get("player_name"),
+                                Integer.parseInt(scoreResult.get("infinitepk_score")),
+                                leaderboard.size() + 1)
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isLocInCurrentBlocks(Location loc) {
         for (InfinitePK infinitePK : participants.values())
             if ((infinitePK.getCurrentBlockLoc().getBlockX() == loc.getBlockX() &&
@@ -317,14 +363,6 @@ public class InfinitePKManager {
                 loc.getBlock().getType() != Material.AIR)
                 return true;
         return false;
-    }
-
-    public InfinitePKLBPosition getLeaderboardPosition(int position) {
-        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
-            if (infinitePKLBPosition.getPosition() == position)
-                return infinitePKLBPosition;
-
-        return null;
     }
 
     public InfinitePKLBPosition getLeaderboardPosition(String playerName) {
@@ -360,7 +398,7 @@ public class InfinitePKManager {
             endPK(infinitePK.getPlayer(), true);
     }
 
-    public Set<InfinitePKLBPosition> getLeaderboard() {
+    public LinkedHashSet<InfinitePKLBPosition> getLeaderboard() {
         return leaderboard;
     }
 
