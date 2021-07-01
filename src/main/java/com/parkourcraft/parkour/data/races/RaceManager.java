@@ -47,113 +47,119 @@ public class RaceManager {
             temporaryLevelList.addAll(Parkour.getLevelManager().getRaceLevels());
         }
 
-        // picks random map
-        Random ran = new Random();
-        Level level = Parkour.getLevelManager().get(
-                temporaryLevelList.get(ran.nextInt(temporaryLevelList.size())
-                ));
+        if (temporaryLevelList.size() > 0) {
+            // picks random map
+            Random ran = new Random();
+            Level level = Parkour.getLevelManager().get(
+                    temporaryLevelList.get(ran.nextInt(temporaryLevelList.size())
+                    ));
 
-        // make sure it is not an invalid level
-        if (level != null) {
-            // create object for the race
-            Race newRace = new Race(player1, player2, level, bet, betAmount);
-            runningRaceList.add(newRace);
+            // make sure it is not an invalid level
+            if (level != null) {
+                // create object for the race
+                Race newRace = new Race(player1, player2, level, bet, betAmount);
+                runningRaceList.add(newRace);
 
-            // set level and set inRace to true
-            PlayerStats player1Stats = Parkour.getStatsManager().get(player1);
-            PlayerStats player2Stats = Parkour.getStatsManager().get(player2);
-            player1Stats.startedRace();
-            player2Stats.startedRace();
-            player1Stats.setLevel(level.getName());
-            player2Stats.setLevel(level.getName());
+                // set level and set inRace to true
+                PlayerStats player1Stats = Parkour.getStatsManager().get(player1);
+                PlayerStats player2Stats = Parkour.getStatsManager().get(player2);
+                player1Stats.startedRace();
+                player2Stats.startedRace();
+                player1Stats.setLevel(level.getName());
+                player2Stats.setLevel(level.getName());
 
-            player1.teleport(level.getRaceLocation1());
-            player2.teleport(level.getRaceLocation2());
+                player1.teleport(level.getRaceLocation1());
+                player2.teleport(level.getRaceLocation2());
 
-            // remove potion effects
-            for (PotionEffect effects : player1.getActivePotionEffects()) {
-                player1.removePotionEffect(effects.getType());
-            }
-
-            for (PotionEffect effects : player2.getActivePotionEffects()) {
-                player2.removePotionEffect(effects.getType());
-            }
-
-            // freeze and do countdown
-            new BukkitRunnable() {
-                int runCycles = 0;
-                public void run() {
-
-                    // cancel, send last title and return
-                    if (runCycles == 100) {
-                        cancel();
-                        TitleAPI.sendTitle(player1, 0, 20, 10, "&cRACE", "");
-                        TitleAPI.sendTitle(player2, 0, 20, 10, "&cRACE", "");
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
-                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
-                        return;
-                    }
-
-                    // race location variables
-                    double race1X = level.getRaceLocation1().getX();
-                    double race1Z = level.getRaceLocation1().getZ();
-                    double race2X = level.getRaceLocation2().getX();
-                    double race2Z = level.getRaceLocation2().getZ();
-
-                    // player location variables
-                    double player1X = player1.getLocation().getX();
-                    double player1Z = player1.getLocation().getZ();
-                    double player2X = player2.getLocation().getX();
-                    double player2Z = player2.getLocation().getZ();
-
-                    // teleport back if moved
-                    if (race1X != player1X || race1Z != player1Z) {
-                        Location raceLoc1 = level.getRaceLocation1().clone();
-                        raceLoc1.setYaw(player1.getLocation().getYaw());
-                        raceLoc1.setPitch(player1.getLocation().getPitch());
-                        player1.teleport(raceLoc1);
-                    }
-
-                    if (race2X != player2X || race2Z != player2Z) {
-                        Location raceLoc2 = level.getRaceLocation2().clone();
-                        raceLoc2.setYaw(player2.getLocation().getYaw());
-                        raceLoc2.setPitch(player2.getLocation().getPitch());
-                        player2.teleport(raceLoc2);
-                    }
-
-                    // countdown if-else
-                    if (runCycles == 0) {
-                        TitleAPI.sendTitle(player1, 0, 20, 0, "&a5", "");
-                        TitleAPI.sendTitle(player2, 0, 20, 0, "&a5", "");
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                    } else if (runCycles == 20) {
-                        TitleAPI.sendTitle(player1, 0, 20, 0, "&e4", "");
-                        TitleAPI.sendTitle(player2, 0, 20, 0, "&e4", "");
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                    } else if (runCycles == 40) {
-                        TitleAPI.sendTitle(player1, 0, 20, 0, "&63", "");
-                        TitleAPI.sendTitle(player2, 0, 20, 0, "&63", "");
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                    } else if (runCycles == 60) {
-                        TitleAPI.sendTitle(player1, 0, 20, 0, "&c2", "");
-                        TitleAPI.sendTitle(player2, 0, 20, 0, "&c2", "");
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                    } else if (runCycles == 80) {
-                        TitleAPI.sendTitle(player1, 0, 20, 0, "&41", "");
-                        TitleAPI.sendTitle(player2, 0, 20, 0, "&41", "");
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                        player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                    }
-                    runCycles++;
+                // remove potion effects
+                for (PotionEffect effects : player1.getActivePotionEffects()) {
+                    player1.removePotionEffect(effects.getType());
                 }
-            }.runTaskTimer(Parkour.getPlugin(), 1, 1);
+
+                for (PotionEffect effects : player2.getActivePotionEffects()) {
+                    player2.removePotionEffect(effects.getType());
+                }
+
+                // freeze and do countdown
+                new BukkitRunnable() {
+                    int runCycles = 0;
+
+                    public void run() {
+
+                        // cancel, send last title and return
+                        if (runCycles == 100) {
+                            cancel();
+                            TitleAPI.sendTitle(player1, 0, 20, 10, "&cRACE", "");
+                            TitleAPI.sendTitle(player2, 0, 20, 10, "&cRACE", "");
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
+                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
+                            return;
+                        }
+
+                        // race location variables
+                        double race1X = level.getRaceLocation1().getX();
+                        double race1Z = level.getRaceLocation1().getZ();
+                        double race2X = level.getRaceLocation2().getX();
+                        double race2Z = level.getRaceLocation2().getZ();
+
+                        // player location variables
+                        double player1X = player1.getLocation().getX();
+                        double player1Z = player1.getLocation().getZ();
+                        double player2X = player2.getLocation().getX();
+                        double player2Z = player2.getLocation().getZ();
+
+                        // teleport back if moved
+                        if (race1X != player1X || race1Z != player1Z) {
+                            Location raceLoc1 = level.getRaceLocation1().clone();
+                            raceLoc1.setYaw(player1.getLocation().getYaw());
+                            raceLoc1.setPitch(player1.getLocation().getPitch());
+                            player1.teleport(raceLoc1);
+                        }
+
+                        if (race2X != player2X || race2Z != player2Z) {
+                            Location raceLoc2 = level.getRaceLocation2().clone();
+                            raceLoc2.setYaw(player2.getLocation().getYaw());
+                            raceLoc2.setPitch(player2.getLocation().getPitch());
+                            player2.teleport(raceLoc2);
+                        }
+
+                        // countdown if-else
+                        if (runCycles == 0) {
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&a5", "");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&a5", "");
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        } else if (runCycles == 20) {
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&e4", "");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&e4", "");
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        } else if (runCycles == 40) {
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&63", "");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&63", "");
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        } else if (runCycles == 60) {
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&c2", "");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&c2", "");
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        } else if (runCycles == 80) {
+                            TitleAPI.sendTitle(player1, 0, 20, 0, "&41", "");
+                            TitleAPI.sendTitle(player2, 0, 20, 0, "&41", "");
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                        }
+                        runCycles++;
+                    }
+                }.runTaskTimer(Parkour.getPlugin(), 1, 1);
+            } else {
+                player1.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
+                player2.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
+            }
         } else {
-            player1.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
-            player2.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
+            player1.sendMessage(Utils.translate("&cNo maps have been made for races"));
+            player2.sendMessage(Utils.translate("&cNo maps have been made for races"));
         }
     }
 
