@@ -155,9 +155,15 @@ public class StatsCMD implements CommandExecutor {
                     int position = 1;
                     for (RaceLBPosition lbPosition : leaderboard) {
                         if (lbPosition != null) {
+
+                            // just for my sanity of proper grammar
+                            String winMsg = "Win";
+                            if (lbPosition.getWins() > 1)
+                                winMsg += "s";
+
                             sender.sendMessage(Utils.translate(" &7" +
                                     position + " &8" +
-                                    lbPosition.getWins() + " Wins &7" +
+                                    lbPosition.getWins() + " " + winMsg + " &7" +
                                     lbPosition.getName() + " &8(" +
                                     lbPosition.getWinRate() + ")"));
                         }
