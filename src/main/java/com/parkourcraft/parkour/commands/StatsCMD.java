@@ -126,7 +126,7 @@ public class StatsCMD implements CommandExecutor {
 
                 if (!topRatedLB.isEmpty()) {
 
-                    sender.sendMessage(Utils.translate("&9Top Rated Levels &7Leaderboard"));
+                    sender.sendMessage(Utils.translate("&9Rated Levels &7Leaderboard"));
 
                     int lbPositionNum = 1;
                     for (Level level : topRatedLB) {
