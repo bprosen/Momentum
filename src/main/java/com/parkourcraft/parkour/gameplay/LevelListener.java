@@ -6,6 +6,8 @@ import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.events.EventType;
 import com.parkourcraft.parkour.data.infinite.InfinitePK;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.races.Race;
+import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
@@ -49,6 +51,16 @@ public class LevelListener implements Listener {
                     eventManager.addEliminated(player);
                     player.sendMessage(Utils.translate("&7You fell in water and got &beliminated out &7of the event!"));
 
+                } else if (playerStats.inRace()) {
+
+                    Race race = Parkour.getRaceManager().get(player);
+                    if (race != null) {
+                        if (race.isPlayer1(player))
+                            race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
+                        // swap tp to loc 2 if player 2
+                        else
+                            race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
+                    }
                 } else {
                     Level level = Parkour.getLevelManager().get(levelName);
 
