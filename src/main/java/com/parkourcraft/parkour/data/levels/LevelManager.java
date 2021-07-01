@@ -101,7 +101,7 @@ public class LevelManager {
                 loadGlobalLevelCompletionsLB();
                 loadTopRatedLevelsLB();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 180, 20 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 10, 20 * 180);
     }
 
     public void pickFeatured() {
@@ -270,16 +270,19 @@ public class LevelManager {
 
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
                 for (Level level : levels.values())
-                    if (highestLevel == null ||
-                        (!addedLevels.contains(level.getName()) && level.getRating() > highestLevel.getRating() &&
-                        level.getRatingsCount() >= 5 &&
-                        level.getRating() > 0.00))
+                    if (highestLevel == null || (!addedLevels.contains(level.getName()) &&
+                        level.getRating() > highestLevel.getRating() &&
+                        level.getRatingsCount() >= 5))
                         highestLevel = level;
 
-                temporaryLB.add(highestLevel);
-                addedLevels.add(highestLevel.getName());
-                highestLevel = null;
+                // add 1 and add to added levels
                 lbSize++;
+                addedLevels.add(highestLevel.getName());
+                // add to temp lb
+                if (highestLevel.getRating() > 0.00)
+                    temporaryLB.add(highestLevel);
+
+                highestLevel = null;
             }
             // quickly swap
             topRatedLevelsLB.clear();
