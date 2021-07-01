@@ -272,7 +272,7 @@ public class LevelManager {
                 for (Level level : levels.values())
                     if (highestLevel == null ||
                         (!addedLevels.contains(level.getName()) && level.getRating() > highestLevel.getRating()) &&
-                        level.getRatingsCount() >= 5)
+                        level.getRatingsCount() >= 5 && level.getRating() > 0.0)
                         highestLevel = level;
 
                 temporaryLB.add(highestLevel);
