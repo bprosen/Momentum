@@ -135,7 +135,7 @@ public class StatsCMD implements CommandExecutor {
                             sender.sendMessage(Utils.translate(" &7" +
                                                lbPositionNum + " &9" +
                                                level.getRating() + " &1" +
-                                               level.getName()));
+                                               level.getFormattedTitle()));
                             lbPositionNum++;
                         }
                     }
