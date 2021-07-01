@@ -61,12 +61,14 @@ public class TablesDB {
                 "uuid CHAR(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
                 "spectatable BIT DEFAULT 1, " +
-                "clan_id INT DEFAULT -1," +
-                "rank_id INT DEFAULT 1," +
-                "rankup_stage BIT default 1," +
-                "rank_prestiges TINYINT default 0," +
-                "infinitepk_score INT default 0," +
-                "level_completions INT default 0," +
+                "clan_id INT DEFAULT -1, " +
+                "rank_id INT DEFAULT 1, " +
+                "rankup_stage BIT default 1, " +
+                "rank_prestiges TINYINT default 0, " +
+                "infinitepk_score INT default 0, " +
+                "level_completions INT default 0, " +
+                "race_wins SMALLINT default 0, " +
+                "race_losses SMALLINT default 0, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

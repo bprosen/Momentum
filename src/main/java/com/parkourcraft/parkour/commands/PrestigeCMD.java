@@ -1,7 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.rank.RanksManager;
+import com.parkourcraft.parkour.data.ranks.RanksManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;

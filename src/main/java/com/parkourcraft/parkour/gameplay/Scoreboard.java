@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
 import me.winterguardian.easyscoreboards.ScoreboardUtil;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -95,9 +96,22 @@ public class Scoreboard {
                 // race section of scoreboard
             } else if (playerStats.inRace()) {
 
+                Player opponent = Parkour.getRaceManager().get(playerStats.getPlayer()).getOpponent(playerStats.getPlayer());
+                PlayerStats opponentStats = Parkour.getStatsManager().get(opponent);
+
                 board.add(formatSpacing(Utils.translate("&6You are in a race!")));
-                board.add(formatSpacing(Utils.translate("&7vs. &c" + Parkour.getRaceManager().get(playerStats.getPlayer())
-                        .getOpponent(playerStats.getPlayer()).getName())));
+                board.add(formatSpacing(Utils.translate("&7vs. &c" + opponent.getName())));
+
+                board.add("");
+
+                // add wins, losses, winrate
+                board.add(formatSpacing(Utils.translate("&6&lWins vs. &e" +
+                        Utils.shortStyleNumber(playerStats.getRaceWins()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceWins()))));
+                board.add(formatSpacing(Utils.translate("&6&lLosses vs. &e" +
+                        Utils.shortStyleNumber(playerStats.getRaceLosses()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceLosses()))));
+                board.add(formatSpacing(Utils.translate("&6&lWin Rate vs. &e" +
+                        Utils.shortStyleNumber(playerStats.getRaceWinRate()) + "/" + Utils.shortStyleNumber(opponentStats.getRaceWinRate()))));
+
 
                 // event section of scoreboard
             } else if (playerStats.isEventParticipant()) {

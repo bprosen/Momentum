@@ -188,8 +188,15 @@ public class RaceManager {
 
             PlayerStats winnerStats = Parkour.getStatsManager().get(winner);
             PlayerStats loserStats = Parkour.getStatsManager().get(loser);
+            // update winner wins
             winnerStats.endedRace();
+            winnerStats.setRaceWins(winnerStats.getRaceWins() + 1);
+            RaceDB.updateRaceWins(winnerStats.getUUID(), winnerStats.getRaceWins());
+
+            // update loser losses
             loserStats.endedRace();
+            loserStats.setRaceLosses(loserStats.getRaceLosses() + 1);
+            RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
 
             List<String> winnerRegions = WorldGuard.getRegions(winner.getLocation());
             List<String> loserRegions = WorldGuard.getRegions(loser.getLocation());

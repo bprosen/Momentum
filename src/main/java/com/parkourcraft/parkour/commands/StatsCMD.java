@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
@@ -177,23 +178,26 @@ public class StatsCMD implements CommandExecutor {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (playerStats != null) {
-                Map<String, List<LevelCompletion>> levelCompletionsMap = playerStats.getLevelCompletionsMap();
+                // objects
+                Rank rank = playerStats.getRank();
+                Clan clan = playerStats.getClan();
 
-                for (Map.Entry<String, List<LevelCompletion>> levelCompletionsEntry : levelCompletionsMap.entrySet()) {
-                    List<LevelCompletion> levelCompletionsList = levelCompletionsEntry.getValue();
-                    Level level = Parkour.getLevelManager().get(levelCompletionsEntry.getKey());
+                // primitive types
+                int prestiges = playerStats.getPrestiges();
+                int infinitePKScore = playerStats.getInfinitePKScore();
+                int totalCompletions = playerStats.getTotalLevelCompletions();
+                int raceWins = playerStats.getRaceWins();
+                int raceLosses = playerStats.getRaceLosses();
+                float raceWinRate = playerStats.getRaceWinRate();
+                double balance = Parkour.getEconomy().getBalance(player);
 
-                    if (level != null) {
+                // get most completed level and its quickest completion
+                Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
+                List<LevelCompletion> quickestCompletion = null;
+                if (mostCompletedLevel != null)
+                    quickestCompletion = playerStats.getQuickestCompletions(mostCompletedLevel.getName());
 
-                        LevelCompletion levelCompletion = levelCompletionsList.get(0);
 
-                        if (levelCompletion.getCompletionTimeElapsed() > 0) {
-                            String levelCompletions = Utils.translate(level.getFormattedTitle() + "  &2"
-                                        + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s");
-                            player.sendMessage(levelCompletions);
-                        }
-                    }
-                }
             }
         } else {
             sender.sendMessage(Utils.translate("&2/stats <infinite/levels/players/clans/levelName> &7View stats"));

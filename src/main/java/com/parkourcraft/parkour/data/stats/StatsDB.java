@@ -4,10 +4,9 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.perks.PerksDB;
-import com.parkourcraft.parkour.data.rank.Rank;
+import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.parkourcraft.parkour.utils.Utils;
 
 import java.util.*;
 
@@ -26,7 +25,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions",
+                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -70,14 +69,25 @@ public class StatsDB {
                 int completions = Integer.parseInt(playerResult.get("level_completions"));
                 playerStats.setTotalLevelCompletions(completions);
 
+                // set total race wins
+                int raceWins = Integer.parseInt(playerResult.get("race_wins"));
+                playerStats.setRaceWins(raceWins);
+
+                // set total race losses
+                int raceLosses = Integer.parseInt(playerResult.get("race_losses"));
+                playerStats.setRaceLosses(raceLosses);
+
+                // set race win rate
+                playerStats.setRaceWinRate(Float.parseFloat(Utils.formatNumber((double) raceWins / raceLosses)));
+
                 // set multiplier percentage
                 if (playerStats.getPrestiges() > 0) {
-                    double newPercentage = prestiges * 5;
+                    int newPercentage = prestiges * 5;
 
                     if (newPercentage >= Parkour.getSettingsManager().max_prestige_multiplier)
                         newPercentage = Parkour.getSettingsManager().max_prestige_multiplier;
 
-                    double newMultiplier = 1.00 + (newPercentage / 100);
+                    float newMultiplier = (float) (1.00 + (newPercentage / 100));
 
                     playerStats.setPrestigeMultiplier(newMultiplier);
                 }

@@ -1,4 +1,4 @@
-package com.parkourcraft.parkour.data.rank;
+package com.parkourcraft.parkour.data.ranks;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;

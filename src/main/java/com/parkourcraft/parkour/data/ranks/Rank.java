@@ -1,4 +1,4 @@
-package com.parkourcraft.parkour.data.rank;
+package com.parkourcraft.parkour.data.ranks;
 
 public class Rank {
 

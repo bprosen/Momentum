@@ -1,10 +1,10 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.rank.Rank;
-import com.parkourcraft.parkour.data.rank.RanksManager;
-import com.parkourcraft.parkour.data.rank.RanksDB;
-import com.parkourcraft.parkour.data.rank.RanksYAML;
+import com.parkourcraft.parkour.data.ranks.Rank;
+import com.parkourcraft.parkour.data.ranks.RanksManager;
+import com.parkourcraft.parkour.data.ranks.RanksDB;
+import com.parkourcraft.parkour.data.ranks.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.parkourcraft.parkour.utils.Utils;
@@ -145,12 +145,12 @@ public class RankCMD implements CommandExecutor {
                                 victimStats.setPrestiges(newPrestige);
 
                                 if (victimStats.getPrestiges() > 0) {
-                                    double prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * victimStats.getPrestiges();
+                                    float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * victimStats.getPrestiges();
 
                                     if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
                                         prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
 
-                                    prestigeMultiplier = 1.00 + (prestigeMultiplier / 100);
+                                    prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
 
                                     victimStats.setPrestigeMultiplier(prestigeMultiplier);
                                 }

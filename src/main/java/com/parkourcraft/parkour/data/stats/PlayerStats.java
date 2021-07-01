@@ -2,8 +2,7 @@ package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
-import com.parkourcraft.parkour.data.rank.Rank;
-import org.bukkit.Bukkit;
+import com.parkourcraft.parkour.data.ranks.Rank;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -26,7 +25,10 @@ public class PlayerStats {
     private boolean inRace = false;
     private Rank rank;
     private int prestiges = 0;
-    private double prestigeMultiplier = 1.00;
+    private int raceWins = 0;
+    private int raceLosses = 0;
+    private float raceWinRate = 0.00f;
+    private float prestigeMultiplier = 1.00f;
     private int rankUpStage;
     private int infinitePKScore = 0;
     private boolean inInfinitePK = false;
@@ -85,6 +87,18 @@ public class PlayerStats {
     public boolean inRace() {
         return inRace;
     }
+
+    public int getRaceWins() { return raceWins; }
+
+    public void setRaceWins(int raceWins) { this.raceWins = raceWins; }
+
+    public int getRaceLosses() { return raceLosses; }
+
+    public void setRaceLosses(int raceLosses) { this.raceLosses = raceLosses; }
+
+    public float getRaceWinRate() { return raceWinRate; }
+
+    public void setRaceWinRate(float raceWinRate) { this.raceWinRate = raceWinRate; }
 
     //
     // Level Section
@@ -205,9 +219,9 @@ public class PlayerStats {
 
     public void setPrestiges(int prestiges) { this.prestiges = prestiges; }
 
-    public double getPrestigeMultiplier() { return prestigeMultiplier; }
+    public float getPrestigeMultiplier() { return prestigeMultiplier; }
 
-    public void setPrestigeMultiplier(double prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
+    public void setPrestigeMultiplier(float prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
 
     //
     // Practice Mode Section
@@ -253,6 +267,22 @@ public class PlayerStats {
     //
     // Completions Section
     //
+    public String getMostCompletedLevel() {
+        int mostCompletions = -1;
+        String mostCompletedLevel = null;
+
+        for (Map.Entry<String, List<LevelCompletion>> entry : levelCompletionsMap.entrySet())
+            if (entry.getValue().size() > mostCompletions) {
+                mostCompletions = entry.getValue().size();
+                mostCompletedLevel = entry.getKey();
+            }
+
+        if (mostCompletions > 0)
+            return mostCompletedLevel;
+
+        return null;
+    }
+
     public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
         if (levelName != null && levelCompletion != null) {
             if (!levelCompletionsMap.containsKey(levelName))

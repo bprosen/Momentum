@@ -1,7 +1,6 @@
-package com.parkourcraft.parkour.data.rank;
+package com.parkourcraft.parkour.data.ranks;
 
 import com.parkourcraft.parkour.Parkour;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;

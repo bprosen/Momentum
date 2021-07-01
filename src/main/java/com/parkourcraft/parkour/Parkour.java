@@ -14,7 +14,7 @@ import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.perks.PerkManager;
 import com.parkourcraft.parkour.data.plots.PlotsManager;
 import com.parkourcraft.parkour.data.races.RaceManager;
-import com.parkourcraft.parkour.data.rank.RanksManager;
+import com.parkourcraft.parkour.data.ranks.RanksManager;
 import com.parkourcraft.parkour.gameplay.SpectatorHandler;
 import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.gameplay.*;

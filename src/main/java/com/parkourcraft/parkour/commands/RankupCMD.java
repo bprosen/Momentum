@@ -2,7 +2,7 @@ package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.menus.MenuManager;
-import com.parkourcraft.parkour.data.rank.RanksYAML;
+import com.parkourcraft.parkour.data.ranks.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.command.Command;
