@@ -388,7 +388,7 @@ public class InfinitePKManager {
             if (lowestScore == 0 || infinitePKLBPosition.getScore() < lowestScore)
                 lowestScore = infinitePKLBPosition.getScore();
 
-        if (lowestScore < score)
+        if (lowestScore <= score)
             return true;
         return false;
     }

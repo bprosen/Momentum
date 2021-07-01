@@ -298,7 +298,7 @@ public class RaceManager {
             if (lowestWins == 0 || raceLBPosition.getWins() < lowestWins)
                 lowestWins = raceLBPosition.getWins();
 
-        if (lowestWins < score)
+        if (lowestWins <= score)
             return true;
         return false;
     }
