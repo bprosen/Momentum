@@ -209,6 +209,7 @@ public class RaceManager {
             // update winner wins
             winnerStats.endedRace();
             winnerStats.setRaceWins(winnerStats.getRaceWins() + 1);
+            RaceDB.updateRaceWins(winnerStats.getUUID(), winnerStats.getRaceWins());
 
             // set winner race win rate
             if (winnerStats.getRaceLosses() > 0)
@@ -216,15 +217,13 @@ public class RaceManager {
             else
                 winnerStats.setRaceWinRate(winnerStats.getRaceWins());
 
-            RaceDB.updateRaceWins(winnerStats.getUUID(), winnerStats.getRaceWins());
-
             // update loser losses
             loserStats.endedRace();
             loserStats.setRaceLosses(loserStats.getRaceLosses() + 1);
+            RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
+
             // set loser race win rate (will be > 0, so no need to check)
             loserStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) loserStats.getRaceWins() / loserStats.getRaceLosses())));
-
-            RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
 
             // load leaderboard if they will have a lb position
             if (scoreWillBeLB(winnerStats.getRaceWins()) ||
@@ -272,7 +271,13 @@ public class RaceManager {
 
                 int wins = Integer.parseInt(scoreResult.get("race_wins"));
                 int losses = Integer.parseInt(scoreResult.get("race_losses"));
-                float winRate = Float.parseFloat(Utils.formatDecimal((double) wins / losses));
+
+                // avoid divided by 0 error
+                float winRate;
+                if (losses > 0)
+                    winRate = Float.parseFloat(Utils.formatDecimal((double) wins / losses));
+                else
+                    winRate = wins;
 
                 leaderboard.add(
                         new RaceLBPosition(
