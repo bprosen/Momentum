@@ -5,6 +5,8 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +66,43 @@ public class RatingDB {
             }
         }
         return hasRated;
+    }
+
+    public static HashMap<Integer, List<String>> getAllLevelRaters(int levelID) {
+
+        HashMap<Integer, List<String>> ratings = new HashMap<>();
+        for (int i = 5; i >= 0; i--) {
+
+            List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
+                    "ratings",
+                    "player_name",
+                    " WHERE level_id=" + levelID + " AND rating=" + i
+            );
+
+            List<String> names = new ArrayList<>();
+            for (Map<String, String> ratingResult : ratingResults)
+                names.add(ratingResult.get("player_name"));
+
+            ratings.put(i, names);
+            names.clear();
+        }
+        return ratings;
+    }
+
+    public static List<String> getSpecificLevelRaters(int levelID, int rating) {
+
+        List<String> ratings = new ArrayList<>();
+
+        List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
+                "ratings",
+                "player_name",
+                " WHERE level_id=" + levelID + " AND rating=" + rating
+        );
+
+        for (Map<String, String> ratingResult : ratingResults)
+            ratings.add(ratingResult.get("player_name"));
+
+        return ratings;
     }
 
     public static boolean hasRatedLevelFromName(String raterName, int levelID) {

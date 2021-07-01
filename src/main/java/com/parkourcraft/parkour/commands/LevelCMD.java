@@ -19,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -486,7 +487,6 @@ public class LevelCMD implements CommandExecutor {
                     Level level = levelManager.get(levelName);
 
                     if (level != null) {
-
                         if (RatingDB.hasRatedLevelFromName(playerName, level.getID()))
 
                             sender.sendMessage(Utils.translate("&c" + playerName + " &7has rated &c" +
@@ -497,6 +497,64 @@ public class LevelCMD implements CommandExecutor {
 
                             sender.sendMessage(Utils.translate("&c" + playerName + " &7has not rated &c" +
                                     level.getFormattedTitle()));
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
+                } else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        if (a.length == 2) {
+                            HashMap<Integer, List<String>> ratings = RatingDB.getAllLevelRaters(level.getID());
+
+                            if (!ratings.isEmpty()) {
+                                // loop through list
+                                for (Map.Entry<Integer, List<String>> entry : ratings.entrySet()) {
+                                    String msg = "&2" + entry.getKey() + " &7-";
+                                    // loop through names
+                                    for (String playerName : entry.getValue()) {
+                                        if (!entry.getValue().get(entry.getValue().size() - 1).equalsIgnoreCase(playerName))
+                                            msg += " &a" + playerName + "&7,";
+                                        else
+                                            // no comma if last one
+                                            msg += " &a" + playerName;
+                                    }
+                                    sender.sendMessage(Utils.translate(msg));
+                                }
+                            } else {
+                                sender.sendMessage(Utils.translate("&cNobody has rated this level"));
+                            }
+                        // if they put the optional specification arg
+                        } else if (a.length == 3) {
+                            if (Utils.isInteger(a[2])) {
+                                int rating = Integer.parseInt(a[2]);
+                                // make sure it is between 0 and 5
+                                if (rating >= 0 && rating <= 5) {
+
+                                    List<String> ratings = RatingDB.getSpecificLevelRaters(level.getID(), rating);
+                                    // if it is empty
+                                    if (!ratings.isEmpty()) {
+                                        String msg = "&2" + ratings + " &7-";
+
+                                        for (String playerName : ratings) {
+                                            if (!ratings.get(ratings.size() - 1).equalsIgnoreCase(playerName))
+                                                msg += " &a" + playerName + "&7,";
+                                            else
+                                                // no comma if last one
+                                                msg += " &a" + playerName;
+                                        }
+                                        sender.sendMessage(Utils.translate(msg));
+                                    } else {
+                                        sender.sendMessage(Utils.translate("&cNobody has rated this level"));
+                                    }
+                                } else {
+                                    sender.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
+                                }
+                            } else {
+                                sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an Integer"));
+                            }
+                        }
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
@@ -624,6 +682,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("addrating"));
         sender.sendMessage(getHelp("removerating"));
         sender.sendMessage(getHelp("hasrated"));
+        sender.sendMessage(getHelp("listratings"));
         sender.sendMessage(getHelp("togglewater"));
         sender.sendMessage(getHelp("rename"));
         sender.sendMessage(getHelp("delcompletion"));
@@ -672,6 +731,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name");
             case "hasrated":
                 return Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating");
+            case "listratings":
+                return Utils.translate("&a/level listratings <level> [rating (0-5)] &7Tells you all the ratings for a level with optional 0-5 specification");
             case "togglewater":
                 return Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level");
             case "rename":
