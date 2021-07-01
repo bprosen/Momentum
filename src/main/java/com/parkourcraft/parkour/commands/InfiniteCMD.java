@@ -54,7 +54,7 @@ public class InfiniteCMD implements CommandExecutor {
 
                     if (lbPosition != null) {
                         player.sendMessage(Utils.translate(
-                                "&c" + lbPosition.getName() + " &7is at &6Spot " + position + " &7with a score of &6" + lbPosition.getScore())
+                                "&c" + lbPosition.getName() + " &7is at &6spot " + position + " &7with a score of &6" + lbPosition.getScore())
                         );
                     } else {
                         player.sendMessage(Utils.translate("&7Something went wrong... invalid position &6" + position));

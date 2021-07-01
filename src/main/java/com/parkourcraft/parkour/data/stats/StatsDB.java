@@ -79,7 +79,7 @@ public class StatsDB {
 
                 // set race win rate
                 if (raceLosses > 0)
-                    playerStats.setRaceWinRate(Float.parseFloat(Utils.formatNumber((double) raceWins / raceLosses)));
+                    playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses)));
                 else
                     playerStats.setRaceWinRate(raceWins);
 

@@ -58,7 +58,7 @@ public class Utils {
         double newAmount = Double.valueOf(new BigDecimal(amount).toPlainString());
         // cannot cast java.lang.Double, need to cast primitive type
         int intAmount = (int) newAmount;
-        // this makes it seperate digits by commands and .2 means round decimal by 2 places
+        // this makes it seperate digits by commas
         return String.format("%,d", intAmount);
     }
 

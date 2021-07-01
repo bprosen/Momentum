@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.races.RaceLBPosition;
 import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -43,7 +44,7 @@ public class StatsCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getInfinitePKScore())));
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cNo infinite leaderboard positions found"));
+                    sender.sendMessage(Utils.translate("&cNo infinite leaderboard positions found or not loaded"));
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("levels")) {
 
@@ -133,14 +134,45 @@ public class StatsCMD implements CommandExecutor {
 
                         if (level != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                               lbPositionNum + " &9" +
-                                               level.getRating() + " &1" +
-                                               level.getFormattedTitle()));
+                                    lbPositionNum + " &9" +
+                                    level.getRating() + " &1" +
+                                    level.getFormattedTitle()));
                             lbPositionNum++;
                         }
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&cTop Rated leaderboard not fully loaded"));
+                }
+            // race lb
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("races")) {
+
+                LinkedHashSet<RaceLBPosition> leaderboard = Parkour.getRaceManager().getLeaderboard();
+
+                if (!leaderboard.isEmpty()) {
+
+                    sender.sendMessage(Utils.translate("&8Races &7Leaderboard"));
+
+                    int position = 1;
+                    for (RaceLBPosition lbPosition : leaderboard) {
+                        if (lbPosition != null) {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                    position + " &8" +
+                                    lbPosition.getWins() + " &7" +
+                                    lbPosition.getName() + " &8(" +
+                                    lbPosition.getWinRate() + ")"));
+                        }
+                        position++;
+                    }
+
+                    if (sender instanceof Player) {
+                        Player player = (Player) sender;
+                        PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
+                        sender.sendMessage(Utils.translate("&7Your Total Wins/Win Rate &8" +
+                                Utils.formatNumber(playerStats.getRaceWins()) + "&7/&8" +
+                                Utils.formatDecimal(playerStats.getRaceWinRate())));
+                    }
+                } else {
+                    sender.sendMessage(Utils.translate("&cNo race leaderboard positions found or not loaded yet"));
                 }
             // level lb
             } else {

@@ -23,7 +23,12 @@ public class RaceManager {
     private LinkedHashSet<RaceLBPosition> raceLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_race_leaderboard_size);
 
     public RaceManager() {
-        loadLeaderboard();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadLeaderboard();
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     public void startRace(Player player1, Player player2, boolean bet, double betAmount) {
@@ -207,7 +212,7 @@ public class RaceManager {
 
             // set winner race win rate
             if (winnerStats.getRaceLosses() > 0)
-                winnerStats.setRaceWinRate(Float.parseFloat(Utils.formatNumber((double) winnerStats.getRaceWins() / winnerStats.getRaceLosses())));
+                winnerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) winnerStats.getRaceWins() / winnerStats.getRaceLosses())));
             else
                 winnerStats.setRaceWinRate(winnerStats.getRaceWins());
 
@@ -217,7 +222,7 @@ public class RaceManager {
             loserStats.endedRace();
             loserStats.setRaceLosses(loserStats.getRaceLosses() + 1);
             // set loser race win rate (will be > 0, so no need to check)
-            loserStats.setRaceWinRate(Float.parseFloat(Utils.formatNumber((double) loserStats.getRaceWins() / loserStats.getRaceLosses())));
+            loserStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) loserStats.getRaceWins() / loserStats.getRaceLosses())));
 
             RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
 
@@ -237,7 +242,7 @@ public class RaceManager {
     public void loadLeaderboard() {
         try {
 
-            LinkedHashSet<RaceLBPosition> leaderboard = getRaceLeaderboard();
+            LinkedHashSet<RaceLBPosition> leaderboard = getLeaderboard();
             leaderboard.clear();
 
             List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
@@ -256,7 +261,7 @@ public class RaceManager {
 
                 int wins = Integer.parseInt(scoreResult.get("race_wins"));
                 int losses = Integer.parseInt(scoreResult.get("race_losses"));
-                float winRate = Float.parseFloat(Utils.formatNumber((double) wins / losses));
+                float winRate = Float.parseFloat(Utils.formatDecimal((double) wins / losses));
 
                 leaderboard.add(
                         new RaceLBPosition(
@@ -282,5 +287,5 @@ public class RaceManager {
         return runningRaceList;
     }
 
-    public LinkedHashSet<RaceLBPosition> getRaceLeaderboard() { return raceLeaderboard; }
+    public LinkedHashSet<RaceLBPosition> getLeaderboard() { return raceLeaderboard; }
 }
