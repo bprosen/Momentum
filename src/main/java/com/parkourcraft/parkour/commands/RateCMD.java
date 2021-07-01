@@ -35,10 +35,14 @@ public class RateCMD implements CommandExecutor {
 
                     if (playerStats.getLevelCompletionsCount(levelName) > 0) {
                         if (!RatingDB.hasRatedLevel(player.getUniqueId().toString(), level.getID())) {
+                            if (rating >= 0 && rating <= 5) {
 
-                            level.addRatingAndCalc(rating);
-                            RatingDB.addRating(player, level, rating);
-                            player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + " &7a &6" + rating + "&7! Thank you for rating!"));
+                                level.addRatingAndCalc(rating);
+                                RatingDB.addRating(player, level, rating);
+                                player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + " &7a &6" + rating + "&7! Thank you for rating!"));
+                            } else {
+                                player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
+                            }
                         } else {
                             player.sendMessage(Utils.translate("&cYou have already rated this level"));
                         }
