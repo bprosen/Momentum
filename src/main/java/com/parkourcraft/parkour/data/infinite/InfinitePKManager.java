@@ -24,7 +24,7 @@ public class InfinitePKManager {
     }
 
     public void startScheduler() {
-        // run a check every 3 seconds to stop them from continuing if they fall too far
+        // run a check every 2 seconds to stop them from continuing if they fall too far
         new BukkitRunnable() {
             @Override
             public void run() {
