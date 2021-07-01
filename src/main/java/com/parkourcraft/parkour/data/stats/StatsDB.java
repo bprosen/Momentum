@@ -260,7 +260,7 @@ public class StatsDB {
 
     public static void loadLeaderboards() {
         for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet()) {
-            if (entry.getValue() != null)
+            if (entry.getValue() != null && entry.getKey() != null)
                 loadLeaderboard(entry.getValue());
         }
     }
