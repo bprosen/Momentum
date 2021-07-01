@@ -135,7 +135,7 @@ public class Scoreboard {
                             ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
                             "&6 " + level.getReward());
 
-                } else if (playerStats.getPrestiges() > 0)
+                } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
                     rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
                 else
                     rewardString = Utils.translate("&6" + level.getReward());
