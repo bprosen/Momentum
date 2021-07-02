@@ -336,19 +336,12 @@ public class InfinitePKManager {
                             " ORDER BY infinitepk_score DESC" +
                             " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
-            outer: for (Map<String, String> scoreResult : scoreResults) {
-
-                // quick loop to make sure there are no duplicates
-                for (InfinitePKLBPosition infinitePK : leaderboard)
-                    if (infinitePK.getName().equalsIgnoreCase(scoreResult.get("player_name")))
-                        continue outer;
-
+            for (Map<String, String> scoreResult : scoreResults) {
                 leaderboard.add(
                         new InfinitePKLBPosition(
                                 scoreResult.get("uuid"),
                                 scoreResult.get("player_name"),
-                                Integer.parseInt(scoreResult.get("infinitepk_score")),
-                                leaderboard.size() + 1)
+                                Integer.parseInt(scoreResult.get("infinitepk_score")))
                 );
             }
         } catch (Exception e) {

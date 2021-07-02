@@ -6,7 +6,7 @@ public class InfinitePKLBPosition {
     private String playerName;
     private int score;
 
-    public InfinitePKLBPosition(String playerUUID, String playerName, int score, int position) {
+    public InfinitePKLBPosition(String playerUUID, String playerName, int score) {
         this.playerUUID = playerUUID;
         this.playerName = playerName;
         this.score = score;
