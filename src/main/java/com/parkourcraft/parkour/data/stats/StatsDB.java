@@ -2,11 +2,13 @@ package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
+import com.parkourcraft.parkour.data.clans.ClansManager;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.perks.PerksDB;
 import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -43,11 +45,23 @@ public class StatsDB {
                     playerStats.setSpectatable(false);
 
                 int clanID = Integer.parseInt(playerResult.get("clan_id"));
-
+                ClansManager clansManager = Parkour.getClansManager();
                 if (clanID > 0) {
-                    Clan clan = Parkour.getClansManager().get(clanID);
-                    if (clan != null)
+                    Clan clan = clansManager.get(clanID);
+
+                    if (clan != null) {
                         playerStats.setClan(clan);
+
+                        // notify members of joining
+                        String memberRole = "Member";
+                        if (playerStats.getClan().getOwner().getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
+                            memberRole = "Owner";
+
+                        // Bukkit#getPlayer() is async safe :)
+                        clansManager.sendMessageToMembers(playerStats.getClan(),
+                                "&eClan " + memberRole + " &6" + playerStats.getPlayerName() + " &7joined",
+                                playerStats.getPlayerName());
+                    }
                 }
 
                 int rankID = Integer.parseInt(playerResult.get("rank_id"));

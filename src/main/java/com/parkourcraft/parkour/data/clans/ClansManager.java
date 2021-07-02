@@ -138,7 +138,7 @@ public class ClansManager {
             ClansDB.setClanXP(totalXP, clan.getID());
             sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
                                 Utils.formatNumber(clanXP) + " &eXP for your clan!" +
-                                " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()));
+                                " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()), null);
 
         // level them up
         } else if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
@@ -160,7 +160,7 @@ public class ClansManager {
                 }
             }
             clan.setLevel(newLevel);
-            sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel);
+            sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
 
             // add rest of xp after leveling up
             ClansDB.setClanLevel(newLevel, clan.getID());
@@ -178,7 +178,7 @@ public class ClansManager {
 
             sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
                     Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
-                    Utils.formatNumber(clanXPNeeded) + "&c)");
+                    Utils.formatNumber(clanXPNeeded) + "&c)", null);
         }
         // update total gained xp
         ClansDB.setTotalGainedClanXP(clan.getTotalGainedXP() + clanXP, clan.getID());
@@ -213,13 +213,16 @@ public class ClansManager {
         }
     }
 
-    public void sendMessageToMembers(Clan clan, String msg) {
+    public void sendMessageToMembers(Clan clan, String msg, String dontSendTo) {
         for (ClanMember clanMember : clan.getMembers()) {
             // make sure they are online
             Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
 
             if (clanPlayer != null)
-                clanPlayer.sendMessage(Utils.translate(msg));
+                if (dontSendTo != null && clanPlayer.getName().equalsIgnoreCase(dontSendTo))
+                    continue;
+                else
+                    clanPlayer.sendMessage(Utils.translate(msg));
         }
     }
 
@@ -245,4 +248,6 @@ public class ClansManager {
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 10, 20 * 180);
     }
+
+    public HashMap<String, Clan> getClans() { return clans; }
 }
