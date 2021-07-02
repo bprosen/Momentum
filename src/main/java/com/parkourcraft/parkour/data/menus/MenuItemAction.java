@@ -140,12 +140,10 @@ public class MenuItemAction {
         if (!playerStats.inRace()) {
             if (!level.getName().equalsIgnoreCase(playerStats.getLevel())) {
                 if (level.hasRequiredLevels(playerStats)) {
-                    if (level.hasPermissionNode()) {
-                        if (!player.hasPermission(level.getRequiredPermissionNode())) {
-                            player.closeInventory();
-                            player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
-                            return;
-                        }
+                    if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
+                        player.closeInventory();
+                        player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
+                        return;
                     }
 
                     player.closeInventory();
