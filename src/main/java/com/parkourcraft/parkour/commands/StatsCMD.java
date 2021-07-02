@@ -159,7 +159,7 @@ public class StatsCMD implements CommandExecutor {
                         if (lbPosition != null) {
 
                             // just for my sanity of proper grammar
-                            String winMsg = "Win";
+                            String winMsg = "win";
                             if (lbPosition.getWins() > 1)
                                 winMsg += "s";
 
