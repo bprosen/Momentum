@@ -77,6 +77,13 @@ public class StatsDB {
                 int raceLosses = Integer.parseInt(playerResult.get("race_losses"));
                 playerStats.setRaceLosses(raceLosses);
 
+                // get total count of how many levels they've rated
+                int ratedLevelsCount = Integer.parseInt(
+                        DatabaseQueries.getResults("ratings", "COUNT(*)",
+                                " WHERE player_name='" + playerStats.getPlayerName() + "'")
+                                .get(0).get("COUNT(*)"));
+                playerStats.setRatedLevelsCount(ratedLevelsCount);
+
                 // set race win rate
                 if (raceLosses > 0)
                     playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses)));
@@ -186,6 +193,14 @@ public class StatsDB {
                     Long.parseLong(completionResult.get("date")),
                     Long.parseLong(completionResult.get("time_taken"))
             );
+
+        // get individual levels beaten by looping through list
+        int individualLevelsBeaten = 0;
+        for (Level level : Parkour.getLevelManager().getLevels().values())
+            if (playerStats.getLevelCompletionsCount(level.getName()) > 0)
+                individualLevelsBeaten++;
+
+        playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
     }
 
     public static void insertCompletion(PlayerStats playerStats, Level level, LevelCompletion levelCompletion) {

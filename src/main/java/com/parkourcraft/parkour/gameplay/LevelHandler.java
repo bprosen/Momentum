@@ -71,6 +71,10 @@ public class LevelHandler {
 
         LevelManager levelManager = Parkour.getLevelManager();
 
+        // if they have not completed this individual level, then add
+        if (playerStats.getLevelCompletionsCount(levelName) < 1)
+            playerStats.setIndividualLevelsBeaten(playerStats.getIndividualLevelsBeaten() + 1);
+
         Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
         LevelCompletion levelCompletion = new LevelCompletion(
                 System.currentTimeMillis(),

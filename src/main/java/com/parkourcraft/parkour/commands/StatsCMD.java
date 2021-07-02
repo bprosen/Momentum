@@ -4,11 +4,13 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.races.RaceLBPosition;
 import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -228,13 +230,40 @@ public class StatsCMD implements CommandExecutor {
                 float raceWinRate = playerStats.getRaceWinRate();
                 double balance = Parkour.getEconomy().getBalance(player);
 
+                LevelManager levelManager = Parkour.getLevelManager();
+
                 // get most completed level and its quickest completion
-                Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
+                Level mostCompletedLevel = levelManager.get(playerStats.getMostCompletedLevel());
                 List<LevelCompletion> quickestCompletion = null;
                 if (mostCompletedLevel != null)
                     quickestCompletion = playerStats.getQuickestCompletions(mostCompletedLevel.getName());
 
+                // now send the entire stats board
+                player.sendMessage(Utils.translate("&c" + player.getDisplayName() + "&7's Stats"));
+                player.sendMessage("");
+                player.sendMessage(Utils.translate(" &6Coins &7" + ((int) balance)));
+                player.sendMessage(Utils.translate(" &cRank &7" + rank.getRankTitle()));
+                // only send if they have a clan
+                if (clan != null)
+                    player.sendMessage(Utils.translate(" &eClan &7" + clan.getTag() + " (" + clan.getMembers().size() + " Members)"));
+                player.sendMessage(Utils.translate(" &3Perks Gained/Total &7" + playerStats.getPerks().size() + "/" + Parkour.getPerkManager().getPerks().size()));
+                player.sendMessage(Utils.translate(" &5Best Infinite &7" + infinitePKScore));
+                player.sendMessage(Utils.translate(" &8Races W/L/WR &7" + raceWins + "/" + raceLosses + "/" + raceWinRate));
+                player.sendMessage("");
+                player.sendMessage(Utils.translate(" &2&lLevel Stats"));
+                player.sendMessage(Utils.translate("  &7-> &aTotal Level Completions &7" + Utils.shortStyleNumber(totalCompletions)));
+                player.sendMessage(Utils.translate("  &7-> &aRated Levels Count &7" + playerStats.getRatedLevelsCount()));
+                player.sendMessage(Utils.translate("  &7-> &aLevels Completed/Total &7" +
+                                   playerStats.getIndividualLevelsBeaten() + "/" + levelManager.getLevels().size()));
 
+                // only send if they have completed a level
+                if (quickestCompletion != null) {
+                    double completionTime = ((double) quickestCompletion.get(0).getCompletionTimeElapsed()) / 1000;
+
+                    player.sendMessage(Utils.translate("  &7-> &aMost Played Level &7" + mostCompletedLevel.getFormattedTitle()));
+                    player.sendMessage(Utils.translate("  &7-> &aYour Fastest " + mostCompletedLevel.getFormattedTitle() +
+                                                            " &7" + completionTime + "s"));
+                }
             }
         } else {
             sender.sendMessage(Utils.translate("&2/stats <infinite/levels/players/clans/levelName> &7View stats"));

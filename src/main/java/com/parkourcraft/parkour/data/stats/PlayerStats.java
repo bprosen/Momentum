@@ -27,9 +27,11 @@ public class PlayerStats {
     private int prestiges = 0;
     private int raceWins = 0;
     private int raceLosses = 0;
+    private int ratedLevelsCount;
     private float raceWinRate = 0.00f;
     private float prestigeMultiplier = 1.00f;
     private int rankUpStage;
+    private int individualLevelsBeaten;
     private int infinitePKScore = 0;
     private boolean inInfinitePK = false;
     private boolean eventParticipant = false;
@@ -136,6 +138,10 @@ public class PlayerStats {
     public int getTotalLevelCompletions() { return totalLevelCompletions; }
 
     public void setTotalLevelCompletions(int totalLevelCompletions) { this.totalLevelCompletions = totalLevelCompletions; }
+
+    public void setIndividualLevelsBeaten(int individualLevelsBeaten) { this.individualLevelsBeaten = individualLevelsBeaten; }
+
+    public int getIndividualLevelsBeaten() { return individualLevelsBeaten; }
 
     //
     // Spectator Section
@@ -348,6 +354,10 @@ public class PlayerStats {
         return perks.containsKey(perkName);
     }
 
+    public Map<String, Long> getPerks() {
+        return perks;
+    }
+
     //
     // Event Section
     //
@@ -362,4 +372,11 @@ public class PlayerStats {
     public void leftEvent() {
         eventParticipant = false;
     }
+
+    //
+    // Rated Levels Section
+    //
+    public void setRatedLevelsCount(int ratedLevelsCount) { this.ratedLevelsCount = ratedLevelsCount; }
+
+    public int getRatedLevelsCount() { return ratedLevelsCount; }
 }
