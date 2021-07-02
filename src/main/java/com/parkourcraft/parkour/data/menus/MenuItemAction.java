@@ -161,8 +161,6 @@ public class MenuItemAction {
                     if (playerStats.getPracticeLocation() != null)
                         playerStats.resetPracticeMode();
 
-                    playerStats.setLevel(level.getName());
-
                     if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
                         CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
                         Parkour.getCheckpointManager().teleportPlayer(player);
@@ -172,6 +170,7 @@ public class MenuItemAction {
                         player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                 + level.getFormattedTitle()));
                     }
+                    playerStats.setLevel(level.getName());
                     playerStats.disableLevelStartTime();
 
                     if (!level.getPotionEffects().isEmpty()) {
