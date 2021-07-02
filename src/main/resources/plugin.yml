@@ -65,3 +65,6 @@ commands:
   infinite:
     description: "PC-Parkour InfinitePK Command"
     aliases: [infinitepk, endless, endlesspk]
+  profile:
+    description: "PC-Parkour Profile Command"
+    aliases: [profilestats]

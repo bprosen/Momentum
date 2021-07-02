@@ -140,6 +140,7 @@ public class Parkour extends JavaPlugin {
         getCommand("rate").setExecutor(new RateCMD());
         getCommand("sword").setExecutor(new SwordCMD());
         getCommand("infinite").setExecutor(new InfiniteCMD());
+        getCommand("profile").setExecutor(new ProfileCMD());
     }
 
     private static void loadClasses() {
