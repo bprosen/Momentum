@@ -243,6 +243,7 @@ public class StatsCMD implements CommandExecutor {
                 player.sendMessage("");
                 player.sendMessage(Utils.translate(" &6Coins &7" + ((int) balance)));
                 player.sendMessage(Utils.translate(" &cRank &7" + rank.getRankTitle()));
+                player.sendMessage(Utils.translate(" &4Prestiges &7" + prestiges));
                 // only send if they have a clan
                 if (clan != null)
                     player.sendMessage(Utils.translate(" &eClan &7" + clan.getTag() + " (" + clan.getMembers().size() + " Members)"));
