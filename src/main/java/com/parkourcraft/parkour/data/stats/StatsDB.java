@@ -92,14 +92,14 @@ public class StatsDB {
 
                 // set multiplier percentage
                 if (playerStats.getPrestiges() > 0) {
-                    int newPercentage = prestiges * 5;
+                    float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
 
-                    if (newPercentage >= Parkour.getSettingsManager().max_prestige_multiplier)
-                        newPercentage = Parkour.getSettingsManager().max_prestige_multiplier;
+                    if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
+                        prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
 
-                    float newMultiplier = (float) (1.00 + (newPercentage / 100));
+                    prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
 
-                    playerStats.setPrestigeMultiplier(newMultiplier);
+                    playerStats.setPrestigeMultiplier(prestigeMultiplier);
                 }
             }
         } else {
