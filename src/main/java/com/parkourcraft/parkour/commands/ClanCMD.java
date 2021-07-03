@@ -1,10 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.clans.Clan;
-import com.parkourcraft.parkour.data.clans.ClanMember;
-import com.parkourcraft.parkour.data.clans.ClansDB;
-import com.parkourcraft.parkour.data.clans.ClansYAML;
+import com.parkourcraft.parkour.data.clans.*;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -160,7 +157,7 @@ public class ClanCMD implements CommandExecutor {
                                     // update in db
                                     ClansDB.setClanLevel(newLevel, targetClan.getID());
                                     player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
-                                                                        " level to &6" + newLevel));
+                                            " level to &6" + newLevel));
                                 } else {
                                     player.sendMessage(Utils.translate("&cThat level does not exist!"));
                                 }
@@ -168,6 +165,21 @@ public class ClanCMD implements CommandExecutor {
                         } else {
                             player.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
                         }
+                    } else {
+                        sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                    }
+                } else if (a.length == 1 && a[0].equalsIgnoreCase("chatspy")) {
+                    if (player.hasPermission("pc-parkour.clans.chatspy")) {
+                        ClansManager clansManager = Parkour.getClansManager();
+
+                        clansManager.toggleChatSpy(player.getName());
+
+                        boolean chatSpy = clansManager.isInChatSpy(player.getName());
+                        String isCSOn = "&aOn";
+                        if (!chatSpy)
+                            isCSOn = "&cOff";
+
+                        player.sendMessage(Utils.translate("&7You have turned &6&lClan ChatSpy " + isCSOn));
                     } else {
                         sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
                     }
@@ -195,6 +207,19 @@ public class ClanCMD implements CommandExecutor {
                         }
                     } else {
                         sender.sendMessage(Utils.translate("&cYou cannot create a clan while in one"));
+                    }
+                } else if (a.length == 1 && a[0].equalsIgnoreCase("chat")) {
+                    if (clan != null) {
+                        ClansManager clansManager = Parkour.getClansManager();
+
+                        clansManager.toggleClanChat(player.getName(), clan);
+
+                        boolean clanChat = clansManager.isInClanChat(player.getName());
+                        String isCCOn = "&aOn";
+                        if (!clanChat)
+                            isCCOn = "&cOff";
+
+                        player.sendMessage(Utils.translate("&7You have turned &6&lClan Chat " + isCCOn));
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("changetag")) {
                     // Changes clan tag
@@ -507,6 +532,7 @@ public class ClanCMD implements CommandExecutor {
         sender.sendMessage(getHelp("disband"));
         sender.sendMessage(getHelp("changetag"));
         sender.sendMessage(getHelp("setowner"));
+        sender.sendMessage(getHelp("chat"));
 
         // send admin section
         if (sender instanceof Player) {
@@ -516,6 +542,7 @@ public class ClanCMD implements CommandExecutor {
                 sender.sendMessage(getHelp("setxp"));
                 sender.sendMessage(getHelp("settotalxp"));
                 sender.sendMessage(getHelp("delete"));
+                sender.sendMessage(getHelp("chatspy"));
             }
         }
     }
@@ -548,6 +575,10 @@ public class ClanCMD implements CommandExecutor {
                 return Utils.translate("&3/clan delete <clan>  &7Deletes the clan");
             case "settotalxp":
                 return Utils.translate("&3/clan settotalxp <clans>  &7Sets total XP of a clan");
+            case "chat":
+                return Utils.translate("&3/clan chat  &7Toggles clan chat");
+            case "chatspy":
+                return Utils.translate("&3/chat chatspy  &7Toggle clan chatspy");
         }
         return "";
     }

@@ -16,6 +16,8 @@ public class ClansManager {
 
     private HashMap<String, Clan> clans = new HashMap<>();
     private LinkedHashSet<Clan> clansLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
+    private HashMap<String, Clan> clanChat = new HashMap<>();
+    private Set<String> chatSpy = new HashSet<>();
 
     public ClansManager(Plugin plugin) {
         load();
@@ -249,5 +251,31 @@ public class ClansManager {
         }.runTaskTimerAsynchronously(plugin, 20 * 10, 20 * 180);
     }
 
+    public boolean isInClanChat(String playerName) {
+        return clanChat.containsKey(playerName);
+    }
+
+    public void toggleClanChat(String playerName, Clan clan) {
+        if (isInClanChat(playerName) || clan == null)
+            clanChat.remove(playerName);
+        else
+            clanChat.put(playerName, clan);
+    }
+
+    public boolean isInChatSpy(String playerName) {
+        return chatSpy.contains(playerName);
+    }
+
+    public void toggleChatSpy(String playerName) {
+        if (isInChatSpy(playerName))
+            chatSpy.remove(playerName);
+        else
+            chatSpy.add(playerName);
+    }
+
     public HashMap<String, Clan> getClans() { return clans; }
+
+    public HashMap<String, Clan> getClanChatMap() { return clanChat; }
+
+    public Set<String> getChatSpyMap() { return chatSpy; }
 }

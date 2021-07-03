@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.gameplay;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
+import com.parkourcraft.parkour.data.clans.ClansManager;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
 import com.parkourcraft.parkour.data.plots.Plot;
@@ -77,6 +78,7 @@ public class JoinLeaveHandler implements Listener {
         RaceManager raceManager = Parkour.getRaceManager();
         EventManager eventManager = Parkour.getEventManager();
         InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
+        ClansManager clansManager = Parkour.getClansManager();
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
@@ -104,5 +106,11 @@ public class JoinLeaveHandler implements Listener {
 
         if (playerStats.isInInfinitePK())
             infinitePKManager.endPK(player, true);
+
+        if (clansManager.isInClanChat(player.getName()))
+            clansManager.toggleClanChat(player.getName(), null);
+
+        if (clansManager.isInChatSpy(player.getName()))
+            clansManager.toggleChatSpy(player.getName());
     }
 }
