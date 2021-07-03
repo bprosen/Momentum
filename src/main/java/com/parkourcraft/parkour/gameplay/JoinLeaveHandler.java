@@ -107,10 +107,8 @@ public class JoinLeaveHandler implements Listener {
         if (playerStats.isInInfinitePK())
             infinitePKManager.endPK(player, true);
 
-        if (clansManager.isInClanChat(player.getName()))
-            clansManager.toggleClanChat(player.getName(), null);
-
-        if (clansManager.isInChatSpy(player.getName()))
-            clansManager.toggleChatSpy(player.getName());
+        // do not need to check, as method already checks
+        clansManager.toggleClanChat(player.getName(), null);
+        clansManager.toggleChatSpy(player.getName());
     }
 }
