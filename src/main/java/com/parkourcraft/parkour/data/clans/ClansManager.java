@@ -266,8 +266,8 @@ public class ClansManager {
         return chatSpy.contains(playerName);
     }
 
-    public void toggleChatSpy(String playerName) {
-        if (isInChatSpy(playerName))
+    public void toggleChatSpy(String playerName, boolean disconnected) {
+        if (isInChatSpy(playerName) || disconnected)
             chatSpy.remove(playerName);
         else
             chatSpy.add(playerName);

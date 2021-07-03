@@ -109,6 +109,6 @@ public class JoinLeaveHandler implements Listener {
 
         // do not need to check, as method already checks
         clansManager.toggleClanChat(player.getName(), null);
-        clansManager.toggleChatSpy(player.getName());
+        clansManager.toggleChatSpy(player.getName(), true);
     }
 }

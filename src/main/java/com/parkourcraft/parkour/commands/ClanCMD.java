@@ -172,7 +172,7 @@ public class ClanCMD implements CommandExecutor {
                     if (player.hasPermission("pc-parkour.clans.chatspy")) {
                         ClansManager clansManager = Parkour.getClansManager();
 
-                        clansManager.toggleChatSpy(player.getName());
+                        clansManager.toggleChatSpy(player.getName(), false);
 
                         boolean chatSpy = clansManager.isInChatSpy(player.getName());
                         String isCSOn = "&aOn";
