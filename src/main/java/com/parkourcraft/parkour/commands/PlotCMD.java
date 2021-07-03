@@ -23,7 +23,8 @@ import java.util.HashMap;
 
 public class PlotCMD implements CommandExecutor {
 
-    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
+    private HashMap<String, BukkitTask> deletePlotConfirm = new HashMap<>();
+    private HashMap<String, BukkitTask> acceptPlotConfirm = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
@@ -50,19 +51,34 @@ public class PlotCMD implements CommandExecutor {
 
                 if (targetPlot != null) {
                     if (targetPlot.isSubmitted()) {
+                        // make sure they confirm it
+                        if (acceptPlotConfirm.containsKey(player.getName())) {
+                            acceptPlotConfirm.get(player.getName()).cancel();
+                            acceptPlotConfirm.remove(player.getName());
 
-                        targetPlot.desubmit();
-                        PlotsDB.toggleSubmittedFromName(plotOwner);
-                        Parkour.getPlotsManager().addPlotToMenu(targetPlot);
-                        player.sendMessage(Utils.translate("&7You accepted &4" + plotOwner + "&7's Plot"));
+                            targetPlot.desubmit();
+                            PlotsDB.toggleSubmittedFromName(plotOwner);
+                            player.sendMessage(Utils.translate("&7You accepted &4" + plotOwner + "&7's Plot"));
 
-                        Player target = Bukkit.getPlayer(plotOwner);
+                            Player target = Bukkit.getPlayer(plotOwner);
 
-                        if (target != null) {
-                            target.sendMessage(Utils.translate("&cYour plot has been accepted, congratulations!"));
+                            if (target != null)
+                                target.sendMessage(Utils.translate("&cYour plot has been accepted, congratulations!"));
+                            // otherwise, add timer and add to confirm map
+                        } else {
+                            player.sendMessage(Utils.translate("&7Are you someone with backend that will add this map?" +
+                                    " If so, type &c/plot submit accept " + plotOwner + " &7again"));
+
+                            acceptPlotConfirm.put(player.getName(), new BukkitRunnable() {
+                                public void run() {
+                                    // make sure they are still in it
+                                    if (acceptPlotConfirm.containsKey(player.getName())) {
+                                        acceptPlotConfirm.remove(player.getName());
+                                        player.sendMessage(Utils.translate("&cYou ran out of time to confirm"));
+                                    }
+                                }
+                            }.runTaskLater(Parkour.getPlugin(), 20 * 30));
                         }
-                    } else {
-                        player.sendMessage(Utils.translate("&4" + plotOwner + "&c's Plot is not submitted!"));
                     }
                 } else {
                     player.sendMessage(Utils.translate("&4" + plotOwner + " &cdoes not have a Plot"));
@@ -241,9 +257,9 @@ public class PlotCMD implements CommandExecutor {
 
         if (targetPlot != null) {
             // if they are confirming, delete it
-            if (confirmMap.containsKey(player.getName())) {
-                confirmMap.get(player.getName()).cancel();
-                confirmMap.remove(player.getName());
+            if (deletePlotConfirm.containsKey(player.getName())) {
+                deletePlotConfirm.get(player.getName()).cancel();
+                deletePlotConfirm.remove(player.getName());
 
                 Parkour.getPlotsManager().deletePlot(targetPlot);
                 if (!forceCleared)
@@ -380,11 +396,11 @@ public class PlotCMD implements CommandExecutor {
     }
 
     private void confirmPlayer(Player player) {
-        confirmMap.put(player.getName(), new BukkitRunnable() {
+        deletePlotConfirm.put(player.getName(), new BukkitRunnable() {
             public void run() {
                 // make sure they are still in it
-                if (confirmMap.containsKey(player.getName())) {
-                    confirmMap.remove(player.getName());
+                if (deletePlotConfirm.containsKey(player.getName())) {
+                    deletePlotConfirm.remove(player.getName());
                     player.sendMessage(Utils.translate("&cYou ran out of time to confirm"));
                 }
             }
