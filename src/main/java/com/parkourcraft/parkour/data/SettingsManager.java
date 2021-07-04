@@ -1,5 +1,7 @@
 package com.parkourcraft.parkour.data;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -54,6 +56,8 @@ public class SettingsManager {
     public int max_infinitepk_z;
     public int infinitepk_starting_y;
     public int min_infinitepk_y;
+    public String infinitepk_portal_region_name;
+    public Location infinitepk_portal_spawn;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -114,5 +118,17 @@ public class SettingsManager {
         prestige_multiplier_per_prestige = settings.getInt("prestiges.multiplier_per_prestige");
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
+
+        // load the respawn point for infinite pk if they enter from spawn
+        String infinitePK = settings.getString("infinitepk.portal_spawn");
+        // need to null check jic
+        if (infinitePK != null) {
+            String[] infinitePKSplit = infinitePK.split(":");
+
+            infinitepk_portal_spawn = new Location(Bukkit.getWorld(infinitePKSplit[0]),
+                    Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]),
+                    Float.parseFloat(infinitePKSplit[4]), Float.parseFloat(infinitePKSplit[5]));
+        }
+        infinitepk_portal_region_name = settings.getString("infinitepk.portal_region_name");
     }
 }

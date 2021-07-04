@@ -61,6 +61,8 @@ public class InfinitePK {
 
     public Location getOriginalLoc() { return originalLoc; }
 
+    public void setOriginalLoc(Location originalLoc) { this.originalLoc = originalLoc; }
+
     public Location getLastBlockLoc() { return lastBlockLoc; }
 
     public Location getCurrentBlockLoc() {

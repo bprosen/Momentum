@@ -6,6 +6,11 @@ import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -52,6 +57,21 @@ public class InfinitePKManager {
         InfinitePK infinitePK = new InfinitePK(player);
         participants.put(player.getName(), infinitePK);
         infinitePK.setCurrentBlockLoc(startingLoc);
+
+        // this section is specifically made for the portal at spawn and to do a different respawn location
+        ProtectedRegion region = WorldGuard.getRegionFromName(player.getWorld(), Parkour.getSettingsManager().infinitepk_portal_region_name);
+        if (region != null) {
+            Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_spawn;
+
+            // get min and max, then get middle from location
+            BlockVector regionMin = region.getMinimumPoint();
+            BlockVector regionMax = region.getMaximumPoint();
+            Location portalLoc = BukkitUtil.toLocation(player.getWorld(), regionMin.add((regionMax.subtract(regionMin)).divide(2)));
+
+            // if they are at spawn prior to teleport, change original loc to setting
+            if (respawnLoc != null && portalLoc.distance(player.getLocation()) <= 3)
+                infinitePK.setOriginalLoc(respawnLoc);
+        }
 
         // prepare block and teleport
         startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);

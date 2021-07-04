@@ -31,6 +31,10 @@ public class WorldGuard implements Listener {
         return (WorldGuardPlugin) plugin;
     }
 
+    public static ProtectedRegion getRegionFromName(World world, String name) {
+        return getWorldGuard().getRegionManager(world).getRegion(name);
+    }
+
     public static List<String> getRegions(Location location) {
         WorldGuardPlugin guard = getWorldGuard();
         RegionManager manager = guard.getRegionManager(location.getWorld());

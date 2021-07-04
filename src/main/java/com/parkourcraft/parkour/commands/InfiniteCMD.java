@@ -5,7 +5,9 @@ import com.parkourcraft.parkour.data.infinite.InfinitePKDB;
 import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
 import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -65,7 +67,6 @@ public class InfiniteCMD implements CommandExecutor {
             }
         // admin command for removing leaderboard position
         } else if (player.hasPermission("pc-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setscore"))) {
-
             if (Utils.isInteger(a[2])) {
                 if (InfinitePKDB.hasScore(a[1])) {
                     int score = Integer.parseInt(a[2]);
@@ -86,6 +87,19 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer"));
             }
+        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportalspawn"))) {
+
+            Location loc = player.getLocation();
+            String locString = player.getWorld().getName() + ":" +
+                    loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" +
+                    loc.getYaw() + ":" + loc.getPitch();
+
+            // set and save
+            ConfigManager configManager = Parkour.getConfigManager();
+            configManager.get("settings").set("infinitepk.portal_spawn", locString);
+            configManager.save("settings");
+            Parkour.getSettingsManager().load(configManager.get("settings"));
+            player.sendMessage(Utils.translate("&7You set the portal respawn to your location"));
         } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -119,11 +133,13 @@ public class InfiniteCMD implements CommandExecutor {
     }
 
     private void sendHelp(Player player) {
+        player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
         player.sendMessage(Utils.translate("&5/infinite score [IGN]  &7Tells you the score of yourself/someone else"));
         player.sendMessage(Utils.translate("&5/infinite score lb <position>  &7Tells you the score of someone in <position> on the leaderboard"));
 
         if (player.hasPermission("pc-parkour.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
+            player.sendMessage(Utils.translate("&5/infinite setportalspawn  &7Sets the portal spawn to your location"));
         }
 
         player.sendMessage(Utils.translate("&5/infinite help  &7Shows you this display"));
