@@ -148,7 +148,7 @@ public class MenuItemFormatter {
             if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
                 return getFeaturedLevel(menuItem);
             else
-                return createLevelItem(playerStats, level, menuItem, item);
+                return createLevelItem(playerStats, level, menuItem, item, false);
         }
         return item;
     }
@@ -203,94 +203,98 @@ public class MenuItemFormatter {
         if (levelName != null) {
             Level level = Parkour.getLevelManager().get(levelName);
 
-            return createLevelItem(playerStats, level, menuItem, item);
+            return createLevelItem(playerStats, level, menuItem, item, true);
         }
         return null;
     }
 
-    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item) {
+    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item, boolean rankUpLevel) {
 
         if (level != null) {
+
             ItemMeta itemMeta = item.getItemMeta();
+            String formattedTitle = level.getFormattedTitle();
 
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
-            // Item Title Section
-            String formattedTitle = level.getFormattedTitle();
-            if (level.getPlayersInLevel() > 0)
-                formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
+            // do not show all the below info if not a rankup level
+            if (!rankUpLevel) {
 
-            itemMeta.setDisplayName(formattedTitle);
+                // Click To Go and Reward Section
+                itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()
+                        .replace("&l", "").replace("&o", "")));
 
-            // Click To Go and Reward Section
-            itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()
-                    .replace("&l", "").replace("&o", "")));
+                // Item Title Section
+                if (level.getPlayersInLevel() > 0)
+                    formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
 
-            if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
-                             Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier()) + " Coin &7Reward"));
-              else
-                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
+                if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+                    itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
+                            Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier()) + " Coin &7Reward"));
+                else
+                    itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
 
-            if (level.getTotalCompletionsCount() > 0)
-                itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + " &7Completions"));
+                if (level.getTotalCompletionsCount() > 0)
+                    itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + " &7Completions"));
 
-            // only show rating if above 5
-            if (level.getRatingsCount() >= 5) {
-                itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
-                itemLore.add(Utils.translate("    &7Out of &e" + level.getRatingsCount() + " &7ratings"));
-            }
-
-            // Required Levels Section
-            if (level.getRequiredLevels().size() > 0) {
-                itemLore.add("");
-                itemLore.add(Utils.translate("&7Required Levels"));
-
-                for (String requiredLevelName : level.getRequiredLevels()) {
-                    Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
-
-                    if (requiredLevel != null)
-                        itemLore.add(Utils.translate("&7 - " + requiredLevel.getFormattedTitle()));
+                // only show rating if above 5
+                if (level.getRatingsCount() >= 5) {
+                    itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
+                    itemLore.add(Utils.translate("    &7Out of &e" + level.getRatingsCount() + " &7ratings"));
                 }
-            }
 
-            // Personal Level Stats Section
-            int levelCompletionsCount = playerStats.getLevelCompletionsCount(level.getName());
-            if (levelCompletionsCount > 0) {
-                // add glow effect to all levels they have completed
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                // Required Levels Section
+                if (level.getRequiredLevels().size() > 0) {
+                    itemLore.add("");
+                    itemLore.add(Utils.translate("&7Required Levels"));
 
-                itemLore.add("");
+                    for (String requiredLevelName : level.getRequiredLevels()) {
+                        Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
-                String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
-                if (levelCompletionsCount > 1)
-                    beatenMessage += "s";
+                        if (requiredLevel != null)
+                            itemLore.add(Utils.translate("&7 - " + requiredLevel.getFormattedTitle()));
+                    }
+                }
 
-                itemLore.add(beatenMessage);
+                // Personal Level Stats Section
+                int levelCompletionsCount = playerStats.getLevelCompletionsCount(level.getName());
+                if (levelCompletionsCount > 0) {
+                    // add glow effect to all levels they have completed
+                    itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-                List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(level.getName());
-                if (bestLevelCompletions.size() > 0) {
-                    itemLore.add(Utils.translate("&7 Best Personal Time"));
+                    itemLore.add("");
 
-                    double completionTime = ((double) bestLevelCompletions.get(0).getCompletionTimeElapsed()) / 1000;
-                    long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
+                    String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
+                    if (levelCompletionsCount > 1)
+                        beatenMessage += "s";
 
-                    itemLore.add(Utils.translate("  &2" + completionTime + "s"));
+                    itemLore.add(beatenMessage);
 
-                    // this makes it so it will not have " ago" if they just completed it
-                    String timeSinceString;
-                    if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
-                        timeSinceString = Utils.translate("   &7Just now");
-                    else
-                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
+                    List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(level.getName());
+                    if (bestLevelCompletions.size() > 0) {
+                        itemLore.add(Utils.translate("&7 Best Personal Time"));
 
-                    itemLore.add(timeSinceString);
+                        double completionTime = ((double) bestLevelCompletions.get(0).getCompletionTimeElapsed()) / 1000;
+                        long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
+
+                        itemLore.add(Utils.translate("  &2" + completionTime + "s"));
+
+                        // this makes it so it will not have " ago" if they just completed it
+                        String timeSinceString;
+                        if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
+                            timeSinceString = Utils.translate("   &7Just now");
+                        else
+                            timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
+
+                        itemLore.add(timeSinceString);
+                    }
                 }
             }
 
             // Sections over
+            itemMeta.setDisplayName(formattedTitle);
             itemMeta.setLore((itemLore));
             item.setItemMeta(itemMeta);
         }

@@ -144,6 +144,7 @@ public class RanksManager {
         int newId = playerStats.getRank().getRankId() + 1;
         Rank rank = get(newId);
         playerStats.setRank(rank);
+        playerStats.setRankUpStage(1);
         RanksDB.updateRank(player.getUniqueId(), newId);
         RanksDB.updateStage(player.getUniqueId(), 1);
         // play sound
