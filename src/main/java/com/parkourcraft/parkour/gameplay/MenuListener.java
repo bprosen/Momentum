@@ -6,10 +6,7 @@ import com.parkourcraft.parkour.data.menus.MenuItem;
 import com.parkourcraft.parkour.data.menus.MenuItemAction;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,6 +38,7 @@ public class MenuListener implements Listener {
 
                 if (menuItem != null) {
                     MenuItemAction.perform(player, menuItem);
+                    player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.05f, 2f);
                 } else {
                     // submitted plots section
                     String submittedPlotsTitle = Parkour.getMenuManager().getMenu("submitted-plots").getFormattedTitleBase();
@@ -86,6 +84,7 @@ public class MenuListener implements Listener {
             if (menu != null) {
                 player.openInventory(Parkour.getMenuManager().getInventory(menu.getName(), 1));
                 Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.05f, 2f);
             }
         }
     }

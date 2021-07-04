@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.menus;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
@@ -32,10 +33,12 @@ public class MenuPage {
     }
 
     void formatInventory(Player player, InventoryView inventory) {
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
         for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(
                     player,
-                    Parkour.getStatsManager().get(player),
+                    playerStats,
                     menuItem));
     }
 
