@@ -13,6 +13,7 @@ import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
@@ -76,6 +77,7 @@ public class LevelHandler {
             playerStats.setIndividualLevelsBeaten(playerStats.getIndividualLevelsBeaten() + 1);
 
         Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
+        String time = (((double) elapsedTime) / 1000) + "s";
         LevelCompletion levelCompletion = new LevelCompletion(
                 System.currentTimeMillis(),
                 elapsedTime
@@ -106,7 +108,6 @@ public class LevelHandler {
         }.runTaskAsynchronously(Parkour.getPlugin());
 
         if (!rankUpLevel) {
-
             if (playerStats.getClan() != null) {
                 // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
                 if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
@@ -127,28 +128,16 @@ public class LevelHandler {
             }
 
             String messageFormatted = level.getFormattedMessage(playerStats);
-            String time = (((double) elapsedTime) / 1000) + "s";
             if (elapsedTime > 0L && elapsedTime < 8388607L)
                 messageFormatted = messageFormatted.replace("%time%", time);
             else
                 messageFormatted = messageFormatted.replace("%time%", "-");
 
-            String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
-            if (elapsedTime > 0L && elapsedTime < 8388607L)
-                titleMessage += Utils.translate("&7 in &2" + time);
-
-            String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
-                    + level.getName() + " (rating from 0-5)");
-
             player.sendMessage(messageFormatted);
-            TitleAPI.sendTitle(
-                    player, 10, 60, 10,
-                    titleMessage,
-                    subTitleMessage
-            );
 
             // only broadcast if it is not a forced completion
             if (!forcedCompletion) {
+
                 // broadcast completed if it the featured level
                 if (level.isFeaturedLevel()) {
                     Bukkit.broadcastMessage(Utils.translate(
@@ -171,6 +160,26 @@ public class LevelHandler {
         if (!forcedCompletion) {
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());
+
+            // send title and sound if not rankup level
+            if (!rankUpLevel) {
+                String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
+                if (elapsedTime > 0L && elapsedTime < 8388607L)
+                    titleMessage += Utils.translate("&7 in &2" + time);
+
+                String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                        + level.getName() + " (rating from 0-5)");
+
+                TitleAPI.sendTitle(
+                        player, 10, 60, 10,
+                        titleMessage,
+                        subTitleMessage
+                );
+
+                // play sound
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.1f, 0f);
+            }
+
             List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());
 
             // if area they are teleporting to is empty

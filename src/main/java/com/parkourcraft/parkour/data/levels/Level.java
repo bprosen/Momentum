@@ -108,7 +108,7 @@ public class Level {
 
             returnMessage = returnMessage.replace(
                     "%completions%",
-                    Integer.toString(playerStats.getLevelCompletionsCount(name))
+                    Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(name))
             );
 
             return returnMessage;
