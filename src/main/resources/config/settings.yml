@@ -9,7 +9,7 @@ database:
 
 levels:
   message:
-    completion: "&7Rewarded &6%reward% Coins &7for %title% &7in &a%time% &2(&a%completions% Completions&2)"
+    completion: "&7Rewarded &6%reward% Coins &7for %title% &7in &a%time% &2(&a%completions%&2)"
     broadcast: "&a%player% &7has beaten %title%"
   featured_level_reward_multiplier: 1.50
   max_rated_levels_leaderboard_size: 10

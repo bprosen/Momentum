@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,6 +41,7 @@ public class InteractListener implements Listener {
                 event.setCancelled(true);
 
                 player.getInventory().removeItem(item);
+                player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
                 if (PlayerHider.containsPlayer(player)) {
                     PlayerHider.showPlayer(player, false);
 

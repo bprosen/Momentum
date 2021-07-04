@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -163,6 +164,14 @@ public class ClansManager {
             }
             clan.setLevel(newLevel);
             sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
+
+            // play level up sound to online clan members
+            for (ClanMember clanMember : clan.getMembers()) {
+                Player onlineMember = Bukkit.getPlayer(clanMember.getPlayerName());
+
+                if (onlineMember != null)
+                    onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
+            }
 
             // add rest of xp after leveling up
             ClansDB.setClanLevel(newLevel, clan.getID());

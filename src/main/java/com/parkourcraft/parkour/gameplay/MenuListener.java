@@ -38,7 +38,7 @@ public class MenuListener implements Listener {
 
                 if (menuItem != null) {
                     MenuItemAction.perform(player, menuItem);
-                    player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.05f, 2f);
+                    player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                 } else {
                     // submitted plots section
                     String submittedPlotsTitle = Parkour.getMenuManager().getMenu("submitted-plots").getFormattedTitleBase();
@@ -84,7 +84,7 @@ public class MenuListener implements Listener {
             if (menu != null) {
                 player.openInventory(Parkour.getMenuManager().getInventory(menu.getName(), 1));
                 Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
-                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.05f, 2f);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
             }
         }
     }

@@ -107,8 +107,13 @@ public class LevelHandler {
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
 
+        // used for playing sound!
+        int beforeClanLevel = -1;
+
         if (!rankUpLevel) {
             if (playerStats.getClan() != null) {
+                beforeClanLevel = playerStats.getClan().getLevel();
+
                 // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
                 if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
                     Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, level);
@@ -176,8 +181,9 @@ public class LevelHandler {
                         subTitleMessage
                 );
 
-                // play sound
-                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.1f, 0f);
+                // play sound if they did not level up their clan
+                if (!(beforeClanLevel > -1 && beforeClanLevel < playerStats.getClan().getLevel()))
+                    player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 0f);
             }
 
             List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());

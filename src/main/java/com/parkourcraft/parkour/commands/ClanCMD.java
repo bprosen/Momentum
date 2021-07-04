@@ -574,7 +574,7 @@ public class ClanCMD implements CommandExecutor {
             case "delete":
                 return Utils.translate("&3/clan delete <clan>  &7Deletes the clan");
             case "settotalxp":
-                return Utils.translate("&3/clan settotalxp <clans>  &7Sets total XP of a clan");
+                return Utils.translate("&3/clan settotalxp <clan>  &7Sets total XP of a clan");
             case "chat":
                 return Utils.translate("&3/clan chat  &7Toggles clan chat");
             case "chatspy":
