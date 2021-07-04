@@ -3,6 +3,7 @@ package com.parkourcraft.parkour.gameplay;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Time;
 import com.parkourcraft.parkour.utils.Utils;
@@ -135,35 +136,48 @@ public class Scoreboard {
 
                 // level section of scoreboard
             } else if (level != null) {
+                // change the entire scoreboard if it is a rankup level
+                if (level.isRankUpLevel()) {
+                    Rank rank = playerStats.getRank();
 
-                String rewardString;
-
-                // add title and adjust rewardstring if it is a featured level
-                if (level.isFeaturedLevel()) {
-                    board.add(formatSpacing(Utils.translate("&dFeatured Level")));
-
-                    // proper cast
-                    rewardString = Utils.translate("&c&m" +
-                            ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
-                            "&6 " + level.getReward());
-
-                } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                    rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
-                else
-                    rewardString = Utils.translate("&6" + level.getReward());
-
-
-                String title = level.getFormattedTitle();
-                board.add(formatSpacing(title));
-                board.add(formatSpacing(rewardString));
-
-                if (playerStats.getLevelStartTime() > 0) {
-                    double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-
-                    String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
-                    board.add(formatSpacing(timing));
+                    // null check their rank to avoid NPE and same with next rank
+                    if (rank != null) {
+                        Rank nextRank = Parkour.getRanksManager().get(rank.getRankId() + 1);
+                        if (nextRank != null) {
+                            board.add(formatSpacing(Utils.translate("&cRankup Level")));
+                            board.add(formatSpacing(Utils.translate("&7To &a" + nextRank.getRankTitle())));
+                        }
+                    }
                 } else {
-                    board.add(formatSpacing(Utils.translate("&7-")));
+                    // normal scoreboard
+                    String rewardString;
+
+                    // add title and adjust rewardstring if it is a featured level
+                    if (level.isFeaturedLevel()) {
+                        board.add(formatSpacing(Utils.translate("&dFeatured Level")));
+
+                        // proper cast
+                        rewardString = Utils.translate("&c&m" +
+                                ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
+                                "&6 " + level.getReward());
+
+                    } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+                        rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
+                    else
+                        rewardString = Utils.translate("&6" + level.getReward());
+
+                    String title = level.getFormattedTitle();
+                    board.add(formatSpacing(title));
+                    board.add(formatSpacing(rewardString));
+
+                    if (playerStats.getLevelStartTime() > 0) {
+                        double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+
+                        String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                        board.add(formatSpacing(timing));
+                    } else {
+                        board.add(formatSpacing(Utils.translate("&7-")));
+                    }
                 }
             }
 
