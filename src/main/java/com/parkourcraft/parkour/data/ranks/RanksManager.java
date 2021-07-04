@@ -147,11 +147,9 @@ public class RanksManager {
         RanksDB.updateRank(player.getUniqueId(), newId);
         RanksDB.updateStage(player.getUniqueId(), 1);
         // play sound
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2f, 0f);
 
-        Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
-        Bukkit.broadcastMessage("");
     }
 
     public void doPrestige(Player player) {
