@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.events;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.levels.LevelsYAML;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -75,7 +76,7 @@ public class Event {
 
                 List<Level> risingWaterLevels = Parkour.getLevelManager().getRisingWaterEventLevels();
                 eventLevel = risingWaterLevels.get(ran.nextInt(risingWaterLevels.size()));
-                currentWaterY = eventLevel.getStartLocation().getBlockY() - 10;
+                currentWaterY = eventLevel.getStartLocation().getBlockY() - LevelsYAML.getRisingWaterStartingMinusY(eventLevel.getName());
                 break;
         }
         // get level region

@@ -103,6 +103,16 @@ public class LevelsYAML {
         }
     }
 
+    public static int getRisingWaterStartingMinusY(String levelName) {
+        // 10 is default
+        int risingWaterY = 10;
+
+        if (exists(levelName) && isSet(levelName, "rising_water_y_below_starting"))
+            risingWaterY = levelsFile.getInt(levelName + ".rising_water_y_below_starting");
+
+        return risingWaterY;
+    }
+
     public static void setMessage(String levelName, String message) {
         if (exists(levelName)) {
             if (message.equals("default"))
