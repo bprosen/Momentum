@@ -35,7 +35,7 @@ public class Event {
         Game Settings
      */
     private boolean fullHealth = false;
-    private boolean halfAHeart = false;
+    private boolean fallingAnvil = false;
     private boolean risingWater = false;
     private int taskDelay;
 
@@ -63,11 +63,11 @@ public class Event {
                 List<Level> pvpLevels = Parkour.getLevelManager().getPvPEventLevels();
                 eventLevel = pvpLevels.get(ran.nextInt(pvpLevels.size()));
                 break;
-            case HALF_HEART:
-                halfAHeart = true;
+            case FALLING_ANVIL:
+                fallingAnvil = true;
                 taskDelay = Parkour.getSettingsManager().half_heart_event_task_delay;
 
-                List<Level> halfHeartLevels = Parkour.getLevelManager().getHalfHeartEventLevels();
+                List<Level> halfHeartLevels = Parkour.getLevelManager().getFallingAnvilEventLevels();
                 eventLevel = halfHeartLevels.get(ran.nextInt(halfHeartLevels.size()));
                 break;
             case RISING_WATER:
@@ -94,13 +94,7 @@ public class Event {
                 // dont do scheduler if nobody is playing
                 if (!eventManager.getParticipants().isEmpty()) {
                     // set all participants to 0.5 health if setting is enabled
-                    if (halfAHeart) {
-                        for (EventParticipant participant : eventManager.getParticipants()) {
-
-                            if (participant.getPlayer().getHealth() > 0.5)
-                                participant.getPlayer().setHealth(0.5);
-
-                        }
+                    if (fallingAnvil) {
 
                         // variables for the region's bounds
                         BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();

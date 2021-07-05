@@ -214,11 +214,11 @@ public class LevelManager {
         return tempList;
     }
 
-    public List<Level> getHalfHeartEventLevels() {
+    public List<Level> getFallingAnvilEventLevels() {
         List<Level> tempList = new ArrayList<>();
 
         for (Level level : getEventLevels())
-            if (level.getEventType() == EventType.HALF_HEART)
+            if (level.getEventType() == EventType.FALLING_ANVIL)
                 tempList.add(level);
 
         return tempList;

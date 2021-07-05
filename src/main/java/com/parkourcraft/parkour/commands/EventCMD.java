@@ -101,9 +101,9 @@ public class EventCMD implements CommandExecutor {
                                     return true;
                                 }
                                 break;
-                            case HALF_HEART:
-                                if (Parkour.getLevelManager().getHalfHeartEventLevels().isEmpty()) {
-                                    player.sendMessage(Utils.translate("&cThere are no levels for &4Half Heart Event &cavailable"));
+                            case FALLING_ANVIL:
+                                if (Parkour.getLevelManager().getFallingAnvilEventLevels().isEmpty()) {
+                                    player.sendMessage(Utils.translate("&cThere are no levels for &4Falling Anvil Event &cavailable"));
                                     return true;
                                 }
                                 break;

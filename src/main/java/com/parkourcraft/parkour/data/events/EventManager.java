@@ -336,8 +336,8 @@ public class EventManager {
     public String formatName(EventType eventType) {
         if (eventType == EventType.PVP)
             return "PvP";
-        else if (eventType == EventType.HALF_HEART)
-            return "Half a Heart";
+        else if (eventType == EventType.FALLING_ANVIL)
+            return "Falling Anvil";
         else if (eventType == EventType.RISING_WATER)
             return "Rising Water";
 

@@ -20,7 +20,7 @@ public class DamageListener implements Listener {
             EventManager eventManager = Parkour.getEventManager();
 
             // only run code if event is running and type HALF_HEART
-            if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.HALF_HEART) {
+            if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.FALLING_ANVIL) {
 
                 Player victim = (Player) event.getEntity();
                 PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
