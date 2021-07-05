@@ -137,43 +137,50 @@ public class Event {
                     // rise water by 1 y
                     if (risingWater) {
 
-                        // add another layer of water
-                        BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();
-                        BlockVector minPoint = levelRegion.getMinimumPoint().toBlockPoint();
-                        int minX = minPoint.getBlockX();
-                        int maxX = maxPoint.getBlockX();
-                        int minZ = minPoint.getBlockZ();
-                        int maxZ = maxPoint.getBlockZ();
+                        // if there is no start loc, then cancel
+                        if (eventLevel.getStartLocation().getX() == Parkour.getLocationManager().get("spawn").getX() &&
+                            eventLevel.getStartLocation().getZ() == Parkour.getLocationManager().get("spawn").getZ())
+                            cancel();
+                        else {
 
-                        WorldEdit FAWEAPI = WorldEdit.getInstance();
+                            // add another layer of water
+                            BlockVector maxPoint = levelRegion.getMaximumPoint().toBlockPoint();
+                            BlockVector minPoint = levelRegion.getMinimumPoint().toBlockPoint();
+                            int minX = minPoint.getBlockX();
+                            int maxX = maxPoint.getBlockX();
+                            int minZ = minPoint.getBlockZ();
+                            int maxZ = maxPoint.getBlockZ();
 
-                        if (FAWEAPI != null) {
+                            WorldEdit FAWEAPI = WorldEdit.getInstance();
 
-                            LocalWorld world = new BukkitWorld(eventLevel.getStartLocation().getWorld());
+                            if (FAWEAPI != null) {
 
-                            Vector pos1 = new Vector(minX, currentWaterY, minZ);
-                            Vector pos2 = new Vector(maxX, currentWaterY, maxZ);
-                            CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
+                                LocalWorld world = new BukkitWorld(eventLevel.getStartLocation().getWorld());
 
-                            try {
-                                // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
-                                EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
-                                editSession.setFastMode(true);
+                                Vector pos1 = new Vector(minX, currentWaterY, minZ);
+                                Vector pos2 = new Vector(maxX, currentWaterY, maxZ);
+                                CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
 
-                                // create single base block set for replace
-                                Set<BaseBlock> baseBlockSet = new HashSet<BaseBlock>() {{
-                                    add(new BaseBlock(Material.AIR.getId()));
-                                }};
+                                try {
+                                    // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
+                                    EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                                    editSession.setFastMode(true);
 
-                                editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.WATER.getId()));
-                                editSession.flushQueue();
-                                editSession.setFastMode(false);
-                            } catch (MaxChangedBlocksException e) {
-                                e.printStackTrace();
+                                    // create single base block set for replace
+                                    Set<BaseBlock> baseBlockSet = new HashSet<BaseBlock>() {{
+                                        add(new BaseBlock(Material.AIR.getId()));
+                                    }};
+
+                                    editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.WATER.getId()));
+                                    editSession.flushQueue();
+                                    editSession.setFastMode(false);
+                                } catch (MaxChangedBlocksException e) {
+                                    e.printStackTrace();
+                                }
+                                currentWaterY++;
+                            } else {
+                                Parkour.getPluginLogger().info("FAWE API found null in Event runScheduler");
                             }
-                            currentWaterY++;
-                        } else {
-                            Parkour.getPluginLogger().info("FAWE API found null in Event runScheduler");
                         }
                     }
 
