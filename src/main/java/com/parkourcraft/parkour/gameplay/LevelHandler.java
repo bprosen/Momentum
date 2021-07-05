@@ -125,12 +125,11 @@ public class LevelHandler {
 
             // give higher reward if prestiged
             int prestiges = playerStats.getPrestiges();
-            if (prestiges > 0 && level.getReward() > 0) {
-                int newReward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
-                Parkour.getEconomy().depositPlayer(player, newReward);
-            } else {
-                Parkour.getEconomy().depositPlayer(player, level.getReward());
-            }
+            int reward = level.getReward();
+            if (prestiges > 0 && level.getReward() > 0)
+                reward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
+
+            Parkour.getEconomy().depositPlayer(player, reward);
 
             String messageFormatted = level.getFormattedMessage(playerStats);
             if (elapsedTime > 0L && elapsedTime < 8388607L)

@@ -115,6 +115,18 @@ public class EventManager {
         // clear all water if it was the rising water event
         clearWater();
 
+        if (winner != null) {
+            PlayerStats playerStats = Parkour.getStatsManager().get(winner);
+
+            // give higher reward if prestiged
+            int prestiges = playerStats.getPrestiges();
+            int reward = runningEvent.getLevel().getReward();
+            if (prestiges > 0 && runningEvent.getLevel().getReward() > 0)
+                reward = (int) (runningEvent.getLevel().getReward() * playerStats.getPrestigeMultiplier());
+
+            Parkour.getEconomy().depositPlayer(winner, reward);
+        }
+
         if (forceEnded) {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())

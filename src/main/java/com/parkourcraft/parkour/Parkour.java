@@ -23,7 +23,6 @@ import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.parkour.utils.dependencies.ProtocolLib;
 import com.parkourcraft.parkour.utils.dependencies.Vault;
-import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -117,6 +116,7 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PacketListener(), this);
         getServer().getPluginManager().registerEvents(new DamageListener(), this);
         getServer().getPluginManager().registerEvents(new ChatListener(), this);
+        getServer().getPluginManager().registerEvents(new ItemSpawnListener(), this);
     }
 
     private void registerCommands() {
