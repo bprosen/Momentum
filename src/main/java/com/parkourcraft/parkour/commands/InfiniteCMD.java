@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -87,7 +88,7 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer"));
             }
-        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportalspawn"))) {
+        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportalrespawn"))) {
 
             Location loc = player.getLocation();
             String locString = player.getWorld().getName() + ":" +
@@ -96,10 +97,22 @@ public class InfiniteCMD implements CommandExecutor {
 
             // set and save
             ConfigManager configManager = Parkour.getConfigManager();
-            configManager.get("settings").set("infinitepk.portal_spawn", locString);
+            configManager.get("settings").set("infinitepk.portal_respawn", locString);
             configManager.save("settings");
             Parkour.getSettingsManager().load(configManager.get("settings"));
             player.sendMessage(Utils.translate("&7You set the portal respawn to your location"));
+        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportallocation"))) {
+
+            Location loc = player.getLocation();
+            String locString = player.getWorld().getName() + ":" +
+                    ((int) Math.ceil(loc.getX())) + ":" + loc.getBlockY() + ":" + loc.getBlockZ();
+
+            // set and save
+            ConfigManager configManager = Parkour.getConfigManager();
+            configManager.get("settings").set("infinitepk.portal_location", locString);
+            configManager.save("settings");
+            Parkour.getSettingsManager().load(configManager.get("settings"));
+            player.sendMessage(Utils.translate("&7You set the portal location to your location"));
         } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -139,7 +152,8 @@ public class InfiniteCMD implements CommandExecutor {
 
         if (player.hasPermission("pc-parkour.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
-            player.sendMessage(Utils.translate("&5/infinite setportalspawn  &7Sets the portal spawn to your location"));
+            player.sendMessage(Utils.translate("&5/infinite setportalrespawn  &7Sets the portal respawn to your location"));
+            player.sendMessage(Utils.translate("&5/infinite setportallocation  &7Sets the portal location to your location"));
         }
 
         player.sendMessage(Utils.translate("&5/infinite help  &7Shows you this display"));

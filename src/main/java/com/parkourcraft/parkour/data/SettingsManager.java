@@ -56,8 +56,8 @@ public class SettingsManager {
     public int max_infinitepk_z;
     public int infinitepk_starting_y;
     public int min_infinitepk_y;
-    public String infinitepk_portal_region_name;
-    public Location infinitepk_portal_spawn;
+    public Location infinitepk_portal_respawn;
+    public Location infinitepk_portal_location;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -120,15 +120,24 @@ public class SettingsManager {
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
 
         // load the respawn point for infinite pk if they enter from spawn
-        String infinitePK = settings.getString("infinitepk.portal_spawn");
+        String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic
-        if (infinitePK != null) {
-            String[] infinitePKSplit = infinitePK.split(":");
+        if (infinitePKRespawn != null) {
+            String[] infinitePKSplit = infinitePKRespawn.split(":");
 
-            infinitepk_portal_spawn = new Location(Bukkit.getWorld(infinitePKSplit[0]),
+            infinitepk_portal_respawn = new Location(Bukkit.getWorld(infinitePKSplit[0]),
                     Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]),
                     Float.parseFloat(infinitePKSplit[4]), Float.parseFloat(infinitePKSplit[5]));
         }
-        infinitepk_portal_region_name = settings.getString("infinitepk.portal_region_name");
+
+        // load the location point of portal
+        String infinitePKLoc = settings.getString("infinitepk.portal_location");
+        // need to null check jic
+        if (infinitePKLoc != null) {
+            String[] infinitePKSplit = infinitePKLoc.split(":");
+
+            infinitepk_portal_location = new Location(Bukkit.getWorld(infinitePKSplit[0]),
+                    Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]));
+        }
     }
 }

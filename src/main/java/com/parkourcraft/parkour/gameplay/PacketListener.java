@@ -157,21 +157,22 @@ public class PacketListener implements Listener {
 
                 // null check jic
                 if (playerStats != null) {
+
+                    InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
+
                     // if in infinite parkour
                     if (playerStats.isInInfinitePK()) {
 
-                        InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
                         InfinitePK infinitePK = infinitePKManager.get(player.getName());
                         // end infinite pk if below current block
                         if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
-                            // run in sync!
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                infinitePKManager.endPK(infinitePK.getPlayer(), false);
-                                }
-                            }.runTask(plugin);
-                    } else {
+                            infinitePKManager.endPK(infinitePK.getPlayer(), false);
+                    // if their loc
+                    } else if (infinitePKManager.isInPortal(
+                            packet.getDoubles().read(0), playerY, packet.getDoubles().read(2)))
+                        infinitePKManager.startPK(player);
+
+                    else {
                         Level level = Parkour.getLevelManager().get(playerStats.getLevel());
 
                         // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn

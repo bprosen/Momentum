@@ -85,8 +85,8 @@ infinitepk:
   min_y: 200
   max_z: 100
   starting_y: 220
-  portal_spawn:
-  portal_region_name: "infinitepk-portal"
+  portal_respawn:
+  portal_location:
 completions:
   global_level_completions_leaderboard:
     max_size: 10

@@ -45,31 +45,29 @@ public class InfinitePKManager {
         participants.put(player.getName(), infinitePK);
         infinitePK.setCurrentBlockLoc(startingLoc);
 
-        // this section is specifically made for the portal at spawn and to do a different respawn location
-        ProtectedRegion region = WorldGuard.getRegionFromName(player.getWorld(), Parkour.getSettingsManager().infinitepk_portal_region_name);
-        if (region != null) {
-            Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_spawn;
+        Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
+        Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
 
-            // get min and max, then get middle from location
-            BlockVector regionMin = region.getMinimumPoint();
-            BlockVector regionMax = region.getMaximumPoint();
-            Location portalLoc = BukkitUtil.toLocation(player.getWorld(), regionMin.add((regionMax.subtract(regionMin)).divide(2)));
+        // if they are at spawn prior to teleport, change original loc to setting
+        if (respawnLoc != null && portalLoc.distance(player.getLocation()) <= 3)
+            infinitePK.setOriginalLoc(respawnLoc);
 
-            // if they are at spawn prior to teleport, change original loc to setting
-            if (respawnLoc != null && portalLoc.distance(player.getLocation()) <= 3)
-                infinitePK.setOriginalLoc(respawnLoc);
-        }
+        // run in sync due to async packet using this method
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // prepare block and teleport
+                startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
+                // immediately get new loc
+                doNextJump(player, true);
+            }
+        }.runTask(Parkour.getPlugin());
 
-        // prepare block and teleport
-        startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
         startingLoc.setPitch(player.getLocation().getPitch());
         startingLoc.setYaw(player.getLocation().getYaw());
 
         // set current loc after teleport
         player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
-        // immediately get new loc
-        doNextJump(player, true);
-
         Parkour.getStatsManager().get(player).toggleInfinitePK();
     }
 
@@ -106,10 +104,18 @@ public class InfinitePKManager {
                 player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
                         "&7Your best is &d" + playerStats.getInfinitePKScore()));
             }
-            // clear blocks and reset data
-            infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
-            infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
-            infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
+
+            // run in sync because of packet listener running in async, need to remove blocks in sync
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    // clear blocks and reset data
+                    infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
+                    infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
+                    infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
+                }
+            }.runTask(Parkour.getPlugin());
+
             playerStats.toggleInfinitePK();
             participants.remove(player.getName());
         }
@@ -135,6 +141,17 @@ public class InfinitePKManager {
                 isBest = true;
         }
         return isBest;
+    }
+
+    public boolean isInPortal(double playerX, double playerY, double playerZ) {
+        boolean inPortal = false;
+        Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
+
+        if (portalLoc != null && (portalLoc.getBlockX() == ((int) playerX) && portalLoc.getBlockZ() == ((int) playerZ) &&
+            ((int) playerY) <= (portalLoc.getBlockY() + 2) && ((int) playerY) >= (portalLoc.getBlockY() - 2)))
+            inPortal = true;
+
+        return inPortal;
     }
 
     // method to update their score in all 3 possible placed
@@ -179,7 +196,8 @@ public class InfinitePKManager {
                 infinitePK.getCurrentBlockLoc().getBlock().setType(Material.QUARTZ_BLOCK);
                 infinitePK.getPressutePlateLoc().getBlock().setType(Material.IRON_PLATE);
 
-                newLocation.getWorld().spawnParticle(Particle.CLOUD, newLocation.getX(), newLocation.getY(), newLocation.getZ(), 15);
+                if (!startingJump)
+                    newLocation.getWorld().spawnParticle(Particle.CLOUD, newLocation.getX(), newLocation.getY(), newLocation.getZ(), 15);
             }
         }
     }
