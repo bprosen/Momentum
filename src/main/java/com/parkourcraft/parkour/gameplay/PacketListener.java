@@ -10,6 +10,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.infinite.InfinitePK;
+import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -19,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PacketListener implements Listener {
 
@@ -148,21 +151,37 @@ public class PacketListener implements Listener {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-
+                Player player = event.getPlayer();
                 double playerY = packet.getDoubles().read(1);
-                PlayerStats playerStats = Parkour.getStatsManager().get(event.getPlayer());
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 // null check jic
                 if (playerStats != null) {
-                    Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+                    // if in infinite parkour
+                    if (playerStats.isInInfinitePK()) {
 
-                    // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
-                    if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
-                        // teleport
-                        if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                            Parkour.getCheckpointManager().teleportPlayer(event.getPlayer());
-                        else
-                            LevelHandler.respawnPlayer(event.getPlayer(), level);
+                        InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
+                        InfinitePK infinitePK = infinitePKManager.get(player.getName());
+                        // end infinite pk if below current block
+                        if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
+                            // run in sync!
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                infinitePKManager.endPK(infinitePK.getPlayer(), false);
+                                }
+                            }.runTask(plugin);
+                    } else {
+                        Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+
+                        // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
+                        if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
+                            // teleport
+                            if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                                Parkour.getCheckpointManager().teleportPlayer(player);
+                            else
+                                LevelHandler.respawnPlayer(event.getPlayer(), level);
+                        }
                     }
                 }
             }

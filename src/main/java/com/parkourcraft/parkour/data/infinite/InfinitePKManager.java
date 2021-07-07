@@ -26,16 +26,6 @@ public class InfinitePKManager {
     }
 
     public void startScheduler() {
-        // run a check every 2 seconds to stop them from continuing if they fall too far
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-
-                for (InfinitePK infinitePK : participants.values())
-                    if (infinitePK.getPlayer().getLocation().getBlockY() < (infinitePK.getCurrentBlockLoc().getBlockY() - 2))
-                        endPK(infinitePK.getPlayer(), false);
-            }
-        }.runTaskTimer(Parkour.getPlugin(), 20 * 5, 20 * 2);
 
         new BukkitRunnable() {
             @Override
