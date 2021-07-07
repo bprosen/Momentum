@@ -138,58 +138,60 @@ public class MenuItemAction {
 
     private static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace()) {
-            if (!level.getName().equalsIgnoreCase(playerStats.getLevel())) {
-                if (level.hasRequiredLevels(playerStats)) {
-                    if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
-                        player.closeInventory();
-                        player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
-                        return;
-                    }
-
+            if (level.hasRequiredLevels(playerStats)) {
+                // if the level has perm node, and player does not have perm node
+                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
                     player.closeInventory();
-
-                    for (PotionEffect potionEffect : player.getActivePotionEffects())
-                        player.removePotionEffect(potionEffect.getType());
-
-                    // save if has checkpoint
-                    if (playerStats.getCheckpoint() != null) {
-                        CheckpointDB.savePlayerAsync(player);
-                        playerStats.resetCheckpoint();
-                    }
-
-                    // if in practice mode
-                    if (playerStats.getPracticeLocation() != null)
-                        playerStats.resetPracticeMode();
-
-                    if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
-                        CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
-                        Parkour.getCheckpointManager().teleportPlayer(player);
-                        player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
-                    } else {
-                        player.teleport(level.getStartLocation());
-                        player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
-                                + level.getFormattedTitle()));
-                    }
-                    playerStats.setLevel(level.getName());
-                    playerStats.disableLevelStartTime();
-
-                    if (!level.getPotionEffects().isEmpty()) {
-                        for (PotionEffect potionEffect : level.getPotionEffects())
-                            player.addPotionEffect(potionEffect);
-                    }
-
-                    TitleAPI.sendTitle(
-                            player, 10, 40, 10,
-                            "",
-                            level.getFormattedTitle()
-                    );
-                } else {
-                    player.closeInventory();
-                    player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
+                    player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
+                    return;
                 }
+                // if player is in level and their level is the level they clicked on, cancel
+                if (playerStats.getLevel() != null && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
+                    player.closeInventory();
+                    player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                    return;
+                }
+
+                player.closeInventory();
+
+                for (PotionEffect potionEffect : player.getActivePotionEffects())
+                    player.removePotionEffect(potionEffect.getType());
+
+                // save if has checkpoint
+                if (playerStats.getCheckpoint() != null) {
+                    CheckpointDB.savePlayerAsync(player);
+                    playerStats.resetCheckpoint();
+                }
+
+                // if in practice mode
+                if (playerStats.getPracticeLocation() != null)
+                    playerStats.resetPracticeMode();
+
+                if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
+                    CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
+                    Parkour.getCheckpointManager().teleportPlayer(player);
+                    player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                } else {
+                    player.teleport(level.getStartLocation());
+                    player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
+                            + level.getFormattedTitle()));
+                }
+                playerStats.setLevel(level);
+                playerStats.disableLevelStartTime();
+
+                if (!level.getPotionEffects().isEmpty()) {
+                    for (PotionEffect potionEffect : level.getPotionEffects())
+                        player.addPotionEffect(potionEffect);
+                }
+
+                TitleAPI.sendTitle(
+                        player, 10, 40, 10,
+                        "",
+                        level.getFormattedTitle()
+                );
             } else {
                 player.closeInventory();
-                player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
             }
         } else {
             player.closeInventory();

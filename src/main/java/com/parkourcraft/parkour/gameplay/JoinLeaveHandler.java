@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.clans.ClansManager;
 import com.parkourcraft.parkour.data.events.EventManager;
 import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -44,9 +45,12 @@ public class JoinLeaveHandler implements Listener {
 
         List<String> regions = WorldGuard.getRegions(player.getLocation());
         if (!regions.isEmpty()) {
+
+            Level level = Parkour.getLevelManager().get(regions.get(0));
+
             // make sure the area they are spawning in is a level
-            if (Parkour.getLevelManager().get(regions.get(0)) != null) {
-                Parkour.getStatsManager().get(player).setLevel(regions.get(0));
+            if (level != null) {
+                Parkour.getStatsManager().get(player).setLevel(level);
 
                 UUID uuid = player.getUniqueId();
 

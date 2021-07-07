@@ -646,11 +646,6 @@ public class LevelCMD implements CommandExecutor {
                                     }
                                 }.runTaskAsynchronously(Parkour.getPlugin());
 
-                                // update all stats for online players
-                                for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                                    if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName))
-                                        playerStats.setLevel(newLevelName);
-
                                 sender.sendMessage(Utils.translate("&cYou have renamed &4" + levelName + " &cto &4" + newLevelName));
                             } else {
                                 sender.sendMessage(Utils.translate("&7Please do not use ' ..."));

@@ -59,7 +59,7 @@ public class Scoreboard {
         if (playerStats != null && playerStats.getPlayer() != null) {
 
             List<String> board = new ArrayList<>();
-            Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+            Level level = playerStats.getLevel();
             EventManager eventManager = Parkour.getEventManager();
 
             board.add(Utils.translate("&c&lRenatus Network"));

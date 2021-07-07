@@ -186,14 +186,15 @@ public class LevelHandler {
             }
 
             List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());
+            Level newLevel = Parkour.getLevelManager().get(getToRegions.get(0));
 
             // if area they are teleporting to is empty
             // if not empty, make sure it is a level
             // if not a level (like spawn), reset level
             if (getToRegions.isEmpty())
                 playerStats.resetLevel();
-            else if (Parkour.getLevelManager().get(getToRegions.get(0)) != null)
-                playerStats.setLevel(getToRegions.get(0));
+            else if (newLevel != null)
+                playerStats.setLevel(newLevel);
             else
                 playerStats.resetLevel();
 

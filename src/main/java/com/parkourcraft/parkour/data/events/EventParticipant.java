@@ -1,5 +1,6 @@
 package com.parkourcraft.parkour.data.events;
 
+import com.parkourcraft.parkour.data.levels.Level;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -7,9 +8,9 @@ public class EventParticipant {
 
     private Player participant;
     private Location originalLocation;
-    private String originalLevelName;
+    private Level originalLevelName;
 
-    public EventParticipant(Player participant, String originalLevelName) {
+    public EventParticipant(Player participant, Level originalLevelName) {
         this.participant = participant;
         this.originalLocation = participant.getLocation();
         this.originalLevelName = originalLevelName;
@@ -23,7 +24,7 @@ public class EventParticipant {
         return originalLocation;
     }
 
-    public String getOriginalLevel() {
+    public Level getOriginalLevel() {
         return originalLevelName;
     }
 }

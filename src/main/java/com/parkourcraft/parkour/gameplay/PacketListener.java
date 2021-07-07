@@ -173,7 +173,7 @@ public class PacketListener implements Listener {
                         infinitePKManager.startPK(player);
 
                     else {
-                        Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+                        Level level = playerStats.getLevel();
 
                         // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
                         if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY) {

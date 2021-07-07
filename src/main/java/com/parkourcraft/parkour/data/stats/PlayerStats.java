@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.ranks.Rank;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -13,7 +14,7 @@ public class PlayerStats {
     private Player player;
     private String UUID;
     private String playerName;
-    private String level = null;
+    private Level level = null;
     private int playerID = -1;
     private long levelStartTime = 0;
     private boolean spectatable;
@@ -105,7 +106,7 @@ public class PlayerStats {
     //
     // Level Section
     //
-    public void setLevel(String level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
 
@@ -113,7 +114,7 @@ public class PlayerStats {
         level = null;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return level;
     }
 

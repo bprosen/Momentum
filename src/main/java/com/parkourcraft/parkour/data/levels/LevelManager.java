@@ -85,7 +85,7 @@ public class LevelManager {
 
                             if (playerStats != null &&
                                     playerStats.getLevel() != null &&
-                                    playerStats.getLevel().equalsIgnoreCase(level.getName()))
+                                    playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
                                 amountInLevel++;
                         }
                         level.setPlayersInLevel(amountInLevel);
@@ -365,7 +365,7 @@ public class LevelManager {
 
             // loop through and reset if applicable
             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                if (playerStats.getLevel() != null && playerStats.getLevel().equalsIgnoreCase(levelName)) {
+                if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
                     playerStats.resetLevel();
 
                     if (playerStats.getPracticeLocation() != null)

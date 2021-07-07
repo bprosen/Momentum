@@ -35,10 +35,10 @@ public class LevelListener implements Listener {
         Player player = event.getPlayer();
         // In water
         if (event.getTo().getBlock().isLiquid()) {
-            String levelName = Parkour.getStatsManager().get(player).getLevel();
-            if (levelName != null) {
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            if (playerStats.getLevel() != null) {
+
                 EventManager eventManager = Parkour.getEventManager();
 
                 // if they are participant and fall into water, eliminate them
@@ -62,7 +62,7 @@ public class LevelListener implements Listener {
                             race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
                     }
                 } else {
-                    Level level = Parkour.getLevelManager().get(levelName);
+                    Level level = playerStats.getLevel();
 
                     if (level != null && level.doesLiquidResetPlayer()) {
 
@@ -85,17 +85,13 @@ public class LevelListener implements Listener {
 
         // Start timer
         if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.STONE_PLATE)) {
-
-            String levelName = Parkour.getStatsManager().get(player).getLevel();
-            if (levelName != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null)
+            if (playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null)
                 LevelHandler.startedLevel(player);
 
         // Checkpoint
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.GOLD_PLATE)) {
 
-            String levelName = Parkour.getStatsManager().get(player).getLevel();
-
-            if (levelName != null) {
+            if (playerStats.getLevel() != null) {
                 if (playerStats.getPracticeLocation() == null) {
                     if (playerStats.getPlayerToSpectate() == null) {
                         if (playerStats.getCheckpoint() != null) {
@@ -149,21 +145,21 @@ public class LevelListener implements Listener {
 
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
+            Player player = event.getPlayer();
 
-            if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line)) {
-                Player player = event.getPlayer();
+            if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line) &&
+                ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
 
-                if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
-                    String levelName = Parkour.getStatsManager().get(player).getLevel();
+                Level level = Parkour.getStatsManager().get(player).getLevel();
 
-                    if (levelName != null)
-                        LevelHandler.levelCompletion(player, levelName);
-                } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
-                    Location lobby = Parkour.getLocationManager().getLobbyLocation();
+                if (level != null)
+                    LevelHandler.levelCompletion(player, level.getName());
 
-                    if (lobby != null)
-                        player.teleport(lobby);
-                }
+            } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
+                Location lobby = Parkour.getLocationManager().getLobbyLocation();
+
+                if (lobby != null)
+                    player.teleport(lobby);
             }
         }
     }
@@ -181,8 +177,8 @@ public class LevelListener implements Listener {
                 // make sure the area they are spawning in is a level
                 Level level = Parkour.getLevelManager().get(regions.get(0));
 
-                if (level != null && !level.getName().equalsIgnoreCase(playerStats.getLevel()))
-                    Parkour.getStatsManager().get(player).setLevel(regions.get(0));
+                if (level != null && (playerStats.getLevel() != null && !level.getName().equalsIgnoreCase(playerStats.getLevel().getName())))
+                    playerStats.setLevel(level);
 
             } else if (playerStats.getLevel() != null) {
                 // save checkpoint if had one

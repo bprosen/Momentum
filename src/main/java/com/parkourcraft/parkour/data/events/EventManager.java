@@ -185,7 +185,7 @@ public class EventManager {
 
         EventParticipant eventParticipant = new EventParticipant(player, playerStats.getLevel());
         participants.add(eventParticipant);
-        playerStats.setLevel(runningEvent.getLevel().getName());
+        playerStats.setLevel(runningEvent.getLevel());
         playerStats.disableLevelStartTime();
         playerStats.joinedEvent();
         player.teleport(runningEvent.getLevel().getStartLocation());
@@ -197,8 +197,8 @@ public class EventManager {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // reset the cache and teleport player back
-        if (!disconnected && CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel()))
-            CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel());
+        if (!disconnected && CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel().getName()))
+            CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel().getName());
 
         // do all setting changes to revert back
         playerStats.setLevel(eventParticipant.getOriginalLevel());

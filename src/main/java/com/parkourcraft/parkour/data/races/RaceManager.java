@@ -77,8 +77,8 @@ public class RaceManager {
                 PlayerStats player2Stats = Parkour.getStatsManager().get(player2);
                 player1Stats.startedRace();
                 player2Stats.startedRace();
-                player1Stats.setLevel(level.getName());
-                player2Stats.setLevel(level.getName());
+                player1Stats.setLevel(level);
+                player2Stats.setLevel(level);
 
                 player1.teleport(level.getRaceLocation1());
                 player2.teleport(level.getRaceLocation2());
@@ -238,11 +238,15 @@ public class RaceManager {
 
             List<String> winnerRegions = WorldGuard.getRegions(winner.getLocation());
             List<String> loserRegions = WorldGuard.getRegions(loser.getLocation());
-            if (!winnerRegions.isEmpty())
-                winnerStats.setLevel(winnerRegions.get(0));
+            if (!winnerRegions.isEmpty()) {
+                Level winnerLevel = Parkour.getLevelManager().get(winnerRegions.get(0));
+                winnerStats.setLevel(winnerLevel);
+            }
 
-            if (!loserRegions.isEmpty())
-                loserStats.setLevel(loserRegions.get(0));
+            if (!loserRegions.isEmpty()) {
+                Level loserLevel = Parkour.getLevelManager().get(loserRegions.get(0));
+                loserStats.setLevel(loserLevel);
+            }
 
             // remove from list
             runningRaceList.remove(raceObject);
