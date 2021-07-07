@@ -168,8 +168,8 @@ public class PacketListener implements Listener {
                         if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
                             infinitePKManager.endPK(infinitePK.getPlayer(), false);
                     // if their loc
-                    } else if (infinitePKManager.isInPortal(
-                            packet.getDoubles().read(0), playerY, packet.getDoubles().read(2)))
+                    } else if (infinitePKManager.isNearPortal(
+                            packet.getDoubles().read(0), playerY, packet.getDoubles().read(2), 1))
                         infinitePKManager.startPK(player);
 
                     else {

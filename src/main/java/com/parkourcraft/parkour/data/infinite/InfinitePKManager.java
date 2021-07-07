@@ -143,14 +143,20 @@ public class InfinitePKManager {
         return isBest;
     }
 
-    public boolean isInPortal(double playerX, double playerY, double playerZ) {
+    public boolean isNearPortal(double playerX, double playerY, double playerZ, int radius) {
         boolean inPortal = false;
         Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
 
-        if (portalLoc != null && (portalLoc.getBlockX() == ((int) playerX) && portalLoc.getBlockZ() == ((int) playerZ) &&
-            ((int) playerY) <= (portalLoc.getBlockY() + 2) && ((int) playerY) >= (portalLoc.getBlockY() - 2)))
-            inPortal = true;
+        if (portalLoc != null) {
 
+            // booleans for all radius
+            boolean inX = ((portalLoc.getBlockX() + radius) >= ((int) playerX)) && ((portalLoc.getBlockX() - radius) <= ((int) playerX));
+            boolean inY = ((portalLoc.getBlockY() + radius) >= ((int) playerY)) && ((portalLoc.getBlockY() - radius) <= ((int) playerY));
+            boolean inZ = ((portalLoc.getBlockZ() + radius) >= ((int) playerZ)) && ((portalLoc.getBlockZ() - radius) <= ((int) playerZ));
+
+            if (inX && inY && inZ)
+                inPortal = true;
+        }
         return inPortal;
     }
 
