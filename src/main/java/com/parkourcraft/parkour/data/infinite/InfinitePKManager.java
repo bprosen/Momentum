@@ -326,10 +326,11 @@ public class InfinitePKManager {
         SettingsManager settingsManager = Parkour.getSettingsManager();
         LocationManager locationManager = Parkour.getLocationManager();
 
-        int minX = locationManager.getLobbyLocation().getBlockX() - settingsManager.max_infinitepk_x;
-        int maxX = locationManager.getLobbyLocation().getBlockX() + settingsManager.max_infinitepk_x;
-        int minZ = locationManager.getLobbyLocation().getBlockZ() - settingsManager.max_infinitepk_z;
-        int maxZ = locationManager.getLobbyLocation().getBlockZ() + settingsManager.max_infinitepk_z;
+        // make the box 6 less so it will never flip on the first one
+        int minX = locationManager.getLobbyLocation().getBlockX() - (settingsManager.max_infinitepk_x - 6);
+        int maxX = locationManager.getLobbyLocation().getBlockX() + (settingsManager.max_infinitepk_x - 6);
+        int minZ = locationManager.getLobbyLocation().getBlockZ() - (settingsManager.max_infinitepk_z - 6);
+        int maxZ = locationManager.getLobbyLocation().getBlockZ() + (settingsManager.max_infinitepk_z - 6);
 
         int foundX = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
         int foundZ = ThreadLocalRandom.current().nextInt(minZ, maxZ + 1);
