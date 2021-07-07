@@ -8,12 +8,12 @@ public class EventParticipant {
 
     private Player participant;
     private Location originalLocation;
-    private Level originalLevelName;
+    private Level originalLevel;
 
-    public EventParticipant(Player participant, Level originalLevelName) {
+    public EventParticipant(Player participant, Level originalLevel) {
         this.participant = participant;
         this.originalLocation = participant.getLocation();
-        this.originalLevelName = originalLevelName;
+        this.originalLevel = originalLevel;
     }
 
     public Player getPlayer() {
@@ -25,6 +25,6 @@ public class EventParticipant {
     }
 
     public Level getOriginalLevel() {
-        return originalLevelName;
+        return originalLevel;
     }
 }
