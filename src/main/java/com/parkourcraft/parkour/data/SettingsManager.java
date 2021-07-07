@@ -56,6 +56,8 @@ public class SettingsManager {
     public int max_infinitepk_z;
     public int infinitepk_starting_y;
     public int min_infinitepk_y;
+    public float infinitepk_starting_pitch;
+    public float infinitepk_starting_yaw;
     public Location infinitepk_portal_respawn;
     public Location infinitepk_portal_location;
 
@@ -111,6 +113,8 @@ public class SettingsManager {
         max_infinitepk_z = settings.getInt("infinitepk.max_z");
         min_infinitepk_y = settings.getInt("infinitepk.min_y");
         infinitepk_starting_y = settings.getInt("infinitepk.starting_y");
+        infinitepk_starting_pitch = (float) settings.getDouble("infinitepk.starting_pitch");
+        infinitepk_starting_yaw = (float) settings.getDouble("infinitepk.starting_yaw");
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
         max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");

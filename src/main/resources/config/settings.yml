@@ -85,6 +85,8 @@ infinitepk:
   min_y: 200
   max_z: 100
   starting_y: 220
+  starting_pitch: 0.0f
+  starting_yaw: 0.0f
   portal_respawn:
   portal_location:
 completions:

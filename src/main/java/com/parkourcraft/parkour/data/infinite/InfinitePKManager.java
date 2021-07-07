@@ -6,10 +6,6 @@ import com.parkourcraft.parkour.data.locations.LocationManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
-import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,8 +59,8 @@ public class InfinitePKManager {
             }
         }.runTask(Parkour.getPlugin());
 
-        startingLoc.setPitch(player.getLocation().getPitch());
-        startingLoc.setYaw(player.getLocation().getYaw());
+        startingLoc.setPitch(Parkour.getSettingsManager().infinitepk_starting_pitch);
+        startingLoc.setYaw(Parkour.getSettingsManager().infinitepk_starting_yaw);
 
         // set current loc after teleport
         player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
