@@ -67,7 +67,7 @@ public class LevelListener implements Listener {
                     if (level != null && level.doesLiquidResetPlayer()) {
 
                         if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                            Parkour.getCheckpointManager().teleportPlayer(player);
+                            Parkour.getCheckpointManager().teleportPlayer(playerStats);
                         else
                             LevelHandler.respawnPlayer(player, level);
                     }

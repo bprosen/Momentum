@@ -177,11 +177,17 @@ public class PacketListener implements Listener {
 
                         // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
                         if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
-                            // teleport
-                            if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                                Parkour.getCheckpointManager().teleportPlayer(player);
-                            else
-                                LevelHandler.respawnPlayer(event.getPlayer(), level);
+                            // run in sync due to teleporting
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    // teleport
+                                    if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                                        Parkour.getCheckpointManager().teleportPlayer(playerStats);
+                                    else
+                                        LevelHandler.respawnPlayer(event.getPlayer(), level);
+                                }
+                            }.runTask(plugin);
                         }
                     }
                 }

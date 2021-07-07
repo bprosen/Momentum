@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 
 public class CheckpointManager {
 
-    public void teleportPlayer(Player player) {
-
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+    public void teleportPlayer(PlayerStats playerStats) {
 
         if (!playerStats.inRace()) {
             if (!playerStats.isEventParticipant()) {
@@ -29,20 +27,20 @@ public class CheckpointManager {
 
                     if (loc != null) {
 
-                        loc.setPitch(player.getLocation().getPitch());
-                        loc.setYaw(player.getLocation().getYaw());
-                        player.teleport(loc);
+                        loc.setPitch(playerStats.getPlayer().getLocation().getPitch());
+                        loc.setYaw(playerStats.getPlayer().getLocation().getYaw());
+                        playerStats.getPlayer().teleport(loc);
                     } else {
-                        player.sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+                        playerStats.getPlayer().sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
                     }
                 } else {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                    playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while spectating"));
                 }
             } else {
-                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in an event"));
             }
         } else {
-            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+            playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in a race"));
         }
     }
 }

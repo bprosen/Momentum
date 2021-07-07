@@ -33,8 +33,10 @@ public class InfinitePKManager {
 
     public void startPK(Player player) {
 
-        // find loc and teleport player
+        // find loc
         Location startingLoc = findStartingLocation();
+        startingLoc.setPitch(Parkour.getSettingsManager().infinitepk_starting_pitch);
+        startingLoc.setYaw(Parkour.getSettingsManager().infinitepk_starting_yaw);
 
         // create cache
         InfinitePK infinitePK = new InfinitePK(player);
@@ -54,16 +56,12 @@ public class InfinitePKManager {
             public void run() {
                 // prepare block and teleport
                 startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
+                player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
                 // immediately get new loc
                 doNextJump(player, true);
             }
         }.runTask(Parkour.getPlugin());
 
-        startingLoc.setPitch(Parkour.getSettingsManager().infinitepk_starting_pitch);
-        startingLoc.setYaw(Parkour.getSettingsManager().infinitepk_starting_yaw);
-
-        // set current loc after teleport
-        player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
         Parkour.getStatsManager().get(player).toggleInfinitePK();
     }
 
@@ -72,9 +70,7 @@ public class InfinitePKManager {
         InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null) {
 
-            player.teleport(infinitePK.getOriginalLoc());
             int score = infinitePK.getScore();
-
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (isBestScore(player.getName(), score)) {
@@ -105,6 +101,8 @@ public class InfinitePKManager {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    // tp in sync
+                    player.teleport(infinitePK.getOriginalLoc());
                     // clear blocks and reset data
                     infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
                     infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);

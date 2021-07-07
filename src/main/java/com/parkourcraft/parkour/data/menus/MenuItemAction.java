@@ -169,7 +169,7 @@ public class MenuItemAction {
 
                 if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
                     CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
-                    Parkour.getCheckpointManager().teleportPlayer(player);
+                    Parkour.getCheckpointManager().teleportPlayer(playerStats);
                     player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                 } else {
                     player.teleport(level.getStartLocation());

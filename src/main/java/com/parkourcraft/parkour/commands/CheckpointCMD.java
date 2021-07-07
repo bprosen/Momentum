@@ -18,7 +18,7 @@ public class CheckpointCMD implements CommandExecutor {
         Player player = (Player) sender;
 
         if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("teleport"))) {
-            Parkour.getCheckpointManager().teleportPlayer(player);
+            Parkour.getCheckpointManager().teleportPlayer(Parkour.getStatsManager().get(player));
         } else {
             sendHelp(player);
         }

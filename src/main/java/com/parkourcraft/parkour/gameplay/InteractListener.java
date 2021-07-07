@@ -67,7 +67,7 @@ public class InteractListener implements Listener {
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
 
                 event.setCancelled(true);
-                Parkour.getCheckpointManager().teleportPlayer(player);
+                Parkour.getCheckpointManager().teleportPlayer(Parkour.getStatsManager().get(player));
 
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
 
