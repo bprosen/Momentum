@@ -387,12 +387,8 @@ public class LevelCMD implements CommandExecutor {
                         String levelName = a[1].toLowerCase();
 
                         if (levelManager.exists(levelName)) {
-                            if (levelManager.get(levelName).isRaceLevel()) {
-                                LevelsYAML.setPlayerRaceLocation(a[2], levelName, player.getLocation());
-                                player.sendMessage(Utils.translate("&cYou set the location for &4" + a[2] + " &con level &4" + levelName));
-                            } else {
-                                sender.sendMessage(Utils.translate("&7The level &c" + levelName + " &7is not a race level"));
-                            }
+                            LevelsYAML.setPlayerRaceLocation(a[2], levelName, player.getLocation());
+                            player.sendMessage(Utils.translate("&cYou set the location for &4" + a[2] + " &con level &4" + levelName));
                         } else {
                             sender.sendMessage(Utils.translate("&7The level &c" + levelName + " &7does not exist"));
                         }
