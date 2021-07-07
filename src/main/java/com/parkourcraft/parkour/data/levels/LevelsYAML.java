@@ -233,6 +233,17 @@ public class LevelsYAML {
         return null;
     }
 
+    public static int getRespawnY(String levelName) {
+        if (levelsFile.isSet(levelName + ".respawn_y"))
+            return levelsFile.getInt(levelName + ".respawn_y");
+        return -1;
+    }
+
+    public static void setRespawnY(String levelName, int newY) {
+        levelsFile.set(levelName + ".respawn_y", newY);
+        commit(levelName);
+    }
+
     public static void setPlayerRaceLocation(String player, String levelName, Location loc) {
 
         String world = loc.getWorld().getName();

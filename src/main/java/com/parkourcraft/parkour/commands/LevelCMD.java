@@ -423,6 +423,24 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));
                     }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("setrespawny")) {
+                    String levelName = a[1].toLowerCase();
+
+                    if (Utils.isInteger(a[2])) {
+                        // get new y
+                        int newY = Integer.parseInt(a[2]);
+
+                        if (levelManager.exists(levelName)) {
+                            LevelsYAML.setRespawnY(levelName, newY);
+                            sender.sendMessage(Utils.translate("&7You have set &c" +
+                                    Parkour.getLevelManager().get(levelName).getFormattedTitle() +
+                                    "&7's respawn y to &c" + newY));
+                        } else {
+                            sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an integer"));
+                    }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("addrating")) {
 
                     if (!(sender instanceof Player)) {
@@ -698,6 +716,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("togglewater"));
         sender.sendMessage(getHelp("rename"));
         sender.sendMessage(getHelp("delcompletion"));
+        sender.sendMessage(getHelp("setrespawny"));
     }
 
     private static String getHelp(String cmd) {
@@ -751,6 +770,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level rename <level> <newLevelName>  &7Renames a level's name to a new name");
             case "delcompletion":
                 return Utils.translate("&a/level delcompletion <player> <levelName>  &7Deletes ALL the completions of a player for a level");
+            case "setrespawny":
+                return Utils.translate("&a/level setrespawny <level> <respawnY>  &7Sets level respawn y");
         }
         return "";
     }

@@ -28,6 +28,7 @@ public class Level {
     private boolean broadcastCompletion;
     private String requiredPermissionNode = null;
     private List<String> requiredLevels;
+    private int respawnY;
     private int ID = -1;
     private int scoreModifier = 1;
     private boolean isRankUpLevel = false;
@@ -334,11 +335,20 @@ public class Level {
             commands = LevelsYAML.getCommands(name);
             liquidResetPlayer = LevelsYAML.getLiquidResetSetting(name);
             requiredPermissionNode = LevelsYAML.getRequiredPermissionNode(name);
+            respawnY = LevelsYAML.getRespawnY(name);
         }
     }
 
     public void setLeaderboardCache(List<LevelCompletion> levelCompletions) {
         leaderboardCache = levelCompletions;
+    }
+
+    public boolean hasRespawnY() {
+        return respawnY > -1;
+    }
+
+    public int getRespawnY() {
+        return respawnY;
     }
 
     public List<LevelCompletion> getLeaderboard() {

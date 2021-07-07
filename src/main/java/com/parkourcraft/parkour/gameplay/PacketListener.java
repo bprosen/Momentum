@@ -10,7 +10,9 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.plots.Plot;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,11 +24,12 @@ public class PacketListener implements Listener {
 
     public static void loadListeners(Plugin plugin) {
         registerBlockListener(plugin);
+        registerMoveListener(plugin);
     }
 
     private static void registerBlockListener(Plugin plugin) {
 
-        // block interact out of block event
+        // listen to block dig/place asynchronously
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(
                 plugin, ListenerPriority.HIGHEST, PacketType.Play.Client.BLOCK_DIG, PacketType.Play.Client.USE_ITEM) {
 
@@ -130,6 +133,36 @@ public class PacketListener implements Listener {
                             // send block update back to player from server that intercepted the packet
                             player.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
                         }
+                    }
+                }
+            }
+        });
+    }
+
+    private static void registerMoveListener(Plugin plugin) {
+
+        // listen to move event asynchronously
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(
+                plugin, ListenerPriority.HIGHEST, PacketType.Play.Client.POSITION) {
+
+            @Override
+            public void onPacketReceiving(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+
+                double playerY = packet.getDoubles().read(1);
+                PlayerStats playerStats = Parkour.getStatsManager().get(event.getPlayer());
+
+                // null check jic
+                if (playerStats != null) {
+                    Level level = Parkour.getLevelManager().get(playerStats.getLevel());
+
+                    // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
+                    if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
+                        // teleport
+                        if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                            Parkour.getCheckpointManager().teleportPlayer(event.getPlayer());
+                        else
+                            LevelHandler.respawnPlayer(event.getPlayer(), level);
                     }
                 }
             }
