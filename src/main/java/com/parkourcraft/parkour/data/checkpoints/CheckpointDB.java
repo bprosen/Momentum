@@ -53,7 +53,7 @@ public class CheckpointDB {
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
                 player.getName() + "','" +
-                stats.getLevel() + "','" +
+                stats.getLevel().getName() + "','" +
                 loc.getWorld().getName() + "','" +
                 loc.getBlockX() + "','" +
                 loc.getBlockY() + "','" +
@@ -72,7 +72,7 @@ public class CheckpointDB {
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
                 player.getName() + "','" +
-                stats.getLevel() + "','" +
+                stats.getLevel().getName() + "','" +
                 loc.getWorld().getName() + "','" +
                 loc.getBlockX() + "','" +
                 loc.getBlockY() + "','" +

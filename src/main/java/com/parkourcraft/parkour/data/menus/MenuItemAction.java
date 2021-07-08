@@ -13,26 +13,43 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import java.util.List;
 
 public class MenuItemAction {
 
     private static void runCommands(Player player, List<String> commands, List<String> consoleCommands) {
-        for (String command : commands)
-            player.performCommand(command.replace("%player%", player.getName()));
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        for (String command : consoleCommands)
-            Bukkit.dispatchCommand(
-                    Parkour.getPlugin().getServer().getConsoleSender(),
-                    command.replace("%player%", player.getName())
-            );
+        boolean armorCommand = false;
+
+        // loop through to see if there is a chest setarmor
+        if (!commands.isEmpty())
+            for (String cmd : commands)
+                if (cmd.startsWith("setarmor chest")) {
+                    armorCommand = true;
+                    break;
+                }
+        // if so, check if they are in elytra level
+        if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytraLevel()) {
+
+            player.sendMessage(Utils.translate("&cYou cannot change your armor in an Elytra level"));
+            player.closeInventory();
+            return;
+        } else {
+
+            for (String command : commands)
+                player.performCommand(command.replace("%player%", player.getName()));
+
+            for (String command : consoleCommands)
+                Bukkit.dispatchCommand(
+                        Parkour.getPlugin().getServer().getConsoleSender(),
+                        command.replace("%player%", player.getName())
+                );
+        }
     }
 
     public static void perform(Player player, MenuItem menuItem) {

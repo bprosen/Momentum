@@ -121,9 +121,7 @@ public class PlayerStats {
     }
 
     public boolean inLevel() {
-        if (level != null)
-            return true;
-        return false;
+        return level != null;
     }
 
     public void startedLevel() {
