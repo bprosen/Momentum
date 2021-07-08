@@ -183,6 +183,9 @@ public class EventManager {
             playerStats.resetCheckpoint();
         }
 
+        // toggle off if saved
+        Parkour.getStatsManager().toggleOffElytra(playerStats);
+
         EventParticipant eventParticipant = new EventParticipant(player, playerStats.getLevel());
         participants.add(eventParticipant);
         playerStats.setLevel(runningEvent.getLevel());
@@ -205,6 +208,10 @@ public class EventManager {
         playerStats.leftEvent();
         player.teleport(eventParticipant.getOriginalLocation());
         player.setHealth(20.0);
+
+        // set back if they came from elytra level
+        if (eventParticipant.getOriginalLevel().isElytraLevel())
+            Parkour.getStatsManager().toggleOnElytra(playerStats);
 
         participants.remove(eventParticipant);
     }

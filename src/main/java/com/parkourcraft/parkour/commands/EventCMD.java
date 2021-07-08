@@ -41,15 +41,17 @@ public class EventCMD implements CommandExecutor {
                                 if (!playerStats.inRace()) {
                                     if (!PlayerHider.containsPlayer(player)) {
                                         if (!eventManager.isEliminated(player)) {
+                                            if (!eventManager.isStartCoveredInWater()) {
+                                                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !player.isOnGround()) {
+                                                    player.sendMessage(Utils.translate("&cYou cannot join this event when you are not on the ground in an elytra level"));
+                                                    return true;
+                                                }
 
-                                            // run a check if the event is rising water to see if where they would spawn has been covered by water
-                                            if (eventManager.isStartCoveredInWater()) {
+                                                eventManager.addParticipant(player);
+                                            } else {
                                                 player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
-                                                                                        "&cTherefore you cannot join this event"));
-                                                return true;
+                                                        "&cTherefore you cannot join this event"));
                                             }
-
-                                            eventManager.addParticipant(player);
                                         } else {
                                             player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
                                         }

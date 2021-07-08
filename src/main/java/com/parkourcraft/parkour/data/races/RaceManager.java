@@ -75,6 +75,11 @@ public class RaceManager {
                 // set level and set inRace to true
                 PlayerStats player1Stats = Parkour.getStatsManager().get(player1);
                 PlayerStats player2Stats = Parkour.getStatsManager().get(player2);
+
+                // toggle off elytra
+                Parkour.getStatsManager().toggleOffElytra(player1Stats);
+                Parkour.getStatsManager().toggleOffElytra(player2Stats);
+
                 player1Stats.startedRace();
                 player2Stats.startedRace();
                 player1Stats.setLevel(level);
@@ -241,11 +246,19 @@ public class RaceManager {
             if (!winnerRegions.isEmpty()) {
                 Level winnerLevel = Parkour.getLevelManager().get(winnerRegions.get(0));
                 winnerStats.setLevel(winnerLevel);
+
+                // if elytra level, give elytra
+                if (winnerLevel.isElytraLevel())
+                    Parkour.getStatsManager().toggleOnElytra(winnerStats);
             }
 
             if (!loserRegions.isEmpty()) {
                 Level loserLevel = Parkour.getLevelManager().get(loserRegions.get(0));
                 loserStats.setLevel(loserLevel);
+
+                // if elytra level, give elytra
+                if (loserLevel.isElytraLevel())
+                    Parkour.getStatsManager().toggleOnElytra(loserStats);
             }
 
             // remove from list

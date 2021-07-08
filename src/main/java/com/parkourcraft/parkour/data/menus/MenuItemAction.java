@@ -156,20 +156,20 @@ public class MenuItemAction {
     private static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace()) {
             if (level.hasRequiredLevels(playerStats)) {
+
+                player.closeInventory();
+
                 // if the level has perm node, and player does not have perm node
                 if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
-                    player.closeInventory();
                     player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
                     return;
                 }
+
                 // if player is in level and their level is the level they clicked on, cancel
                 if (playerStats.getLevel() != null && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
-                    player.closeInventory();
                     player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                     return;
                 }
-
-                player.closeInventory();
 
                 for (PotionEffect potionEffect : player.getActivePotionEffects())
                     player.removePotionEffect(potionEffect.getType());

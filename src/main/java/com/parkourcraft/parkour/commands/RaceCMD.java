@@ -71,6 +71,12 @@ public class RaceCMD implements CommandExecutor {
             return;
         }
 
+        // if in elytra and not on the ground, dont send
+        if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !playerStats.getPlayer().isOnGround()) {
+            player.sendMessage(Utils.translate("&cYou cannot do this while not on the ground in an elytra level"));
+            return;
+        }
+
         // make sure they have enough money for the bet
         double victimBalance = Parkour.getEconomy().getBalance(victim);
         double senderBalance = Parkour.getEconomy().getBalance(player);
@@ -142,6 +148,8 @@ public class RaceCMD implements CommandExecutor {
 
             // conditions to cancel
             PlayerStats playerStats = Parkour.getStatsManager().get(accepter);
+            PlayerStats victimStats = Parkour.getStatsManager().get(victim);
+
             if (playerStats.getPlayerToSpectate() != null) {
                 accepter.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
                 removeFromConfirmMap(victim, accepter);
@@ -157,6 +165,18 @@ public class RaceCMD implements CommandExecutor {
             // if accepting race while in race
             if (playerStats.inRace()) {
                 accepter.sendMessage(Utils.translate("&cYou cannot race someone else while in a race"));
+                return;
+            }
+
+            // if they are in an elytra level and not on the ground, do not continue
+            if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !playerStats.getPlayer().isOnGround()) {
+                accepter.sendMessage(Utils.translate("&cYou cannot race someone else while not on the ground in an elytra level"));
+                return;
+            }
+
+            // if other player is in an elytra level and not on the ground, do not continue
+            if (victimStats.inLevel() && victimStats.getLevel().isElytraLevel() && !victimStats.getPlayer().isOnGround()) {
+                accepter.sendMessage(Utils.translate("&cYou cannot race someone when " + victim.getName() + " is not on the ground in an elytra level"));
                 return;
             }
 

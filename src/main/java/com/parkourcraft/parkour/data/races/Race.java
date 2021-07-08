@@ -49,12 +49,6 @@ public class Race {
         return false;
     }
 
-    public boolean isPlayer2(Player player) {
-        if (player.getName().equalsIgnoreCase(player2.getName()))
-            return true;
-        return false;
-    }
-
     public boolean hasBet() {
         return bet;
     }
