@@ -91,11 +91,12 @@ public class Parkour extends JavaPlugin {
     @Override
     public void onDisable() {
         // save and do all shutdown methods
-        CheckpointDB.saveAllPlayers();
+        CheckpointDB.shutdown();
         PracticeHandler.shutdown();
         SpectatorHandler.shutdown();
         infinite.shutdown();
         events.shutdown();
+        levels.shutdown();
 
         // close database and unload classes
         database.close();

@@ -81,11 +81,10 @@ public class CheckpointDB {
         );
     }
 
-    public static void saveAllPlayers() {
-        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
-            PlayerStats playerStats = entry.getValue();
+    public static void shutdown() {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
             if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getCheckpoint() != null)
-                savePlayer(entry.getValue().getPlayer());
+                savePlayer(playerStats.getPlayer());
         }
     }
 

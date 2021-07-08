@@ -13,11 +13,13 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
-
 import java.util.List;
 
 public class MenuItemAction {
@@ -157,6 +159,9 @@ public class MenuItemAction {
                 for (PotionEffect potionEffect : player.getActivePotionEffects())
                     player.removePotionEffect(potionEffect.getType());
 
+                // toggle off if saved
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
                 // save if has checkpoint
                 if (playerStats.getCheckpoint() != null) {
                     CheckpointDB.savePlayerAsync(player);
@@ -183,6 +188,9 @@ public class MenuItemAction {
                     for (PotionEffect potionEffect : level.getPotionEffects())
                         player.addPotionEffect(potionEffect);
                 }
+
+                if (level.isElytraLevel())
+                    Parkour.getStatsManager().toggleOnElytra(playerStats);
 
                 TitleAPI.sendTitle(
                         player, 10, 40, 10,

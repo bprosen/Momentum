@@ -6,10 +6,12 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class SpawnCMD implements CommandExecutor {
 
@@ -59,6 +61,9 @@ public class SpawnCMD implements CommandExecutor {
                     CheckpointDB.savePlayerAsync(player);
                     playerStats.resetCheckpoint();
                 }
+                // toggle off elytra armor
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
                 playerStats.resetPracticeMode();
                 playerStats.resetLevel();
             } else {

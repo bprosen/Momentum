@@ -13,8 +13,10 @@ import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 
@@ -162,6 +164,9 @@ public class LevelHandler {
 
         // run teleport and location management if not forced completion
         if (!forcedCompletion) {
+
+            Parkour.getStatsManager().toggleOffElytra(playerStats);
+
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());
 

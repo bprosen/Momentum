@@ -143,6 +143,32 @@ public class StatsManager {
         return globalPersonalCompletionsLB;
     }
 
+    public void toggleOffElytra(PlayerStats playerStats) {
+        // load if saved
+        if (playerStats.getChestplateSavedFromElytra() != null) {
+            playerStats.getPlayer().getInventory().setChestplate(playerStats.getChestplateSavedFromElytra());
+            playerStats.setChestplateSavedFromElytra(null);
+        // remove elytra if was in level
+        } else if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+            playerStats.getPlayer().getInventory().setChestplate(null);
+    }
+
+    public void toggleOnElytra(PlayerStats playerStats) {
+
+        // save item
+        if (playerStats.getPlayer().getInventory().getChestplate() != null)
+            playerStats.setChestplateSavedFromElytra(playerStats.getPlayer().getInventory().getChestplate());
+
+        // create item
+        ItemStack elytraItem = new ItemStack(Material.ELYTRA);
+        ItemMeta itemMeta = elytraItem.getItemMeta();
+
+        itemMeta.setDisplayName(Utils.translate("&cElytra"));
+        elytraItem.setItemMeta(itemMeta);
+
+        playerStats.getPlayer().getInventory().setChestplate(elytraItem);
+    }
+
     public void clean() {
 
         if (playerStatsList.isEmpty())

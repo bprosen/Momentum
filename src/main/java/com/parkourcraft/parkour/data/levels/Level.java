@@ -7,6 +7,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ public class Level {
     private int scoreModifier = 1;
     private boolean isRankUpLevel = false;
     private boolean liquidResetPlayer = true;
+    private boolean elytraLevel = false;
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
@@ -336,6 +338,7 @@ public class Level {
             liquidResetPlayer = LevelsYAML.getLiquidResetSetting(name);
             requiredPermissionNode = LevelsYAML.getRequiredPermissionNode(name);
             respawnY = LevelsYAML.getRespawnY(name);
+            elytraLevel = LevelsYAML.isElytraLevel(name);
         }
     }
 
@@ -350,6 +353,8 @@ public class Level {
     public int getRespawnY() {
         return respawnY;
     }
+
+    public boolean isElytraLevel() { return elytraLevel; }
 
     public List<LevelCompletion> getLeaderboard() {
         return leaderboardCache;

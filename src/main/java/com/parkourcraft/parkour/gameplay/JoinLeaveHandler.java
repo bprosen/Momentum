@@ -14,11 +14,13 @@ import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 import java.util.UUID;
@@ -39,30 +41,7 @@ public class JoinLeaveHandler implements Listener {
                 ));
             }
         }
-
-        Parkour.getStatsManager().add(player);
         PlayerHider.hideHiddenPlayersFromJoined(player);
-
-        List<String> regions = WorldGuard.getRegions(player.getLocation());
-        if (!regions.isEmpty()) {
-
-            Level level = Parkour.getLevelManager().get(regions.get(0));
-
-            // make sure the area they are spawning in is a level
-            if (level != null) {
-                Parkour.getStatsManager().get(player).setLevel(level);
-
-                UUID uuid = player.getUniqueId();
-
-                // run async
-                new BukkitRunnable() {
-                    public void run() {
-                        if (CheckpointDB.hasCheckpoint(uuid, regions.get(0)))
-                            CheckpointDB.loadPlayer(uuid, regions.get(0));
-                    }
-                }.runTaskAsynchronously(Parkour.getPlugin());
-            }
-        }
 
         // send message to op people that there are undecided plots
         if (player.isOp()) {
@@ -70,8 +49,40 @@ public class JoinLeaveHandler implements Listener {
 
             if (!submittedPlotList.isEmpty())
                 player.sendMessage(Utils.translate("&7There are &c&l" + submittedPlotList.size() + "" +
-                                    " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
+                        " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
+
+        // run most of this in async (region lookup, stat editing, etc)
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Parkour.getStatsManager().add(player);
+                List<String> regions = WorldGuard.getRegions(player.getLocation());
+                if (!regions.isEmpty()) {
+
+                    Level level = Parkour.getLevelManager().get(regions.get(0));
+
+                    // make sure the area they are spawning in is a level
+                    if (level != null) {
+                        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                        playerStats.setLevel(level);
+
+                        UUID uuid = player.getUniqueId();
+                        if (CheckpointDB.hasCheckpoint(uuid, regions.get(0)))
+                            CheckpointDB.loadPlayer(uuid, regions.get(0));
+
+                        // is elytra level, then set elytra in sync (player inventory changes)
+                        if (level.isElytraLevel())
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Parkour.getStatsManager().toggleOnElytra(playerStats);
+                                }
+                            }.runTask(Parkour.getPlugin());
+                    }
+                }
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     @EventHandler
@@ -110,6 +121,9 @@ public class JoinLeaveHandler implements Listener {
 
         if (playerStats.isInInfinitePK())
             infinitePKManager.endPK(player, true);
+
+        // toggle off elytra armor
+        Parkour.getStatsManager().toggleOffElytra(playerStats);
 
         // do not need to check, as method already checks
         clansManager.toggleClanChat(player.getName(), null);

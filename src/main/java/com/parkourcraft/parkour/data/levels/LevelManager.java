@@ -11,6 +11,8 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.sk89q.minecraft.util.commands.Link;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -392,6 +394,9 @@ public class LevelManager {
 
                     if (playerStats.getCheckpoint() != null)
                         playerStats.resetCheckpoint();
+
+                    // toggle off elytra armor
+                    Parkour.getStatsManager().toggleOffElytra(playerStats);
                 }
 
             levels.remove(levelName);
@@ -404,5 +409,10 @@ public class LevelManager {
 
     public Set<String> getNames() {
         return levels.keySet();
+    }
+
+    public void shutdown() {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+            Parkour.getStatsManager().toggleOffElytra(playerStats);
     }
 }

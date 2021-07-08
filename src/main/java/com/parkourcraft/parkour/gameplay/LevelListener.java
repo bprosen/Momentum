@@ -170,7 +170,7 @@ public class LevelListener implements Listener {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // this is mainly QOL for staff!
-        if (player.hasPermission("pc-parkour.staff")) {
+        if (playerStats != null && player.hasPermission("pc-parkour.staff")) {
             List<String> regions = WorldGuard.getRegions(event.getTo());
             if (!regions.isEmpty()) {
 

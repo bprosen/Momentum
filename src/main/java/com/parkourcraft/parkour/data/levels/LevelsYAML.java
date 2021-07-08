@@ -3,12 +3,16 @@ package com.parkourcraft.parkour.data.levels;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.events.EventType;
 import com.parkourcraft.parkour.data.stats.StatsDB;
+import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -241,6 +245,20 @@ public class LevelsYAML {
 
     public static void setRespawnY(String levelName, int newY) {
         levelsFile.set(levelName + ".respawn_y", newY);
+        commit(levelName);
+    }
+
+    public static boolean isElytraLevel(String levelName) {
+        boolean elytra = false;
+        if (isSet(levelName, "elytra"))
+            elytra = levelsFile.getBoolean(levelName + ".elytra");
+
+        return elytra;
+    }
+
+    public static void toggleElytraLevel(String levelName) {
+        boolean elytra = isElytraLevel(levelName);
+        levelsFile.set(levelName + ".elytra", !elytra);
         commit(levelName);
     }
 

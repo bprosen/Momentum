@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.ranks.Rank;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -25,6 +26,7 @@ public class PlayerStats {
     private Location spectateSpawn = null;
     private boolean inRace = false;
     private Rank rank;
+    private ItemStack chestplateSavedFromElytra = null;
     private int prestiges = 0;
     private int raceWins = 0;
     private int raceLosses = 0;
@@ -143,6 +145,10 @@ public class PlayerStats {
     public void setIndividualLevelsBeaten(int individualLevelsBeaten) { this.individualLevelsBeaten = individualLevelsBeaten; }
 
     public int getIndividualLevelsBeaten() { return individualLevelsBeaten; }
+
+    public ItemStack getChestplateSavedFromElytra() { return chestplateSavedFromElytra; }
+
+    public void setChestplateSavedFromElytra(ItemStack chestplate) { chestplateSavedFromElytra = chestplate; }
 
     //
     // Spectator Section
