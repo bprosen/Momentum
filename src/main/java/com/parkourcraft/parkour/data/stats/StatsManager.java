@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -164,6 +165,8 @@ public class StatsManager {
         ItemMeta itemMeta = elytraItem.getItemMeta();
 
         itemMeta.setDisplayName(Utils.translate("&cElytra"));
+        itemMeta.setUnbreakable(true);
+        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         elytraItem.setItemMeta(itemMeta);
 
         playerStats.getPlayer().getInventory().setChestplate(elytraItem);

@@ -82,9 +82,7 @@ public class MenuItemAction {
                         Parkour.getLevelManager().getFeaturedLevel());
             else if (typeValue.equals("exit"))
                 player.closeInventory();
-        }
-
-        if (menuItem.hasCommands())
+        } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
