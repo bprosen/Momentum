@@ -222,7 +222,7 @@ public class LevelHandler {
     }
 
     // Respawn player if checkpoint isn't there
-    static void respawnPlayer(Player player, Level level) {
+    public static void respawnPlayer(Player player, Level level) {
         // make sure the water reset is toggled on
         if (level != null) {
             Location loc = level.getStartLocation();

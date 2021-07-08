@@ -166,8 +166,14 @@ public class MenuItemAction {
                 }
 
                 // if player is in level and their level is the level they clicked on, cancel
-                if (playerStats.getLevel() != null && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
+                if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
                     player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                    return;
+                }
+
+                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !playerStats.getPlayer().isOnGround()) {
+                    player.sendMessage(Utils.translate("&cFor teleporting safety, you cannot enter another level" +
+                            " when you are not on the ground in an elytra level"));
                     return;
                 }
 

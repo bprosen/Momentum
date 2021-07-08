@@ -2,6 +2,7 @@ package com.parkourcraft.parkour.data.checkpoints;
 
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.gameplay.LevelHandler;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -30,8 +31,9 @@ public class CheckpointManager {
                         loc.setPitch(playerStats.getPlayer().getLocation().getPitch());
                         loc.setYaw(playerStats.getPlayer().getLocation().getYaw());
                         playerStats.getPlayer().teleport(loc);
-                    } else {
-                        playerStats.getPlayer().sendMessage(Utils.translate("&cYou do not have a saved checkpoint"));
+
+                    } else if (playerStats.getLevel() != null) {
+                        LevelHandler.respawnPlayer(playerStats.getPlayer(), playerStats.getLevel());
                     }
                 } else {
                     playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while spectating"));
