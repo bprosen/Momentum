@@ -595,7 +595,6 @@ public class LevelCMD implements CommandExecutor {
                         else
                             sender.sendMessage(Utils.translate("&7You have toggled on liquid resetting players for level &c" + level.getFormattedTitle()));
 
-                        level.toggleLiquidReset();
                         LevelsYAML.toggleWaterReset(levelName);
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));

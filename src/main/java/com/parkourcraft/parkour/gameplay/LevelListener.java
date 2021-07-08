@@ -177,7 +177,7 @@ public class LevelListener implements Listener {
                 // make sure the area they are spawning in is a level
                 Level level = Parkour.getLevelManager().get(regions.get(0));
 
-                if (level != null && (playerStats.getLevel() != null && !level.getName().equalsIgnoreCase(playerStats.getLevel().getName())))
+                if (level != null)
                     playerStats.setLevel(level);
 
             } else if (playerStats.getLevel() != null) {

@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LevelManager {
 
@@ -50,10 +51,12 @@ public class LevelManager {
     public void load(String levelName) {
         boolean exists = exists(levelName);
 
+        Level level = null;
+
         if (!LevelsYAML.exists(levelName) && exists)
             levels.remove(levelName);
         else {
-            Level level = new Level(levelName);
+            level = new Level(levelName);
             LevelsDB.syncDataCache(level, levelDataCache);
 
             if (exists)
@@ -61,6 +64,22 @@ public class LevelManager {
 
             levels.put(levelName, level);
         }
+
+        // need to add final copy for outside inner class access
+        Level finalLevel = level;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // loop through to update stats
+                for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+                    if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName))
+                        if (finalLevel != null)
+                            playerStats.setLevel(finalLevel);
+                        else
+                            // if level was just removed from only config, then reset their level
+                            playerStats.resetLevel();
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     private void startScheduler(Plugin plugin) {
