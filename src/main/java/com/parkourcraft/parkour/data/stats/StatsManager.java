@@ -190,9 +190,9 @@ public class StatsManager {
     /*
         Profile Section
      */
-    public void loadProfile(PlayerStats playerStats) {
+    public void loadProfile(PlayerStats playerStats, Player opener) {
 
-        Inventory openInventory = playerStats.getPlayer().getOpenInventory().getTopInventory();
+        Inventory openInventory = opener.getOpenInventory().getTopInventory();
         Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
 
         if (openInventory != null && playerStats != null) {
@@ -253,7 +253,7 @@ public class StatsManager {
 
                             } else {
                                 newLore.add(Utils.translate("&7You do not have a clan"));
-                                break;
+                                continue;
                             }
 
                             if (loreString != null)
@@ -275,8 +275,8 @@ public class StatsManager {
                 }
                 newInventory.setItem(i, item);
             }
-            playerStats.getPlayer().closeInventory();
-            playerStats.getPlayer().openInventory(newInventory);
+            opener.closeInventory();
+            opener.openInventory(newInventory);
         }
     }
 }
