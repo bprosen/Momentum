@@ -36,7 +36,7 @@ public class MenuListener implements Listener {
                 Player player = (Player) event.getWhoClicked();
                 ItemStack itemClicked = event.getCurrentItem();
 
-                if (menuItem != null) {
+                if (menuItem != null && menuItem.getItem().getType() == itemClicked.getType()) {
                     MenuItemAction.perform(player, menuItem);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                 } else {

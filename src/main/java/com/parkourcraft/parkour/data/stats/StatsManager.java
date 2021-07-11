@@ -13,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
@@ -83,7 +84,11 @@ public class StatsManager {
     }
 
     public PlayerStats getByNameIgnoreCase(String playerName) {
-        return playerStatsList.get(playerName);
+        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
+            if (entry.getKey().equalsIgnoreCase(playerName))
+                return entry.getValue();
+
+        return null;
     }
 
     public PlayerStats get(Player player) {
@@ -196,6 +201,9 @@ public class StatsManager {
         Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
 
         if (openInventory != null && playerStats != null) {
+            // so there is not many lines of "You do not have a clan" spam
+            boolean alreadyCheckedClan = false;
+
             for (int i = 0; i < openInventory.getSize(); i++) {
                 ItemStack item = openInventory.getItem(i);
 
@@ -208,58 +216,73 @@ public class StatsManager {
                         List<String> itemLore = item.getItemMeta().getLore();
                         List<String> newLore = new ArrayList<>();
 
-                        Clan clan = playerStats.getClan();
-                        for (String loreString : itemLore) {
+                        // special condition if they are viewing someone else's stats, replace the skull with correct values
+                        if (playerStats.getPlayerName() != opener.getName() && item.getType() == Material.GOLD_NUGGET) {
+                            ItemStack skullItem = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+                            SkullMeta skullMeta = (SkullMeta) skullItem.getItemMeta();
+                            skullMeta.setOwningPlayer(playerStats.getPlayer());
+                            skullMeta.setDisplayName(Utils.translate("&7You are viewing &c" + playerStats.getPlayer().getDisplayName() + "&7's Profile"));
+                            skullItem.setItemMeta(skullMeta);
+                            // replace item for later when it sets
+                            item = skullItem;
+                        // otherwise it is a stat item
+                        } else {
 
-                            // rank and game stats item
-                            loreString = loreString.replace("%balance%", ((int) Parkour.getEconomy().getBalance(playerStats.getPlayer())) + "")
-                                    .replace("%perks_gained%", playerStats.getPerks().size() + "")
-                                    .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
-                                    .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
-                                    .replace("%prestiges%", playerStats.getPrestiges() + "")
-                                    .replace("%infinite_score%", playerStats.getInfinitePKScore() + "")
-                                    .replace("%race_wins%", playerStats.getRaceWins() + "")
-                                    .replace("%race_losses%", playerStats.getRaceLosses() + "")
-                                    .replace("%race_winrate%", playerStats.getRaceWinRate() + "");
+                            Clan clan = playerStats.getClan();
+                            for (String loreString : itemLore) {
 
-                            // level stats, only add if the most completed level is not null
-                            Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
-                            if (mostCompletedLevel != null) {
+                                // rank and game stats item
+                                loreString = loreString.replace("%balance%", ((int) Parkour.getEconomy().getBalance(playerStats.getPlayer())) + "")
+                                        .replace("%perks_gained%", playerStats.getPerks().size() + "")
+                                        .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
+                                        .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
+                                        .replace("%prestiges%", playerStats.getPrestiges() + "")
+                                        .replace("%infinite_score%", playerStats.getInfinitePKScore() + "")
+                                        .replace("%race_wins%", playerStats.getRaceWins() + "")
+                                        .replace("%race_losses%", playerStats.getRaceLosses() + "")
+                                        .replace("%race_winrate%", playerStats.getRaceWinRate() + "");
 
-                                loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
-                                        .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "")
-                                        .replace("%fastest_completion%", (((double) playerStats.getQuickestCompletions(
-                                                playerStats.getMostCompletedLevel()).get(0).getCompletionTimeElapsed()) / 1000) + "s");
-                            }
-                            // now add the last part of the level stats
-                            loreString = loreString.replace("%total_completions%", playerStats.getTotalLevelCompletions() + "")
+                                // level stats, only add if the most completed level is not null
+                                Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
+                                if (mostCompletedLevel != null) {
+
+                                    loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
+                                            .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "")
+                                            .replace("%fastest_completion%", (((double) playerStats.getQuickestCompletions(
+                                                    playerStats.getMostCompletedLevel()).get(0).getCompletionTimeElapsed()) / 1000) + "s");
+                                }
+                                // now add the last part of the level stats
+                                loreString = loreString.replace("%total_completions%", playerStats.getTotalLevelCompletions() + "")
                                         .replace("%levels_completed%", playerStats.getIndividualLevelsBeaten() + "")
                                         .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
                                         .replace("%rated_levels_count%", playerStats.getRatedLevelsCount() + "");
-                            // if they have a clan, check for clan item
-                            if (clan != null) {
 
-                                // replace clan items
-                                loreString = loreString.replace("%clan_name%", clan.getTag())
-                                        .replace("%clan_level%", clan.getLevel() + "")
-                                        .replace("%clan_total_xp%", Utils.shortStyleNumber(clan.getTotalGainedXP()))
-                                        .replace("%clan_level_xp%", Utils.shortStyleNumber(clan.getXP()))
-                                        .replace("%clan_owner%", clan.getOwner().getPlayerName())
-                                        .replace("%clan_member_count%", clan.getMembers().size() + "");
+                                // if they have a clan, check for clan item
+                                if (clan != null) {
 
-                                // null it for clan
-                                if (loreString.contains("%clan_members%"))
-                                    loreString = null;
+                                    // replace clan items
+                                    loreString = loreString.replace("%clan_name%", clan.getTag())
+                                            .replace("%clan_level%", clan.getLevel() + "")
+                                            .replace("%clan_total_xp%", Utils.shortStyleNumber(clan.getTotalGainedXP()))
+                                            .replace("%clan_level_xp%", Utils.shortStyleNumber(clan.getXP()))
+                                            .replace("%clan_owner%", clan.getOwner().getPlayerName())
+                                            .replace("%clan_member_count%", clan.getMembers().size() + "");
 
-                            } else {
-                                newLore.add(Utils.translate("&7You do not have a clan"));
-                                continue;
-                            }
+                                    // null it for clan
+                                    if (loreString.contains("%clan_members%"))
+                                        loreString = null;
 
-                            if (loreString != null)
-                                newLore.add(loreString);
-                            // this means clan members!
-                            else for (ClanMember clanMember : clan.getMembers()) {
+                                    // item loaded for clan is emerald
+                                } else if (item.getType() == Material.EMERALD && !alreadyCheckedClan) {
+                                    newLore.add(Utils.translate("&7They do not have a clan"));
+                                    alreadyCheckedClan = true;
+                                    continue;
+                                }
+
+                                if (loreString != null)
+                                    newLore.add(loreString);
+                                    // this means clan members!
+                                else for (ClanMember clanMember : clan.getMembers()) {
 
                                     // make string for online/offline
                                     String onlineStatus = "&cOffline";
@@ -269,8 +292,9 @@ public class StatsManager {
                                     newLore.add(Utils.translate("  &7" + clanMember.getPlayerName() + " " + onlineStatus));
                                 }
                             }
-                        itemMeta.setLore(newLore);
-                        item.setItemMeta(itemMeta);
+                            itemMeta.setLore(newLore);
+                            item.setItemMeta(itemMeta);
+                        }
                     }
                 }
                 newInventory.setItem(i, item);
