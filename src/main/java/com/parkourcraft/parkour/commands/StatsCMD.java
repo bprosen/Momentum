@@ -212,63 +212,14 @@ public class StatsCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&7No level named '&c" + levelName + "&7' exists"));
                 }
             }
-        } else if (sender instanceof Player) {
-            Player player = (Player) sender;
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-            if (playerStats != null) {
-                // objects
-                Rank rank = playerStats.getRank();
-                Clan clan = playerStats.getClan();
-
-                // primitive types
-                int prestiges = playerStats.getPrestiges();
-                int infinitePKScore = playerStats.getInfinitePKScore();
-                int totalCompletions = playerStats.getTotalLevelCompletions();
-                int raceWins = playerStats.getRaceWins();
-                int raceLosses = playerStats.getRaceLosses();
-                float raceWinRate = playerStats.getRaceWinRate();
-                double balance = Parkour.getEconomy().getBalance(player);
-
-                LevelManager levelManager = Parkour.getLevelManager();
-
-                // get most completed level and its quickest completion
-                Level mostCompletedLevel = levelManager.get(playerStats.getMostCompletedLevel());
-                List<LevelCompletion> quickestCompletion = null;
-                if (mostCompletedLevel != null)
-                    quickestCompletion = playerStats.getQuickestCompletions(mostCompletedLevel.getName());
-
-                // now send the entire stats board
-                player.sendMessage(Utils.translate("&c" + player.getDisplayName() + "&7's Stats"));
-                player.sendMessage("");
-                player.sendMessage(Utils.translate(" &6Coins &7" + ((int) balance)));
-                player.sendMessage(Utils.translate(" &cRank &7" + rank.getRankTitle()));
-                player.sendMessage(Utils.translate(" &4Prestiges &7" + prestiges));
-                // only send if they have a clan
-                if (clan != null)
-                    player.sendMessage(Utils.translate(" &eClan &7" + clan.getTag() + " (" + clan.getMembers().size() + " Members)"));
-                player.sendMessage(Utils.translate(" &3Perks Gained/Total &7" + playerStats.getPerks().size() + "/" + Parkour.getPerkManager().getPerks().size()));
-                player.sendMessage(Utils.translate(" &5Best Infinite &7" + infinitePKScore));
-                player.sendMessage(Utils.translate(" &8Races W/L/WR &7" + raceWins + "/" + raceLosses + "/" + raceWinRate));
-                player.sendMessage("");
-                player.sendMessage(Utils.translate(" &2&lLevel Stats"));
-                player.sendMessage(Utils.translate("  &7-> &aTotal Level Completions &7" + Utils.shortStyleNumber(totalCompletions)));
-                player.sendMessage(Utils.translate("  &7-> &aRated Levels Count &7" + playerStats.getRatedLevelsCount()));
-                player.sendMessage(Utils.translate("  &7-> &aLevels Completed/Total &7" +
-                                   playerStats.getIndividualLevelsBeaten() + "/" + levelManager.getLevels().size()));
-
-                // only send if they have completed a level
-                if (quickestCompletion != null) {
-                    double completionTime = ((double) quickestCompletion.get(0).getCompletionTimeElapsed()) / 1000;
-
-                    player.sendMessage(Utils.translate("  &7-> &aMost Played Level &7" + mostCompletedLevel.getFormattedTitle()
-                            + " &7(" + playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "&7)"));
-                    player.sendMessage(Utils.translate("  &7-> &aYour Fastest " + mostCompletedLevel.getFormattedTitle() +
-                                                            " &7" + completionTime + "s"));
-                }
-            }
         } else {
-            sender.sendMessage(Utils.translate("&2/stats <infinite/levels/players/clans/levelName> &7View stats"));
+            sender.sendMessage(Utils.translate("&6/stats <levelName>  &7Gets level's Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats infinite  &7Gets Infinite Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats races  &7Gets Races Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats toprated  &7Gets Top Rated Levels Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats clans  &7Gets Clan XP Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats players  &7Gets Players Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats levels  &7Gets Levels Leaderboard"));
         }
         return true;
     }
