@@ -200,7 +200,9 @@ public class EventManager {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // reset the cache and teleport player back
-        if (!disconnected && CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel().getName()))
+        if (!disconnected &&
+            eventParticipant.getOriginalLevel() != null &&
+            CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel().getName()))
             CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel().getName());
 
         // do all setting changes to revert back
@@ -210,7 +212,7 @@ public class EventManager {
         player.setHealth(20.0);
 
         // set back if they came from elytra level
-        if (eventParticipant.getOriginalLevel().isElytraLevel())
+        if (eventParticipant.getOriginalLevel() != null && eventParticipant.getOriginalLevel().isElytraLevel())
             Parkour.getStatsManager().toggleOnElytra(playerStats);
 
         participants.remove(eventParticipant);

@@ -40,8 +40,8 @@ public class RaceManager {
             // this is what filters not in use races
             for (Race race : getRaces()) {
                 for (String levelName : Parkour.getLevelManager().getRaceLevels()) {
-                    if (!race.getRaceLevel().getName().equalsIgnoreCase(levelName)
-                            && Parkour.getLevelManager().get(levelName).hasValidRaceLocations()) {
+                    if (race.getRaceLevel().getName().equalsIgnoreCase(levelName)
+                        && Parkour.getLevelManager().get(levelName).hasValidRaceLocations()) {
 
                         temporaryLevelList.add(levelName);
                     }
@@ -245,20 +245,26 @@ public class RaceManager {
             List<String> loserRegions = WorldGuard.getRegions(loser.getLocation());
             if (!winnerRegions.isEmpty()) {
                 Level winnerLevel = Parkour.getLevelManager().get(winnerRegions.get(0));
-                winnerStats.setLevel(winnerLevel);
 
-                // if elytra level, give elytra
-                if (winnerLevel.isElytraLevel())
-                    Parkour.getStatsManager().toggleOnElytra(winnerStats);
+                if (winnerLevel != null) {
+                    winnerStats.setLevel(winnerLevel);
+
+                    // if elytra level, give elytra
+                    if (winnerLevel.isElytraLevel())
+                        Parkour.getStatsManager().toggleOnElytra(winnerStats);
+                }
             }
 
             if (!loserRegions.isEmpty()) {
                 Level loserLevel = Parkour.getLevelManager().get(loserRegions.get(0));
-                loserStats.setLevel(loserLevel);
 
-                // if elytra level, give elytra
-                if (loserLevel.isElytraLevel())
-                    Parkour.getStatsManager().toggleOnElytra(loserStats);
+                if (loserLevel != null) {
+                    loserStats.setLevel(loserLevel);
+
+                    // if elytra level, give elytra
+                    if (loserLevel.isElytraLevel())
+                        Parkour.getStatsManager().toggleOnElytra(loserStats);
+                }
             }
 
             // remove from list
