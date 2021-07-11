@@ -212,7 +212,10 @@ public class StatsManager {
                         for (String loreString : itemLore) {
 
                             // rank and game stats item
-                            loreString = loreString.replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
+                            loreString = loreString.replace("%balance%", ((int) Parkour.getEconomy().getBalance(playerStats.getPlayer())) + "")
+                                    .replace("%perks_gained%", playerStats.getPerks().size() + "")
+                                    .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
+                                    .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
                                     .replace("%prestiges%", playerStats.getPrestiges() + "")
                                     .replace("%infinite_score%", playerStats.getInfinitePKScore() + "")
                                     .replace("%race_wins%", playerStats.getRaceWins() + "")
@@ -224,13 +227,15 @@ public class StatsManager {
                             if (mostCompletedLevel != null) {
 
                                 loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
+                                        .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "")
                                         .replace("%fastest_completion%", (((double) playerStats.getQuickestCompletions(
                                                 playerStats.getMostCompletedLevel()).get(0).getCompletionTimeElapsed()) / 1000) + "s");
                             }
                             // now add the last part of the level stats
                             loreString = loreString.replace("%total_completions%", playerStats.getTotalLevelCompletions() + "")
                                         .replace("%levels_completed%", playerStats.getIndividualLevelsBeaten() + "")
-                                        .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "");
+                                        .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
+                                        .replace("%rated_levels_count%", playerStats.getRatedLevelsCount() + "");
                             // if they have a clan, check for clan item
                             if (clan != null) {
 

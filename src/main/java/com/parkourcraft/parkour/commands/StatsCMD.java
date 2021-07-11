@@ -261,7 +261,8 @@ public class StatsCMD implements CommandExecutor {
                 if (quickestCompletion != null) {
                     double completionTime = ((double) quickestCompletion.get(0).getCompletionTimeElapsed()) / 1000;
 
-                    player.sendMessage(Utils.translate("  &7-> &aMost Played Level &7" + mostCompletedLevel.getFormattedTitle()));
+                    player.sendMessage(Utils.translate("  &7-> &aMost Played Level &7" + mostCompletedLevel.getFormattedTitle()
+                            + " &7(" + playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "&7)"));
                     player.sendMessage(Utils.translate("  &7-> &aYour Fastest " + mostCompletedLevel.getFormattedTitle() +
                                                             " &7" + completionTime + "s"));
                 }
