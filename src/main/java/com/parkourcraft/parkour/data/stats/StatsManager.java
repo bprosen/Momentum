@@ -108,6 +108,7 @@ public class StatsManager {
 
     private void loadUnloadedStats() {
         if (!running) {
+            running = true;
             for (PlayerStats playerStats : playerStatsList.values()) {
                 if (playerStats.getPlayerID() == -1) {
                     StatsDB.loadPlayerStats(playerStats);
