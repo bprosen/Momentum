@@ -1,5 +1,6 @@
 package com.parkourcraft.parkour.data.events;
 
+import com.connorlinfoot.titleapi.TitleAPI;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
@@ -23,6 +24,7 @@ import java.util.*;
 public class EventManager {
 
     private Event runningEvent = null;
+    private Player winner = null;
     private BukkitTask maxRunTimer;
     private BukkitTask reminderTimer;
     private Set<EventParticipant> participants = new HashSet<>();
@@ -103,6 +105,8 @@ public class EventManager {
 
     // method to end event
     public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime) {
+        this.winner = winner;
+
         // cancel schedulers first
         runningEvent.getScheduler().cancel();
         maxRunTimer.cancel();
@@ -127,17 +131,13 @@ public class EventManager {
             Parkour.getEconomy().depositPlayer(winner, reward);
         }
 
-        if (forceEnded) {
-            Bukkit.broadcastMessage("");
+        if (forceEnded)
             Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
                     + " &7Event has been force ended!"));
-            Bukkit.broadcastMessage("");
-        } else if (ranOutOfTime) {
-            Bukkit.broadcastMessage("");
+        else if (ranOutOfTime)
             Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
                     + " &7Event has gone on too long! Nobody beat it in time :("));
-            Bukkit.broadcastMessage("");
-        } else {
+        else {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
                     + " &7Event has ended! &b&l" + winner.getName() + " &7has won!"));
@@ -211,6 +211,11 @@ public class EventManager {
         player.teleport(eventParticipant.getOriginalLocation());
         player.setHealth(20.0);
 
+        if (!disconnected)
+            TitleAPI.sendTitle(eventParticipant.getPlayer(), 10, 80, 10,
+                    Utils.translate("&c" + winner.getDisplayName() + " &7has won the &2&l" +
+                                         formatName(runningEvent.getEventType()) + " &7Event"));
+
         // set back if they came from elytra level
         if (eventParticipant.getOriginalLevel() != null && eventParticipant.getOriginalLevel().isElytraLevel())
             Parkour.getStatsManager().toggleOnElytra(playerStats);
@@ -229,6 +234,9 @@ public class EventManager {
         // now remove so theres no concurrency problem
         for (EventParticipant participant : tempList)
             removeParticipant(participant.getPlayer(), shutdown);
+
+        // null winner once all participants have been handled
+        winner = null;
     }
 
     public Set<EventParticipant> getParticipants() {

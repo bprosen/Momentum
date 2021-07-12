@@ -188,11 +188,11 @@ public class RaceManager {
             Player loser = raceObject.getOpponent(winner);
 
             if (raceObject.hasBet())
-                Bukkit.broadcastMessage(Utils.translate("&4&l" + winner.getName() + " &chas beaten &4&l" + loser.getName()
-                                        + " &cin a race for &6$" + raceObject.getBet()));
+                Bukkit.broadcastMessage(Utils.translate("&4" + winner.getName() + " &7has beaten &4" + loser.getName()
+                                        + " &7in a race for &6$" + raceObject.getBet()));
             else
-                Bukkit.broadcastMessage(Utils.translate("&4&l" + winner.getName() + " &chas beaten &4&l" + loser.getName()
-                                        + " &cin a race!"));
+                Bukkit.broadcastMessage(Utils.translate("&4" + winner.getName() + " &7has beaten &4" + loser.getName()
+                                        + " &7in a race!"));
 
             // give winner money and take from loser if betted on race
             if (raceObject.hasBet()) {
@@ -208,6 +208,11 @@ public class RaceManager {
                 loser.teleport(raceObject.getOriginalPlayer1Loc());
                 winner.teleport(raceObject.getOriginalPlayer2Loc());
             }
+
+            // send title to winner and loser
+            String titleString = Utils.translate("&c" + winner.getDisplayName() + " &7has won the Race!");
+            TitleAPI.sendTitle(winner, 10, 60, 10, titleString);
+            TitleAPI.sendTitle(loser, 10, 60, 10, titleString);
 
             PlayerStats winnerStats = Parkour.getStatsManager().get(winner);
             PlayerStats loserStats = Parkour.getStatsManager().get(loser);
@@ -245,26 +250,20 @@ public class RaceManager {
             List<String> loserRegions = WorldGuard.getRegions(loser.getLocation());
             if (!winnerRegions.isEmpty()) {
                 Level winnerLevel = Parkour.getLevelManager().get(winnerRegions.get(0));
+                winnerStats.setLevel(winnerLevel);
 
-                if (winnerLevel != null) {
-                    winnerStats.setLevel(winnerLevel);
-
-                    // if elytra level, give elytra
-                    if (winnerLevel.isElytraLevel())
-                        Parkour.getStatsManager().toggleOnElytra(winnerStats);
-                }
+                // if elytra level, give elytra
+                if (winnerLevel != null && winnerLevel.isElytraLevel())
+                    Parkour.getStatsManager().toggleOnElytra(winnerStats);
             }
 
             if (!loserRegions.isEmpty()) {
                 Level loserLevel = Parkour.getLevelManager().get(loserRegions.get(0));
+                loserStats.setLevel(loserLevel);
 
-                if (loserLevel != null) {
-                    loserStats.setLevel(loserLevel);
-
-                    // if elytra level, give elytra
-                    if (loserLevel.isElytraLevel())
-                        Parkour.getStatsManager().toggleOnElytra(loserStats);
-                }
+                // if elytra level, give elytra
+                if (loserLevel != null && loserLevel.isElytraLevel())
+                    Parkour.getStatsManager().toggleOnElytra(loserStats);
             }
 
             // remove from list
