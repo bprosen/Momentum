@@ -248,7 +248,7 @@ public class Level {
         leaderboardCache = newLeaderboard;
     }
 
-    public void addCompletion(Player player, LevelCompletion levelCompletion, Level level) {
+    public void addCompletion(Player player, LevelCompletion levelCompletion) {
         if (totalCompletionsCount < 0)
             totalCompletionsCount = 0;
 

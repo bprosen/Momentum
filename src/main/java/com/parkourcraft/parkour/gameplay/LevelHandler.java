@@ -89,7 +89,7 @@ public class LevelHandler {
         playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
         StatsDB.insertCompletion(playerStats, level, levelCompletion);
         levelManager.addTotalLevelCompletion();
-        level.addCompletion(player, levelCompletion, level); // Update totalLevelCompletionsCount
+        level.addCompletion(player, levelCompletion); // Update totalLevelCompletionsCount
 
         // run commands if there is any
         if (level.hasCommands()) {

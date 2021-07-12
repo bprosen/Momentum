@@ -8,9 +8,6 @@ import com.parkourcraft.parkour.data.perks.PerksDB;
 import com.parkourcraft.parkour.data.ranks.Rank;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.*;
 
 public class StatsDB {
@@ -312,25 +309,26 @@ public class StatsDB {
         );
 
         List<LevelCompletion> levelCompletions = new ArrayList<>();
+        Set<String> addedPlayers = new HashSet<>(); // used to avoid duplicate positions
 
         for (Map<String, String> levelResult : levelsResults) {
 
             if (levelCompletions.size() >= 10)
                 break;
 
-            LevelCompletion levelCompletion = new LevelCompletion(
-                    Long.parseLong(levelResult.get("date")),
-                    Long.parseLong(levelResult.get("time_taken"))
-            );
+            String playerName = levelResult.get("player_name");
 
-            levelCompletion.setPlayerName(levelResult.get("player_name"));
-            levelCompletions.add(levelCompletion);
+            // if not added already, add to leaderboard
+            if (!addedPlayers.contains(playerName)) {
+                LevelCompletion levelCompletion = new LevelCompletion(
+                        Long.parseLong(levelResult.get("date")),
+                        Long.parseLong(levelResult.get("time_taken"))
+                );
 
-            for (int outer = 0; outer < levelCompletions.size(); outer++)
-                for (int inner = outer + 1; inner < levelCompletions.size(); inner++)
-                    if (levelCompletions.get(inner).getPlayerName().equalsIgnoreCase(
-                        levelCompletions.get(outer).getPlayerName()))
-                        levelCompletions.remove(levelCompletion);
+                levelCompletion.setPlayerName(playerName);
+                levelCompletions.add(levelCompletion);
+                addedPlayers.add(playerName);
+            }
         }
         level.setLeaderboardCache(levelCompletions);
     }
