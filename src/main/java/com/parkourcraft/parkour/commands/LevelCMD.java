@@ -662,6 +662,17 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("toggledropper")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        LevelsYAML.toggleDropperLevel(levelName);
+                        sender.sendMessage(Utils.translate("&7You have set &c" + level.getFormattedTitle() +
+                                "&7 as a dropper level to &c" + LevelsYAML.isDropperLevel(levelName)));
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletion")) {
                     String playerName = a[1];
                     String levelName = a[2].toLowerCase();
@@ -719,6 +730,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("delcompletion"));
         sender.sendMessage(getHelp("setrespawny"));
         sender.sendMessage(getHelp("toggleelytra"));
+        sender.sendMessage(getHelp("toggledropper"));
     }
 
     private static String getHelp(String cmd) {
@@ -776,6 +788,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level setrespawny <level> <respawnY>  &7Sets level respawn y");
             case "toggleelytra":
                 return Utils.translate("&a/level toggleelytra <level>  &7Sets level elytra");
+            case "toggledropper":
+                return Utils.translate("&a/level toggledropper <level>  &7Sets level as dropper");
         }
         return "";
     }

@@ -262,6 +262,20 @@ public class LevelsYAML {
         commit(levelName);
     }
 
+    public static boolean isDropperLevel(String levelName) {
+        boolean dropper = false;
+        if (isSet(levelName, "dropper"))
+            dropper = levelsFile.getBoolean(levelName + ".dropper");
+
+        return dropper;
+    }
+
+    public static void toggleDropperLevel(String levelName) {
+        boolean dropper = isDropperLevel(levelName);
+        levelsFile.set(levelName + ".dropper", !dropper);
+        commit(levelName);
+    }
+
     public static void setPlayerRaceLocation(String player, String levelName, Location loc) {
 
         String world = loc.getWorld().getName();
