@@ -211,7 +211,7 @@ public class EventManager {
         player.teleport(eventParticipant.getOriginalLocation());
         player.setHealth(20.0);
 
-        if (!disconnected)
+        if (!disconnected && winner != null)
             TitleAPI.sendTitle(eventParticipant.getPlayer(), 10, 80, 10,
                     Utils.translate("&c" + winner.getDisplayName() + " &7has won the &2&l" +
                                          formatName(runningEvent.getEventType()) + " &7Event"));
