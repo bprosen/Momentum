@@ -176,19 +176,22 @@ public class PacketListener implements Listener {
                         Level level = playerStats.getLevel();
 
                         // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
-                        if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
-                            // run in sync due to teleporting
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    // teleport
-                                    if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                                        Parkour.getCheckpointManager().teleportPlayer(playerStats);
-                                    else
-                                        LevelHandler.respawnPlayer(event.getPlayer(), level);
-                                }
-                            }.runTask(plugin);
-                        }
+                        if (level != null)
+                            if (level.hasRespawnY() && level.getRespawnY() >= playerY) {
+                                // run in sync due to teleporting
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        // teleport
+                                        if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                                            Parkour.getCheckpointManager().teleportPlayer(playerStats);
+                                        else
+                                            LevelHandler.respawnPlayer(event.getPlayer(), level);
+                                    }
+                                }.runTask(plugin);
+                            // if dropper level, has respawn y, is on ground and they are below the respawn y, respawn them
+                            } else if (level.isDropperLevel() && level.hasDropperRespawnY() && event.getPlayer().isOnGround() && level.getDropperRespawnY() >= playerY)
+                                LevelHandler.respawnPlayer(event.getPlayer(), level);
                     }
                 }
             }

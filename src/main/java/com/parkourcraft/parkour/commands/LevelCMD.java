@@ -673,6 +673,24 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("setdropperrespawny")) {
+                    String levelName = a[1].toLowerCase();
+
+                    if (Utils.isInteger(a[2])) {
+                        // get new y
+                        int newY = Integer.parseInt(a[2]);
+
+                        if (levelManager.exists(levelName)) {
+                            LevelsYAML.setDropperRespawnY(levelName, newY);
+                            sender.sendMessage(Utils.translate("&7You have set &c" +
+                                    Parkour.getLevelManager().get(levelName).getFormattedTitle() +
+                                    "&7's dropper respawn y to &c" + newY));
+                        } else {
+                            sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an integer"));
+                    }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletion")) {
                     String playerName = a[1];
                     String levelName = a[2].toLowerCase();
@@ -729,6 +747,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("rename"));
         sender.sendMessage(getHelp("delcompletion"));
         sender.sendMessage(getHelp("setrespawny"));
+        sender.sendMessage(getHelp("setdropperrespawny"));
         sender.sendMessage(getHelp("toggleelytra"));
         sender.sendMessage(getHelp("toggledropper"));
     }
@@ -790,6 +809,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level toggleelytra <level>  &7Sets level elytra");
             case "toggledropper":
                 return Utils.translate("&a/level toggledropper <level>  &7Sets level as dropper");
+            case "setdropperrespawny":
+                return Utils.translate("&a/level setdropperrespawny <level>  &7Sets dropper level respawn y");
         }
         return "";
     }
