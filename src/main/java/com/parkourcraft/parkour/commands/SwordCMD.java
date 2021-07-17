@@ -27,24 +27,10 @@ public class SwordCMD implements CommandExecutor {
 
         if (a.length == 0) {
 
-            boolean hasSword = false;
-            ItemStack swordItem = null;
-
-            // try to find the sword in their inventory
-            for (ItemStack item : player.getInventory().getContents()) {
-
-                if (item != null && item.getType() == settingsManager.sword_type &&
-                    item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                    item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.sword_title))) {
-
-                    hasSword = true;
-                    swordItem = item;
-                    break;
-                }
-            }
+            ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
 
             // take away item
-            if (hasSword) {
+            if (swordItem != null) {
                 player.getInventory().removeItem(swordItem);
                 player.sendMessage(Utils.translate("&7You took away your &cSetup Sword"));
             } else {

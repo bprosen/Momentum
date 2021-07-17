@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EventCMD implements CommandExecutor {
 
@@ -46,6 +47,11 @@ public class EventCMD implements CommandExecutor {
                                                     player.sendMessage(Utils.translate("&cYou cannot join this event when you are not on the ground in an elytra level"));
                                                     return true;
                                                 }
+
+                                                // remove sword item if they have it and the mode is pvp
+                                                ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
+                                                if (eventManager.getEventType() == EventType.PVP && swordItem != null)
+                                                    player.getInventory().removeItem(swordItem);
 
                                                 eventManager.addParticipant(player);
                                             } else {

@@ -1,6 +1,11 @@
 package com.parkourcraft.parkour.utils;
 
+import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.SettingsManager;
 import org.bukkit.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +75,25 @@ public class Utils {
 
     public static String shortStyleNumber(double amount) {
         return amount < 1000 ? String.valueOf((int) amount) : formatDecimal(amount / 1000) + "k";
+    }
+
+    public static ItemStack getSwordIfExists(Inventory inventory) {
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        ItemStack swordItem = null;
+
+        // try to find the sword in their inventory
+        for (ItemStack item : inventory.getContents()) {
+
+            if (item != null && item.getType() == settingsManager.sword_type &&
+                    item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
+                    item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.sword_title))) {
+
+                swordItem = item;
+                break;
+            }
+        }
+        return swordItem;
     }
 
     public static String translate(String msg) {
