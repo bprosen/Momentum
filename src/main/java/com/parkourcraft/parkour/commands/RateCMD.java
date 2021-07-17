@@ -11,6 +11,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+
 public class RateCMD implements CommandExecutor {
 
     @Override
@@ -22,18 +24,32 @@ public class RateCMD implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if (a.length == 2) {
-            String levelName = a[0].toLowerCase();
+        if (a.length >= 2) {
+
             LevelManager levelManager = Parkour.getLevelManager();
-            Level level = levelManager.get(levelName);
+            String levelName;
+            Level level;
+
+            // if just levelName like coal-1
+            if (a.length == 2) {
+                levelName = a[0].toLowerCase();
+                level = levelManager.get(levelName);
+            // or if they want to use the title like Coal 1
+            } else {
+                // have to do -1 from a.length due to rating being after name
+                String[] split = Arrays.copyOfRange(a, 0, a.length - 1);
+                levelName = String.join(" ", split);
+                level = levelManager.getFromTitle(levelName);
+            }
 
             if (level != null) {
-                if (Utils.isInteger(a[1])) {
+                // rating will be -1 the length of a
+                if (Utils.isInteger(a[a.length - 1])) {
 
-                    int rating = Integer.parseInt(a[1]);
+                    int rating = Integer.parseInt(a[a.length - 1]);
                     PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                    if (playerStats.getLevelCompletionsCount(levelName) > 0) {
+                    if (playerStats.getLevelCompletionsCount(level.getName()) > 0) {
                         if (!RatingDB.hasRatedLevel(player.getUniqueId().toString(), level.getID())) {
                             if (rating >= 0 && rating <= 5) {
 

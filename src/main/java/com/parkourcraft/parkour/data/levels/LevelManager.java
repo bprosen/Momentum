@@ -9,8 +9,10 @@ import com.parkourcraft.parkour.data.menus.MenuPage;
 import com.parkourcraft.parkour.data.menus.MenusYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsDB;
+import com.parkourcraft.parkour.utils.Utils;
 import com.sk89q.minecraft.util.commands.Link;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -271,6 +273,14 @@ public class LevelManager {
     public Level get(int levelID) {
         for (Level level : levels.values())
             if (level.getID() == levelID)
+                return level;
+
+        return null;
+    }
+
+    public Level getFromTitle(String levelTitle) {
+        for (Level level : levels.values())
+            if (ChatColor.stripColor(level.getFormattedTitle()).equalsIgnoreCase(levelTitle))
                 return level;
 
         return null;
