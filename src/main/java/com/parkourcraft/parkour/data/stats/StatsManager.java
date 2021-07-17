@@ -204,6 +204,8 @@ public class StatsManager {
         if (openInventory != null && playerStats != null) {
             // so there is not many lines of "You do not have a clan" spam
             boolean alreadyCheckedClan = false;
+            boolean hasMostCompletedLevel = false;
+            boolean hasClan = false;
 
             for (int i = 0; i < openInventory.getSize(); i++) {
                 ItemStack item = openInventory.getItem(i);
@@ -252,6 +254,10 @@ public class StatsManager {
                                             .replace("%fastest_completion%", (((double) playerStats.getQuickestCompletions(
                                                     playerStats.getMostCompletedLevel()).get(0).getCompletionTimeElapsed()) / 1000) + "s");
                                 }
+
+                                if (loreString.contains("%favorite_level%"))
+                                    continue;
+
                                 // now add the last part of the level stats
                                 loreString = loreString.replace("%total_completions%", playerStats.getTotalLevelCompletions() + "")
                                         .replace("%levels_completed%", playerStats.getIndividualLevelsBeaten() + "")
@@ -273,10 +279,12 @@ public class StatsManager {
                                     if (loreString.contains("%clan_members%"))
                                         loreString = null;
 
-                                    // item loaded for clan is emerald
-                                } else if (item.getType() == Material.EMERALD && !alreadyCheckedClan) {
-                                    newLore.add(Utils.translate("&7They do not have a clan"));
-                                    alreadyCheckedClan = true;
+                                // item loaded for clan is emerald
+                                } else if (item.getType() == Material.EMERALD) {
+                                    if (!alreadyCheckedClan) {
+                                        newLore.add(Utils.translate("&7They do not have a clan"));
+                                        alreadyCheckedClan = true;
+                                    }
                                     continue;
                                 }
 
