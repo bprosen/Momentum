@@ -11,10 +11,7 @@ import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -166,7 +163,7 @@ public class LevelHandler {
         if (!forcedCompletion) {
 
             Parkour.getStatsManager().toggleOffElytra(playerStats);
-            Parkour.getPluginLogger().info(player.getName() + " beat " + levelName); // log to console
+            Parkour.getPluginLogger().info(player.getName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());
