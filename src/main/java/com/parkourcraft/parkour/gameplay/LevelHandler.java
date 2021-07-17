@@ -166,6 +166,7 @@ public class LevelHandler {
         if (!forcedCompletion) {
 
             Parkour.getStatsManager().toggleOffElytra(playerStats);
+            Parkour.getPluginLogger().info(player.getName() + " beat " + levelName); // log to console
 
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());
