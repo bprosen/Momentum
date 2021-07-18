@@ -158,8 +158,22 @@ public class LevelListener implements Listener {
             } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
                 Location lobby = Parkour.getLocationManager().getLobbyLocation();
 
-                if (lobby != null)
+                if (lobby != null) {
+                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                    // toggle off elytra armor
+                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+
+                    if (playerStats.getCheckpoint() != null) {
+                        CheckpointDB.savePlayerAsync(player);
+                        playerStats.resetCheckpoint();
+                    }
+
+                    playerStats.resetPracticeMode();
+                    playerStats.resetLevel();
+
                     player.teleport(lobby);
+                }
             }
         }
     }
