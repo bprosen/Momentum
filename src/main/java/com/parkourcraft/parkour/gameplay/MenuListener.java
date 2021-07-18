@@ -66,9 +66,7 @@ public class MenuListener implements Listener {
                     }
                 }
             }
-        } else if (event.getWhoClicked() instanceof Player
-                && !event.getWhoClicked().isOp())
-            event.setCancelled(true);
+        }
     }
 
     @EventHandler
