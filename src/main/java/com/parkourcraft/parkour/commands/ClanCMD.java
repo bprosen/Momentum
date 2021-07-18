@@ -488,8 +488,8 @@ public class ClanCMD implements CommandExecutor {
 
     private static boolean clanTagRequirements(String clanTag, CommandSender sender) {
         // Clan Tag has improper length
-        if (clanTag.length() < Parkour.getSettingsManager().clans_tag_length_min
-            && clanTag.length() > Parkour.getSettingsManager().clans_tag_length_max) {
+        if (clanTag.length() <= Parkour.getSettingsManager().clans_tag_length_min
+            || clanTag.length() >= Parkour.getSettingsManager().clans_tag_length_max) {
 
             sender.sendMessage(Utils.translate("&c'&4" + clanTag + "&c' does not fit Clan Tag requirements"));
             sender.sendMessage(Utils.translate("&cClan Tags must be &4" + Parkour.getSettingsManager().clans_tag_length_min + "-"
