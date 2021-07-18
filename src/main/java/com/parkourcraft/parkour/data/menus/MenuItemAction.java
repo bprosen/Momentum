@@ -177,6 +177,11 @@ public class MenuItemAction {
                     return;
                 }
 
+                if (playerStats.isInInfinitePK()) {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
+                    return;
+                }
+
                 for (PotionEffect potionEffect : player.getActivePotionEffects())
                     player.removePotionEffect(potionEffect.getType());
 
