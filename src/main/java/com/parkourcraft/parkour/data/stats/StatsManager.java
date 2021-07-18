@@ -204,8 +204,6 @@ public class StatsManager {
         if (openInventory != null && playerStats != null) {
             // so there is not many lines of "You do not have a clan" spam
             boolean alreadyCheckedClan = false;
-            boolean hasMostCompletedLevel = false;
-            boolean hasClan = false;
 
             for (int i = 0; i < openInventory.getSize(); i++) {
                 ItemStack item = openInventory.getItem(i);
@@ -282,7 +280,7 @@ public class StatsManager {
                                 // item loaded for clan is emerald
                                 } else if (item.getType() == Material.EMERALD) {
                                     if (!alreadyCheckedClan) {
-                                        newLore.add(Utils.translate("&7They do not have a clan"));
+                                        newLore.add(Utils.translate("&7Not in a clan"));
                                         alreadyCheckedClan = true;
                                     }
                                     continue;
