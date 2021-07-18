@@ -40,14 +40,19 @@ public class SpectateCMD implements CommandExecutor {
                                 if (!player.getName().equalsIgnoreCase(playerStats.getPlayer().getName())) {
                                     if (playerStats.isSpectatable()) {
                                         if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
-                                            if (playerStats.getPracticeLocation() == null) {
-                                                if (!playerStats.inRace()) {
-                                                    if (!playerStats.isEventParticipant()) {
-                                                        // enable spectator mode
-                                                        SpectatorHandler.setSpectatorMode(spectatorStats, playerStats);
+                                            if (spectatorStats.getPracticeLocation() == null) {
+                                                if (!spectatorStats.inRace()) {
+                                                    if (!spectatorStats.isEventParticipant()) {
 
-                                                        playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                                                spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                                        boolean spectatingAlready = false;
+                                                        if (spectatorStats.getPlayerToSpectate() != null)
+                                                            spectatingAlready = true;
+
+                                                            // enable spectator mode
+                                                            SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, spectatingAlready);
+
+                                                            playerStats.getPlayer().sendMessage(Utils.translate("&2" +
+                                                                    spectatorStats.getPlayerName() + " &7began to spectate you"));
                                                     } else {
                                                         player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
                                                     }

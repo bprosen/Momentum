@@ -49,7 +49,7 @@ public class SpectatorHandler {
         }
     }
 
-    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats) {
+    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean changeLocation) {
 
         Player spectator = spectatorStats.getPlayer();
         Player player = playerStats.getPlayer();
@@ -57,7 +57,11 @@ public class SpectatorHandler {
         spectator.setAllowFlight(true);
         spectator.setFlying(true);
         spectatorStats.setPlayerToSpectate(playerStats);
-        spectatorStats.setSpectateSpawn(spectator.getLocation());
+
+        // in case they /spectate while spectating
+        if (changeLocation)
+            spectatorStats.setSpectateSpawn(spectator.getLocation());
+
         PlayerHider.hidePlayer(spectator, true);
         spectateToPlayer(spectator, player);
     }
