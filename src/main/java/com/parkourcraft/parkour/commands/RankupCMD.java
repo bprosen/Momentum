@@ -30,6 +30,12 @@ public class RankupCMD implements CommandExecutor {
                 return true;
             }
 
+            // TODO: remove this once beta testing is done
+            if (playerStats.getRank().getRankId() >= 2) {
+                player.sendMessage(Utils.translate("&cHeya beta tester, no more going past first rankup :)"));
+                return true;
+            }
+
             String menuName = null;
             // stage 1, meaning coin rankup part
             if (playerStats.getRankUpStage() == 1)
