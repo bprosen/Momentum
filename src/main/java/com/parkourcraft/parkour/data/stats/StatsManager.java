@@ -248,12 +248,17 @@ public class StatsManager {
                                 if (mostCompletedLevel != null) {
 
                                     loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
-                                            .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "")
-                                            .replace("%fastest_completion%", (((double) playerStats.getQuickestCompletions(
-                                                    playerStats.getMostCompletedLevel()).get(0).getCompletionTimeElapsed()) / 1000) + "s");
+                                            .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "");
+
+                                    List<LevelCompletion> levelCompletions = playerStats.getQuickestCompletions(
+                                            playerStats.getMostCompletedLevel());
+
+                                    if (!levelCompletions.isEmpty())
+                                            loreString = loreString.replace("%fastest_completion%",
+                                  (((double) levelCompletions.get(0).getCompletionTimeElapsed()) / 1000) + "s");
                                 }
 
-                                if (loreString.contains("%favorite_level%"))
+                                if (loreString.contains("%favorite_level%") || loreString.contains("%fastest_completion%"))
                                     continue;
 
                                 // now add the last part of the level stats

@@ -29,8 +29,8 @@ public class InteractListener implements Listener {
 
         Player player = event.getPlayer();
 
-        if ((event.getAction() == Action.RIGHT_CLICK_AIR ||
-            event.getAction() == Action.RIGHT_CLICK_BLOCK) && event.getHand() == EquipmentSlot.HAND) {
+        if (event.getHand() == EquipmentSlot.HAND && (event.getAction() == Action.RIGHT_CLICK_AIR ||
+            event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
 
             ItemStack item = event.getItem();
 
