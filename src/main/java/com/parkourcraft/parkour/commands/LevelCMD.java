@@ -700,13 +700,70 @@ public class LevelCMD implements CommandExecutor {
                     if (level != null) {
                         int playerID = StatsDB.getPlayerID(playerName);
                         if (playerID > -1) {
-                            StatsDB.removeCompletions(playerID, level.getID());
-                            sender.sendMessage(Utils.translate("&cYou removed all of &4" + playerName + "&c's completions for &4" + levelName));
+                            PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(playerName);
+
+                            if (playerStats.getLevelCompletionsCount(levelName) > 0) {
+                                StatsDB.removeCompletions(playerID, level.getID());
+                                playerStats.getLevelCompletionsMap().remove(levelName);
+                                sender.sendMessage(Utils.translate("&cYou removed all of &4" + playerName + "&c's completions for &4" + levelName));
+                            } else {
+                                sender.sendMessage(Utils.translate("&4" + playerName + " &chas yet to complete &4" + levelName));
+                            }
                         } else {
                             sender.sendMessage(Utils.translate("&4" + playerName + " &chas not joined the server"));
                         }
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("resetcheckpoints")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = Parkour.getLevelManager().get(levelName);
+
+                    if (level != null) {
+                        // reset from cache
+                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+                            if (playerStats.getCheckpoint() != null && playerStats.getLevel() != null &&
+                                    playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
+                                playerStats.resetCheckpoint();
+                            }
+
+                        // delete from db
+                        Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");
+
+                        sender.sendMessage(Utils.translate("&cYou have deleted all checkpoints for level &4" + levelName));
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a level"));
+                    }
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("resetcheckpoint")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = Parkour.getLevelManager().get(levelName);
+
+                    if (level != null) {
+                        String playerName = a[2].toLowerCase();
+                        Player target = Bukkit.getPlayer(playerName);
+
+                        if (target != null) {
+                            PlayerStats playerStats = Parkour.getStatsManager().get(target);
+
+                            // if they have checkpoint loaded
+                            if (playerStats.getCheckpoint() != null) {
+                                // if they are in level and their level is the same as the target level
+                                if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
+                                    playerStats.resetCheckpoint();
+                                    Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'" +
+                                            " AND player_name='" + playerName + "'");
+                                    sender.sendMessage(Utils.translate("&cYou deleted &4" + playerName + "&c's checkpoint for &4" + levelName));
+                                } else {
+                                    sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in " + levelName));
+                                }
+                            } else {
+                                sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a checkpoint"));
+                            }
+                        } else {
+                            sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a level"));
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -750,6 +807,8 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("setdropperrespawny"));
         sender.sendMessage(getHelp("toggleelytra"));
         sender.sendMessage(getHelp("toggledropper"));
+        sender.sendMessage(getHelp("resetcheckpoint"));
+        sender.sendMessage(getHelp("resetcheckpoints"));
     }
 
     private static String getHelp(String cmd) {
@@ -811,6 +870,10 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level toggledropper <level>  &7Sets level as dropper");
             case "setdropperrespawny":
                 return Utils.translate("&a/level setdropperrespawny <level>  &7Sets dropper level respawn y");
+            case "resetcheckpoint":
+                return Utils.translate("&a/level resetcheckpoint <level> <player>  &7Resets level checkpoint for single player");
+            case "resetcheckpoints":
+                return Utils.translate("&a/level resetcheckpoints <level>  &7Resets ALL checkpoints for specific level");
         }
         return "";
     }

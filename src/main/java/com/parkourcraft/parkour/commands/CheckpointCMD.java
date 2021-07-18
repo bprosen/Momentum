@@ -1,7 +1,11 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.levels.Level;
+import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,7 +31,6 @@ public class CheckpointCMD implements CommandExecutor {
 
     private void sendHelp(Player player) {
         player.sendMessage(Utils.translate("&cCheckpoint Help"));
-        player.sendMessage(Utils.translate("&c/checkpoint  &7teleports you to your previous checkpoint"));
-        player.sendMessage(Utils.translate("&c/checkpoint  &7teleports you to your previous checkpoint"));
+        player.sendMessage(Utils.translate("&c/checkpoint  &7Teleports you to your previous checkpoint"));
     }
 }

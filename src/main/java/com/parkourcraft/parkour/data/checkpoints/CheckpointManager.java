@@ -34,6 +34,8 @@ public class CheckpointManager {
 
                     } else if (playerStats.getLevel() != null) {
                         LevelHandler.respawnPlayer(playerStats.getPlayer(), playerStats.getLevel());
+                    } else {
+                        playerStats.getPlayer().sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
                     }
                 } else {
                     playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while spectating"));
