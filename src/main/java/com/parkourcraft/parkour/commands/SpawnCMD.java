@@ -55,14 +55,15 @@ public class SpawnCMD implements CommandExecutor {
 
             if (!playerStats.isEventParticipant()) {
 
+                // toggle off elytra armor
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
                 player.teleport(loc);
 
                 if (playerStats.getCheckpoint() != null) {
                     CheckpointDB.savePlayerAsync(player);
                     playerStats.resetCheckpoint();
                 }
-                // toggle off elytra armor
-                Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                 playerStats.resetPracticeMode();
                 playerStats.resetLevel();
