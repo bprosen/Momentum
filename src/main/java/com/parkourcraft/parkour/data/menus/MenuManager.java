@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -63,8 +64,10 @@ public class MenuManager {
     }
 
     public Menu getMenuFromTitle(String menuTitle) {
+        // need to make exception for rate level menu as the title gets changed to replace a placeholder
         for (Menu menu : menuMap.values())
-            if (menuTitle.startsWith(menu.getFormattedTitleBase()))
+            if (menuTitle.startsWith(menu.getFormattedTitleBase()) ||
+               (menu.getName().equalsIgnoreCase("rate_level") && ChatColor.stripColor(menuTitle).contains("Rate")))
                 return menu;
 
         return null;
