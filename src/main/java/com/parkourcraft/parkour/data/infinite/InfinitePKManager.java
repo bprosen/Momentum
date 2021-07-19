@@ -70,6 +70,19 @@ public class InfinitePKManager {
         InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null) {
 
+            // run in sync because of packet listener running in async, need to remove blocks in sync
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    // tp in sync
+                    player.teleport(infinitePK.getOriginalLoc());
+                    // clear blocks and reset data
+                    infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
+                    infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
+                    infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
+                }
+            }.runTask(Parkour.getPlugin());
+
             int score = infinitePK.getScore();
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
@@ -96,19 +109,6 @@ public class InfinitePKManager {
                 player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
                         "&7Your best is &d" + playerStats.getInfinitePKScore()));
             }
-
-            // run in sync because of packet listener running in async, need to remove blocks in sync
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    // tp in sync
-                    player.teleport(infinitePK.getOriginalLoc());
-                    // clear blocks and reset data
-                    infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
-                    infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
-                    infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
-                }
-            }.runTask(Parkour.getPlugin());
 
             playerStats.toggleInfinitePK();
             participants.remove(player.getName());
