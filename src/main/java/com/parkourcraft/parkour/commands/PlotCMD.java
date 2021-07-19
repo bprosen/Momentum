@@ -236,12 +236,14 @@ public class PlotCMD implements CommandExecutor {
     private void createPlot(Player player) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
-        Rank minimumRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().minimum_rank_for_plot_creation);
+        if (checkConditions(playerStats)) {
+            Rank minimumRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().minimum_rank_for_plot_creation);
 
-        if (playerStats.getRank().getRankId() >= minimumRank.getRankId() || playerStats.getPrestiges() >= 1) {
-            Parkour.getPlotsManager().createPlot(player);
-        } else {
-            player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getRankTitle() + " &7to create a &aPlot"));
+            if (playerStats.getRank().getRankId() >= minimumRank.getRankId() || playerStats.getPrestiges() >= 1) {
+                Parkour.getPlotsManager().createPlot(player);
+            } else {
+                player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getRankTitle() + " &7to create a &aPlot"));
+            }
         }
     }
 
@@ -336,25 +338,29 @@ public class PlotCMD implements CommandExecutor {
     }
 
     private void visitPlot(Player player, String[] a) {
-        String playerName = a[1];
-        if (PlotsDB.hasPlotFromName(playerName)) {
-            String targetLoc = PlotsDB.getPlotCenterFromName(playerName);
-            String[] split = targetLoc.split(":");
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            // get loc from result
-            Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                    Double.parseDouble(split[0]),
-                    Parkour.getSettingsManager().player_submitted_plot_default_y,
-                    Double.parseDouble(split[1]),
-                    player.getLocation().getYaw(), player.getLocation().getPitch());
+        if (checkConditions(playerStats)) {
 
-            player.teleport(loc.clone().add(0.5, 0, 0.5));
-            player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
+            String playerName = a[1];
+            if (PlotsDB.hasPlotFromName(playerName)) {
+                String targetLoc = PlotsDB.getPlotCenterFromName(playerName);
+                String[] split = targetLoc.split(":");
 
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            resetPlayerLevelData(playerStats);
-        } else {
-            player.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a plot"));
+                // get loc from result
+                Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
+                        Double.parseDouble(split[0]),
+                        Parkour.getSettingsManager().player_submitted_plot_default_y,
+                        Double.parseDouble(split[1]),
+                        player.getLocation().getYaw(), player.getLocation().getPitch());
+
+                player.teleport(loc.clone().add(0.5, 0, 0.5));
+                player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
+
+                resetPlayerLevelData(playerStats);
+            } else {
+                player.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a plot"));
+            }
         }
     }
 
@@ -363,10 +369,11 @@ public class PlotCMD implements CommandExecutor {
 
         // make sure they have a plot
         if (plot != null) {
-            plot.teleportOwner();
-
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            resetPlayerLevelData(playerStats);
+            if (checkConditions(playerStats)) {
+                plot.teleportOwner();
+                resetPlayerLevelData(playerStats);
+            }
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot to teleport to"));
         }
@@ -438,6 +445,36 @@ public class PlotCMD implements CommandExecutor {
         } else {
             player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
         }
+    }
+
+    private boolean checkConditions(PlayerStats playerStats) {
+        Player player = playerStats.getPlayer();
+
+        boolean passes = false;
+
+        if (!playerStats.inRace()) {
+            if (!playerStats.isInInfinitePK()) {
+                if (playerStats.getPlayerToSpectate() == null) {
+                    if (!playerStats.isEventParticipant()) {
+                        if (playerStats.getPracticeLocation() == null) {
+                            passes = true;
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
+            }
+        } else {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+        }
+
+        return passes;
     }
 
     private static void sendHelp(CommandSender sender) {
