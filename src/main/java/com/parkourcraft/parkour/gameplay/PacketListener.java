@@ -90,7 +90,7 @@ public class PacketListener implements Listener {
                         }
 
                         // get nearest plot from location
-                        Plot plot = Parkour.getPlotsManager().getNearestPlot(loc);
+                        Plot plot = Parkour.getPlotsManager().getPlotInLocation(loc);
 
                         /*
                             This section of the code runs then uses the found location to do conditional checks on whether

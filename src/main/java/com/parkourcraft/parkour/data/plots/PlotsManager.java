@@ -277,7 +277,7 @@ public class PlotsManager {
     }
 
     // get nearest plot from location
-    public Plot getNearestPlot(Location loc) {
+    public Plot getPlotInLocation(Location loc) {
 
         Plot nearestPlot = null;
         for (Plot plot : plotList.values()) {

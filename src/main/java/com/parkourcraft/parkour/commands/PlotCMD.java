@@ -169,6 +169,9 @@ public class PlotCMD implements CommandExecutor {
             // submit your plot
             } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
                 submitPlot(player);
+            // get info of current loc
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
+                plotInfo(player);
             } else if ((a.length == 1 && a[0].equalsIgnoreCase("help")) || a.length == 0) {
                 sendHelp(sender);
             } else {
@@ -219,6 +222,9 @@ public class PlotCMD implements CommandExecutor {
         // submit your plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
             submitPlot(player);
+        // get info of current loc
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
+            plotInfo(player);
         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
             sendHelp(sender);
         } else {
@@ -381,6 +387,15 @@ public class PlotCMD implements CommandExecutor {
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot to submit!"));
         }
+    }
+
+    private void plotInfo(Player player) {
+        Plot plot = Parkour.getPlotsManager().getPlotInLocation(player.getLocation());
+
+        if (plot != null)
+            player.sendMessage(Utils.translate("&a" + plot.getOwnerName() + " &7owns this plot"));
+        else
+            player.sendMessage(Utils.translate("&cYou are not in any plot currently"));
     }
 
     private void resetPlayerLevelData(PlayerStats playerStats) {
