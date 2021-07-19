@@ -86,7 +86,9 @@ public class SpectatorHandler {
     public static void updateSpectator(PlayerStats spectator) {
         PlayerStats playerStats = spectator.getPlayerToSpectate();
 
-        if (playerStats != null && playerStats.getPlayer().isOnline() && playerStats.isSpectatable()) {
+        if (playerStats != null && playerStats.getPlayer().isOnline() && playerStats.isSpectatable() &&
+            !playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+
             if (spectator.getPlayer().getLocation().distance(playerStats.getPlayer().getLocation()) > 20)
                 spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer());
         } else {
