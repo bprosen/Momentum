@@ -171,12 +171,6 @@ public class MenuItemAction {
                     return;
                 }
 
-                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !playerStats.getPlayer().isOnGround()) {
-                    player.sendMessage(Utils.translate("&cFor teleporting safety, you cannot enter another level" +
-                            " when you are not on the ground in an elytra level"));
-                    return;
-                }
-
                 if (playerStats.isInInfinitePK()) {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
                     return;
