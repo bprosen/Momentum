@@ -41,25 +41,29 @@ public class EventCMD implements CommandExecutor {
                             if (playerStats.getPlayerToSpectate() == null) {
                                 if (!playerStats.inRace()) {
                                     if (!PlayerHider.containsPlayer(player)) {
-                                        if (!eventManager.isEliminated(player)) {
-                                            if (!eventManager.isStartCoveredInWater()) {
-                                                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !player.isOnGround()) {
-                                                    player.sendMessage(Utils.translate("&cYou cannot join this event when you are not on the ground in an elytra level"));
-                                                    return true;
+                                        if (playerStats.isInInfinitePK()) {
+                                            if (!eventManager.isEliminated(player)) {
+                                                if (!eventManager.isStartCoveredInWater()) {
+                                                    if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !player.isOnGround()) {
+                                                        player.sendMessage(Utils.translate("&cYou cannot join this event when you are not on the ground in an elytra level"));
+                                                        return true;
+                                                    }
+
+                                                    // remove sword item if they have it and the mode is pvp
+                                                    ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
+                                                    if (eventManager.getEventType() == EventType.PVP && swordItem != null)
+                                                        player.getInventory().removeItem(swordItem);
+
+                                                    eventManager.addParticipant(player);
+                                                } else {
+                                                    player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
+                                                            "&cTherefore you cannot join this event"));
                                                 }
-
-                                                // remove sword item if they have it and the mode is pvp
-                                                ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
-                                                if (eventManager.getEventType() == EventType.PVP && swordItem != null)
-                                                    player.getInventory().removeItem(swordItem);
-
-                                                eventManager.addParticipant(player);
                                             } else {
-                                                player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
-                                                        "&cTherefore you cannot join this event"));
+                                                player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
                                             }
                                         } else {
-                                            player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
+                                            player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
                                         }
                                     } else {
                                         player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
