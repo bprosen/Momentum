@@ -30,7 +30,7 @@ public class MenuItemFormatter {
             if (menuItem.getTypeValue().equals("coin-rankup"))
                 return getRankUp(playerStats, menuItem);
             else if (menuItem.getTypeValue().equals("featured-level"))
-                return getFeaturedLevel(menuItem);
+                return getFeaturedLevel(playerStats, menuItem);
             // make levels for /rankup if in stage 2
             else if (menuItem.getTypeValue().equals("rankup-level-1")
                     || menuItem.getTypeValue().equals("rankup-level-2")
@@ -146,7 +146,7 @@ public class MenuItemFormatter {
         if (level != null) {
             // make it the featured in normal gui section too for consistency
             if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
-                return getFeaturedLevel(menuItem);
+                return getFeaturedLevel(playerStats, menuItem);
             else
                 return createLevelItem(playerStats, level, menuItem, item, false);
         }
@@ -154,7 +154,7 @@ public class MenuItemFormatter {
     }
 
     // create a slightly different level item for featured level in gui
-    private static ItemStack getFeaturedLevel(MenuItem menuItem) {
+    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem) {
         Level featuredLevel = Parkour.getLevelManager().getFeaturedLevel();
         ItemStack levelItem = menuItem.getItem();
 
@@ -186,6 +186,41 @@ public class MenuItemFormatter {
             if (featuredLevel.getRatingsCount() >= 5) {
                 itemLore.add(Utils.translate("  &6" + featuredLevel.getRating() + " &7Rating"));
                 itemLore.add(Utils.translate("    &7Out of &e" + featuredLevel.getRatingsCount() + " &7ratings"));
+            }
+
+            // Personal Level Stats Section
+            int levelCompletionsCount = playerStats.getLevelCompletionsCount(featuredLevel.getName());
+            if (levelCompletionsCount > 0) {
+                // add glow effect to all levels they have completed
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+                itemLore.add("");
+
+                String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
+                if (levelCompletionsCount > 1)
+                    beatenMessage += "s";
+
+                itemLore.add(beatenMessage);
+
+                List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(featuredLevel.getName());
+                if (bestLevelCompletions.size() > 0) {
+                    itemLore.add(Utils.translate("&7 Best Personal Time"));
+
+                    double completionTime = ((double) bestLevelCompletions.get(0).getCompletionTimeElapsed()) / 1000;
+                    long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
+
+                    itemLore.add(Utils.translate("  &2" + completionTime + "s"));
+
+                    // this makes it so it will not have " ago" if they just completed it
+                    String timeSinceString;
+                    if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
+                        timeSinceString = Utils.translate("   &7Just now");
+                    else
+                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
+
+                    itemLore.add(timeSinceString);
+                }
             }
 
             // Sections over
