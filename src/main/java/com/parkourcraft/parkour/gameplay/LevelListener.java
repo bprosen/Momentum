@@ -24,6 +24,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
 
@@ -171,6 +172,9 @@ public class LevelListener implements Listener {
 
                     playerStats.resetPracticeMode();
                     playerStats.resetLevel();
+
+                    for (PotionEffect potionEffect : player.getActivePotionEffects())
+                        player.removePotionEffect(potionEffect.getType());
 
                     player.teleport(lobby);
                 }
