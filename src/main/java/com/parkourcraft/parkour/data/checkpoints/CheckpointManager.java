@@ -16,6 +16,7 @@ public class CheckpointManager {
                 if (playerStats.getPlayerToSpectate() == null) {
 
                     Location loc = null;
+                    boolean setDirection = false;
                     /*
                      check if there is a practice location,
                      if not then check if the loc is checkpoint and
@@ -23,13 +24,16 @@ public class CheckpointManager {
                      */
                     if (playerStats.getPracticeLocation() != null)
                         loc = playerStats.getPracticeLocation().clone();
-                    else if (playerStats.getCheckpoint() != null)
+                    else if (playerStats.getCheckpoint() != null) {
                         loc = playerStats.getCheckpoint().clone().add(0.5, 0, 0.5);
+                        setDirection = true;
+                    }
 
                     if (loc != null) {
-
-                        loc.setPitch(playerStats.getPlayer().getLocation().getPitch());
-                        loc.setYaw(playerStats.getPlayer().getLocation().getYaw());
+                        if (setDirection) {
+                            loc.setPitch(playerStats.getPlayer().getLocation().getPitch());
+                            loc.setYaw(playerStats.getPlayer().getLocation().getYaw());
+                        }
                         playerStats.getPlayer().teleport(loc);
 
                     } else if (playerStats.getLevel() != null) {
