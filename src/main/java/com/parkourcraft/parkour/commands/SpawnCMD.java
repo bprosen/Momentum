@@ -55,22 +55,25 @@ public class SpawnCMD implements CommandExecutor {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (!playerStats.isEventParticipant()) {
+                if (!playerStats.inRace()) {
+                    // toggle off elytra armor
+                    Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                // toggle off elytra armor
-                Parkour.getStatsManager().toggleOffElytra(playerStats);
+                    player.teleport(loc);
 
-                player.teleport(loc);
+                    if (playerStats.getCheckpoint() != null) {
+                        CheckpointDB.savePlayerAsync(player);
+                        playerStats.resetCheckpoint();
+                    }
 
-                if (playerStats.getCheckpoint() != null) {
-                    CheckpointDB.savePlayerAsync(player);
-                    playerStats.resetCheckpoint();
+                    playerStats.resetPracticeMode();
+                    playerStats.resetLevel();
+
+                    for (PotionEffect potionEffect : player.getActivePotionEffects())
+                        player.removePotionEffect(potionEffect.getType());
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                 }
-
-                playerStats.resetPracticeMode();
-                playerStats.resetLevel();
-
-                for (PotionEffect potionEffect : player.getActivePotionEffects())
-                    player.removePotionEffect(potionEffect.getType());
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
             }
