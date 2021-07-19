@@ -49,7 +49,7 @@ public class SpectatorHandler {
         }
     }
 
-    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean changeLocation) {
+    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean alreadySpectating) {
 
         Player spectator = spectatorStats.getPlayer();
         Player player = playerStats.getPlayer();
@@ -59,7 +59,7 @@ public class SpectatorHandler {
         spectatorStats.setPlayerToSpectate(playerStats);
 
         // in case they /spectate while spectating
-        if (changeLocation)
+        if (!alreadySpectating)
             spectatorStats.setSpectateSpawn(spectator.getLocation());
 
         PlayerHider.hidePlayer(spectator, true);
