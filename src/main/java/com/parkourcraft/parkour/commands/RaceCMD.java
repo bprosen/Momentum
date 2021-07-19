@@ -71,11 +71,6 @@ public class RaceCMD implements CommandExecutor {
             return;
         }
 
-        // if in elytra and not on the ground, dont send
-        if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !playerStats.getPlayer().isOnGround()) {
-            player.sendMessage(Utils.translate("&cYou cannot do this while not on the ground in an elytra level"));
-            return;
-        }
 
         // make sure they have enough money for the bet
         double victimBalance = Parkour.getEconomy().getBalance(victim);
@@ -168,12 +163,6 @@ public class RaceCMD implements CommandExecutor {
                 return;
             }
 
-            // if they are in an elytra level and not on the ground, do not continue
-            if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !playerStats.getPlayer().isOnGround()) {
-                accepter.sendMessage(Utils.translate("&cYou cannot race someone else while not on the ground in an elytra level"));
-                return;
-            }
-
             // if other player is in an elytra level and not on the ground, do not continue
             if (victimStats.inLevel() && victimStats.getLevel().isElytraLevel() && !victimStats.getPlayer().isOnGround()) {
                 accepter.sendMessage(Utils.translate("&cYou cannot race someone when " + victim.getName() + " is not on the ground in an elytra level"));
@@ -196,6 +185,14 @@ public class RaceCMD implements CommandExecutor {
                 removeFromConfirmMap(victim, accepter);
                 return;
             }
+
+            // if in elytra and not on the ground, dont send
+            if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
+            // if in elytra and not on the ground, dont send
+            if (victimStats.inLevel() && victimStats.getLevel().isElytraLevel())
+                Parkour.getStatsManager().toggleOffElytra(victimStats);
 
             // otherwise do race and disable any current time on levels
             playerStats.disableLevelStartTime();

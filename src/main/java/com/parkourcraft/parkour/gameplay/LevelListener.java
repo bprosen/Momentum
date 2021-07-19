@@ -64,8 +64,11 @@ public class LevelListener implements Listener {
                     }
                 } else {
                     Level level = playerStats.getLevel();
-
                     if (level != null && level.doesLiquidResetPlayer()) {
+
+                        // if is elytra level, set gliding to false
+                        if (level.isElytraLevel())
+                            player.setGliding(false);
 
                         if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
                             Parkour.getCheckpointManager().teleportPlayer(playerStats);

@@ -151,6 +151,8 @@ public class StatsManager {
     }
 
     public void toggleOffElytra(PlayerStats playerStats) {
+        playerStats.getPlayer().setGliding(false); // disable gliding
+
         // load if saved
         if (playerStats.getChestplateSavedFromElytra() != null) {
             playerStats.getPlayer().getInventory().setChestplate(playerStats.getChestplateSavedFromElytra());

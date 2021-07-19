@@ -121,6 +121,10 @@ public class InfiniteCMD implements CommandExecutor {
                     if (!playerStats.isEventParticipant()) {
                         if (!playerStats.inRace()) {
                             if (playerStats.getPracticeLocation() == null) {
+                                // if in elytra level, then toggle off
+                                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+
                                 infinitePKManager.startPK(player);
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));

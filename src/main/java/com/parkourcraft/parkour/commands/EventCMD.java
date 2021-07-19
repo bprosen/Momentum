@@ -44,10 +44,8 @@ public class EventCMD implements CommandExecutor {
                                         if (playerStats.isInInfinitePK()) {
                                             if (!eventManager.isEliminated(player)) {
                                                 if (!eventManager.isStartCoveredInWater()) {
-                                                    if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel() && !player.isOnGround()) {
-                                                        player.sendMessage(Utils.translate("&cYou cannot join this event when you are not on the ground in an elytra level"));
-                                                        return true;
-                                                    }
+                                                    if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                                                        Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                                                     // remove sword item if they have it and the mode is pvp
                                                     ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
