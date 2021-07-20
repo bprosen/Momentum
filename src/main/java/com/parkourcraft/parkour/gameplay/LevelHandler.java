@@ -137,6 +137,8 @@ public class LevelHandler {
                 messageFormatted = messageFormatted.replace("%time%", "-");
 
             player.sendMessage(messageFormatted);
+            player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                    + ChatColor.stripColor(level.getFormattedTitle())));
 
             // only broadcast if it is not a forced completion
             if (!forcedCompletion) {
@@ -175,7 +177,7 @@ public class LevelHandler {
                     titleMessage += Utils.translate("&7 in &2" + time);
 
                 String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
-                        + level.getName() + " (rating from 0-5)");
+                        + ChatColor.stripColor(level.getFormattedTitle()));
 
                 TitleAPI.sendTitle(
                         player, 10, 60, 10,

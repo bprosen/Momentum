@@ -50,9 +50,10 @@ public class Utils {
 
     public static int getTrailingInt(String input) {
         input = ChatColor.stripColor(input);
-        String finalChar = input.substring(input.length() - 1, input.length());
+        String finalChar = input.substring(input.length() - 1);
 
-        if (isInteger(finalChar))
+        // make exception for Rate menu as it can have numbers at the end due to level name in title
+        if (!input.contains("Rate") && isInteger(finalChar))
             return Integer.parseInt(finalChar);
 
         return 1;
