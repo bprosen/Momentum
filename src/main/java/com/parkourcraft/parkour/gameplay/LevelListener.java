@@ -88,30 +88,32 @@ public class LevelListener implements Listener {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // Start timer
-        if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.STONE_PLATE)) {
-            if (playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null)
-                LevelHandler.startedLevel(player);
+        if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.STONE_PLATE) &&
+            playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
+
+            // cancel so no click sound and no hogging plate
+            event.setCancelled(true);
+            LevelHandler.startedLevel(player);
 
         // Checkpoint
-        } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.GOLD_PLATE)) {
+        } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.GOLD_PLATE) &&
+                   playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
 
-            if (playerStats.getLevel() != null) {
-                if (playerStats.getPracticeLocation() == null) {
-                    if (playerStats.getPlayerToSpectate() == null) {
-                        if (playerStats.getCheckpoint() != null) {
+            // cancel so no click sound and no hogging plate
+            event.setCancelled(true);
 
-                            int blockX = playerStats.getCheckpoint().getBlockX();
-                            int blockZ = playerStats.getCheckpoint().getBlockZ();
+            if (playerStats.getCheckpoint() != null) {
 
-                            if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ()))
-                                setCheckpoint(player, playerStats, block.getLocation());
-                        } else {
-                            setCheckpoint(player, playerStats, block.getLocation());
-                        }
-                    }
-                }
+                int blockX = playerStats.getCheckpoint().getBlockX();
+                int blockZ = playerStats.getCheckpoint().getBlockZ();
+
+                if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ()))
+                    setCheckpoint(player, playerStats, block.getLocation());
+            } else {
+                setCheckpoint(player, playerStats, block.getLocation());
             }
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.IRON_PLATE)) {
+            // cancel so no click sound and no hogging plate
             event.setCancelled(true);
 
             // end if in race
