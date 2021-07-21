@@ -129,7 +129,7 @@ public class LevelListener implements Listener {
                     infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ()) {
 
                     block.setType(Material.AIR);
-                    player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.5f, 2f);
+                    player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
                     Parkour.getInfinitePKManager().doNextJump(player, false);
                 }
             }
@@ -137,7 +137,7 @@ public class LevelListener implements Listener {
     }
 
     private void setCheckpoint(Player player, PlayerStats playerStats, Location location) {
-        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.3f, 0f);
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
         playerStats.setCheckpoint(location);
 
         String msgString = "&eYour checkpoint has been set";
