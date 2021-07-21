@@ -112,21 +112,22 @@ public class LevelListener implements Listener {
                 }
             }
         } else if (event.getAction().equals(Action.PHYSICAL) && block.getType().equals(Material.IRON_PLATE)) {
-            // end if in race
+            event.setCancelled(true);
 
+            // end if in race
             if (playerStats.inRace())
                 Parkour.getRaceManager().endRace(player);
             else if (playerStats.isInInfinitePK()) {
-
-                block.setType(Material.AIR);
 
                 // prevent double clicking
                 InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getName());
 
                 if (infinitePK.getPressutePlateLoc().getBlockX() == block.getLocation().getBlockX() &&
-                    infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ())
+                    infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ()) {
 
-                Parkour.getInfinitePKManager().doNextJump(player, false);
+                    block.setType(Material.AIR);
+                    Parkour.getInfinitePKManager().doNextJump(player, false);
+                }
             }
         }
     }
