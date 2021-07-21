@@ -137,7 +137,7 @@ public class LevelHandler {
                 messageFormatted = messageFormatted.replace("%time%", "-");
 
             player.sendMessage(messageFormatted);
-            player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+            player.sendMessage(Utils.translate(" &7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
                     + ChatColor.stripColor(level.getFormattedTitle())));
 
             // only broadcast if it is not a forced completion

@@ -95,8 +95,8 @@ public class InteractListener implements Listener {
                                         for (PotionEffect potionEffect : level.getPotionEffects())
                                             player.addPotionEffect(potionEffect);
                                     }
-
                                     player.teleport(level.getStartLocation());
+                                    player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
                                 } else {
                                     // otherwise, put them in and ask them to confirm within 5 seconds
                                     player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
