@@ -24,7 +24,6 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.parkour.utils.dependencies.ProtocolLib;
 import com.parkourcraft.parkour.utils.dependencies.Vault;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -119,8 +118,7 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DamageListener(), this);
         getServer().getPluginManager().registerEvents(new ChatListener(), this);
         getServer().getPluginManager().registerEvents(new ItemSpawnListener(), this);
-        getServer().getPluginManager().registerEvents(new EntitySpawnListener(), this);
-        getServer().getPluginManager().registerEvents(new RedstoneListener(), this);
+        getServer().getPluginManager().registerEvents(new PlotLimitingListener(), this);
         getServer().getPluginManager().registerEvents(new SwapHandListener(), this);
     }
 
