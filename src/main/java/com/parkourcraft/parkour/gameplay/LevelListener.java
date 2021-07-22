@@ -63,7 +63,8 @@ public class LevelListener implements Listener {
                         else
                             race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
                     }
-                } else {
+                // if they are not spectating anyone, continue
+                } else if (playerStats.getPlayerToSpectate() == null) {
                     Level level = playerStats.getLevel();
                     if (level != null && level.doesLiquidResetPlayer()) {
 
