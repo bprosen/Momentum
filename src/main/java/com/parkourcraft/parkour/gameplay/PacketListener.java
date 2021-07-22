@@ -138,8 +138,14 @@ public class PacketListener implements Listener {
                         if (doCancel) {
                             player.sendMessage(Utils.translate(reason));
                             event.setCancelled(true);
-                            // send block update back to player from server that intercepted the packet
-                            player.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
+
+                            // send block update back to player from server that intercepted the packet, run in sync so no async async chunk load
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    player.sendBlockChange(loc, loc.getBlock().getType(), loc.getBlock().getData());
+                                }
+                            }.runTask(plugin);
                         }
                     }
                 }
