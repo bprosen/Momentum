@@ -41,7 +41,7 @@ public class EventCMD implements CommandExecutor {
                             if (playerStats.getPlayerToSpectate() == null) {
                                 if (!playerStats.inRace()) {
                                     if (!PlayerHider.containsPlayer(player)) {
-                                        if (playerStats.isInInfinitePK()) {
+                                        if (!playerStats.isInInfinitePK()) {
                                             if (!eventManager.isEliminated(player)) {
                                                 if (!eventManager.isStartCoveredInWater()) {
                                                     if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
