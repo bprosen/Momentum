@@ -46,6 +46,10 @@ public class SpectatorHandler {
                     "",
                     Utils.translate("&7You are no longer spectating anyone"));
             playerStats.resetSpectateSpawn();
+
+            // if level is elytra level, toggle back on
+            if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                Parkour.getStatsManager().toggleOnElytra(playerStats);
         }
     }
 
@@ -59,8 +63,10 @@ public class SpectatorHandler {
         spectatorStats.setPlayerToSpectate(playerStats);
 
         // in case they /spectate while spectating
-        if (!alreadySpectating)
+        if (!alreadySpectating) {
             spectatorStats.setSpectateSpawn(spectator.getLocation());
+            Parkour.getStatsManager().toggleOffElytra(spectatorStats);
+        }
 
         PlayerHider.hidePlayer(spectator, true);
         spectateToPlayer(spectator, player);
