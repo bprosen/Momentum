@@ -188,71 +188,76 @@ public class MenuItemAction {
     private static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace()) {
             if (playerStats.getPlayerToSpectate() == null) {
-                if (level.hasRequiredLevels(playerStats)) {
+                if (!playerStats.isEventParticipant()) {
+                    if (!playerStats.isInInfinitePK()) {
+                        if (level.hasRequiredLevels(playerStats)) {
 
-                    player.closeInventory();
+                            player.closeInventory();
 
-                    // if the level has perm node, and player does not have perm node
-                    if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
-                        player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
-                        return;
-                    }
+                            // if the level has perm node, and player does not have perm node
+                            if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
+                                player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
+                                return;
+                            }
 
-                    // if player is in level and their level is the level they clicked on, cancel
-                    if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
-                        player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
-                        return;
-                    }
+                            // if player is in level and their level is the level they clicked on, cancel
+                            if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
+                                player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                                return;
+                            }
 
-                    if (playerStats.isInInfinitePK()) {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
-                        return;
-                    }
+                            for (PotionEffect potionEffect : player.getActivePotionEffects())
+                                player.removePotionEffect(potionEffect.getType());
 
-                    for (PotionEffect potionEffect : player.getActivePotionEffects())
-                        player.removePotionEffect(potionEffect.getType());
+                            // toggle off if saved
+                            Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                    // toggle off if saved
-                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+                            // save if has checkpoint
+                            if (playerStats.getCheckpoint() != null) {
+                                CheckpointDB.savePlayerAsync(player);
+                                playerStats.resetCheckpoint();
+                            }
 
-                    // save if has checkpoint
-                    if (playerStats.getCheckpoint() != null) {
-                        CheckpointDB.savePlayerAsync(player);
-                        playerStats.resetCheckpoint();
-                    }
+                            // if in practice mode
+                            if (playerStats.getPracticeLocation() != null)
+                                playerStats.resetPracticeMode();
 
-                    // if in practice mode
-                    if (playerStats.getPracticeLocation() != null)
-                        playerStats.resetPracticeMode();
+                            if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
+                                CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
+                                Parkour.getCheckpointManager().teleportPlayer(playerStats);
+                                player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                            } else {
+                                player.teleport(level.getStartLocation());
+                                player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
+                                        + level.getFormattedTitle()));
+                            }
+                            playerStats.setLevel(level);
+                            playerStats.disableLevelStartTime();
 
-                    if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
-                        CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
-                        Parkour.getCheckpointManager().teleportPlayer(playerStats);
-                        player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                            if (!level.getPotionEffects().isEmpty()) {
+                                for (PotionEffect potionEffect : level.getPotionEffects())
+                                    player.addPotionEffect(potionEffect);
+                            }
+
+                            if (level.isElytraLevel())
+                                Parkour.getStatsManager().toggleOnElytra(playerStats);
+
+                            TitleAPI.sendTitle(
+                                    player, 10, 40, 10,
+                                    "",
+                                    level.getFormattedTitle()
+                            );
+                        } else {
+                            player.closeInventory();
+                            player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
+                        }
                     } else {
-                        player.teleport(level.getStartLocation());
-                        player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
-                                + level.getFormattedTitle()));
+                        player.closeInventory();
+                        player.sendMessage(Utils.translate("&cYou cannot enter a level while in infinite parkour"));
                     }
-                    playerStats.setLevel(level);
-                    playerStats.disableLevelStartTime();
-
-                    if (!level.getPotionEffects().isEmpty()) {
-                        for (PotionEffect potionEffect : level.getPotionEffects())
-                            player.addPotionEffect(potionEffect);
-                    }
-
-                    if (level.isElytraLevel())
-                        Parkour.getStatsManager().toggleOnElytra(playerStats);
-
-                    TitleAPI.sendTitle(
-                            player, 10, 40, 10,
-                            "",
-                            level.getFormattedTitle()
-                    );
                 } else {
                     player.closeInventory();
-                    player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
+                    player.sendMessage(Utils.translate("&cYou cannot enter a level while in an event"));
                 }
             } else {
                 player.closeInventory();
