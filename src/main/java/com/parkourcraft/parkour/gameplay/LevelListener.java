@@ -109,7 +109,7 @@ public class LevelListener implements Listener {
                 int blockX = playerStats.getCheckpoint().getBlockX();
                 int blockZ = playerStats.getCheckpoint().getBlockZ();
 
-                if (!(blockX == block.getLocation().getBlockX()) && !(blockZ == block.getLocation().getBlockZ()))
+                if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
                     setCheckpoint(player, playerStats, block.getLocation());
             } else {
                 setCheckpoint(player, playerStats, block.getLocation());
