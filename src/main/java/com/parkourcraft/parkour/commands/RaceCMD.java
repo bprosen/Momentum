@@ -151,8 +151,20 @@ public class RaceCMD implements CommandExecutor {
                 return;
             }
 
+            if (victimStats.getPlayerToSpectate() != null) {
+                accepter.sendMessage(Utils.translate("&cYou cannot do this while they are in spectator"));
+                removeFromConfirmMap(victim, accepter);
+                return;
+            }
+
             if (playerStats.getPracticeLocation() != null) {
                 accepter.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                removeFromConfirmMap(victim, accepter);
+                return;
+            }
+
+            if (victimStats.getPracticeLocation() != null) {
+                accepter.sendMessage(Utils.translate("&cYou cannot do this while they are in practice mode"));
                 removeFromConfirmMap(victim, accepter);
                 return;
             }

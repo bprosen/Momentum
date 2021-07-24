@@ -46,39 +46,45 @@ public class CheckpointDB {
     public static void savePlayer(Player player) {
 
         PlayerStats stats = Parkour.getStatsManager().get(player);
-        Location loc = stats.getCheckpoint();
 
-        Parkour.getDatabaseManager().run("INSERT INTO checkpoints " +
-                "(uuid, player_name, level_name, world, x, y, z)" +
-                " VALUES ('" +
-                player.getUniqueId().toString() + "','" +
-                player.getName() + "','" +
-                stats.getLevel().getName() + "','" +
-                loc.getWorld().getName() + "','" +
-                loc.getBlockX() + "','" +
-                loc.getBlockY() + "','" +
-                loc.getBlockZ() +
-                "')"
-        );
+        if (stats.inLevel()) {
+            Location loc = stats.getCheckpoint();
+
+            Parkour.getDatabaseManager().run("INSERT INTO checkpoints " +
+                    "(uuid, player_name, level_name, world, x, y, z)" +
+                    " VALUES ('" +
+                    player.getUniqueId().toString() + "','" +
+                    player.getName() + "','" +
+                    stats.getLevel().getName() + "','" +
+                    loc.getWorld().getName() + "','" +
+                    loc.getBlockX() + "','" +
+                    loc.getBlockY() + "','" +
+                    loc.getBlockZ() +
+                    "')"
+            );
+        }
     }
 
     public static void savePlayerAsync(Player player) {
 
         PlayerStats stats = Parkour.getStatsManager().get(player);
-        Location loc = stats.getCheckpoint();
 
-        Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
-                "(uuid, player_name, level_name, world, x, y, z)" +
-                " VALUES ('" +
-                player.getUniqueId().toString() + "','" +
-                player.getName() + "','" +
-                stats.getLevel().getName() + "','" +
-                loc.getWorld().getName() + "','" +
-                loc.getBlockX() + "','" +
-                loc.getBlockY() + "','" +
-                loc.getBlockZ() +
-                "')"
-        );
+        if (stats.inLevel()) {
+            Location loc = stats.getCheckpoint();
+
+            Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
+                    "(uuid, player_name, level_name, world, x, y, z)" +
+                    " VALUES ('" +
+                    player.getUniqueId().toString() + "','" +
+                    player.getName() + "','" +
+                    stats.getLevel().getName() + "','" +
+                    loc.getWorld().getName() + "','" +
+                    loc.getBlockX() + "','" +
+                    loc.getBlockY() + "','" +
+                    loc.getBlockZ() +
+                    "')"
+            );
+        }
     }
 
     public static void shutdown() {
