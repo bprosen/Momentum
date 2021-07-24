@@ -5,10 +5,13 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
+import javafx.scene.layout.Priority;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -29,8 +32,8 @@ public class InteractListener implements Listener {
 
         Player player = event.getPlayer();
 
-        if (event.getHand() == EquipmentSlot.HAND && (event.getAction() == Action.RIGHT_CLICK_AIR ||
-            event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+        if (event.getHand() == EquipmentSlot.HAND &&
+           (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
 
             ItemStack item = event.getItem();
 
@@ -82,9 +85,21 @@ public class InteractListener implements Listener {
                             if (level != null) {
 
                                 // gets if they have right clicked it already, if so, cancel the task and reset them
-                                if (confirmMap.containsKey(player.getName())) {
+                                if (!confirmMap.containsKey(player.getName())) {
+                                    // otherwise, put them in and ask them to confirm within 5 seconds
+                                    player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+
+                                    confirmMap.put(player.getName(), new BukkitRunnable() {
+                                        public void run() {
+                                            if (confirmMap.containsKey(player.getName())) {
+                                                confirmMap.remove(player.getName());
+                                                player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                            }
+                                        }
+                                    }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                                } else {
                                     confirmMap.get(player.getName()).cancel();
-                                    confirmMap.remove(player.getName());
+
                                     playerStats.resetCheckpoint();
                                     playerStats.resetPracticeMode();
 
@@ -97,18 +112,8 @@ public class InteractListener implements Listener {
                                     }
                                     player.teleport(level.getStartLocation());
                                     player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
-                                } else {
-                                    // otherwise, put them in and ask them to confirm within 5 seconds
-                                    player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
 
-                                    confirmMap.put(player.getName(), new BukkitRunnable() {
-                                        public void run() {
-                                            if (confirmMap.containsKey(player.getName())) {
-                                                confirmMap.remove(player.getName());
-                                                player.sendMessage(Utils.translate("&cYou did not confirm in time"));
-                                            }
-                                        }
-                                    }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                                    confirmMap.remove(player.getName());
                                 }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou are not in a level"));
