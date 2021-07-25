@@ -14,12 +14,15 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
 public class RaceManager {
 
     private Set<Race> runningRaceList = new HashSet<>();
+    private Set<RaceRequest> raceRequests = new HashSet<>();
+    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
     private LinkedHashSet<RaceLBPosition> raceLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_race_leaderboard_size);
 
     public RaceManager() {
@@ -31,8 +34,12 @@ public class RaceManager {
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
-    public void startRace(Player player1, Player player2, boolean bet, double betAmount) {
+    public void startRace(PlayerStats player1, PlayerStats player2, boolean randomLevel, Level selectedLevel, boolean bet, double betAmount) {
 
+        Level chosenLevel = null;
+
+        // if they did not select a level
+        if (randomLevel) {
         List<String> temporaryLevelList = new ArrayList<>();
 
         // if races are in use, then filter through which ones are in use
@@ -50,8 +57,8 @@ public class RaceManager {
 
             // if there are no levels available
             if (temporaryLevelList.isEmpty()) {
-                player1.sendMessage(Utils.translate("&cNo maps available for use, try again later"));
-                player2.sendMessage(Utils.translate("&cNo maps available for use, try again later"));
+                player1.getPlayer().sendMessage(Utils.translate("&cNo maps available for use, try again later"));
+                player2.getPlayer().sendMessage(Utils.translate("&cNo maps available for use, try again later"));
                 return;
             }
         } else {
@@ -62,40 +69,42 @@ public class RaceManager {
         if (temporaryLevelList.size() > 0) {
             // picks random map
             Random ran = new Random();
-            Level level = Parkour.getLevelManager().get(
+            chosenLevel = Parkour.getLevelManager().get(
                     temporaryLevelList.get(ran.nextInt(temporaryLevelList.size())
                     ));
+        } else if (selectedLevel != null)
+            chosenLevel = selectedLevel;
 
             // make sure it is not an invalid level
-            if (level != null) {
+            if (chosenLevel != null) {
                 // create object for the race
-                Race newRace = new Race(player1, player2, level, bet, betAmount);
+                Race newRace = new Race(player1.getPlayer(), player2.getPlayer(), chosenLevel, bet, betAmount);
                 runningRaceList.add(newRace);
 
                 // set level and set inRace to true
-                PlayerStats player1Stats = Parkour.getStatsManager().get(player1);
-                PlayerStats player2Stats = Parkour.getStatsManager().get(player2);
 
                 // toggle off elytra
-                Parkour.getStatsManager().toggleOffElytra(player1Stats);
-                Parkour.getStatsManager().toggleOffElytra(player2Stats);
+                Parkour.getStatsManager().toggleOffElytra(player1);
+                Parkour.getStatsManager().toggleOffElytra(player2);
 
-                player1Stats.startedRace();
-                player2Stats.startedRace();
-                player1Stats.setLevel(level);
-                player2Stats.setLevel(level);
+                player1.startedRace();
+                player2.startedRace();
+                player1.setLevel(chosenLevel);
+                player2.setLevel(chosenLevel);
 
-                player1.teleport(level.getRaceLocation1());
-                player2.teleport(level.getRaceLocation2());
+                player1.getPlayer().teleport(chosenLevel.getRaceLocation1());
+                player2.getPlayer().teleport(chosenLevel.getRaceLocation2());
 
                 // remove potion effects
-                for (PotionEffect effects : player1.getActivePotionEffects()) {
-                    player1.removePotionEffect(effects.getType());
+                for (PotionEffect effects : player1.getPlayer().getActivePotionEffects()) {
+                    player1.getPlayer().removePotionEffect(effects.getType());
                 }
 
-                for (PotionEffect effects : player2.getActivePotionEffects()) {
-                    player2.removePotionEffect(effects.getType());
+                for (PotionEffect effects : player2.getPlayer().getActivePotionEffects()) {
+                    player2.getPlayer().removePotionEffect(effects.getType());
                 }
+
+                Level finalChosenLevel = chosenLevel; // need to make final for inner class usage
 
                 // freeze and do countdown
                 new BukkitRunnable() {
@@ -106,77 +115,77 @@ public class RaceManager {
                         // cancel, send last title and return
                         if (runCycles == 100) {
                             cancel();
-                            TitleAPI.sendTitle(player1, 0, 20, 10, "&cRACE", "");
-                            TitleAPI.sendTitle(player2, 0, 20, 10, "&cRACE", "");
-                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
-                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
+                            TitleAPI.sendTitle(player1.getPlayer(), 0, 20, 10, "&cRACE", "");
+                            TitleAPI.sendTitle(player2.getPlayer(), 0, 20, 10, "&cRACE", "");
+                            player1.getPlayer().playSound(player1.getPlayer().getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
+                            player2.getPlayer().playSound(player2.getPlayer().getLocation(), Sound.BLOCK_NOTE_BELL, 8F, 2F);
                             return;
                         }
 
                         // race location variables
-                        double race1X = level.getRaceLocation1().getX();
-                        double race1Z = level.getRaceLocation1().getZ();
-                        double race2X = level.getRaceLocation2().getX();
-                        double race2Z = level.getRaceLocation2().getZ();
+                        double race1X = finalChosenLevel.getRaceLocation1().getX();
+                        double race1Z = finalChosenLevel.getRaceLocation1().getZ();
+                        double race2X = finalChosenLevel.getRaceLocation2().getX();
+                        double race2Z = finalChosenLevel.getRaceLocation2().getZ();
 
                         // player location variables
-                        double player1X = player1.getLocation().getX();
-                        double player1Z = player1.getLocation().getZ();
-                        double player2X = player2.getLocation().getX();
-                        double player2Z = player2.getLocation().getZ();
+                        double player1X = player1.getPlayer().getLocation().getX();
+                        double player1Z = player1.getPlayer().getLocation().getZ();
+                        double player2X = player2.getPlayer().getLocation().getX();
+                        double player2Z = player2.getPlayer().getLocation().getZ();
 
                         // teleport back if moved
                         if (race1X != player1X || race1Z != player1Z) {
-                            Location raceLoc1 = level.getRaceLocation1().clone();
-                            raceLoc1.setYaw(player1.getLocation().getYaw());
-                            raceLoc1.setPitch(player1.getLocation().getPitch());
-                            player1.teleport(raceLoc1);
+                            Location raceLoc1 = finalChosenLevel.getRaceLocation1().clone();
+                            raceLoc1.setYaw(player1.getPlayer().getLocation().getYaw());
+                            raceLoc1.setPitch(player1.getPlayer().getLocation().getPitch());
+                            player1.getPlayer().teleport(raceLoc1);
                         }
 
                         if (race2X != player2X || race2Z != player2Z) {
-                            Location raceLoc2 = level.getRaceLocation2().clone();
-                            raceLoc2.setYaw(player2.getLocation().getYaw());
-                            raceLoc2.setPitch(player2.getLocation().getPitch());
-                            player2.teleport(raceLoc2);
+                            Location raceLoc2 = finalChosenLevel.getRaceLocation2().clone();
+                            raceLoc2.setYaw(player2.getPlayer().getLocation().getYaw());
+                            raceLoc2.setPitch(player2.getPlayer().getLocation().getPitch());
+                            player2.getPlayer().teleport(raceLoc2);
                         }
 
                         // countdown if-else
                         if (runCycles == 0) {
-                            TitleAPI.sendTitle(player1, 0, 20, 0, "&a5", "");
-                            TitleAPI.sendTitle(player2, 0, 20, 0, "&a5", "");
-                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            TitleAPI.sendTitle(player1.getPlayer(), 0, 20, 0, "&a5", "");
+                            TitleAPI.sendTitle(player2.getPlayer(), 0, 20, 0, "&a5", "");
+                            player1.getPlayer().playSound(player1.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.getPlayer().playSound(player2.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                         } else if (runCycles == 20) {
-                            TitleAPI.sendTitle(player1, 0, 20, 0, "&e4", "");
-                            TitleAPI.sendTitle(player2, 0, 20, 0, "&e4", "");
-                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            TitleAPI.sendTitle(player1.getPlayer(), 0, 20, 0, "&e4", "");
+                            TitleAPI.sendTitle(player2.getPlayer(), 0, 20, 0, "&e4", "");
+                            player1.getPlayer().playSound(player1.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.getPlayer().playSound(player2.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                         } else if (runCycles == 40) {
-                            TitleAPI.sendTitle(player1, 0, 20, 0, "&63", "");
-                            TitleAPI.sendTitle(player2, 0, 20, 0, "&63", "");
-                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            TitleAPI.sendTitle(player1.getPlayer(), 0, 20, 0, "&63", "");
+                            TitleAPI.sendTitle(player2.getPlayer(), 0, 20, 0, "&63", "");
+                            player1.getPlayer().playSound(player1.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.getPlayer().playSound(player2.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                         } else if (runCycles == 60) {
-                            TitleAPI.sendTitle(player1, 0, 20, 0, "&c2", "");
-                            TitleAPI.sendTitle(player2, 0, 20, 0, "&c2", "");
-                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            TitleAPI.sendTitle(player1.getPlayer(), 0, 20, 0, "&c2", "");
+                            TitleAPI.sendTitle(player2.getPlayer(), 0, 20, 0, "&c2", "");
+                            player1.getPlayer().playSound(player1.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.getPlayer().playSound(player2.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                         } else if (runCycles == 80) {
-                            TitleAPI.sendTitle(player1, 0, 20, 0, "&41", "");
-                            TitleAPI.sendTitle(player2, 0, 20, 0, "&41", "");
-                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
-                            player2.playSound(player2.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            TitleAPI.sendTitle(player1.getPlayer(), 0, 20, 0, "&41", "");
+                            TitleAPI.sendTitle(player2.getPlayer(), 0, 20, 0, "&41", "");
+                            player1.getPlayer().playSound(player1.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+                            player2.getPlayer().playSound(player2.getPlayer().getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
                         }
                         runCycles++;
                     }
                 }.runTaskTimer(Parkour.getPlugin(), 1, 1);
             } else {
-                player1.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
-                player2.sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
+                player1.getPlayer().sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
+                player2.getPlayer().sendMessage(Utils.translate("&cInvalid level? Try again or contact an Admin"));
             }
         } else {
-            player1.sendMessage(Utils.translate("&cNo maps have been made for races"));
-            player2.sendMessage(Utils.translate("&cNo maps have been made for races"));
+            player1.getPlayer().sendMessage(Utils.translate("&cNo maps have been made for races"));
+            player2.getPlayer().sendMessage(Utils.translate("&cNo maps have been made for races"));
         }
     }
 
@@ -333,9 +342,214 @@ public class RaceManager {
         return null;
     }
 
+    public void sendRequest(PlayerStats player1, PlayerStats player2, Level selectedLevel, boolean bet, double betAmount) {
+
+        if (player1.getPlayerName().equalsIgnoreCase(player2.getPlayerName())) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race yourself..."));
+            return;
+        }
+
+        double minBetAmount = Parkour.getSettingsManager().min_race_bet_amount;
+        if (bet && betAmount < minBetAmount) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot bet less than &4$" + minBetAmount));
+            return;
+        }
+
+        if (player1.getPlayerToSpectate() != null) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
+            return;
+        }
+
+        if (player1.getPracticeLocation() != null) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+            return;
+        }
+
+        // make sure they have enough money for the bet
+        double victimBalance = Parkour.getEconomy().getBalance(player2.getPlayer());
+        double senderBalance = Parkour.getEconomy().getBalance(player1.getPlayer());
+
+        if (senderBalance < betAmount) {
+            player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
+                    " Your Balance &4$" + senderBalance));
+            return;
+        }
+
+        if (victimBalance < betAmount) {
+            player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayer().getName() + " &7does not have enough to do this bet" +
+                    " - &cTheir Balance &4$" + victimBalance));
+            return;
+        }
+
+        // if they are in race
+        if (player1.inRace()) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
+            return;
+        }
+
+        // if target is in race
+        if (player2.inRace()) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while &4" + player2.getPlayer().getName() + " &cis in a race"));
+            return;
+        }
+
+        if (getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou have already send one to them!"));
+        } else {
+            // otherwise, put them in and ask them to confirm within 5 seconds
+            if (bet) {
+                player2.getPlayer().sendMessage(Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + betAmount));
+                player1.getPlayer().sendMessage(Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + betAmount));
+            } else {
+                player2.getPlayer().sendMessage(Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request"));
+                player1.getPlayer().sendMessage(Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request"));
+            }
+            RaceRequest raceRequest = new RaceRequest(player1, player2);
+
+            // set selected level if not null
+            if (selectedLevel != null)
+                raceRequest.setSelectedLevel(selectedLevel);
+
+            // set bet if doing bet
+            if (bet)
+                raceRequest.setBet(betAmount);
+
+            raceRequests.add(raceRequest);
+
+            player2.getPlayer().sendMessage(Utils.translate("&7Type &c/race accept " + player1.getPlayer().getName() + " &7within &c30 seconds &7to accept"));
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
+                        removeRequest(raceRequest);
+                        player2.getPlayer().sendMessage(Utils.translate("&4" + player2.getPlayer().getName() + " &cdid not accept your race request in time"));
+                    }
+                }
+            }.runTaskLater(Parkour.getPlugin(), 20 * 30);
+        }
+    }
+
+    public void acceptRequest(PlayerStats player1, PlayerStats player2) {
+
+        RaceRequest raceRequest = getRequest(player1.getPlayer(), player2.getPlayer());
+        // request exists
+        if (raceRequest != null) {
+
+            boolean doingBet = raceRequest.hasBet();
+            double betAmount = raceRequest.getBet();
+
+            if (player1.getPlayerToSpectate() != null) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            if (player2.getPlayerToSpectate() != null) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while they are in spectator"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            if (player1.getPracticeLocation() != null) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            if (player2.getPracticeLocation() != null) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while they are in practice mode"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            // if accepting race while in race
+            if (player1.inRace()) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race someone else while in a race"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            // if accepting race while in race
+            if (player2.inRace()) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race someone else while they are in a race"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            // if other player is in an elytra level and not on the ground, do not continue
+            if (player2.inLevel() && player2.getLevel().isElytraLevel() && !player2.getPlayer().isOnGround()) {
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race someone when " + player2.getPlayerName() + " is not on the ground in an elytra level"));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            // make sure they still have enough money for the bet
+            double accepterBalance = Parkour.getEconomy().getBalance(player1.getPlayer());
+            double senderBalance = Parkour.getEconomy().getBalance(player2.getPlayer());
+            if (accepterBalance < betAmount) {
+                player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
+                        " Your Balance &4$" + senderBalance));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            if (senderBalance < betAmount) {
+                player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayerName() + " &7does not have enough to do this bet" +
+                        " - &cTheir Balance &4$" + senderBalance));
+                removeRequest(raceRequest);
+                return;
+            }
+
+            // if in elytra and not on the ground, dont send
+            if (player1.inLevel() && player1.getLevel().isElytraLevel())
+                Parkour.getStatsManager().toggleOffElytra(player1);
+
+            // if in elytra and not on the ground, dont send
+            if (player2.inLevel() && player2.getLevel().isElytraLevel())
+                Parkour.getStatsManager().toggleOffElytra(player2);
+
+            // otherwise do race and disable any current time on levels
+            player1.disableLevelStartTime();
+            player2.disableLevelStartTime();
+
+            Level chosenLevel = null;
+            boolean randomLevel = true;
+            if (!raceRequest.randomLevel()) {
+                chosenLevel = raceRequest.getSelectedLevel();
+                randomLevel = false;
+            }
+
+            startRace(player1, player2, randomLevel, chosenLevel, doingBet, betAmount);
+            removeRequest(raceRequest);
+        } else {
+            player1.getPlayer().sendMessage(Utils.translate("&cYou do not have a request from &4" + player2.getPlayerName()));
+        }
+    }
+
+    public RaceRequest getRequest(Player player1, Player player2) {
+        for (RaceRequest raceRequest : raceRequests) {
+            String requestPlayer1Name = raceRequest.getPlayer1().getPlayerName();
+            String requestPlayer2Name = raceRequest.getPlayer2().getPlayerName();
+
+            if ((requestPlayer1Name.equalsIgnoreCase(player1.getName()) &&
+                requestPlayer2Name.equalsIgnoreCase(player2.getName())) ||
+               (requestPlayer1Name.equalsIgnoreCase(player2.getName()) &&
+                requestPlayer2Name.equalsIgnoreCase(player1.getName())))
+                return raceRequest;
+        }
+        return null;
+    }
+
+    public void removeRequest(RaceRequest raceRequest) {
+        raceRequests.remove(raceRequest);
+    }
+
     public Set<Race> getRaces() {
         return runningRaceList;
     }
+
+    public Set<RaceRequest> getRaceRequests() { return raceRequests; }
 
     public LinkedHashSet<RaceLBPosition> getLeaderboard() { return raceLeaderboard; }
 }

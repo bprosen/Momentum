@@ -71,6 +71,8 @@ public class SettingsManager {
     public int max_prestige_multiplier;
     public int prestige_multiplier_per_prestige;
 
+    public double min_race_bet_amount;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -124,6 +126,7 @@ public class SettingsManager {
         prestige_multiplier_per_prestige = settings.getInt("prestiges.multiplier_per_prestige");
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
+        min_race_bet_amount = settings.getInt("races.min_bet_amount");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");

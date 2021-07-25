@@ -99,3 +99,4 @@ prestiges:
   multiplier_per_prestige: 5
 races:
   max_leaderboard_size: 10
+  min_bet_amount: 100.0

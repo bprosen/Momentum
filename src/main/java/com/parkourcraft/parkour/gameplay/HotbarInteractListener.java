@@ -5,13 +5,11 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
-import javafx.scene.layout.Priority;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -23,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
 
-public class InteractListener implements Listener {
+public class HotbarInteractListener implements Listener {
 
     private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
 
@@ -110,10 +108,10 @@ public class InteractListener implements Listener {
                                         for (PotionEffect potionEffect : level.getPotionEffects())
                                             player.addPotionEffect(potionEffect);
                                     }
+                                    confirmMap.remove(player.getName());
+
                                     player.teleport(level.getStartLocation());
                                     player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
-
-                                    confirmMap.remove(player.getName());
                                 }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou are not in a level"));

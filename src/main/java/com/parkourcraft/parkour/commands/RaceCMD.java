@@ -1,7 +1,9 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -16,8 +18,6 @@ import java.util.Map;
 
 public class RaceCMD implements CommandExecutor {
 
-    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
-
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
@@ -26,22 +26,44 @@ public class RaceCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        RaceManager raceManager = Parkour.getRaceManager();
+        StatsManager statsManager = Parkour.getStatsManager();
+        PlayerStats playerStats = statsManager.get(player);
 
         if (a.length == 0) {
             sendHelp(player);
         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
             sendHelp(player);
         } else if (a.length == 1) {
-            // send race request
-            sendRequest(player, a[0], false, 0.0);
+            PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[0]);
+
+            if (targetStats != null) {
+                // send race request
+                raceManager.sendRequest(playerStats, targetStats, null, false, 0.0);
+            } else {
+                player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not online"));
+            }
         } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
-            // accept race request
-            acceptRequest(a[1], player);
+            PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[1]);
+
+            if (targetStats != null) {
+                // accept race request
+                raceManager.acceptRequest(playerStats, targetStats);
+            } else {
+                player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not online"));
+            }
         } else if (a.length == 2) {
             // send race request with bet
             if (Utils.isDouble(a[1])) {
                 double betAmount = Double.parseDouble(a[1]);
-                sendRequest(player, a[0], true, betAmount);
+                PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[0]);
+
+                if (targetStats != null) {
+                    // send race request
+                    raceManager.sendRequest(playerStats, targetStats, null, true, betAmount);
+                } else {
+                    player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not online"));
+                }
             } else {
                 player.sendMessage(Utils.translate("&cThat is not a valid amount to bet!"));
             }
@@ -50,206 +72,6 @@ public class RaceCMD implements CommandExecutor {
         }
 
         return false;
-    }
-
-    private void sendRequest(Player player, String victimName, boolean bet, double betAmount) {
-
-        Player victim = Bukkit.getPlayer(victimName);
-        if (victim == null) {
-            player.sendMessage(Utils.translate("&4" + victimName + " &cis offline"));
-            return;
-        }
-
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        if (playerStats.getPlayerToSpectate() != null) {
-            player.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
-            return;
-        }
-
-        if (playerStats.getPracticeLocation() != null) {
-            player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-            return;
-        }
-
-
-        // make sure they have enough money for the bet
-        double victimBalance = Parkour.getEconomy().getBalance(victim);
-        double senderBalance = Parkour.getEconomy().getBalance(player);
-
-        if (senderBalance < betAmount) {
-            player.sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                    " Your Balance &4$" + senderBalance));
-            return;
-        }
-
-        if (victimBalance < betAmount) {
-            player.sendMessage(Utils.translate("&c" + victimName + " &7does not have enough to do this bet" +
-                    " - &cTheir Balance &4$" + victimBalance));
-            return;
-        }
-
-        // if they are in race
-        if (playerStats.inRace()) {
-            player.sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
-            return;
-        }
-
-        // if target is in race
-        PlayerStats victimStats = Parkour.getStatsManager().get(victim);
-        if (victimStats.inRace()) {
-            player.sendMessage(Utils.translate("&cYou cannot send a request while &4" + victimName + " &cis in a race"));
-            return;
-        }
-
-        if (inConfirmMap(player, victim)) {
-            player.sendMessage(Utils.translate("&cYou have already send one to them!"));
-        } else {
-            // otherwise, put them in and ask them to confirm within 5 seconds
-            if (bet) {
-                victim.sendMessage(Utils.translate("&4" + player.getName() + " &7has sent you a race request with bet amount &4$" + betAmount));
-                player.sendMessage(Utils.translate("&7You sent &4" + victim.getName() + " &7a race request with bet amount &4$" + betAmount));
-            } else {
-                victim.sendMessage(Utils.translate("&4" + player.getName() + " &7has sent you a race request"));
-                player.sendMessage(Utils.translate("&7You sent &4" + victim.getName() + " &7a race request"));
-            }
-
-            victim.sendMessage(Utils.translate("&7Type &c/race accept " + player.getName() + " &7within &c15 seconds &7to accept"));
-
-            confirmMap.put(player.getName() + ":" + victim.getName() + ":" + bet + ":" + betAmount, new BukkitRunnable() {
-                public void run() {
-                if (inConfirmMap(player, victim)) {
-                    removeFromConfirmMap(player, victim);
-                    player.sendMessage(Utils.translate("&4" + victim.getName() + " &7did not accept your race request in time"));
-                }
-                }
-            }.runTaskLater(Parkour.getPlugin(), 20 * 15));
-        }
-    }
-
-    private void acceptRequest(String challenger, Player accepter) {
-
-        Player victim = Bukkit.getPlayer(challenger);
-        if (victim == null) {
-            accepter.sendMessage(Utils.translate("&4" + challenger + " &cis offline"));
-            return;
-        }
-
-        // request exists
-        if (inConfirmMap(victim, accepter)) {
-
-            String[] split = getStringFromConfirmMap(victim, accepter).split(":");
-            boolean doingBet = Boolean.parseBoolean(split[2]);
-            double betAmount = Double.parseDouble(split[3]);
-
-            // conditions to cancel
-            PlayerStats playerStats = Parkour.getStatsManager().get(accepter);
-            PlayerStats victimStats = Parkour.getStatsManager().get(victim);
-
-            if (playerStats.getPlayerToSpectate() != null) {
-                accepter.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
-                removeFromConfirmMap(victim, accepter);
-                return;
-            }
-
-            if (victimStats.getPlayerToSpectate() != null) {
-                accepter.sendMessage(Utils.translate("&cYou cannot do this while they are in spectator"));
-                removeFromConfirmMap(victim, accepter);
-                return;
-            }
-
-            if (playerStats.getPracticeLocation() != null) {
-                accepter.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-                removeFromConfirmMap(victim, accepter);
-                return;
-            }
-
-            if (victimStats.getPracticeLocation() != null) {
-                accepter.sendMessage(Utils.translate("&cYou cannot do this while they are in practice mode"));
-                removeFromConfirmMap(victim, accepter);
-                return;
-            }
-
-            // if accepting race while in race
-            if (playerStats.inRace()) {
-                accepter.sendMessage(Utils.translate("&cYou cannot race someone else while in a race"));
-                return;
-            }
-
-            // if other player is in an elytra level and not on the ground, do not continue
-            if (victimStats.inLevel() && victimStats.getLevel().isElytraLevel() && !victimStats.getPlayer().isOnGround()) {
-                accepter.sendMessage(Utils.translate("&cYou cannot race someone when " + victim.getName() + " is not on the ground in an elytra level"));
-                return;
-            }
-
-            // make sure they still have enough money for the bet
-            double accepterBalance = Parkour.getEconomy().getBalance(accepter);
-            double senderBalance = Parkour.getEconomy().getBalance(victim);
-            if (accepterBalance < betAmount) {
-                accepter.sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                        " Your Balance &4$" + senderBalance));
-                removeFromConfirmMap(victim, accepter);
-                return;
-            }
-
-            if (senderBalance < betAmount) {
-                accepter.sendMessage(Utils.translate("&c" + victim.getName() + " &7does not have enough to do this bet" +
-                        " - &cTheir Balance &4$" + senderBalance));
-                removeFromConfirmMap(victim, accepter);
-                return;
-            }
-
-            // if in elytra and not on the ground, dont send
-            if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
-                Parkour.getStatsManager().toggleOffElytra(playerStats);
-
-            // if in elytra and not on the ground, dont send
-            if (victimStats.inLevel() && victimStats.getLevel().isElytraLevel())
-                Parkour.getStatsManager().toggleOffElytra(victimStats);
-
-            // otherwise do race and disable any current time on levels
-            playerStats.disableLevelStartTime();
-            Parkour.getStatsManager().get(victim).disableLevelStartTime();
-
-            Parkour.getRaceManager().startRace(victim, accepter, doingBet, betAmount);
-            removeFromConfirmMap(victim, accepter);
-        } else {
-            accepter.sendMessage(Utils.translate("&cYou do not have a request from &4" + challenger));
-        }
-    }
-
-    private boolean inConfirmMap(Player player1, Player player2) {
-        for (Map.Entry<String, BukkitTask> entry : confirmMap.entrySet()) {
-            if (entry.getKey().startsWith(player1.getName() + ":" + player2.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void removeFromConfirmMap(Player player1, Player player2) {
-
-        String deleteString = null;
-
-        for (Map.Entry<String, BukkitTask> entry : confirmMap.entrySet()) {
-            if (entry.getKey().startsWith(player1.getName() + ":" + player2.getName())) {
-                deleteString = entry.getKey();
-            }
-        }
-
-        if (deleteString != null) {
-            confirmMap.get(deleteString).cancel();
-            confirmMap.remove(deleteString);
-        }
-    }
-
-    private String getStringFromConfirmMap(Player player1, Player player2) {
-
-        for (Map.Entry<String, BukkitTask> entry : confirmMap.entrySet()) {
-            if (entry.getKey().startsWith(player1.getName() + ":" + player2.getName())) {
-                return entry.getKey();
-            }
-        }
-        return null;
     }
 
     private void sendHelp(Player player) {
