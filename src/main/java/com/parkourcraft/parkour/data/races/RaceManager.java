@@ -402,12 +402,6 @@ public class RaceManager {
             return;
         }
 
-        double minBetAmount = Parkour.getSettingsManager().min_race_bet_amount;
-        if (bet && betAmount < minBetAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot bet less than &4$" + minBetAmount));
-            return;
-        }
-
         if (player1.getPlayerToSpectate() != null) {
             player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
             return;

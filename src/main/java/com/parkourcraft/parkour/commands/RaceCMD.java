@@ -71,22 +71,27 @@ public class RaceCMD implements CommandExecutor {
                 double betAmount = Double.parseDouble(a[1]);
                 Player target = Bukkit.getPlayer(a[0]);
 
-                if (target != null) {
-                    // if they are in race
-                    if (Parkour.getStatsManager().get(player).inRace()) {
-                        player.sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
-                        return true;
-                    }
+                double minBetAmount = Parkour.getSettingsManager().min_race_bet_amount;
+                if (betAmount >= minBetAmount) {
+                    if (target != null) {
+                        // if they are in race
+                        if (Parkour.getStatsManager().get(player).inRace()) {
+                            player.sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
+                            return true;
+                        }
 
-                    // if target is in race
-                    if (Parkour.getStatsManager().get(target).inRace()) {
-                        player.sendMessage(Utils.translate("&cYou cannot send a request while &4" + target.getName() + " &cis in a race"));
-                        return true;
+                        // if target is in race
+                        if (Parkour.getStatsManager().get(target).inRace()) {
+                            player.sendMessage(Utils.translate("&cYou cannot send a request while &4" + target.getName() + " &cis in a race"));
+                            return true;
+                        }
+                        // send race request
+                        menuManager.openRaceLevelsGUI(player, target, betAmount);
+                    } else {
+                        player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
                     }
-                    // send race request
-                    menuManager.openRaceLevelsGUI(player, target, betAmount);
                 } else {
-                    player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
+                    player.sendMessage(Utils.translate("&cYou cannot bet less than &4$" + minBetAmount));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cThat is not a valid amount to bet!"));
