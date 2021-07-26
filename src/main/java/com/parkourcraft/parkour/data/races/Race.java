@@ -34,7 +34,7 @@ public class Race {
         maxTimer = new BukkitRunnable() {
             @Override
             public void run() {
-                Parkour.getRaceManager().forceEndRace(race);
+                Parkour.getRaceManager().forceEndRace(race, false);
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 10);
     }

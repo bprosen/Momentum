@@ -46,8 +46,21 @@ public class SpectateCMD implements CommandExecutor {
                                                         if (!spectatorStats.isEventParticipant()) {
 
                                                             boolean spectatingAlready = false;
-                                                            if (spectatorStats.getPlayerToSpectate() != null)
+                                                            if (spectatorStats.getPlayerToSpectate() != null) {
                                                                 spectatingAlready = true;
+
+                                                                /*
+                                                                 if they are already spectating and the person they
+                                                                 are spectating are who they are trying to spectate again, cancel
+                                                                 */
+                                                                if (spectatorStats.getPlayerToSpectate().getPlayerName()
+                                                                    .equalsIgnoreCase(playerStats.getPlayerName())) {
+
+                                                                    player.sendMessage(Utils.translate(
+                                                                    "&cYou cannot spectate the same person you are spectating"));
+                                                                    return true;
+                                                                }
+                                                            }
 
                                                             // enable spectator mode
                                                             SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, spectatingAlready);

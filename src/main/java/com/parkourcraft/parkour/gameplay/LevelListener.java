@@ -62,8 +62,6 @@ public class LevelListener implements Listener {
                         // swap tp to loc 2 if player 2
                         else
                             race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
-
-                        playerStats.startedLevel();
                     }
                 // if they are not spectating anyone, continue
                 } else if (playerStats.getPlayerToSpectate() == null) {
@@ -232,6 +230,11 @@ public class LevelListener implements Listener {
             playerStats.getPlayerToSpectate() == null &&
             playerStats.getCheckpoint() == null &&
             playerStats.getPracticeLocation() == null) {
+
+            // extra condition to make sure race level timers do not stop once the race has started
+            if (playerStats.inLevel() && playerStats.getLevel().isRaceLevel())
+                return;
+
             playerStats.disableLevelStartTime();
         }
     }

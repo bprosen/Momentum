@@ -37,6 +37,9 @@ public class RaceManager {
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
+    /*
+        Race Section
+     */
     public void startRace(PlayerStats player1, PlayerStats player2, Level selectedLevel, boolean bet, double betAmount) {
 
         // make sure it is not an invalid level
@@ -151,18 +154,21 @@ public class RaceManager {
         }
     }
 
-    public void forceEndRace(Race endedRace) {
-        endedRace.getPlayer1().sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
-        endedRace.getPlayer2().sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
+    public void forceEndRace(Race endedRace, boolean shutdown) {
 
         // teleport back
         endedRace.getPlayer1().teleport(endedRace.getOriginalPlayer1Loc());
         endedRace.getPlayer2().teleport(endedRace.getOriginalPlayer2Loc());
 
-        // send title
-        String titleString = Utils.translate("&7Ran Out of Time in Your Race");
-        TitleAPI.sendTitle(endedRace.getPlayer1(), 10, 60, 10, titleString);
-        TitleAPI.sendTitle(endedRace.getPlayer2(), 10, 60, 10, titleString);
+        // if server is not shutting down
+        if (!shutdown) {
+            endedRace.getPlayer1().sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
+            endedRace.getPlayer2().sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
+            // send title
+            String titleString = Utils.translate("&7Ran Out of Time in Your Race");
+            TitleAPI.sendTitle(endedRace.getPlayer1(), 10, 60, 10, titleString);
+            TitleAPI.sendTitle(endedRace.getPlayer2(), 10, 60, 10, titleString);
+        }
 
         // set level in cache and toggle back on elytra
         List<String> player1Regions = WorldGuard.getRegions(endedRace.getPlayer1().getLocation());
@@ -257,6 +263,7 @@ public class RaceManager {
 
             // update winner wins
             winnerStats.endedRace();
+            winnerStats.disableLevelStartTime();
             winnerStats.setRaceWins(winnerStats.getRaceWins() + 1);
             RaceDB.updateRaceWins(winnerStats.getUUID(), winnerStats.getRaceWins());
 
@@ -268,6 +275,7 @@ public class RaceManager {
 
             // update loser losses
             loserStats.endedRace();
+            loserStats.disableLevelStartTime();
             loserStats.setRaceLosses(loserStats.getRaceLosses() + 1);
             RaceDB.updateRaceLosses(loserStats.getUUID(), loserStats.getRaceLosses());
 
@@ -310,48 +318,6 @@ public class RaceManager {
         }
     }
 
-    public void loadLeaderboard() {
-        try {
-
-            LinkedHashSet<RaceLBPosition> leaderboard = getLeaderboard();
-            leaderboard.clear();
-
-            List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
-                    "players",
-                    "player_name, race_wins, race_losses",
-                    " WHERE race_wins > 0" +
-                            " ORDER BY race_wins DESC" +
-                            " LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
-
-            outer: for (Map<String, String> scoreResult : scoreResults) {
-
-                // quick loop to make sure there are no duplicates
-                for (RaceLBPosition raceLBPosition : leaderboard)
-                    if (raceLBPosition.getName().equalsIgnoreCase(scoreResult.get("player_name")))
-                        continue outer;
-
-                int wins = Integer.parseInt(scoreResult.get("race_wins"));
-                int losses = Integer.parseInt(scoreResult.get("race_losses"));
-
-                // avoid divided by 0 error
-                float winRate;
-                if (losses > 0)
-                    winRate = Float.parseFloat(Utils.formatDecimal((double) wins / losses));
-                else
-                    winRate = wins;
-
-                leaderboard.add(
-                        new RaceLBPosition(
-                                scoreResult.get("player_name"),
-                                wins,
-                                winRate)
-                );
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public boolean scoreWillBeLB(int score) {
         int lowestWins = 0;
         // gets lowest score
@@ -372,6 +338,9 @@ public class RaceManager {
         return null;
     }
 
+    /*
+        Race Requests Section
+     */
     public void sendRequest(PlayerStats player1, PlayerStats player2, boolean randomLevel, Level selectedLevel, boolean bet, double betAmount) {
 
         List<String> temporaryLevelList;
@@ -397,84 +366,49 @@ public class RaceManager {
             return;
         }
 
-        if (player1.getPlayerName().equalsIgnoreCase(player2.getPlayerName())) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race yourself..."));
-            return;
-        }
+        // otherwise, put them in and ask them to confirm within 5 seconds
+        String senderString;
+        String opponentString;
 
-        if (player1.getPlayerToSpectate() != null) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
-            return;
-        }
-
-        if (player1.getPracticeLocation() != null) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-            return;
-        }
-
-        // make sure they have enough money for the bet
-        double victimBalance = Parkour.getEconomy().getBalance(player2.getPlayer());
-        double senderBalance = Parkour.getEconomy().getBalance(player1.getPlayer());
-
-        if (senderBalance < betAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                    " Your Balance &4$" + senderBalance));
-            return;
-        }
-
-        if (victimBalance < betAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayer().getName() + " &7does not have enough to do this bet" +
-                    " - &cTheir Balance &4$" + victimBalance));
-            return;
-        }
-
-        if (getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou have already send one to them!"));
+        if (bet) {
+            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + betAmount);
+            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + betAmount);
         } else {
-            // otherwise, put them in and ask them to confirm within 5 seconds
-            String senderString;
-            String opponentString;
-
-            if (bet) {
-                opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + betAmount);
-                senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + betAmount);
-            } else {
-                opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request");
-                senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request");
-            }
-
-            if (!randomLevel) {
-                senderString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
-                opponentString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
-            }
-            // send made messages
-            player1.getPlayer().sendMessage(senderString);
-            player2.getPlayer().sendMessage(opponentString);
-
-            RaceRequest raceRequest = new RaceRequest(player1, player2);
-
-            // set selected level if not null
-            if (selectedLevel != null)
-                raceRequest.setSelectedLevel(selectedLevel);
-
-            // set bet if doing bet
-            if (bet)
-                raceRequest.setBet(betAmount);
-
-            raceRequests.add(raceRequest);
-
-            player2.getPlayer().sendMessage(Utils.translate("&7Type &c/race accept " + player1.getPlayer().getName() + " &7within &c30 seconds &7to accept"));
-
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
-                        removeRequest(raceRequest);
-                        player2.getPlayer().sendMessage(Utils.translate("&4" + player2.getPlayer().getName() + " &cdid not accept your race request in time"));
-                    }
-                }
-            }.runTaskLater(Parkour.getPlugin(), 20 * 30);
+            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request");
+            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request");
         }
+
+        if (!randomLevel) {
+            senderString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
+            opponentString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
+        }
+        // send made messages
+        player1.getPlayer().sendMessage(senderString);
+        player2.getPlayer().sendMessage(opponentString);
+
+        RaceRequest raceRequest = new RaceRequest(player1, player2);
+
+        // set selected level if not null
+        if (selectedLevel != null)
+            raceRequest.setSelectedLevel(selectedLevel);
+
+        // set bet if doing bet
+        if (bet)
+            raceRequest.setBet(betAmount);
+
+        raceRequests.add(raceRequest);
+
+        player2.getPlayer().sendMessage(Utils.translate("&7Type &c/race accept " + player1.getPlayer().getName() + " &7within &c30 seconds &7to accept"));
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
+                    removeRequest(raceRequest);
+                    player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getPlayer().getName() + " &cdid not accept your race request in time"));
+                }
+            }
+        }.runTaskLater(Parkour.getPlugin(), 20 * 30);
     }
 
     public void acceptRequest(PlayerStats player1, PlayerStats player2) {
@@ -561,9 +495,8 @@ public class RaceManager {
             player2.disableLevelStartTime();
 
             Level chosenLevel = null;
-            if (!raceRequest.randomLevel()) {
+            if (!raceRequest.randomLevel())
                 chosenLevel = raceRequest.getSelectedLevel();
-            }
 
             startRace(player1, player2, chosenLevel, doingBet, betAmount);
             removeRequest(raceRequest);
@@ -586,6 +519,10 @@ public class RaceManager {
         return null;
     }
 
+    public void removeRequest(RaceRequest raceRequest) {
+        raceRequests.remove(raceRequest);
+    }
+
     public List<String> getNotInUseRaceLevels() {
 
         List<String> notInUseRaceLevels = Parkour.getLevelManager().getRaceLevels();
@@ -597,15 +534,61 @@ public class RaceManager {
         return notInUseRaceLevels;
     }
 
-    public void removeRequest(RaceRequest raceRequest) {
-        raceRequests.remove(raceRequest);
-    }
-
     public Set<Race> getRaces() {
         return runningRaceList;
     }
 
     public Set<RaceRequest> getRaceRequests() { return raceRequests; }
+
+    public void shutdown() {
+        for (Race race : runningRaceList)
+            forceEndRace(race, true);
+    }
+
+    /*
+        Leaderboard Section
+     */
+    public void loadLeaderboard() {
+        try {
+
+            LinkedHashSet<RaceLBPosition> leaderboard = getLeaderboard();
+            leaderboard.clear();
+
+            List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
+                    "players",
+                    "player_name, race_wins, race_losses",
+                    " WHERE race_wins > 0" +
+                            " ORDER BY race_wins DESC" +
+                            " LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
+
+            outer: for (Map<String, String> scoreResult : scoreResults) {
+
+                // quick loop to make sure there are no duplicates
+                for (RaceLBPosition raceLBPosition : leaderboard)
+                    if (raceLBPosition.getName().equalsIgnoreCase(scoreResult.get("player_name")))
+                        continue outer;
+
+                int wins = Integer.parseInt(scoreResult.get("race_wins"));
+                int losses = Integer.parseInt(scoreResult.get("race_losses"));
+
+                // avoid divided by 0 error
+                float winRate;
+                if (losses > 0)
+                    winRate = Float.parseFloat(Utils.formatDecimal((double) wins / losses));
+                else
+                    winRate = wins;
+
+                leaderboard.add(
+                        new RaceLBPosition(
+                                scoreResult.get("player_name"),
+                                wins,
+                                winRate)
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public LinkedHashSet<RaceLBPosition> getLeaderboard() { return raceLeaderboard; }
 }
