@@ -154,6 +154,11 @@ public class Scoreboard {
                             board.add(formatSpacing(Utils.translate("&7To &a" + nextRank.getRankTitle())));
                         }
                     }
+                } else if (level.isAscendanceLevel()) {
+
+                    // add scoreboard
+                    board.add(formatSpacing(Utils.translate("&8&lAscendance")));
+                    board.add(formatSpacing(Utils.translate("&7Explore for Rewards")));
                 } else {
                     // normal scoreboard
                     String rewardString;
