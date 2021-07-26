@@ -13,6 +13,8 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -673,6 +675,43 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("toggleascendance")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        LevelsYAML.toggleAscendanceLevel(levelName);
+                        sender.sendMessage(Utils.translate("&7You have set &c" + level.getFormattedTitle() +
+                                "&7 as a ascendance level to &c" + LevelsYAML.isAscendanceLevel(levelName)));
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("setascendancesign")) {
+                    if (sender instanceof Player) {
+                        Player player = (Player) sender;
+                        String levelName = a[1].toLowerCase();
+                        Level level = levelManager.get(levelName);
+
+                        if (level != null) {
+                            if (level.isAscendanceLevel()) {
+                                Block block = player.getTargetBlock(null, 5);
+
+                                if (block.getType() == Material.WALL_SIGN) {
+
+                                    Location blockLoc = block.getLocation();
+                                    LevelsYAML.setAscendanceLevelSignLoc(levelName, blockLoc);
+                                    player.sendMessage(Utils.translate("&7You have set &c" + level.getFormattedTitle() +
+                                            "&7's Ascendance Sign Loc to &c(" + blockLoc.getBlockX() + ", " + blockLoc.getBlockY() + ", " + blockLoc.getBlockZ() + ")"));
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou need to be looking at a sign to be able to set it"));
+                                }
+                            } else {
+                                player.sendMessage(Utils.translate("&4" + level.getFormattedTitle() + " &cis not an ascendance level"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                        }
+                    }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletion")) {
                     String playerName = a[1];
                     String levelName = a[2].toLowerCase();
@@ -788,6 +827,8 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("setrespawny"));
         sender.sendMessage(getHelp("toggleelytra"));
         sender.sendMessage(getHelp("toggledropper"));
+        sender.sendMessage(getHelp("toggleascendance"));
+        sender.sendMessage(getHelp("setascendancesign"));
         sender.sendMessage(getHelp("resetcheckpoint"));
         sender.sendMessage(getHelp("resetcheckpoints"));
     }
@@ -849,6 +890,10 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level toggleelytra <level>  &7Sets level elytra");
             case "toggledropper":
                 return Utils.translate("&a/level toggledropper <level>  &7Sets level as dropper");
+            case "toggleascendance":
+                return Utils.translate("&a/level toggleascendance <level>  &7Sets level as ascendance level");
+            case "setascendancesign":
+                return Utils.translate("&a/level setascendancesign <level>  &7Sets the sign you are looking at as that ascendance level's sign");
             case "resetcheckpoint":
                 return Utils.translate("&a/level resetcheckpoint <level> <player>  &7Resets level checkpoint for single player");
             case "resetcheckpoints":

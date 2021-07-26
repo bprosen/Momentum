@@ -20,6 +20,7 @@ public class SettingsManager {
     public String signs_first_line;
     public String signs_second_line_completion;
     public String signs_second_line_spawn;
+    public String signs_ascendance_first_line;
 
     public int clans_max_members;
     public int clans_price_create;
@@ -73,6 +74,8 @@ public class SettingsManager {
 
     public double min_race_bet_amount;
 
+    public String ascendant_realm_world;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -83,6 +86,7 @@ public class SettingsManager {
         signs_first_line = settings.getString("signs.first_line");
         signs_second_line_completion = settings.getString("signs.second_line.completion");
         signs_second_line_spawn = settings.getString("signs.second_line.spawn");
+        signs_ascendance_first_line = settings.getString("signs.ascendance.first_line");
         clans_max_members = settings.getInt("clans.max_members");
         clans_price_create = settings.getInt("clans.price.create");
         clans_price_tag = settings.getInt("clans.price.tag");
@@ -127,6 +131,7 @@ public class SettingsManager {
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
         min_race_bet_amount = settings.getInt("races.min_bet_amount");
+        ascendant_realm_world = settings.getString("ascendant_realm_world");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");

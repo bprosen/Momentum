@@ -13,6 +13,7 @@ import com.parkourcraft.parkour.utils.Utils;
 import com.sk89q.minecraft.util.commands.Link;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -256,6 +257,21 @@ public class LevelManager {
                 temporaryRaceLevelList.add(level.getName());
         }
         return temporaryRaceLevelList;
+    }
+
+    public Level getAscendanceLevelFromSignLoc(Location loc) {
+        for (Level level : levels.values())
+            if (level.isAscendanceLevel()) {
+                String[] signLoc = level.getAscendanceSignLoc().split(":");
+                int blockX = Integer.parseInt(signLoc[0]);
+                int blockY = Integer.parseInt(signLoc[1]);
+                int blockZ = Integer.parseInt(signLoc[2]);
+
+                if (loc.getBlockX() == blockX && loc.getBlockY() == blockY && loc.getBlockZ() == blockZ)
+                    return level;
+            }
+
+        return null;
     }
 
     public void setLevelDataCache(Map<String, LevelData> levelDataCache) {
