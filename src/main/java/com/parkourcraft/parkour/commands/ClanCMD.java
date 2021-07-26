@@ -287,7 +287,7 @@ public class ClanCMD implements CommandExecutor {
                         Player victim = Bukkit.getPlayer(a[1]);
 
                         if (victim == null) {
-                            player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis not online"));
+                            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
                             return true;
                         }
 

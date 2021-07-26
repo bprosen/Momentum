@@ -279,6 +279,8 @@ public class LevelManager {
     }
 
     public Level getFromTitle(String levelTitle) {
+        levelTitle = ChatColor.stripColor(levelTitle);
+
         for (Level level : levels.values())
             if (ChatColor.stripColor(level.getFormattedTitle()).equalsIgnoreCase(levelTitle))
                 return level;

@@ -1,8 +1,11 @@
 package com.parkourcraft.parkour.data.races;
 
+import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 public class Race {
 
@@ -13,6 +16,8 @@ public class Race {
     private double betAmount;
     private Location originalPlayer1Loc;
     private Location originalPlayer2Loc;
+    private BukkitTask maxTimer;
+    private Race race = this;
 
     public Race(Player player1, Player player2, Level level, boolean doingBet, double betAmount) {
         this.player1 = player1;
@@ -25,7 +30,16 @@ public class Race {
             bet = true;
             this.betAmount = betAmount;
         }
+
+        maxTimer = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Parkour.getRaceManager().forceEndRace(race);
+            }
+        }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 10);
     }
+
+    public BukkitTask getMaxTimer() { return maxTimer; }
 
     public Player getPlayer1() {
         return player1;

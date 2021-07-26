@@ -102,7 +102,13 @@ public class Scoreboard {
 
                 board.add(formatSpacing(Utils.translate("&6You are in a race!")));
                 board.add(formatSpacing(Utils.translate("&7vs. &c" + opponent.getName())));
+                // add timer
+                if (playerStats.getLevelStartTime() > 0) {
+                    double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
+                    String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                    board.add(formatSpacing(timing));
+                }
                 board.add("");
 
                 // add wins, losses, winrate

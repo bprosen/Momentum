@@ -30,15 +30,17 @@ public class RateCMD implements CommandExecutor {
 
         if (a.length >= 1) {
 
+            // allow ability to get from title or name
             String levelName = a[0].toLowerCase();
-            Level level = levelManager.get(levelName);
-
-            // if it is integer, then its manual input
-            if (a.length > 1) {
+            if (a.length >= 1) {
                 String[] split = Arrays.copyOfRange(a, 0, a.length);
                 levelName = String.join(" ", split);
-                level = levelManager.getFromTitle(levelName);
             }
+
+            // if it does not get it from name, then attempt to get it from title
+            Level level = Parkour.getLevelManager().get(levelName);
+            if (level == null)
+                level = Parkour.getLevelManager().getFromTitle(levelName);
 
             if (level != null) {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);

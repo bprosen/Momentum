@@ -185,11 +185,21 @@ public class StatsCMD implements CommandExecutor {
             // level lb
             } else {
 
-                String levelName = a[0];
+                // allow ability to get from title or name
+                String levelName = a[0].toLowerCase();
+                if (a.length >= 1) {
+                    String[] split = Arrays.copyOfRange(a, 0, a.length);
+                    levelName = String.join(" ", split);
+                }
 
+                // if it does not get it from name, then attempt to get it from title
                 Level level = Parkour.getLevelManager().get(levelName);
+                if (level == null)
+                    level = Parkour.getLevelManager().getFromTitle(levelName);
 
+                // then check if it is still null
                 if (level != null) {
+
                     sender.sendMessage(Utils.translate(level.getFormattedTitle() + " &7Leaderboard"));
                     List<LevelCompletion> completions = level.getLeaderboard();
 

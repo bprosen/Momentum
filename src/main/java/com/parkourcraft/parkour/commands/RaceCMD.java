@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.menus.MenuManager;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.data.stats.StatsManager;
@@ -10,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -26,7 +28,7 @@ public class RaceCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        RaceManager raceManager = Parkour.getRaceManager();
+        MenuManager menuManager = Parkour.getMenuManager();
         StatsManager statsManager = Parkour.getStatsManager();
         PlayerStats playerStats = statsManager.get(player);
 
@@ -35,34 +37,56 @@ public class RaceCMD implements CommandExecutor {
         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
             sendHelp(player);
         } else if (a.length == 1) {
-            PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[0]);
+            Player target = Bukkit.getPlayer(a[0]);
 
-            if (targetStats != null) {
+            if (target != null) {
+                // if they are in race
+                if (Parkour.getStatsManager().get(player).inRace()) {
+                    player.sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
+                    return true;
+                }
+
+                // if target is in race
+                if (Parkour.getStatsManager().get(target).inRace()) {
+                    player.sendMessage(Utils.translate("&cYou cannot send a request while &4" + target.getName() + " &cis in a race"));
+                    return true;
+                }
                 // send race request
-                raceManager.sendRequest(playerStats, targetStats, null, false, 0.0);
+                menuManager.openRaceLevelsGUI(player, target, -1.0);
             } else {
-                player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not online"));
+                player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
             }
         } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
             PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[1]);
 
             if (targetStats != null) {
                 // accept race request
-                raceManager.acceptRequest(playerStats, targetStats);
+                Parkour.getRaceManager().acceptRequest(playerStats, targetStats);
             } else {
-                player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not online"));
+                player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
             }
         } else if (a.length == 2) {
             // send race request with bet
             if (Utils.isDouble(a[1])) {
                 double betAmount = Double.parseDouble(a[1]);
-                PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[0]);
+                Player target = Bukkit.getPlayer(a[0]);
 
-                if (targetStats != null) {
+                if (target != null) {
+                    // if they are in race
+                    if (Parkour.getStatsManager().get(player).inRace()) {
+                        player.sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
+                        return true;
+                    }
+
+                    // if target is in race
+                    if (Parkour.getStatsManager().get(target).inRace()) {
+                        player.sendMessage(Utils.translate("&cYou cannot send a request while &4" + target.getName() + " &cis in a race"));
+                        return true;
+                    }
                     // send race request
-                    raceManager.sendRequest(playerStats, targetStats, null, true, betAmount);
+                    menuManager.openRaceLevelsGUI(player, target, betAmount);
                 } else {
-                    player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not online"));
+                    player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cThat is not a valid amount to bet!"));

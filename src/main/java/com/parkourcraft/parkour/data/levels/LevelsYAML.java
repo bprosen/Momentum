@@ -315,6 +315,10 @@ public class LevelsYAML {
         return new Location(world, x, y, z, yaw, pitch);
     }
 
+    public static Material getRaceMenuItemType(String levelName) {
+        return Material.matchMaterial(levelsFile.getString(levelName + ".race.menu_item"));
+    }
+
     public static List<String> getCommands(String levelName) {
         List<String> tempList = new ArrayList<>();
 

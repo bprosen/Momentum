@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.stats.LevelCompletion;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -46,8 +47,9 @@ public class Level {
 
     private Location raceLocation1 = null;
     private Location raceLocation2 = null;
+    private Material raceLevelItemType;
 
-    private int totalCompletionsCount = -1;
+    private int totalCompletionsCount = 0;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
     private List<String> commands = new ArrayList<>();
 
@@ -324,6 +326,9 @@ public class Level {
                     raceLocation1 = LevelsYAML.getPlayerRaceLocation("player1", name);
                     raceLocation2 = LevelsYAML.getPlayerRaceLocation("player2", name);
                 }
+
+                if (LevelsYAML.isSet(name, "race.menu_item"))
+                    raceLevelItemType = LevelsYAML.getRaceMenuItemType(name);
             }
 
             if (LevelsYAML.isSet(name, "event")) {
@@ -402,6 +407,10 @@ public class Level {
         if (LevelsYAML.isSet(name, "race.player1-loc") && LevelsYAML.isSet(name, "race.player2-loc"))
             return true;
         return false;
+    }
+
+    public Material getRaceLevelMenuItemType() {
+        return raceLevelItemType;
     }
 
     public boolean hasRequiredLevels(PlayerStats playerStats) {

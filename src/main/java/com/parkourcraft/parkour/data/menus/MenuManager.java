@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.levels.LevelManager;
 import com.parkourcraft.parkour.data.plots.Plot;
+import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -133,7 +134,7 @@ public class MenuManager {
         }
     }
 
-    // in ONE case where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
+    // in ONE of TWO cases where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
     public void openSubmittedPlotsGUI(Player player) {
         Inventory inventory = getInventory("submitted-plots", 0);
 
@@ -173,6 +174,85 @@ public class MenuManager {
                 itemMeta.setDisplayName(Utils.translate("&8Renatus Network"));
                 item.setItemMeta(itemMeta);
 
+                inventory.setItem(i, item);
+            }
+            player.openInventory(inventory);
+        } else {
+            player.sendMessage(Utils.translate("&cUnable to open inventory, null?"));
+        }
+    }
+
+    // in ONE of TWO cases where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
+    public void openRaceLevelsGUI(Player player, Player target, double betAmount) {
+        Inventory inventory = getInventory("pick-race-levels", 0);
+
+        if (inventory != null) {
+            RaceManager raceManager = Parkour.getRaceManager();
+            List<String> notInUseRaceLevels = raceManager.getNotInUseRaceLevels();
+
+            for (int i = 0; i < notInUseRaceLevels.size() && i < inventory.getSize() - 9; i++) {
+
+                String levelName = notInUseRaceLevels.get(i);
+                Level level = Parkour.getLevelManager().get(levelName);
+                if (level != null) {
+
+                    // if they have a menu item type configured, use it
+                    Material raceMenuItem = level.getRaceLevelMenuItemType();
+                    ItemStack item;
+                    if (raceMenuItem != null)
+                        item = new ItemStack(raceMenuItem);
+                    else
+                        item = new ItemStack(Material.QUARTZ_BLOCK);
+
+                    ItemMeta itemMeta = item.getItemMeta();
+
+                    itemMeta.setDisplayName(level.getFormattedTitle());
+                    List<String> itemLore = new ArrayList<String>() {{
+                        add(Utils.translate("&7Click to select &c" + level.getFormattedTitle()));
+                        add(Utils.translate("&7for your race!"));
+                        add(Utils.translate(""));
+                        add(Utils.translate("&7Wins this Race Level Has &6" + level.getTotalCompletionsCount()));
+                        add(Utils.translate("&7Racing Against &e-> &6" + target.getName()));
+                    }};
+
+                    // this means they put a bet!
+                    if (betAmount > -1.0)
+                        itemLore.add(Utils.translate("&7Bet Amount &e-> &6" + betAmount));
+
+                    itemMeta.setLore(itemLore);
+                    item.setItemMeta(itemMeta);
+                    inventory.setItem(i, item);
+                }
+            }
+            // make black glass at the bottom row
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+
+                int middleSlot = inventory.getSize() - 5;
+                ItemStack item;
+
+                if (i == middleSlot) {
+                    item = new ItemStack(Material.DIAMOND_BLOCK);
+                    ItemMeta itemMeta = item.getItemMeta();
+                    itemMeta.setDisplayName(Utils.translate("&c&lRandom Level"));
+
+                    List<String> itemLore = new ArrayList<String>() {{
+                        add(Utils.translate("&7Click me to select Random Level"));
+                        add(Utils.translate(""));
+                        add(Utils.translate("&7Racing Against &e-> &6" + target.getName()));
+                    }};
+
+                    if (betAmount > -1.0)
+                        itemLore.add(Utils.translate("&7Bet Amount &e-> &6" + betAmount));
+
+                    itemMeta.setLore(itemLore);
+
+                    item.setItemMeta(itemMeta);
+                } else {
+                    item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
+                    ItemMeta itemMeta = item.getItemMeta();
+                    itemMeta.setDisplayName(Utils.translate("&8Renatus Network"));
+                    item.setItemMeta(itemMeta);
+                }
                 inventory.setItem(i, item);
             }
             player.openInventory(inventory);
