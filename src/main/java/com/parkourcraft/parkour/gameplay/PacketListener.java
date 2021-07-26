@@ -181,7 +181,7 @@ public class PacketListener implements Listener {
                     // if their loc
                     } else if (infinitePKManager.isNearPortal(
                             packet.getDoubles().read(0), playerY, packet.getDoubles().read(2), 1))
-                        infinitePKManager.startPK(player);
+                        infinitePKManager.startPK(playerStats, true);
 
                     else {
                         Level level = playerStats.getLevel();
@@ -200,9 +200,7 @@ public class PacketListener implements Listener {
                                             LevelHandler.respawnPlayer(event.getPlayer(), level);
                                     }
                                 }.runTask(plugin);
-                            // if dropper level, has respawn y, is on ground and they are below the respawn y, respawn them
-                            } else if (level.isDropperLevel() && level.hasDropperRespawnY() && event.getPlayer().isOnGround() && level.getDropperRespawnY() >= playerY)
-                                LevelHandler.respawnPlayer(event.getPlayer(), level);
+                            }
                     }
                 }
             }

@@ -248,11 +248,6 @@ public class LevelsYAML {
         commit(levelName);
     }
 
-    public static void setDropperRespawnY(String levelName, int newY) {
-        levelsFile.set(levelName + ".dropper_respawn_y", newY);
-        commit(levelName);
-    }
-
     public static boolean isElytraLevel(String levelName) {
         boolean elytra = false;
         if (isSet(levelName, "elytra"))
@@ -279,14 +274,6 @@ public class LevelsYAML {
         boolean dropper = isDropperLevel(levelName);
         levelsFile.set(levelName + ".dropper", !dropper);
         commit(levelName);
-    }
-
-    public static int getDropperRespawnY(String levelName) {
-        int dropperY = -1;
-        if (isSet(levelName, "dropper_respawn_y"))
-            dropperY = levelsFile.getInt(levelName + ".dropper_respawn_y");
-
-        return dropperY;
     }
 
     public static void setPlayerRaceLocation(String player, String levelName, Location loc) {

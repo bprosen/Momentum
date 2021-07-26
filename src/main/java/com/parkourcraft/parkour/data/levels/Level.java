@@ -37,7 +37,6 @@ public class Level {
     private boolean liquidResetPlayer = true;
     private boolean elytraLevel = false;
     private boolean dropperLevel = false;
-    private int dropperRespawnY = -1;
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
@@ -347,9 +346,6 @@ public class Level {
             respawnY = LevelsYAML.getRespawnY(name);
             elytraLevel = LevelsYAML.isElytraLevel(name);
             dropperLevel = LevelsYAML.isDropperLevel(name);
-
-            if (dropperLevel)
-                dropperRespawnY = LevelsYAML.getDropperRespawnY(name);
         }
     }
 
@@ -368,10 +364,6 @@ public class Level {
     public boolean isElytraLevel() { return elytraLevel; }
 
     public boolean isDropperLevel() { return dropperLevel; }
-
-    public boolean hasDropperRespawnY() { return dropperRespawnY > -1; }
-
-    public int getDropperRespawnY() { return dropperRespawnY; }
 
     public List<LevelCompletion> getLeaderboard() {
         return leaderboardCache;

@@ -46,7 +46,13 @@ public class InfinitePKManager {
         }.runTaskLater(Parkour.getPlugin(), 20 * 5);
     }
 
-    public void startPK(Player player) {
+    public void startPK(PlayerStats playerStats, boolean fromPortal) {
+
+        // if from portal, prevent getting in via spectator
+        if (fromPortal && playerStats.getPlayerToSpectate() != null)
+            return;
+
+        Player player = playerStats.getPlayer();
 
         // find loc
         Location startingLoc = findStartingLocation();
@@ -77,7 +83,7 @@ public class InfinitePKManager {
             }
         }.runTask(Parkour.getPlugin());
 
-        Parkour.getStatsManager().get(player).toggleInfinitePK();
+        playerStats.toggleInfinitePK();
     }
 
     public void endPK(Player player, boolean disconnected) {
@@ -465,6 +471,7 @@ public class InfinitePKManager {
 
                 // set fast mode
                 editSession.setFastMode(true);
+
                 editSession.replaceBlocks(selection, replaceBlocks, new BaseBlock(Material.AIR.getId()));
                 editSession.flushQueue(); // flush queue
                 // disable fast mode

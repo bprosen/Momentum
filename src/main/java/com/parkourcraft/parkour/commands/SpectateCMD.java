@@ -44,29 +44,33 @@ public class SpectateCMD implements CommandExecutor {
                                                 if (!spectatorStats.inRace()) {
                                                     if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
                                                         if (!spectatorStats.isEventParticipant()) {
+                                                            if (!spectatorStats.isInInfinitePK()) {
 
-                                                            boolean spectatingAlready = false;
-                                                            if (spectatorStats.getPlayerToSpectate() != null) {
-                                                                spectatingAlready = true;
+                                                                boolean spectatingAlready = false;
+                                                                if (spectatorStats.getPlayerToSpectate() != null) {
+                                                                    spectatingAlready = true;
 
                                                                 /*
                                                                  if they are already spectating and the person they
                                                                  are spectating are who they are trying to spectate again, cancel
                                                                  */
-                                                                if (spectatorStats.getPlayerToSpectate().getPlayerName()
-                                                                    .equalsIgnoreCase(playerStats.getPlayerName())) {
+                                                                    if (spectatorStats.getPlayerToSpectate().getPlayerName()
+                                                                            .equalsIgnoreCase(playerStats.getPlayerName())) {
 
-                                                                    player.sendMessage(Utils.translate(
-                                                                    "&cYou cannot spectate the same person you are spectating"));
-                                                                    return true;
+                                                                        player.sendMessage(Utils.translate(
+                                                                                "&cYou cannot spectate the same person you are spectating"));
+                                                                        return true;
+                                                                    }
                                                                 }
+
+                                                                // enable spectator mode
+                                                                SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, spectatingAlready);
+
+                                                                playerStats.getPlayer().sendMessage(Utils.translate("&2" +
+                                                                        spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                                            } else {
+                                                                player.sendMessage(Utils.translate("&cYou cannot spectate while in Infinite Parkour"));
                                                             }
-
-                                                            // enable spectator mode
-                                                            SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, spectatingAlready);
-
-                                                            playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                                                    spectatorStats.getPlayerName() + " &7began to spectate you"));
                                                         } else {
                                                             player.sendMessage(Utils.translate("&cYou cannot spectate in the plot world"));
                                                         }

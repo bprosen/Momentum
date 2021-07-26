@@ -125,7 +125,7 @@ public class InfiniteCMD implements CommandExecutor {
                                 if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
                                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                infinitePKManager.startPK(player);
+                                infinitePKManager.startPK(playerStats, false);
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                             }
