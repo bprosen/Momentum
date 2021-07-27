@@ -68,7 +68,8 @@ public class InfinitePKManager {
         Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
 
         // if they are at spawn prior to teleport, change original loc to setting
-        if (respawnLoc != null && portalLoc.distance(player.getLocation()) <= 3)
+        if (respawnLoc != null && portalLoc.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()) &&
+            portalLoc.distance(player.getLocation()) <= 3)
             infinitePK.setOriginalLoc(respawnLoc);
 
         // run in sync due to async packet using this method

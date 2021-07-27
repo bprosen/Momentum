@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.clans.ClanMember;
 import com.parkourcraft.parkour.data.levels.Level;
@@ -220,13 +221,25 @@ public class StatsManager {
         and very few people to iterate through.
      */
     public void updateAscendancePlayers() {
+
         for (PlayerStats playerStats : ascendancePlayerList) {
+
             List<String> regions = WorldGuard.getRegions(playerStats.getPlayer().getLocation());
             Level level = Parkour.getLevelManager().get(regions.get(0));
 
             // if their level is not the same as what they moved to, then update it
-            if (level != null && playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+            if (level != null && playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName())) {
+                // save if has checkpoint
+                if (playerStats.getCheckpoint() != null) {
+                    CheckpointDB.savePlayerAsync(playerStats);
+                    playerStats.resetCheckpoint();
+                }
+                // load checkpoint into cache
+                CheckpointDB.loadPlayer(playerStats.getUUID(), level);
+
                 playerStats.setLevel(level);
+                playerStats.disableLevelStartTime();
+            }
         }
     }
 

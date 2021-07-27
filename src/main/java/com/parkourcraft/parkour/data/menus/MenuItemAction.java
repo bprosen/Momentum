@@ -212,20 +212,12 @@ public class MenuItemAction {
                             for (PotionEffect potionEffect : player.getActivePotionEffects())
                                 player.removePotionEffect(potionEffect.getType());
 
-                            if (statsManager.isInAscendance(playerStats))
-                                statsManager.leftAscendance(playerStats);
-
                             // toggle off if saved
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                             // save if has checkpoint
                             if (playerStats.getCheckpoint() != null) {
-                                // if ascendance level, do NOT do async saving, as all checkpoints are global in ascendance
-                                if (level.isAscendanceLevel())
-                                    CheckpointDB.savePlayer(playerStats);
-                                else
-                                    CheckpointDB.savePlayerAsync(playerStats);
-
+                                CheckpointDB.savePlayerAsync(playerStats);
                                 playerStats.resetCheckpoint();
                             }
 
@@ -233,12 +225,8 @@ public class MenuItemAction {
                             if (playerStats.getPracticeLocation() != null)
                                 playerStats.resetPracticeMode();
 
-                            // if it is an ascendance level, they will be added to the list
-                            if (level.isAscendanceLevel())
-                                statsManager.enteredAscendance(playerStats);
-
-                            if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level)) {
-                                CheckpointDB.loadPlayer(player.getUniqueId(), level);
+                            if (CheckpointDB.hasCheckpoint(player.getUniqueId().toString(), level)) {
+                                CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
                                 Parkour.getCheckpointManager().teleportPlayer(playerStats);
                                 player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                             } else {

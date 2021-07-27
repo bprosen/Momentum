@@ -13,33 +13,36 @@ import java.util.UUID;
 
 public class CheckpointDB {
 
-    public static void loadPlayer(UUID uuid, Level level) {
+    public static void loadPlayer(String uuid, Level level) {
 
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "checkpoints",
                 "*",
-                "WHERE UUID='" + uuid.toString() + "' " +
+                "WHERE UUID='" + uuid + "' " +
                 "AND LEVEL_NAME='" + level.getName() + "'"
         );
 
-        String playerName = null;
-        String worldName = null;
-        int x = 0;
-        int y = 0;
-        int z = 0;
+        // if they have a checkpoint, load it
+        if (!levelsResults.isEmpty()) {
+            String playerName = null;
+            String worldName = null;
+            int x = 0;
+            int y = 0;
+            int z = 0;
 
-        for (Map<String, String> levelResult : levelsResults) {
-            playerName = levelResult.get("player_name");
-            x = Integer.parseInt(levelResult.get("x"));
-            y = Integer.parseInt(levelResult.get("y"));
-            z = Integer.parseInt(levelResult.get("z"));
-            worldName = levelResult.get("world");
-        }
+            for (Map<String, String> levelResult : levelsResults) {
+                playerName = levelResult.get("player_name");
+                x = Integer.parseInt(levelResult.get("x"));
+                y = Integer.parseInt(levelResult.get("y"));
+                z = Integer.parseInt(levelResult.get("z"));
+                worldName = levelResult.get("world");
+            }
 
-        if (playerName != null && worldName != null) {
-            Parkour.getStatsManager().getByNameIgnoreCase(playerName).setCheckpoint(new Location(Bukkit.getWorld(worldName), x, y, z));
-            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid +
-                                             "' AND LEVEL_NAME='" + level.getName() + "'");
+            if (playerName != null && worldName != null) {
+                Parkour.getStatsManager().getByNameIgnoreCase(playerName).setCheckpoint(new Location(Bukkit.getWorld(worldName), x, y, z));
+                Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid +
+                        "' AND LEVEL_NAME='" + level.getName() + "'");
+            }
         }
     }
 
@@ -91,12 +94,12 @@ public class CheckpointDB {
         }
     }
 
-    public static boolean hasCheckpoint(UUID uuid, Level level) {
+    public static boolean hasCheckpoint(String uuid, Level level) {
 
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "checkpoints",
                 "*",
-                "WHERE UUID='" + uuid.toString() + "' " +
+                "WHERE UUID='" + uuid + "' " +
                          "AND LEVEL_NAME='" + level.getName() + "'"
         );
 

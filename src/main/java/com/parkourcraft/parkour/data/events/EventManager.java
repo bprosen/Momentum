@@ -202,8 +202,8 @@ public class EventManager {
         // reset the cache and teleport player back
         if (!disconnected &&
             eventParticipant.getOriginalLevel() != null &&
-            CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel()))
-            CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel());
+            CheckpointDB.hasCheckpoint(player.getUniqueId().toString(), eventParticipant.getOriginalLevel()))
+            CheckpointDB.loadPlayer(player.getUniqueId().toString(), eventParticipant.getOriginalLevel());
 
         // do all setting changes to revert back
         playerStats.setLevel(eventParticipant.getOriginalLevel());

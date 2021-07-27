@@ -76,9 +76,8 @@ public class JoinLeaveHandler implements Listener {
                         if (level.isAscendanceLevel())
                             statsManager.enteredAscendance(playerStats);
 
-                        UUID uuid = player.getUniqueId();
-                        if (CheckpointDB.hasCheckpoint(uuid, level))
-                            CheckpointDB.loadPlayer(uuid, level);
+                        // load if they have one
+                        CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
 
                         // is elytra level, then set elytra in sync (player inventory changes)
                         if (level.isElytraLevel())
