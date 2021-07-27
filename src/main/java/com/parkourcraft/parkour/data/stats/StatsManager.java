@@ -225,20 +225,22 @@ public class StatsManager {
         for (PlayerStats playerStats : ascendancePlayerList) {
 
             List<String> regions = WorldGuard.getRegions(playerStats.getPlayer().getLocation());
-            Level level = Parkour.getLevelManager().get(regions.get(0));
+            if (!regions.isEmpty()) {
+                Level level = Parkour.getLevelManager().get(regions.get(0));
 
-            // if their level is not the same as what they moved to, then update it
-            if (level != null && playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName())) {
-                // save if has checkpoint
-                if (playerStats.getCheckpoint() != null) {
-                    CheckpointDB.savePlayerAsync(playerStats);
-                    playerStats.resetCheckpoint();
+                // if their level is not the same as what they moved to, then update it
+                if (level != null && playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName())) {
+                    // save if has checkpoint
+                    if (playerStats.getCheckpoint() != null) {
+                        CheckpointDB.savePlayerAsync(playerStats);
+                        playerStats.resetCheckpoint();
+                    }
+                    // load checkpoint into cache
+                    CheckpointDB.loadPlayer(playerStats.getUUID(), level);
+
+                    playerStats.setLevel(level);
+                    playerStats.disableLevelStartTime();
                 }
-                // load checkpoint into cache
-                CheckpointDB.loadPlayer(playerStats.getUUID(), level);
-
-                playerStats.setLevel(level);
-                playerStats.disableLevelStartTime();
             }
         }
     }
