@@ -259,21 +259,6 @@ public class LevelManager {
         return temporaryRaceLevelList;
     }
 
-    public Level getAscendanceLevelFromSignLoc(Location loc) {
-        for (Level level : levels.values())
-            if (level.isAscendanceLevel()) {
-                String[] signLoc = level.getAscendanceSignLoc().split(":");
-                int blockX = Integer.parseInt(signLoc[0]);
-                int blockY = Integer.parseInt(signLoc[1]);
-                int blockZ = Integer.parseInt(signLoc[2]);
-
-                if (loc.getBlockX() == blockX && loc.getBlockY() == blockY && loc.getBlockZ() == blockZ)
-                    return level;
-            }
-
-        return null;
-    }
-
     public void setLevelDataCache(Map<String, LevelData> levelDataCache) {
         this.levelDataCache = levelDataCache;
     }

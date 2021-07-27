@@ -22,8 +22,6 @@ signs:
   second_line:
     completion: "To redeem"
     spawn: "To return to"
-  ascendance:
-    first_line: "Ascendance"
 setup-sword:
   type: IRON_SWORD
   title: "&cSetup Sword"

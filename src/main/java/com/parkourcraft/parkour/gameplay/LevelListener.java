@@ -196,13 +196,6 @@ public class LevelListener implements Listener {
 
                     player.teleport(lobby);
                 }
-            } else if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world) &&
-                       ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_ascendance_first_line)) {
-
-                Level level = Parkour.getLevelManager().getAscendanceLevelFromSignLoc(event.getClickedBlock().getLocation());
-
-                if (level != null)
-                    LevelHandler.levelCompletion(player, level.getName());
             }
         }
     }

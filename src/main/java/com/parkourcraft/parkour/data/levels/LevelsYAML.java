@@ -290,18 +290,6 @@ public class LevelsYAML {
         commit(levelName);
     }
 
-    public static void setAscendanceLevelSignLoc(String levelName, Location loc) {
-        String locString = loc.getBlockX() + ":" + loc.getBlockY() + ":" + loc.getBlockZ();
-        levelsFile.set(levelName + ".ascendance_sign_loc", locString);
-        commit(levelName);
-    }
-
-    public static String getAscendanceLevelSignLoc(String levelName) {
-        if (levelsFile.isSet(levelName + ".ascendance_sign_loc"))
-            return levelsFile.getString(levelName + ".ascendance_sign_loc");
-        return null;
-    }
-
     public static void setPlayerRaceLocation(String player, String levelName, Location loc) {
 
         String world = loc.getWorld().getName();

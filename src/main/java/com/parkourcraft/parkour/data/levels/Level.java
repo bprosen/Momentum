@@ -53,7 +53,6 @@ public class Level {
     private List<String> commands = new ArrayList<>();
 
     private boolean ascendanceLevel = false;
-    private String ascendanceLevelSign = null;
 
     public Level(String levelName) {
         this.name = levelName;
@@ -350,9 +349,6 @@ public class Level {
             elytraLevel = LevelsYAML.isElytraLevel(name);
             dropperLevel = LevelsYAML.isDropperLevel(name);
             ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
-
-            if (ascendanceLevel)
-                ascendanceLevelSign = LevelsYAML.getAscendanceLevelSignLoc(name);
         }
     }
 
@@ -373,8 +369,6 @@ public class Level {
     public boolean isDropperLevel() { return dropperLevel; }
 
     public boolean isAscendanceLevel() { return ascendanceLevel; }
-
-    public String getAscendanceSignLoc() { return ascendanceLevelSign; }
 
     public List<LevelCompletion> getLeaderboard() {
         return leaderboardCache;
