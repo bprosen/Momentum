@@ -179,7 +179,7 @@ public class EventManager {
 
         // save checkpoint
         if (playerStats.getCheckpoint() != null) {
-            CheckpointDB.savePlayerAsync(player);
+            CheckpointDB.savePlayerAsync(playerStats);
             playerStats.resetCheckpoint();
         }
 
@@ -202,8 +202,8 @@ public class EventManager {
         // reset the cache and teleport player back
         if (!disconnected &&
             eventParticipant.getOriginalLevel() != null &&
-            CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel().getName()))
-            CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel().getName());
+            CheckpointDB.hasCheckpoint(player.getUniqueId(), eventParticipant.getOriginalLevel()))
+            CheckpointDB.loadPlayer(player.getUniqueId(), eventParticipant.getOriginalLevel());
 
         // do all setting changes to revert back
         playerStats.setLevel(eventParticipant.getOriginalLevel());

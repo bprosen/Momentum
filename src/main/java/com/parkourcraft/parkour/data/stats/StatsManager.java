@@ -6,6 +6,7 @@ import com.parkourcraft.parkour.data.clans.ClanMember;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
+import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,6 +23,8 @@ public class StatsManager {
 
     private boolean running = false;
     private HashMap<String, PlayerStats> playerStatsList = new HashMap<>();
+    private HashSet<PlayerStats> ascendancePlayerList = new HashSet<>();
+
     private LinkedHashMap<String, Integer> globalPersonalCompletionsLB = new LinkedHashMap<>
             (Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
 
@@ -61,6 +64,14 @@ public class StatsManager {
                 loadGlobalPersonalCompletionsLB();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
+
+        // update ascendance players every 2 seconds
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                updateAscendancePlayers();
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 2, 20 * 2);
     }
 
     public PlayerStats get(String UUID) {
@@ -82,6 +93,14 @@ public class StatsManager {
     public HashMap<String, PlayerStats> getPlayerStats() {
         return playerStatsList;
     }
+
+    public HashSet<PlayerStats> getPlayersInAscendance() { return ascendancePlayerList; }
+
+    public void enteredAscendance(PlayerStats playerStats) { ascendancePlayerList.add(playerStats); }
+
+    public void leftAscendance(PlayerStats playerStats) { ascendancePlayerList.remove(playerStats); }
+
+    public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
 
     public PlayerStats getByNameIgnoreCase(String playerName) {
         for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
@@ -127,6 +146,7 @@ public class StatsManager {
 
     public void remove(PlayerStats playerStats) {
         playerStatsList.remove(playerStats);
+        ascendancePlayerList.remove(playerStats);
     }
 
     public void loadGlobalPersonalCompletionsLB() {
@@ -193,6 +213,21 @@ public class StatsManager {
 
         for (PlayerStats playerStats : removeList)
             remove(playerStats);
+    }
+
+    /*
+        Only use active level updating for ascendance, this should barely cause issues as it will be ran every few seconds
+        and very few people to iterate through.
+     */
+    public void updateAscendancePlayers() {
+        for (PlayerStats playerStats : ascendancePlayerList) {
+            List<String> regions = WorldGuard.getRegions(playerStats.getPlayer().getLocation());
+            Level level = Parkour.getLevelManager().get(regions.get(0));
+
+            // if their level is not the same as what they moved to, then update it
+            if (level != null && playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                playerStats.setLevel(level);
+        }
     }
 
     /*

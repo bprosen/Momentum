@@ -9,6 +9,7 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
@@ -52,11 +53,15 @@ public class JoinLeaveHandler implements Listener {
                         " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
 
+
         // run most of this in async (region lookup, stat editing, etc)
         new BukkitRunnable() {
             @Override
             public void run() {
-                Parkour.getStatsManager().add(player);
+                StatsManager statsManager = Parkour.getStatsManager();
+
+                statsManager.add(player);
+
                 List<String> regions = WorldGuard.getRegions(player.getLocation());
                 if (!regions.isEmpty()) {
 
@@ -64,12 +69,16 @@ public class JoinLeaveHandler implements Listener {
 
                     // make sure the area they are spawning in is a level
                     if (level != null) {
-                        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                        PlayerStats playerStats = statsManager.get(player);
                         playerStats.setLevel(level);
 
+                        // if the level they are being added to is an ascendance level, add them to the list
+                        if (level.isAscendanceLevel())
+                            statsManager.enteredAscendance(playerStats);
+
                         UUID uuid = player.getUniqueId();
-                        if (CheckpointDB.hasCheckpoint(uuid, regions.get(0)))
-                            CheckpointDB.loadPlayer(uuid, regions.get(0));
+                        if (CheckpointDB.hasCheckpoint(uuid, level))
+                            CheckpointDB.loadPlayer(uuid, level);
 
                         // is elytra level, then set elytra in sync (player inventory changes)
                         if (level.isElytraLevel())
@@ -97,7 +106,7 @@ public class JoinLeaveHandler implements Listener {
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
-            CheckpointDB.savePlayerAsync(player);
+            CheckpointDB.savePlayerAsync(playerStats);
 
         // if left in spectator, remove it
         if (playerStats.getPlayerToSpectate() != null)

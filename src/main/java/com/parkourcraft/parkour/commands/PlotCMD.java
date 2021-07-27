@@ -409,7 +409,7 @@ public class PlotCMD implements CommandExecutor {
         if (playerStats.getLevel() != null) {
             // save checkpoint if had one
             if (playerStats.getCheckpoint() != null) {
-                CheckpointDB.savePlayerAsync(playerStats.getPlayer());
+                CheckpointDB.savePlayerAsync(playerStats);
                 playerStats.resetCheckpoint();
             }
             playerStats.resetLevel();

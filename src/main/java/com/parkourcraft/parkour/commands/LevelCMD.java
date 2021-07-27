@@ -37,11 +37,20 @@ public class LevelCMD implements CommandExecutor {
                 sendHelp(sender);
             } else {
                 if (a[0].equalsIgnoreCase("show")) { // subcommand: show
-                    if (a.length == 2) {
-                        sender.sendMessage("unfinished");
-                    } else {
-                        sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("show"));
+                    if (sender instanceof Player) {
+
+                        Player player = (Player) sender;
+                        if (a.length == 1) {
+                            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                            if (playerStats.inLevel())
+                                sender.sendMessage(Utils.translate("&7You are in &c" + playerStats.getLevel().getFormattedTitle()));
+                            else
+                                sender.sendMessage(Utils.translate("&7You are not in a level"));
+                        } else {
+                            sender.sendMessage(Utils.translate("&cIncorrect parameters"));
+                            sender.sendMessage(getHelp("show"));
+                        }
                     }
                 } else if (a[0].equalsIgnoreCase("list")) { // subcommand: list
                     sender.sendMessage(Utils.translate("&7Levels loaded in: &2" + String.join("&7, &2",
@@ -836,7 +845,7 @@ public class LevelCMD implements CommandExecutor {
     private static String getHelp(String cmd) {
         switch (cmd.toLowerCase()) {
             case "show":
-                return Utils.translate("&a/level show <level>  &7Show level information");
+                return Utils.translate("&a/level show  &7Show level information");
             case "list":
                 return Utils.translate("&a/level list  &7List levels loaded in memory");
             case "create":

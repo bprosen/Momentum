@@ -14,7 +14,8 @@ levels:
   featured_level_reward_multiplier: 1.50
   max_rated_levels_leaderboard_size: 10
 
-ascendant_realm_world: "ascendant_realm"
+ascendance:
+  realm_world: "ascendant_realm"
 # It will check if that line contains 'Click Here', or whatever is defined
 signs:
   first_line: "Click Here"

@@ -131,7 +131,7 @@ public class SettingsManager {
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
         min_race_bet_amount = settings.getInt("races.min_bet_amount");
-        ascendant_realm_world = settings.getString("ascendant_realm_world");
+        ascendant_realm_world = settings.getString("ascendance.realm_world");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");

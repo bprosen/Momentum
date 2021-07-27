@@ -184,7 +184,7 @@ public class LevelListener implements Listener {
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                     if (playerStats.getCheckpoint() != null) {
-                        CheckpointDB.savePlayerAsync(player);
+                        CheckpointDB.savePlayerAsync(playerStats);
                         playerStats.resetCheckpoint();
                     }
 
@@ -226,7 +226,7 @@ public class LevelListener implements Listener {
             } else if (playerStats.getLevel() != null) {
                 // save checkpoint if had one
                 if (playerStats.getCheckpoint() != null) {
-                    CheckpointDB.savePlayerAsync(player);
+                    CheckpointDB.savePlayerAsync(playerStats);
                     playerStats.resetCheckpoint();
                 }
                 playerStats.resetLevel();

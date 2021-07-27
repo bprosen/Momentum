@@ -11,6 +11,7 @@ import com.parkourcraft.parkour.data.plots.PlotsDB;
 import com.parkourcraft.parkour.data.ranks.RanksDB;
 import com.parkourcraft.parkour.data.ranks.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -192,6 +193,8 @@ public class MenuItemAction {
                     if (!playerStats.isInInfinitePK()) {
                         if (level.hasRequiredLevels(playerStats)) {
 
+                            StatsManager statsManager = Parkour.getStatsManager();
+
                             player.closeInventory();
 
                             // if the level has perm node, and player does not have perm node
@@ -209,12 +212,20 @@ public class MenuItemAction {
                             for (PotionEffect potionEffect : player.getActivePotionEffects())
                                 player.removePotionEffect(potionEffect.getType());
 
+                            if (statsManager.isInAscendance(playerStats))
+                                statsManager.leftAscendance(playerStats);
+
                             // toggle off if saved
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                             // save if has checkpoint
                             if (playerStats.getCheckpoint() != null) {
-                                CheckpointDB.savePlayerAsync(player);
+                                // if ascendance level, do NOT do async saving, as all checkpoints are global in ascendance
+                                if (level.isAscendanceLevel())
+                                    CheckpointDB.savePlayer(playerStats);
+                                else
+                                    CheckpointDB.savePlayerAsync(playerStats);
+
                                 playerStats.resetCheckpoint();
                             }
 
@@ -222,8 +233,12 @@ public class MenuItemAction {
                             if (playerStats.getPracticeLocation() != null)
                                 playerStats.resetPracticeMode();
 
-                            if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level.getName())) {
-                                CheckpointDB.loadPlayer(player.getUniqueId(), level.getName());
+                            // if it is an ascendance level, they will be added to the list
+                            if (level.isAscendanceLevel())
+                                statsManager.enteredAscendance(playerStats);
+
+                            if (CheckpointDB.hasCheckpoint(player.getUniqueId(), level)) {
+                                CheckpointDB.loadPlayer(player.getUniqueId(), level);
                                 Parkour.getCheckpointManager().teleportPlayer(playerStats);
                                 player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                             } else {
