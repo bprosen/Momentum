@@ -229,7 +229,8 @@ public class StatsManager {
                 Level level = Parkour.getLevelManager().get(regions.get(0));
 
                 // if their level is not the same as what they moved to, then update it
-                if (level != null && playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName())) {
+                if (level != null && level.isAscendanceLevel() &&
+                    playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName())) {
                     // save if has checkpoint
                     if (playerStats.getCheckpoint() != null) {
                         CheckpointDB.savePlayerAsync(playerStats);
