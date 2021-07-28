@@ -256,7 +256,7 @@ public class ClanCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis not online"));
                         return true;
                     }
-                    Clan targetClan = Parkour.getStatsManager().get(player).getClan();
+                    Clan targetClan = Parkour.getStatsManager().get(victim).getClan();
 
                     if (clan != null) {
                         if (targetClan != null) {

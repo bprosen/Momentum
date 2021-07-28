@@ -48,8 +48,6 @@ public class RaceManager {
             Race newRace = new Race(player1.getPlayer(), player2.getPlayer(), selectedLevel, bet, betAmount);
             runningRaceList.add(newRace);
 
-            // set level and set inRace to true
-
             // toggle off elytra
             Parkour.getStatsManager().toggleOffElytra(player1);
             Parkour.getStatsManager().toggleOffElytra(player2);
@@ -61,6 +59,11 @@ public class RaceManager {
 
             player1.getPlayer().teleport(selectedLevel.getRaceLocation1());
             player2.getPlayer().teleport(selectedLevel.getRaceLocation2());
+
+            if (bet) {
+                Parkour.getEconomy().withdrawPlayer(player1.getPlayer(), betAmount);
+                Parkour.getEconomy().withdrawPlayer(player2.getPlayer(), betAmount);
+            }
 
             // remove potion effects
             for (PotionEffect effects : player1.getPlayer().getActivePotionEffects()) {
@@ -170,6 +173,12 @@ public class RaceManager {
             TitleAPI.sendTitle(endedRace.getPlayer2(), 10, 60, 10, titleString);
         }
 
+        // if has bet, give bet back
+        if (endedRace.hasBet()) {
+            Parkour.getEconomy().depositPlayer(endedRace.getPlayer1(), endedRace.getBet());
+            Parkour.getEconomy().depositPlayer(endedRace.getPlayer2(), endedRace.getBet());
+        }
+
         // set level in cache and toggle back on elytra
         List<String> player1Regions = WorldGuard.getRegions(endedRace.getPlayer1().getLocation());
         List<String> player2Regions = WorldGuard.getRegions(endedRace.getPlayer2().getLocation());
@@ -242,10 +251,8 @@ public class RaceManager {
                                         + " &7in a race on " + raceObject.getRaceLevel().getFormattedTitle()));
 
             // give winner money and take from loser if betted on race
-            if (raceObject.hasBet()) {
-                Parkour.getEconomy().withdrawPlayer(loser, raceObject.getBet());
-                Parkour.getEconomy().depositPlayer(winner, raceObject.getBet());
-            }
+            if (raceObject.hasBet())
+                Parkour.getEconomy().depositPlayer(winner, (raceObject.getBet() * 2));
 
             // check if winner is player 1, then teleport accordingly, otherwise they are player 2
             if (raceObject.isPlayer1(winner)) {
