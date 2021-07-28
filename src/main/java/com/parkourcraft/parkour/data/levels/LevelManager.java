@@ -99,6 +99,7 @@ public class LevelManager {
 
         // update player count in levels every 60 seconds
         new BukkitRunnable() {
+            @Override
             public void run() {
 
                 // loop through levels then all players online to determine how many are in each level
@@ -107,9 +108,8 @@ public class LevelManager {
                         int amountInLevel = 0;
                         for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
 
-                            if (playerStats != null &&
-                                    playerStats.getLevel() != null &&
-                                    playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                            if (playerStats != null && playerStats.inLevel() &&
+                                playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
                                 amountInLevel++;
                         }
                         level.setPlayersInLevel(amountInLevel);

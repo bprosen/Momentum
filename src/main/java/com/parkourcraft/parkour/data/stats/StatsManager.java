@@ -146,7 +146,7 @@ public class StatsManager {
     }
 
     public void remove(PlayerStats playerStats) {
-        playerStatsList.remove(playerStats);
+        playerStatsList.remove(playerStats.getPlayerName());
         ascendancePlayerList.remove(playerStats);
     }
 
