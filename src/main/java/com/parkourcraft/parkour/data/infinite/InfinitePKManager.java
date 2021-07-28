@@ -40,51 +40,61 @@ public class InfinitePKManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // clean all remaining blocks
-                cleanBlocks();
+                /*
+                    Disabled for right now as I may have made it so glitched blocks will never happen
+                 */
+                //cleanBlocks();
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 5);
     }
 
     public void startPK(PlayerStats playerStats, boolean fromPortal) {
 
-        // if from portal, prevent getting in via spectator
-        if (fromPortal && playerStats.getPlayerToSpectate() != null)
-            return;
-
-        Player player = playerStats.getPlayer();
-
-        // find loc
-        Location startingLoc = findStartingLocation();
-        startingLoc.setPitch(Parkour.getSettingsManager().infinitepk_starting_pitch);
-        startingLoc.setYaw(Parkour.getSettingsManager().infinitepk_starting_yaw);
-
-        // create cache
-        InfinitePK infinitePK = new InfinitePK(player);
-        participants.put(player.getName(), infinitePK);
-        infinitePK.setCurrentBlockLoc(startingLoc);
-
-        Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
-        Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
-
-        // if they are at spawn prior to teleport, change original loc to setting
-        if (respawnLoc != null && portalLoc.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()) &&
-            portalLoc.distance(player.getLocation()) <= 3)
-            infinitePK.setOriginalLoc(respawnLoc);
-
-        // run in sync due to async packet using this method
+        /*
+            We force run this in sync for a few reasons:
+            1. The packet listener executes this in async which cant be done as this creates blocks.
+            2. Someone with bad ping can sometimes make this method run many times causing glitched blocks in the air
+               if they have bad ping.
+         */
         new BukkitRunnable() {
             @Override
             public void run() {
+
+                // if from portal, prevent getting in via spectator
+                if (playerStats.isInInfinitePK() || (fromPortal && playerStats.getPlayerToSpectate() != null))
+                    return;
+
+                Player player = playerStats.getPlayer();
+
+                // find loc
+                Location startingLoc = findStartingLocation();
+                startingLoc.setPitch(Parkour.getSettingsManager().infinitepk_starting_pitch);
+                startingLoc.setYaw(Parkour.getSettingsManager().infinitepk_starting_yaw);
+
+                // create cache
+                InfinitePK infinitePK = new InfinitePK(player);
+                participants.put(player.getName(), infinitePK);
+
+                infinitePK.setCurrentBlockLoc(startingLoc);
+
+                Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
+                Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
+
+                // if they are at spawn prior to teleport, change original loc to setting
+                if (respawnLoc != null && portalLoc.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()) &&
+                    portalLoc.distance(player.getLocation()) <= 3)
+                    infinitePK.setOriginalLoc(respawnLoc);
+
                 // prepare block and teleport
                 startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
                 player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
                 // immediately get new loc
                 doNextJump(player, true);
+
+                // set to true
+                playerStats.setInfinitePK(true);
             }
         }.runTask(Parkour.getPlugin());
-
-        playerStats.toggleInfinitePK();
     }
 
     public void endPK(Player player, boolean disconnected) {
@@ -132,7 +142,7 @@ public class InfinitePKManager {
                         "&7Your best is &d" + playerStats.getInfinitePKScore()));
             }
 
-            playerStats.toggleInfinitePK();
+            playerStats.setInfinitePK(false);
             participants.remove(player.getName());
         }
     }

@@ -190,9 +190,7 @@ public class PlayerStats {
         return infinitePKScore;
     }
 
-    public void toggleInfinitePK() {
-        inInfinitePK = !inInfinitePK;
-    }
+    public void setInfinitePK(boolean inInfinitePK) { this.inInfinitePK = inInfinitePK; }
 
     public boolean isInInfinitePK() {
         return inInfinitePK;
