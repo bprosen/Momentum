@@ -42,12 +42,15 @@ public class StatsManager {
             }
         }.runTaskTimerAsynchronously(plugin, 10L, 4L);
 
+        /*
+          // Do not know why Sean did this, as you can just remove from quit, but just gonna disable for now...
+
         // Garbage collection for offline players
         new BukkitRunnable() {
             public void run() {
                 clean();
             }
-        }.runTaskTimer(plugin, 0L, 10L);
+        }.runTaskTimer(plugin, 0L, 10L);*/
 
         // Leader Boards
         new BukkitRunnable() {
@@ -202,7 +205,7 @@ public class StatsManager {
         playerStats.getPlayer().getInventory().setChestplate(elytraItem);
     }
 
-    public void clean() {
+    /*public void clean() {
 
         if (playerStatsList.isEmpty())
             return;
@@ -215,7 +218,7 @@ public class StatsManager {
 
         for (PlayerStats playerStats : removeList)
             remove(playerStats);
-    }
+    }*/
 
     /*
         Only use active level updating for ascendance, this should barely cause issues as it will be ran every few seconds

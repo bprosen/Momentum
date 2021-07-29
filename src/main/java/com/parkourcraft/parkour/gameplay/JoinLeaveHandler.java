@@ -127,6 +127,7 @@ public class JoinLeaveHandler implements Listener {
         if (playerStats.isEventParticipant())
             eventManager.removeParticipant(player, true);
 
+        // if in infinite pk, end it
         if (playerStats.isInInfinitePK())
             infinitePKManager.endPK(player, true);
 
@@ -136,5 +137,8 @@ public class JoinLeaveHandler implements Listener {
         // do not need to check, as method already checks
         clansManager.toggleClanChat(player.getName(), null);
         clansManager.toggleChatSpy(player.getName(), true);
+
+        // finally, remove them from the stats list
+        Parkour.getStatsManager().remove(playerStats);
     }
 }
