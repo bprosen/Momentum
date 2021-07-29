@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class StatsManager {
 
@@ -76,7 +77,7 @@ public class StatsManager {
     }
 
     public PlayerStats get(String UUID) {
-        for (PlayerStats playerStats : playerStatsList.values())
+        for (PlayerStats playerStats : getPlayerStats().values())
             if (playerStats.getUUID().equals(UUID))
                 return playerStats;
 
@@ -84,7 +85,7 @@ public class StatsManager {
     }
 
     public PlayerStats get(int playerID) {
-        for (PlayerStats playerStats : playerStatsList.values())
+        for (PlayerStats playerStats : getPlayerStats().values())
             if (playerStats.getPlayerID() == playerID)
                 return playerStats;
 
@@ -92,7 +93,7 @@ public class StatsManager {
     }
 
     public HashMap<String, PlayerStats> getPlayerStats() {
-        return playerStatsList;
+        return (HashMap<String, PlayerStats>) playerStatsList.clone();
     }
 
     public HashSet<PlayerStats> getPlayersInAscendance() { return ascendancePlayerList; }
@@ -103,8 +104,8 @@ public class StatsManager {
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
 
-    public PlayerStats getByNameIgnoreCase(String playerName) {
-        for (Map.Entry<String, PlayerStats> entry : playerStatsList.entrySet())
+    public PlayerStats getByName(String playerName) {
+        for (Map.Entry<String, PlayerStats> entry : getPlayerStats().entrySet())
             if (entry.getKey().equalsIgnoreCase(playerName))
                 return entry.getValue();
 
@@ -116,7 +117,7 @@ public class StatsManager {
     }
 
     public boolean exists(String playerName) {
-        return getByNameIgnoreCase(playerName) != null;
+        return getByName(playerName) != null;
     }
 
     public void add(Player player) {
@@ -129,7 +130,7 @@ public class StatsManager {
     private void loadUnloadedStats() {
         if (!running) {
             running = true;
-            for (PlayerStats playerStats : playerStatsList.values()) {
+            for (PlayerStats playerStats : getPlayerStats().values()) {
                 if (playerStats.getPlayerID() == -1) {
                     StatsDB.loadPlayerStats(playerStats);
                     Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
@@ -208,7 +209,7 @@ public class StatsManager {
 
         Set<PlayerStats> removeList = new HashSet<>();
 
-        for (PlayerStats playerStats : playerStatsList.values())
+        for (PlayerStats playerStats : getPlayerStats().values())
             if (!playerStats.getPlayer().isOnline())
                 removeList.add(playerStats);
 

@@ -34,7 +34,7 @@ public class SpectateCMD implements CommandExecutor {
                             sendHelp(sender);
                         // spectate to player
                         } else if (a.length == 1) {
-                            PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
+                            PlayerStats playerStats = Parkour.getStatsManager().getByName(a[0]);
 
                             if (playerStats != null && playerStats.getPlayer().isOnline()) {
                                 if (!player.getName().equalsIgnoreCase(playerStats.getPlayer().getName())) {

@@ -704,7 +704,7 @@ public class LevelCMD implements CommandExecutor {
                     if (level != null) {
                         int playerID = StatsDB.getPlayerID(playerName);
                         if (playerID > -1) {
-                            PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(playerName);
+                            PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
 
                             if (playerStats.getLevelCompletionsCount(levelName) > 0) {
                                 StatsDB.removeCompletions(playerID, level.getID());

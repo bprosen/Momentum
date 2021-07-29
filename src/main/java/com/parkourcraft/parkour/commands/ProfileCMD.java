@@ -36,7 +36,7 @@ public class ProfileCMD implements CommandExecutor {
 
                 // get properly through if-else
                 if (a.length >= 1)
-                    playerStats = Parkour.getStatsManager().getByNameIgnoreCase(a[0]);
+                    playerStats = Parkour.getStatsManager().getByName(a[0]);
                 else
                     playerStats = Parkour.getStatsManager().get(player);
 

@@ -47,7 +47,7 @@ public class RaceCMD implements CommandExecutor {
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
             }
         } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
-            PlayerStats targetStats = statsManager.getByNameIgnoreCase(a[1]);
+            PlayerStats targetStats = statsManager.getByName(a[1]);
 
             if (targetStats != null) {
                 // accept race request

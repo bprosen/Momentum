@@ -188,7 +188,7 @@ public class InfinitePKManager {
 
     // method to update their score in all 3 possible placed
     public void updateScore(String playerName, int score) {
-        PlayerStats playerStats = Parkour.getStatsManager().getByNameIgnoreCase(playerName);
+        PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
 
         if (playerStats != null)
             playerStats.setInfinitePKScore(score);

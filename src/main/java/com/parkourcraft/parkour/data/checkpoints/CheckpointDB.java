@@ -39,7 +39,7 @@ public class CheckpointDB {
             }
 
             if (playerName != null && worldName != null) {
-                Parkour.getStatsManager().getByNameIgnoreCase(playerName).setCheckpoint(new Location(Bukkit.getWorld(worldName), x, y, z));
+                Parkour.getStatsManager().getByName(playerName).setCheckpoint(new Location(Bukkit.getWorld(worldName), x, y, z));
                 Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE UUID='" + uuid +
                         "' AND LEVEL_NAME='" + level.getName() + "'");
             }

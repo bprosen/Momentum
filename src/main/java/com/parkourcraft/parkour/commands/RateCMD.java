@@ -26,7 +26,6 @@ public class RateCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        LevelManager levelManager = Parkour.getLevelManager();
 
         if (a.length >= 1) {
 

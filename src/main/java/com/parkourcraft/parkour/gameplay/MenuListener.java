@@ -114,7 +114,7 @@ public class MenuListener implements Listener {
                                 opponentName = lastString.split("-> ")[1];
 
                             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                            PlayerStats opponentStats = Parkour.getStatsManager().getByNameIgnoreCase(opponentName);
+                            PlayerStats opponentStats = Parkour.getStatsManager().getByName(opponentName);
 
                             // close inventory
                             player.closeInventory();
