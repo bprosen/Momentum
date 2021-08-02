@@ -307,12 +307,12 @@ public class StatsManager {
                                     loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
                                             .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "");
 
-                                    List<LevelCompletion> levelCompletions = playerStats.getQuickestCompletions(
+                                    LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(
                                             playerStats.getMostCompletedLevel());
 
-                                    if (!levelCompletions.isEmpty())
+                                    if (fastestCompletion != null)
                                             loreString = loreString.replace("%fastest_completion%",
-                                  (((double) levelCompletions.get(0).getCompletionTimeElapsed()) / 1000) + "s");
+                                  (((double) fastestCompletion.getCompletionTimeElapsed()) / 1000) + "s");
                                 }
 
                                 if (loreString.contains("%favorite_level%") || loreString.contains("%fastest_completion%"))

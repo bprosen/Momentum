@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.ranks.Rank;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +40,7 @@ public class PlayerStats {
     private boolean inInfinitePK = false;
     private boolean eventParticipant = false;
     private int totalLevelCompletions = 0;
-    private Map<String, List<LevelCompletion>> levelCompletionsMap = new HashMap<>();
+    private Map<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private Map<String, Long> perks = new HashMap<>();
 
     public PlayerStats(Player player) {
@@ -280,7 +281,7 @@ public class PlayerStats {
         int mostCompletions = -1;
         String mostCompletedLevel = null;
 
-        for (Map.Entry<String, List<LevelCompletion>> entry : levelCompletionsMap.entrySet())
+        for (Map.Entry<String, Set<LevelCompletion>> entry : levelCompletionsMap.entrySet())
             if (entry.getValue().size() > mostCompletions) {
                 mostCompletions = entry.getValue().size();
                 mostCompletedLevel = entry.getKey();
@@ -295,7 +296,7 @@ public class PlayerStats {
     public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
         if (levelName != null && levelCompletion != null) {
             if (!levelCompletionsMap.containsKey(levelName))
-                levelCompletionsMap.put(levelName, new ArrayList<>());
+                levelCompletionsMap.put(levelName, new HashSet<>());
 
             if (levelCompletionsMap.get(levelName) != null)
                 levelCompletionsMap.get(levelName).add(levelCompletion);
@@ -306,7 +307,7 @@ public class PlayerStats {
         this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
     }
 
-    public Map<String, List<LevelCompletion>> getLevelCompletionsMap() {
+    public Map<String, Set<LevelCompletion>> getLevelCompletionsMap() {
         return levelCompletionsMap;
     }
 
@@ -317,6 +318,7 @@ public class PlayerStats {
         return 0;
     }
 
+    // top 3 completions
     public List<LevelCompletion> getQuickestCompletions(String levelName) {
         List<LevelCompletion> levelCompletions = new ArrayList<>();
 
@@ -344,6 +346,22 @@ public class PlayerStats {
         }
 
         return levelCompletions;
+    }
+
+    // fastest completion
+    public LevelCompletion getQuickestCompletion(String levelName) {
+        LevelCompletion fastestCompletion = null;
+
+        if (levelCompletionsMap.containsKey(levelName)) {
+            // loop through to find fastest completion
+            for (LevelCompletion levelCompletion : levelCompletionsMap.get(levelName))
+                // if not null and not including not timed levels, continue
+                if (levelCompletion != null && levelCompletion.getCompletionTimeElapsed() > 0)
+                    // if null or faster than already fastest completion, set to new completion
+                    if (fastestCompletion == null || (levelCompletion.getCompletionTimeElapsed() < fastestCompletion.getCompletionTimeElapsed()))
+                        fastestCompletion = levelCompletion;
+        }
+        return fastestCompletion;
     }
 
     //

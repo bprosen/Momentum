@@ -203,12 +203,12 @@ public class MenuItemFormatter {
 
                 itemLore.add(beatenMessage);
 
-                List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(featuredLevel.getName());
-                if (bestLevelCompletions.size() > 0) {
+                LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(featuredLevel.getName());
+                if (fastestCompletion != null) {
                     itemLore.add(Utils.translate("&7 Best Personal Time"));
 
-                    double completionTime = ((double) bestLevelCompletions.get(0).getCompletionTimeElapsed()) / 1000;
-                    long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
+                    double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
+                    long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
 
                     itemLore.add(Utils.translate("  &2" + completionTime + "s"));
 
@@ -307,12 +307,12 @@ public class MenuItemFormatter {
 
                     itemLore.add(beatenMessage);
 
-                    List<LevelCompletion> bestLevelCompletions = playerStats.getQuickestCompletions(level.getName());
-                    if (bestLevelCompletions.size() > 0) {
+                    LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
+                    if (fastestCompletion != null) {
                         itemLore.add(Utils.translate("&7 Best Personal Time"));
 
-                        double completionTime = ((double) bestLevelCompletions.get(0).getCompletionTimeElapsed()) / 1000;
-                        long timeSince = System.currentTimeMillis() - bestLevelCompletions.get(0).getTimeOfCompletion();
+                        double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
+                        long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
 
                         itemLore.add(Utils.translate("  &2" + completionTime + "s"));
 
