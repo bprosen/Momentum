@@ -56,13 +56,13 @@ public class LevelsDB {
     public static boolean syncLevelData() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet())
-            if (!Parkour.getLevelManager().getLevelDataCache().containsKey(entry.getValue().getName()))
+        for (Level level : Parkour.getLevelManager().getLevels().values())
+            if (!Parkour.getLevelManager().getLevelDataCache().containsKey(level.getName()))
                 insertQueries.add(
                         "INSERT INTO levels " +
                                 "(level_name)" +
                                 " VALUES " +
-                                "('" + entry.getValue().getName() + "')"
+                                "('" + level.getName() + "')"
                 );
 
         if (insertQueries.size() > 0) {

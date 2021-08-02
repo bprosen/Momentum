@@ -149,6 +149,10 @@ public class LevelListener implements Listener {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
         playerStats.setCheckpoint(location);
 
+        // update if in ascendance realm
+        if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
+            playerStats.updateAscendanceCheckpoint(playerStats.getLevel().getName(), location);
+
         String msgString = "&eYour checkpoint has been set";
         if (playerStats.getLevelStartTime() > 0) {
             double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();

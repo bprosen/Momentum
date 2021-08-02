@@ -98,6 +98,10 @@ public class HotbarInteractListener implements Listener {
                                 } else {
                                     confirmMap.get(player.getName()).cancel();
 
+                                    // if in ascendance realm
+                                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
+                                        playerStats.removeAscendanceCheckpoint(level.getName());
+
                                     playerStats.resetCheckpoint();
                                     playerStats.resetPracticeMode();
 

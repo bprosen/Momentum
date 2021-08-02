@@ -7,6 +7,8 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -106,5 +108,31 @@ public class CheckpointDB {
         if (!levelsResults.isEmpty())
             return true;
         return false;
+    }
+
+    public static HashMap<String, Location> getAscendanceCheckpoints(PlayerStats playerStats) {
+        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                "checkpoints",
+                "*",
+                "WHERE uuid='" + playerStats.getUUID() + "'" +
+                         " AND world='" + Parkour.getSettingsManager().ascendant_realm_world + "'"
+        );
+
+        HashMap<String, Location> ascendanceCheckpoints = new HashMap<>();
+
+        if (!levelsResults.isEmpty()) {
+            for (Map<String, String> levelResult : levelsResults) {
+                String levelName = levelResult.get("level_name");
+                int x = Integer.parseInt(levelResult.get("x"));
+                int y = Integer.parseInt(levelResult.get("y"));
+                int z = Integer.parseInt(levelResult.get("z"));
+
+                // we can safely use settings for ascendance realm world rather than db as thats what our query is confined to
+                Location checkpointLoc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().ascendant_realm_world), x, y, z);
+
+                ascendanceCheckpoints.put(levelName, checkpointLoc);
+            }
+        }
+        return ascendanceCheckpoints;
     }
 }

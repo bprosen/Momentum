@@ -193,8 +193,6 @@ public class MenuItemAction {
                     if (!playerStats.isInInfinitePK()) {
                         if (level.hasRequiredLevels(playerStats)) {
 
-                            StatsManager statsManager = Parkour.getStatsManager();
-
                             player.closeInventory();
 
                             // if the level has perm node, and player does not have perm node

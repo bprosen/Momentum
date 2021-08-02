@@ -9,6 +9,7 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import com.parkourcraft.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -101,9 +102,22 @@ public class StatsManager {
 
     public HashSet<PlayerStats> getPlayersInAscendance() { return ascendancePlayerList; }
 
-    public void enteredAscendance(PlayerStats playerStats) { ascendancePlayerList.add(playerStats); }
+    public void enteredAscendance(PlayerStats playerStats) {
+        ascendancePlayerList.add(playerStats);
 
-    public void leftAscendance(PlayerStats playerStats) { ascendancePlayerList.remove(playerStats); }
+        // run in async
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadAscendanceCheckpoints(playerStats);
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
+    }
+
+    public void leftAscendance(PlayerStats playerStats) {
+        ascendancePlayerList.remove(playerStats);
+        playerStats.resetAscendanceCheckpoints();
+    }
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
 
@@ -241,13 +255,23 @@ public class StatsManager {
                         playerStats.resetCheckpoint();
                     }
                     // load checkpoint into cache
-                    CheckpointDB.loadPlayer(playerStats.getUUID(), level);
+                    Location ascendanceCheckpoint = playerStats.getAscendanceCheckpoint(level.getName());
+                    if (ascendanceCheckpoint != null) {
+                        playerStats.setCheckpoint(ascendanceCheckpoint);
+                        Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE uuid='" + playerStats.getUUID() +
+                                "' AND level_name='" + level.getName() + "'");
+                    }
 
                     playerStats.setLevel(level);
                     playerStats.disableLevelStartTime();
                 }
             }
         }
+    }
+
+    public void loadAscendanceCheckpoints(PlayerStats playerStats) {
+        playerStats.resetAscendanceCheckpoints();
+        playerStats.setAscendanceCheckpoints(CheckpointDB.getAscendanceCheckpoints(playerStats));
     }
 
     /*

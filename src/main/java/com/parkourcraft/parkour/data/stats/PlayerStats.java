@@ -1,6 +1,7 @@
 package com.parkourcraft.parkour.data.stats;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.data.checkpoints.CheckpointDB;
 import com.parkourcraft.parkour.data.clans.Clan;
 import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.ranks.Rank;
@@ -40,8 +41,9 @@ public class PlayerStats {
     private boolean inInfinitePK = false;
     private boolean eventParticipant = false;
     private int totalLevelCompletions = 0;
-    private Map<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
-    private Map<String, Long> perks = new HashMap<>();
+    private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
+    private HashMap<String, Long> perks = new HashMap<>();
+    private HashMap<String, Location> ascendanceCheckpoints = new HashMap<>();
 
     public PlayerStats(Player player) {
         this.player = player;
@@ -274,6 +276,29 @@ public class PlayerStats {
         currentCheckpoint = null;
     }
 
+    public HashMap<String, Location> getAscendanceCheckpoints() { return ascendanceCheckpoints; }
+
+    public Location getAscendanceCheckpoint(String levelName) {
+        return ascendanceCheckpoints.get(levelName);
+    }
+
+    public void setAscendanceCheckpoints(HashMap<String, Location> checkpoints) {
+        ascendanceCheckpoints = checkpoints;
+    }
+
+    public void resetAscendanceCheckpoints() {
+        ascendanceCheckpoints.clear();
+    }
+
+    public void updateAscendanceCheckpoint(String levelName, Location location) {
+        ascendanceCheckpoints.remove(levelName);
+        ascendanceCheckpoints.put(levelName, location);
+    }
+
+    public void removeAscendanceCheckpoint(String levelName) {
+        ascendanceCheckpoints.remove(levelName);
+    }
+
     //
     // Completions Section
     //
@@ -307,7 +332,7 @@ public class PlayerStats {
         this.levelCompletion(levelName, new LevelCompletion(timeOfCompletion, completionTimeElapsed));
     }
 
-    public Map<String, Set<LevelCompletion>> getLevelCompletionsMap() {
+    public HashMap<String, Set<LevelCompletion>> getLevelCompletionsMap() {
         return levelCompletionsMap;
     }
 
@@ -375,7 +400,7 @@ public class PlayerStats {
         return perks.containsKey(perkName);
     }
 
-    public Map<String, Long> getPerks() {
+    public HashMap<String, Long> getPerks() {
         return perks;
     }
 
