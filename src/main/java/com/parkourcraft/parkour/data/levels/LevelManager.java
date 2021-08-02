@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class LevelManager {
 
     private HashMap<String, Level> levels = new HashMap<>();
-    private Map<String, LevelData> levelDataCache;
+    private HashMap<String, LevelData> levelDataCache;
     private Set<Level> levelsInMenus = new HashSet<>();
     private String featuredLevel = null;
     private long totalLevelCompletions;
@@ -259,11 +259,11 @@ public class LevelManager {
         return temporaryRaceLevelList;
     }
 
-    public void setLevelDataCache(Map<String, LevelData> levelDataCache) {
+    public void setLevelDataCache(HashMap<String, LevelData> levelDataCache) {
         this.levelDataCache = levelDataCache;
     }
 
-    public Map<String, LevelData> getLevelDataCache() {
+    public HashMap<String, LevelData> getLevelDataCache() {
         return levelDataCache;
     }
 

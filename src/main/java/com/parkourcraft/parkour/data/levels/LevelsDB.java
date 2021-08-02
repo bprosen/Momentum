@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class LevelsDB {
 
-    public static Map<String, LevelData> getDataCache() {
-        Map<String, LevelData> levelData = new HashMap<>();
+    public static HashMap<String, LevelData> getDataCache() {
+        HashMap<String, LevelData> levelData = new HashMap<>();
 
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "levels",
@@ -71,10 +71,8 @@ public class LevelsDB {
                 finalQuery = finalQuery + sql + "; ";
 
             Parkour.getDatabaseManager().run(finalQuery);
-
             return true;
         }
-
         return false;
     }
 
