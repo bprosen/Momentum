@@ -9,6 +9,7 @@ import com.parkourcraft.parkour.data.levels.Level;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.races.RaceManager;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
+import com.parkourcraft.parkour.data.stats.StatsDB;
 import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.PlayerHider;
 import com.parkourcraft.parkour.utils.Utils;
@@ -61,7 +62,13 @@ public class JoinLeaveHandler implements Listener {
                 StatsManager statsManager = Parkour.getStatsManager();
 
                 statsManager.add(player);
+                PlayerStats playerStats = statsManager.get(player);
 
+                // now load stats in async
+                StatsDB.loadPlayerStats(playerStats);
+                Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
+
+                // load level, checkpoint info here
                 List<String> regions = WorldGuard.getRegions(player.getLocation());
                 if (!regions.isEmpty()) {
 
@@ -69,7 +76,6 @@ public class JoinLeaveHandler implements Listener {
 
                     // make sure the area they are spawning in is a level
                     if (level != null) {
-                        PlayerStats playerStats = statsManager.get(player);
                         playerStats.setLevel(level);
 
                         // if the level they are being added to is an ascendance level, add them to the list

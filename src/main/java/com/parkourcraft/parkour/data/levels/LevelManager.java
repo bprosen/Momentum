@@ -27,7 +27,7 @@ public class LevelManager {
     private HashMap<String, Level> levels = new HashMap<>();
     private HashMap<String, LevelData> levelDataCache;
     private Set<Level> levelsInMenus = new HashSet<>();
-    private String featuredLevel = null;
+    private Level featuredLevel = null;
     private long totalLevelCompletions;
     private LinkedHashSet<Level> globalLevelCompletionsLB = new LinkedHashSet<>
             (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
@@ -145,7 +145,7 @@ public class LevelManager {
         Level level = temporaryList.get(ran.nextInt(temporaryList.size()));
 
         if (level != null) {
-            featuredLevel = level.getName();
+            featuredLevel = level;
             // proper casting
             level.setReward((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier));
             Parkour.getPluginLogger().info("Featured Level: " + level.getName());
@@ -201,11 +201,7 @@ public class LevelManager {
     }
 
     public Level getFeaturedLevel() {
-        Level level = get(featuredLevel);
-
-        if (level != null)
-            return level;
-        return null;
+        return featuredLevel;
     }
 
     public List<Level> getEventLevels() {

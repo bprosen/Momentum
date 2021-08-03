@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 public class StatsManager {
 
-    private boolean running = false;
     private HashMap<String, PlayerStats> playerStatsList = new HashMap<>();
     private HashSet<PlayerStats> ascendancePlayerList = new HashSet<>();
 
@@ -36,13 +35,6 @@ public class StatsManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        // Loads unloaded PlayersStats
-        new BukkitRunnable() {
-            public void run() {
-                loadUnloadedStats();
-            }
-        }.runTaskTimerAsynchronously(plugin, 10L, 4L);
-
         /*
           // Do not know why Sean did this, as you can just remove from quit, but just gonna disable for now...
 
@@ -141,19 +133,6 @@ public class StatsManager {
         if (!exists(player.getUniqueId().toString())) {
             PlayerStats playerStats = new PlayerStats(player);
             playerStatsList.put(player.getName(), playerStats);
-        }
-    }
-
-    private void loadUnloadedStats() {
-        if (!running) {
-            running = true;
-            for (PlayerStats playerStats : getPlayerStats().values()) {
-                if (playerStats.getPlayerID() == -1) {
-                    StatsDB.loadPlayerStats(playerStats);
-                    Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
-                }
-            }
-            running = false;
         }
     }
 
