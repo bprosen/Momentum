@@ -244,12 +244,12 @@ public class ClansManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        new BukkitRunnable() {
+        /*new BukkitRunnable() {
             @Override
             public void run() {
                 syncNewClans();
             }
-        }.runTaskTimerAsynchronously(plugin, 0, 5);
+        }.runTaskTimerAsynchronously(plugin, 0, 5);*/
 
         // load clans leaderboard in async every 3 minutes
         new BukkitRunnable() {

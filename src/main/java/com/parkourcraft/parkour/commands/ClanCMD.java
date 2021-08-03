@@ -195,7 +195,9 @@ public class ClanCMD implements CommandExecutor {
 
                                 if (clanTagRequirements(clanTag, sender)) {
                                     Parkour.getEconomy().withdrawPlayer(player, Parkour.getSettingsManager().clans_price_create);
-                                    Parkour.getClansManager().add(new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0));
+                                    Clan newClan = new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0);
+                                    Parkour.getClansManager().add(newClan);
+                                    ClansDB.newClan(newClan);
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&cNo clan tag specified"));

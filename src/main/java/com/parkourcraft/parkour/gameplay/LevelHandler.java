@@ -84,7 +84,15 @@ public class LevelHandler {
 
         levelCompletion.setPlayerName(player.getName());
         playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
-        StatsDB.insertCompletion(playerStats, level, levelCompletion);
+
+        // small microoptimization running it in async
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                StatsDB.insertCompletion(playerStats, level, levelCompletion);
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
+
         levelManager.addTotalLevelCompletion();
         level.addCompletion(player, levelCompletion); // Update totalLevelCompletionsCount
 
