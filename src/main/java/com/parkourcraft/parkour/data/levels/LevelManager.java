@@ -408,6 +408,7 @@ public class LevelManager {
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
                 }
 
+            levelDataCache.remove(levelName);
             levels.remove(levelName);
         }
     }

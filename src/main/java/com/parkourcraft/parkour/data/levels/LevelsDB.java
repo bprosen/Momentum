@@ -32,7 +32,6 @@ public class LevelsDB {
             );
 
         Parkour.getPluginLogger().info("Levels in data cache: " + levelData.size());
-
         return levelData;
     }
 
@@ -54,24 +53,32 @@ public class LevelsDB {
     }
 
     public static boolean syncLevelData() {
-        List<String> insertQueries = new ArrayList<>();
 
-        for (Level level : Parkour.getLevelManager().getLevels().values())
-            if (!Parkour.getLevelManager().getLevelDataCache().containsKey(level.getName()))
-                insertQueries.add(
-                        "INSERT INTO levels " +
-                                "(level_name)" +
-                                " VALUES " +
-                                "('" + level.getName() + "')"
-                );
+        HashMap<String, LevelData> levelCache = Parkour.getLevelManager().getLevelDataCache();
+        HashMap<String, Level> levels = Parkour.getLevelManager().getLevels();
 
-        if (insertQueries.size() > 0) {
-            String finalQuery = "";
-            for (String sql : insertQueries)
-                finalQuery = finalQuery + sql + "; ";
+        // if not equal size, then sort through
+        if (levelCache.size() != levels.size()) {
 
-            Parkour.getDatabaseManager().run(finalQuery);
-            return true;
+            List<String> insertQueries = new ArrayList<>();
+            for (Level level : levels.values())
+                if (!levelCache.containsKey(level.getName()))
+                    insertQueries.add(
+                            "INSERT INTO levels " +
+                                    "(level_name)" +
+                                    " VALUES " +
+                                    "('" + level.getName() + "')"
+                    );
+
+            if (insertQueries.size() > 0) {
+                String finalQuery = "";
+                for (String sql : insertQueries)
+                    finalQuery = finalQuery + sql + "; ";
+
+                Parkour.getDatabaseManager().run(finalQuery);
+                return true;
+            }
+            return false;
         }
         return false;
     }

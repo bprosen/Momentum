@@ -21,9 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LevelCMD implements CommandExecutor {
 
@@ -769,6 +767,29 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a level"));
                     }
+                } else if (a.length == 1 && a[0].equalsIgnoreCase("cleanleveldatadb")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            HashMap<String, LevelData> levelCache = levelManager.getLevelDataCache();
+                            HashMap<String, Level> levels = levelManager.getLevels();
+
+                            Set<String> levelsToRemove = new HashSet<>();
+
+                            for (String levelName : levelCache.keySet())
+                                if (!levels.containsKey(levelName))
+                                    levelsToRemove.add(levelName); // add to levels to remove
+
+                            // now remove from level cache and db
+                            for (String levelName : levelsToRemove) {
+                                levelCache.remove(levelName);
+                                Parkour.getDatabaseManager().run("DELETE FROM levels WHERE level_name='" + levelName + "'");
+                            }
+
+                            sender.sendMessage(Utils.translate("&2" + levelsToRemove.size() + " &7levels cleaned from the database (already removed levels, etc)"));
+                            Parkour.getPluginLogger().info("Levels in data cache: " + levelCache.size());
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
                 } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
