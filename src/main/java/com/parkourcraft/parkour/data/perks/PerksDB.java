@@ -32,8 +32,8 @@ public class PerksDB {
     }
 
     static void syncIDCache() {
-        for (Map.Entry<String, Perk> entry: Parkour.getPerkManager().getPerks().entrySet())
-            syncIDCache(entry.getValue(), Parkour.getPerkManager().getIDCache());
+        for (Perk perk : Parkour.getPerkManager().getPerks().values())
+            syncIDCache(perk, Parkour.getPerkManager().getIDCache());
     }
 
     static void syncIDCache(Perk perk, Map<String, Integer> IDCache) {
@@ -44,9 +44,7 @@ public class PerksDB {
     static boolean syncPerkIDs() {
         List<String> insertQueries = new ArrayList<>();
 
-        for (Map.Entry<String, Perk> entry : Parkour.getPerkManager().getPerks().entrySet()) {
-            Perk perk = entry.getValue();
-
+        for (Perk perk : Parkour.getPerkManager().getPerks().values()) {
             if (perk.getID() == -1)
                 insertQueries.add(
                         "INSERT INTO perks " +

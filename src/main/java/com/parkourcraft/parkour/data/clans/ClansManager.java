@@ -237,20 +237,7 @@ public class ClansManager {
         }
     }
 
-    private void syncNewClans() {
-        for (Clan clan : clans.values())
-            if (clan.getID() == -1)
-                ClansDB.newClan(clan);
-    }
-
     private void startScheduler(Plugin plugin) {
-        /*new BukkitRunnable() {
-            @Override
-            public void run() {
-                syncNewClans();
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, 5);*/
-
         // load clans leaderboard in async every 3 minutes
         new BukkitRunnable() {
             @Override

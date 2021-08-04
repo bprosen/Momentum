@@ -5,6 +5,7 @@ import com.parkourcraft.parkour.data.stats.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -29,14 +30,15 @@ public class PerkManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+        new BukkitRunnable() {
+            @Override
             public void run() {
                 if (PerksDB.syncPerkIDs()) {
                     Parkour.getPerkManager().setIDCache(PerksDB.getIDCache());
                     PerksDB.syncIDCache();
                 }
             }
-        }, 0L, 10L);
+        }.runTaskTimerAsynchronously(plugin, 0L, 10L);
     }
 
     public void setIDCache(HashMap<String, Integer> IDCache) {
