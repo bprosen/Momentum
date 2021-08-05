@@ -58,8 +58,8 @@ public class DamageListener implements Listener {
 
                     if (!(eventManager.isEventRunning() &&
                         eventManager.getEventType() == EventType.PVP &&
-                        Parkour.getStatsManager().get(damager).isEventParticipant() &&
-                        Parkour.getStatsManager().get(player).isEventParticipant())) {
+                        eventManager.isParticipant(player) &&
+                        eventManager.isParticipant(damager))) {
                         // cancel event
                         entityDamageEvent.setCancelled(true);
                     } else {

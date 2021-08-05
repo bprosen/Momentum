@@ -36,7 +36,7 @@ public class EventCMD implements CommandExecutor {
 
                 // run through all the conditions that would not allow them to join
                 if (eventManager.isEventRunning()) {
-                    if (eventManager.get(player.getUniqueId().toString()) == null) {
+                    if (eventManager.get(player) == null) {
                         if (playerStats.getPracticeLocation() == null) {
                             if (playerStats.getPlayerToSpectate() == null) {
                                 if (!playerStats.inRace()) {
@@ -87,7 +87,7 @@ public class EventCMD implements CommandExecutor {
 
                 if (eventManager.isEventRunning()) {
 
-                    if (eventManager.get(player.getUniqueId().toString()) != null)
+                    if (eventManager.isParticipant(player))
                         eventManager.removeParticipant(player, false);
                     else
                         player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));
@@ -154,7 +154,7 @@ public class EventCMD implements CommandExecutor {
 
             // run through all the conditions that would not allow them to join
             if (eventManager.isEventRunning()) {
-                if (eventManager.get(player.getUniqueId().toString()) == null) {
+                if (eventManager.isParticipant(player)) {
                     if (playerStats.getPracticeLocation() == null) {
                         if (playerStats.getPlayerToSpectate() == null) {
                             if (!playerStats.inRace()) {
@@ -187,7 +187,7 @@ public class EventCMD implements CommandExecutor {
 
             if (eventManager.isEventRunning()) {
 
-                if (eventManager.get(player.getUniqueId().toString()) != null)
+                if (eventManager.isParticipant(player))
                     eventManager.removeParticipant(player, false);
                 else
                     player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));

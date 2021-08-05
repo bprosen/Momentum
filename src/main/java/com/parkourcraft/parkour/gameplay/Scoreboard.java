@@ -121,12 +121,11 @@ public class Scoreboard {
                 // event section of scoreboard
             } else if (playerStats.isEventParticipant()) {
 
-                board.add(formatSpacing(Utils.translate("&7You are in an event!")));
-                board.add(formatSpacing(Utils.translate("&2&l" +
-                        eventManager.formatName(eventManager.getEventType()))));
+                board.add(Utils.translate("  &e&lEvent &2&l" + eventManager.formatName(eventManager.getEventType())));
+                board.add(Utils.translate("  &e&lPlayers &6" + eventManager.getParticipants().size()));
                 board.add("");
                 board.add(formatSpacing(Utils.translate("&6&lTime Left")));
-                board.add(formatSpacing(Utils.translate("&e" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
+                board.add(formatSpacing(Utils.translate("&7" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
 
                 // infinite parkour section of scoreboard
             } else if (playerStats.isInInfinitePK()) {

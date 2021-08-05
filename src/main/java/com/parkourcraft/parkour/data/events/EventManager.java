@@ -27,7 +27,7 @@ public class EventManager {
     private Player winner = null;
     private BukkitTask maxRunTimer;
     private BukkitTask reminderTimer;
-    private Set<EventParticipant> participants = new HashSet<>();
+    private HashMap<String, EventParticipant> participants = new HashMap<>();
     private Set<String> eliminated = new HashSet<>();
     // start millis according to system
     private long startTime = 0L;
@@ -157,20 +157,18 @@ public class EventManager {
     }
 
     public boolean isEventRunning() {
-        if (runningEvent != null)
-            return true;
-        return false;
+        return runningEvent != null;
     }
 
     /*
         Event Participant Section
      */
-    public EventParticipant get(String UUID) {
-        for (EventParticipant eventParticipant : participants)
-            if (eventParticipant.getPlayer().getUniqueId().toString().equalsIgnoreCase(UUID))
-                return eventParticipant;
+    public EventParticipant get(Player player) {
+        return participants.get(player.getName());
+    }
 
-        return null;
+    public boolean isParticipant(Player player) {
+        return get(player) != null;
     }
 
     public void addParticipant(Player player) {
@@ -187,7 +185,7 @@ public class EventManager {
         Parkour.getStatsManager().toggleOffElytra(playerStats);
 
         EventParticipant eventParticipant = new EventParticipant(player, playerStats.getLevel());
-        participants.add(eventParticipant);
+        participants.put(player.getName(), eventParticipant);
         playerStats.setLevel(runningEvent.getLevel());
         playerStats.disableLevelStartTime();
         playerStats.joinedEvent();
@@ -195,7 +193,7 @@ public class EventManager {
     }
 
     public void removeParticipant(Player player, boolean disconnected) {
-        EventParticipant eventParticipant = get(player.getUniqueId().toString());
+        EventParticipant eventParticipant = get(player);
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
@@ -220,15 +218,15 @@ public class EventManager {
         if (eventParticipant.getOriginalLevel() != null && eventParticipant.getOriginalLevel().isElytraLevel())
             Parkour.getStatsManager().toggleOnElytra(playerStats);
 
-        participants.remove(eventParticipant);
+        participants.remove(player.getName());
     }
 
     public void removeAllParticipants(boolean shutdown) {
 
-        List<EventParticipant> tempList = new ArrayList<>();
+        Set<EventParticipant> tempList = new HashSet<>();
 
         // create a DEEP copy of the list so no concurrent errors
-        for (EventParticipant eventParticipant : participants)
+        for (EventParticipant eventParticipant : participants.values())
             tempList.add(eventParticipant);
 
         // now remove so theres no concurrency problem
@@ -239,7 +237,7 @@ public class EventManager {
         winner = null;
     }
 
-    public Set<EventParticipant> getParticipants() {
+    public HashMap<String, EventParticipant> getParticipants() {
         return participants;
     }
 
@@ -248,9 +246,7 @@ public class EventManager {
     }
 
     public boolean isEliminated(Player player) {
-        if (eliminated.contains(player.getName()))
-            return true;
-        return false;
+        return eliminated.contains(player.getName());
     }
 
     public void addEliminated(Player player) {
