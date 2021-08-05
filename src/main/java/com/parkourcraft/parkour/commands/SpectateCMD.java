@@ -39,11 +39,11 @@ public class SpectateCMD implements CommandExecutor {
                             if (playerStats != null && playerStats.getPlayer().isOnline()) {
                                 if (!player.getName().equalsIgnoreCase(playerStats.getPlayer().getName())) {
                                     if (playerStats.isSpectatable()) {
-                                        if (playerStats.getPlayer().getWorld().equals(spectatorStats.getPlayer().getWorld())) {
+                                        if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
                                             if (spectatorStats.getPracticeLocation() == null) {
                                                 if (!spectatorStats.inRace()) {
-                                                    if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-                                                        if (!spectatorStats.isEventParticipant()) {
+                                                    if (!spectatorStats.isEventParticipant()) {
+                                                        if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
                                                             if (!spectatorStats.isInInfinitePK()) {
 
                                                                 boolean spectatingAlready = false;
@@ -69,7 +69,7 @@ public class SpectateCMD implements CommandExecutor {
                                                                 playerStats.getPlayer().sendMessage(Utils.translate("&2" +
                                                                         spectatorStats.getPlayerName() + " &7began to spectate you"));
                                                             } else {
-                                                                player.sendMessage(Utils.translate("&cYou cannot spectate while in Infinite Parkour"));
+                                                                player.sendMessage(Utils.translate("&cYou cannot spectate while in infinite parkour"));
                                                             }
                                                         } else {
                                                             player.sendMessage(Utils.translate("&cYou cannot spectate in the plot world"));
@@ -84,7 +84,7 @@ public class SpectateCMD implements CommandExecutor {
                                                 player.sendMessage(Utils.translate("&cYou cannot enter spectator mode while in /prac"));
                                             }
                                         } else {
-                                            sender.sendMessage(Utils.translate("&cYou are not in the same world as &4" + a[0]));
+                                            sender.sendMessage(Utils.translate("&cYou cannot spectate players that are in the plot world"));
                                         }
                                     } else {
                                         sender.sendMessage(Utils.translate("&cThat player cannot be spectated"));

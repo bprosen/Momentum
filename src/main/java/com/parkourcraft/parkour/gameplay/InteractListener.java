@@ -16,12 +16,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Openable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
 
-public class HotbarInteractListener implements Listener {
+public class InteractListener implements Listener {
 
     private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
 
@@ -32,6 +33,15 @@ public class HotbarInteractListener implements Listener {
 
         if (event.getHand() == EquipmentSlot.HAND &&
            (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
+
+            // this is in case they try to click a trapdoor, door or something openable if they're in spectator
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK &&
+                event.getClickedBlock() != null &&
+                event.getClickedBlock().getState().getData() instanceof Openable &&
+                Parkour.getStatsManager().get(player).getPlayerToSpectate() != null) {
+                event.setCancelled(true);
+                return;
+            }
 
             ItemStack item = event.getItem();
 

@@ -93,10 +93,10 @@ public class SpectatorHandler {
         PlayerStats playerStats = spectator.getPlayerToSpectate();
 
         if (playerStats != null && playerStats.getPlayer().isOnline() && playerStats.isSpectatable() &&
-            !playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) &&
-            playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(spectator.getPlayer().getWorld().getName())) {
+            !playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
 
-            if (spectator.getPlayer().getLocation().distance(playerStats.getPlayer().getLocation()) > 20)
+            if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(spectator.getPlayer().getWorld().getName()) ||
+                spectator.getPlayer().getLocation().distance(playerStats.getPlayer().getLocation()) > 20)
                 spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer());
         } else {
             removeSpectatorMode(spectator);
