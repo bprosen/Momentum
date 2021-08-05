@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 public class DamageListener implements Listener {
@@ -18,11 +19,10 @@ public class DamageListener implements Listener {
 
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
+            EventManager eventManager = Parkour.getEventManager();
 
+            // for anvil event
             if (event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
-
-                EventManager eventManager = Parkour.getEventManager();
-
                 // only run code if event is running and type HALF_HEART
                 if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.FALLING_ANVIL) {
 
@@ -41,12 +41,31 @@ public class DamageListener implements Listener {
                         victim.sendMessage(Utils.translate("&7You were hit and got &beliminated out &7of the event!"));
                     }
                 }
+            // for droppers
             } else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
                     event.setCancelled(true);
                     Bukkit.broadcastMessage("this would restart you");
+                }
+            // for pvp event
+            } else if (event instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent entityDamageEvent = (EntityDamageByEntityEvent) event;
+
+                if (entityDamageEvent.getDamager() instanceof Player) {
+                    Player damager = (Player) entityDamageEvent.getDamager();
+
+                    if (!(eventManager.isEventRunning() &&
+                        eventManager.getEventType() == EventType.PVP &&
+                        Parkour.getStatsManager().get(damager).isEventParticipant() &&
+                        Parkour.getStatsManager().get(player).isEventParticipant())) {
+                        // cancel event
+                        entityDamageEvent.setCancelled(true);
+                    } else {
+                        // set damage to 0
+                        entityDamageEvent.setDamage(0.0);
+                    }
                 }
             }
         }

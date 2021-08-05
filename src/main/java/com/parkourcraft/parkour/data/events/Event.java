@@ -34,7 +34,6 @@ public class Event {
     /*
         Game Settings
      */
-    private boolean fullHealth = false;
     private boolean fallingAnvil = false;
     private boolean risingWater = false;
     private int taskDelay;
@@ -57,7 +56,6 @@ public class Event {
 
         switch (eventType) {
             case PVP:
-                fullHealth = true;
                 taskDelay = Parkour.getSettingsManager().pvp_event_task_delay;
 
                 List<Level> pvpLevels = Parkour.getLevelManager().getPvPEventLevels();
@@ -177,11 +175,6 @@ public class Event {
                                 Parkour.getPluginLogger().info("FAWE API found null in Event runScheduler");
                             }
                         }
-                    }
-
-                    if (fullHealth) {
-                        for (EventParticipant particpant : eventManager.getParticipants())
-                            particpant.getPlayer().setHealth(20.0);
                     }
                 // if nobody is playing and spawn is filled (rising water event), there is no way for anyone to beat it!
                 } else if (eventManager.isStartCoveredInWater()) {
