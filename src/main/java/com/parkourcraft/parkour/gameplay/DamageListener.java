@@ -41,6 +41,9 @@ public class DamageListener implements Listener {
                         victim.sendMessage(Utils.translate("&7You were hit and got &beliminated out &7of the event!"));
                     }
                 }
+            // for elytra
+            } else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
+                event.setCancelled(true);
             // for droppers
             } else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
