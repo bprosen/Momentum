@@ -28,6 +28,13 @@ public class PracticeCMD implements CommandExecutor {
                     if (!playerStats.inRace()) {
                         if (playerStats.getPlayerToSpectate() == null) {
                             if (!playerStats.isEventParticipant()) {
+
+                                // if it is a dropper level, disable /prac
+                                if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
+                                    player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
+                                    return true;
+                                }
+
                                 if (playerStats.getPracticeLocation() != null) {
                                     PracticeHandler.resetPlayer(player, true);
                                 } else {

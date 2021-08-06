@@ -47,7 +47,12 @@ public class DamageListener implements Listener {
 
                 if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
                     event.setCancelled(true);
-                    Bukkit.broadcastMessage("this would restart you");
+
+                    // just in case we use checkpoints for droppers at some point
+                    if (playerStats.getCheckpoint() != null)
+                        Parkour.getCheckpointManager().teleportPlayer(playerStats);
+                    else
+                        LevelHandler.respawnPlayer(player, playerStats.getLevel());
                 }
             // for pvp event
             } else if (event instanceof EntityDamageByEntityEvent) {
