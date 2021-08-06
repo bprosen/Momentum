@@ -307,7 +307,7 @@ public class LevelCMD implements CommandExecutor {
                                 }
                             }
                             level = levelManager.get(levelName);
-                            sender.sendMessage(Utils.translate("&2" + levelName + "&7'srequired levels: &2" +
+                            sender.sendMessage(Utils.translate("&2" + levelName + "&7's required levels: &2" +
                                                String.join("&7, &2", level.getRequiredLevels())));
 
                             if (a.length != 3)
@@ -863,7 +863,7 @@ public class LevelCMD implements CommandExecutor {
             case "broadcast":
                 return Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion");
             case "requires":
-                return Utils.translate("&a/level requires <level> <level>  &7Add/Remove required level");
+                return Utils.translate("&a/level requires <level> <levelTheyNeed>  &7Add/Remove required level");
             case "modifier":
                 return Utils.translate("&a/level modifier <level> [modifier]  &7View/Set Score Modifier");
             case "removetime":
