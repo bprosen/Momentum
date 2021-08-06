@@ -66,7 +66,7 @@ public class LevelListener implements Listener {
                 // if they are not spectating anyone, continue
                 } else if (playerStats.getPlayerToSpectate() == null) {
                     Level level = playerStats.getLevel();
-                    if (level != null && level.doesLiquidResetPlayer()) {
+                    if (level != null && !level.isDropperLevel() && level.doesLiquidResetPlayer()) {
 
                         // if is elytra level, set gliding to false
                         if (level.isElytraLevel())
