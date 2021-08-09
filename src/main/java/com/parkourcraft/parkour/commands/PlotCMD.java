@@ -44,6 +44,17 @@ public class PlotCMD implements CommandExecutor {
 
                 // open submitted plots list
                 Parkour.getMenuManager().openSubmittedPlotsGUI(player);
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("bypass")) {
+
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                boolean bypassingPlots = true;
+
+                if (playerStats.isBypassingPlots())
+                    bypassingPlots = false;
+
+                playerStats.setPlotBypassing(bypassingPlots);
+                player.sendMessage(Utils.translate("&7You have toggled &cPlot Bypassing &7to &c" + bypassingPlots));
+
             } else if (a.length == 3 && a[0].equalsIgnoreCase("submit") && a[1].equalsIgnoreCase("accept")) {
 
                 String plotOwner = a[2];
@@ -493,6 +504,7 @@ public class PlotCMD implements CommandExecutor {
             sender.sendMessage(getHelp("accept"));
             sender.sendMessage(getHelp("deny"));
             sender.sendMessage(getHelp("list"));
+            sender.sendMessage(getHelp("bypass"));
         }
         sender.sendMessage(getHelp("help"));
     }
@@ -523,6 +535,8 @@ public class PlotCMD implements CommandExecutor {
                 return Utils.translate("&a/plot submit list  &7Open the submitted parkours GUI");
             case "help":
                 return Utils.translate("&a/plot help  &7Sends this display");
+            case "bypass":
+                return Utils.translate("&a/plot bypass  &7Toggles Plot Bypassing");
         }
         return "";
     }

@@ -40,6 +40,7 @@ public class PlayerStats {
     private int infinitePKScore = 0;
     private boolean inInfinitePK = false;
     private boolean eventParticipant = false;
+    private boolean bypassingPlots = false;
     private int totalLevelCompletions = 0;
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
@@ -425,4 +426,13 @@ public class PlayerStats {
     public void setRatedLevelsCount(int ratedLevelsCount) { this.ratedLevelsCount = ratedLevelsCount; }
 
     public int getRatedLevelsCount() { return ratedLevelsCount; }
+
+    //
+    // Plots Sections
+    //
+    public void setPlotBypassing(boolean bypassingPlots) {
+        this.bypassingPlots = bypassingPlots;
+    }
+
+    public boolean isBypassingPlots() { return bypassingPlots; }
 }

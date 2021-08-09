@@ -52,8 +52,11 @@ public class PacketListener implements Listener {
                     Player player = event.getPlayer();
 
                     // make sure they are in the right world and not opped
-                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)
-                        && !player.isOp()) {
+                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+
+                        // if they are opped, and if they are bypassing plots, then ignore
+                        if (player.isOp() && Parkour.getStatsManager().get(player).isBypassingPlots())
+                            return;
 
                         /*
                             This section of the code runs checks to find the location of the block packet sent
@@ -105,13 +108,13 @@ public class PacketListener implements Listener {
                             // check if their plot is submitted
                             if (plot.isSubmitted()) {
                                 doCancel = true;
-                                reason = "&cYou cannot edit your plot when it has been submitted";
+                                reason = "&cYou cannot edit your plot when it has been submitted!";
                             // check if they are not trusted and not owner, then cancel
                             } else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) &&
                                        !plot.getTrustedPlayers().contains(player.getName())) {
 
                                 doCancel = true;
-                                reason = "&cYou cannot do this here";
+                                reason = "&cYou cannot do this here!";
                             // this will only continue if the block they edited is in the x and y of the bedrock spawn
                             } else if (loc.getBlockX() == plot.getSpawnLoc().getBlockX() && loc.getBlockZ() == plot.getSpawnLoc().getBlockZ()) {
 
@@ -126,16 +129,20 @@ public class PacketListener implements Listener {
                                 } else if (packet.getType() == PacketType.Play.Client.BLOCK_DIG &&
                                            loc.getBlockY() == plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlockY()) {
                                     doCancel = true;
-                                    reason = "&cYou cannot break the spawn bedrock";
+                                    reason = "&cYou cannot break the spawn bedrock!";
                                 }
                             }
                         // no nearest plot
                         } else {
                             doCancel = true;
-                            reason = "&cYou cannot do this here";
+                            reason = "&cYou cannot do this here!";
                         }
 
                         if (doCancel) {
+                            // if they are opped, tell them on being able to bypass
+                            if (player.isOp())
+                                reason += " &7You can bypass this with &c/plot bypass";
+
                             player.sendMessage(Utils.translate(reason));
                             event.setCancelled(true);
 
