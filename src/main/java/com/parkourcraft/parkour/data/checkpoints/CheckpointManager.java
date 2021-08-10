@@ -35,12 +35,11 @@ public class CheckpointManager {
                             loc.setYaw(playerStats.getPlayer().getLocation().getYaw());
                         }
                         playerStats.getPlayer().teleport(loc);
-
-                    } else if (playerStats.getLevel() != null) {
-                        LevelHandler.respawnPlayer(playerStats.getPlayer(), playerStats.getLevel());
-                    } else {
+                    // if the level has a stored start loc (not spawn), tp them to it
+                    } else if (playerStats.getLevel() != null && Parkour.getLocationManager().exists(playerStats.getLevel().getName() + "-spawn"))
+                            playerStats.getPlayer().teleport(playerStats.getLevel().getStartLocation());
+                    else
                         playerStats.getPlayer().sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
-                    }
                 } else {
                     playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while spectating"));
                 }
