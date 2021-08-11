@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -26,7 +27,7 @@ public class InteractListener implements Listener {
 
     private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event) {
 
         Player player = event.getPlayer();
