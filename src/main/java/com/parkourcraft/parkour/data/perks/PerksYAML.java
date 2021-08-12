@@ -1,9 +1,16 @@
 package com.parkourcraft.parkour.data.perks;
 
 import com.parkourcraft.parkour.Parkour;
+import com.parkourcraft.parkour.utils.Utils;
+import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PerksYAML {
@@ -34,10 +41,73 @@ public class PerksYAML {
         return perkName;
     }
 
-    public static List<String> getPermissions(String perkName) {
+    /*public static List<String> getPermissions(String perkName) {
         if (isSet(perkName, "permissions"))
             return perksConfig.getStringList(perkName + ".permissions");
         return new ArrayList<>();
+    }*/
+
+    public static HashMap<String, ItemStack> getItems(String perkName) {
+
+        HashMap<String, ItemStack> items = new HashMap<>();
+
+        if (perksConfig.isConfigurationSection(perkName + ".items")) {
+            if (perksConfig.isConfigurationSection(perkName + ".items.head"))
+                items.put("head", createItem(perkName, "head"));
+
+            if (perksConfig.isConfigurationSection(perkName + ".items.chest"))
+                items.put("chest", createItem(perkName, "chest"));
+
+            if (perksConfig.isConfigurationSection(perkName + ".items.leg"))
+                items.put("leg", createItem(perkName, "leg"));
+
+            if (perksConfig.isConfigurationSection(perkName + ".items.feet"))
+                items.put("feet", createItem(perkName, "feet"));
+        }
+        return items;
+    }
+
+    private static ItemStack createItem(String perkName, String armorType) {
+        ItemStack item = new ItemStack(
+                Material.matchMaterial(perksConfig.getString(perkName + ".items." + armorType + ".material")),
+                1,
+                (byte) perksConfig.getInt(perkName + ".items." + armorType + ".type"));
+
+        // if not null, continue
+        if (item != null) {
+            ItemMeta itemMeta = item.getItemMeta();
+
+            if (isSet(perkName, "items." + armorType + ".color")) {
+
+                String leatherArmorColor = perksConfig.getString(perkName + ".items." + armorType + ".color");
+                Color armorColor = Utils.getColorFromString(leatherArmorColor);
+
+                // if not null, this means colored leather armor
+                if (armorColor != null) {
+                    LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+                    meta.setColor(armorColor);
+                    meta.setDisplayName(Utils.translate(perksConfig.getString(perkName + ".items." + armorType + ".title")));
+
+                    List<String> lore = new ArrayList<>();
+                    for (String loreString : perksConfig.getStringList(perkName + ".items." + armorType + ".lore"))
+                        lore.add(Utils.translate(loreString));
+
+                    meta.setLore(lore);
+                    item.setItemMeta(meta);
+                }
+            // everything else is here
+            } else {
+                itemMeta.setDisplayName(Utils.translate(perksConfig.getString(perkName + ".items." + armorType + ".title")));
+
+                List<String> lore = new ArrayList<>();
+                for (String loreString : perksConfig.getStringList(perkName + ".items." + armorType + ".lore"))
+                    lore.add(Utils.translate(loreString));
+
+                itemMeta.setLore(lore);
+                item.setItemMeta(itemMeta);
+            }
+        }
+        return item;
     }
 
     public static List<String> getRequirements(String perkName) {

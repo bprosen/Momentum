@@ -11,7 +11,6 @@ import com.parkourcraft.parkour.data.plots.PlotsDB;
 import com.parkourcraft.parkour.data.ranks.RanksDB;
 import com.parkourcraft.parkour.data.ranks.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.data.stats.StatsManager;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -148,9 +147,13 @@ public class MenuItemAction {
         if (perk != null) {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (menuItem.hasCommands() && perk.hasRequirements(playerStats, player)) {
+            if (perk.hasRequirements(playerStats, player)) {
                 player.closeInventory();
-                runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                Parkour.getPerkManager().setPerk(perk, player);
+
+                // if has commands, run them
+                if (menuItem.hasCommands())
+                    runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
             } else if (!playerStats.hasPerk(perk.getName())
                     && perk.getPrice() > 0) {
                 int playerBalance = (int) Parkour.getEconomy().getBalance(player);

@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -25,8 +26,6 @@ public class PerkManager {
             load(perkName);
 
         Parkour.getPluginLogger().info("Perks loaded: " + perks.size());
-
-        syncPermissions();
     }
 
     private void startScheduler(Plugin plugin) {
@@ -89,22 +88,6 @@ public class PerkManager {
         }
     }
 
-    public void syncPermissions(Player player) {
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-        for (Perk perk : perks.values()) {
-            boolean hasRequirements = perk.hasRequirements(playerStats, player);
-
-            for (String permission : perk.getPermissions())
-                player.addAttachment(Parkour.getPlugin(), permission, hasRequirements);
-        }
-    }
-
-    private void syncPermissions() {
-        for (Player player : Bukkit.getOnlinePlayers())
-            syncPermissions(player);
-    }
-
     public void bought(PlayerStats playerStats, Perk perk) {
         if (perk.getID() > 0) {
             Long date = System.currentTimeMillis();
@@ -112,5 +95,25 @@ public class PerkManager {
             playerStats.addPerk(perk.getName(), date);
             PerksDB.insertPerk(playerStats, perk, date);
         }
+    }
+
+    public void setPerk(Perk perk, Player player) {
+        HashMap<String, ItemStack> items = perk.getItems();
+        if (!items.isEmpty())
+            for (Map.Entry<String, ItemStack> entry : items.entrySet())
+                switch (entry.getKey()) {
+                    case "head":
+                        player.getInventory().setHelmet(entry.getValue());
+                        break;
+                    case "chest":
+                        player.getInventory().setChestplate(entry.getValue());
+                        break;
+                    case "leg":
+                        player.getInventory().setLeggings(entry.getValue());
+                        break;
+                    case "feet":
+                        player.getInventory().setBoots(entry.getValue());
+                        break;
+                }
     }
 }

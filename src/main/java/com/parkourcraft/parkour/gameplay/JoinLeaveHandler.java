@@ -66,7 +66,6 @@ public class JoinLeaveHandler implements Listener {
 
                 // now load stats in async
                 StatsDB.loadPlayerStats(playerStats);
-                Parkour.getPerkManager().syncPermissions(playerStats.getPlayer());
 
                 // load level, checkpoint info here
                 List<String> regions = WorldGuard.getRegions(player.getLocation());

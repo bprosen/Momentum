@@ -3,14 +3,16 @@ package com.parkourcraft.parkour.data.perks;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Perk {
 
     private String name;
     private String title;
-    private List<String> permissions;
+    private HashMap<String, ItemStack> items;
     private List<String> requirements;
     private List<String> requiredPermissions;
 
@@ -26,7 +28,7 @@ public class Perk {
     public void load() {
         if (PerksYAML.exists(name)) {
             title = PerksYAML.getTitle(name);
-            permissions = PerksYAML.getPermissions(name);
+            items = PerksYAML.getItems(name);
             requirements = PerksYAML.getRequirements(name);
             requiredPermissions = PerksYAML.getRequiredPermissions(name);
             price = PerksYAML.getPrice(name);
@@ -49,9 +51,7 @@ public class Perk {
         return Utils.translate(title);
     }
 
-    public List<String> getPermissions() {
-        return permissions;
-    }
+    public HashMap<String, ItemStack> getItems() { return items; }
 
     public List<String> getRequirements() {
         return requirements;

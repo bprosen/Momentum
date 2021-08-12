@@ -107,13 +107,6 @@ public class LevelHandler {
         // Update player information
         playerStats.levelCompletion(levelName, levelCompletion);
 
-        // This can be run in async, stops BIG sync loads and main thread pauses onCompletion
-        new BukkitRunnable() {
-            public void run() {
-                Parkour.getPerkManager().syncPermissions(player);
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
-
         // used for playing sound!
         int beforeClanLevel = -1;
 
