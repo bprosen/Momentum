@@ -41,12 +41,6 @@ public class PerksYAML {
         return perkName;
     }
 
-    /*public static List<String> getPermissions(String perkName) {
-        if (isSet(perkName, "permissions"))
-            return perksConfig.getStringList(perkName + ".permissions");
-        return new ArrayList<>();
-    }*/
-
     public static HashMap<String, ItemStack> getItems(String perkName) {
 
         HashMap<String, ItemStack> items = new HashMap<>();
