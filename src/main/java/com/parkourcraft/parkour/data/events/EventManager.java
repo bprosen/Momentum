@@ -301,7 +301,6 @@ public class EventManager {
             WorldEdit api = WorldEdit.getInstance();
 
             if (api != null) {
-
                 LocalWorld world = new BukkitWorld(runningEvent.getLevel().getStartLocation().getWorld());
                 Vector pos1 = new Vector(minX, 0, minZ);
                 Vector pos2 = new Vector(maxX, 255, maxZ);
@@ -318,7 +317,7 @@ public class EventManager {
                     editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.AIR.getId()));
                     editSession.flushQueue();
                     editSession.setFastMode(false);
-                } catch (MaxChangedBlocksException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {

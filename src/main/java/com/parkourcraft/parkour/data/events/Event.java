@@ -168,7 +168,7 @@ public class Event {
                                     editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.WATER.getId()));
                                     editSession.flushQueue();
                                     editSession.setFastMode(false);
-                                } catch (MaxChangedBlocksException e) {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                                 currentWaterY++;

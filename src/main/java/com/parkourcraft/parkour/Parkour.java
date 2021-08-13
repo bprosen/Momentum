@@ -63,7 +63,7 @@ public class Parkour extends JavaPlugin {
 
         // check before loading classes
         if (!ProtocolLib.setupProtocol()) {
-            getLogger().info("ProtocolLib v4.6.0 not found or disabled");
+            getLogger().info("ProtocolLib v4.7.0 not found or disabled");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }

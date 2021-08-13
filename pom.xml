@@ -94,10 +94,11 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>6.1.4-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>com.intellectualsites.fawe</groupId>
+            <artifactId>FAWE-core</artifactId>
+            <version>1.12</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/FastAsyncWorldEdit-core-1.12.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -112,14 +113,6 @@
             <artifactId>worldguard</artifactId>
             <version>6.1.1-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.intellectualsites.fawe</groupId>
-            <artifactId>FAWE-bukkit</artifactId>
-            <version>1.12</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/FastAsyncWorldEdit-bukkit-1.12.jar</systemPath>
         </dependency>
 
         <dependency>

@@ -488,7 +488,7 @@ public class InfinitePKManager {
                 editSession.flushQueue(); // flush queue
                 // disable fast mode
                 editSession.setFastMode(false);
-            } catch (MaxChangedBlocksException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {

@@ -108,13 +108,13 @@ public class PacketListener implements Listener {
                             // check if their plot is submitted
                             if (plot.isSubmitted()) {
                                 doCancel = true;
-                                reason = "&cYou cannot edit your plot when it has been submitted!";
+                                reason = "&cYou cannot edit your plot when it has been submitted";
                             // check if they are not trusted and not owner, then cancel
                             } else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) &&
                                        !plot.getTrustedPlayers().contains(player.getName())) {
 
                                 doCancel = true;
-                                reason = "&cYou cannot do this here!";
+                                reason = "&cYou cannot do this here";
                             // this will only continue if the block they edited is in the x and y of the bedrock spawn
                             } else if (loc.getBlockX() == plot.getSpawnLoc().getBlockX() && loc.getBlockZ() == plot.getSpawnLoc().getBlockZ()) {
 
@@ -123,19 +123,19 @@ public class PacketListener implements Listener {
                                    (loc.getBlockY() <= plot.getSpawnLoc().getBlockY() + 1 &&
                                     loc.getBlockY() >= plot.getSpawnLoc().getBlockY())) {
                                     doCancel = true;
-                                    reason = "&cYou cannot build that close on the top of the spawn block!";
+                                    reason = "&cYou cannot build that close on the top of the spawn block";
 
                                 // this means cancel if they are trying to break the spawn block
                                 } else if (packet.getType() == PacketType.Play.Client.BLOCK_DIG &&
                                            loc.getBlockY() == plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlockY()) {
                                     doCancel = true;
-                                    reason = "&cYou cannot break the spawn bedrock!";
+                                    reason = "&cYou cannot break the spawn bedrock";
                                 }
                             }
                         // no nearest plot
                         } else {
                             doCancel = true;
-                            reason = "&cYou cannot do this here!";
+                            reason = "&cYou cannot do this here";
                         }
 
                         if (doCancel) {
