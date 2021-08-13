@@ -58,13 +58,12 @@ public class Plot {
         return spawnLoc;
     }
 
-    public void teleportOwner() {
-        Player player = Bukkit.getPlayer(ownerName);
+    public void teleportPlayerToEdge(Player player) {
         // teleport player if not null
         if (player != null) {
-            Location loc = spawnLoc.clone();
-            loc.setYaw(player.getLocation().getYaw());
-            loc.setPitch(player.getLocation().getPitch());
+            // + 1 so they spawn OUTSIDE their plot, not at the border
+            Location loc = spawnLoc.clone()
+                           .subtract(0, 0,(Parkour.getSettingsManager().player_submitted_plot_width / 2) + 1);
             player.teleport(loc);
         }
     }

@@ -116,21 +116,6 @@ public class PacketListener implements Listener {
                                 doCancel = true;
                                 reason = "&cYou cannot do this here";
                             // this will only continue if the block they edited is in the x and y of the bedrock spawn
-                            } else if (loc.getBlockX() == plot.getSpawnLoc().getBlockX() && loc.getBlockZ() == plot.getSpawnLoc().getBlockZ()) {
-
-                                // this means they edited a block within 2 above the spawn bedrock
-                                if (packet.getType() == PacketType.Play.Client.USE_ITEM &&
-                                   (loc.getBlockY() <= plot.getSpawnLoc().getBlockY() + 1 &&
-                                    loc.getBlockY() >= plot.getSpawnLoc().getBlockY())) {
-                                    doCancel = true;
-                                    reason = "&cYou cannot build that close on the top of the spawn block";
-
-                                // this means cancel if they are trying to break the spawn block
-                                } else if (packet.getType() == PacketType.Play.Client.BLOCK_DIG &&
-                                           loc.getBlockY() == plot.getSpawnLoc().clone().subtract(0, 1, 0).getBlockY()) {
-                                    doCancel = true;
-                                    reason = "&cYou cannot break the spawn bedrock";
-                                }
                             }
                         // no nearest plot
                         } else {

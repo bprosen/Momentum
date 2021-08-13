@@ -263,7 +263,7 @@ public class PlotCMD implements CommandExecutor {
         if (targetPlot != null) {
             Parkour.getPlotsManager().clearPlot(targetPlot);
             if (!forceCleared)
-                player.sendMessage(Utils.translate("&aYou cleared your plot!"));
+                player.sendMessage(Utils.translate("&aYou cleared your plot! You may need to relog to remove any glitched client-side blocks you see"));
             else
                 player.sendMessage(Utils.translate("&aYou cleared &2" + targetPlot.getOwnerName() + "&a's Plot"));
         } else if (!forceCleared)
@@ -354,18 +354,9 @@ public class PlotCMD implements CommandExecutor {
         if (checkConditions(playerStats)) {
 
             String playerName = a[1];
-            if (PlotsDB.hasPlotFromName(playerName)) {
-                String targetLoc = PlotsDB.getPlotCenterFromName(playerName);
-                String[] split = targetLoc.split(":");
-
-                // get loc from result
-                Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                        Double.parseDouble(split[0]),
-                        Parkour.getSettingsManager().player_submitted_plot_default_y,
-                        Double.parseDouble(split[1]),
-                        player.getLocation().getYaw(), player.getLocation().getPitch());
-
-                player.teleport(loc.clone().add(0.5, 0, 0.5));
+            Plot targetPlot = Parkour.getPlotsManager().get(playerName);
+            if (targetPlot != null) {
+                targetPlot.teleportPlayerToEdge(player);
                 player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
 
                 resetPlayerLevelData(playerStats);
@@ -382,7 +373,7 @@ public class PlotCMD implements CommandExecutor {
         if (plot != null) {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
             if (checkConditions(playerStats)) {
-                plot.teleportOwner();
+                plot.teleportPlayerToEdge(player);
                 resetPlayerLevelData(playerStats);
             }
         } else {

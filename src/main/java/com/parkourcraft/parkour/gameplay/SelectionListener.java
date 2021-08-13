@@ -4,6 +4,7 @@ import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.plots.PlotsManager;
 import com.parkourcraft.parkour.utils.Utils;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
@@ -21,7 +22,7 @@ public class SelectionListener {
 
     // listen very early to be ahead of normal fawe
     @Subscribe (priority = EventHandler.Priority.VERY_EARLY)
-    public void onSelection(EditSessionEvent event) throws Exception {
+    public void onSelection(EditSessionEvent event) {
 
         Actor actor = event.getActor();
 
@@ -37,19 +38,20 @@ public class SelectionListener {
 
             // only continue if not opped
             if (player != null && !player.isOp()) {
+                // try catch for incomplete regions
+                try {
+                    // get their session, the region from that selection, and the min/max points
+                    LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
+                    Region region = session.getSelection(event.getWorld());
+                    Vector maxPoint = region.getMaximumPoint();
+                    Vector minPoint = region.getMinimumPoint();
 
-                // get their session, the region from that selection, and the min/max points
-                LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
-                Region region = session.getSelection(event.getWorld());
-                Vector maxPoint = region.getMaximumPoint();
-                Vector minPoint = region.getMinimumPoint();
+                    PlotsManager plotsManager = Parkour.getPlotsManager();
+                    World world = Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world);
 
-                PlotsManager plotsManager = Parkour.getPlotsManager();
-                World world = Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world);
-
-                // get plot from min and max locations
-                Plot plotInMin = plotsManager.getPlotInLocation(new Location(world, minPoint.getX(), minPoint.getY(), minPoint.getZ()));
-                Plot plotInMax = plotsManager.getPlotInLocation(new Location(world, maxPoint.getX(), maxPoint.getY(), maxPoint.getZ()));
+                    // get plot from min and max locations
+                    Plot plotInMin = plotsManager.getPlotInLocation(new Location(world, minPoint.getX(), minPoint.getY(), minPoint.getZ()));
+                    Plot plotInMax = plotsManager.getPlotInLocation(new Location(world, maxPoint.getX(), maxPoint.getY(), maxPoint.getZ()));
 
                 /*
                     this logic is a bit complicated in a couple ways:
@@ -61,13 +63,16 @@ public class SelectionListener {
                        of one of their pos and another pos in their own plot, therefore the selection goes over the road
                        and across multiple plots
                  */
-                boolean cantInMin = plotInMin == null || !plotInMin.canBuild(player.getName());
-                boolean cantInMax = plotInMax == null || !plotInMax.canBuild(player.getName());
+                    boolean cantInMin = plotInMin == null || !plotInMin.canBuild(player.getName());
+                    boolean cantInMax = plotInMax == null || !plotInMax.canBuild(player.getName());
 
-                if (cantInMin || cantInMax || ((plotInMin != null && plotInMax != null) && !plotInMin.getOwnerName().equalsIgnoreCase(plotInMax.getOwnerName()))) {
-                    // use FAWE api to cancel and send message
-                    event.setCancelled(true);
-                    player.sendMessage(Utils.translate("&cThis WorldEdit selection is out of where you can build"));
+                    if (cantInMin || cantInMax || ((plotInMin != null && plotInMax != null) && !plotInMin.getOwnerName().equalsIgnoreCase(plotInMax.getOwnerName()))) {
+                        // use FAWE api to cancel and send message
+                        event.setCancelled(true);
+                        player.sendMessage(Utils.translate("&cThis WorldEdit selection is out of where you can build"));
+                    }
+                } catch (IncompleteRegionException e) {
+                    // dont print stack track so we dont spam console with simple error
                 }
             }
         }
