@@ -23,6 +23,7 @@ import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.storage.mysql.DatabaseManager;
 import com.parkourcraft.parkour.utils.dependencies.ProtocolLib;
 import com.parkourcraft.parkour.utils.dependencies.Vault;
+import com.sk89q.worldedit.WorldEdit;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -122,6 +123,8 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlotLimitingListener(), this);
         getServer().getPluginManager().registerEvents(new SwapHandListener(), this);
         getServer().getPluginManager().registerEvents(new WorldChangeListener(), this);
+        WorldEdit.getInstance().getEventBus().register(new SelectionListener());
+
     }
 
     private void registerCommands() {

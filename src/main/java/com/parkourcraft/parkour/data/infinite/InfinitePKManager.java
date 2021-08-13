@@ -12,6 +12,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -450,10 +451,10 @@ public class InfinitePKManager {
     }
 
     public void cleanBlocks() {
-        WorldEdit FAWEAPI = WorldEdit.getInstance();
+        WorldEdit api = WorldEdit.getInstance();
 
         // null check api
-        if (FAWEAPI != null) {
+        if (api != null) {
             LocationManager locationManager = Parkour.getLocationManager();
             SettingsManager settingsManager = Parkour.getSettingsManager();
 
@@ -473,7 +474,7 @@ public class InfinitePKManager {
 
             // attempt to replace quartz block and iron plates with air
             try {
-                EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
 
                 Set<BaseBlock> replaceBlocks = new HashSet<BaseBlock>() {{
                     add(new BaseBlock(Material.QUARTZ_BLOCK.getId()));
@@ -491,7 +492,7 @@ public class InfinitePKManager {
                 e.printStackTrace();
             }
         } else {
-            Parkour.getPluginLogger().info("FAWE API found null in cleanBlocks");
+            Parkour.getPluginLogger().info("WorldEdit API found null in cleanBlocks");
         }
     }
 

@@ -10,6 +10,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.*;
 import org.bukkit.Location;
@@ -297,9 +298,9 @@ public class EventManager {
             int minZ = minPoint.getBlockZ();
             int maxZ = maxPoint.getBlockZ();
 
-            WorldEdit FAWEAPI = WorldEdit.getInstance();
+            WorldEdit api = WorldEdit.getInstance();
 
-            if (FAWEAPI != null) {
+            if (api != null) {
 
                 LocalWorld world = new BukkitWorld(runningEvent.getLevel().getStartLocation().getWorld());
                 Vector pos1 = new Vector(minX, 0, minZ);
@@ -308,7 +309,7 @@ public class EventManager {
 
                 try {
                     // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
-                    EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                    EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
                     editSession.setFastMode(true);
 
                     // create single base block set for replace
@@ -321,7 +322,7 @@ public class EventManager {
                     e.printStackTrace();
                 }
             } else {
-                Parkour.getPluginLogger().info("FAWE API found null in Event clearWater()");
+                Parkour.getPluginLogger().info("WorldEdit API found null in Event clearWater()");
             }
         }
     }

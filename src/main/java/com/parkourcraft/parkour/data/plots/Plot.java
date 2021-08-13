@@ -68,6 +68,11 @@ public class Plot {
             player.teleport(loc);
         }
     }
+
+    public boolean canBuild(String playerName) {
+        return ownerName.equalsIgnoreCase(playerName) || trustedPlayers.contains(playerName);
+    }
+
     public List<String> getTrustedPlayers() { return trustedPlayers; }
 
     public void addTrustedPlayer(Player player) { trustedPlayers.add(player.getName()); }

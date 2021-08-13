@@ -198,21 +198,6 @@ public class StatsManager {
         playerStats.getPlayer().getInventory().setChestplate(elytraItem);
     }
 
-    /*public void clean() {
-
-        if (playerStatsList.isEmpty())
-            return;
-
-        Set<PlayerStats> removeList = new HashSet<>();
-
-        for (PlayerStats playerStats : getPlayerStats().values())
-            if (!playerStats.getPlayer().isOnline())
-                removeList.add(playerStats);
-
-        for (PlayerStats playerStats : removeList)
-            remove(playerStats);
-    }*/
-
     /*
         Only use active level updating for ascendance, this should barely cause issues as it will be ran every few seconds
         and very few people to iterate through.

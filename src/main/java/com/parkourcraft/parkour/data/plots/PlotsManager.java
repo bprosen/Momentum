@@ -7,6 +7,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -144,9 +145,9 @@ public class PlotsManager {
 
     public void clearPlot(Plot plot) {
 
-        WorldEdit FAWEAPI = WorldEdit.getInstance();
+        WorldEdit api = WorldEdit.getInstance();
 
-        if (FAWEAPI != null) {
+        if (api != null) {
             int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width;
 
             double pos1X = (plot.getSpawnLoc().getBlockX() - (plotWidth / 2));
@@ -165,7 +166,7 @@ public class PlotsManager {
             CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
 
             try {
-                EditSession editSession = FAWEAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
                 editSession.setFastMode(true);
                 editSession.setBlocks(selection, new BaseBlock(Material.AIR.getId()));
                 editSession.flushQueue();
@@ -176,7 +177,7 @@ public class PlotsManager {
                 e.printStackTrace();
             }
         } else {
-            Parkour.getPluginLogger().info("FAWE API found null in clearPlot");
+            Parkour.getPluginLogger().info("WorldEdit API found null in clearPlot");
         }
     }
 
