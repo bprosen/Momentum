@@ -14,6 +14,8 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
@@ -94,19 +96,32 @@ public class SelectionListener {
             LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
             ClipboardHolder holder = session.getClipboard();
 
-            AffineTransform transform = new AffineTransform();
-            /*transform = transform.rotateY(-(yRotate != null ? yRotate : 0));
+            /*AffineTransform transform = new AffineTransform();
+            transform = transform.rotateY(-(yRotate != null ? yRotate : 0));
             transform = transform.rotateX(-(xRotate != null ? xRotate : 0));
-            transform = transform.rotateZ(-(zRotate != null ? zRotate : 0));*/
+            transform = transform.rotateZ(-(zRotate != null ? zRotate : 0));
 
             holder.setTransform(holder.getTransform().combine(transform));
-
             Vector min = event.getClipboard().getMinimumPoint();
             Vector diff = min.subtract(event.getClipboard().getOrigin());
             Vector pastedMin = event.getPosition().add(diff);
-            Vector pastedMax = pastedMin.add(event.getClipboard().getMaximumPoint().subtract(event.getClipboard().getMinimumPoint()));
+            Vector pastedMax = pastedMin.add(event.getClipboard().getMaximumPoint().subtract(event.getClipboard().getMinimumPoint()));*/
 
-            //Bukkit.broadcastMessage(pastedMin + " -> " + pastedMax);
+            // TODO: actually make this adjust for rotations, so far ive tried practically everything
+            // https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/main/worldedit-core/src/main/java/com/sk89q/worldedit/command/ClipboardCommands.java#L529-L539
+            // code from here ^
+
+            Vector clipboardOffset = event.getClipboard().getRegion().getMinimumPoint().subtract(event.getClipboard().getOrigin());
+            Vector realTo = event.getPosition().add(holder.getTransform().apply(clipboardOffset));
+            Vector max = realTo.add(holder
+                    .getTransform()
+                    .apply(event.getClipboard().getRegion().getMaximumPoint().subtract(event.getClipboard().getMinimumPoint())));
+            RegionSelector selector = new CuboidRegionSelector(wePlayer.getWorld(), event.getPosition().toBlockPoint(), max.toBlockPoint());
+            session.setRegionSelector(wePlayer.getWorld(), selector);
+            selector.learnChanges();
+            selector.explainRegionAdjust(wePlayer, session);
+
+            //Bukkit.broadcastMessage(session.getClipboard().getClipboard().getMinimumPoint() + " -> " + session.getClipboard().getClipboard().getMaximumPoint());
         }
     }
 }
