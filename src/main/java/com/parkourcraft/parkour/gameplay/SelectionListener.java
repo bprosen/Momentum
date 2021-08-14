@@ -1,16 +1,20 @@
 package com.parkourcraft.parkour.gameplay;
 
+import com.boydti.fawe.object.FawePlayer;
 import com.parkourcraft.parkour.Parkour;
 import com.parkourcraft.parkour.data.plots.Plot;
 import com.parkourcraft.parkour.data.plots.PlotsManager;
 import com.parkourcraft.parkour.utils.Utils;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import org.bukkit.Bukkit;
@@ -75,6 +79,34 @@ public class SelectionListener {
                     // dont print stack track so we dont spam console with simple error
                 }
             }
+        }
+    }
+
+    @Subscribe (priority = EventHandler.Priority.VERY_EARLY)
+    public void onPaste(PasteEvent event) throws EmptyClipboardException {
+
+        com.sk89q.worldedit.entity.Player wePlayer = event.getPlayer();
+        Player player = Bukkit.getPlayer(wePlayer.getName());
+
+        if (player != null && !player.isOp() &&
+            player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+
+            LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
+            ClipboardHolder holder = session.getClipboard();
+
+            AffineTransform transform = new AffineTransform();
+            /*transform = transform.rotateY(-(yRotate != null ? yRotate : 0));
+            transform = transform.rotateX(-(xRotate != null ? xRotate : 0));
+            transform = transform.rotateZ(-(zRotate != null ? zRotate : 0));*/
+
+            holder.setTransform(holder.getTransform().combine(transform));
+
+            Vector min = event.getClipboard().getMinimumPoint();
+            Vector diff = min.subtract(event.getClipboard().getOrigin());
+            Vector pastedMin = event.getPosition().add(diff);
+            Vector pastedMax = pastedMin.add(event.getClipboard().getMaximumPoint().subtract(event.getClipboard().getMinimumPoint()));
+
+            //Bukkit.broadcastMessage(pastedMin + " -> " + pastedMax);
         }
     }
 }
