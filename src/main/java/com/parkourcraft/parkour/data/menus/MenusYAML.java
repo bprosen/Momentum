@@ -172,7 +172,7 @@ public class MenusYAML {
         int type = 7;
         int size = 1;
         List<String> lore = new ArrayList<>();
-        int armorColor = -1;
+        Color armorColor = null;
 
         if (hasItem(menuName, pageNumber, itemSlot)) {
             String itemPath = pageNumber + "." + itemSlot + ".item";
@@ -194,7 +194,7 @@ public class MenusYAML {
                 size = menusConfig.getInt(menuName + "." + itemPath + ".size");
 
             if (isSet(menuName, itemPath + ".armor_color"))
-                armorColor = menusConfig.getInt(menuName + "." + itemPath + ".armor_color");
+                armorColor = Utils.getColorFromString(menusConfig.getString(menuName + "." + itemPath + ".armor_color"));
 
             lore = Utils.formatLore(getItemLore(menuName, pageNumber, itemSlot));
         }
@@ -210,9 +210,9 @@ public class MenusYAML {
 
         item.setItemMeta(itemMeta);
 
-        if (armorColor > 0) {
+        if (armorColor != null) {
             LeatherArmorMeta leatherItemMeta = (LeatherArmorMeta) item.getItemMeta();
-            leatherItemMeta.setColor(Color.fromRGB(armorColor));
+            leatherItemMeta.setColor(armorColor);
             item.setItemMeta(leatherItemMeta);
         }
 
