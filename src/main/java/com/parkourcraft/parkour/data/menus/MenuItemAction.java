@@ -64,7 +64,11 @@ public class MenuItemAction {
         else if (itemType.equals("teleport"))
             performTeleportItem(player, menuItem);
         else if (itemType.equals("open"))
-            performOpenItem(player, menuItem);
+            // if it is rankup gui, do special method for it
+            if (menuItem.getTypeValue().equals("rankup"))
+                performRankupOpen(player, menuItem);
+            else
+                performOpenItem(player, menuItem);
         else if (itemType.equals("rate"))
             performLevelRate(player, menuItem);
         else if (itemType.equals("type")) {
@@ -88,6 +92,39 @@ public class MenuItemAction {
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performRankupOpen(Player player, MenuItem menuItem) {
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+        String menuName = null;
+        if (playerStats.getRankUpStage() == 1)
+            menuName = "coin-rankup";
+            // stage 2, meaning level rankup part
+        else if (playerStats.getRankUpStage() == 2) {
+            // get if it is a single level style rankup (expert and up)
+            if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
+                menuName = "single-level-rankup";
+            else
+                menuName = "double-level-rankup";
+        }
+
+        if (menuName != null) {
+            Menu menu = Parkour.getMenuManager().getMenu(menuName);
+
+            if (menu != null) {
+                int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
+
+                Inventory inventory = Parkour.getMenuManager().getInventory(menu.getName(), pageNumber);
+
+                if (inventory != null) {
+                    player.closeInventory();
+                    player.openInventory(inventory);
+                    Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
+                }
+            }
+        }
     }
 
     private static void performLevelRate(Player player, MenuItem menuItem) {
