@@ -1,9 +1,7 @@
 package com.parkourcraft.parkour.commands;
 
 import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.infinite.InfinitePKDB;
-import com.parkourcraft.parkour.data.infinite.InfinitePKLBPosition;
-import com.parkourcraft.parkour.data.infinite.InfinitePKManager;
+import com.parkourcraft.parkour.data.infinite.*;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.storage.ConfigManager;
 import com.parkourcraft.parkour.utils.Utils;
@@ -14,6 +12,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
 
 public class InfiniteCMD implements CommandExecutor {
 
@@ -113,6 +113,12 @@ public class InfiniteCMD implements CommandExecutor {
             configManager.save("settings");
             Parkour.getSettingsManager().load(configManager.get("settings"));
             player.sendMessage(Utils.translate("&7You set the portal location to your location"));
+        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
+
+            Parkour.getInfinitePKManager().clearRewards();
+            InfiniteRewardsYAML.loadRewards();
+            player.sendMessage(Utils.translate("&cYou have reloaded Infinite Parkour Rewards"));
+
         } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -141,6 +147,31 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&cYou are already in infinite parkour"));
             }
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("rewards")) {
+
+            HashMap<Integer, InfinitePKReward> rewards = Parkour.getInfinitePKManager().getRewards();
+            player.sendMessage(Utils.translate("&5&lInfinite Parkour Rewards"));
+
+            // if not empty continue
+            if (!rewards.isEmpty()) {
+
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                int position = 1;
+
+                for (InfinitePKReward reward : rewards.values()) {
+
+                    String msg = "&7" + position + " &5" + reward.getScoreNeeded() + " Score &7- &d" + reward.getName();
+
+                    // send crossed out msg if their high score is more than the score needed
+                    if (playerStats.getInfinitePKScore() >= reward.getScoreNeeded())
+                        msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score &7- &d" + reward.getName();
+
+                    player.sendMessage(Utils.translate(msg));
+                    position++;
+                }
+            } else {
+                player.sendMessage(Utils.translate("&dNo rewards available"));
+            }
         } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
             sendHelp(player);
         } else {
@@ -153,11 +184,13 @@ public class InfiniteCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
         player.sendMessage(Utils.translate("&5/infinite score [IGN]  &7Tells you the score of yourself/someone else"));
         player.sendMessage(Utils.translate("&5/infinite score lb <position>  &7Tells you the score of someone in <position> on the leaderboard"));
+        player.sendMessage(Utils.translate("&5/infinite rewards  &7Tells you a list of the rewards and if you have them (crossed out)"));
 
         if (player.hasPermission("pc-parkour.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
             player.sendMessage(Utils.translate("&5/infinite setportalrespawn  &7Sets the portal respawn to your location"));
             player.sendMessage(Utils.translate("&5/infinite setportallocation  &7Sets the portal location to your location"));
+            player.sendMessage(Utils.translate("&5/infinite loadrewards  &7Loads rewards from rewards.yml"));
         }
 
         player.sendMessage(Utils.translate("&5/infinite help  &7Shows you this display"));

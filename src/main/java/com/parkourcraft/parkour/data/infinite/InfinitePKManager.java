@@ -8,11 +8,9 @@ import com.parkourcraft.parkour.storage.mysql.DatabaseQueries;
 import com.parkourcraft.parkour.utils.Utils;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalWorld;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -24,6 +22,7 @@ public class InfinitePKManager {
 
     private HashMap<String, InfinitePK> participants = new HashMap<>();
     private LinkedHashSet<InfinitePKLBPosition> leaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
+    private HashMap<Integer, InfinitePKReward> rewards = new HashMap<>();
 
     public InfinitePKManager() {
         startScheduler();
@@ -35,6 +34,7 @@ public class InfinitePKManager {
             @Override
             public void run() {
                 loadLeaderboard();
+                InfiniteRewardsYAML.loadRewards();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
 
@@ -119,12 +119,26 @@ public class InfinitePKManager {
             int score = infinitePK.getScore();
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
+            InfinitePKReward reward = getClosestRewardBelowScore(score);
+            boolean sendMsg = false;
+
+            // dispatch command if not null and they havent gotten this reward yet
+            if (reward != null && playerStats.getInfinitePKScore() < score) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                sendMsg = true;
+            }
+
             if (isBestScore(player.getName(), score)) {
                 // if they disconnected
                 if (!disconnected) {
-                    player.sendMessage(Utils.translate("&7You have beaten your best &d(" +
+                    String msg = "&7You have beaten your best &d(" +
                             Utils.formatNumber(playerStats.getInfinitePKScore()) + ")" +
-                            " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score)));
+                            " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score);
+
+                    if (sendMsg)
+                        msg += " &7and received &d" + reward.getName() + "&d(Score of " + reward.getScoreNeeded() + ") &7as a reward";
+
+                    player.sendMessage(Utils.translate(msg));
                 }
 
                 updateScore(player.getName(), score);
@@ -146,6 +160,37 @@ public class InfinitePKManager {
             playerStats.setInfinitePK(false);
             participants.remove(player.getName());
         }
+    }
+
+    public HashMap<Integer, InfinitePKReward> getRewards() { return rewards; }
+
+    public InfinitePKReward getReward(int score) { return rewards.get(score); }
+
+    public boolean hasReward(int score) { return rewards.get(score) != null; }
+
+    public void addReward(InfinitePKReward infinitePKReward) { rewards.put(infinitePKReward.getScoreNeeded(), infinitePKReward); }
+
+    public void clearRewards() { rewards.clear(); }
+
+    public InfinitePKReward getClosestRewardBelowScore(int score) {
+
+        // store closest globally
+        int closestRewardScore = -1;
+        InfinitePKReward closestReward = null;
+
+        for (Integer rewardsScore : rewards.keySet()) {
+            // if diff is > 0, that means they got the reward
+            int diff = score - rewardsScore;
+
+            if (diff > 0 && rewardsScore > closestRewardScore)
+                closestRewardScore = rewardsScore;
+        }
+
+        // if > -1, that means they got a reward!
+        if (closestRewardScore > -1)
+            closestReward = rewards.get(closestRewardScore);
+
+        return closestReward;
     }
 
     public InfinitePK get(String playerName) {

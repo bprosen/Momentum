@@ -1,0 +1,4 @@
+infinitepk:
+  10:
+    command: "say %player% hi"
+    name: "&8Funny Test"
