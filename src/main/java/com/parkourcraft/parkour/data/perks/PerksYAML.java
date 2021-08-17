@@ -62,13 +62,20 @@ public class PerksYAML {
     }
 
     private static ItemStack createItem(String perkName, String armorType) {
-        ItemStack item = new ItemStack(
-                Material.matchMaterial(perksConfig.getString(perkName + ".items." + armorType + ".material")),
-                1,
-                (byte) perksConfig.getInt(perkName + ".items." + armorType + ".type"));
+
+        Material itemType = Material.matchMaterial(perksConfig.getString(perkName + ".items." + armorType + ".material"));
+
+        // in case wrong material name, default to white glass
+        ItemStack item;
+        if (itemType != null)
+            item = new ItemStack(itemType,1,
+                                (short) perksConfig.getInt(perkName + ".items." + armorType + ".type"));
+        else
+            item = new ItemStack(Material.STAINED_GLASS_PANE, 1);
 
         // if not null, continue
         if (item != null) {
+
             ItemMeta itemMeta = item.getItemMeta();
 
             if (isSet(perkName, "items." + armorType + ".color")) {
@@ -93,11 +100,13 @@ public class PerksYAML {
             } else {
                 itemMeta.setDisplayName(Utils.translate(perksConfig.getString(perkName + ".items." + armorType + ".title")));
 
-                List<String> lore = new ArrayList<>();
-                for (String loreString : perksConfig.getStringList(perkName + ".items." + armorType + ".lore"))
-                    lore.add(Utils.translate(loreString));
+                List<String> lore = perksConfig.getStringList(perkName + ".items." + armorType + ".lore");
+                if (!lore.isEmpty()) {
+                    for (String loreString : lore)
+                        lore.add(Utils.translate(loreString));
 
-                itemMeta.setLore(lore);
+                    itemMeta.setLore(lore);
+                }
                 item.setItemMeta(itemMeta);
             }
         }
