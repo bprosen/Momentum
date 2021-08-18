@@ -111,38 +111,38 @@ public class LevelHandler {
         int beforeClanLevel = -1;
 
         if (!rankUpLevel) {
-            if (playerStats.getClan() != null) {
-                beforeClanLevel = playerStats.getClan().getLevel();
-
-                // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
-                if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
-                    Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, level);
-
-                // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
-                if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
-                    Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
-            }
-
-            // give higher reward if prestiged
-            int prestiges = playerStats.getPrestiges();
-            int reward = level.getReward();
-            if (prestiges > 0 && level.getReward() > 0)
-                reward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
-
-            Parkour.getEconomy().depositPlayer(player, reward);
-
-            String messageFormatted = level.getFormattedMessage(playerStats);
-            if (elapsedTime > 0L && elapsedTime < 8388607L)
-                messageFormatted = messageFormatted.replace("%time%", time);
-            else
-                messageFormatted = messageFormatted.replace("%time%", "-");
-
-            player.sendMessage(messageFormatted);
-            player.sendMessage(Utils.translate(" &7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
-                    + ChatColor.stripColor(level.getFormattedTitle())));
-
-            // only broadcast if it is not a forced completion
+            // only broadcast and give xp/coins if it is not a forced completion
             if (!forcedCompletion) {
+
+                if (playerStats.getClan() != null) {
+                    beforeClanLevel = playerStats.getClan().getLevel();
+
+                    // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
+                    if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
+                        Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, level);
+
+                    // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
+                    if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
+                        Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
+                }
+
+                // give higher reward if prestiged
+                int prestiges = playerStats.getPrestiges();
+                int reward = level.getReward();
+                if (prestiges > 0 && level.getReward() > 0)
+                    reward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
+
+                Parkour.getEconomy().depositPlayer(player, reward);
+
+                String messageFormatted = level.getFormattedMessage(playerStats);
+                if (elapsedTime > 0L && elapsedTime < 8388607L)
+                    messageFormatted = messageFormatted.replace("%time%", time);
+                else
+                    messageFormatted = messageFormatted.replace("%time%", "-");
+
+                player.sendMessage(messageFormatted);
+                player.sendMessage(Utils.translate(" &7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                        + ChatColor.stripColor(level.getFormattedTitle())));
 
                 // broadcast completed if it the featured level
                 if (level.isFeaturedLevel()) {
@@ -157,6 +157,8 @@ public class LevelHandler {
 
                     Bukkit.broadcastMessage(broadcastMessage);
                 }
+            } else {
+                player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
             }
         } else {
             Parkour.getRanksManager().doRankUp(player);
