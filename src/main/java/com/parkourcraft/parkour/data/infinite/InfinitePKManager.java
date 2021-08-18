@@ -22,7 +22,7 @@ public class InfinitePKManager {
 
     private HashMap<String, InfinitePK> participants = new HashMap<>();
     private LinkedHashSet<InfinitePKLBPosition> leaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
-    private HashMap<Integer, InfinitePKReward> rewards = new HashMap<>();
+    private LinkedHashMap<Integer, InfinitePKReward> rewards = new LinkedHashMap<>(); // linked so order stays
 
     public InfinitePKManager() {
         startScheduler();
@@ -124,8 +124,14 @@ public class InfinitePKManager {
 
             // dispatch command if not null and they havent gotten this reward yet
             if (reward != null && playerStats.getInfinitePKScore() < score) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
                 sendMsg = true;
+                // run in sync for safety
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                    }
+                }.runTask(Parkour.getPlugin());
             }
 
             if (isBestScore(player.getName(), score)) {
@@ -136,7 +142,7 @@ public class InfinitePKManager {
                             " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score);
 
                     if (sendMsg)
-                        msg += " &7and received &d" + reward.getName() + "&d(Score of " + reward.getScoreNeeded() + ") &7as a reward";
+                        msg += " &7and received &d" + reward.getName() + " &d(Score of " + reward.getScoreNeeded() + ") &7as a reward!";
 
                     player.sendMessage(Utils.translate(msg));
                 }
@@ -162,7 +168,7 @@ public class InfinitePKManager {
         }
     }
 
-    public HashMap<Integer, InfinitePKReward> getRewards() { return rewards; }
+    public LinkedHashMap<Integer, InfinitePKReward> getRewards() { return rewards; }
 
     public InfinitePKReward getReward(int score) { return rewards.get(score); }
 
@@ -182,7 +188,7 @@ public class InfinitePKManager {
             // if diff is > 0, that means they got the reward
             int diff = score - rewardsScore;
 
-            if (diff > 0 && rewardsScore > closestRewardScore)
+            if (diff >= 0 && rewardsScore > closestRewardScore)
                 closestRewardScore = rewardsScore;
         }
 

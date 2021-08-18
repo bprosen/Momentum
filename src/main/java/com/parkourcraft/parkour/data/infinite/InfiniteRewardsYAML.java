@@ -10,6 +10,9 @@ public class InfiniteRewardsYAML {
 
     public static void loadRewards() {
 
+        // load before so new config
+        Parkour.getConfigManager().load("rewards");
+
         // get int keys
         for (String key : rewardsFile.getConfigurationSection("infinitepk").getKeys(false))
             // if it is an int and .command and .name is set, add it

@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class InfiniteCMD implements CommandExecutor {
 
@@ -149,7 +150,7 @@ public class InfiniteCMD implements CommandExecutor {
             }
         } else if (a.length == 1 && a[0].equalsIgnoreCase("rewards")) {
 
-            HashMap<Integer, InfinitePKReward> rewards = Parkour.getInfinitePKManager().getRewards();
+            LinkedHashMap<Integer, InfinitePKReward> rewards = Parkour.getInfinitePKManager().getRewards();
             player.sendMessage(Utils.translate("&5&lInfinite Parkour Rewards"));
 
             // if not empty continue
@@ -164,7 +165,7 @@ public class InfiniteCMD implements CommandExecutor {
 
                     // send crossed out msg if their high score is more than the score needed
                     if (playerStats.getInfinitePKScore() >= reward.getScoreNeeded())
-                        msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score &7- &d" + reward.getName();
+                        msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score&7 - &d" + reward.getName();
 
                     player.sendMessage(Utils.translate(msg));
                     position++;
