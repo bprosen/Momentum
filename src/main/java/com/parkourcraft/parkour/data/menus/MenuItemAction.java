@@ -184,7 +184,8 @@ public class MenuItemAction {
         if (perk != null) {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (perk.hasRequirements(playerStats, player)) {
+            // bypass if opped
+            if (player.isOp() || perk.hasRequirements(playerStats, player)) {
                 player.closeInventory();
                 Parkour.getPerkManager().setPerk(perk, player);
 
