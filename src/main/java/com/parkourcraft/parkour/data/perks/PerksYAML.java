@@ -5,6 +5,8 @@ import com.parkourcraft.parkour.utils.Utils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -77,37 +79,33 @@ public class PerksYAML {
         if (item != null) {
 
             ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.setDisplayName(Utils.translate(perksConfig.getString(perkName + ".items." + armorType + ".title")));
 
-            if (isSet(perkName, "items." + armorType + ".color")) {
+            // set lore
+            List<String> lore = new ArrayList<>();
+            for (String loreString : perksConfig.getStringList(perkName + ".items." + armorType + ".lore"))
+                lore.add(Utils.translate(loreString));
 
-                String leatherArmorColor = perksConfig.getString(perkName + ".items." + armorType + ".color");
-                Color armorColor = Utils.getColorFromString(leatherArmorColor);
+            // add glow effect if set
+            if (isSet(perkName, "items." + armorType + ".glow") &&
+                perksConfig.getBoolean(perkName + ".items." + armorType + ".glow")) {
 
-                // if not null, this means colored leather armor
-                if (armorColor != null) {
-                    LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
-                    meta.setColor(armorColor);
-                    meta.setDisplayName(Utils.translate(perksConfig.getString(perkName + ".items." + armorType + ".title")));
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
 
-                    List<String> lore = new ArrayList<>();
-                    for (String loreString : perksConfig.getStringList(perkName + ".items." + armorType + ".lore"))
-                        lore.add(Utils.translate(loreString));
+            // set lore and meta
+            itemMeta.setLore(lore);
+            item.setItemMeta(itemMeta);
 
-                    meta.setLore(lore);
-                    item.setItemMeta(meta);
-                }
-            // everything else is here
-            } else {
-                itemMeta.setDisplayName(Utils.translate(perksConfig.getString(perkName + ".items." + armorType + ".title")));
+            String leatherArmorColor = perksConfig.getString(perkName + ".items." + armorType + ".color");
+            Color armorColor = Utils.getColorFromString(leatherArmorColor);
 
-                List<String> lore = perksConfig.getStringList(perkName + ".items." + armorType + ".lore");
-                if (!lore.isEmpty()) {
-                    for (String loreString : lore)
-                        lore.add(Utils.translate(loreString));
-
-                    itemMeta.setLore(lore);
-                }
-                item.setItemMeta(itemMeta);
+            // if colored, need to cast to new meta and set again
+            if (armorColor != null) {
+                LeatherArmorMeta leatherItemMeta = (LeatherArmorMeta) item.getItemMeta();
+                leatherItemMeta.setColor(armorColor);
+                item.setItemMeta(leatherItemMeta);
             }
         }
         return item;

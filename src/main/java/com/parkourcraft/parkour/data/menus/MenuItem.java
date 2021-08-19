@@ -14,6 +14,7 @@ public class MenuItem {
     private String title;
     private String type;
     private String typeValue;
+    private boolean glow = false;
     private List<String> lore;
     private List<String> commands;
     private List<String> consoleCommands;
@@ -32,11 +33,14 @@ public class MenuItem {
         lore = MenusYAML.getItemLore(menu.getName(), menuPage.getPageNumber(), slot);
         commands = MenusYAML.getCommands(menu.getName(), menuPage.getPageNumber(), slot);
         consoleCommands = MenusYAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), slot);
+        glow = MenusYAML.getGlow(menu.getName(), menuPage.getPageNumber(), slot);
     }
 
     public int getSlot() {
         return slot;
     }
+
+    public boolean isGlowing() { return glow; }
 
     public ItemStack getItem() {
         return item;

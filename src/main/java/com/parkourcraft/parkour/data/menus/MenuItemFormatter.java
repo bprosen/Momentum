@@ -56,6 +56,12 @@ public class MenuItemFormatter {
         if (perk != null) {
             ItemMeta itemMeta = item.getItemMeta();
 
+            // if glowing, add glow effect
+            if (menuItem.isGlowing()) {
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 

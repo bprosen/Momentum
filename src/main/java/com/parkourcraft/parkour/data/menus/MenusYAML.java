@@ -166,6 +166,15 @@ public class MenusYAML {
 
     }
 
+    public static boolean getGlow(String menuName, int pageNumber, int itemSlot) {
+        String itemPath = pageNumber + "." + itemSlot + ".item";
+
+        if (isSet(menuName, itemPath + ".glow"))
+            return menusConfig.getBoolean(menuName + "." + itemPath + ".glow");
+
+        return false;
+    }
+
     public static ItemStack getItem(String menuName, int pageNumber, int itemSlot) {
         String title = "";
         Material material = Material.STAINED_GLASS_PANE;
