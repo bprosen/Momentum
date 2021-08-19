@@ -86,18 +86,28 @@ public class MenuItemAction {
                 performLevelTeleport(Parkour.getStatsManager().get(player.getUniqueId().toString()),
                         player,
                         Parkour.getLevelManager().getFeaturedLevel());
-            else if (typeValue.equals("clearhat"))
-                player.getInventory().setHelmet(new ItemStack(Material.AIR));
-            else if (typeValue.equals("cleararmor")) {
-                player.getInventory().setChestplate(new ItemStack(Material.AIR));
-                player.getInventory().setLeggings(new ItemStack(Material.AIR));
-                player.getInventory().setBoots(new ItemStack(Material.AIR));
-            } else if (typeValue.equals("exit"))
+            else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor"))
+                performArmorClear(player, typeValue);
+            else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
+    private static void performArmorClear(Player player, String clearType) {
+
+        if (clearType.equalsIgnoreCase("cleararmor")) {
+            player.getInventory().setChestplate(new ItemStack(Material.AIR));
+            player.getInventory().setLeggings(new ItemStack(Material.AIR));
+            player.getInventory().setBoots(new ItemStack(Material.AIR));
+
+            player.closeInventory();
+            player.sendMessage(Utils.translate("&cYou have cleared your current armor"));
+        } else if (clearType.equalsIgnoreCase("clearhat")) {
+            player.getInventory().setHelmet(new ItemStack(Material.AIR));
+            player.sendMessage(Utils.translate("&cYou have cleared your current hat"));
+        }
+    }
     private static void performRankupOpen(Player player, MenuItem menuItem) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
