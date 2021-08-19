@@ -12,12 +12,10 @@ import com.parkourcraft.parkour.data.ranks.RanksDB;
 import com.parkourcraft.parkour.data.ranks.RanksYAML;
 import com.parkourcraft.parkour.data.stats.PlayerStats;
 import com.parkourcraft.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import java.util.List;
 
@@ -88,7 +86,13 @@ public class MenuItemAction {
                 performLevelTeleport(Parkour.getStatsManager().get(player.getUniqueId().toString()),
                         player,
                         Parkour.getLevelManager().getFeaturedLevel());
-            else if (typeValue.equals("exit"))
+            else if (typeValue.equals("clearhat"))
+                player.getInventory().setHelmet(new ItemStack(Material.AIR));
+            else if (typeValue.equals("cleararmor")) {
+                player.getInventory().setChestplate(new ItemStack(Material.AIR));
+                player.getInventory().setLeggings(new ItemStack(Material.AIR));
+                player.getInventory().setBoots(new ItemStack(Material.AIR));
+            } else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
