@@ -66,3 +66,5 @@ commands:
   profile:
     description: "PC-Parkour Profile Command"
     aliases: [profilestats]
+  cosmetics:
+    description: "PC-Parkour Cosmetics Command"
