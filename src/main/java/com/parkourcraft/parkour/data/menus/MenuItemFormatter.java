@@ -115,7 +115,7 @@ public class MenuItemFormatter {
                 }
 
                 if (perk.getPrice() > 0)
-                    itemLore.add(Utils.translate("&7 - Pay &6" + perk.getPrice() + " Coins"));
+                    itemLore.add(Utils.translate("&7 - Pay &6" + Utils.formatNumber(perk.getPrice()) + " Coins"));
             }
 
             // Sections Over
