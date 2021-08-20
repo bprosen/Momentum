@@ -11,6 +11,8 @@ import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -111,15 +113,28 @@ public class SelectionListener {
             // https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/main/worldedit-core/src/main/java/com/sk89q/worldedit/command/ClipboardCommands.java#L529-L539
             // code from here ^
 
+            /*EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(event.getPlayer().getWorld(), -1, wePlayer);
+            Operation operation = holder.createPaste(editSession.getExtent(), editSession.getWorldData())
+                                 .to(holder.getClipboard().getOrigin())
+                                 .ignoreAirBlocks(false).build();
+            Operations.completeLegacy(operation);*/
+
+            // OPTION 2
+
             Vector clipboardOffset = event.getClipboard().getRegion().getMinimumPoint().subtract(event.getClipboard().getOrigin());
             Vector realTo = event.getPosition().add(holder.getTransform().apply(clipboardOffset));
             Vector max = realTo.add(holder
                     .getTransform()
                     .apply(event.getClipboard().getRegion().getMaximumPoint().subtract(event.getClipboard().getMinimumPoint())));
-            RegionSelector selector = new CuboidRegionSelector(wePlayer.getWorld(), event.getPosition().toBlockPoint(), max.toBlockPoint());
+
+            Vector min = max.subtract(event.getPlayer().getLocation().toVector());
+            Bukkit.broadcastMessage(min + " -> " + max);
+
+
+            /*RegionSelector selector = new CuboidRegionSelector(wePlayer.getWorld(), event.getPosition().toBlockPoint(), max.toBlockPoint());
             session.setRegionSelector(wePlayer.getWorld(), selector);
             selector.learnChanges();
-            selector.explainRegionAdjust(wePlayer, session);
+            selector.explainRegionAdjust(wePlayer, session);*/
 
             //Bukkit.broadcastMessage(session.getClipboard().getClipboard().getMinimumPoint() + " -> " + session.getClipboard().getClipboard().getMaximumPoint());
         }

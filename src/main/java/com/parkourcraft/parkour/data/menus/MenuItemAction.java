@@ -87,14 +87,14 @@ public class MenuItemAction {
                         Parkour.getLevelManager().getFeaturedLevel());
             else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
                      typeValue.equals("cleartrail") || typeValue.equals("clearnick"))
-                performCosmeticsClear(player, typeValue);
+                performCosmeticsClear(player, typeValue, menuItem);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
-    private static void performCosmeticsClear(Player player, String clearType) {
+    private static void performCosmeticsClear(Player player, String clearType, MenuItem menuItem) {
 
         switch (clearType) {
             case "cleararmor":
@@ -111,15 +111,21 @@ public class MenuItemAction {
                 player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou have cleared your current hat"));
                 break;
-            // dont need to do anything but close inventory as a command from another plugin is ran
             case "clearnick":
                 player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou have cleared your current nick"));
+
+                // run clear cmds
+                if (menuItem.hasCommands())
+                    runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
                 break;
-            // dont need to do anything but close inventory as a command from another plugin is ran
             case "cleartrail":
                 player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou have cleared your current trail"));
+
+                // run clear cmds
+                if (menuItem.hasCommands())
+                    runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
                 break;
         }
     }
