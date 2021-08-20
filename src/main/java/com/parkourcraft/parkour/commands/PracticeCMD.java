@@ -52,7 +52,7 @@ public class PracticeCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                     }
                 } else {
-                    player.sendMessage(Utils.translate("&cYou cannot enable/disable practice mode while falling"));
+                    player.sendMessage(Utils.translate("&cYou cannot enable/disable practice mode while in the air"));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot enter practice mode when not in a level"));
