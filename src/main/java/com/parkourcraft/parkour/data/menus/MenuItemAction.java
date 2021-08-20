@@ -35,10 +35,7 @@ public class MenuItemAction {
                 }
         // if so, check if they are in elytra level
         if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytraLevel()) {
-
             player.sendMessage(Utils.translate("&cYou cannot change your armor in an Elytra level"));
-            player.closeInventory();
-            return;
         } else {
 
             for (String command : commands)
@@ -50,6 +47,7 @@ public class MenuItemAction {
                         command.replace("%player%", player.getName())
                 );
         }
+        player.closeInventory();
     }
 
     public static void perform(Player player, MenuItem menuItem) {
