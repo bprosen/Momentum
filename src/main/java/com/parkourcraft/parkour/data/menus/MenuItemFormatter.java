@@ -76,7 +76,7 @@ public class MenuItemFormatter {
 
             // Ownership Status Section
             itemLore.add("");
-            if (perk.hasRequirements(playerStats, player))
+            if (player.isOp() || perk.hasRequirements(playerStats, player))
                 itemLore.add(Utils.translate("&2You own this perk"));
             else {
                 itemLore.add(Utils.translate("&cYou do not own this perk"));
