@@ -132,6 +132,14 @@ public class PerksYAML {
         return 0;
     }
 
+    public static List<String> getShortenedRequirementsLore(String perkName) {
+
+        if (isSet(perkName, "shortened_requirements_lore"))
+            return perksConfig.getStringList(perkName + ".shortened_requirements_lore");
+
+        return null;
+    }
+
     public static void create(String perkName) {
         if (!exists(perkName)) {
             perksConfig.set(perkName + ".permissions", new ArrayList<>());

@@ -97,12 +97,17 @@ public class MenuItemFormatter {
 
             // Level Requirements Section
             List<String> requirements = perk.getRequirements();
-            if (requirements.size() > 0
-                    || perk.getPrice() > 0) {
+            if (requirements.size() > 0 || perk.getPrice() > 0) {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Requirements"));
 
-                for (String requirement : requirements) {
+                // if size of requirements is > 0 and it has shortened custom lore, add it, otherwise do normal lore
+                if (requirements.size() > 0 && perk.hasShortenedRequirementsLore()) {
+                    // loop through if it has shortened lore and add it
+                    for (String shortLore : perk.getShortenedRequirementsLore())
+                        itemLore.add(Utils.translate(shortLore));
+
+                } else for (String requirement : requirements) {
                     Level level = Parkour.getLevelManager().get(requirement);
 
                     if (level != null)
