@@ -18,39 +18,43 @@ public class ChatListener implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String msg = event.getMessage();
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
         ClansManager clansManager = Parkour.getClansManager();
 
-        // this means they are in a clan and in clan chat!
-        if (playerStats != null && playerStats.getClan() != null && clansManager.isInClanChat(player.getName())) {
+        // iterate through the smaller list first
+        if (clansManager.isInClanChat(player.getName())) {
 
-            // cancel event, clear recipients, and send to clan members
-            event.setCancelled(true);
-            event.getRecipients().clear();
-            clansManager.sendMessageToMembers(playerStats.getClan(), "&6CC &e" + player.getDisplayName() + " &7" + msg, null);
-            // log to console!
-            Parkour.getPluginLogger().info("Clan Chat: " + playerStats.getClan().getTag() + " " + player.getName() + " " + ChatColor.stripColor(msg));
+            // now get player stats to see if they have a clan
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            if (playerStats != null && playerStats.getClan() != null) {
 
-            // now send to spying players
-            for (String spyPlayers : clansManager.getChatSpyMap()) {
-                Player spyPlayer = Bukkit.getPlayer(spyPlayers);
+                // cancel event, clear recipients, and send to clan members
+                event.setCancelled(true);
+                event.getRecipients().clear();
+                clansManager.sendMessageToMembers(playerStats.getClan(), "&6CC &e" + player.getDisplayName() + " &7" + msg, null);
+                // log to console!
+                Parkour.getPluginLogger().info("Clan Chat: " + playerStats.getClan().getTag() + " " + player.getName() + " " + ChatColor.stripColor(msg));
 
-                // null check and make sure they will not be sent msgs from their own clan
-                if (spyPlayer != null) {
+                // now send to spying players
+                for (String spyPlayers : clansManager.getChatSpyMap()) {
+                    Player spyPlayer = Bukkit.getPlayer(spyPlayers);
 
-                    boolean sendMsg = true;
+                    // null check and make sure they will not be sent msgs from their own clan
+                    if (spyPlayer != null) {
 
-                    // loop through members, to check if they are in clan
-                    for (ClanMember clanMember : playerStats.getClan().getMembers())
-                        // if they arent, send message to online spying staff
-                        if (clanMember.getPlayerName().equalsIgnoreCase(spyPlayer.getName())) {
-                            sendMsg = false;
-                            break;
-                        }
-                    // send msg if not found!
-                    if (sendMsg)
-                        spyPlayer.sendMessage(Utils.translate("&6CS " + playerStats.getClan().getTag() + " &e" +
-                                player.getDisplayName() + " &7" + msg));
+                        boolean sendMsg = true;
+
+                        // loop through members, to check if they are in clan
+                        for (ClanMember clanMember : playerStats.getClan().getMembers())
+                            // if they arent, send message to online spying staff
+                            if (clanMember.getPlayerName().equalsIgnoreCase(spyPlayer.getName())) {
+                                sendMsg = false;
+                                break;
+                            }
+                        // send msg if not found!
+                        if (sendMsg)
+                            spyPlayer.sendMessage(Utils.translate("&6CS " + playerStats.getClan().getTag() + " &e" +
+                                    player.getDisplayName() + " &7" + msg));
+                    }
                 }
             }
         }
