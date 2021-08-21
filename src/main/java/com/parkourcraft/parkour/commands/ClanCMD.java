@@ -580,7 +580,7 @@ public class ClanCMD implements CommandExecutor {
             case "chat":
                 return Utils.translate("&3/clan chat  &7Toggles clan chat");
             case "chatspy":
-                return Utils.translate("&3/chat chatspy  &7Toggle clan chatspy");
+                return Utils.translate("&3/chan chatspy  &7Toggle clan chatspy");
         }
         return "";
     }
