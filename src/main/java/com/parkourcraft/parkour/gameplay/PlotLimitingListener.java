@@ -22,20 +22,6 @@ public class PlotLimitingListener implements Listener {
     }
 
     @EventHandler
-    public void onPistonPush(BlockPistonExtendEvent event) {
-        // ZERO piston overloading
-        if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
-            event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onPistonPull(BlockPistonRetractEvent event) {
-        // ZERO piston overloading
-        if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
-            event.setCancelled(true);
-    }
-
-    @EventHandler
     public void onDispenserDrop(BlockDispenseEvent event) {
         // ZERO dispenser overloading
         if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
@@ -46,6 +32,6 @@ public class PlotLimitingListener implements Listener {
     public void onRedstone(BlockRedstoneEvent event) {
         // ZERO redstone overloading
         if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
-            event.getBlock().setType(Material.AIR);
+            event.setNewCurrent(0);
     }
 }
