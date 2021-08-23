@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -34,15 +35,6 @@ public class StatsManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        /*
-          // Do not know why Sean did this, as you can just remove from quit, but just gonna disable for now...
-
-        // Garbage collection for offline players
-        new BukkitRunnable() {
-            public void run() {
-                clean();
-            }
-        }.runTaskTimer(plugin, 0L, 10L);*/
 
         // Leader Boards
         new BukkitRunnable() {
@@ -54,11 +46,12 @@ public class StatsManager {
             }
         }.runTaskAsynchronously(plugin);
 
-        // run personal lb load every 3 mins in async
+        // run personal lb load and online players perks gained count every 3 mins in async
         new BukkitRunnable() {
             @Override
             public void run() {
                 loadGlobalPersonalCompletionsLB();
+                loadOnlinePerksGainedCount();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
 
@@ -195,6 +188,20 @@ public class StatsManager {
         elytraItem.setItemMeta(itemMeta);
 
         playerStats.getPlayer().getInventory().setChestplate(elytraItem);
+    }
+
+    // loads all online players and updates their perks gained count
+    public void loadOnlinePerksGainedCount() {
+        for (PlayerStats playerStats : playerStatsList.values()) {
+
+            int perksGainedCount = 0;
+            for (Perk perk : Parkour.getPerkManager().getPerks().values())
+                if (perk.hasRequirements(playerStats, playerStats.getPlayer()))
+                    perksGainedCount++;
+
+            // set once all looped through
+            playerStats.setGainedPerksCount(perksGainedCount);
+        }
     }
 
     /*
