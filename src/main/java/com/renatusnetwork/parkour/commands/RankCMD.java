@@ -28,7 +28,7 @@ public class RankCMD implements CommandExecutor {
         Player player = (Player) sender;
         RanksManager ranksManager = Parkour.getRanksManager();
 
-        if (player.hasPermission("pc-parkour.admin")) {
+        if (player.hasPermission("rn-parkour.admin")) {
             if (a.length == 0) {
                 sendRank(player);
             } else if (a.length == 3 && a[0].equalsIgnoreCase("set")) {

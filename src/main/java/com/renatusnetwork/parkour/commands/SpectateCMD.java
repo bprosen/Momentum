@@ -16,7 +16,7 @@ public class SpectateCMD implements CommandExecutor {
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (sender.hasPermission("pc-parkour.donator")) {
+            if (sender.hasPermission("rn-parkour.donator")) {
 
                 PlayerStats spectatorStats = Parkour.getStatsManager().get(player);
 

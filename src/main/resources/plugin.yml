@@ -8,63 +8,63 @@ depend: [TitleAPI, Vault, WorldGuard, EasyScoreboards, ProtocolLib, WorldEdit]
 
 commands:
   level:
-    description: "PC-Parkour level management"
+    description: "RN-Parkour level management command"
     aliases: [lvl, levels]
   location:
-    description: "PC-Parkour location management"
+    description: "RN-Parkour location management command"
     aliases: [loc, locations]
   menu:
-    description: "PC-Parkour menu management"
+    description: "RN-Parkour menu management command"
     aliases: [menus]
   perks:
-    description: "PC-Parkour perks management"
+    description: "RN-Parkour perks management command"
     aliases: [perk]
   stats:
-    description: "PC-Parkour stats display"
+    description: "RN-Parkour stats display command"
   spectate:
-    description: "Spectate another player"
+    description: "RN-Parkour spectate command"
   clan:
-    description: "Clan management"
+    description: "RN-Parkour clan management command"
     aliases: [clans]
-  pc-parkour:
-    description: "Parkour"
+  rn-parkour:
+    description: "RN-Parkour main command"
   toggleplayers:
-    description: "PC-Parkour Player Toggling Command"
+    description: "RN-Parkour player toggling command"
   checkpoint:
-    description: "PC-Parkour Checkpoint COmmand"
+    description: "RN-Parkour checkpoint command"
   setspawn:
-    description: "PC-Parkour SetSpawn Command"
+    description: "RN-Parkour setspawn command"
   spawn:
-    description: "PC-Parkour Spawn Command"
+    description: "RN-Parkour spawn command"
   practice:
-    description: "PC-Parkour Practice Command"
+    description: "RN-Parkour practice command"
     aliases: [prac]
   race:
-    description: "PC-Parkour Race Command"
+    description: "RN-Parkour race command"
     aliases: [races]
   rank:
-    description: "PC-Parkour Rank Command"
+    description: "RN-Parkour rank command"
     aliases: [ranks]
   rankup:
-    description: "PC-Parkour Rankup Command"
+    description: "RN-Parkour rankup command"
   plot:
-    description: "PC-Parkour Player Submitted Command"
+    description: "RN-Parkour player submitted command"
     aliases: [plots, playersubmitted, playersubmit]
   event:
-    description: "PC-Parkour Events Command"
+    description: "RN-Parkour events command"
   prestige:
-    description: "PC-Parkour Prestige Command"
+    description: "RN-Parkour prestige command"
   rate:
-    description: "PC-Parkour Rate Command"
+    description: "RN-Parkour rate command"
     aliases: [ratelevel, levelrate]
   sword:
-    description: "PC-Parkour Sword Command"
+    description: "RN-Parkour sword command"
     aliases: [setup, setupsword]
   infinite:
-    description: "PC-Parkour InfinitePK Command"
+    description: "RN-Parkour InfinitePK command"
     aliases: [infinitepk, endless, endlesspk]
   profile:
-    description: "PC-Parkour Profile Command"
+    description: "RN-Parkour profile command"
     aliases: [profilestats]
   cosmetics:
-    description: "PC-Parkour Cosmetics Command"
+    description: "RN-Parkour cosmetics command"

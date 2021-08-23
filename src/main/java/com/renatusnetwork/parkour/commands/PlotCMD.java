@@ -37,7 +37,7 @@ public class PlotCMD implements CommandExecutor {
         /*
           admin commands section
          */
-        if (player.hasPermission("pc-parkour.admin")) {
+        if (player.hasPermission("rn-parkour.admin")) {
             // send list of plots in gui
             if (a.length == 2 && a[0].equalsIgnoreCase("submit") && a[1].equalsIgnoreCase("list")) {
 
@@ -489,7 +489,7 @@ public class PlotCMD implements CommandExecutor {
         sender.sendMessage(getHelp("submit"));
 
         // send admin commands if they have permission
-        if (sender.hasPermission("pc-parkour.admin")) {
+        if (sender.hasPermission("rn-parkour.admin")) {
 
             sender.sendMessage(getHelp("accept"));
             sender.sendMessage(getHelp("deny"));

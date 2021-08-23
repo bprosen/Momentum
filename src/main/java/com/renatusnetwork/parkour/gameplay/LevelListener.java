@@ -210,7 +210,7 @@ public class LevelListener implements Listener {
 
         // this is mainly QOL for staff!
         if (playerStats != null && playerStats.getPlayerToSpectate() == null &&
-           !playerStats.isEventParticipant() && player.hasPermission("pc-parkour.staff")) {
+           !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff")) {
             List<String> regions = WorldGuard.getRegions(event.getTo());
             if (!regions.isEmpty()) {
 

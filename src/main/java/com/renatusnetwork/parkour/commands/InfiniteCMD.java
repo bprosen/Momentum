@@ -66,7 +66,7 @@ public class InfiniteCMD implements CommandExecutor {
                 }
             }
         // admin command for removing leaderboard position
-        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setscore"))) {
+        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setscore"))) {
             if (Utils.isInteger(a[2])) {
                 if (InfinitePKDB.hasScore(a[1])) {
                     int score = Integer.parseInt(a[2]);
@@ -87,7 +87,7 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer"));
             }
-        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportalrespawn"))) {
+        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportalrespawn"))) {
 
             Location loc = player.getLocation();
             String locString = player.getWorld().getName() + ":" +
@@ -100,7 +100,7 @@ public class InfiniteCMD implements CommandExecutor {
             configManager.save("settings");
             Parkour.getSettingsManager().load(configManager.get("settings"));
             player.sendMessage(Utils.translate("&7You set the portal respawn to your location"));
-        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportallocation"))) {
+        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportallocation"))) {
 
             Location loc = player.getLocation();
             String locString = player.getWorld().getName() + ":" +
@@ -112,7 +112,7 @@ public class InfiniteCMD implements CommandExecutor {
             configManager.save("settings");
             Parkour.getSettingsManager().load(configManager.get("settings"));
             player.sendMessage(Utils.translate("&7You set the portal location to your location"));
-        } else if (player.hasPermission("pc-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
+        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
 
             Parkour.getInfinitePKManager().clearRewards();
             InfiniteRewardsYAML.loadRewards();
@@ -185,7 +185,7 @@ public class InfiniteCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&5/infinite score lb <position>  &7Tells you the score of someone in <position> on the leaderboard"));
         player.sendMessage(Utils.translate("&5/infinite rewards  &7Tells you a list of the rewards and if you have them (crossed out)"));
 
-        if (player.hasPermission("pc-parkour.admin")) {
+        if (player.hasPermission("rn-parkour.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
             player.sendMessage(Utils.translate("&5/infinite setportalrespawn  &7Sets the portal respawn to your location"));
             player.sendMessage(Utils.translate("&5/infinite setportallocation  &7Sets the portal location to your location"));

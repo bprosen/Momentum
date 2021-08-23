@@ -85,7 +85,7 @@ public class Parkour extends JavaPlugin {
         SpectatorHandler.startScheduler(plugin);
         stats.addUnloadedPlayers();
 
-        getLogger().info("PC-Parkour Enabled");
+        getLogger().info("RN-Parkour Enabled");
     }
 
     @Override
@@ -103,7 +103,7 @@ public class Parkour extends JavaPlugin {
         database.close();
         unloadClasses();
 
-        getLogger().info("PC-Parkour Disabled");
+        getLogger().info("RN-Parkour Disabled");
 
         plugin = null;
     }
@@ -135,7 +135,7 @@ public class Parkour extends JavaPlugin {
         getCommand("perks").setExecutor(new PerksCMD());
         getCommand("spectate").setExecutor(new SpectateCMD());
         getCommand("clan").setExecutor(new ClanCMD());
-        getCommand("pc-parkour").setExecutor(new PCParkourCMD());
+        getCommand("rn-parkour").setExecutor(new RNParkourCMD());
         getCommand("toggleplayers").setExecutor(new PlayerToggleCMD());
         getCommand("checkpoint").setExecutor(new CheckpointCMD());
         getCommand("spawn").setExecutor(new SpawnCMD());
