@@ -138,8 +138,6 @@ public class LevelManager {
 
         if (level != null) {
             featuredLevel = level;
-            // proper casting
-            level.setReward((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier));
             Parkour.getPluginLogger().info("Featured Level: " + level.getName());
         }
     }

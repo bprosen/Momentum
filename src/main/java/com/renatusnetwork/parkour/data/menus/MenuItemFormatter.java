@@ -186,9 +186,10 @@ public class MenuItemFormatter {
             itemLore.add(Utils.translate("&7Click to go to " + featuredLevel.getFormattedTitle()
                     .replace("&l", "").replace("&o", "")));
 
-            itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(
-                                 featuredLevel.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)
-                                        + "&r &6" + Utils.formatNumber(featuredLevel.getReward()) + " &6Coin &7Reward"));
+            itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(featuredLevel.getReward()) +
+                                        "&r &6" + Utils.formatNumber(featuredLevel.getReward() *
+                                        Parkour.getSettingsManager().featured_level_reward_multiplier) +
+                                        " &6Coin &7Reward"));
 
             if (featuredLevel.getTotalCompletionsCount() > 0)
                 itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(featuredLevel.getTotalCompletionsCount()) + " &7Completions"));

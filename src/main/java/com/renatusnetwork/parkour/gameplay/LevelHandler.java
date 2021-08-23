@@ -127,7 +127,10 @@ public class LevelHandler {
                 // give higher reward if prestiged
                 int prestiges = playerStats.getPrestiges();
                 int reward = level.getReward();
-                if (prestiges > 0 && level.getReward() > 0)
+                // if featured, set reward!
+                if (level.isFeaturedLevel())
+                    reward = (int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier);
+                else if (prestiges > 0 && level.getReward() > 0)
                     reward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
 
                 Parkour.getEconomy().depositPlayer(player, reward);

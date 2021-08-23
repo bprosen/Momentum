@@ -167,9 +167,8 @@ public class Scoreboard {
                         board.add(formatSpacing(Utils.translate("&dFeatured Level")));
 
                         // proper cast
-                        rewardString = Utils.translate("&c&m" +
-                                ((int) (level.getReward() / Parkour.getSettingsManager().featured_level_reward_multiplier)) +
-                                "&6 " + level.getReward());
+                        rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " +
+                                ((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
 
                     } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
                         rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
