@@ -190,18 +190,20 @@ public class StatsManager {
         playerStats.getPlayer().getInventory().setChestplate(elytraItem);
     }
 
+    public void loadPerksGainedCount(PlayerStats playerStats) {
+        // set gained perks count
+        int gainedPerksCount = 0;
+        for (Perk perk : Parkour.getPerkManager().getPerks().values())
+            if (perk.hasRequirements(playerStats, playerStats.getPlayer()))
+                gainedPerksCount++;
+
+        playerStats.setGainedPerksCount(gainedPerksCount);
+    }
+
     // loads all online players and updates their perks gained count
     public void loadOnlinePerksGainedCount() {
-        for (PlayerStats playerStats : playerStatsList.values()) {
-
-            int perksGainedCount = 0;
-            for (Perk perk : Parkour.getPerkManager().getPerks().values())
-                if (perk.hasRequirements(playerStats, playerStats.getPlayer()))
-                    perksGainedCount++;
-
-            // set once all looped through
-            playerStats.setGainedPerksCount(perksGainedCount);
-        }
+        for (PlayerStats playerStats : playerStatsList.values())
+            loadPerksGainedCount(playerStats);
     }
 
     /*

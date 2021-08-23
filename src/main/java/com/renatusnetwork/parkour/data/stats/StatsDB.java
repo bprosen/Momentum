@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -21,6 +22,7 @@ public class StatsDB {
         loadPlayerID(playerStats);
         loadCompletions(playerStats);
         PerksDB.loadPerks(playerStats);
+        Parkour.getStatsManager().loadPerksGainedCount(playerStats);
     }
 
     private static void loadPlayerID(PlayerStats playerStats) {
@@ -97,15 +99,6 @@ public class StatsDB {
                                 " WHERE player_name='" + playerStats.getPlayerName() + "'")
                                 .get(0).get("COUNT(*)"));
                 playerStats.setRatedLevelsCount(ratedLevelsCount);
-
-
-                // set gained perks count
-                int gainedPerksCount = 0;
-                for (Perk perk : Parkour.getPerkManager().getPerks().values())
-                    if (perk.hasRequirements(playerStats, playerStats.getPlayer()))
-                        gainedPerksCount++;
-
-                playerStats.setGainedPerksCount(gainedPerksCount);
 
                 // set race win rate
                 if (raceLosses > 0)
