@@ -17,9 +17,10 @@ public class PerksCMD implements CommandExecutor {
         if (sender.isOp()) {
             if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
                 Parkour.getConfigManager().load("perks");
-                sender.sendMessage("Loaded perks.yml from disk");
+                sender.sendMessage(Utils.translate("&eLoaded perks.yml from disk"));
                 Parkour.getPerkManager().load();
-                sender.sendMessage("Loaded all perks into memory");
+                sender.sendMessage(Utils.translate("&eLoaded all perks into memory"));
+
             } else if (a.length == 3 && a[0].equalsIgnoreCase("setperk")) {
                 Player player = Bukkit.getPlayer(a[1]);
                 String perkName = a[2];
