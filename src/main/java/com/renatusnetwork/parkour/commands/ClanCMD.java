@@ -1,7 +1,6 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.parkourcraft.parkour.data.clans.*;
 import com.renatusnetwork.parkour.data.clans.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -11,7 +10,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.UUID;
 
 public class ClanCMD implements CommandExecutor {

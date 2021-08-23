@@ -1,7 +1,6 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.parkourcraft.parkour.data.infinite.*;
 import com.renatusnetwork.parkour.data.infinite.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.ConfigManager;

@@ -1,7 +1,6 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.parkourcraft.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.LocationsYAML;
