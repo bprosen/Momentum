@@ -132,10 +132,10 @@ public class PerksYAML {
         return 0;
     }
 
-    public static List<String> getShortenedRequirementsLore(String perkName) {
+    public static List<String> getSetRequirementsLore(String perkName) {
 
-        if (isSet(perkName, "shortened_requirements_lore"))
-            return perksConfig.getStringList(perkName + ".shortened_requirements_lore");
+        if (isSet(perkName, "set_requirements_lore"))
+            return perksConfig.getStringList(perkName + ".set_requirements_lore");
 
         return null;
     }

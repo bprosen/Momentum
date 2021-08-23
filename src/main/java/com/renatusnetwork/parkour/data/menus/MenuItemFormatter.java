@@ -64,15 +64,7 @@ public class MenuItemFormatter {
 
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
-
-            // Item Name Seciton (If not Perk Name, include Required Perk)
-            if (menuItem.getFormattedTitle().equals(""))
-                itemMeta.setDisplayName(perk.getFormattedTitle());
-            else {
-                itemLore.add("");
-                itemLore.add(Utils.translate("&7Perk Required"));
-                itemLore.add("  " + perk.getFormattedTitle());
-            }
+            itemMeta.setDisplayName(perk.getFormattedTitle());
 
             // Ownership Status Section
             itemLore.add("");
@@ -95,27 +87,31 @@ public class MenuItemFormatter {
                 }
             }
 
-            // Level Requirements Section
-            List<String> requirements = perk.getRequirements();
-            if (requirements.size() > 0 || perk.getPrice() > 0) {
+            // if it has shortened custom lore, add it, otherwise do normal lore
+            if (perk.hasSetRequirementsLore()) {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Requirements"));
 
-                // if size of requirements is > 0 and it has shortened custom lore, add it, otherwise do normal lore
-                if (requirements.size() > 0 && perk.hasShortenedRequirementsLore()) {
-                    // loop through if it has shortened lore and add it
-                    for (String shortLore : perk.getShortenedRequirementsLore())
-                        itemLore.add(Utils.translate(shortLore));
+                // loop through if it has shortened lore and add it
+                for (String shortLore : perk.getSetRequirementsLore())
+                    itemLore.add(Utils.translate(shortLore));
+            } else {
+                // Level Requirements Section
+                List<String> requirements = perk.getRequirements();
+                if (requirements.size() > 0 || perk.getPrice() > 0) {
+                    itemLore.add("");
+                    itemLore.add(Utils.translate("&7Requirements"));
 
-                } else for (String requirement : requirements) {
-                    Level level = Parkour.getLevelManager().get(requirement);
+                    for (String requirement : requirements) {
+                        Level level = Parkour.getLevelManager().get(requirement);
 
-                    if (level != null)
-                        itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
+                        if (level != null)
+                            itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
+                    }
+
+                    if (perk.getPrice() > 0)
+                        itemLore.add(Utils.translate("&7 - Pay &6" + Utils.formatNumber(perk.getPrice()) + " Coins"));
                 }
-
-                if (perk.getPrice() > 0)
-                    itemLore.add(Utils.translate("&7 - Pay &6" + Utils.formatNumber(perk.getPrice()) + " Coins"));
             }
 
             // Sections Over

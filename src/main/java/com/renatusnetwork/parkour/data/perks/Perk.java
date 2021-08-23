@@ -13,7 +13,7 @@ public class Perk {
     private String name;
     private String title;
     private HashMap<String, ItemStack> items;
-    private List<String> shortenedRequirementsLore;
+    private List<String> setRequirementsLore;
     private List<String> requirements;
     private List<String> requiredPermissions;
 
@@ -33,7 +33,7 @@ public class Perk {
             requirements = PerksYAML.getRequirements(name);
             requiredPermissions = PerksYAML.getRequiredPermissions(name);
             price = PerksYAML.getPrice(name);
-            shortenedRequirementsLore = PerksYAML.getShortenedRequirementsLore(name);
+            setRequirementsLore = PerksYAML.getSetRequirementsLore(name);
         }
     }
 
@@ -63,9 +63,9 @@ public class Perk {
         return requiredPermissions;
     }
 
-    public List<String> getShortenedRequirementsLore() { return shortenedRequirementsLore; }
+    public List<String> getSetRequirementsLore() { return setRequirementsLore; }
 
-    public boolean hasShortenedRequirementsLore() { return shortenedRequirementsLore != null; }
+    public boolean hasSetRequirementsLore() { return setRequirementsLore != null; }
     public int getPrice() {
         return price;
     }
