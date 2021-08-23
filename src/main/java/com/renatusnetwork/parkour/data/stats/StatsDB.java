@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -96,6 +97,15 @@ public class StatsDB {
                                 " WHERE player_name='" + playerStats.getPlayerName() + "'")
                                 .get(0).get("COUNT(*)"));
                 playerStats.setRatedLevelsCount(ratedLevelsCount);
+
+
+                // set gained perks count
+                int gainedPerksCount = 0;
+                for (Perk perk : Parkour.getPerkManager().getPerks().values())
+                    if (perk.hasRequirements(playerStats, playerStats.getPlayer()))
+                        gainedPerksCount++;
+
+                playerStats.setGainedPerksCount(gainedPerksCount);
 
                 // set race win rate
                 if (raceLosses > 0)

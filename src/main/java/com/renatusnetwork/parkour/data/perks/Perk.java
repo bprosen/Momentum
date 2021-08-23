@@ -75,6 +75,9 @@ public class Perk {
     }
 
     public boolean hasRequirements(PlayerStats playerStats, Player player) {
+        if (player.isOp())
+            return true;
+
         for (String requiredPermission : requiredPermissions)
             if (!player.hasPermission(requiredPermission))
                 return false;

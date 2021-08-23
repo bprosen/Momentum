@@ -73,8 +73,7 @@ public class PerkManager {
     public void load(String perkName) {
         boolean exists = exists(perkName);
 
-        if (!PerksYAML.exists(perkName)
-                && exists)
+        if (!PerksYAML.exists(perkName) && exists)
             remove(perkName);
         else {
             Perk perk = new Perk(perkName);

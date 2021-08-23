@@ -278,7 +278,7 @@ public class StatsManager {
 
                                 // rank and game stats item
                                 loreString = loreString.replace("%balance%", Utils.formatNumber(Parkour.getEconomy().getBalance(playerStats.getPlayer())))
-                                        .replace("%perks_gained%", playerStats.getPerks().size() + "")
+                                        .replace("%perks_gained%", playerStats.getGainedPerksCount() + "")
                                         .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
                                         .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
                                         .replace("%prestiges%", playerStats.getPrestiges() + "")

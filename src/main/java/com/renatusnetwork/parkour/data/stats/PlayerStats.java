@@ -31,6 +31,7 @@ public class PlayerStats {
     private int raceWins = 0;
     private int raceLosses = 0;
     private int ratedLevelsCount;
+    private int gainedPerksCount = 0;
     private float raceWinRate = 0.00f;
     private float prestigeMultiplier = 1.00f;
     private int rankUpStage;
@@ -399,9 +400,11 @@ public class PlayerStats {
         return perks.containsKey(perkName);
     }
 
-    public HashMap<String, Long> getPerks() {
-        return perks;
-    }
+    public int getGainedPerksCount() { return gainedPerksCount; }
+
+    public void setGainedPerksCount(int gainedPerksCount) { this.gainedPerksCount = gainedPerksCount; }
+
+    public HashMap<String, Long> getPerks() { return perks; }
 
     //
     // Event Section
