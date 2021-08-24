@@ -132,6 +132,12 @@ public class MenuItemAction {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
+        if (playerStats.isLastRank()) {
+            player.closeInventory();
+            player.sendMessage(Utils.translate("&cYou are at last rank!"));
+            return;
+        }
+
         String menuName = null;
         if (playerStats.getRankUpStage() == 1)
             menuName = "coin-rankup";
