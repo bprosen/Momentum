@@ -158,13 +158,21 @@ public class RanksManager {
         Rank defaultRank = get(1);
         // update cache and database
         playerStats.setRank(defaultRank);
+        playerStats.addPrestige();
+
         // update prestige multiplier
-        playerStats.setPrestigeMultiplier(playerStats.getPrestigeMultiplier() + (Parkour.getSettingsManager().prestige_multiplier_per_prestige / 100));
+        float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
+
+        if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
+            prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
+
+        prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
+        playerStats.setPrestigeMultiplier(prestigeMultiplier);
+
         // dont need to update stage as they will never hit stage 2 in max rank
         RanksDB.updateRank(player.getUniqueId(), 1);
 
-        // now add prestige to stats and database
-        playerStats.addPrestige();
+        // now add prestige db
         RanksDB.updatePrestiges(player.getUniqueId(), playerStats.getPrestiges());
 
         // add an s if its not one because im OCD with this

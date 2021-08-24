@@ -227,7 +227,7 @@ public class PlayerStats {
 
     public int getPrestiges() { return prestiges; }
 
-    public void addPrestige() { prestiges += 1; }
+    public void addPrestige() { prestiges++; }
 
     public void setPrestiges(int prestiges) { this.prestiges = prestiges; }
 
