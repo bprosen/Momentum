@@ -153,7 +153,7 @@ public class ClansManager {
             int newLevel = clan.getLevel() + 1;
 
             // this is the section that will determine if they will skip any levels
-            for (int i = clan.getLevel(); i <= ClansYAML.getMaxLevel(); i++) {
+            for (int i = clan.getLevel(); i < ClansYAML.getMaxLevel(); i++) {
                 // this means they are still above the next level amount
                 if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel)) {
 
@@ -164,6 +164,11 @@ public class ClansManager {
                     break;
                 }
             }
+
+            // if > or = max level, manually set jic
+            if (newLevel >= ClansYAML.getMaxLevel())
+                newLevel = ClansYAML.getMaxLevel();
+
             clan.setLevel(newLevel);
             sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
 
@@ -182,7 +187,6 @@ public class ClansManager {
 
         // add xp to clan
         } else {
-
             // otherwise add xp to cache and database
             clan.addXP(clanXP);
             ClansDB.setClanXP(totalXP, clan.getID());
