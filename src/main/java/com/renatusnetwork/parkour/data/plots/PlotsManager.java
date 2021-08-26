@@ -135,14 +135,14 @@ public class PlotsManager {
             owner.teleport(Parkour.getLocationManager().getLobbyLocation());
 
         // clear plot!
-        clearPlot(plot);
+        clearPlot(plot, true);
 
         // remove from cache and teleport to spawn
         plotList.remove(plot);
         PlotsDB.removePlot(plot.getOwnerUUID());
     }
 
-    public void clearPlot(Plot plot) {
+    public void clearPlot(Plot plot, boolean deletePlot) {
 
         WorldEdit api = WorldEdit.getInstance();
 
@@ -169,8 +169,12 @@ public class PlotsManager {
                 editSession.setFastMode(true);
                 editSession.setBlocks(selection, new BaseBlock(Material.AIR.getId()));
                 editSession.flushQueue();
-                editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
-                editSession.flushQueue();
+
+                // if plot isnt being deleted then regen the bedrock
+                if (!deletePlot) {
+                    editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
+                    editSession.flushQueue();
+                }
                 editSession.setFastMode(false);
             } catch (MaxChangedBlocksException e) {
                 e.printStackTrace();

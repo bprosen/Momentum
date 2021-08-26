@@ -260,7 +260,7 @@ public class PlotCMD implements CommandExecutor {
     private void clearPlot(Plot targetPlot, boolean forceCleared, Player player) {
 
         if (targetPlot != null) {
-            Parkour.getPlotsManager().clearPlot(targetPlot);
+            Parkour.getPlotsManager().clearPlot(targetPlot, false);
             if (!forceCleared)
                 player.sendMessage(Utils.translate("&aYou cleared your plot! You may need to relog to remove any glitched client-side blocks you see"));
             else
