@@ -65,7 +65,7 @@ public class EventCMD implements CommandExecutor {
                                         player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
                                     }
                                 } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                                 }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
@@ -183,7 +183,7 @@ public class EventCMD implements CommandExecutor {
                                     player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                             }
                         } else {
                             player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
