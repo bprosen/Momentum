@@ -347,8 +347,8 @@ public class LevelManager {
                     temporaryLB.add(highestLevel);
                     addedLevels.add(highestLevel.getName());
                     highestLevel = null;
-                    lbSize++;
                 }
+                lbSize++;
             }
             // quickly swap
             globalLevelCompletionsLB.clear();

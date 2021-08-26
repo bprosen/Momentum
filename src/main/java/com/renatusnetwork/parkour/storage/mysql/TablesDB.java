@@ -63,7 +63,7 @@ public class TablesDB {
                 "spectatable BIT DEFAULT 1, " +
                 "clan_id INT DEFAULT -1, " +
                 "rank_id INT DEFAULT 1, " +
-                "rankup_stage BIT default 1, " +
+                "rankup_stage BIT default 0, " +
                 "rank_prestiges TINYINT default 0, " +
                 "infinitepk_score INT default 0, " +
                 "level_completions INT default 0, " +
