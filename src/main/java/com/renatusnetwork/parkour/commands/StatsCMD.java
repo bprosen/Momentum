@@ -43,7 +43,7 @@ public class StatsCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getInfinitePKScore())));
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cNo infinite leaderboard positions found or not loaded"));
+                    sender.sendMessage(Utils.translate("&cInfinite Parkour lb not loaded or no lb positions"));
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("levels")) {
 
@@ -66,7 +66,7 @@ public class StatsCMD implements CommandExecutor {
                     }
                     sender.sendMessage(Utils.translate("&7Global Completions &c" + Utils.formatNumber(Parkour.getLevelManager().getTotalLevelCompletions())));
                 } else {
-                    sender.sendMessage(Utils.translate("&cLevels leaderboard not loaded fully"));
+                    sender.sendMessage(Utils.translate("&cLevels lb not loaded or no lb positions"));
                 }
             // players
             } else if (a.length == 1 && a[0].equalsIgnoreCase("players")) {
@@ -95,7 +95,7 @@ public class StatsCMD implements CommandExecutor {
                                 Parkour.getStatsManager().get(player).getTotalLevelCompletions())));
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cPlayers leaderboard not loaded fully"));
+                    sender.sendMessage(Utils.translate("&cPlayers lb not loaded or no lb positions"));
                 }
             // clans lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("clans")) {
@@ -117,7 +117,7 @@ public class StatsCMD implements CommandExecutor {
                         }
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cClans leaderboard not loaded fully"));
+                    sender.sendMessage(Utils.translate("&cClans lb not loaded or no lb positions"));
                 }
             // top rated lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("toprated")) {
@@ -140,7 +140,7 @@ public class StatsCMD implements CommandExecutor {
                         }
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cTop Rated leaderboard not fully loaded"));
+                    sender.sendMessage(Utils.translate("&cTop Rated lb not loaded or no lb positions"));
                 }
             // race lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("races")) {
@@ -177,7 +177,7 @@ public class StatsCMD implements CommandExecutor {
                                 playerStats.getRaceWinRate()));
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cNo race leaderboard positions found or not loaded yet"));
+                    sender.sendMessage(Utils.translate("&cRace lb not loaded or no lb positions"));
                 }
             // level lb
             } else {

@@ -41,7 +41,6 @@ public class StatsManager {
             public void run() {
                 StatsDB.loadTotalCompletions();
                 StatsDB.loadLeaderboards();
-                Parkour.getLevelManager().loadGlobalLevelCompletionsLB(); // we MUST load this after leaderboards
                 loadGlobalPersonalCompletionsLB();
             }
         }.runTaskAsynchronously(plugin);
@@ -147,10 +146,13 @@ public class StatsManager {
             List<Map<String, String>> playerCompletions = DatabaseQueries.getResults("players", "player_name, level_completions",
                     " ORDER BY level_completions DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
 
-                for (Map<String, String> playerCompletionStat : playerCompletions)
-                    // add playername to completion in map
-                    globalPersonalCompletionsLB.put(playerCompletionStat.get("player_name"),
-                                                    Integer.parseInt(playerCompletionStat.get("level_completions")));
+                for (Map<String, String> playerCompletionStat : playerCompletions) {
+                    int completions = Integer.parseInt(playerCompletionStat.get("level_completions"));
+                    // if they have more than 0 completions, add (reset stats case)
+                    if (completions > 0)
+                        // add playername to completion in map
+                        globalPersonalCompletionsLB.put(playerCompletionStat.get("player_name"), completions);
+                }
         } catch (Exception e) {
             e.printStackTrace();
         }

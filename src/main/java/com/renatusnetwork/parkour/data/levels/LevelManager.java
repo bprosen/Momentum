@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.menus.MenuItem;
 import com.renatusnetwork.parkour.data.menus.MenuPage;
 import com.renatusnetwork.parkour.data.menus.MenusYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -117,7 +118,7 @@ public class LevelManager {
                 loadGlobalLevelCompletionsLB();
                 loadTopRatedLevelsLB();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 10, 20 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 15, 20 * 180);
     }
 
     public void pickFeatured() {
@@ -336,14 +337,18 @@ public class LevelManager {
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
 
                 for (Level level : levels.values())
-                    if (highestLevel == null ||
-                       (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount()))
+                    if (level.getTotalCompletionsCount() > 0 &&
+                       (highestLevel == null ||
+                       (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount())))
                         highestLevel = level;
 
-                temporaryLB.add(highestLevel);
-                addedLevels.add(highestLevel.getName());
-                highestLevel = null;
-                lbSize++;
+                // null check jic
+                if (highestLevel != null) {
+                    temporaryLB.add(highestLevel);
+                    addedLevels.add(highestLevel.getName());
+                    highestLevel = null;
+                    lbSize++;
+                }
             }
             // quickly swap
             globalLevelCompletionsLB.clear();

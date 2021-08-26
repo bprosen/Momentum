@@ -88,10 +88,12 @@ public class ClansManager {
                         (highestXPClan == null || clan.getTotalGainedXP() > highestXPClan.getTotalGainedXP()))
                         highestXPClan = clan;
 
-                temporaryClanLB.add(highestXPClan);
-                alreadyAddedClans.add(highestXPClan);
-                highestXPClan = null;
-                lbSize++;
+                if (highestXPClan != null) {
+                    temporaryClanLB.add(highestXPClan);
+                    alreadyAddedClans.add(highestXPClan);
+                    highestXPClan = null;
+                    lbSize++;
+                }
             }
             // clear and then add all from temporary (fast swap)
             clansLeaderboard.clear();
