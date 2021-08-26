@@ -264,7 +264,9 @@ public class InfinitePKManager {
                 doNextJump(player, startingJump);
             } else {
 
-                infinitePK.addScore();
+                // so they dont start at score of 1
+                if (!startingJump)
+                    infinitePK.addScore();
 
                 // remove old loc and update to new loc if not null, otherwise it is starting location, just remove current block
                 if (infinitePK.getLastBlockLoc() != null) {
