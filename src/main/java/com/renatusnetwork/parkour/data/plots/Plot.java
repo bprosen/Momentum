@@ -61,8 +61,10 @@ public class Plot {
         // teleport player if not null
         if (player != null) {
             // + 1 so they spawn OUTSIDE their plot, not at the border
-            Location loc = spawnLoc.clone()
-                           .subtract(0, 0,(Parkour.getSettingsManager().player_submitted_plot_width / 2) + 1);
+            Location loc = spawnLoc.clone();
+            loc.subtract(0, 0,(Parkour.getSettingsManager().player_submitted_plot_width / 2) + 1);
+            loc.setPitch(0);
+            loc.setYaw(0);
             player.teleport(loc);
         }
     }
