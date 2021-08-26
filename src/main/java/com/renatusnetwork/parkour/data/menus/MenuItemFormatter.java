@@ -82,7 +82,7 @@ public class MenuItemFormatter {
                     else {
                         int requiredCoins = perk.getPrice() - playerBalance;
 
-                        itemLore.add(Utils.translate("&7  Requires &6" + requiredCoins + " &7more &6Coins"));
+                        itemLore.add(Utils.translate("&7  Requires &6" + Utils.formatNumber(requiredCoins) + " &7more &6Coins"));
                     }
                 }
             }
