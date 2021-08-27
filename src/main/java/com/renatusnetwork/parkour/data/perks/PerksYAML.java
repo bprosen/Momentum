@@ -93,6 +93,9 @@ public class PerksYAML {
                 itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
+            // set unbreakable
+            itemMeta.setUnbreakable(true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 
             // set lore and meta
             itemMeta.setLore(lore);
