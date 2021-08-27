@@ -339,7 +339,7 @@ public class LevelManager {
                 for (Level level : levels.values())
                     if (level.getTotalCompletionsCount() > 0 &&
                        (highestLevel == null ||
-                       (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() > highestLevel.getTotalCompletionsCount())))
+                       (!addedLevels.contains(level.getName()) && level.getTotalCompletionsCount() >= highestLevel.getTotalCompletionsCount())))
                         highestLevel = level;
 
                 // null check jic
