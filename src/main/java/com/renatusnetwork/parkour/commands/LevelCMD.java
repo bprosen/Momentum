@@ -702,8 +702,19 @@ public class LevelCMD implements CommandExecutor {
                             PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
 
                             if (playerStats.getLevelCompletionsCount(levelName) > 0) {
+                                // remove completion from stats and other personalized stat
                                 StatsDB.removeCompletions(playerID, level.getID());
+                                Parkour.getDatabaseManager().add(
+                                        "UPDATE players SET level_completions=" + (playerStats.getTotalLevelCompletions() - 1) +
+                                                " WHERE player_name='" + playerStats.getPlayerName() + "'");
+
                                 playerStats.getLevelCompletionsMap().remove(levelName);
+                                playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() - 1);
+
+                                // remove completion on level basis
+                                levelManager.removeTotalLevelCompletion();
+                                level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
+
                                 sender.sendMessage(Utils.translate("&cYou removed all of &4" + playerName + "&c's completions for &4" + levelName));
                             } else {
                                 sender.sendMessage(Utils.translate("&4" + playerName + " &chas yet to complete &4" + levelName));

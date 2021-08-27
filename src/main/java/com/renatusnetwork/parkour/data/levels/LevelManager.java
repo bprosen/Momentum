@@ -280,6 +280,8 @@ public class LevelManager {
 
     public void addTotalLevelCompletion() { totalLevelCompletions++; }
 
+    public void removeTotalLevelCompletion() { totalLevelCompletions--; }
+
     // top rated levels lb
     public void loadTopRatedLevelsLB() {
         try {
