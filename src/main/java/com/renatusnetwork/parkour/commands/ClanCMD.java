@@ -299,7 +299,7 @@ public class ClanCMD implements CommandExecutor {
                             if (!clan.isInvited(victim.getUniqueId().toString())) {
 
                                 int maxMembers = Parkour.getSettingsManager().clans_max_members;
-                                if (clan.getMembers().size() <= maxMembers) {
+                                if (clan.getMembers().size() < maxMembers) {
                                     // add an invite
                                     victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
                                             " invitation to their &6&lClan &c" + clan.getTag()));
@@ -356,7 +356,7 @@ public class ClanCMD implements CommandExecutor {
                             // if they are invited
                             if (targetClan.isInvited(player.getUniqueId().toString())) {
 
-                                if (targetClan.getMembers().size() <= Parkour.getSettingsManager().clans_max_members) {
+                                if (targetClan.getMembers().size() < Parkour.getSettingsManager().clans_max_members) {
                                     // add to clan and remove invite
                                     targetClan.addMember(new ClanMember(playerStats.getPlayerID(), playerStats.getUUID(), player.getName()));
                                     playerStats.setClan(targetClan);
@@ -402,7 +402,7 @@ public class ClanCMD implements CommandExecutor {
                                     // make sure they are kicking from the same clan
                                     if (targetClan.getID() == clan.getID()) {
 
-                                        sendClanMessage(clan, "&6" + victimName + " &ehas been removed from your clan", true, victim);
+                                        sendClanMessage(clan, "&6" + victimName + " &ehas been removed from the clan", true, victim);
 
                                         targetClan.removeMemberFromName(victimName);
 
