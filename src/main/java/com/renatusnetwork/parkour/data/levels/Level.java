@@ -110,6 +110,10 @@ public class Level {
                 returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
                         Utils.formatNumber(reward) + "&6 " +
                         Utils.formatNumber(reward * playerStats.getPrestigeMultiplier())));
+            else if (isFeaturedLevel())
+                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
+                        Utils.formatNumber(reward) + "&6 " +
+                        Utils.formatNumber((reward * Parkour.getSettingsManager().featured_level_reward_multiplier))));
             else
                 returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
 
