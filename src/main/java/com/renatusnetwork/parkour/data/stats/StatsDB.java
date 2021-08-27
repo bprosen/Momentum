@@ -223,18 +223,17 @@ public class StatsDB {
 
         Parkour.getDatabaseManager().asyncRun(
                 "INSERT INTO completions " +
-                        "(player_id, level_id, time_taken, completion_date)" +
-                        " VALUES (" +
-                        playerStats.getPlayerID() + ", " +
-                        level.getID() + ", " +
-                        levelCompletion.getCompletionTimeElapsed() + ", " +
-                        "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
-                        ")"
+                    "(player_id, level_id, time_taken, completion_date)" +
+                    " VALUES (" +
+                    playerStats.getPlayerID() + ", " +
+                    level.getID() + ", " +
+                    levelCompletion.getCompletionTimeElapsed() + ", " +
+                    "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
+                    ")"
         );
 
-        int totalCompletions = getTotalCompletions(playerStats.getPlayerName());
-        if (totalCompletions > -1)
-            Parkour.getDatabaseManager().asyncRun("UPDATE players SET level_completions=" + (totalCompletions + 1) + " WHERE player_name='" + playerStats.getPlayerName() + "'");
+        Parkour.getDatabaseManager().asyncRun("UPDATE players SET level_completions=" + playerStats.getTotalLevelCompletions() +
+                                                  " WHERE player_name='" + playerStats.getPlayerName() + "'");
     }
 
     public static int getTotalCompletions(String playerName) {
