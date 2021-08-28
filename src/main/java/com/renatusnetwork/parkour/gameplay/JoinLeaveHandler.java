@@ -52,14 +52,14 @@ public class JoinLeaveHandler implements Listener {
                         " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
 
+        StatsManager statsManager = Parkour.getStatsManager();
+
+        statsManager.add(player);
 
         // run most of this in async (region lookup, stat editing, etc)
         new BukkitRunnable() {
             @Override
             public void run() {
-                StatsManager statsManager = Parkour.getStatsManager();
-
-                statsManager.add(player);
                 PlayerStats playerStats = statsManager.get(player);
 
                 // now load stats in async
@@ -93,7 +93,7 @@ public class JoinLeaveHandler implements Listener {
                     }
                 }
             }
-        }.runTaskAsynchronously(Parkour.getPlugin());
+        }.runTaskLaterAsynchronously(Parkour.getPlugin(), 20 * 3);
     }
 
     @EventHandler
