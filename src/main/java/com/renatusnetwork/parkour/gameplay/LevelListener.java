@@ -94,7 +94,7 @@ public class LevelListener implements Listener {
             if (block.getType() == Material.STONE_PLATE) {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
+                if (playerStats != null && playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
 
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
@@ -103,7 +103,7 @@ public class LevelListener implements Listener {
             } else if (block.getType() == Material.GOLD_PLATE) {
                 // gold plate = checkpoint
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
+                if (playerStats != null && playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
 
@@ -122,23 +122,25 @@ public class LevelListener implements Listener {
                 // iron plate = infinite pk or race end
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                // cancel so no click sound and no hogging plate
-                event.setCancelled(true);
+                if (playerStats != null) {
+                    // cancel so no click sound and no hogging plate
+                    event.setCancelled(true);
 
-                // end if in race
-                if (playerStats.inRace())
-                    Parkour.getRaceManager().endRace(player);
-                else if (playerStats.isInInfinitePK()) {
+                    // end if in race
+                    if (playerStats.inRace())
+                        Parkour.getRaceManager().endRace(player);
+                    else if (playerStats.isInInfinitePK()) {
 
-                    // prevent double clicking
-                    InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getName());
+                        // prevent double clicking
+                        InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getName());
 
-                    if (infinitePK.getPressutePlateLoc().getBlockX() == block.getLocation().getBlockX() &&
-                            infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ()) {
+                        if (infinitePK.getPressutePlateLoc().getBlockX() == block.getLocation().getBlockX() &&
+                                infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ()) {
 
-                        block.setType(Material.AIR);
-                        player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
-                        Parkour.getInfinitePKManager().doNextJump(player, false);
+                            block.setType(Material.AIR);
+                            player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
+                            Parkour.getInfinitePKManager().doNextJump(player, false);
+                        }
                     }
                 }
             }
