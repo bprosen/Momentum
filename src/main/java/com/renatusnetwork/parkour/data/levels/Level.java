@@ -267,7 +267,7 @@ public class Level {
             return;
         }
 
-        if (levelCompletion.getCompletionTimeElapsed() <= 0)
+        if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
             return;
 
         // Compare completion against scoreboard
