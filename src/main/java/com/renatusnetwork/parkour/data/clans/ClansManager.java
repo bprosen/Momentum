@@ -55,9 +55,7 @@ public class ClansManager {
             clan.addMember(clanMember);
     }
 
-    public void removeClan(int clanID) {
-        clans.remove(clanID);
-    }
+    public void remove(String clanTag) { clans.remove(clanTag); }
 
     public Clan get(int clanID) {
         for (Clan clan : clans.values())

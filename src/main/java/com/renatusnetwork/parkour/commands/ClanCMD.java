@@ -226,29 +226,36 @@ public class ClanCMD implements CommandExecutor {
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("changetag")) {
                     // Changes clan tag
 
-                    // if they are in a clan
-                    if (clan != null) {
-                        if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
+                    if (sender instanceof Player) {
+                        Player senderPlayer = (Player) sender;
 
-                            if (a.length > 1) {
-                                String clanTag = a[1];
+                        // if they are in a clan
+                        if (clan != null) {
+                            if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
 
-                                if (clanTagRequirements(clanTag, sender)) {
-                                    // update in data
-                                    clan.setTag(clanTag);
-                                    ClansDB.updateClanTag(clan);
-                                    sendClanMessage(clan, "&6&lClan Owner " +
-                                            player.getName() + " &ehas changed your clan's tag to &c" + clanTag, true, player);
+                                if (a.length > 1) {
+                                    String clanTag = ChatColor.stripColor(a[1]);
+
+                                    if (clanTagRequirements(clanTag, sender)) {
+                                        // update in data
+                                        Parkour.getClansManager().remove(clan.getTag());
+                                        Parkour.getClansManager().getClans().put(clanTag, clan);
+                                        clan.setTag(clanTag);
+                                        Parkour.getEconomy().withdrawPlayer(senderPlayer, Parkour.getSettingsManager().clans_price_tag);
+                                        ClansDB.updateClanTag(clan);
+                                        sendClanMessage(clan, "&6&lClan Owner " +
+                                                player.getName() + " &ehas changed your clan's tag to &c" + clanTag, true, player);
+                                    }
+                                } else {
+                                    sender.sendMessage(Utils.translate("&cNo clan tag specified"));
+                                    sender.sendMessage(getHelp("changetag"));
                                 }
                             } else {
-                                sender.sendMessage(Utils.translate("&cNo clan tag specified"));
-                                sender.sendMessage(getHelp("changetag"));
+                                player.sendMessage(Utils.translate("&cYou are not the owner of your clan"));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&cYou are not the owner of your clan"));
+                            player.sendMessage(Utils.translate("&cYou are not in a clan"));
                         }
-                    } else {
-                        player.sendMessage(Utils.translate("&cYou are not in a clan"));
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("setowner")) {
                     // sets new owner
@@ -446,7 +453,7 @@ public class ClanCMD implements CommandExecutor {
 
                             ClansDB.resetClanMember(player.getName());
                             ClansDB.removeClan(clan.getID());
-                            Parkour.getClansManager().removeClan(clan.getID());
+                            Parkour.getClansManager().remove(clan.getTag());
                             playerStats.resetClan();
                             player.sendMessage(Utils.translate("&eYou have left your clan"));
 
