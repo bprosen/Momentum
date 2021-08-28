@@ -406,7 +406,7 @@ public class LevelCMD implements CommandExecutor {
                     String levelName = a[2].toLowerCase();
 
                     if (target == null) {
-                        sender.sendMessage(Utils.translate("&4" + target + " &cis not online!"));
+                        sender.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
                         return true;
                     }
 

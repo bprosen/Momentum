@@ -103,7 +103,7 @@ public class MenuListener implements Listener {
                             double betAmount = -1.0;
                             String opponentName = null;
 
-                            if (lastString.toUpperCase().contains("bet".toUpperCase())) {
+                            if (lastString.toUpperCase().contains("bet amount".toUpperCase())) {
                                 bet = true;
                                 // get the right side of the ->
                                 betAmount = Double.parseDouble(lastString.split("-> ")[1]);
