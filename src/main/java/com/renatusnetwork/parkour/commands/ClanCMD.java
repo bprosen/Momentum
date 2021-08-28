@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.clans.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -190,7 +191,7 @@ public class ClanCMD implements CommandExecutor {
 
                         if (playerBalance >= Parkour.getSettingsManager().clans_price_create) {
                             if (a.length > 1) {
-                                String clanTag = a[1];
+                                String clanTag = ChatColor.stripColor(a[1]);
 
                                 if (clanTagRequirements(clanTag, sender)) {
                                     Parkour.getEconomy().withdrawPlayer(player, Parkour.getSettingsManager().clans_price_create);
