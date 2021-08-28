@@ -390,8 +390,13 @@ public class InfinitePKManager {
         }
 
         // run through maxes, and flip if they hit it
-        if (((oldLocation.getX() + xIncrease) >= (locationManager.getLobbyLocation().getBlockX() + settingsManager.max_infinitepk_x)) ||
-             (oldLocation.getZ() + zIncrease) >= (locationManager.getLobbyLocation().getBlockZ() + settingsManager.max_infinitepk_z)) {
+        if ((directionType == InfinitePKDirection.FORWARDS &&
+           (((oldLocation.getX() + xIncrease) >= (locationManager.getLobbyLocation().getBlockX() + settingsManager.max_infinitepk_x)) ||
+           (oldLocation.getZ() + zIncrease) >= (locationManager.getLobbyLocation().getBlockZ() + settingsManager.max_infinitepk_z)))
+           || (directionType == InfinitePKDirection.BACKWARDS &&
+           (((oldLocation.getX() - xIncrease) <= (locationManager.getLobbyLocation().getBlockX() - settingsManager.max_infinitepk_x)) ||
+           (oldLocation.getZ() - zIncrease) <= (locationManager.getLobbyLocation().getBlockZ() - settingsManager.max_infinitepk_z)))) {
+
             xIncrease *= -1;
             zIncrease *= -1;
 

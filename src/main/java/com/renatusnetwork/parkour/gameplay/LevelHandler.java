@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -194,13 +195,13 @@ public class LevelHandler {
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 0f);
             }
 
-            List<String> getToRegions = WorldGuard.getRegions(level.getRespawnLocation());
-            Level newLevel = Parkour.getLevelManager().get(getToRegions.get(0));
+            ProtectedRegion getToRegion = WorldGuard.getRegion(level.getRespawnLocation());
+            Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
 
             // if area they are teleporting to is empty
             // if not empty, make sure it is a level
             // if not a level (like spawn), reset level
-            if (getToRegions.isEmpty())
+            if (getToRegion == null)
                 playerStats.resetLevel();
             else if (newLevel != null)
                 playerStats.setLevel(newLevel);

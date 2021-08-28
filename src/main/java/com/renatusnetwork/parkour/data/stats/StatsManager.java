@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -216,9 +217,9 @@ public class StatsManager {
 
         for (PlayerStats playerStats : ascendancePlayerList) {
 
-            List<String> regions = WorldGuard.getRegions(playerStats.getPlayer().getLocation());
-            if (!regions.isEmpty()) {
-                Level level = Parkour.getLevelManager().get(regions.get(0));
+            ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
+            if (region != null) {
+                Level level = Parkour.getLevelManager().get(region.getId());
 
                 // if their level is not the same as what they moved to, then update it
                 if (level != null && level.isAscendanceLevel() &&

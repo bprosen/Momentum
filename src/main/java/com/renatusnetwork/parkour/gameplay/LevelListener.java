@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -214,11 +215,11 @@ public class LevelListener implements Listener {
 
             // boolean for resetting level
             boolean resetLevel = false;
-            List<String> regions = WorldGuard.getRegions(event.getTo());
-            if (!regions.isEmpty()) {
+            ProtectedRegion region = WorldGuard.getRegion(event.getTo());
+            if (region != null) {
 
                 // make sure the area they are spawning in is a level
-                Level level = Parkour.getLevelManager().get(regions.get(0));
+                Level level = Parkour.getLevelManager().get(region.getId());
 
                 if (level != null)
                     playerStats.setLevel(level);

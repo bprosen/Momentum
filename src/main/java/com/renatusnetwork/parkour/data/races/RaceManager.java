@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -179,10 +180,10 @@ public class RaceManager {
         }
 
         // set level in cache and toggle back on elytra
-        List<String> player1Regions = WorldGuard.getRegions(endedRace.getPlayer1().getLocation());
-        List<String> player2Regions = WorldGuard.getRegions(endedRace.getPlayer2().getLocation());
-        if (!player1Regions.isEmpty()) {
-            Level level = Parkour.getLevelManager().get(player1Regions.get(0));
+        ProtectedRegion player1Region = WorldGuard.getRegion(endedRace.getPlayer1().getLocation());
+        ProtectedRegion player2Region = WorldGuard.getRegion(endedRace.getPlayer2().getLocation());
+        if (player1Region != null) {
+            Level level = Parkour.getLevelManager().get(player1Region.getId());
             PlayerStats playerStats = Parkour.getStatsManager().get(endedRace.getPlayer1());
             playerStats.endedRace();
             playerStats.disableLevelStartTime();
@@ -193,8 +194,8 @@ public class RaceManager {
                 Parkour.getStatsManager().toggleOnElytra(playerStats);
         }
 
-        if (!player2Regions.isEmpty()) {
-            Level level = Parkour.getLevelManager().get(player2Regions.get(0));
+        if (player2Region != null) {
+            Level level = Parkour.getLevelManager().get(player2Region.getId());
             PlayerStats playerStats = Parkour.getStatsManager().get(endedRace.getPlayer2());
             playerStats.endedRace();
             playerStats.disableLevelStartTime();
@@ -299,10 +300,10 @@ public class RaceManager {
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
 
-            List<String> winnerRegions = WorldGuard.getRegions(winner.getLocation());
-            List<String> loserRegions = WorldGuard.getRegions(loser.getLocation());
-            if (!winnerRegions.isEmpty()) {
-                Level winnerLevel = Parkour.getLevelManager().get(winnerRegions.get(0));
+            ProtectedRegion winnerRegion = WorldGuard.getRegion(winner.getLocation());
+            ProtectedRegion loserRegion = WorldGuard.getRegion(loser.getLocation());
+            if (winnerRegion != null) {
+                Level winnerLevel = Parkour.getLevelManager().get(winnerRegion.getId());
                 winnerStats.setLevel(winnerLevel);
 
                 // if elytra level, give elytra
@@ -310,8 +311,8 @@ public class RaceManager {
                     Parkour.getStatsManager().toggleOnElytra(winnerStats);
             }
 
-            if (!loserRegions.isEmpty()) {
-                Level loserLevel = Parkour.getLevelManager().get(loserRegions.get(0));
+            if (loserRegion != null) {
+                Level loserLevel = Parkour.getLevelManager().get(loserRegion.getId());
                 loserStats.setLevel(loserLevel);
 
                 // if elytra level, give elytra

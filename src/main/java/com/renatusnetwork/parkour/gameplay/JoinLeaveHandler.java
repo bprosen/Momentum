@@ -14,6 +14,7 @@ import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -65,10 +66,10 @@ public class JoinLeaveHandler implements Listener {
                 StatsDB.loadPlayerStats(playerStats);
 
                 // load level, checkpoint info here
-                List<String> regions = WorldGuard.getRegions(player.getLocation());
-                if (!regions.isEmpty()) {
+                ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
+                if (region != null) {
 
-                    Level level = Parkour.getLevelManager().get(regions.get(0));
+                    Level level = Parkour.getLevelManager().get(region.getId());
 
                     // make sure the area they are spawning in is a level
                     if (level != null) {
