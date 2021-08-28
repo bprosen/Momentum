@@ -52,48 +52,52 @@ public class JoinLeaveHandler implements Listener {
                         " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
 
-        StatsManager statsManager = Parkour.getStatsManager();
-
-        statsManager.add(player);
-
-        // run most of this in async (region lookup, stat editing, etc)
         new BukkitRunnable() {
             @Override
             public void run() {
+
+                StatsManager statsManager = Parkour.getStatsManager();
                 PlayerStats playerStats = statsManager.get(player);
 
                 // now load stats in async
                 StatsDB.loadPlayerStats(playerStats);
 
-                // load level, checkpoint info here
-                ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
-                if (region != null) {
+                // run most of this in async (region lookup, stat editing, etc)
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
 
-                    Level level = Parkour.getLevelManager().get(region.getId());
+                        // load level, checkpoint info here
+                        ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
+                        if (region != null) {
 
-                    // make sure the area they are spawning in is a level
-                    if (level != null) {
-                        playerStats.setLevel(level);
+                            Level level = Parkour.getLevelManager().get(region.getId());
 
-                        // if the level they are being added to is an ascendance level, add them to the list
-                        if (level.isAscendanceLevel())
-                            statsManager.enteredAscendance(playerStats);
+                            // make sure the area they are spawning in is a level
+                            if (level != null) {
+                                playerStats.setLevel(level);
 
-                        // load if they have one
-                        CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
+                                // if the level they are being added to is an ascendance level, add them to the list
+                                if (level.isAscendanceLevel())
+                                    statsManager.enteredAscendance(playerStats);
 
-                        // is elytra level, then set elytra in sync (player inventory changes)
-                        if (level.isElytraLevel())
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    Parkour.getStatsManager().toggleOnElytra(playerStats);
-                                }
-                            }.runTask(Parkour.getPlugin());
+                                // load if they have one
+                                CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
+
+                                // is elytra level, then set elytra in sync (player inventory changes)
+                                if (level.isElytraLevel())
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            Parkour.getStatsManager().toggleOnElytra(playerStats);
+                                        }
+                                    }.runTask(Parkour.getPlugin());
+                            }
+                        }
                     }
-                }
+                }.runTaskLaterAsynchronously(Parkour.getPlugin(), 20 * 3);
             }
-        }.runTaskLaterAsynchronously(Parkour.getPlugin(), 20 * 3);
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     @EventHandler
