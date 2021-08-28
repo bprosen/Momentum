@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.plots;
 
 import com.renatusnetwork.parkour.Parkour;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -65,6 +66,7 @@ public class Plot {
             loc.subtract(0, 0,(Parkour.getSettingsManager().player_submitted_plot_width / 2) + 1);
             loc.setPitch(0);
             loc.setYaw(0);
+            loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
             player.teleport(loc);
         }
     }

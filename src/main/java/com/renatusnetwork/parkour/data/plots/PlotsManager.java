@@ -138,7 +138,7 @@ public class PlotsManager {
         clearPlot(plot, true);
 
         // remove from cache and teleport to spawn
-        plotList.remove(plot);
+        plotList.remove(owner.getName());
         PlotsDB.removePlot(plot.getOwnerUUID());
     }
 
