@@ -49,7 +49,7 @@ public class PracticeCMD implements CommandExecutor {
                             player.sendMessage(Utils.translate("&cYou cannot enter practice mode while in /spectator"));
                         }
                     } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                        player.sendMessage(Utils.translate("&cYou cannot do this while racing"));
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou cannot enable/disable practice mode while in the air"));
