@@ -119,32 +119,41 @@ public class InfinitePKManager {
             int score = infinitePK.getScore();
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            InfinitePKReward reward = getClosestRewardBelowScore(score);
-            boolean sendMsg = false;
+            boolean doRewardsMsg = false;
+            List<InfinitePKReward> rewards = null;
+            if (score > playerStats.getInfinitePKScore()) {
+                rewards = getApplicableRewards(playerStats.getInfinitePKScore(), score);
 
-            // dispatch command if not null and they havent gotten this reward yet
-            if (reward != null && playerStats.getInfinitePKScore() < score) {
-                sendMsg = true;
-                // run in sync for safety
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                // dispatch command if not null and they havent gotten this reward yet
+                if (!rewards.isEmpty()) {
+                    doRewardsMsg = true;
+
+                    // run in sync for safety
+                    for (InfinitePKReward reward : rewards) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                // loop through and run commands of applicable rewards
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                            }
+                        }.runTask(Parkour.getPlugin());
                     }
-                }.runTask(Parkour.getPlugin());
+                }
             }
 
             if (isBestScore(player.getName(), score)) {
                 // if they disconnected
                 if (!disconnected) {
-                    String msg = "&7You have beaten your best &d(" +
+                    player.sendMessage(Utils.translate("&7You have beaten your best &d(" +
                             Utils.formatNumber(playerStats.getInfinitePKScore()) + ")" +
-                            " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score);
+                            " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score)));
 
-                    if (sendMsg)
-                        msg += " &7and received &d" + reward.getName() + " &d(Score of " + reward.getScoreNeeded() + ") &7as a reward!";
-
-                    player.sendMessage(Utils.translate(msg));
+                    if (doRewardsMsg) {
+                        // we can safely assume since it will only be true if its not empty
+                        for (InfinitePKReward reward : rewards)
+                            player.sendMessage(Utils.translate(
+                        " &7You received &d" + reward.getName() + " &d(Score of " + reward.getScoreNeeded() + ")"));
+                    }
                 }
 
                 updateScore(player.getName(), score);
@@ -197,6 +206,18 @@ public class InfinitePKManager {
             closestReward = rewards.get(closestRewardScore);
 
         return closestReward;
+    }
+
+    public List<InfinitePKReward> getApplicableRewards(int oldBestScore, int newBestScore) {
+        List<InfinitePKReward> tempRewards = new ArrayList<>();
+
+        for (Map.Entry<Integer, InfinitePKReward> entry : rewards.entrySet()) {
+            int score = entry.getKey();
+            // if score is greater than old and less than or = to new, then add
+            if (score > oldBestScore && score <= newBestScore)
+                tempRewards.add(entry.getValue());
+        }
+        return tempRewards;
     }
 
     public InfinitePK get(String playerName) {
