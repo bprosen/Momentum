@@ -211,6 +211,9 @@ public class LevelListener implements Listener {
         // this is mainly QOL for staff!
         if (playerStats != null && playerStats.getPlayerToSpectate() == null &&
            !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff")) {
+
+            // boolean for resetting level
+            boolean resetLevel = false;
             List<String> regions = WorldGuard.getRegions(event.getTo());
             if (!regions.isEmpty()) {
 
@@ -219,8 +222,13 @@ public class LevelListener implements Listener {
 
                 if (level != null)
                     playerStats.setLevel(level);
+                else if (playerStats.getLevel() != null)
+                    resetLevel = true;
 
-            } else if (playerStats.getLevel() != null) {
+            } else if (playerStats.getLevel() != null)
+                resetLevel = true;
+
+            if (resetLevel) {
                 // save checkpoint if had one
                 if (playerStats.getCheckpoint() != null) {
                     CheckpointDB.savePlayerAsync(playerStats);
