@@ -304,9 +304,9 @@ public class ClanCMD implements CommandExecutor {
                                     victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
                                             " invitation to their &6&lClan &c" + clan.getTag()));
                                     victim.sendMessage(Utils.translate("   &7Type &e/clan accept " + player.getName() +
-                                            " &7within &c20 seconds &7to accept"));
+                                            " &7within &c30 seconds &7to accept"));
                                     player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
-                                            + " &ethey have 20 seconds to accept"));
+                                            + " &ethey have 30 seconds to accept"));
 
                                     clan.addInvite(victim.getUniqueId().toString());
                                     new BukkitRunnable() {
@@ -324,13 +324,13 @@ public class ClanCMD implements CommandExecutor {
                                             }
                                         }
                                         // 20 seconds to accept invite
-                                    }.runTaskLater(Parkour.getPlugin(), 20 * 20);
+                                    }.runTaskLater(Parkour.getPlugin(), 20 * 30);
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot invite anymore people to your" +
                                                                         " clan! Max - " + maxMembers));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou have already sent an invite to &4" + victim.getUniqueId().toString()));
+                                player.sendMessage(Utils.translate("&cYou have already sent an invite to &4" + victim.getName()));
                             }
                         } else {
                             player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis already in a clan"));

@@ -82,6 +82,11 @@ public class RaceManager {
 
                 public void run() {
 
+                    if (!runningRaceList.contains(newRace)) {
+                        cancel();
+                        return;
+                    }
+
                     // cancel, send last title and return
                     if (runCycles == 100) {
                         cancel();
