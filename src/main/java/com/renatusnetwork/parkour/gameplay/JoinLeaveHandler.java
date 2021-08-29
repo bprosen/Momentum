@@ -57,6 +57,7 @@ public class JoinLeaveHandler implements Listener {
             public void run() {
 
                 StatsManager statsManager = Parkour.getStatsManager();
+                statsManager.add(player);
                 PlayerStats playerStats = statsManager.get(player);
 
                 // now load stats in async
