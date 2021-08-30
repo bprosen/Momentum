@@ -172,6 +172,9 @@ public class LevelHandler {
             Parkour.getStatsManager().toggleOffElytra(playerStats);
             Parkour.getPluginLogger().info(player.getName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
+            // reset cp before teleport
+            playerStats.resetCheckpoint();
+
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());
 
@@ -207,8 +210,6 @@ public class LevelHandler {
                 playerStats.setLevel(newLevel);
             else
                 playerStats.resetLevel();
-
-            Parkour.getStatsManager().get(player).resetCheckpoint();
         /*
          if the level has required levels and the player does not have them,
          then loop through and redo this method until they have them all
