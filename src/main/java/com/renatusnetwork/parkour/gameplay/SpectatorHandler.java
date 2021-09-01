@@ -58,17 +58,17 @@ public class SpectatorHandler {
         Player spectator = spectatorStats.getPlayer();
         Player player = playerStats.getPlayer();
 
-        spectator.setAllowFlight(true);
-        spectator.setFlying(true);
         spectatorStats.setPlayerToSpectate(playerStats);
 
         // in case they /spectate while spectating
         if (!alreadySpectating) {
+            spectator.setAllowFlight(true);
+            spectator.setFlying(true);
             spectatorStats.setSpectateSpawn(spectator.getLocation());
             Parkour.getStatsManager().toggleOffElytra(spectatorStats);
+            PlayerHider.hidePlayer(spectator, true);
         }
 
-        PlayerHider.hidePlayer(spectator, true);
         spectateToPlayer(spectator, player);
     }
 
