@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,6 +26,12 @@ public class SwordCMD implements CommandExecutor {
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         if (a.length == 0) {
+            EventManager eventManager = Parkour.getEventManager();
+            // if running and participant, cancel
+            if (eventManager.isEventRunning() && eventManager.isParticipant(player)) {
+                player.sendMessage(Utils.translate("&cYou cannot do this "));
+                return true;
+            }
 
             ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
 
