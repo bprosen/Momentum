@@ -105,6 +105,13 @@ public class Clan {
             ownerID = newOwner.getPlayerID();
     }
 
+    public void promoteOwnerFromName(String name) {
+        ClanMember newOwner = getMemberFromName(name);
+
+        if (newOwner != null)
+            ownerID = newOwner.getPlayerID();
+    }
+
     public boolean isMember(String UUID) {
         return getMemberFromUUID(UUID) != null;
     }

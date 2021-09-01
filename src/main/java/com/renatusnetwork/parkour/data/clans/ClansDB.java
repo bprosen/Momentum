@@ -168,6 +168,12 @@ public class ClansDB {
         Parkour.getDatabaseManager().add(query);
     }
 
+    public static void updatePlayerClanID(String playerName, int clanID) {
+        Parkour.getDatabaseManager().add(
+                "UPDATE players SET clan_id=" + clanID + " WHERE player_name='" + playerName + "'"
+        );
+    }
+
     public static void updateClanTag(Clan clan) {
         String query = "UPDATE clans SET " +
                 "clan_tag='" + clan.getTag() + "' " +

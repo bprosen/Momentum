@@ -65,6 +65,15 @@ public class ClansManager {
         return null;
     }
 
+    public Clan getFromMember(String clanMember) {
+        for (Clan clan : clans.values())
+            for (ClanMember member : clan.getMembers())
+                if (member.getPlayerName().equalsIgnoreCase(clanMember))
+                    return clan;
+
+        return null;
+    }
+
     public Clan get(String clanTag) {
         return clans.get(clanTag);
     }

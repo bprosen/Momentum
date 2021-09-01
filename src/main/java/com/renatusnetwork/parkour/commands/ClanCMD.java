@@ -260,12 +260,7 @@ public class ClanCMD implements CommandExecutor {
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("setowner")) {
                     // sets new owner
 
-                    Player victim = Bukkit.getPlayer(a[1]);
-                    if (victim == null) {
-                        player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis not online"));
-                        return true;
-                    }
-                    Clan targetClan = Parkour.getStatsManager().get(victim).getClan();
+                    Clan targetClan = Parkour.getClansManager().getFromMember(a[1]);
 
                     if (clan != null) {
                         if (targetClan != null) {
@@ -273,18 +268,18 @@ public class ClanCMD implements CommandExecutor {
                             if (targetClan.getID() == clan.getID()) {
                                 if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
                                     // update data
-                                    clan.promoteOwner(victim.getUniqueId().toString());
+                                    clan.promoteOwnerFromName(a[1]);
                                     ClansDB.updateClanOwnerID(clan);
-                                    sendClanMessage(clan, "&6" + victim.getName() + " &ehas been promoted to" +
+                                    sendClanMessage(clan, "&6" + a[1] + " &ehas been promoted to" +
                                             " &6&lClan Owner &eby &6" + player.getName(), true, player);
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot switch clan owners if you are not owner"));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + victim.getName()));
+                                player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + a[1]));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis not in a clan"));
+                            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not in a clan"));
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
@@ -292,56 +287,60 @@ public class ClanCMD implements CommandExecutor {
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("invite")) {
                     // invite player
                     if (clan != null) {
+                        if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
 
-                        Player victim = Bukkit.getPlayer(a[1]);
+                            Player victim = Bukkit.getPlayer(a[1]);
 
-                        if (victim == null) {
-                            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
-                            return true;
-                        }
+                            if (victim == null) {
+                                player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
+                                return true;
+                            }
 
-                        // if they are not in a clan
-                        if (Parkour.getStatsManager().get(victim).getClan() == null) {
+                            // if they are not in a clan
+                            if (Parkour.getStatsManager().get(victim).getClan() == null) {
 
-                            // if they already have an invite or not
-                            if (!clan.isInvited(victim.getUniqueId().toString())) {
+                                // if they already have an invite or not
+                                if (!clan.isInvited(victim.getUniqueId().toString())) {
 
-                                int maxMembers = Parkour.getSettingsManager().clans_max_members;
-                                if (clan.getMembers().size() < maxMembers) {
-                                    // add an invite
-                                    victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
-                                            " invitation to their &6&lClan &c" + clan.getTag()));
-                                    victim.sendMessage(Utils.translate("   &7Type &e/clan accept " + player.getName() +
-                                            " &7within &c30 seconds &7to accept"));
-                                    player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
-                                            + " &ethey have 30 seconds to accept"));
+                                    int maxMembers = Parkour.getSettingsManager().clans_max_members;
+                                    if (clan.getMembers().size() < maxMembers) {
+                                        // add an invite
+                                        victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
+                                                " invitation to their &6&lClan &c" + clan.getTag()));
+                                        victim.sendMessage(Utils.translate("   &7Type &e/clan accept " + player.getName() +
+                                                " &7within &c30 seconds &7to accept"));
+                                        player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
+                                                + " &ethey have 30 seconds to accept"));
 
-                                    clan.addInvite(victim.getUniqueId().toString());
-                                    new BukkitRunnable() {
-                                        public void run() {
-                                            // ran out of time
-                                            if (clan.isInvited(victim.getUniqueId().toString())) {
+                                        clan.addInvite(victim.getUniqueId().toString());
+                                        new BukkitRunnable() {
+                                            public void run() {
+                                                // ran out of time
+                                                if (clan.isInvited(victim.getUniqueId().toString())) {
 
-                                                player.sendMessage(Utils.translate("&6" + victim.getName() +
-                                                        " &edid not accept your &6&lClan Invite &ein time"));
-                                                victim.sendMessage(Utils.translate("&6You did not accept &6" +
-                                                        player.getName() + "&e's &6&lClan Invite &ein time"));
+                                                    player.sendMessage(Utils.translate("&6" + victim.getName() +
+                                                            " &edid not accept your &6&lClan Invite &ein time"));
+                                                    victim.sendMessage(Utils.translate("&6You did not accept &6" +
+                                                            player.getName() + "&e's &6&lClan Invite &ein time"));
 
-                                                // remove old invite
-                                                clan.removeInvite(victim.getUniqueId().toString());
+                                                    // remove old invite
+                                                    clan.removeInvite(victim.getUniqueId().toString());
+                                                }
                                             }
-                                        }
-                                        // 20 seconds to accept invite
-                                    }.runTaskLater(Parkour.getPlugin(), 20 * 30);
+                                            // 20 seconds to accept invite
+                                        }.runTaskLater(Parkour.getPlugin(), 20 * 30);
+                                    } else {
+                                        player.sendMessage(Utils.translate("&cYou cannot invite anymore people to your" +
+                                                " clan! Max - " + maxMembers));
+                                    }
                                 } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot invite anymore people to your" +
-                                                                        " clan! Max - " + maxMembers));
+                                    player.sendMessage(Utils.translate("&cYou have already sent an invite to &4" + victim.getName()));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou have already sent an invite to &4" + victim.getName()));
+                                player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis already in a clan"));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis already in a clan"));
+                            player.sendMessage(Utils.translate("&cOnly the owner can invite others"));
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou have to be in a clan to invite someone!"));
@@ -393,33 +392,32 @@ public class ClanCMD implements CommandExecutor {
                         // make sure they are owner of the clan
                         if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
 
-                            String victimName = a[1];
-                            if (Bukkit.getPlayer(victimName) == null) {
-                                player.sendMessage(Utils.translate("&4" + victimName + " &cis not online"));
-                                return true;
-                            }
-
-                            Player victim = Bukkit.getPlayer(victimName);
-                            Clan targetClan = ClansDB.getClan(victimName);
-
                             // make sure they are not trying to kick themselves
-                            if (!victim.getName().equalsIgnoreCase(player.getName())) {
-                                // if they do not have a clan stored in database
+                            if (!a[1].equalsIgnoreCase(player.getName())) {
+
+                                Clan targetClan = Parkour.getClansManager().getFromMember(a[1]);
+
+                                // if they do not have a clan stored in cache
                                 if (targetClan != null) {
 
                                     // make sure they are kicking from the same clan
                                     if (targetClan.getID() == clan.getID()) {
 
-                                        sendClanMessage(clan, "&6" + victimName + " &ehas been removed from the clan", true, victim);
+                                        Player victim = Bukkit.getPlayer(a[1]);
+                                        boolean sendToSelf = victim != null;
 
-                                        targetClan.removeMemberFromName(victimName);
+                                        sendClanMessage(clan, "&6" + a[1] + " &ehas been removed from the clan", sendToSelf, victim);
 
-                                        PlayerStats victimStats = Parkour.getStatsManager().get(victim);
-                                        victimStats.resetClan();
-                                        ClansDB.updatePlayerClanID(victimStats);
+                                        targetClan.removeMemberFromName(a[1]);
+
+                                        PlayerStats victimStats = Parkour.getStatsManager().get(a[1]);
+                                        if (victimStats != null)
+                                            victimStats.resetClan();
+
+                                        ClansDB.updatePlayerClanID(a[1], -1);
                                     }
                                 } else {
-                                    player.sendMessage(Utils.translate("&4" + victimName + " &cis not in your clan"));
+                                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not in your clan"));
                                 }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot kick yourself"));
