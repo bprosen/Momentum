@@ -78,6 +78,14 @@ public class ClansManager {
         return clans.get(clanTag);
     }
 
+    public Clan getIgnoreCase(String clanTag) {
+        for (Clan clan : clans.values())
+            if (clan.getTag().equalsIgnoreCase(clanTag))
+                return clan;
+
+        return null;
+    }
+
     public LinkedHashSet<Clan> getLeaderboard() { return clansLeaderboard; }
 
     public void loadLeaderboard() {

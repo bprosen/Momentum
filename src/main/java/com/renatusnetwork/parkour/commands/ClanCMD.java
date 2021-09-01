@@ -41,7 +41,7 @@ public class ClanCMD implements CommandExecutor {
                         return true;
                     }
                 } else {
-                    targetClan = Parkour.getClansManager().get(a[1]);
+                    targetClan = Parkour.getClansManager().getIgnoreCase(a[1]);
                 }
 
                 if (targetClan != null) {
