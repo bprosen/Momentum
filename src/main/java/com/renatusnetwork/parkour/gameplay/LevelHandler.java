@@ -211,9 +211,14 @@ public class LevelHandler {
             // if not a level (like spawn), reset level
             if (getToRegion == null)
                 playerStats.resetLevel();
-            else if (newLevel != null)
+            else if (newLevel != null) {
                 playerStats.setLevel(newLevel);
-            else
+
+                // apply potion effects if any exist
+                if (!newLevel.getPotionEffects().isEmpty())
+                    for (PotionEffect potionEffect : newLevel.getPotionEffects())
+                        player.addPotionEffect(potionEffect);
+            } else
                 playerStats.resetLevel();
         /*
          if the level has required levels and the player does not have them,
