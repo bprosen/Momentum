@@ -63,6 +63,10 @@ public class LevelManager {
             levels.put(levelName, level);
         }
 
+        // refresh featured here
+        if (featuredLevel != null && level != null && level.getName().equalsIgnoreCase(featuredLevel.getName()))
+            featuredLevel = level;
+
         // need to add final copy for outside inner class access
         Level finalLevel = level;
         new BukkitRunnable() {
