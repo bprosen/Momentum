@@ -403,10 +403,7 @@ public class ClanCMD implements CommandExecutor {
                                     // make sure they are kicking from the same clan
                                     if (targetClan.getID() == clan.getID()) {
 
-                                        Player victim = Bukkit.getPlayer(a[1]);
-                                        boolean sendToSelf = victim != null;
-
-                                        sendClanMessage(clan, "&6" + a[1] + " &ehas been removed from the clan", sendToSelf, victim);
+                                        sendClanMessage(clan, "&6" + a[1] + " &ehas been removed from the clan", true, player);
 
                                         targetClan.removeMemberFromName(a[1]);
 
@@ -523,7 +520,7 @@ public class ClanCMD implements CommandExecutor {
                 if (sendToSelf)
                     clanPlayer.sendMessage(Utils.translate(message));
                 // otherwise make sure it is not the same person
-                else if (clanPlayer.getName() != self.getName())
+                else if (self != null && clanPlayer.getName() != self.getName())
                     clanPlayer.sendMessage(Utils.translate(message));
             }
         }
