@@ -13,6 +13,7 @@ import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 
@@ -170,10 +171,14 @@ public class LevelHandler {
         if (!forcedCompletion) {
 
             Parkour.getStatsManager().toggleOffElytra(playerStats);
-            Parkour.getPluginLogger().info(player.getName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
+            Parkour.getPluginLogger().info(playerStats.getPlayerName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
             // reset cp before teleport
             playerStats.resetCheckpoint();
+
+            // clear potion effects
+            for (PotionEffect potionEffect : player.getActivePotionEffects())
+                player.removePotionEffect(potionEffect.getType());
 
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());
