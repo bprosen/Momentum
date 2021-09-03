@@ -298,7 +298,7 @@ public class LevelManager {
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
                 for (Level level : levels.values())
                     if (highestLevel == null || (!addedLevels.contains(level.getName()) &&
-                        level.getRating() > highestLevel.getRating() &&
+                        level.getRating() >= highestLevel.getRating() &&
                         level.getRatingsCount() >= 5))
                         highestLevel = level;
 
