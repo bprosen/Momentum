@@ -21,22 +21,25 @@ public class WorldChangeListener implements Listener {
         StatsManager statsManager = Parkour.getStatsManager();
         PlayerStats playerStats = statsManager.get(player);
 
-        // if entering ascendance world, add to list to start tracking
-        if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
-            statsManager.enteredAscendance(playerStats);
-        // if they are switching to not ascendance world and were in ascendance, remove them
-        else if (statsManager.isInAscendance(playerStats))
-            statsManager.leftAscendance(playerStats);
+        // avoid all this code if spectating someone
+        if (playerStats.getPlayerToSpectate() == null) {
+            // if entering ascendance world, add to list to start tracking
+            if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
+                statsManager.enteredAscendance(playerStats);
+                // if they are switching to not ascendance world and were in ascendance, remove them
+            else if (statsManager.isInAscendance(playerStats))
+                statsManager.leftAscendance(playerStats);
 
-        // if going to/from plot world, clear inv, armor and potions
-        if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) ||
-            event.getFrom().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-            player.getInventory().clear();
-            player.getInventory().setArmorContents(null);
+            // if going to/from plot world, clear inv, armor and potions
+            if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) ||
+                    event.getFrom().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+                player.getInventory().clear();
+                player.getInventory().setArmorContents(null);
 
-            // clear potion effects
-            for (PotionEffect potionEffect : player.getActivePotionEffects())
-                player.removePotionEffect(potionEffect.getType());
+                // clear potion effects
+                for (PotionEffect potionEffect : player.getActivePotionEffects())
+                    player.removePotionEffect(potionEffect.getType());
+            }
         }
     }
 }
