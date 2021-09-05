@@ -298,18 +298,20 @@ public class LevelManager {
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
                 for (Level level : levels.values())
                     if (highestLevel == null || (!addedLevels.contains(level.getName()) &&
-                        level.getRating() >= highestLevel.getRating() &&
-                        level.getRatingsCount() >= 5))
+                        level.getRating() >= highestLevel.getRating()) && level.getRatingsCount() >= 5)
                         highestLevel = level;
 
                 // add 1 and add to added levels
                 lbSize++;
-                addedLevels.add(highestLevel.getName());
-                // add to temp lb
-                if (highestLevel.getRating() > 0.00)
-                    temporaryLB.add(highestLevel);
 
-                highestLevel = null;
+                if (highestLevel != null) {
+                    addedLevels.add(highestLevel.getName());
+                    // add to temp lb
+                    if (highestLevel.getRating() > 0.00)
+                        temporaryLB.add(highestLevel);
+
+                    highestLevel = null;
+                }
             }
             // quickly swap
             topRatedLevelsLB.clear();

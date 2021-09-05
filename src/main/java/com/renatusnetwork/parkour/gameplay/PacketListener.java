@@ -171,9 +171,9 @@ public class PacketListener implements Listener {
                     else {
                         Level level = playerStats.getLevel();
 
-                        // if level is not null, has a respawn y, and the y is greater than or equal to player y, respawn
+                        // if level is not null, they are not spectating, it has a respawn y, and the y is greater than or equal to player y, respawn
                         if (level != null)
-                            if (level.hasRespawnY() && level.getRespawnY() >= playerY) {
+                            if (playerStats.getPlayerToSpectate() == null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
                                 // run in sync due to teleporting
                                 new BukkitRunnable() {
                                     @Override
