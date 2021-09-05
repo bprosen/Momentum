@@ -46,9 +46,9 @@ public class SpectateCMD implements CommandExecutor {
                                                         if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
                                                             if (!spectatorStats.isInInfinitePK()) {
 
-                                                                boolean spectatingAlready = false;
+                                                                boolean initialSpectate = true;
                                                                 if (spectatorStats.getPlayerToSpectate() != null) {
-                                                                    spectatingAlready = true;
+                                                                    initialSpectate = false;
 
                                                                 /*
                                                                  if they are already spectating and the person they
@@ -64,7 +64,7 @@ public class SpectateCMD implements CommandExecutor {
                                                                 }
 
                                                                 // enable spectator mode
-                                                                SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, spectatingAlready);
+                                                                SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, initialSpectate);
 
                                                                 playerStats.getPlayer().sendMessage(Utils.translate("&2" +
                                                                         spectatorStats.getPlayerName() + " &7began to spectate you"));

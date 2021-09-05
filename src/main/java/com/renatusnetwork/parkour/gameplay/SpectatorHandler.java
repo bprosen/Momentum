@@ -23,10 +23,16 @@ public class SpectatorHandler {
         }.runTaskTimer(plugin, 20, 20);
     }
 
-    public static void spectateToPlayer(Player spectator, Player player) {
+    public static void spectateToPlayer(Player spectator, Player player, boolean initialSpectate) {
         if (player.isOnline() && spectator.isOnline()) {
 
             spectator.teleport(player.getLocation());
+
+            // this is done AFTER teleport to override some world changes that can happen
+            if (initialSpectate) {
+                spectator.setAllowFlight(true);
+                spectator.setFlying(true);
+            }
 
             TitleAPI.sendTitle(
                     spectator, 10, 40, 10,
@@ -53,7 +59,7 @@ public class SpectatorHandler {
         }
     }
 
-    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean alreadySpectating) {
+    public static void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean initialSpectate) {
 
         Player spectator = spectatorStats.getPlayer();
         Player player = playerStats.getPlayer();
@@ -61,15 +67,13 @@ public class SpectatorHandler {
         spectatorStats.setPlayerToSpectate(playerStats);
 
         // in case they /spectate while spectating
-        if (!alreadySpectating) {
-            spectator.setAllowFlight(true);
-            spectator.setFlying(true);
+        if (initialSpectate) {
             spectatorStats.setSpectateSpawn(spectator.getLocation());
             Parkour.getStatsManager().toggleOffElytra(spectatorStats);
             PlayerHider.hidePlayer(spectator, true);
         }
 
-        spectateToPlayer(spectator, player);
+        spectateToPlayer(spectator, player, initialSpectate);
     }
 
     public static void removeSpectatorMode(PlayerStats spectatorStats) {
@@ -97,7 +101,7 @@ public class SpectatorHandler {
 
             if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(spectator.getPlayer().getWorld().getName()) ||
                 spectator.getPlayer().getLocation().distance(playerStats.getPlayer().getLocation()) > 20)
-                spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer());
+                spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer(), false);
         } else {
             removeSpectatorMode(spectator);
         }
