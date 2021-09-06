@@ -34,7 +34,10 @@ public class PracticeCMD implements CommandExecutor {
                                 return true;
                             }
 
-                            // check practice location first, if not null, reset, then check if they are on ground, if they are, enable, if not, cancel
+                            /*
+                             check practice location first, if not null then reset or
+                             then check if they are on ground then enable or cancel
+                             */
                             if (playerStats.getPracticeLocation() != null) {
                                 PracticeHandler.resetPlayer(player, true);
                             } else if (player.isOnGround()) {
