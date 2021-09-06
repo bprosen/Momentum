@@ -223,9 +223,14 @@ public class LevelListener implements Listener {
                 // make sure the area they are spawning in is a level
                 Level level = Parkour.getLevelManager().get(region.getId());
 
-                if (level != null)
+                if (level != null) {
+                    // save checkpoint if had one
+                    if (playerStats.getCheckpoint() != null) {
+                        CheckpointDB.savePlayerAsync(playerStats);
+                        playerStats.resetCheckpoint();
+                    }
                     playerStats.setLevel(level);
-                else if (playerStats.getLevel() != null)
+                } else if (playerStats.getLevel() != null)
                     resetLevel = true;
 
             } else if (playerStats.getLevel() != null)
