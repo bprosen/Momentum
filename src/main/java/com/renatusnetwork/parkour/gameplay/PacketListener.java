@@ -16,6 +16,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -37,15 +38,16 @@ public class PacketListener implements Listener {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-                // use block change for right click, left click, etc
 
+                // use block change for right click, left click, etc
                 if (packet.getType() == PacketType.Play.Client.BLOCK_DIG ||
                     packet.getType() == PacketType.Play.Client.USE_ITEM) {
 
                     Player player = event.getPlayer();
 
-                    // make sure they are in the right world and not opped
-                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+                    // make sure they are not temporary and in the right world
+                    if (!event.isPlayerTemporary() &&
+                        player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
 
                         // if they are opped, and if they are bypassing plots, then ignore
                         if (player.isOp() && Parkour.getStatsManager().get(player).isBypassingPlots())
