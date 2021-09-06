@@ -37,8 +37,9 @@ public class StatsDB {
             for (Map<String, String> playerResult : playerResults) {
                 playerStats.setPlayerID(Integer.parseInt(playerResult.get("player_id")));
 
+                // update player names
                 if (!playerResult.get("player_name").equals(playerStats.getPlayerName()))
-                    updatePlayerName(playerStats);
+                    updatePlayerName(playerStats, playerResult.get("player_name"));
 
                 int spectatable = Integer.parseInt(playerResult.get("spectatable"));
                 if (spectatable == 1)
@@ -137,13 +138,27 @@ public class StatsDB {
         Parkour.getDatabaseManager().run(query);
     }
 
-    private static void updatePlayerName(PlayerStats playerStats) {
-        String query = "UPDATE players SET " +
+    // this will update the player name all across the database
+    private static void updatePlayerName(PlayerStats playerStats, String oldName) {
+        // update in stats
+        Parkour.getDatabaseManager().asyncRun("UPDATE players SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_id=" + playerStats.getPlayerID()
-                ;
+                "WHERE player_id=" + playerStats.getPlayerID());
 
-        Parkour.getDatabaseManager().add(query);
+        // update in checkpoints
+        Parkour.getDatabaseManager().asyncRun("UPDATE checkpoints SET " +
+                "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_name='" + oldName + "'");
+
+        // update in ratings
+        Parkour.getDatabaseManager().asyncRun("UPDATE ratings SET " +
+                "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_name='" + oldName + "'");
+
+        // update in plots
+        Parkour.getDatabaseManager().asyncRun("UPDATE plots SET " +
+                "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_name='" + oldName + "'");
     }
 
     public static void updatePlayerSpectatable(PlayerStats playerStats) {
