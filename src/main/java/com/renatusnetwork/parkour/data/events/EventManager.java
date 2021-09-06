@@ -3,13 +3,16 @@ package com.renatusnetwork.parkour.data.events;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
+import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Firework;
@@ -202,8 +205,23 @@ public class EventManager {
             CheckpointDB.hasCheckpoint(player.getUniqueId().toString(), eventParticipant.getOriginalLevel()))
             CheckpointDB.loadPlayer(player.getUniqueId().toString(), eventParticipant.getOriginalLevel());
 
-        // do all setting changes to revert back
-        playerStats.setLevel(eventParticipant.getOriginalLevel());
+        // if their original level is not null, then set it, if it is, do region lookup of their original location jic
+        if (eventParticipant.getOriginalLevel() != null)
+            playerStats.setLevel(eventParticipant.getOriginalLevel());
+        else {
+            // region lookup here
+            ProtectedRegion region = WorldGuard.getRegion(eventParticipant.getOriginalLocation());
+            if (region != null) {
+
+                // level lookup here
+                Level level = Parkour.getLevelManager().get(region.getId());
+
+                // make sure the area they are spawning in is a level
+                if (level != null)
+                    playerStats.setLevel(level);
+            }
+        }
+
         playerStats.leftEvent();
         player.teleport(eventParticipant.getOriginalLocation());
         player.setHealth(20.0);
@@ -214,7 +232,7 @@ public class EventManager {
                                          formatName(runningEvent.getEventType()) + " &7Event"));
 
         // set back if they came from elytra level
-        if (eventParticipant.getOriginalLevel() != null && eventParticipant.getOriginalLevel().isElytraLevel())
+        if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
             Parkour.getStatsManager().toggleOnElytra(playerStats);
 
         participants.remove(player.getName());
