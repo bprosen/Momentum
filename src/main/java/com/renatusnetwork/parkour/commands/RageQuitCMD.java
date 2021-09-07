@@ -67,9 +67,9 @@ public class RageQuitCMD implements CommandExecutor {
                     }
                 }.runTaskLater(Parkour.getPlugin(), 10);
 
-                // kick and broadcast
-                player.kickPlayer("Rage Quit :(");
+                // broadcast and kick
                 Bukkit.broadcastMessage(randomMessage);
+                player.kickPlayer("Rage Quit :(");
 
             // run confirm and buy
             } else {
