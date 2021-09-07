@@ -224,6 +224,10 @@ public class LevelListener implements Listener {
                 Level level = Parkour.getLevelManager().get(region.getId());
 
                 if (level != null) {
+                    // if player has level and if not same level, then run level change
+                    if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
+                        return;
+
                     // save checkpoint if had one
                     if (playerStats.getCheckpoint() != null) {
                         CheckpointDB.savePlayerAsync(playerStats);
