@@ -86,6 +86,12 @@ public class ClansManager {
         return null;
     }
 
+    public void updatePlayerNameInClan(Clan clan, String oldName, String newName) {
+        for (ClanMember clanMember : clan.getMembers())
+            if (clanMember.getPlayerName().equalsIgnoreCase(oldName))
+                clanMember.setPlayerName(newName);
+    }
+
     public LinkedHashSet<Clan> getLeaderboard() { return clansLeaderboard; }
 
     public void loadLeaderboard() {

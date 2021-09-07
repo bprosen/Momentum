@@ -50,6 +50,8 @@ public class Plot {
         return ownerName;
     }
 
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+
     public String getOwnerUUID() {
         return ownerUUID;
     }

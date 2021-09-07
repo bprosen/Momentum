@@ -293,6 +293,19 @@ public class PlotsManager {
         return nearestPlot;
     }
 
+    public void updatePlayerNameInPlot(String oldName, String newName) {
+        Plot plot = get(oldName);
+
+        if (plot != null) {
+            // remove
+            plotList.remove(oldName);
+
+            // then set and add
+            plot.setOwnerName(newName);
+            plotList.put(newName, plot);
+        }
+    }
+
     public boolean blockInPlot(Location loc, Plot plot) {
 
         int maxX = plot.getSpawnLoc().getBlockX() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);

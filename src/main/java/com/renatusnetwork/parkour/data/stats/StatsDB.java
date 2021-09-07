@@ -35,11 +35,24 @@ public class StatsDB {
 
         if (playerResults.size() > 0) {
             for (Map<String, String> playerResult : playerResults) {
+                ClansManager clansManager = Parkour.getClansManager();
+
                 playerStats.setPlayerID(Integer.parseInt(playerResult.get("player_id")));
+                int clanID = Integer.parseInt(playerResult.get("clan_id"));
+                String nameInDB = playerResult.get("player_name");
 
                 // update player names
-                if (!playerResult.get("player_name").equals(playerStats.getPlayerName()))
-                    updatePlayerName(playerStats, playerResult.get("player_name"));
+                if (!nameInDB.equals(playerStats.getPlayerName())) {
+                    updatePlayerName(playerStats, nameInDB);
+
+                    if (clanID > 0) {
+                        Clan clan = clansManager.get(clanID);
+                        // update name in cache
+                        Parkour.getClansManager().updatePlayerNameInClan(clan, nameInDB, playerStats.getPlayerName());
+                    }
+                    // update in db
+                    Parkour.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getPlayerName());
+                }
 
                 int spectatable = Integer.parseInt(playerResult.get("spectatable"));
                 if (spectatable == 1)
@@ -47,8 +60,6 @@ public class StatsDB {
                 else
                     playerStats.setSpectatable(false);
 
-                int clanID = Integer.parseInt(playerResult.get("clan_id"));
-                ClansManager clansManager = Parkour.getClansManager();
                 if (clanID > 0) {
                     Clan clan = clansManager.get(clanID);
 
