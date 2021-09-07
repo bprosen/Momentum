@@ -101,3 +101,21 @@ prestiges:
 races:
   max_leaderboard_size: 10
   min_bet_amount: 100.0
+rage_quit:
+  price: 10000.0
+  messages:
+    - "&6&l%player% &7slipped on a pickle and &c&lRage Quit"
+    - "&6&l%player% &7lost a 1v1 with a cow and &c&lRage Quit"
+    - "&6&l%player% &7slipped on kiot's apple and &c&lRage Quit"
+    - "&6&l%player% &7lost chess in 2 turns and &c&lRage Quit"
+    - "&6&l%player% &7found a pack of wolves and &c&lRage Quit"
+    - "&6&l%player% &7failed at the last jump and &c&lRage Quit"
+    - "&6&l%player% &7tripped and &c&lRage Quit"
+    - "&6&l%player% &7fell on a spike and &c&lRage Quit"
+    - "&6&l%player% &7drank too much BBQ sauce and &c&lRage Quit"
+    - "&6&l%player% &7respectfully &c&l&oRage Quit"
+    - "&6&l%player% &7bought &c/ragequit &7to &c&lRage Quit"
+    - "&6&l%player% &7went for a swim in syrup and &c&lRage Quit"
+    - "&6&l%player% &7failed their test and &c&lRage Quit"
+    - "&6&l%player% &7missed their bedtime and &c&lRage Quit"
+    - "&6&l%player% &7got the great idea to &c&lRage Quit"

@@ -68,3 +68,6 @@ commands:
     aliases: [profilestats]
   cosmetics:
     description: "RN-Parkour cosmetics command"
+  ragequit:
+    description: "RN-Parkour rage quit command"
+    aliases: [rq, rage]

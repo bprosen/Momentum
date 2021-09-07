@@ -75,6 +75,9 @@ public class SettingsManager {
 
     public String ascendant_realm_world;
 
+    public double rage_quit_price;
+    public List<String> rage_quit_messages;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -130,6 +133,8 @@ public class SettingsManager {
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
         min_race_bet_amount = settings.getInt("races.min_bet_amount");
         ascendant_realm_world = settings.getString("ascendance.realm_world");
+        rage_quit_price = settings.getDouble("rage_quit.price");
+        rage_quit_messages = settings.getStringList("rage_quit.messages");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
