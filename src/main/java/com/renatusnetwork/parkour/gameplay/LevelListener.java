@@ -228,16 +228,26 @@ public class LevelListener implements Listener {
                     if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
                         return;
 
-                    // save checkpoint if had one
-                    if (playerStats.getCheckpoint() != null) {
-                        CheckpointDB.savePlayerAsync(playerStats);
-                        playerStats.resetCheckpoint();
+                    // if they are in a level and have a cp, continue
+                    if (playerStats.inLevel() && playerStats.getCheckpoint() != null) {
+                        ProtectedRegion checkpointTo = WorldGuard.getRegion(playerStats.getCheckpoint());
+
+                        // if the cp region isnt null, continue and get level
+                        if (checkpointTo != null) {
+                            Level checkpointLevel = Parkour.getLevelManager().get(checkpointTo.getId());
+
+                            // if they cp level isnt null and the cp level is NOT the same as the level theyre teleporting to, save the cp
+                            if (checkpointLevel != null && !checkpointLevel.getName().equalsIgnoreCase(level.getName())) {
+                                CheckpointDB.savePlayerAsync(playerStats);
+                                playerStats.resetCheckpoint();
+                            }
+                        }
                     }
                     playerStats.setLevel(level);
-                } else if (playerStats.getLevel() != null)
+                } else if (playerStats.inLevel())
                     resetLevel = true;
 
-            } else if (playerStats.getLevel() != null)
+            } else if (playerStats.inLevel())
                 resetLevel = true;
 
             if (resetLevel) {
