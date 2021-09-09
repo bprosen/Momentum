@@ -219,6 +219,10 @@ public class EventManager {
                 // make sure the area they are spawning in is a level
                 if (level != null)
                     playerStats.setLevel(level);
+                else
+                    playerStats.resetLevel();
+            } else {
+                playerStats.resetLevel();
             }
         }
 
