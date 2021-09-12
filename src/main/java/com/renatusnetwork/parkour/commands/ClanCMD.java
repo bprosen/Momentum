@@ -558,7 +558,7 @@ public class ClanCMD implements CommandExecutor {
             case "create":
                 return Utils.translate("&3/clan create <tag>  &7Create a clan &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
             case "changetag":
-                return Utils.translate("&3/clan changetag <tag>  &7Change clan tag &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
+                return Utils.translate("&3/clan changetag <tag>  &7Change clan tag &6" + Parkour.getSettingsManager().clans_price_tag + " Coins");
             case "setowner":
                 return Utils.translate("&3/clan setowner <player>  &7Give your clan ownership");
             case "kick":
