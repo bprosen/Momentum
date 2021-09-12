@@ -699,17 +699,21 @@ public class LevelCMD implements CommandExecutor {
                     if (level != null) {
                         int playerID = StatsDB.getPlayerID(playerName);
                         if (playerID > -1) {
-                            PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
+                            if (StatsDB.hasCompleted(playerID, level.getID())) {
 
-                            if (playerStats.getLevelCompletionsCount(levelName) > 0) {
-                                // remove completion from stats and other personalized stat
-                                StatsDB.removeCompletions(playerID, level.getID());
+                                int totalCompletions = StatsDB.getTotalCompletions(playerName);
                                 Parkour.getDatabaseManager().add(
-                                        "UPDATE players SET level_completions=" + (playerStats.getTotalLevelCompletions() - 1) +
-                                                " WHERE player_name='" + playerStats.getPlayerName() + "'");
+                                        "UPDATE players SET level_completions=" + (totalCompletions - 1) +
+                                                " WHERE player_name='" + playerName + "'");
 
-                                playerStats.getLevelCompletionsMap().remove(levelName);
-                                playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() - 1);
+                                StatsDB.removeCompletions(playerID, level.getID());
+
+                                PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
+                                if (playerStats != null) {
+                                    // remove completion from stats and other personalized stat
+                                    playerStats.getLevelCompletionsMap().remove(levelName);
+                                    playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() - 1);
+                                }
 
                                 // remove completion on level basis
                                 levelManager.removeTotalLevelCompletion();

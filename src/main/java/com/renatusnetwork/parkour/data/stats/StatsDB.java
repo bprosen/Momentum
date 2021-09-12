@@ -278,6 +278,15 @@ public class StatsDB {
 
         Parkour.getDatabaseManager().add(query);
     }
+
+    public static boolean hasCompleted(int playerID, int levelID) {
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults("completions", "*",
+                                        " WHERE player_id=" + playerID + " AND level_id=" + levelID);
+
+        return !playerResults.isEmpty();
+    }
+
     /*
      * Leader Board Section
      */
