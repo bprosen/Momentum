@@ -152,6 +152,7 @@ public class Parkour extends JavaPlugin {
         getCommand("profile").setExecutor(new ProfileCMD());
         getCommand("cosmetics").setExecutor(new CosmeticsCMD());
         getCommand("ragequit").setExecutor(new RageQuitCMD());
+        getCommand("setspawn").setExecutor(new SetSpawnCMD());
     }
 
     private static void loadClasses() {
