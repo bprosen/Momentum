@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -192,6 +193,10 @@ public class EventManager {
         playerStats.disableLevelStartTime();
         playerStats.joinedEvent();
         player.teleport(runningEvent.getLevel().getStartLocation());
+
+        // remove active effects
+        for (PotionEffect potionEffect : player.getActivePotionEffects())
+            player.removePotionEffect(potionEffect.getType());
     }
 
     public void removeParticipant(Player player, boolean disconnected) {
