@@ -70,10 +70,7 @@ public class PlotCMD implements CommandExecutor {
                             PlotsDB.toggleSubmittedFromName(plotOwner);
                             player.sendMessage(Utils.translate("&7You accepted &4" + plotOwner + "&7's Plot"));
 
-                            Player target = Bukkit.getPlayer(plotOwner);
-
-                            if (target != null)
-                                target.sendMessage(Utils.translate("&cYour plot has been accepted, congratulations!"));
+                            Bukkit.dispatchCommand(player, "mail send " + plotOwner + " Your plot has been accepted, congratulations!");
                             // otherwise, add timer and add to confirm map
                         } else {
                             player.sendMessage(Utils.translate("&7Are you someone with backend that will add this map?" +
@@ -115,12 +112,7 @@ public class PlotCMD implements CommandExecutor {
                         PlotsDB.toggleSubmittedFromName(plotOwner);
                         player.sendMessage(Utils.translate("&cYou denied &4" + plotOwner + "&c's Plot"));
 
-                        Player target = Bukkit.getPlayer(plotOwner);
-
-                        if (target != null) {
-                            target.sendMessage(Utils.translate("&cYour plot has been denied, try again soon!"));
-                            target.sendMessage(Utils.translate("&7With reason: &c" + reason));
-                        }
+                        Bukkit.dispatchCommand(player, "mail send " + plotOwner + " Your plot has been denied for: " + reason);
                     } else {
                         player.sendMessage(Utils.translate("&4" + plotOwner + "&c's Plot is not submitted!"));
                     }
