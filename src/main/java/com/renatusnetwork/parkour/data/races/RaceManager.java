@@ -23,6 +23,7 @@ import java.util.*;
 
 public class RaceManager {
 
+    Race newRace; // Define as class variable for use in both sendRequest and startRace
     private Set<Race> runningRaceList = new HashSet<>();
     private Set<RaceRequest> raceRequests = new HashSet<>();
     private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
@@ -45,7 +46,7 @@ public class RaceManager {
         // make sure it is not an invalid level
         if (selectedLevel != null) {
             // create object for the race
-            Race newRace = new Race(player1.getPlayer(), player2.getPlayer(), selectedLevel, bet, betAmount);
+            // Race newRace = new Race(player1.getPlayer(), player2.getPlayer(), selectedLevel, bet, betAmount);
             runningRaceList.add(newRace);
 
             // toggle off elytra
@@ -372,6 +373,10 @@ public class RaceManager {
                         ));
             }
         }
+
+        // Create race object in sendRequest instead so races are removed from the list upon request instead of race start.
+        newRace = new Race(player1.getPlayer(), player2.getPlayer(), selectedLevel, bet, betAmount);
+        runningRaceList.add(newRace); // Add to running list in sendRequest.
 
         if (selectedLevel == null) {
             player1.getPlayer().sendMessage(Utils.translate("&cInvalid level? Try again"));
