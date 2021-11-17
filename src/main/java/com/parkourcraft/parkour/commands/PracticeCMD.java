@@ -1,9 +1,9 @@
 package com.parkourcraft.parkour.commands;
 
-import com.parkourcraft.parkour.Parkour;
-import com.parkourcraft.parkour.data.stats.PlayerStats;
-import com.parkourcraft.parkour.gameplay.PracticeHandler;
-import com.parkourcraft.parkour.utils.Utils;
+import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.gameplay.PracticeHandler;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,35 +24,37 @@ public class PracticeCMD implements CommandExecutor {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (playerStats.getLevel() != null) {
-                if (player.isOnGround()) {
-                    if (!playerStats.inRace()) {
-                        if (playerStats.getPlayerToSpectate() == null) {
-                            if (!playerStats.isEventParticipant()) {
+                if (!playerStats.inRace()) {
+                    if (playerStats.getPlayerToSpectate() == null) {
+                        if (!playerStats.isEventParticipant()) {
 
-                                // if it is a dropper level, disable /prac
-                                if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
-                                    player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
-                                    return true;
-                                }
+                            // if it is a dropper level, disable /prac
+                            if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
+                                player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
+                                return true;
+                            }
 
-                                if (playerStats.getPracticeLocation() != null) {
-                                    PracticeHandler.resetPlayer(player, true);
-                                } else {
-                                    playerStats.setPracticeMode(player.getLocation());
-                                    playerStats.disableLevelStartTime();
-                                    player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
-                                }
+                            /*
+                             check practice location first, if not null then reset or
+                             then check if they are on ground then enable or cancel
+                             */
+                            if (playerStats.getPracticeLocation() != null) {
+                                PracticeHandler.resetPlayer(player, true);
+                            } else if (player.isOnGround()) {
+                                playerStats.setPracticeMode(player.getLocation());
+                                playerStats.disableLevelStartTime();
+                                player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
                             } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&cYou cannot enter practice mode while in /spectator"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
                         }
                     } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                        player.sendMessage(Utils.translate("&cYou cannot enter practice mode while in /spectator"));
                     }
                 } else {
-                    player.sendMessage(Utils.translate("&cYou cannot enable/disable practice mode while in the air"));
+                    player.sendMessage(Utils.translate("&cYou cannot do this while racing"));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot enter practice mode when not in a level"));
