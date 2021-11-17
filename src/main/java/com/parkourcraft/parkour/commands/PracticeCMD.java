@@ -27,23 +27,26 @@ public class PracticeCMD implements CommandExecutor {
                 if (player.isOnGround()) {
                     if (!playerStats.inRace()) {
                         if (playerStats.getPlayerToSpectate() == null) {
-                            if (!playerStats.isEventParticipant()) {
+                            if (!playerStats.isInInfinitePK()) {
+                                if (!playerStats.isEventParticipant()) {
+                                    // if it is a dropper level, disable /prac
+                                    if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
+                                        player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
+                                        return true;
+                                    }
 
-                                // if it is a dropper level, disable /prac
-                                if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
-                                    player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
-                                    return true;
-                                }
-
-                                if (playerStats.getPracticeLocation() != null) {
-                                    PracticeHandler.resetPlayer(player, true);
+                                    if (playerStats.getPracticeLocation() != null) {
+                                        PracticeHandler.resetPlayer(player, true);
+                                    } else {
+                                        playerStats.setPracticeMode(player.getLocation());
+                                        playerStats.disableLevelStartTime();
+                                        player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                                    }
                                 } else {
-                                    playerStats.setPracticeMode(player.getLocation());
-                                    playerStats.disableLevelStartTime();
-                                    player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                player.sendMessage(Utils.translate("&cYou cannot activate practice mode while in infinite parkour"));
                             }
                         } else {
                             player.sendMessage(Utils.translate("&cYou cannot enter practice mode while in /spectator"));
