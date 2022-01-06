@@ -55,13 +55,13 @@ public class StatsManager {
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
 
-        // update ascendance players every 2 seconds
+        // update ascendance players every second
         new BukkitRunnable() {
             @Override
             public void run() {
                 updateAscendancePlayers();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 2, 20 * 2);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20, 20);
     }
 
     public PlayerStats get(String UUID) {
