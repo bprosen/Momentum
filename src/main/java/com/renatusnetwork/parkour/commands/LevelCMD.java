@@ -60,11 +60,16 @@ public class LevelCMD implements CommandExecutor {
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7already exists"));
                         else {
                             LevelsYAML.create(levelName);
-                            // sync level data now
-                            if (LevelsDB.syncLevelData()) {
-                                levelManager.setLevelDataCache(LevelsDB.getDataCache());
-                                LevelsDB.syncDataCache();
-                            }
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    // sync level data now
+                                    if (LevelsDB.syncLevelData()) {
+                                        levelManager.setLevelDataCache(LevelsDB.getDataCache());
+                                        LevelsDB.syncDataCache();
+                                    }
+                                }
+                            }.runTaskAsynchronously(Parkour.getPlugin());
                             sender.sendMessage(Utils.translate("&7Created level &2" + levelName));
                         }
                     } else {
