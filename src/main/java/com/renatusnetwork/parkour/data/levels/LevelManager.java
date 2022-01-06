@@ -85,14 +85,6 @@ public class LevelManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        new BukkitRunnable() {
-            public void run() {
-                if (LevelsDB.syncLevelData()) {
-                    setLevelDataCache(LevelsDB.getDataCache());
-                    LevelsDB.syncDataCache();
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 60 * 20, 10);
 
         // update player count in levels every 60 seconds
         new BukkitRunnable() {
