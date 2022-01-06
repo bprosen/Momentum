@@ -275,12 +275,18 @@ public class Level {
                 > levelCompletion.getCompletionTimeElapsed()) {
 
             LevelCompletion completionToRemove = null;
+            boolean completionSlower = false;
             for (LevelCompletion completion : leaderboardCache) {
                 if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
-                    completionToRemove = completion;
+                    if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                        completionToRemove = completion;
+                    else
+                        completionSlower = true;
             }
             if (completionToRemove != null)
-            leaderboardCache.remove(completionToRemove);
+                leaderboardCache.remove(completionToRemove);
+            else if (completionSlower)
+                return;
 
             sortNewCompletion(levelCompletion);
         }
