@@ -68,31 +68,34 @@ public class JoinLeaveHandler implements Listener {
                     @Override
                     public void run() {
 
-                        // load level, checkpoint info here
-                        ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
-                        if (region != null) {
+                        // if not spectating
+                        if (playerStats.getPlayerToSpectate() == null) {
+                            // load level, checkpoint info here
+                            ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
+                            if (region != null) {
 
-                            Level level = Parkour.getLevelManager().get(region.getId());
+                                Level level = Parkour.getLevelManager().get(region.getId());
 
-                            // make sure the area they are spawning in is a level
-                            if (level != null) {
-                                playerStats.setLevel(level);
+                                // make sure the area they are spawning in is a level
+                                if (level != null) {
+                                    playerStats.setLevel(level);
 
-                                // if the level they are being added to is an ascendance level, add them to the list
-                                if (level.isAscendanceLevel())
-                                    statsManager.enteredAscendance(playerStats);
+                                    // if the level they are being added to is an ascendance level, add them to the list
+                                    if (level.isAscendanceLevel())
+                                        statsManager.enteredAscendance(playerStats);
 
-                                // load if they have one
-                                CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
+                                    // load if they have one
+                                    CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
 
-                                // is elytra level, then set elytra in sync (player inventory changes)
-                                if (level.isElytraLevel())
-                                    new BukkitRunnable() {
-                                        @Override
-                                        public void run() {
-                                            Parkour.getStatsManager().toggleOnElytra(playerStats);
-                                        }
-                                    }.runTask(Parkour.getPlugin());
+                                    // is elytra level, then set elytra in sync (player inventory changes)
+                                    if (level.isElytraLevel())
+                                        new BukkitRunnable() {
+                                            @Override
+                                            public void run() {
+                                                Parkour.getStatsManager().toggleOnElytra(playerStats);
+                                            }
+                                        }.runTask(Parkour.getPlugin());
+                                }
                             }
                         }
                     }

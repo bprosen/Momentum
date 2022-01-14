@@ -152,8 +152,20 @@ public class LevelListener implements Listener {
         playerStats.setCheckpoint(location);
 
         // update if in ascendance realm
-        if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
+        if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world)) {
+
+            // check region null
+            ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
+            if (region != null) {
+
+                Level level = Parkour.getLevelManager().get(region.getId());
+                // make sure the area they are spawning in is a level and not equal
+                if (level != null && !level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
+                    playerStats.setLevel(level);
+            }
+            // update in ascendance map
             playerStats.updateAscendanceCheckpoint(playerStats.getLevel().getName(), location);
+        }
 
         String msgString = "&eYour checkpoint has been set";
         if (playerStats.getLevelStartTime() > 0) {
@@ -175,11 +187,26 @@ public class LevelListener implements Listener {
             if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line) &&
                 ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
 
-                Level level = Parkour.getStatsManager().get(player).getLevel();
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                Level level = playerStats.getLevel();
 
-                if (level != null)
-                    LevelHandler.levelCompletion(player, level.getName());
+                // level null check
+                if (level != null) {
+                    // update if in ascendance realm
+                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world)) {
 
+                        // check region null
+                        ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
+                        if (region != null) {
+
+                            Level levelTo = Parkour.getLevelManager().get(region.getId());
+                            // make sure the area they are spawning in is a level and not equal
+                            if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                                playerStats.setLevel(levelTo);
+                        }
+                    }
+                    LevelHandler.levelCompletion(player, playerStats.getLevel().getName());
+                }
             } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
                 Location lobby = Parkour.getLocationManager().getLobbyLocation();
 
