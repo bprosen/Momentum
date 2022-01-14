@@ -1,9 +1,12 @@
 package com.renatusnetwork.parkour.gameplay;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -46,6 +49,7 @@ public class SpectatorHandler {
         Player player = playerStats.getPlayer();
 
         if (loc != null) {
+
             player.teleport(loc);
             TitleAPI.sendTitle(
                     player, 10, 40, 10,
@@ -53,9 +57,21 @@ public class SpectatorHandler {
                     Utils.translate("&7You are no longer spectating anyone"));
             playerStats.resetSpectateSpawn();
 
-            // if level is elytra level, toggle back on
-            if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
-                Parkour.getStatsManager().toggleOnElytra(playerStats);
+            // region null check
+            ProtectedRegion region = WorldGuard.getRegion(loc);
+            if (region != null) {
+
+                Level level = Parkour.getLevelManager().get(region.getId());
+
+                // make sure the area they are spawning in is a level
+                if (level != null) {
+                    playerStats.setLevel(level);
+
+                    // if elytra level, toggle on
+                    if (playerStats.getLevel().isElytraLevel())
+                        Parkour.getStatsManager().toggleOnElytra(playerStats);
+                }
+            }
         }
     }
 
