@@ -3,7 +3,7 @@
 database:
   host: ""
   port:
-  database: "parkourcraft_parkour_stats_new"
+  database: ""
   username: ""
   password: ""
 
