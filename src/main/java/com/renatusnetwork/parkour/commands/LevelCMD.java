@@ -781,7 +781,9 @@ public class LevelCMD implements CommandExecutor {
                                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in " + levelName));
                                 }
                             } else {
-                                sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a checkpoint"));
+                                Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'" +
+                                        " AND player_name='" + playerName + "'");
+                                sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a loaded checkpoint, but any database record was deleted"));
                             }
                         } else {
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
