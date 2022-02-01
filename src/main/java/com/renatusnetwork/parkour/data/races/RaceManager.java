@@ -250,7 +250,7 @@ public class RaceManager {
 
             if (raceObject.hasBet())
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getName() + " &7has beaten &4" + loser.getName()
-                                        + " &7in a race for &6$" + raceObject.getBet() + " &7on " + raceObject.getRaceLevel().getFormattedTitle()));
+                                        + " &7in a race for &6$" + Utils.formatNumber(raceObject.getBet()) + " &7on " + raceObject.getRaceLevel().getFormattedTitle()));
             else
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getName() + " &7has beaten &4" + loser.getName()
                                         + " &7in a race on " + raceObject.getRaceLevel().getFormattedTitle()));
@@ -383,8 +383,8 @@ public class RaceManager {
         String opponentString;
 
         if (bet) {
-            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + betAmount);
-            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + betAmount);
+            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + Utils.formatNumber(betAmount));
+            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + Utils.formatNumber(betAmount));
         } else {
             opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request");
             senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request");
@@ -482,14 +482,14 @@ public class RaceManager {
             double senderBalance = Parkour.getEconomy().getBalance(player2.getPlayer());
             if (accepterBalance < betAmount) {
                 player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                        " Your Balance &4$" + senderBalance));
+                        " Your Balance &4$" + Utils.formatNumber(senderBalance)));
                 removeRequest(raceRequest);
                 return;
             }
 
             if (senderBalance < betAmount) {
                 player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayerName() + " &7does not have enough to do this bet" +
-                        " - &cTheir Balance &4$" + senderBalance));
+                        " - &cTheir Balance &4$" + Utils.formatNumber(senderBalance)));
                 removeRequest(raceRequest);
                 return;
             }
