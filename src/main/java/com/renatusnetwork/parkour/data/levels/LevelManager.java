@@ -19,7 +19,7 @@ public class LevelManager {
 
     private HashMap<String, Level> levels = new HashMap<>();
     private HashMap<String, LevelData> levelDataCache;
-    private Set<Level> levelsInMenus = new HashSet<>();
+    private HashMap<Menu, Set<Level>> menuLevels = new HashMap<>();
     private Level featuredLevel = null;
     private long totalLevelCompletions;
     private LinkedHashSet<Level> globalLevelCompletionsLB = new LinkedHashSet<>
@@ -91,15 +91,14 @@ public class LevelManager {
             @Override
             public void run() {
 
-                // loop through levels then all players online to determine how many are in each level
-                for (Level level : levelsInMenus) {
-                    if (level != null) {
-                        int amountInLevel = 0;
-                        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
+            // loop through levels then all players online to determine how many are in each level
+            for (Level level : getLevelsInAllMenus()) {
+                if (level != null) {
+                    int amountInLevel = 0;
+                    for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
 
-                            if (playerStats != null && playerStats.inLevel() &&
-                                playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
-                                amountInLevel++;
+                        if (playerStats != null && playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                            amountInLevel++;
                         }
                         level.setPlayersInLevel(amountInLevel);
                     }
@@ -125,7 +124,7 @@ public class LevelManager {
            sort through all levels that are in menus
            to make sure it does not have required levels and has more than 0 coin reward
          */
-        for (Level level : getLevelsInMenus()) {
+        for (Level level : getLevelsInAllMenus()) {
             if (level.getRequiredLevels().isEmpty() && level.getReward() > 0 && level.getReward() < 50000)
                 temporaryList.add(level);
         }
@@ -145,14 +144,14 @@ public class LevelManager {
      */
     public void loadLevelsInMenus() {
 
-        // clear for each time its loaded, just in case
-        levelsInMenus.clear();
-
-        // first loop through each menu
+        menuLevels.clear();
         for (String menuName : MenusYAML.getNames()) {
             Menu menu = Parkour.getMenuManager().getMenu(menuName);
             // null check menu
             if (menu != null) {
+                Set<Level> levelsInMenu = new HashSet<>();
+                boolean menuHasLevels = false;
+
                 // then loop through each page in the menu
                 for (int i = 1; i <= menu.getPageCount(); i++) {
 
@@ -167,24 +166,39 @@ public class LevelManager {
                             if (menuItem != null) {
                                 // then check if the item is a level type, if so, add to list
                                 if (menuItem.getType().equalsIgnoreCase("level")) {
+                                    menuHasLevels = true; // enable it as a menu with levels
                                     Level menuLevel = get(menuItem.getTypeValue());
 
                                     // last step! null check level
                                     if (menuLevel != null)
-                                        levelsInMenus.add(menuLevel);
+                                        levelsInMenu.add(menuLevel);
                                 }
                             }
                         }
                     }
                 }
-            } else {
-                Parkour.getPluginLogger().info("Null Menu on getLevelsInMenus()");
+                if (menuHasLevels)
+                    // add to menu map
+                    menuLevels.put(menu, levelsInMenu);
             }
         }
     }
 
-    public Set<Level> getLevelsInMenus() {
+    public Set<Level> getLevelsInAllMenus() {
+        Set<Level> levelsInMenus = new HashSet<>();
+
+        // loop through then add to new hashset
+        for (Set<Level> levels : menuLevels.values())
+            for (Level level : levels)
+                levelsInMenus.add(level);
+
         return levelsInMenus;
+    }
+
+    public Set<Level> getLevelsFromMenu(Menu menu) {
+        if (menuLevels.containsKey(menu))
+            return menuLevels.get(menu);
+        return null;
     }
 
     public Level getFeaturedLevel() {

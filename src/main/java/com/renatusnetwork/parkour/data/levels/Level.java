@@ -195,9 +195,7 @@ public class Level {
     public List<String> getCommands() { return commands; }
 
     public boolean hasCommands() {
-        if (!commands.isEmpty())
-            return true;
-        return false;
+        return !commands.isEmpty();
     }
 
     public void setTotalCompletionsCount(int count) {

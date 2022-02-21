@@ -9,14 +9,17 @@ import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class MenuItemFormatter {
 
@@ -25,6 +28,8 @@ public class MenuItemFormatter {
             return getLevel(playerStats, menuItem);
         if (menuItem.getType().equals("perk"))
             return getPerk(player, playerStats, menuItem);
+        if (menuItem.getType().equals("open"))
+            return enchantMenuItem(playerStats, menuItem, Parkour.getMenuManager().getMenu(menuItem.getTypeValue()));
         if (menuItem.getType().equals("type")) {
             // make coin rankup menu for /rankup if in stage 1
             if (menuItem.getTypeValue().equals("coin-rankup"))
@@ -236,6 +241,32 @@ public class MenuItemFormatter {
             levelItem.setItemMeta(itemMeta);
         }
         return levelItem;
+    }
+
+    private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu) {
+        // get item and levels, clone so it can change properly
+        ItemStack item = menuItem.getItem().clone();
+        Set<Level> levelsInMenu = Parkour.getLevelManager().getLevelsFromMenu(menu);
+
+        if (levelsInMenu != null && !levelsInMenu.isEmpty()) {
+
+            // more optimized: start as true and if a level is not completed, toggle to false and break
+            boolean enchant = true;
+            for (Level level : levelsInMenu)
+                if (playerStats.getLevelCompletionsCount(level.getName()) < 1) {
+                    enchant = false;
+                    break;
+                }
+
+            // if enchanting, add durability and hide it for glow effect
+            if (enchant) {
+                ItemMeta itemMeta = item.getItemMeta();
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                item.setItemMeta(itemMeta);
+            }
+        }
+        return item;
     }
 
     private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem) {

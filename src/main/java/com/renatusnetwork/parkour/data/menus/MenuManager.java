@@ -23,7 +23,6 @@ public class MenuManager {
 
     public MenuManager() {
         load();
-        //startScheduler(plugin);
     }
 
     public void load() {
@@ -33,18 +32,20 @@ public class MenuManager {
             load(menuName);
     }
 
-    // disabled due to really not worth it for the micro-optimization lost from using it
-    /*private void startScheduler(Plugin plugin) {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            public void run() {
-                updateOpenInventories();
-            }
-        }, 0L, 10L);
-    }*/
-
     public void load(String menuName) {
         if (MenusYAML.exists(menuName))
             menuMap.put(menuName, new Menu(menuName));
+    }
+
+    public List<Menu> getMenus() {
+        List<Menu> menuArray = new ArrayList<>();
+
+        // add menus to list
+        for (Menu menu : menuMap.values())
+            if (menu != null)
+                menuArray.add(menu);
+
+        return menuArray;
     }
 
     public boolean exists(String menuName) {
@@ -101,8 +102,10 @@ public class MenuManager {
     }
 
     public void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
-        if (exists(menuName))
-            menuMap.get(menuName).updateInventory(player, inventory, pageNumber);
+        Menu menu = menuMap.get(menuName);
+        if (menu != null) {
+            menu.updateInventory(player, inventory, pageNumber);
+        }
     }
 
     public void renameLevel(String oldLevelName, String newLevelName) {
@@ -259,26 +262,4 @@ public class MenuManager {
             player.sendMessage(Utils.translate("&cUnable to open inventory, null?"));
         }
     }
-
-    /*public void updateOpenInventories() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            InventoryView inventoryView = player.getOpenInventory();
-
-            if (inventoryView != null) {
-                Menu menu = getMenuFromTitle(inventoryView.getTitle());
-
-                if (menu != null
-                        && menu.isUpdating()) {
-                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-                    updateInventory(
-                            player,
-                            inventoryView,
-                            menu.getName(),
-                            Utils.getTrailingInt(inventoryView.getTitle())
-                    );
-                }
-            }
-        }
-    }*/
 }

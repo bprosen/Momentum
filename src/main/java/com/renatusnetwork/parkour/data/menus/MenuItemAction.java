@@ -12,6 +12,8 @@ import com.renatusnetwork.parkour.data.ranks.RanksDB;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -354,9 +356,18 @@ public class MenuItemAction {
     private static void performTeleportItem(Player player, MenuItem menuItem) {
         Location location = Parkour.getLocationManager().get(menuItem.getTypeValue());
 
+        // null check
         if (location != null) {
-            player.closeInventory();
-            player.teleport(location);
+            // region check
+            ProtectedRegion region = WorldGuard.getRegion(location);
+            if (region != null) {
+
+                Level level = Parkour.getLevelManager().get(region.getId());
+
+                // make sure the area they are spawning in is a level
+                if (level != null)
+                    performLevelTeleport(Parkour.getStatsManager().get(player), player, level);
+            }
         }
     }
 

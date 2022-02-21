@@ -55,6 +55,7 @@ public class MenuCMD implements CommandExecutor {
 
                     sender.sendMessage(Utils.translate("&7Loaded &2menus.yml &7from disk"));
                     menuManager.load();
+                    Parkour.getLevelManager().loadLevelsInMenus();
                     sender.sendMessage(Utils.translate("&7Loaded menus from the config"));
                 } else {
                     sender.sendMessage(Utils.translate("&cYou do not have permission to use this command"));
