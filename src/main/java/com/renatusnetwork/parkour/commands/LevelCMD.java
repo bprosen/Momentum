@@ -342,8 +342,11 @@ public class LevelCMD implements CommandExecutor {
                                 int name = row - 1;
                                 LevelCompletion levelCompletion = completions.get(name);
                                 int time = (int) levelCompletion.getCompletionTimeElapsed();
+                                // get player ID for specific deletion on no timer based levels
+                                int playerID = StatsDB.getPlayerID(levelCompletion.getPlayerName());
+
                                 Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" +
-                                        level.getID() + " AND time_taken=" + time);
+                                        level.getID() + " AND time_taken=" + time + " AND player_id=" + playerID);
                                 completions.remove(levelCompletion);
                                 level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
                                 sender.sendMessage(Utils.translate("&4" + levelCompletion.getPlayerName() + "'s" +
