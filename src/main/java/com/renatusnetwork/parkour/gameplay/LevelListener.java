@@ -94,7 +94,9 @@ public class LevelListener implements Listener {
             if (block.getType() == Material.STONE_PLATE) {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats != null && playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
+                if (playerStats != null && playerStats.getLevel() != null &&
+                    playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null &&
+                    playerStats.getCheckpoint() == null) {
 
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
