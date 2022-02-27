@@ -46,12 +46,13 @@ public class LevelListener implements Listener {
                 // if they are participant and fall into water, eliminate them
                 if (eventManager.isEventRunning() &&
                     playerStats.isEventParticipant() &&
-                    eventManager.getEventType() == EventType.RISING_WATER) {
+                    eventManager.getEventType() == EventType.RISING_WATER &&
+                    eventManager.isStartCoveredInWater()) {
 
                     eventManager.doFireworkExplosion(player.getLocation());
                     eventManager.removeParticipant(player, false);
                     eventManager.addEliminated(player);
-                    player.sendMessage(Utils.translate("&7You fell in water and got &beliminated out &7of the event!"));
+                    player.sendMessage(Utils.translate("&7You are &beliminated &7out of the event!"));
 
                 } else if (playerStats.inRace()) {
 

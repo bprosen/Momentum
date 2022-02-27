@@ -30,15 +30,9 @@ public class DamageListener implements Listener {
 
                     // cancel damage event just for safety
                     event.setCancelled(true);
-                    // only run code if they are both participants, therefore the victim is eliminated
-                    if (victimStats.isEventParticipant()) {
-
-                        // then cancel and remove, and do firework
-                        eventManager.doFireworkExplosion(victim.getLocation());
-                        eventManager.removeParticipant(victim, false);
-                        eventManager.addEliminated(victim);
-                        victim.sendMessage(Utils.translate("&7You were hit and got &beliminated out &7of the event!"));
-                    }
+                    // only run code if they are both participants, therefore respawn player
+                    if (victimStats.isEventParticipant())
+                        LevelHandler.respawnPlayer(player, eventManager.getRunningEvent().getLevel());
                 }
             // for elytra
             } else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
