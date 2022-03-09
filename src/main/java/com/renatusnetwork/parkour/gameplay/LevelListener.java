@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -227,8 +228,7 @@ public class LevelListener implements Listener {
                     playerStats.resetPracticeMode();
                     playerStats.resetLevel();
 
-                    for (PotionEffect potionEffect : player.getActivePotionEffects())
-                        player.removePotionEffect(potionEffect.getType());
+                    StatsManager.clearEffects(player);
 
                     player.teleport(lobby);
                 }

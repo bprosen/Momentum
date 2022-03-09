@@ -41,6 +41,7 @@ public class PlayerStats {
     private boolean eventParticipant = false;
     private boolean bypassingPlots = false;
     private int totalLevelCompletions = 0;
+    private boolean nightVision = false;
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> ascendanceCheckpoints = new HashMap<>();
@@ -80,6 +81,10 @@ public class PlayerStats {
     public int getPlayerID() {
         return playerID;
     }
+
+    public boolean getVisionStatus() {return nightVision; }
+
+    public void setVisionStatus(boolean inp) {nightVision = inp; }
 
     //
     // Race Section

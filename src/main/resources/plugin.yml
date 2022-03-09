@@ -71,3 +71,6 @@ commands:
   ragequit:
     description: "RN-Parkour rage quit command"
     aliases: [rq, rage]
+  nightvision:
+    description: "RN-Parkour night vision command"
+    aliases: [nv, nightvision]

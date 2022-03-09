@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -177,8 +178,7 @@ public class LevelHandler {
             playerStats.resetCheckpoint();
 
             // clear potion effects
-            for (PotionEffect potionEffect : player.getActivePotionEffects())
-                player.removePotionEffect(potionEffect.getType());
+            StatsManager.clearEffects(player);
 
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());

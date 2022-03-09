@@ -37,8 +37,7 @@ public class WorldChangeListener implements Listener {
                 player.getInventory().setArmorContents(null);
 
                 // clear potion effects
-                for (PotionEffect potionEffect : player.getActivePotionEffects())
-                    player.removePotionEffect(potionEffect.getType());
+                StatsManager.clearEffects(player);
             }
         }
     }

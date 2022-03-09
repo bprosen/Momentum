@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -68,8 +69,8 @@ public class SpawnCMD implements CommandExecutor {
                         playerStats.resetPracticeMode();
                         playerStats.resetLevel();
 
-                        for (PotionEffect potionEffect : player.getActivePotionEffects())
-                            player.removePotionEffect(potionEffect.getType());
+                        StatsManager.clearEffects(player);
+
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
                     }

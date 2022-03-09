@@ -186,6 +186,22 @@ public class StatsDB {
         Parkour.getDatabaseManager().add(query);
     }
 
+    public static void updatePlayerNightVision(PlayerStats playerStats) {
+        int vision = 0;
+
+        if (playerStats.getVisionStatus())
+            vision = 1;
+
+        String query = "UPDATE players SET " +
+                "vision=" + vision + " " +
+                "WHERE player_id=" + playerStats.getPlayerID()
+                ;
+
+        Parkour.getDatabaseManager().add(query);
+    }
+
+
+
     public static boolean isPlayerInDatabase(String playerName) {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(

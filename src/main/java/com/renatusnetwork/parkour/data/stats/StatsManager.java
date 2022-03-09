@@ -20,6 +20,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
@@ -79,6 +81,60 @@ public class StatsManager {
 
         return null;
     }
+
+    public static void giveEffects(Player player, PotionEffect effect) {
+        player.addPotionEffect(effect);
+    }
+
+    public static void clearEffects(Player player) {
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+        ArrayList<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
+
+        if (playerStats.getVisionStatus()) {
+            for (PotionEffect e : effects) {
+                if (e.getType() != PotionEffectType.NIGHT_VISION) {
+                    player.removePotionEffect(e.getType());
+                }
+            }
+        } else {
+            for (PotionEffect e : effects) {
+                player.removePotionEffect(e.getType());
+            }
+        }
+
+    }
+
+    public static void clearNightVisionEffect(Player player) {
+
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+        boolean conatinsVision = false;
+
+        if (playerStats.getVisionStatus()) {
+            List<PotionEffect> potionEffects = playerStats.getLevel().getPotionEffects();
+            if (potionEffects.size() > 0) {
+                for (PotionEffect p : potionEffects) {
+                    if (p.getType() == PotionEffectType.NIGHT_VISION) {
+                        conatinsVision = true;
+                        break;
+                    }
+                }
+                if (conatinsVision) {
+                    playerStats.setVisionStatus(false);
+                } else {
+                    playerStats.setVisionStatus(false);
+                    player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+                }
+            } else {
+                playerStats.setVisionStatus(false);
+                player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            }
+        }
+
+    }
+
 
     public HashMap<String, PlayerStats> getPlayerStats() {
         return (HashMap<String, PlayerStats>) playerStatsList.clone();
