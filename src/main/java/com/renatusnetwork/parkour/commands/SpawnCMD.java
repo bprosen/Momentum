@@ -48,6 +48,7 @@ public class SpawnCMD implements CommandExecutor {
 
     private void teleportToSpawn(Player player) {
         Location loc = Parkour.getLocationManager().getLobbyLocation();
+        StatsManager statsManager = Parkour.getStatsManager();
 
         if (loc != null) {
 
@@ -69,7 +70,7 @@ public class SpawnCMD implements CommandExecutor {
                         playerStats.resetPracticeMode();
                         playerStats.resetLevel();
 
-                        StatsManager.clearEffects(player);
+                        statsManager.clearEffects(player);
 
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));

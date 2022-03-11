@@ -113,6 +113,7 @@ public class JoinLeaveHandler implements Listener {
         EventManager eventManager = Parkour.getEventManager();
         InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
         ClansManager clansManager = Parkour.getClansManager();
+        StatsManager statsManager = Parkour.getStatsManager();
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
@@ -143,8 +144,8 @@ public class JoinLeaveHandler implements Listener {
             infinitePKManager.endPK(player, true);
 
         // if night vision is enabled, clear it
-        if (playerStats.getVisionStatus())
-            StatsManager.clearNightVisionEffect(player);
+        if (playerStats.hasNVstatus())
+            statsManager.clearEffects(player);
 
         // toggle off elytra armor
         Parkour.getStatsManager().toggleOffElytra(playerStats);

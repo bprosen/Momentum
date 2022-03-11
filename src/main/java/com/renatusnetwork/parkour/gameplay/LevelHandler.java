@@ -71,6 +71,7 @@ public class LevelHandler {
     public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean rankUpLevel, boolean forcedCompletion) {
 
         LevelManager levelManager = Parkour.getLevelManager();
+        StatsManager statsManager = Parkour.getStatsManager();
 
         // if they have not completed this individual level, then add
         if (playerStats.getLevelCompletionsCount(levelName) < 1)
@@ -178,7 +179,7 @@ public class LevelHandler {
             playerStats.resetCheckpoint();
 
             // clear potion effects
-            StatsManager.clearEffects(player);
+            statsManager.clearEffects(player);
 
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());

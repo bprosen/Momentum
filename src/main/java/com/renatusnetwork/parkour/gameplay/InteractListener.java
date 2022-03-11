@@ -87,6 +87,7 @@ public class InteractListener implements Listener {
                 event.setCancelled(true);
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 Level level = playerStats.getLevel();
+                StatsManager statsManager = Parkour.getStatsManager();
 
                 if (!playerStats.inRace()) {
                     if (!playerStats.isEventParticipant()) {
@@ -118,7 +119,7 @@ public class InteractListener implements Listener {
 
                                     if (!level.getPotionEffects().isEmpty()) {
 
-                                        StatsManager.clearEffects(player);
+                                        statsManager.clearEffects(player);
 
                                         for (PotionEffect potionEffect : level.getPotionEffects())
                                             player.addPotionEffect(potionEffect);

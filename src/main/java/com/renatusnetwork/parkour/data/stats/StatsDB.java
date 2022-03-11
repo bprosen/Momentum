@@ -4,12 +4,10 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -189,11 +187,11 @@ public class StatsDB {
     public static void updatePlayerNightVision(PlayerStats playerStats) {
         int vision = 0;
 
-        if (playerStats.getVisionStatus())
+        if (playerStats.hasNVstatus())
             vision = 1;
 
         String query = "UPDATE players SET " +
-                "vision=" + vision + " " +
+                "night_vision=" + vision + " " +
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 

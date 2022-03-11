@@ -82,17 +82,13 @@ public class StatsManager {
         return null;
     }
 
-    public static void giveEffects(Player player, PotionEffect effect) {
-        player.addPotionEffect(effect);
-    }
-
-    public static void clearEffects(Player player) {
+    public void clearEffects(Player player) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         ArrayList<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
 
-        if (playerStats.getVisionStatus()) {
+        if (playerStats.hasNVstatus()) {
             for (PotionEffect e : effects) {
                 if (e.getType() != PotionEffectType.NIGHT_VISION) {
                     player.removePotionEffect(e.getType());
@@ -105,36 +101,6 @@ public class StatsManager {
         }
 
     }
-
-    public static void clearNightVisionEffect(Player player) {
-
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-        boolean conatinsVision = false;
-
-        if (playerStats.getVisionStatus()) {
-            List<PotionEffect> potionEffects = playerStats.getLevel().getPotionEffects();
-            if (potionEffects.size() > 0) {
-                for (PotionEffect p : potionEffects) {
-                    if (p.getType() == PotionEffectType.NIGHT_VISION) {
-                        conatinsVision = true;
-                        break;
-                    }
-                }
-                if (conatinsVision) {
-                    playerStats.setVisionStatus(false);
-                } else {
-                    playerStats.setVisionStatus(false);
-                    player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-                }
-            } else {
-                playerStats.setVisionStatus(false);
-                player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-            }
-        }
-
-    }
-
 
     public HashMap<String, PlayerStats> getPlayerStats() {
         return (HashMap<String, PlayerStats>) playerStatsList.clone();

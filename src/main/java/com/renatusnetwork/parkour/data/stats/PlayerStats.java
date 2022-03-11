@@ -82,7 +82,7 @@ public class PlayerStats {
         return playerID;
     }
 
-    public boolean getVisionStatus() {return nightVision; }
+    public boolean hasNVstatus() {return nightVision; }
 
     public void setVisionStatus(boolean inp) {nightVision = inp; }
 

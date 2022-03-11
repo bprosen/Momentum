@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NightVisionCMD implements CommandExecutor {
@@ -24,6 +23,7 @@ public class NightVisionCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        StatsManager statsManager = Parkour.getStatsManager();
 
         PotionEffect nightVision = new PotionEffect(PotionEffectType.NIGHT_VISION,Integer.MAX_VALUE,0);
 
@@ -33,11 +33,11 @@ public class NightVisionCMD implements CommandExecutor {
 
             // Enable
 
-            if (!playerStats.getVisionStatus()) { // Status is off
+            if (!playerStats.hasNVstatus()) { // Status is off
 
                 if (potionEffects.size() == 0) { // Level doesn't have effects
                     playerStats.setVisionStatus(true);
-                    StatsManager.giveEffects(player,nightVision);
+                    player.addPotionEffect(nightVision);
                     sender.sendMessage(Utils.translate("&aYou have been given night vision."));
                     return true;
                 } else { // Level does have effects
@@ -52,7 +52,7 @@ public class NightVisionCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&aYou enabled night vision!"));
                     } else { // Level has effects but not vision, so give them the sight and set stats to true
                         playerStats.setVisionStatus(true);
-                        StatsManager.giveEffects(player,nightVision);
+                        player.addPotionEffect(nightVision);
                         sender.sendMessage(Utils.translate("&aYou have been given night vision."));
                     }
                 }
@@ -61,8 +61,8 @@ public class NightVisionCMD implements CommandExecutor {
 
             // Disable
 
-            if (playerStats.getVisionStatus()) {
-                StatsManager.clearNightVisionEffect(player);
+            if (playerStats.hasNVstatus()) {
+                statsManager.clearEffects(player);
                 playerStats.setVisionStatus(false);
                 sender.sendMessage(Utils.translate("&4You have disabled night vision."));
             }
