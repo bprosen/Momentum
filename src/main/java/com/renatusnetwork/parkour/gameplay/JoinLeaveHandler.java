@@ -144,7 +144,7 @@ public class JoinLeaveHandler implements Listener {
             infinitePKManager.endPK(player, true);
 
         // if night vision is enabled, clear it
-        if (playerStats.hasNVstatus())
+        if (playerStats.hasNVStatus())
             statsManager.clearEffects(player);
 
         // toggle off elytra armor

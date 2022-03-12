@@ -33,9 +33,9 @@ public class NightVisionCMD implements CommandExecutor {
 
             // Enable
 
-            if (!playerStats.hasNVstatus()) { // Status is off
+            if (!playerStats.hasNVStatus()) { // Status is off
 
-                if (potionEffects.size() == 0) { // Level doesn't have effects
+                if (potionEffects.isEmpty()) { // Level doesn't have effects
                     playerStats.setVisionStatus(true);
                     player.addPotionEffect(nightVision);
                     sender.sendMessage(Utils.translate("&aYou have been given night vision."));
@@ -61,7 +61,7 @@ public class NightVisionCMD implements CommandExecutor {
 
             // Disable
 
-            if (playerStats.hasNVstatus()) {
+            if (playerStats.hasNVStatus()) {
                 statsManager.clearEffects(player);
                 playerStats.setVisionStatus(false);
                 sender.sendMessage(Utils.translate("&4You have disabled night vision."));

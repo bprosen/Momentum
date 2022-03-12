@@ -187,7 +187,7 @@ public class StatsDB {
     public static void updatePlayerNightVision(PlayerStats playerStats) {
         int vision = 0;
 
-        if (playerStats.hasNVstatus())
+        if (playerStats.hasNVStatus())
             vision = 1;
 
         String query = "UPDATE players SET " +

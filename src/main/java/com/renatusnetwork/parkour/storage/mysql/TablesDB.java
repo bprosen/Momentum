@@ -70,6 +70,7 @@ public class TablesDB {
                 "race_wins SMALLINT default 0, " +
                 "race_losses SMALLINT default 0, " +
                 "PRIMARY KEY (player_id)" +
+                "night_vision SMALLINT default 0, " +
                 ")";
 
         database.run(sqlQuery);

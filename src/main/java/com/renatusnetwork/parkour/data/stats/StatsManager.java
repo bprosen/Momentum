@@ -84,22 +84,11 @@ public class StatsManager {
 
     public void clearEffects(Player player) {
 
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
         ArrayList<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
 
-        if (playerStats.hasNVstatus()) {
-            for (PotionEffect e : effects) {
-                if (e.getType() != PotionEffectType.NIGHT_VISION) {
-                    player.removePotionEffect(e.getType());
-                }
-            }
-        } else {
             for (PotionEffect e : effects) {
                 player.removePotionEffect(e.getType());
             }
-        }
-
     }
 
     public HashMap<String, PlayerStats> getPlayerStats() {
