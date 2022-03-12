@@ -86,8 +86,9 @@ public class StatsManager {
 
         ArrayList<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
 
-            for (PotionEffect e : effects) {
-                player.removePotionEffect(e.getType());
+            for (PotionEffect effect : effects) {
+                if (effect.getType() != PotionEffectType.NIGHT_VISION)
+                    player.removePotionEffect(effect.getType());
             }
     }
 
