@@ -66,13 +66,8 @@ public class RaceManager {
             }
 
             // remove potion effects
-            for (PotionEffect effects : player1.getPlayer().getActivePotionEffects()) {
-                player1.getPlayer().removePotionEffect(effects.getType());
-            }
-
-            for (PotionEffect effects : player2.getPlayer().getActivePotionEffects()) {
-                player2.getPlayer().removePotionEffect(effects.getType());
-            }
+            player1.clearPotionEffects();
+            player2.clearPotionEffects();
 
             Level finalChosenLevel = selectedLevel; // need to make final for inner class usage
 

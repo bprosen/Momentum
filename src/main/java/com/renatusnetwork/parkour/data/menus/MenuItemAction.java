@@ -290,8 +290,7 @@ public class MenuItemAction {
                                 return;
                             }
 
-                            for (PotionEffect potionEffect : player.getActivePotionEffects())
-                                player.removePotionEffect(potionEffect.getType());
+                            playerStats.clearPotionEffects();
 
                             // toggle off if saved
                             Parkour.getStatsManager().toggleOffElytra(playerStats);

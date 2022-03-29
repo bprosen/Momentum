@@ -8,6 +8,9 @@ import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -27,7 +30,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses",
+                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -102,6 +105,22 @@ public class StatsDB {
                 // set total race losses
                 int raceLosses = Integer.parseInt(playerResult.get("race_losses"));
                 playerStats.setRaceLosses(raceLosses);
+
+                // set night vision, 0 == false, 1 == true
+                int nightVision = Integer.parseInt(playerResult.get("night_vision"));
+                if (nightVision == 0)
+                    playerStats.setNVStatus(false);
+                else {
+                    playerStats.setNVStatus(true);
+
+                    // run sync potion add
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                        }
+                    }.runTask(Parkour.getPlugin());
+                }
 
                 // get total count of how many levels they've rated
                 int ratedLevelsCount = Integer.parseInt(

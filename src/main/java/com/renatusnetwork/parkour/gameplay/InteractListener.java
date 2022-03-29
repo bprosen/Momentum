@@ -119,7 +119,7 @@ public class InteractListener implements Listener {
 
                                     if (!level.getPotionEffects().isEmpty()) {
 
-                                        statsManager.clearEffects(player);
+                                        playerStats.clearPotionEffects();
 
                                         for (PotionEffect potionEffect : level.getPotionEffects())
                                             player.addPotionEffect(potionEffect);

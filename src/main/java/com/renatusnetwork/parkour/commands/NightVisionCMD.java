@@ -12,64 +12,38 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.List;
-
 public class NightVisionCMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (!(sender instanceof Player)) {
-            return true;
-        }
+        if (sender instanceof Player) {
 
-        Player player = (Player) sender;
-        StatsManager statsManager = Parkour.getStatsManager();
+            Player player = (Player) sender;
+            StatsManager statsManager = Parkour.getStatsManager();
 
-        PotionEffect nightVision = new PotionEffect(PotionEffectType.NIGHT_VISION,Integer.MAX_VALUE,0);
+            PotionEffect nightVision = new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0);
 
-        if (a.length == 0) {
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            List<PotionEffect> potionEffects = playerStats.getLevel().getPotionEffects();
+            if (a.length == 0) {
+                PlayerStats playerStats = statsManager.get(player);
 
-            // Enable
+                if (!playerStats.hasNVStatus()) { // enable
 
-            if (!playerStats.hasNVStatus()) { // Status is off
-
-                if (potionEffects.isEmpty()) { // Level doesn't have effects
-                    playerStats.setVisionStatus(true);
+                    playerStats.setNVStatus(true);
                     player.addPotionEffect(nightVision);
-                    sender.sendMessage(Utils.translate("&aYou have been given night vision."));
-                    return true;
-                } else { // Level does have effects
-                    boolean containsVision = false;
-                    for (PotionEffect p : potionEffects) { // Check if one of those effects is night vision
-                        if (p.getType() == PotionEffectType.NIGHT_VISION) {
-                            containsVision = true;
-                        }
-                    }
-                    if (containsVision) { // Level has vision but still sets stats to true
-                        playerStats.setVisionStatus(true);
-                        sender.sendMessage(Utils.translate("&aYou enabled night vision!"));
-                    } else { // Level has effects but not vision, so give them the sight and set stats to true
-                        playerStats.setVisionStatus(true);
-                        player.addPotionEffect(nightVision);
-                        sender.sendMessage(Utils.translate("&aYou have been given night vision."));
-                    }
+                    sender.sendMessage(Utils.translate("&aYou have enabled Night Vision"));
+                } else { // disable
+
+                    // if !(in level and level is ascendance level) remove night vision
+                    if (!(playerStats.inLevel() && playerStats.getLevel().isAscendanceLevel()))
+                        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+                    playerStats.setNVStatus(false);
+                    player.sendMessage(Utils.translate("&cYou have disabled Night Vision"));
                 }
+                // update db
                 StatsDB.updatePlayerNightVision(playerStats);
             }
-
-            // Disable
-
-            if (playerStats.hasNVStatus()) {
-                statsManager.clearEffects(player);
-                playerStats.setVisionStatus(false);
-                sender.sendMessage(Utils.translate("&4You have disabled night vision."));
-            }
-
         }
-
-
-    return true;
+        return true;
     }
 }

@@ -82,16 +82,6 @@ public class StatsManager {
         return null;
     }
 
-    public void clearEffects(Player player) {
-
-        ArrayList<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
-
-            for (PotionEffect effect : effects) {
-                if (effect.getType() != PotionEffectType.NIGHT_VISION)
-                    player.removePotionEffect(effect.getType());
-            }
-    }
-
     public HashMap<String, PlayerStats> getPlayerStats() {
         return (HashMap<String, PlayerStats>) playerStatsList.clone();
     }

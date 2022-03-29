@@ -69,8 +69,8 @@ public class TablesDB {
                 "level_completions INT default 0, " +
                 "race_wins SMALLINT default 0, " +
                 "race_losses SMALLINT default 0, " +
+                "night_vision BIT DEFAULT 0, " +
                 "PRIMARY KEY (player_id)" +
-                "night_vision BIT DEFAULT 1, " +
                 ")";
 
         database.run(sqlQuery);

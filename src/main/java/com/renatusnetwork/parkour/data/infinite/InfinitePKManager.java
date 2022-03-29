@@ -88,6 +88,7 @@ public class InfinitePKManager {
 
                 // prepare block and teleport
                 startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
+                playerStats.clearPotionEffects();
                 player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
                 // immediately get new loc
                 doNextJump(player, true);

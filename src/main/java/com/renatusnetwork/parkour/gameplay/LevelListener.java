@@ -229,7 +229,7 @@ public class LevelListener implements Listener {
                     playerStats.resetPracticeMode();
                     playerStats.resetLevel();
 
-                    statsManager.clearEffects(player);
+                    playerStats.clearPotionEffects();
 
                     player.teleport(lobby);
                 }

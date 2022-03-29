@@ -22,6 +22,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 
@@ -145,7 +147,7 @@ public class JoinLeaveHandler implements Listener {
 
         // if night vision is enabled, clear it
         if (playerStats.hasNVStatus())
-            statsManager.clearEffects(player);
+            playerStats.clearPotionEffects();
 
         // toggle off elytra armor
         Parkour.getStatsManager().toggleOffElytra(playerStats);

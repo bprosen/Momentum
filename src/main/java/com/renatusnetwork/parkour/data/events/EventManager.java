@@ -195,8 +195,7 @@ public class EventManager {
         player.teleport(runningEvent.getLevel().getStartLocation());
 
         // remove active effects
-        for (PotionEffect potionEffect : player.getActivePotionEffects())
-            player.removePotionEffect(potionEffect.getType());
+        playerStats.clearPotionEffects();
     }
 
     public void removeParticipant(Player player, boolean disconnected) {

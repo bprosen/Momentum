@@ -70,7 +70,7 @@ public class SpawnCMD implements CommandExecutor {
                         playerStats.resetPracticeMode();
                         playerStats.resetLevel();
 
-                        statsManager.clearEffects(player);
+                        playerStats.clearPotionEffects();
 
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));

@@ -179,7 +179,7 @@ public class LevelHandler {
             playerStats.resetCheckpoint();
 
             // clear potion effects
-            statsManager.clearEffects(player);
+            playerStats.clearPotionEffects();
 
             // run gameplay actions: teleport and messaging
             player.teleport(level.getRespawnLocation());

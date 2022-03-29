@@ -4,9 +4,12 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.ranks.Rank;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -84,7 +87,7 @@ public class PlayerStats {
 
     public boolean hasNVStatus() {return nightVision; }
 
-    public void setVisionStatus(boolean inp) {nightVision = inp; }
+    public void setNVStatus(boolean nightVision) { this.nightVision = nightVision; }
 
     //
     // Race Section
@@ -441,4 +444,16 @@ public class PlayerStats {
     }
 
     public boolean isBypassingPlots() { return bypassingPlots; }
+
+    //
+    // Misc
+    //
+    public void clearPotionEffects() {
+
+        for (PotionEffect potionEffect : player.getActivePotionEffects())
+
+            // dont remove effect if its night vision, and they have it enabled
+            if (!(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION) && nightVision))
+                player.removePotionEffect(potionEffect.getType());
+    }
 }

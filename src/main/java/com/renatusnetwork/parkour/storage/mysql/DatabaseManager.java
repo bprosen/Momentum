@@ -29,11 +29,7 @@ public class DatabaseManager {
     }
 
     private void startScheduler(Plugin plugin) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
-            public void run() {
-                runCaches();
-            }
-        }, 0L, 2L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> runCaches(), 0L, 2L);
 
         // run async random queue every 10 minutes to keep connection alive if nobody is online and no database activity
         new BukkitRunnable() {
