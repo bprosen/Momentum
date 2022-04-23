@@ -40,8 +40,7 @@ public class PacketListener implements Listener {
                 PacketContainer packet = event.getPacket();
 
                 // use block change for right click, left click, etc
-                if (packet.getType() == PacketType.Play.Client.BLOCK_DIG ||
-                    packet.getType() == PacketType.Play.Client.USE_ITEM) {
+                if (packet.getType() == PacketType.Play.Client.BLOCK_DIG || packet.getType() == PacketType.Play.Client.USE_ITEM) {
 
                     Player player = event.getPlayer();
 
