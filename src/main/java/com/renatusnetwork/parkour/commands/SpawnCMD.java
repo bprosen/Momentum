@@ -48,7 +48,6 @@ public class SpawnCMD implements CommandExecutor {
 
     private void teleportToSpawn(Player player) {
         Location loc = Parkour.getLocationManager().getLobbyLocation();
-        StatsManager statsManager = Parkour.getStatsManager();
 
         if (loc != null) {
 

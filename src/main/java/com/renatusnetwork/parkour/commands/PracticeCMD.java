@@ -19,11 +19,11 @@ public class PracticeCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (a.length == 0) {
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (playerStats.getLevel() != null) {
+            if (!(playerStats.getLevel() == null && !player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))) {
                 if (!playerStats.inRace()) {
                     if (playerStats.getPlayerToSpectate() == null) {
                         if (!playerStats.isEventParticipant()) {
@@ -62,6 +62,8 @@ public class PracticeCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot enter practice mode when not in a level"));
             }
+        } else if (a.length == 1 && (a[0].equalsIgnoreCase("go") || a[0].equalsIgnoreCase("tp"))) {
+                Parkour.getCheckpointManager().teleportToPrac(playerStats);
         }
         return false;
     }

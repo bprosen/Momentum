@@ -7,7 +7,27 @@ import org.bukkit.Location;
 
 public class CheckpointManager {
 
-    public void teleportPlayer(PlayerStats playerStats) {
+    public void teleportToPrac(PlayerStats playerStats) {
+        if (!playerStats.inRace()) {
+            if (!playerStats.isEventParticipant()) {
+                if (playerStats.getPlayerToSpectate() == null) {
+                    if (playerStats.getPracticeLocation() != null)
+                        playerStats.getPlayer().teleport(playerStats.getPracticeLocation());
+                    else {
+                        playerStats.getPlayer().sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
+                    }
+                } else {
+                    playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+                }
+            } else {
+                playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+            }
+        } else {
+            playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+        }
+    }
+
+    public void teleportToCP(PlayerStats playerStats) {
 
         if (!playerStats.inRace()) {
             if (!playerStats.isEventParticipant()) {

@@ -181,7 +181,7 @@ public class PacketListener implements Listener {
                                     public void run() {
                                         // teleport
                                         if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
-                                            Parkour.getCheckpointManager().teleportPlayer(playerStats);
+                                            Parkour.getCheckpointManager().teleportToCP(playerStats);
                                         else
                                             LevelHandler.respawnPlayer(event.getPlayer(), level);
                                     }

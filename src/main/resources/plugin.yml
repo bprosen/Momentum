@@ -74,3 +74,6 @@ commands:
   nightvision:
     description: "RN-Parkour night vision command"
     aliases: [nv, nightvision]
+  practicego:
+    description: "RN-Parkour practice go command"
+    aliases: [pgo, ptp, practicetp, pracgo, practp]
