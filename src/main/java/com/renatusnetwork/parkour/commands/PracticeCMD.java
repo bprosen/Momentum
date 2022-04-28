@@ -63,7 +63,7 @@ public class PracticeCMD implements CommandExecutor {
                 player.sendMessage(Utils.translate("&cYou cannot enter practice mode when not in a level"));
             }
         } else if (a.length == 1 && (a[0].equalsIgnoreCase("go") || a[0].equalsIgnoreCase("tp"))) {
-                Parkour.getCheckpointManager().teleportToPrac(playerStats);
+                Parkour.getCheckpointManager().teleportToPracCP(playerStats);
         }
         return false;
     }

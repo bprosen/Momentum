@@ -15,7 +15,7 @@ public class PracticeGoCMD implements CommandExecutor {
 
             Player player = (Player) sender;
             if (a.length == 0)
-                Parkour.getCheckpointManager().teleportToPrac(Parkour.getStatsManager().get(player));
+                Parkour.getCheckpointManager().teleportToPracCP(Parkour.getStatsManager().get(player));
         }
         return false;
     }

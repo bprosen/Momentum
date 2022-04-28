@@ -244,10 +244,10 @@ public class RaceManager {
             winnerStats.levelCompletion(raceObject.getRaceLevel().getName(), levelCompletion);
 
             if (raceObject.hasBet())
-                Bukkit.broadcastMessage(Utils.translate("&4" + winner.getName() + " &7has beaten &4" + loser.getName()
+                Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()
                                         + " &7in a race for &6$" + Utils.formatNumber(raceObject.getBet()) + " &7on " + raceObject.getRaceLevel().getFormattedTitle()));
             else
-                Bukkit.broadcastMessage(Utils.translate("&4" + winner.getName() + " &7has beaten &4" + loser.getName()
+                Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()
                                         + " &7in a race on " + raceObject.getRaceLevel().getFormattedTitle()));
 
             // give winner money and take from loser if betted on race
