@@ -37,16 +37,6 @@ public class InfinitePKManager {
                 InfiniteRewardsYAML.loadRewards();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                /*
-                    Disabled for right now as I may have made it so glitched blocks will never happen
-                 */
-                //cleanBlocks();
-            }
-        }.runTaskLater(Parkour.getPlugin(), 20 * 5);
     }
 
     public void startPK(PlayerStats playerStats, boolean fromPortal) {
@@ -528,52 +518,6 @@ public class InfinitePKManager {
     public void shutdown() {
         for (InfinitePK infinitePK : participants.values())
             endPK(infinitePK.getPlayer(), true);
-    }
-
-    public void cleanBlocks() {
-        WorldEdit api = WorldEdit.getInstance();
-
-        // null check api
-        if (api != null) {
-            LocationManager locationManager = Parkour.getLocationManager();
-            SettingsManager settingsManager = Parkour.getSettingsManager();
-
-            LocalWorld world = new BukkitWorld(Parkour.getLocationManager().getLobbyLocation().getWorld());
-
-            // get all min and maxes
-            int minX = locationManager.getLobbyLocation().getBlockX() - (settingsManager.max_infinitepk_x);
-            int maxX = locationManager.getLobbyLocation().getBlockX() + (settingsManager.max_infinitepk_x);
-            int minZ = locationManager.getLobbyLocation().getBlockZ() - (settingsManager.max_infinitepk_z);
-            int maxZ = locationManager.getLobbyLocation().getBlockZ() + (settingsManager.max_infinitepk_z);
-
-            // get worldedit vectors for pos1 and pos2
-            com.sk89q.worldedit.Vector pos1 = new com.sk89q.worldedit.Vector(minX, settingsManager.min_infinitepk_y, minZ);
-            com.sk89q.worldedit.Vector pos2 = new com.sk89q.worldedit.Vector(maxX, settingsManager.max_infinitepk_y, maxZ);
-
-            CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
-
-            // attempt to replace quartz block and iron plates with air
-            try {
-                EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
-
-                Set<BaseBlock> replaceBlocks = new HashSet<BaseBlock>() {{
-                    add(new BaseBlock(Material.QUARTZ_BLOCK.getId()));
-                    add(new BaseBlock(Material.IRON_PLATE.getId()));
-                }};
-
-                // set fast mode
-                editSession.setFastMode(true);
-
-                editSession.replaceBlocks(selection, replaceBlocks, new BaseBlock(Material.AIR.getId()));
-                editSession.flushQueue(); // flush queue
-                // disable fast mode
-                editSession.setFastMode(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Parkour.getPluginLogger().info("WorldEdit API found null in cleanBlocks");
-        }
     }
 
     public LinkedHashSet<InfinitePKLBPosition> getLeaderboard() {
