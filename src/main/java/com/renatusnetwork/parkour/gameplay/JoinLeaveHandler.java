@@ -115,7 +115,6 @@ public class JoinLeaveHandler implements Listener {
         EventManager eventManager = Parkour.getEventManager();
         InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
         ClansManager clansManager = Parkour.getClansManager();
-        StatsManager statsManager = Parkour.getStatsManager();
 
         // if left with checkpoint, save it
         if (playerStats.getCheckpoint() != null)
