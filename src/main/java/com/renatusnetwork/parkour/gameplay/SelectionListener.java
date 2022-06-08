@@ -28,7 +28,8 @@ public class SelectionListener implements Listener {
 
             // if in plot world and it is a worldedit command, continue
             if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) &&
-               (cmd.startsWith("//") || cmd.startsWith("/replacenear") || cmd.startsWith("/undo") || cmd.startsWith("/redo"))) {
+               (cmd.startsWith("//") || cmd.startsWith("/replacenear") || cmd.startsWith("/worldedit:replacenear") ||
+               cmd.startsWith("/undo") || cmd.startsWith("/worldedit:undo") || cmd.startsWith("/redo") || cmd.startsWith("/worldedit:redo"))) {
 
                 try {
                     // next get the region from player
