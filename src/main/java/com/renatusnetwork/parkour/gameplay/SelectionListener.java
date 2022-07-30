@@ -4,20 +4,25 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.event.extent.PasteEvent;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.eventbus.EventHandler;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-public class SelectionListener implements Listener {
+public class SelectionListener {
 
     /*
         yeah... i know... it's pretty jank, but the listeners below stopped working (due to something with FAWE) :(
      */
+
+    /*
     @EventHandler
     public void onCmd(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
@@ -34,37 +39,51 @@ public class SelectionListener implements Listener {
                 try {
                     // next get the region from player
                     LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
-                    Region region = session.getSelection(session.getSelectionWorld());
 
-                    // check if region is allowed, if not, cancel and notify
-                    if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player)) {
-                        event.setCancelled(true);
+                    if (cmd.startsWith("//paste")) {
 
-                        // send bypass info if opped
-                        String messageToSend = "&cYou cannot do WorldEdit commands here!";
-                        if (player.isOp())
-                            messageToSend += " &7You can bypass this with &c/plot bypass";
+                        ClipboardHolder holder = session.getClipboard();
 
-                        player.sendMessage(Utils.translate(messageToSend));
+                        if (holder != null) {
+
+
+                        }
+                    // null check the session and world
+                    } else if (session != null && session.getSelectionWorld() != null) {
+                        Region region = session.getSelection(session.getSelectionWorld());
+                        // just in case
+                        if (region != null) {
+                            // check if region is allowed, if not, cancel and notify
+                            if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player)) {
+                                event.setCancelled(true);
+
+                                // send bypass info if opped
+                                String messageToSend = "&cYou cannot do WorldEdit commands here!";
+                                if (player.isOp())
+                                    messageToSend += " &7You can bypass this with &c/plot bypass";
+
+                                player.sendMessage(Utils.translate(messageToSend));
+                            }
+                        }
                     }
-                } catch (IncompleteRegionException e) {
+                } catch (IncompleteRegionException | EmptyClipboardException e) {
                     // dont print stack track so we dont spam console with simple error
                 }
             }
         }
-    }
+    }*/
 
-    /*
+
     // listen very early to be ahead of normal fawe
     @Subscribe (priority = EventHandler.Priority.VERY_EARLY)
     public void onSelection(EditSessionEvent event) {
 
         Actor actor = event.getActor();
 
-        /
+        /*
            there are 3 stages, so only listen to before anything happens (avoid 3 event fires),
            make sure the player is the person executing and the world is the plot world
-         /
+        */
         if (event.getStage().toString().equalsIgnoreCase("BEFORE_CHANGE") && actor != null && actor.isPlayer() &&
             event.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
 
@@ -101,7 +120,7 @@ public class SelectionListener implements Listener {
         }
     }
 
-    @Subscribe (priority = EventHandler.Priority.VERY_EARLY)
+    @Subscribe(priority = EventHandler.Priority.VERY_EARLY)
     public void onPaste(PasteEvent event) {
 
         com.sk89q.worldedit.entity.Player wePlayer = event.getPlayer();
@@ -119,7 +138,7 @@ public class SelectionListener implements Listener {
                 LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
                 ClipboardHolder holder = session.getClipboard();
 
-                /
+                /*
                     this is a complicated part because the location of
                     the min/max of the new paste is not stored, so we have to do hacky math
 
@@ -130,12 +149,12 @@ public class SelectionListener implements Listener {
                        to the position (gives us the new max)
                     3) finally, we apply the max clipboard point subtracted by the min and then apply that to the transform,
                        and add that to the max point, giving us the min
-                 /
+                */
                 Vector clipboardOffset = event.getClipboard().getMinimumPoint().subtract(event.getClipboard().getOrigin());
                 Vector max = event.getPosition().add(holder.getTransform().apply(clipboardOffset));
                 Vector min = max.add(holder.getTransform()
-                                    .apply(event.getClipboard().getMaximumPoint()
-                                    .subtract(event.getClipboard().getMinimumPoint())));
+                        .apply(event.getClipboard().getMaximumPoint()
+                                .subtract(event.getClipboard().getMinimumPoint())));
 
                 if (checkSelection(min, max, player)) {
                     event.setCancelled(true);
@@ -151,7 +170,7 @@ public class SelectionListener implements Listener {
                 // dont print stack track so we dont spam console with simple error
             }
         }
-    }*/
+    }
 
 
     // method to check if a selection will pass if they are in their plot or a trusted plot
