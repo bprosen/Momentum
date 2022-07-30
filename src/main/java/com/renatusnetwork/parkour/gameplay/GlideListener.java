@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,9 +20,12 @@ public class GlideListener implements Listener {
             if (playerStats != null) {
 
                 // if the level they are in is not an elytra level or their world is not the plot world, cancel it
-                if ((playerStats.inLevel() && !playerStats.getLevel().isElytraLevel()) ||
-                    player.getWorld().getName() != Parkour.getSettingsManager().player_submitted_world)
+                if (event.isGliding() &&
+                   (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) &&
+                   !(playerStats.inLevel() && playerStats.getLevel().isElytraLevel()))) {
+                    player.setGliding(false);
                     event.setCancelled(true);
+                }
             }
         }
     }
