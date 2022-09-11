@@ -12,6 +12,7 @@ import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.plots.Plot;
+import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -182,6 +183,16 @@ public class PacketListener implements Listener {
                                         // teleport
                                         if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
                                             Parkour.getCheckpointManager().teleportToCP(playerStats);
+                                        else if (playerStats.inRace()) {
+                                            Race race = Parkour.getRaceManager().get(player);
+                                            if (race != null) {
+                                                if (race.isPlayer1(player))
+                                                    race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
+                                                    // swap tp to loc 2 if player 2
+                                                else
+                                                    race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
+                                            }
+                                        }
                                         else
                                             LevelHandler.respawnPlayer(event.getPlayer(), level);
                                     }
