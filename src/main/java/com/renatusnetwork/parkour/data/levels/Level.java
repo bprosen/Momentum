@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Level {
@@ -231,25 +232,13 @@ public class Level {
         if (newLeaderboard.size() > 0) {
             newLeaderboard.add(levelCompletion);
 
-            // Bubble sort
-            for (int outer = 0; outer < newLeaderboard.size() - 1; outer++) {
-                for (int inner = 0; inner < newLeaderboard.size() - outer - 1; inner++) {
-                    if (newLeaderboard.get(inner).getCompletionTimeElapsed()
-                            > newLeaderboard.get(inner + 1).getCompletionTimeElapsed()) {
-                        LevelCompletion tempCompletion = newLeaderboard.get(inner);
-
-                        newLeaderboard.set(inner, newLeaderboard.get(inner + 1));
-                        newLeaderboard.set(inner + 1, tempCompletion);
-                    }
-                }
-            }
+            Arrays.sort(newLeaderboard.toArray()); // Dual pivot quick sort....?
 
             // Trimming potential #11 datapoint
             if (newLeaderboard.size() > 10)
                 newLeaderboard.remove(10);
-        } else {
+        } else
             newLeaderboard.add(0, levelCompletion);
-        }
 
         leaderboardCache = newLeaderboard;
     }
@@ -260,33 +249,36 @@ public class Level {
 
         totalCompletionsCount += 1;
 
-        if (leaderboardCache.isEmpty()) {
-            leaderboardCache.add(levelCompletion);
-            return;
-        }
-
-        if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
-            return;
-
-        // Compare completion against scoreboard
-        if (leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed()
-                > levelCompletion.getCompletionTimeElapsed()) {
-
-            LevelCompletion completionToRemove = null;
-            boolean completionSlower = false;
-            for (LevelCompletion completion : leaderboardCache) {
-                if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
-                    if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                        completionToRemove = completion;
-                    else
-                        completionSlower = true;
-            }
-            if (completionToRemove != null)
-                leaderboardCache.remove(completionToRemove);
-            else if (completionSlower)
+        if (!leaderboardCache.isEmpty())
+        {
+            if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
                 return;
 
-            sortNewCompletion(levelCompletion);
+            // Compare completion against scoreboard
+            if (leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed()
+                    > levelCompletion.getCompletionTimeElapsed()) {
+
+                LevelCompletion completionToRemove = null;
+                boolean completionSlower = false;
+
+                for (LevelCompletion completion : leaderboardCache) {
+                    if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
+                        if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                            completionToRemove = completion;
+                        else
+                            completionSlower = true;
+                }
+                if (completionToRemove != null)
+                    leaderboardCache.remove(completionToRemove);
+                else if (completionSlower)
+                    return;
+
+                sortNewCompletion(levelCompletion);
+            }
+        }
+        else
+        {
+            leaderboardCache.add(levelCompletion);
         }
     }
 

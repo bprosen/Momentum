@@ -351,36 +351,6 @@ public class PlayerStats {
         return 0;
     }
 
-    // top 3 completions
-    public List<LevelCompletion> getQuickestCompletions(String levelName) {
-        List<LevelCompletion> levelCompletions = new ArrayList<>();
-
-        if (levelCompletionsMap.containsKey(levelName)) {
-
-            for (LevelCompletion levelCompletion : levelCompletionsMap.get(levelName))
-                if (levelCompletion != null && levelCompletion.getCompletionTimeElapsed() > 0)
-                    levelCompletions.add(levelCompletion);
-
-            if (levelCompletions.size() < 2)
-                return levelCompletions;
-
-            for (int i = 0; i < levelCompletions.size() - 1; i++) {
-                int min_id = i;
-
-                for (int j = i + 1; j < levelCompletions.size(); j++)
-                    if (levelCompletions.get(j).getCompletionTimeElapsed()
-                            < levelCompletions.get(min_id).getCompletionTimeElapsed())
-                        min_id = j;
-
-                LevelCompletion temp = levelCompletions.get(min_id);
-                levelCompletions.set(min_id, levelCompletions.get(i));
-                levelCompletions.set(i, temp);
-            }
-        }
-
-        return levelCompletions;
-    }
-
     // fastest completion
     public LevelCompletion getQuickestCompletion(String levelName) {
         LevelCompletion fastestCompletion = null;
