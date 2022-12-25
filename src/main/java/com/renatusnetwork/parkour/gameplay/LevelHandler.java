@@ -180,9 +180,6 @@ public class LevelHandler {
             // clear potion effects
             playerStats.clearPotionEffects();
 
-            // run gameplay actions: teleport and messaging
-            player.teleport(level.getRespawnLocation());
-
             // send title and sound if not rankup level
             if (!rankUpLevel) {
                 String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
@@ -203,7 +200,13 @@ public class LevelHandler {
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 0f);
             }
 
-            ProtectedRegion getToRegion = WorldGuard.getRegion(level.getRespawnLocation());
+            Location locationTo = level.getRespawnLocation();
+
+            // If not rank up level
+            if (!rankUpLevel && playerStats.isGrinding())
+                locationTo = level.getStartLocation();
+
+            ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
             Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
 
             // if area they are teleporting to is empty
@@ -220,6 +223,10 @@ public class LevelHandler {
                         player.addPotionEffect(potionEffect);
             } else
                 playerStats.resetLevel();
+
+            // teleport
+            player.teleport(locationTo);
+
         /*
          if the level has required levels and the player does not have them,
          then loop through and redo this method until they have them all

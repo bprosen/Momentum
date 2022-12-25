@@ -45,6 +45,7 @@ public class PlayerStats {
     private boolean bypassingPlots = false;
     private int totalLevelCompletions = 0;
     private boolean nightVision = false;
+    private boolean grinding = false;
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> ascendanceCheckpoints = new HashMap<>();
@@ -414,6 +415,17 @@ public class PlayerStats {
     }
 
     public boolean isBypassingPlots() { return bypassingPlots; }
+
+    //
+    // Grinding Section
+    //
+    public boolean isGrinding() {
+        return grinding;
+    }
+
+    public void toggleGrinding() {
+        grinding = !grinding;
+    }
 
     //
     // Misc

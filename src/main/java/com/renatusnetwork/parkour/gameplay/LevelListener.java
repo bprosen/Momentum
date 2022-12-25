@@ -187,7 +187,6 @@ public class LevelListener implements Listener {
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
             Player player = event.getPlayer();
-            StatsManager statsManager = Parkour.getStatsManager();
 
             if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line) &&
                 ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {

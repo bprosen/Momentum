@@ -30,7 +30,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision",
+                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -146,6 +146,10 @@ public class StatsDB {
 
                     playerStats.setPrestigeMultiplier(prestigeMultiplier);
                 }
+
+                // Set to true if 1 (true)
+                if (Integer.parseInt(playerResult.get("grinding")) == 1)
+                    playerStats.toggleGrinding();
             }
         } else {
             insertPlayerID(playerStats);
@@ -217,7 +221,18 @@ public class StatsDB {
         Parkour.getDatabaseManager().add(query);
     }
 
+    public static void updatePlayerGrinding(PlayerStats playerStats)
+    {
+        int grinding = 0;
 
+        if (playerStats.isGrinding())
+            grinding = 1;
+
+        String query = "UPDATE players SET " +
+                "grinding=" + grinding + " WHERE player_id=" + playerStats.getPlayerID();
+
+        Parkour.getDatabaseManager().add(query);
+    }
 
     public static boolean isPlayerInDatabase(String playerName) {
 
@@ -402,12 +417,5 @@ public class StatsDB {
             }
         }
         level.setLeaderboardCache(levelCompletions);
-    }
-
-    public static long getPersonalGlobalCompletions(int playerID) {
-        List<Map<String, String>> globalResults = DatabaseQueries.getResults("players",
-                "completions", " WHERE player_id=" + playerID);
-
-        return Integer.parseInt(globalResults.get(0).get("completions"));
     }
 }

@@ -77,3 +77,6 @@ commands:
   practicego:
     description: "RN-Parkour practice go command"
     aliases: [pgo, ptp, practicetp, pracgo, practp]
+  grinding:
+    description: "RN-Parkour grinding command"
+    aliases: [togglegrind, grindmode]
