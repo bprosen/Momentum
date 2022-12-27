@@ -153,40 +153,48 @@ public class Scoreboard {
                             board.add(formatSpacing(Utils.translate("&7To &a" + nextRank.getRankTitle())));
                         }
                     }
-                } else if (level.isAscendanceLevel()) {
-
-                    // add scoreboard
-                    board.add(formatSpacing(Utils.translate("&8&lAscendance")));
-                    board.add(formatSpacing(Utils.translate("&7Explore for Rewards")));
                 } else {
-                    // normal scoreboard
-                    String rewardString;
 
-                    // add title and adjust rewardstring if it is a featured level
-                    if (level.isFeaturedLevel()) {
-                        board.add(formatSpacing(Utils.translate("&dFeatured Level")));
+                    if (level.isAscendanceLevel()) {
 
-                        // proper cast
-                        rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " +
-                                ((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
-
-                    } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                        rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
-                    else
-                        rewardString = Utils.translate("&6" + level.getReward());
-
-                    String title = level.getFormattedTitle();
-                    board.add(formatSpacing(title));
-                    board.add(formatSpacing(rewardString));
-
-                    if (playerStats.getLevelStartTime() > 0) {
-                        double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-
-                        String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
-                        board.add(formatSpacing(timing));
+                        // add scoreboard
+                        board.add(formatSpacing(Utils.translate("&8&lAscendance")));
+                        board.add(formatSpacing(Utils.translate("&7Explore for Rewards")));
                     } else {
-                        board.add(formatSpacing(Utils.translate("&7-")));
+
+                        // normal scoreboard
+                        String rewardString;
+
+                        // add title and adjust rewardstring if it is a featured level
+                        if (level.isFeaturedLevel()) {
+                            board.add(formatSpacing(Utils.translate("&dFeatured Level")));
+
+                            // proper cast
+                            rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " +
+                                    ((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
+
+                        } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+                            rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
+                        else
+                            rewardString = Utils.translate("&6" + level.getReward());
+
+                        String title = level.getFormattedTitle();
+                        board.add(formatSpacing(title));
+                        board.add(formatSpacing(rewardString));
+
+                        if (playerStats.getLevelStartTime() > 0) {
+                            double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+
+                            String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                            board.add(formatSpacing(timing));
+                        } else {
+                            board.add(formatSpacing(Utils.translate("&7-")));
+                        }
                     }
+
+                    // grind mode on scoreboard
+                    if (playerStats.isGrinding())
+                        board.add(formatSpacing(Utils.translate("&aGrinding")));
                 }
             }
 

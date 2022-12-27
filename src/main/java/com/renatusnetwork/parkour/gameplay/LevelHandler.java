@@ -202,8 +202,8 @@ public class LevelHandler {
 
             Location locationTo = level.getRespawnLocation();
 
-            // If not rank up level
-            if (!rankUpLevel && playerStats.isGrinding())
+            // If not rank up level or has a start location and is grinding, set to start loc
+            if (!rankUpLevel && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
                 locationTo = level.getStartLocation();
 
             ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
@@ -226,6 +226,7 @@ public class LevelHandler {
 
             // teleport
             player.teleport(locationTo);
+            playerStats.disableLevelStartTime();
 
         /*
          if the level has required levels and the player does not have them,
