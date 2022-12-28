@@ -232,17 +232,29 @@ public class Level {
         if (newLeaderboard.size() > 0) {
             newLeaderboard.add(levelCompletion);
 
-            // Bubble sort
-            for (int outer = 0; outer < newLeaderboard.size() - 1; outer++) {
-                for (int inner = 0; inner < newLeaderboard.size() - outer - 1; inner++) {
-                    if (newLeaderboard.get(inner).getCompletionTimeElapsed()
-                            > newLeaderboard.get(inner + 1).getCompletionTimeElapsed()) {
-                        LevelCompletion tempCompletion = newLeaderboard.get(inner);
+            boolean done = false;
+            int currentIndex = newLeaderboard.size() - 1;
 
-                        newLeaderboard.set(inner, newLeaderboard.get(inner + 1));
-                        newLeaderboard.set(inner + 1, tempCompletion);
-                    }
+            // working from the tail iteration
+            while (!done)
+            {
+                int nextIndex = currentIndex - 1;
+
+                // if next is negative and current is less than next (higher lb position), swap!
+                if (nextIndex >= 0 &&
+                    newLeaderboard.get(nextIndex).getCompletionTimeElapsed() > newLeaderboard.get(currentIndex).getCompletionTimeElapsed())
+                {
+                    // swap
+                    LevelCompletion temp = newLeaderboard.get(nextIndex);
+
+                    newLeaderboard.set(nextIndex, newLeaderboard.get(currentIndex));
+                    newLeaderboard.set(currentIndex, temp);
                 }
+                else
+                {
+                    done = true;
+                }
+                currentIndex--;
             }
 
             // Trimming potential #11 datapoint
