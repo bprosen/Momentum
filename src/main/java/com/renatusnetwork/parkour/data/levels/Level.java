@@ -232,7 +232,18 @@ public class Level {
         if (newLeaderboard.size() > 0) {
             newLeaderboard.add(levelCompletion);
 
-            Arrays.sort(newLeaderboard.toArray()); // Dual pivot quick sort....?
+            // Bubble sort
+            for (int outer = 0; outer < newLeaderboard.size() - 1; outer++) {
+                for (int inner = 0; inner < newLeaderboard.size() - outer - 1; inner++) {
+                    if (newLeaderboard.get(inner).getCompletionTimeElapsed()
+                            > newLeaderboard.get(inner + 1).getCompletionTimeElapsed()) {
+                        LevelCompletion tempCompletion = newLeaderboard.get(inner);
+
+                        newLeaderboard.set(inner, newLeaderboard.get(inner + 1));
+                        newLeaderboard.set(inner + 1, tempCompletion);
+                    }
+                }
+            }
 
             // Trimming potential #11 datapoint
             if (newLeaderboard.size() > 10)
