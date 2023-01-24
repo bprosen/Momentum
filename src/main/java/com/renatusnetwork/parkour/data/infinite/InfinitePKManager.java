@@ -135,9 +135,11 @@ public class InfinitePKManager {
             if (isBestScore(player.getName(), score)) {
                 // if they disconnected
                 if (!disconnected) {
-                    player.sendMessage(Utils.translate("&7You have beaten your best &d(" +
-                            Utils.formatNumber(playerStats.getInfinitePKScore()) + ")" +
-                            " &5Infinite Parkour &7record with &d" + Utils.formatNumber(score)));
+                    player.sendMessage(Utils.translate(
+                            "&7You have beaten your previous record of &d" +
+                            Utils.formatNumber(playerStats.getInfinitePKScore()) + " &7 with &d" + Utils.formatNumber(score) + "\n" +
+                            "Awarded &e&l" + Math.ceil(score / 2) + " Coins"
+                    ));
 
                     if (doRewardsMsg) {
                         // we can safely assume since it will only be true if its not empty
@@ -159,9 +161,13 @@ public class InfinitePKManager {
                     }.runTaskAsynchronously(Parkour.getPlugin());
                 }
             } else if (!disconnected) {
-                player.sendMessage(Utils.translate("&7You failed at &d" + Utils.formatNumber(score) + "&7! " +
-                        "&7Your best is &d" + playerStats.getInfinitePKScore()));
+                player.sendMessage(Utils.translate(
+                        "&7You failed at &d" + Utils.formatNumber(score) + "&5(Best is " + playerStats.getInfinitePKScore() + ")\n" +
+                             "Awarded &e&l" + Math.ceil(score / 2) + " Coins"
+                ));
             }
+            // deposit score
+            Parkour.getEconomy().depositPlayer(player, score);
 
             playerStats.setInfinitePK(false);
             participants.remove(player.getName());
