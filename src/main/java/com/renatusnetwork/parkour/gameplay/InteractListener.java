@@ -109,11 +109,8 @@ public class InteractListener implements Listener {
                                 } else {
                                     confirmMap.get(player.getName()).cancel();
 
-                                    // if in ascendance realm
-                                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
-                                        playerStats.removeAscendanceCheckpoint(level.getName());
+                                    Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
 
-                                    playerStats.resetCheckpoint();
                                     playerStats.resetPracticeMode();
 
                                     if (!level.getPotionEffects().isEmpty()) {

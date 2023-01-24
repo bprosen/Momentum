@@ -175,7 +175,7 @@ public class LevelHandler {
             Parkour.getPluginLogger().info(playerStats.getPlayerName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
             // reset cp before teleport
-            playerStats.resetCheckpoint();
+            Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
 
             // clear potion effects
             playerStats.clearPotionEffects();

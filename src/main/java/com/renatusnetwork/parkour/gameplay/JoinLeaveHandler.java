@@ -65,6 +65,9 @@ public class JoinLeaveHandler implements Listener {
                 // now load stats in async
                 StatsDB.loadPlayerStats(playerStats);
 
+                // load checkpoints
+                CheckpointDB.loadCheckpoints(playerStats);
+
                 // run most of this in async (region lookup, stat editing, etc)
                 new BukkitRunnable() {
                     @Override
@@ -86,8 +89,9 @@ public class JoinLeaveHandler implements Listener {
                                     if (level.isAscendanceLevel())
                                         statsManager.enteredAscendance(playerStats);
 
-                                    // load if they have one
-                                    CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
+                                    Location checkpoint = playerStats.getCheckpoint(level.getName());
+                                    if (checkpoint != null)
+                                        playerStats.setCurrentCheckpoint(checkpoint);
 
                                     // is elytra level, then set elytra in sync (player inventory changes)
                                     if (level.isElytraLevel())
@@ -115,10 +119,6 @@ public class JoinLeaveHandler implements Listener {
         EventManager eventManager = Parkour.getEventManager();
         InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
         ClansManager clansManager = Parkour.getClansManager();
-
-        // if left with checkpoint, save it
-        if (playerStats.getCheckpoint() != null)
-            CheckpointDB.savePlayerAsync(playerStats);
 
         // if left in spectator, remove it
         if (playerStats.getPlayerToSpectate() != null)

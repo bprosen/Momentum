@@ -179,10 +179,7 @@ public class EventManager {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // save checkpoint
-        if (playerStats.getCheckpoint() != null) {
-            CheckpointDB.savePlayerAsync(playerStats);
-            playerStats.resetCheckpoint();
-        }
+        playerStats.resetCurrentCheckpoint();
 
         // toggle off if saved
         Parkour.getStatsManager().toggleOffElytra(playerStats);
@@ -202,12 +199,13 @@ public class EventManager {
         EventParticipant eventParticipant = get(player);
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        Location location = playerStats.getCheckpoint(eventParticipant.getOriginalLevel().getName());
 
         // reset the cache and teleport player back
         if (!disconnected &&
             eventParticipant.getOriginalLevel() != null &&
-            CheckpointDB.hasCheckpoint(player.getUniqueId().toString(), eventParticipant.getOriginalLevel()))
-            CheckpointDB.loadPlayer(player.getUniqueId().toString(), eventParticipant.getOriginalLevel());
+            location != null)
+            playerStats.setCurrentCheckpoint(location);
 
         // if their original level is not null, then set it, if it is, do region lookup of their original location jic
         if (eventParticipant.getOriginalLevel() != null)

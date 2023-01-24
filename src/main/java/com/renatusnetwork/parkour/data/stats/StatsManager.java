@@ -86,23 +86,14 @@ public class StatsManager {
         return (HashMap<String, PlayerStats>) playerStatsList.clone();
     }
 
-    public HashSet<PlayerStats> getPlayersInAscendance() { return ascendancePlayerList; }
-
-    public void enteredAscendance(PlayerStats playerStats) {
+    public void enteredAscendance(PlayerStats playerStats)
+    {
         ascendancePlayerList.add(playerStats);
-
-        // run in async
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                loadAscendanceCheckpoints(playerStats);
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
-    public void leftAscendance(PlayerStats playerStats) {
+    public void leftAscendance(PlayerStats playerStats)
+    {
         ascendancePlayerList.remove(playerStats);
-        playerStats.resetAscendanceCheckpoints();
     }
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
@@ -215,40 +206,32 @@ public class StatsManager {
         Only use active level updating for ascendance, this should barely cause issues as it will be ran every few seconds
         and very few people to iterate through.
      */
-    public void updateAscendancePlayers() {
+    public void updateAscendancePlayers()
+    {
 
-        for (PlayerStats playerStats : ascendancePlayerList) {
-
+        for (PlayerStats playerStats : ascendancePlayerList)
+        {
             ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
             if (region != null) {
                 Level level = Parkour.getLevelManager().get(region.getId());
 
                 // if their level is not the same as what they moved to, then update it
                 if (level != null && level.isAscendanceLevel() &&
-                    playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName())) {
-                    // save if has checkpoint
-                    if (playerStats.getCheckpoint() != null) {
-                        CheckpointDB.savePlayerAsync(playerStats);
-                        playerStats.resetCheckpoint();
-                    }
+                        playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                {
+                    playerStats.resetCurrentCheckpoint();
+
                     // load checkpoint into cache
-                    Location ascendanceCheckpoint = playerStats.getAscendanceCheckpoint(level.getName());
-                    if (ascendanceCheckpoint != null) {
-                        playerStats.setCheckpoint(ascendanceCheckpoint);
-                        Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE uuid='" + playerStats.getUUID() +
-                                "' AND level_name='" + level.getName() + "'");
-                    }
+                    Location checkpoint = playerStats.getCheckpoint(level.getName());
+
+                    if (checkpoint != null)
+                        playerStats.setCurrentCheckpoint(checkpoint);
 
                     playerStats.setLevel(level);
                     playerStats.disableLevelStartTime();
                 }
             }
         }
-    }
-
-    public void loadAscendanceCheckpoints(PlayerStats playerStats) {
-        playerStats.resetAscendanceCheckpoints();
-        playerStats.setAscendanceCheckpoints(CheckpointDB.getAscendanceCheckpoints(playerStats));
     }
 
     /*

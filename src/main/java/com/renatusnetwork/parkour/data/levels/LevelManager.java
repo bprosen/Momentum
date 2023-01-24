@@ -410,8 +410,8 @@ public class LevelManager {
                     if (playerStats.getPracticeLocation() != null)
                         playerStats.resetPracticeMode();
 
-                    if (playerStats.getCheckpoint() != null)
-                        playerStats.resetCheckpoint();
+                    if (playerStats.hasCurrentCheckpoint())
+                        playerStats.resetCurrentCheckpoint();
 
                     // toggle off elytra armor
                     Parkour.getStatsManager().toggleOffElytra(playerStats);

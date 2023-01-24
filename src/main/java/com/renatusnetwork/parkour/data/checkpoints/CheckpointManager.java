@@ -1,11 +1,25 @@
 package com.renatusnetwork.parkour.data.checkpoints;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 
 public class CheckpointManager {
+
+    public void deleteCheckpoint(PlayerStats playerStats, Level level)
+    {
+        if (playerStats.hasCurrentCheckpoint())
+        {
+            // remove all checkpoint data
+            playerStats.removeCheckpoint(level.getName());
+            playerStats.resetCurrentCheckpoint();
+
+            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + level.getName() + "'" +
+                    " AND player_name='" + playerStats.getPlayerName() + "'");
+        }
+    }
 
     public void teleportToPracCP(PlayerStats playerStats) {
         if (!playerStats.inRace()) {
@@ -41,8 +55,8 @@ public class CheckpointManager {
                      */
                     if (playerStats.getPracticeLocation() != null)
                         loc = playerStats.getPracticeLocation().clone();
-                    else if (playerStats.getCheckpoint() != null) {
-                        loc = playerStats.getCheckpoint().clone().add(0.5, 0, 0.5);
+                    else if (playerStats.getCurrentCheckpoint() != null) {
+                        loc = playerStats.getCurrentCheckpoint().clone().add(0.5, 0, 0.5);
                         setDirection = true;
                     }
 

@@ -4,7 +4,6 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.ranks.Rank;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +47,7 @@ public class PlayerStats {
     private boolean grinding = false;
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
-    private HashMap<String, Location> ascendanceCheckpoints = new HashMap<>();
+    private HashMap<String, Location> checkpoints = new HashMap<>();
 
     public PlayerStats(Player player) {
         this.player = player;
@@ -275,38 +274,42 @@ public class PlayerStats {
     //
     // Checkpoint Section
     //
-    public void setCheckpoint(Location loc) {
-        currentCheckpoint = loc;
+    public void setCurrentCheckpoint(Location location)
+    {
+        currentCheckpoint = location;
     }
 
-    public Location getCheckpoint() { return currentCheckpoint; }
+    public Location getCurrentCheckpoint()
+    {
+        return currentCheckpoint;
+    }
 
-    public void resetCheckpoint() {
+    public boolean hasCurrentCheckpoint()
+    {
+        return currentCheckpoint != null;
+    }
+
+    public void resetCurrentCheckpoint()
+    {
         currentCheckpoint = null;
     }
 
-    public HashMap<String, Location> getAscendanceCheckpoints() { return ascendanceCheckpoints; }
-
-    public Location getAscendanceCheckpoint(String levelName) {
-        return ascendanceCheckpoints.get(levelName);
+    public void addCheckpoint(String levelName, Location location)
+    {
+        checkpoints.put(levelName, location);
     }
 
-    public void setAscendanceCheckpoints(HashMap<String, Location> checkpoints) {
-        ascendanceCheckpoints = checkpoints;
+    public void removeCheckpoint(String levelName)
+    {
+        checkpoints.remove(levelName);
     }
 
-    public void resetAscendanceCheckpoints() {
-        ascendanceCheckpoints.clear();
+    public Location getCheckpoint(String levelName)
+    {
+        return checkpoints.get(levelName);
     }
 
-    public void updateAscendanceCheckpoint(String levelName, Location location) {
-        ascendanceCheckpoints.remove(levelName);
-        ascendanceCheckpoints.put(levelName, location);
-    }
-
-    public void removeAscendanceCheckpoint(String levelName) {
-        ascendanceCheckpoints.remove(levelName);
-    }
+    public HashMap<String, Location> getCheckpoints() { return checkpoints; }
 
     //
     // Completions Section

@@ -74,7 +74,7 @@ public class LevelListener implements Listener {
                         if (level.isElytraLevel())
                             player.setGliding(false);
 
-                        if (playerStats.getCheckpoint() != null || playerStats.getPracticeLocation() != null)
+                        if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
                             Parkour.getCheckpointManager().teleportToCP(playerStats);
                         else
                             LevelHandler.respawnPlayer(player, level);
@@ -96,9 +96,9 @@ public class LevelListener implements Listener {
             if (block.getType() == Material.STONE_PLATE) {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats != null && playerStats.getLevel() != null &&
+                if (playerStats != null && playerStats.inLevel() &&
                     playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null &&
-                    playerStats.getCheckpoint() == null) {
+                    !playerStats.hasCurrentCheckpoint()) {
 
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
@@ -111,16 +111,17 @@ public class LevelListener implements Listener {
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
 
-                    if (playerStats.getCheckpoint() != null) {
+                    if (playerStats.hasCurrentCheckpoint())
+                    {
 
-                        int blockX = playerStats.getCheckpoint().getBlockX();
-                        int blockZ = playerStats.getCheckpoint().getBlockZ();
+                        int blockX = playerStats.getCurrentCheckpoint().getBlockX();
+                        int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
 
                         if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
                             setCheckpoint(player, playerStats, block.getLocation());
-                    } else {
-                        setCheckpoint(player, playerStats, block.getLocation());
                     }
+                    else
+                        setCheckpoint(player, playerStats, block.getLocation());
                 }
             } else if (block.getType() == Material.IRON_PLATE) {
                 // iron plate = infinite pk or race end
@@ -153,23 +154,31 @@ public class LevelListener implements Listener {
 
     private void setCheckpoint(Player player, PlayerStats playerStats, Location location) {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
-        playerStats.setCheckpoint(location);
+
+        // delete if they have a cp
+        if (playerStats.hasCurrentCheckpoint())
+            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
+                    " AND player_name='" + playerStats.getPlayerName() + "'");
+
+        playerStats.setCurrentCheckpoint(location);
+        playerStats.removeCheckpoint(playerStats.getLevel().getName());
 
         // update if in ascendance realm
-        if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world)) {
-
+        if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
+        {
             // check region null
             ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
-            if (region != null) {
-
+            if (region != null)
+            {
                 Level level = Parkour.getLevelManager().get(region.getId());
+
                 // make sure the area they are spawning in is a level and not equal
                 if (level != null && !level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
                     playerStats.setLevel(level);
             }
-            // update in ascendance map
-            playerStats.updateAscendanceCheckpoint(playerStats.getLevel().getName(), location);
         }
+
+        playerStats.addCheckpoint(playerStats.getLevel().getName(), location);
 
         String msgString = "&eYour checkpoint has been set";
         if (playerStats.getLevelStartTime() > 0) {
@@ -177,6 +186,20 @@ public class LevelListener implements Listener {
             msgString += " &7- &6" + (timeElapsed / 1000.0) + "s";
         }
         player.sendMessage(Utils.translate(msgString));
+
+        // add to async queue
+        Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
+                "(uuid, player_name, level_name, world, x, y, z)" +
+                " VALUES ('" +
+                playerStats.getUUID() + "','" +
+                playerStats.getPlayerName() + "','" +
+                playerStats.getLevel().getName() + "','" +
+                location.getWorld().getName() + "','" +
+                location.getBlockX() + "','" +
+                location.getBlockY() + "','" +
+                location.getBlockZ() +
+                "')"
+        );
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -220,10 +243,7 @@ public class LevelListener implements Listener {
                     // toggle off elytra armor
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                    if (playerStats.getCheckpoint() != null) {
-                        CheckpointDB.savePlayerAsync(playerStats);
-                        playerStats.resetCheckpoint();
-                    }
+                    playerStats.resetCurrentCheckpoint();
 
                     playerStats.resetPracticeMode();
                     playerStats.resetLevel();
@@ -259,18 +279,16 @@ public class LevelListener implements Listener {
                         return;
 
                     // if they are in a level and have a cp, continue
-                    if (playerStats.inLevel() && playerStats.getCheckpoint() != null) {
-                        ProtectedRegion checkpointTo = WorldGuard.getRegion(playerStats.getCheckpoint());
+                    if (playerStats.inLevel() && playerStats.hasCurrentCheckpoint()) {
+                        ProtectedRegion checkpointTo = WorldGuard.getRegion(playerStats.getCurrentCheckpoint());
 
                         // if the cp region isnt null, continue and get level
                         if (checkpointTo != null) {
                             Level checkpointLevel = Parkour.getLevelManager().get(checkpointTo.getId());
 
                             // if they cp level isnt null and the cp level is NOT the same as the level theyre teleporting to, save the cp
-                            if (checkpointLevel != null && !checkpointLevel.getName().equalsIgnoreCase(level.getName())) {
-                                CheckpointDB.savePlayerAsync(playerStats);
-                                playerStats.resetCheckpoint();
-                            }
+                            if (checkpointLevel != null && !checkpointLevel.getName().equalsIgnoreCase(level.getName()))
+                                playerStats.resetCurrentCheckpoint();
                         }
                     }
                     playerStats.setLevel(level);
@@ -282,17 +300,14 @@ public class LevelListener implements Listener {
 
             if (resetLevel) {
                 // save checkpoint if had one
-                if (playerStats.getCheckpoint() != null) {
-                    CheckpointDB.savePlayerAsync(playerStats);
-                    playerStats.resetCheckpoint();
-                }
+                playerStats.resetCurrentCheckpoint();
                 playerStats.resetLevel();
             }
         }
 
         if (playerStats != null &&
             playerStats.getPlayerToSpectate() == null &&
-            playerStats.getCheckpoint() == null &&
+            !playerStats.hasCurrentCheckpoint() &&
             playerStats.getPracticeLocation() == null) {
 
             // extra condition to make sure race level timers do not stop once the race has started

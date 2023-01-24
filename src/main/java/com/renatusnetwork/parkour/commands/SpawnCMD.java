@@ -61,11 +61,7 @@ public class SpawnCMD implements CommandExecutor {
 
                         player.teleport(loc);
 
-                        if (playerStats.getCheckpoint() != null) {
-                            CheckpointDB.savePlayerAsync(playerStats);
-                            playerStats.resetCheckpoint();
-                        }
-
+                        playerStats.resetCurrentCheckpoint();
                         playerStats.resetPracticeMode();
                         playerStats.resetLevel();
 

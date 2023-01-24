@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.LocationsYAML;
@@ -749,9 +750,11 @@ public class LevelCMD implements CommandExecutor {
                     if (level != null) {
                         // reset from cache
                         for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                            if (playerStats.getCheckpoint() != null && playerStats.getLevel() != null &&
-                                    playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
-                                playerStats.resetCheckpoint();
+                            if (playerStats.hasCurrentCheckpoint() && playerStats.getLevel() != null &&
+                                    playerStats.getLevel().getName().equalsIgnoreCase(levelName))
+                            {
+                                playerStats.resetCurrentCheckpoint();
+                                playerStats.removeCheckpoint(levelName);
                             }
 
                         // delete from db
@@ -773,12 +776,10 @@ public class LevelCMD implements CommandExecutor {
                             PlayerStats playerStats = Parkour.getStatsManager().get(target);
 
                             // if they have checkpoint loaded
-                            if (playerStats.getCheckpoint() != null) {
+                            if (playerStats.hasCurrentCheckpoint()) {
                                 // if they are in level and their level is the same as the target level
                                 if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
-                                    playerStats.resetCheckpoint();
-                                    Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'" +
-                                            " AND player_name='" + playerName + "'");
+                                    Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
                                     sender.sendMessage(Utils.translate("&cYou deleted &4" + playerName + "&c's checkpoint for &4" + levelName));
                                 } else {
                                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in " + levelName));

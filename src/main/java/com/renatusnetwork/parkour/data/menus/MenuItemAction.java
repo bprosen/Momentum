@@ -295,21 +295,21 @@ public class MenuItemAction {
                             // toggle off if saved
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                            // save if has checkpoint
-                            if (playerStats.getCheckpoint() != null) {
-                                CheckpointDB.savePlayerAsync(playerStats);
-                                playerStats.resetCheckpoint();
-                            }
+                            playerStats.resetCurrentCheckpoint(); // reset
 
                             // if in practice mode
                             if (playerStats.getPracticeLocation() != null)
                                 playerStats.resetPracticeMode();
 
-                            if (CheckpointDB.hasCheckpoint(player.getUniqueId().toString(), level)) {
-                                CheckpointDB.loadPlayer(player.getUniqueId().toString(), level);
+                            Location spawn = playerStats.getCheckpoint(level.getName());
+                            if (spawn != null)
+                            {
+                                playerStats.setCurrentCheckpoint(spawn);
                                 Parkour.getCheckpointManager().teleportToCP(playerStats);
                                 player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
-                            } else {
+                            }
+                            else
+                            {
                                 player.teleport(level.getStartLocation());
                                 player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                         + level.getFormattedTitle()));
