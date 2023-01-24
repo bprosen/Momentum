@@ -320,8 +320,8 @@ public class StatsManager {
                                     continue;
 
                                 // now add the last part of the level stats
-                                loreString = loreString.replace("%total_completions%", playerStats.getTotalLevelCompletions() + "")
-                                        .replace("%levels_completed%", playerStats.getIndividualLevelsBeaten() + "")
+                                loreString = loreString.replace("%total_completions%", Utils.formatNumber(playerStats.getTotalLevelCompletions()))
+                                        .replace("%levels_completed%", Utils.formatNumber(playerStats.getIndividualLevelsBeaten()))
                                         .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
                                         .replace("%rated_levels_count%", playerStats.getRatedLevelsCount() + "");
 
