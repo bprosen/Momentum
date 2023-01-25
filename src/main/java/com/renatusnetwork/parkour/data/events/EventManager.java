@@ -199,13 +199,15 @@ public class EventManager {
         EventParticipant eventParticipant = get(player);
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        Location location = playerStats.getCheckpoint(eventParticipant.getOriginalLevel().getName());
 
-        // reset the cache and teleport player back
-        if (!disconnected &&
-            eventParticipant.getOriginalLevel() != null &&
-            location != null)
-            playerStats.setCurrentCheckpoint(location);
+        if (!disconnected && eventParticipant.getOriginalLevel() != null)
+        {
+            Location location = playerStats.getCheckpoint(eventParticipant.getOriginalLevel().getName());
+
+            // reset the cache and teleport player back
+            if (location != null)
+                playerStats.setCurrentCheckpoint(location);
+        }
 
         // if their original level is not null, then set it, if it is, do region lookup of their original location jic
         if (eventParticipant.getOriginalLevel() != null)
