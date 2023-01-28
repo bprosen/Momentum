@@ -17,6 +17,7 @@ public class PlayerStats {
     private Player player;
     private String UUID;
     private String playerName;
+    private double coins;
     private Level level = null;
     private int playerID = -1;
     private long levelStartTime = 0;
@@ -88,6 +89,34 @@ public class PlayerStats {
     public boolean hasNVStatus() {return nightVision; }
 
     public void setNVStatus(boolean nightVision) { this.nightVision = nightVision; }
+
+
+    //
+    // Coins Sections
+    //
+    public double getCoins()
+    {
+        return coins;
+    }
+
+    public void setCoins(double coins)
+    {
+        this.coins = coins;
+    }
+
+    public void addCoins(double coins)
+    {
+        this.coins += coins;
+    }
+
+    public void removeCoins(double coins)
+    {
+        this.coins -= coins;
+
+        // no allowing negative numbers, NO DEBT
+        if (this.coins < 0)
+            this.coins = 0;
+    }
 
     //
     // Race Section

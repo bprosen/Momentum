@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,6 +34,9 @@ public class StatsManager {
     private LinkedHashMap<String, Integer> globalPersonalCompletionsLB = new LinkedHashMap<>
             (Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
 
+    private LinkedHashMap<String, Double> coinsLB = new LinkedHashMap<>(
+            Parkour.getSettingsManager().max_coins_leaderboard_size);
+
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
     }
@@ -45,6 +49,7 @@ public class StatsManager {
                 StatsDB.loadTotalCompletions();
                 StatsDB.loadLeaderboards();
                 loadGlobalPersonalCompletionsLB();
+                loadCoinsLB();
             }
         }.runTaskAsynchronously(plugin);
 
@@ -132,6 +137,24 @@ public class StatsManager {
         ascendancePlayerList.remove(playerStats);
     }
 
+    public void updateCoins(PlayerStats playerStats, double coins)
+    {
+        StatsDB.updateCoins(playerStats, coins);
+        playerStats.setCoins(coins);
+    }
+
+    public void removeCoins(PlayerStats playerStats, double coins)
+    {
+        StatsDB.updateCoins(playerStats, playerStats.getCoins() - coins);
+        playerStats.removeCoins(coins);
+    }
+
+    public void addCoins(PlayerStats playerStats, double coins)
+    {
+        StatsDB.updateCoins(playerStats, playerStats.getCoins() + coins);
+        playerStats.addCoins(coins);
+    }
+
     public void loadGlobalPersonalCompletionsLB() {
         try {
             globalPersonalCompletionsLB.clear();
@@ -147,6 +170,26 @@ public class StatsManager {
                         // add playername to completion in map
                         globalPersonalCompletionsLB.put(playerCompletionStat.get("player_name"), completions);
                 }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadCoinsLB() {
+        try {
+
+            // find the highest top 10 completion stat
+            List<Map<String, String>> coinsResults = DatabaseQueries.getResults("players", "player_name, coins",
+                    " ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
+
+            for (Map<String, String> coinsResult : coinsResults) {
+                String playerName = coinsResult.get("player_name");
+                double coins = Double.parseDouble(coinsResult.get("coins"));
+
+                // if they have more than 0 completions, add (reset stats case)
+                if (coins > 0)
+                    coinsLB.put(playerName, coins);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -274,7 +317,7 @@ public class StatsManager {
                             for (String loreString : itemLore) {
 
                                 // rank and game stats item
-                                loreString = loreString.replace("%balance%", Utils.formatNumber(Parkour.getEconomy().getBalance(playerStats.getPlayer())))
+                                loreString = loreString.replace("%balance%", Utils.formatNumber(playerStats.getCoins()))
                                         .replace("%perks_gained%", playerStats.getGainedPerksCount() + "")
                                         .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
                                         .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))

@@ -236,10 +236,10 @@ public class MenuItemAction {
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
             } else if (!playerStats.hasPerk(perk.getName())
                     && perk.getPrice() > 0) {
-                int playerBalance = (int) Parkour.getEconomy().getBalance(player);
+                int playerBalance = (int) playerStats.getCoins();
 
                 if (playerBalance > perk.getPrice()) {
-                    Parkour.getEconomy().withdrawPlayer(player, perk.getPrice());
+                    Parkour.getStatsManager().removeCoins(playerStats, perk.getPrice());
                     Parkour.getPerkManager().bought(playerStats, perk);
                     Parkour.getMenuManager().updateInventory(player, player.getOpenInventory());
                 }
@@ -388,13 +388,13 @@ public class MenuItemAction {
 
     private static void performRankupItem(Player player) {
 
-        double playerBalance = Parkour.getEconomy().getBalance(player);
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        double playerBalance = playerStats.getCoins();
 
         if (playerBalance >= playerStats.getRank().getRankUpPrice()) {
             player.closeInventory();
             // remove amount
-            Parkour.getEconomy().withdrawPlayer(player, playerStats.getRank().getRankUpPrice());
+            Parkour.getStatsManager().removeCoins(playerStats, playerStats.getRank().getRankUpPrice());
             // change to next stage
             RanksDB.updateStage(player.getUniqueId(), 2);
             playerStats.setRankUpStage(2);

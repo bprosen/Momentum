@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -74,8 +75,9 @@ public class RageQuitCMD implements CommandExecutor {
             // run confirm and buy
             } else {
 
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 double price = Parkour.getSettingsManager().rage_quit_price;
-                double balance = Parkour.getEconomy().getBalance(player);
+                double balance = playerStats.getCoins();
 
                 // can buy it
                 if (balance >= price) {
@@ -85,7 +87,7 @@ public class RageQuitCMD implements CommandExecutor {
                         confirmMap.remove(player.getName());
 
                         // remove price and give perm
-                        Parkour.getEconomy().withdrawPlayer(player, price);
+                        Parkour.getStatsManager().removeCoins(playerStats, price);
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + player.getName() + " permission set rn-parkour.ragequit");
                         player.sendMessage(Utils.translate("&7You purchased &c/ragequit&7! Type it again to use it"));
                     } else {

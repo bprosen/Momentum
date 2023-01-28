@@ -179,7 +179,9 @@ public class StatsCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&cRace lb not loaded or no lb positions"));
                 }
-            // level lb
+                // level lb
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("coins")) {
+                printCoinsLB(sender);
             } else {
 
                 // allow ability to get from title or name
@@ -229,5 +231,36 @@ public class StatsCMD implements CommandExecutor {
             sender.sendMessage(Utils.translate("&6/stats levels  &7Gets Levels Leaderboard"));
         }
         return true;
+    }
+
+    public static void printCoinsLB(CommandSender sender)
+    {
+        LinkedHashMap<String, Integer> globalPersonalCompletionsLB = Parkour.getStatsManager().getGlobalPersonalCompletionsLB();
+
+        if (!globalPersonalCompletionsLB.isEmpty()) {
+
+            sender.sendMessage(Utils.translate("&eCoins &7Leaderboard"));
+
+            int lbPositionNum = 1;
+            for (Map.Entry<String, Integer> entry : globalPersonalCompletionsLB.entrySet()) {
+
+                if (entry != null) {
+                    sender.sendMessage(Utils.translate(" &7" +
+                            lbPositionNum + " &6" +
+                            Utils.shortStyleNumber(entry.getValue()) + " &7" +
+                            entry.getKey()));
+                    lbPositionNum++;
+                }
+            }
+
+            // if player, send personal total
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                sender.sendMessage(Utils.translate("&7Your total &6" + Utils.formatNumber(
+                        Parkour.getStatsManager().get(player).getCoins())));
+            }
+        } else {
+            sender.sendMessage(Utils.translate("&cCoins lb not loaded or no lb positions"));
+        }
     }
 }

@@ -60,6 +60,7 @@ public class TablesDB {
                 "player_id INT NOT NULL AUTO_INCREMENT, " +
                 "uuid CHAR(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
+                "coins DOUBLE DEFAULT 0, " +
                 "spectatable BIT DEFAULT 1, " +
                 "clan_id INT DEFAULT -1, " +
                 "rank_id INT DEFAULT 1, " +

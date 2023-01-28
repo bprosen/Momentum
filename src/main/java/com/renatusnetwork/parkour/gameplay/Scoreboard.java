@@ -65,7 +65,7 @@ public class Scoreboard {
             board.add(Utils.translate("&c&lRenatus Network"));
             board.add(Utils.translate("&7"));
 
-            String coinBalance = Utils.translate("  &e&lCoins &6" + (int) Parkour.getEconomy().getBalance(playerStats.getPlayer()));
+            String coinBalance = Utils.translate("  &e&lCoins &6" + (int) playerStats.getCoins());
             board.add(coinBalance);
 
             // if they have a rank, show it

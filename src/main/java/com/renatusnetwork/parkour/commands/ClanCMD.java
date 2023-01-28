@@ -187,14 +187,14 @@ public class ClanCMD implements CommandExecutor {
                     // Creates a clan at the set price
                     if (clan == null) {
 
-                        int playerBalance = (int) Parkour.getEconomy().getBalance(player);
+                        int playerBalance = (int) playerStats.getCoins();
 
                         if (playerBalance >= Parkour.getSettingsManager().clans_price_create) {
                             if (a.length > 1) {
                                 String clanTag = ChatColor.stripColor(a[1]);
 
                                 if (clanTagRequirements(clanTag, sender)) {
-                                    Parkour.getEconomy().withdrawPlayer(player, Parkour.getSettingsManager().clans_price_create);
+                                    Parkour.getStatsManager().removeCoins(playerStats, Parkour.getSettingsManager().clans_price_create);
                                     Clan newClan = new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0);
                                     Parkour.getClansManager().add(newClan);
                                     ClansDB.newClan(newClan);
@@ -227,7 +227,6 @@ public class ClanCMD implements CommandExecutor {
                     // Changes clan tag
 
                     if (sender instanceof Player) {
-                        Player senderPlayer = (Player) sender;
 
                         // if they are in a clan
                         if (clan != null) {
@@ -241,7 +240,7 @@ public class ClanCMD implements CommandExecutor {
                                         Parkour.getClansManager().remove(clan.getTag());
                                         Parkour.getClansManager().getClans().put(clanTag, clan);
                                         clan.setTag(clanTag);
-                                        Parkour.getEconomy().withdrawPlayer(senderPlayer, Parkour.getSettingsManager().clans_price_tag);
+                                        Parkour.getStatsManager().removeCoins(playerStats, Parkour.getSettingsManager().clans_price_tag);
                                         ClansDB.updateClanTag(clan);
                                         sendClanMessage(clan, "&6&lClan Owner " +
                                                 player.getName() + " &ehas changed your clan's tag to &c" + clanTag, true, player);

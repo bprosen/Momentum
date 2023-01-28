@@ -30,7 +30,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding",
+                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -54,6 +54,9 @@ public class StatsDB {
                     // update in db
                     Parkour.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getPlayerName());
                 }
+
+                double coins = Double.parseDouble(playerResult.get("coins"));
+                playerStats.setCoins(coins);
 
                 int spectatable = Integer.parseInt(playerResult.get("spectatable"));
                 if (spectatable == 1)
@@ -234,6 +237,48 @@ public class StatsDB {
         Parkour.getDatabaseManager().add(query);
     }
 
+    public static void updateCoins(PlayerStats playerStats, double coins)
+    {
+        if (coins < 0)
+            coins = 0;
+
+        String query = "UPDATE players SET coins=" + coins + " WHERE player_id=" + playerStats.getPlayerID();
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void updateCoinsUUID(String UUID, double coins)
+    {
+        if (coins < 0)
+            coins = 0;
+
+        String query = "UPDATE players SET coins=" + coins + " WHERE uuid='" + UUID + "'";
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void updateCoinsName(String playerName, double coins)
+    {
+        if (coins < 0)
+            coins = 0;
+
+        String query = "UPDATE players SET coins=" + coins + " WHERE player_name='" + playerName + "'";
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static double getCoinsFromName(String playerName)
+    {
+        double coins = 0;
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "players",
+                "coins",
+                " WHERE player_name='" + playerName + "'"
+        );
+
+        for (Map<String, String> playerResult : playerResults)
+            coins = Double.parseDouble(playerResult.get("coins"));
+
+        return coins;
+    }
     public static boolean isPlayerInDatabase(String playerName) {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
@@ -242,9 +287,7 @@ public class StatsDB {
                 " WHERE player_name='" + playerName + "'"
         );
 
-        if (!playerResults.isEmpty())
-            return true;
-        return false;
+        return !playerResults.isEmpty();
     }
 
     public static int getPlayerID(String playerName) {

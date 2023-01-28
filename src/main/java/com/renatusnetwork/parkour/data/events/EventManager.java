@@ -131,7 +131,7 @@ public class EventManager {
             if (prestiges > 0 && runningEvent.getLevel().getReward() > 0)
                 reward = (int) (runningEvent.getLevel().getReward() * playerStats.getPrestigeMultiplier());
 
-            Parkour.getEconomy().depositPlayer(winner, reward);
+            Parkour.getStatsManager().addCoins(playerStats, reward);
         }
 
         if (forceEnded)

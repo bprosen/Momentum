@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -48,9 +49,10 @@ public class RaceManager {
             Race newRace = new Race(player1.getPlayer(), player2.getPlayer(), selectedLevel, bet, betAmount);
             runningRaceList.add(newRace);
 
+            StatsManager statsManager = Parkour.getStatsManager();
             // toggle off elytra
-            Parkour.getStatsManager().toggleOffElytra(player1);
-            Parkour.getStatsManager().toggleOffElytra(player2);
+            statsManager.toggleOffElytra(player1);
+            statsManager.toggleOffElytra(player2);
 
             player1.startedRace();
             player2.startedRace();
@@ -61,8 +63,8 @@ public class RaceManager {
             player2.getPlayer().teleport(selectedLevel.getRaceLocation2());
 
             if (bet) {
-                Parkour.getEconomy().withdrawPlayer(player1.getPlayer(), betAmount);
-                Parkour.getEconomy().withdrawPlayer(player2.getPlayer(), betAmount);
+                statsManager.removeCoins(player1, betAmount);
+                statsManager.removeCoins(player2, betAmount);
             }
 
             // remove potion effects
@@ -159,14 +161,18 @@ public class RaceManager {
 
     public void forceEndRace(Race endedRace, boolean shutdown) {
 
+        StatsManager statsManager = Parkour.getStatsManager();
+        Player player1 = endedRace.getPlayer1();
+        Player player2 = endedRace.getPlayer2();
+
         // teleport back
-        endedRace.getPlayer1().teleport(endedRace.getOriginalPlayer1Loc());
-        endedRace.getPlayer2().teleport(endedRace.getOriginalPlayer2Loc());
+        player1.teleport(endedRace.getOriginalPlayer1Loc());
+        player2.teleport(endedRace.getOriginalPlayer2Loc());
 
         // if server is not shutting down
         if (!shutdown) {
-            endedRace.getPlayer1().sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
-            endedRace.getPlayer2().sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
+            player1.sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
+            player2.sendMessage(Utils.translate("&7You ran out of time to complete the race!"));
             // send title
             String titleString = Utils.translate("&7Ran Out of Time in Your Race");
             TitleAPI.sendTitle(endedRace.getPlayer1(), 10, 60, 10, titleString);
@@ -174,9 +180,13 @@ public class RaceManager {
         }
 
         // if has bet, give bet back
-        if (endedRace.hasBet()) {
-            Parkour.getEconomy().depositPlayer(endedRace.getPlayer1(), endedRace.getBet());
-            Parkour.getEconomy().depositPlayer(endedRace.getPlayer2(), endedRace.getBet());
+        if (endedRace.hasBet())
+        {
+            PlayerStats player1Stats = statsManager.get(player1);
+            PlayerStats player2Stats = statsManager.get(player2);
+
+            statsManager.addCoins(player1Stats, endedRace.getBet());
+            statsManager.addCoins(player2Stats, endedRace.getBet());
         }
 
         // set level in cache and toggle back on elytra
@@ -184,26 +194,26 @@ public class RaceManager {
         ProtectedRegion player2Region = WorldGuard.getRegion(endedRace.getPlayer2().getLocation());
         if (player1Region != null) {
             Level level = Parkour.getLevelManager().get(player1Region.getId());
-            PlayerStats playerStats = Parkour.getStatsManager().get(endedRace.getPlayer1());
+            PlayerStats playerStats = statsManager.get(player1);
             playerStats.endedRace();
             playerStats.disableLevelStartTime();
             playerStats.setLevel(level);
 
             // if elytra level, give elytra
             if (level != null && level.isElytraLevel())
-                Parkour.getStatsManager().toggleOnElytra(playerStats);
+                statsManager.toggleOnElytra(playerStats);
         }
 
         if (player2Region != null) {
             Level level = Parkour.getLevelManager().get(player2Region.getId());
-            PlayerStats playerStats = Parkour.getStatsManager().get(endedRace.getPlayer2());
+            PlayerStats playerStats = statsManager.get(endedRace.getPlayer2());
             playerStats.endedRace();
             playerStats.disableLevelStartTime();
             playerStats.setLevel(level);
 
             // if elytra level, give elytra
             if (level != null && level.isElytraLevel())
-                Parkour.getStatsManager().toggleOnElytra(playerStats);
+                statsManager.toggleOnElytra(playerStats);
         }
 
         // remove from list
@@ -216,8 +226,10 @@ public class RaceManager {
 
         if (raceObject != null) {
             Player loser = raceObject.getOpponent(winner);
-            PlayerStats winnerStats = Parkour.getStatsManager().get(winner);
-            PlayerStats loserStats = Parkour.getStatsManager().get(loser);
+            StatsManager statsManager = Parkour.getStatsManager();
+
+            PlayerStats winnerStats = statsManager.get(winner);
+            PlayerStats loserStats = statsManager.get(loser);
 
             // apply completion stats to level
             LevelManager levelManager = Parkour.getLevelManager();
@@ -239,7 +251,8 @@ public class RaceManager {
             winnerStats.setTotalLevelCompletions(winnerStats.getTotalLevelCompletions() + 1);
             StatsDB.insertCompletion(winnerStats, raceObject.getRaceLevel(), levelCompletion);
             levelManager.addTotalLevelCompletion();
-            raceObject.getRaceLevel().addCompletion(winner, levelCompletion); // Update totalLevelCompletionsCount
+            raceObject.getRaceLevel().addCompletion(winner, levelCompletion);
+
             // Update player information
             winnerStats.levelCompletion(raceObject.getRaceLevel().getName(), levelCompletion);
 
@@ -252,7 +265,7 @@ public class RaceManager {
 
             // give winner money and take from loser if betted on race
             if (raceObject.hasBet())
-                Parkour.getEconomy().depositPlayer(winner, (raceObject.getBet() * 2));
+                statsManager.removeCoins(winnerStats, (raceObject.getBet() * 2));
 
             // check if winner is player 1, then teleport accordingly, otherwise they are player 2
             if (raceObject.isPlayer1(winner)) {
@@ -420,7 +433,9 @@ public class RaceManager {
 
     public void acceptRequest(PlayerStats player1, PlayerStats player2) {
 
+        StatsManager statsManager = Parkour.getStatsManager();
         RaceRequest raceRequest = getRequest(player1.getPlayer(), player2.getPlayer());
+
         // request exists
         if (raceRequest != null) {
 
@@ -473,8 +488,8 @@ public class RaceManager {
             }
 
             // make sure they still have enough money for the bet
-            double accepterBalance = Parkour.getEconomy().getBalance(player1.getPlayer());
-            double senderBalance = Parkour.getEconomy().getBalance(player2.getPlayer());
+            double accepterBalance = player1.getCoins();
+            double senderBalance = player2.getCoins();
             if (accepterBalance < betAmount) {
                 player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
                         " Your Balance &4$" + Utils.formatNumber(senderBalance)));

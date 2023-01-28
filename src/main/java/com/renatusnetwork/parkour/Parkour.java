@@ -3,7 +3,6 @@ package com.renatusnetwork.parkour;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
@@ -21,9 +20,7 @@ import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.storage.ConfigManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.utils.dependencies.ProtocolLib;
-import com.renatusnetwork.parkour.utils.dependencies.Vault;
 import com.sk89q.worldedit.WorldEdit;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -44,7 +41,6 @@ public class Parkour extends JavaPlugin {
     private static ClansManager clans;
     private static MenuManager menus;
     private static CheckpointManager checkpoint;
-    private static Economy economy;
     private static RaceManager races;
     private static RanksManager ranks;
     private static PlotsManager plots;
@@ -69,13 +65,6 @@ public class Parkour extends JavaPlugin {
 
         // load all classes
         loadClasses();
-
-        // setup vault
-        if (!Vault.setupEconomy()) {
-            getLogger().info("Vault not found or disabled");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
 
         // initialize packet listeners
         PacketListener.loadListeners(this);
@@ -158,6 +147,7 @@ public class Parkour extends JavaPlugin {
         getCommand("setspawn").setExecutor(new SetSpawnCMD());
         getCommand("nightvision").setExecutor(new NightVisionCMD());
         getCommand("grinding").setExecutor(new GrindCMD());
+        getCommand("coins").setExecutor(new CoinsCMD());
     }
 
     private static void loadClasses() {
@@ -202,7 +192,6 @@ public class Parkour extends JavaPlugin {
     public static Logger getPluginLogger() {
         return logger;
     }
-    public static void setEconomy(Economy eco) { economy = eco; }
 
     // all manager methods
     public static SettingsManager getSettingsManager() { return settings; }
@@ -226,7 +215,6 @@ public class Parkour extends JavaPlugin {
     public static ClansManager getClansManager() {
         return clans;
     }
-    public static Economy getEconomy() { return economy; }
     public static CheckpointManager getCheckpointManager() { return checkpoint; }
     public static RaceManager getRaceManager() { return races; }
     public static RanksManager getRanksManager() { return ranks; }

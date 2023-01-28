@@ -67,6 +67,7 @@ public class SettingsManager {
     public int max_global_personal_completions_leaderboard_size;
     public int max_clans_leaderboard_size;
     public int max_race_leaderboard_size;
+    public int max_coins_leaderboard_size;
 
     public int max_prestige_multiplier;
     public int prestige_multiplier_per_prestige;
@@ -127,6 +128,7 @@ public class SettingsManager {
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
         max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");
+        max_coins_leaderboard_size = settings.getInt("stats.max_coins_leaderboard_size");
         max_prestige_multiplier = settings.getInt("prestiges.max_multiplier");
         prestige_multiplier_per_prestige = settings.getInt("prestiges.multiplier_per_prestige");
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");

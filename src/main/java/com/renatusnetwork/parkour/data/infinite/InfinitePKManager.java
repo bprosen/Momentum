@@ -167,7 +167,7 @@ public class InfinitePKManager {
                 ));
             }
             // deposit score
-            Parkour.getEconomy().depositPlayer(player, score);
+            Parkour.getStatsManager().addCoins(playerStats, score);
 
             playerStats.setInfinitePK(false);
             participants.remove(player.getName());

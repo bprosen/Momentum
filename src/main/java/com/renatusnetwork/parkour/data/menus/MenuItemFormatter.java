@@ -80,7 +80,7 @@ public class MenuItemFormatter {
 
                 // Click to Buy Section
                 if (perk.getPrice() > 0) {
-                    int playerBalance = (int) Parkour.getEconomy().getBalance(player);
+                    int playerBalance = (int) playerStats.getCoins();
 
                     if (playerBalance > perk.getPrice())
                         itemLore.add(Utils.translate("&7  Click to buy "));

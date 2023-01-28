@@ -18,62 +18,6 @@ import org.bukkit.entity.Player;
 
 public class SelectionListener {
 
-    /*
-        yeah... i know... it's pretty jank, but the listeners below stopped working (due to something with FAWE) :(
-     */
-
-    /*
-    @EventHandler
-    public void onCmd(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        String cmd = event.getMessage();
-
-        // only continue if not opped and not bypassing
-        if (player != null && !(player.isOp() && Parkour.getStatsManager().get(player).isBypassingPlots())) {
-
-            // if in plot world and it is a worldedit command, continue
-            if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) &&
-               (cmd.startsWith("//") || cmd.startsWith("/replacenear") || cmd.startsWith("/worldedit:replacenear") ||
-               cmd.startsWith("/undo") || cmd.startsWith("/worldedit:undo") || cmd.startsWith("/redo") || cmd.startsWith("/worldedit:redo"))) {
-
-                try {
-                    // next get the region from player
-                    LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
-
-                    if (cmd.startsWith("//paste")) {
-
-                        ClipboardHolder holder = session.getClipboard();
-
-                        if (holder != null) {
-
-
-                        }
-                    // null check the session and world
-                    } else if (session != null && session.getSelectionWorld() != null) {
-                        Region region = session.getSelection(session.getSelectionWorld());
-                        // just in case
-                        if (region != null) {
-                            // check if region is allowed, if not, cancel and notify
-                            if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player)) {
-                                event.setCancelled(true);
-
-                                // send bypass info if opped
-                                String messageToSend = "&cYou cannot do WorldEdit commands here!";
-                                if (player.isOp())
-                                    messageToSend += " &7You can bypass this with &c/plot bypass";
-
-                                player.sendMessage(Utils.translate(messageToSend));
-                            }
-                        }
-                    }
-                } catch (IncompleteRegionException | EmptyClipboardException e) {
-                    // dont print stack track so we dont spam console with simple error
-                }
-            }
-        }
-    }*/
-
-
     // listen very early to be ahead of normal fawe
     @Subscribe (priority = EventHandler.Priority.VERY_EARLY)
     public void onSelection(EditSessionEvent event) {

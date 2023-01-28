@@ -80,3 +80,6 @@ commands:
   grinding:
     description: "RN-Parkour grinding command"
     aliases: [togglegrind, grindmode, grind]
+  coins:
+    description: "RN-Parkour coins command"
+    aliases: [c]

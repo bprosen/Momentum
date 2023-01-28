@@ -100,8 +100,8 @@ public class RaceCMD implements CommandExecutor {
         }
 
         // make sure they have enough money for the bet
-        double victimBalance = Parkour.getEconomy().getBalance(player2.getPlayer());
-        double senderBalance = Parkour.getEconomy().getBalance(player1.getPlayer());
+        double victimBalance = player2.getCoins();
+        double senderBalance = player1.getCoins();
 
         if (bet && senderBalance < betAmount) {
             player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +

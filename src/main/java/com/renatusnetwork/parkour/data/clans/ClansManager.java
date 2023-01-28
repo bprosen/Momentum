@@ -2,6 +2,9 @@ package com.renatusnetwork.parkour.data.clans;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -136,15 +139,17 @@ public class ClansManager {
                 if (Bukkit.getPlayer(UUID.fromString(clanMember.getUUID())) != null) {
 
                     Player onlineMember = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
-                    Parkour.getEconomy().depositPlayer(onlineMember, splitAmountPerMember);
+                    StatsManager statsManager = Parkour.getStatsManager();
+                    PlayerStats memberStats = statsManager.get(onlineMember);
+
+                    Parkour.getStatsManager().addCoins(memberStats, splitAmountPerMember);
 
                     onlineMember.sendMessage(Utils.translate("&6" + player.getName() + " &ehas completed &6" +
                             level.getFormattedTitle() + " &eand you received &6" + (percentage * 100) + "%" +
                             " &eof the reward! &6($" + (int) splitAmountPerMember + ")"));
-                } else {
-                    OfflinePlayer offlineMember = Bukkit.getOfflinePlayer(UUID.fromString(clanMember.getUUID()));
-                    Parkour.getEconomy().depositPlayer(offlineMember, splitAmountPerMember);
                 }
+                else
+                    StatsDB.updateCoinsUUID(clanMember.getUUID(), splitAmountPerMember);
             }
         }
     }
