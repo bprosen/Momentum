@@ -138,15 +138,24 @@ public class CoinsCMD implements CommandExecutor
                         String playerName = a[0];
                         Player target = Bukkit.getPlayer(playerName);
 
-                        double coins;
+                        double coins = 0;
+                        boolean exists = true;
 
                         // if null, update in db
                         if (target == null)
-                            coins = StatsDB.getCoinsFromName(playerName);
+                        {
+                            if (StatsDB.isPlayerInDatabase(playerName))
+                                coins = StatsDB.getCoinsFromName(playerName);
+                            else
+                                exists = false;
+                        }
                         else
                             coins = statsManager.get(target).getCoins();
 
-                        player.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
+                        if (exists)
+                            player.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
+                        else
+                            player.sendMessage(Utils.translate("&c" + playerName + " &7has not joined the server"));
                     }
                     else
                         sendHelp(sender);

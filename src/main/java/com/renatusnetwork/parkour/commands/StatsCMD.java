@@ -229,6 +229,7 @@ public class StatsCMD implements CommandExecutor {
             sender.sendMessage(Utils.translate("&6/stats clans  &7Gets Clan XP Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats players  &7Gets Players Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats levels  &7Gets Levels Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats coins  &7Gets coins leaderboard"));
         }
         return true;
     }
