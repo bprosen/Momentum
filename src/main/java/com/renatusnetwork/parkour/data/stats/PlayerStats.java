@@ -101,6 +101,9 @@ public class PlayerStats {
 
     public void setCoins(double coins)
     {
+        if (coins < 0)
+            coins = 0;
+
         this.coins = coins;
     }
 

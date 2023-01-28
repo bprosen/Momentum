@@ -14,6 +14,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -24,6 +26,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.File;
 import java.util.*;
 
 public class StatsManager {
@@ -59,6 +63,7 @@ public class StatsManager {
             public void run() {
                 loadGlobalPersonalCompletionsLB();
                 loadOnlinePerksGainedCount();
+                loadCoinsLB();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
 
@@ -176,6 +181,8 @@ public class StatsManager {
     }
 
     public void loadCoinsLB() {
+        coinsLB.clear();
+
         try {
 
             // find the highest top 10 completion stat
@@ -193,6 +200,11 @@ public class StatsManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public LinkedHashMap<String, Double> getCoinsLB()
+    {
+        return coinsLB;
     }
 
     public LinkedHashMap<String, Integer> getGlobalPersonalCompletionsLB() {

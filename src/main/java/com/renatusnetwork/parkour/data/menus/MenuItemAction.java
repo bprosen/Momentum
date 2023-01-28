@@ -227,21 +227,29 @@ public class MenuItemAction {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             // bypass if opped
-            if (player.isOp() || perk.hasRequirements(playerStats, player)) {
+            if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
+            {
                 player.closeInventory();
                 Parkour.getPerkManager().setPerk(perk, player);
 
                 // if has commands, run them
                 if (menuItem.hasCommands())
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
-            } else if (!playerStats.hasPerk(perk.getName())
-                    && perk.getPrice() > 0) {
+
+            }
+            else if (!playerStats.hasPerk(perk.getName()) && perk.getPrice() > 0)
+            {
                 int playerBalance = (int) playerStats.getCoins();
 
-                if (playerBalance > perk.getPrice()) {
+                if (playerBalance > perk.getPrice())
+                {
                     Parkour.getStatsManager().removeCoins(playerStats, perk.getPrice());
                     Parkour.getPerkManager().bought(playerStats, perk);
                     Parkour.getMenuManager().updateInventory(player, player.getOpenInventory());
+
+                    // if has commands, run them
+                    if (menuItem.hasCommands())
+                        runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
                 }
             }
         }

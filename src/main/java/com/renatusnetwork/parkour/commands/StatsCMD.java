@@ -235,14 +235,14 @@ public class StatsCMD implements CommandExecutor {
 
     public static void printCoinsLB(CommandSender sender)
     {
-        LinkedHashMap<String, Integer> globalPersonalCompletionsLB = Parkour.getStatsManager().getGlobalPersonalCompletionsLB();
+        LinkedHashMap<String, Double> coinsLB = Parkour.getStatsManager().getCoinsLB();
 
-        if (!globalPersonalCompletionsLB.isEmpty()) {
+        if (!coinsLB.isEmpty()) {
 
             sender.sendMessage(Utils.translate("&eCoins &7Leaderboard"));
 
             int lbPositionNum = 1;
-            for (Map.Entry<String, Integer> entry : globalPersonalCompletionsLB.entrySet()) {
+            for (Map.Entry<String, Double> entry : coinsLB.entrySet()) {
 
                 if (entry != null) {
                     sender.sendMessage(Utils.translate(" &7" +
@@ -256,8 +256,8 @@ public class StatsCMD implements CommandExecutor {
             // if player, send personal total
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                sender.sendMessage(Utils.translate("&7Your total &6" + Utils.formatNumber(
-                        Parkour.getStatsManager().get(player).getCoins())));
+                sender.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(
+                        Parkour.getStatsManager().get(player).getCoins()) + " &e&lCoins"));
             }
         } else {
             sender.sendMessage(Utils.translate("&cCoins lb not loaded or no lb positions"));

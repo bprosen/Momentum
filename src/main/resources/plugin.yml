@@ -68,6 +68,7 @@ commands:
     aliases: [profilestats]
   cosmetics:
     description: "RN-Parkour cosmetics command"
+    aliases: [shop]
   ragequit:
     description: "RN-Parkour rage quit command"
     aliases: [rq, rage]
@@ -82,4 +83,4 @@ commands:
     aliases: [togglegrind, grindmode, grind]
   coins:
     description: "RN-Parkour coins command"
-    aliases: [c]
+    aliases: [c, coin]

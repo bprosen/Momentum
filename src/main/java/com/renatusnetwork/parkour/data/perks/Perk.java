@@ -65,6 +65,24 @@ public class Perk {
 
     public List<String> getSetRequirementsLore() { return setRequirementsLore; }
 
+    public boolean hasRequiredPermissions(Player player)
+    {
+        boolean perk = false;
+
+        if (!requiredPermissions.isEmpty())
+        {
+            perk = true;
+
+            for (String requiredPermission : requiredPermissions)
+                if (!player.hasPermission(requiredPermission))
+                {
+                    perk = false;
+                    break;
+                }
+        }
+        return perk;
+    }
+
     public boolean hasSetRequirementsLore() { return setRequirementsLore != null; }
     public int getPrice() {
         return price;
@@ -74,7 +92,8 @@ public class Perk {
         return ID;
     }
 
-    public boolean hasRequirements(PlayerStats playerStats, Player player) {
+    public boolean hasRequirements(PlayerStats playerStats, Player player)
+    {
         if (player.isOp())
             return true;
 
