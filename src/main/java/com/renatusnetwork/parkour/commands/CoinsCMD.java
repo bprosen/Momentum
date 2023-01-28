@@ -131,6 +131,10 @@ public class CoinsCMD implements CommandExecutor
                     Player player = (Player) sender;
                     player.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(statsManager.get(player).getCoins()) + " &e&lCoins"));
                 }
+                else
+                {
+                    sender.sendMessage("Console cannot do this");
+                }
             }
             else if (a.length == 1)
             {
