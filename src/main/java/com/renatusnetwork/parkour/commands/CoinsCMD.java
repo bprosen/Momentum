@@ -87,7 +87,8 @@ public class CoinsCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate(
                             "&7You have added &6" + coins + " &e&lCoins &e(" + total + ") &7to &6" + targetName
                     ));
-                } else if (a[0].equalsIgnoreCase("remove"))
+                }
+                else if (a[0].equalsIgnoreCase("remove"))
                 {
                     double total;
 
@@ -122,45 +123,43 @@ public class CoinsCMD implements CommandExecutor
         }
         else if (a.length >= 0 && a.length <= 1)
         {
-            // only players
-            if (sender instanceof Player)
+            if (a.length == 0)
             {
-                Player player = (Player) sender;
-
-                if (a.length == 0)
+                // only players
+                if (sender instanceof Player)
                 {
+                    Player player = (Player) sender;
                     player.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(statsManager.get(player).getCoins()) + " &e&lCoins"));
                 }
-                else if (a.length == 1)
+            }
+            else if (a.length == 1)
+            {
+                if (!a[0].equalsIgnoreCase("help"))
                 {
-                    if (!a[0].equalsIgnoreCase("help"))
+                    String playerName = a[0];
+                    Player target = Bukkit.getPlayer(playerName);
+
+                    double coins = 0;
+                    boolean exists = true;
+
+                    // if null, update in db
+                    if (target == null)
                     {
-                        String playerName = a[0];
-                        Player target = Bukkit.getPlayer(playerName);
-
-                        double coins = 0;
-                        boolean exists = true;
-
-                        // if null, update in db
-                        if (target == null)
-                        {
-                            if (StatsDB.isPlayerInDatabase(playerName))
-                                coins = StatsDB.getCoinsFromName(playerName);
-                            else
-                                exists = false;
-                        }
+                        if (StatsDB.isPlayerInDatabase(playerName))
+                            coins = StatsDB.getCoinsFromName(playerName);
                         else
-                            coins = statsManager.get(target).getCoins();
-
-                        if (exists)
-                            player.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
-                        else
-                            player.sendMessage(Utils.translate("&c" + playerName + " &7has not joined the server"));
+                            exists = false;
                     }
                     else
-                        sendHelp(sender);
-                }
+                        coins = statsManager.get(target).getCoins();
 
+                    if (exists)
+                        sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
+                    else
+                        sender.sendMessage(Utils.translate("&c" + playerName + " &7has not joined the server"));
+                }
+                else
+                    sendHelp(sender);
             }
         }
         else

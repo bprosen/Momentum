@@ -149,7 +149,10 @@ public class ClansManager {
                             " &eof the reward! &6($" + (int) splitAmountPerMember + ")"));
                 }
                 else
-                    StatsDB.updateCoinsUUID(clanMember.getUUID(), splitAmountPerMember);
+                {
+                    double coins = StatsDB.getCoinsFromUUID(clanMember.getUUID());
+                    StatsDB.updateCoinsUUID(clanMember.getUUID(), splitAmountPerMember + coins);
+                }
             }
         }
     }

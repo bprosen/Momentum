@@ -279,6 +279,23 @@ public class StatsDB {
 
         return coins;
     }
+
+    public static double getCoinsFromUUID(String UUID)
+    {
+        double coins = 0;
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "players",
+                "coins",
+                " WHERE uuid='" + UUID + "'"
+        );
+
+        for (Map<String, String> playerResult : playerResults)
+            coins = Double.parseDouble(playerResult.get("coins"));
+
+        return coins;
+    }
+
     public static boolean isPlayerInDatabase(String playerName) {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
