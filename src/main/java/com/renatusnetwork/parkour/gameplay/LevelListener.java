@@ -271,27 +271,33 @@ public class LevelListener implements Listener {
             if (region != null) {
 
                 // make sure the area they are spawning in is a level
-                Level level = Parkour.getLevelManager().get(region.getId());
+                Level levelTo = Parkour.getLevelManager().get(region.getId());
 
-                if (level != null) {
+                if (levelTo != null) {
                     // if player has level and if not same level, then run level change
-                    if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
+                    if (playerStats.inLevel() && levelTo.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
                         return;
 
                     // if they are in a level and have a cp, continue
                     if (playerStats.inLevel() && playerStats.hasCurrentCheckpoint()) {
-                        ProtectedRegion checkpointTo = WorldGuard.getRegion(playerStats.getCurrentCheckpoint());
+                        ProtectedRegion currentCPRegion = WorldGuard.getRegion(playerStats.getCurrentCheckpoint());
 
                         // if the cp region isnt null, continue and get level
-                        if (checkpointTo != null) {
-                            Level checkpointLevel = Parkour.getLevelManager().get(checkpointTo.getId());
+                        if (currentCPRegion != null) {
+                            Level currentLevel = Parkour.getLevelManager().get(currentCPRegion.getId());
 
                             // if they cp level isnt null and the cp level is NOT the same as the level theyre teleporting to, save the cp
-                            if (checkpointLevel != null && !checkpointLevel.getName().equalsIgnoreCase(level.getName()))
+                            if (currentLevel != null && !currentLevel.getName().equalsIgnoreCase(levelTo.getName()))
+                            {
                                 playerStats.resetCurrentCheckpoint();
+
+                                // set cp if finds one
+                                Location newCP = playerStats.getCheckpoint(levelTo.getName());
+                                playerStats.setCurrentCheckpoint(newCP);
+                            }
                         }
                     }
-                    playerStats.setLevel(level);
+                    playerStats.setLevel(levelTo);
                 } else if (playerStats.inLevel())
                     resetLevel = true;
 
