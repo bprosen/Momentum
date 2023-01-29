@@ -17,18 +17,9 @@ public class Plot {
     private boolean submitted = false;
 
     // add via player object
-    public Plot(Player owner, Location spawnLoc) {
-        this.ownerName = owner.getName();
-        this.ownerUUID = owner.getUniqueId().toString();
-        this.spawnLoc = spawnLoc;
-
-        // run async
-        new BukkitRunnable() {
-            public void run() {
-                trustedPlayers = PlotsDB.getTrustedPlayers(owner.getUniqueId().toString());
-                submitted = PlotsDB.isSubmitted(owner.getUniqueId().toString());
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
+    public Plot(Player owner, Location spawnLoc)
+    {
+        this(owner.getName(), owner.getUniqueId().toString(), spawnLoc);
     }
 
     // no player object addition
@@ -42,6 +33,11 @@ public class Plot {
             public void run() {
                 trustedPlayers = PlotsDB.getTrustedPlayers(ownerUUID);
                 submitted = PlotsDB.isSubmitted(ownerUUID);
+
+                // do it this way for allowing this to be used
+                if (submitted)
+                    submit();
+
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
@@ -87,9 +83,14 @@ public class Plot {
         return submitted;
     }
 
-    public void submit() {
+    public void submit()
+    {
         submitted = true;
+        Parkour.getPlotsManager().addSubmittedItemStack(this);
     }
 
-    public void desubmit() { submitted = false; }
+    public void desubmit() {
+        submitted = false;
+        Parkour.getPlotsManager().removeSubmittedItemStack(this);
+    }
 }

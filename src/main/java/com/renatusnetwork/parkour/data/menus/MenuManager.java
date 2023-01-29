@@ -30,6 +30,8 @@ public class MenuManager {
 
         for (String menuName : MenusYAML.getNames())
             load(menuName);
+
+        Parkour.getPluginLogger().info("Menus loaded: " + menuMap.size());
     }
 
     public void load(String menuName) {
@@ -145,29 +147,7 @@ public class MenuManager {
             for (int i = 0; i < submittedPlots.size() && i < inventory.getSize() - 9; i++) {
 
                 Plot plot = submittedPlots.get(i);
-                // third byte is a player skull
-                ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
-                SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
-
-                final String plotOwnerName = plot.getOwnerName();
-
-                UUID targetUUID = UUID.fromString(plot.getOwnerUUID());
-                skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUUID));
-
-                skullMeta.setDisplayName(Utils.translate("&4" + plotOwnerName + "&c's Plot Submission"));
-
-                List<String> itemLore = new ArrayList<String>() {{
-                    add("");
-                    add(Utils.translate("&7Click to teleport to"));
-                    add(Utils.translate("&4" + plotOwnerName + "&c's Plot"));
-                    add("");
-                    add(Utils.translate("&7Awaiting &aaccept &7or &cdeny"));
-                    add("");
-                }};
-
-                skullMeta.setLore(itemLore);
-                item.setItemMeta(skullMeta);
-                inventory.setItem(i, item);
+                inventory.setItem(i, Parkour.getPlotsManager().getSubmittedItemStack(plot));
             }
             // make black glass at the bottom row
             for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {

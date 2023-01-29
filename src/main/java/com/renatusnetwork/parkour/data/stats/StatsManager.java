@@ -314,14 +314,14 @@ public class StatsManager {
                         List<String> newLore = new ArrayList<>();
 
                         // special condition if they are viewing someone else's stats, replace the skull with correct values
-                        if (playerStats.getPlayerName() != opener.getName() && item.getType() == Material.GOLD_NUGGET) {
-                            ItemStack skullItem = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
-                            SkullMeta skullMeta = (SkullMeta) skullItem.getItemMeta();
-                            skullMeta.setOwningPlayer(playerStats.getPlayer());
-                            skullMeta.setDisplayName(Utils.translate("&7You are viewing &c" + playerStats.getPlayer().getDisplayName() + "&7's Profile"));
-                            skullItem.setItemMeta(skullMeta);
+                        if (playerStats.getPlayerName() != opener.getName() && item.getType() == Material.GOLD_NUGGET)
+                        {
+                            ItemStack headItem = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+                            ItemMeta headMeta = headItem.getItemMeta();
+                            headMeta.setDisplayName(Utils.translate("&7You are viewing &c" + playerStats.getPlayer().getDisplayName() + "&7's Profile"));
+                            headItem.setItemMeta(headMeta);
                             // replace item for later when it sets
-                            item = skullItem;
+                            item = headItem;
                         // otherwise it is a stat item
                         } else {
 
