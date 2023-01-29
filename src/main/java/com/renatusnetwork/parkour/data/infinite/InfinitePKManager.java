@@ -69,7 +69,7 @@ public class InfinitePKManager {
                 infinitePK.setCurrentBlockLoc(startingLoc);
 
                 Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
-                Location portalLoc = Parkour.getLocationManager().get(LocationManager.INFINITE_PORTAL_NAME);
+                Location portalLoc = Parkour.getLocationManager().get(SettingsManager.INFINITE_PORTAL_NAME);
 
                 // if they are at spawn prior to teleport, change original loc to setting
                 if (respawnLoc != null && portalLoc.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()) &&

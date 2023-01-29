@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 
 public class SettingsManager {
 
+    // constants
+    public static final String INFINITE_PORTAL_NAME = "infinite-portal";
+    public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
+
     public String levels_message_completion;
     public String levels_message_broadcast;
     public double featured_level_reward_multiplier;

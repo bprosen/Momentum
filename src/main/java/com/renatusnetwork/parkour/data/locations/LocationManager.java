@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.locations;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -11,10 +12,6 @@ import java.util.List;
 public class LocationManager {
 
     private HashMap<String, Location> locations;
-
-    // constants
-    public static final String INFINITE_PORTAL_NAME = "infinite-portal";
-    public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
 
     public LocationManager() {
         load();
@@ -90,10 +87,10 @@ public class LocationManager {
         switch (portalType)
         {
             case INFINITE:
-                portalLoc = locations.get(LocationManager.INFINITE_PORTAL_NAME);
+                portalLoc = locations.get(SettingsManager.INFINITE_PORTAL_NAME);
                 break;
             case ASCENDANCE:
-                portalLoc = locations.get(LocationManager.ASCENDANCE_PORTAL_NAME);
+                portalLoc = locations.get(SettingsManager.ASCENDANCE_PORTAL_NAME);
                 break;
         }
 
