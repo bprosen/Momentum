@@ -147,7 +147,11 @@ public class MenuManager {
             for (int i = 0; i < submittedPlots.size() && i < inventory.getSize() - 9; i++) {
 
                 Plot plot = submittedPlots.get(i);
-                inventory.setItem(i, Parkour.getPlotsManager().getSubmittedItemStack(plot));
+                ItemStack item = Parkour.getPlotsManager().getSubmittedItemStack(plot);
+
+                // non null
+                if (item != null)
+                    inventory.setItem(i, item);
             }
             // make black glass at the bottom row
             for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
