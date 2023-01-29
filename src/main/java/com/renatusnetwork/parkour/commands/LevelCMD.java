@@ -653,6 +653,11 @@ public class LevelCMD implements CommandExecutor {
                                     locationManager.load(newLevelName + "-spawn");
                                 }
 
+                                if (locationManager.hasPortalLocation(levelName))
+                                {
+                                    locationManager.getLocations().remove(levelName + "-portal");
+                                    locationManager.load(newLevelName + "-portal");
+                                }
                                 // run this in async, heavy task and can be in async
                                 new BukkitRunnable() {
                                     @Override

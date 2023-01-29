@@ -14,6 +14,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -142,19 +143,39 @@ public class MenuManager {
     public void openSubmittedPlotsGUI(Player player) {
         Inventory inventory = getInventory("submitted-plots", 0);
 
-        if (inventory != null) {
+        if (inventory != null)
+        {
             List<Plot> submittedPlots = Parkour.getPlotsManager().getSubmittedPlots();
-            for (int i = 0; i < submittedPlots.size() && i < inventory.getSize() - 9; i++) {
-
+            for (int i = 0; i < submittedPlots.size() && i < inventory.getSize() - 9; i++)
+            {
                 Plot plot = submittedPlots.get(i);
-                ItemStack item = Parkour.getPlotsManager().getSubmittedItemStack(plot);
+
+                ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+                ItemMeta skullMeta = item.getItemMeta();
+
+                String plotOwnerName = plot.getOwnerName();
+
+                skullMeta.setDisplayName(Utils.translate("&4" + plotOwnerName + "&c's Plot Submission"));
+
+                List<String> itemLore = new ArrayList<String>() {{
+                    add("");
+                    add(Utils.translate("&7Click to teleport to"));
+                    add(Utils.translate("&4" + plotOwnerName + "&c's Plot"));
+                    add("");
+                    add(Utils.translate("&7Awaiting &aaccept &7or &cdeny"));
+                    add("");
+                }};
+
+                skullMeta.setLore(itemLore);
+                item.setItemMeta(skullMeta);
 
                 // non null
                 if (item != null)
                     inventory.setItem(i, item);
             }
             // make black glass at the bottom row
-            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++)
+            {
                 ItemStack item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
                 ItemMeta itemMeta = item.getItemMeta();
                 itemMeta.setDisplayName(Utils.translate("&8Renatus Network"));
@@ -163,7 +184,9 @@ public class MenuManager {
                 inventory.setItem(i, item);
             }
             player.openInventory(inventory);
-        } else {
+        }
+        else
+        {
             player.sendMessage(Utils.translate("&cUnable to open inventory, null?"));
         }
     }

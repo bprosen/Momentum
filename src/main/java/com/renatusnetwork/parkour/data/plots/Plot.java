@@ -86,11 +86,10 @@ public class Plot {
     public void submit()
     {
         submitted = true;
-        Parkour.getPlotsManager().addSubmittedItemStack(this);
     }
 
-    public void desubmit() {
+    public void desubmit()
+    {
         submitted = false;
-        Parkour.getPlotsManager().removeSubmittedItemStack(this);
     }
 }

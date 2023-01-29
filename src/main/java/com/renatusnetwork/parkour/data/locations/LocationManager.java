@@ -12,6 +12,10 @@ public class LocationManager {
 
     private HashMap<String, Location> locations;
 
+    // constants
+    public static final String INFINITE_PORTAL_NAME = "infinite-portal";
+    public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
+
     public LocationManager() {
         load();
     }
@@ -70,6 +74,40 @@ public class LocationManager {
         if (exists(levelName + "-spawn"))
             return true;
         return false;
+    }
+
+    public boolean hasPortalLocation(String levelName)
+    {
+        return exists(levelName + "-portal");
+    }
+
+    public boolean isNearPortal(double playerX, double playerY, double playerZ, double radius, PortalType portalType)
+    {
+        boolean inPortal = false;
+        Location portalLoc = null;
+
+        // portal type
+        switch (portalType)
+        {
+            case INFINITE:
+                portalLoc = locations.get(LocationManager.INFINITE_PORTAL_NAME);
+                break;
+            case ASCENDANCE:
+                portalLoc = locations.get(LocationManager.ASCENDANCE_PORTAL_NAME);
+                break;
+        }
+
+        if (portalLoc != null) {
+
+            // booleans for all radius
+            boolean inX = ((portalLoc.getBlockX() + radius) >= ((int) playerX)) && ((portalLoc.getBlockX() - radius) <= ((int) playerX));
+            boolean inY = ((portalLoc.getBlockY() + radius) >= ((int) playerY)) && ((portalLoc.getBlockY() - radius) <= ((int) playerY));
+            boolean inZ = ((portalLoc.getBlockZ() + radius) >= ((int) playerZ)) && ((portalLoc.getBlockZ() - radius) <= ((int) playerZ));
+
+            if (inX && inY && inZ)
+                inPortal = true;
+        }
+        return inPortal;
     }
 
     public HashMap<String, Location> getLocations() { return locations; }

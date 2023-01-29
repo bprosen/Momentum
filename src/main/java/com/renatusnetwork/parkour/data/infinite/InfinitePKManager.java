@@ -69,7 +69,7 @@ public class InfinitePKManager {
                 infinitePK.setCurrentBlockLoc(startingLoc);
 
                 Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
-                Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
+                Location portalLoc = Parkour.getLocationManager().get(LocationManager.INFINITE_PORTAL_NAME);
 
                 // if they are at spawn prior to teleport, change original loc to setting
                 if (respawnLoc != null && portalLoc.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()) &&
@@ -237,23 +237,6 @@ public class InfinitePKManager {
                 isBest = true;
         }
         return isBest;
-    }
-
-    public boolean isNearPortal(double playerX, double playerY, double playerZ, int radius) {
-        boolean inPortal = false;
-        Location portalLoc = Parkour.getSettingsManager().infinitepk_portal_location;
-
-        if (portalLoc != null) {
-
-            // booleans for all radius
-            boolean inX = ((portalLoc.getBlockX() + radius) >= ((int) playerX)) && ((portalLoc.getBlockX() - radius) <= ((int) playerX));
-            boolean inY = ((portalLoc.getBlockY() + radius) >= ((int) playerY)) && ((portalLoc.getBlockY() - radius) <= ((int) playerY));
-            boolean inZ = ((portalLoc.getBlockZ() + radius) >= ((int) playerZ)) && ((portalLoc.getBlockZ() - radius) <= ((int) playerZ));
-
-            if (inX && inY && inZ)
-                inPortal = true;
-        }
-        return inPortal;
     }
 
     // method to update their score in all 3 possible placed

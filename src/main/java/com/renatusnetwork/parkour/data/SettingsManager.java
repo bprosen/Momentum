@@ -61,7 +61,6 @@ public class SettingsManager {
     public float infinitepk_starting_pitch;
     public float infinitepk_starting_yaw;
     public Location infinitepk_portal_respawn;
-    public Location infinitepk_portal_location;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -75,6 +74,7 @@ public class SettingsManager {
     public double min_race_bet_amount;
 
     public String ascendant_realm_world;
+    public String ascendance_hub_level;
 
     public double rage_quit_price;
     public List<String> rage_quit_messages;
@@ -137,6 +137,7 @@ public class SettingsManager {
         ascendant_realm_world = settings.getString("ascendance.realm_world");
         rage_quit_price = settings.getDouble("rage_quit.price");
         rage_quit_messages = settings.getStringList("rage_quit.messages");
+        ascendance_hub_level = settings.getString("ascendance.hub_level");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
@@ -147,16 +148,6 @@ public class SettingsManager {
             infinitepk_portal_respawn = new Location(Bukkit.getWorld(infinitePKSplit[0]),
                     Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]),
                     Float.parseFloat(infinitePKSplit[4]), Float.parseFloat(infinitePKSplit[5]));
-        }
-
-        // load the location point of portal
-        String infinitePKLoc = settings.getString("infinitepk.portal_location");
-        // need to null check jic
-        if (infinitePKLoc != null) {
-            String[] infinitePKSplit = infinitePKLoc.split(":");
-
-            infinitepk_portal_location = new Location(Bukkit.getWorld(infinitePKSplit[0]),
-                    Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]));
         }
     }
 }

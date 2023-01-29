@@ -19,6 +19,7 @@ stats:
 
 ascendance:
   realm_world: "ascendant_realm"
+  hub_level: "ascendantrealm"
 # It will check if that line contains 'Click Here', or whatever is defined
 signs:
   first_line: "Click Here"
@@ -92,7 +93,6 @@ infinitepk:
   starting_pitch: 0.0f
   starting_yaw: 0.0f
   portal_respawn:
-  portal_location:
 completions:
   global_level_completions_leaderboard:
     max_size: 10

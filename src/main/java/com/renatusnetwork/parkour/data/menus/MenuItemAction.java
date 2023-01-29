@@ -277,7 +277,7 @@ public class MenuItemAction {
             performLevelTeleport(playerStats, player, level);
     }
 
-    private static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
+    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace()) {
             if (playerStats.getPlayerToSpectate() == null) {
                 if (!playerStats.isEventParticipant()) {

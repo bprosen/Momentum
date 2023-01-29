@@ -11,6 +11,9 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.locations.LocationManager;
+import com.renatusnetwork.parkour.data.locations.PortalType;
+import com.renatusnetwork.parkour.data.menus.MenuItemAction;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -158,19 +161,49 @@ public class PacketListener implements Listener {
 
                     InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
 
-                    // if in infinite parkour
-                    if (playerStats.isInInfinitePK()) {
+                    if (!playerStats.inLevel())
+                    {
+                        LocationManager locationManager = Parkour.getLocationManager();
 
-                        InfinitePK infinitePK = infinitePKManager.get(player.getName());
-                        // end infinite pk if below current block
-                        if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
-                            infinitePKManager.endPK(infinitePK.getPlayer(), false);
-                    // if their loc
-                    } else if (infinitePKManager.isNearPortal(
-                            packet.getDoubles().read(0), playerY, packet.getDoubles().read(2), 1))
-                        infinitePKManager.startPK(playerStats, true);
+                        // if in infinite parkour
+                        if (playerStats.isInInfinitePK())
+                        {
+                            InfinitePK infinitePK = infinitePKManager.get(player.getName());
 
-                    else {
+                            // end infinite pk if below current block
+                            if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
+                                infinitePKManager.endPK(infinitePK.getPlayer(), false);
+                            // if their loc
+                        }
+                        else if (locationManager.isNearPortal(
+                                packet.getDoubles().read(0), playerY, packet.getDoubles().read(2),
+                                1,
+                                PortalType.INFINITE
+                        ))
+                                infinitePKManager.startPK(playerStats, true);
+                        else if (locationManager.isNearPortal(
+                                packet.getDoubles().read(0), playerY, packet.getDoubles().read(2),
+                                1,
+                                PortalType.ASCENDANCE
+                        ))
+                        {
+                            Level level = Parkour.getLevelManager().get(Parkour.getSettingsManager().ascendance_hub_level);
+                            if (level != null)
+                            {
+                                // force sync
+                                new BukkitRunnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        MenuItemAction.performLevelTeleport(playerStats, player, level); // Tp to ascendance hub
+                                    }
+                                }.runTask(Parkour.getPlugin());
+                            }
+                        }
+                    }
+                    else
+                    {
                         Level level = playerStats.getLevel();
 
                         // if level is not null, they are not spectating, it has a respawn y, and the y is greater than or equal to player y, respawn

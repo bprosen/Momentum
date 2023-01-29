@@ -22,7 +22,6 @@ import java.util.*;
 public class PlotsManager {
 
     private HashMap<String, Plot> plotList = new HashMap<>();
-    private HashMap<Plot, ItemStack> submittedItemStack = new HashMap<>();
 
     public PlotsManager() {
         load();
@@ -63,53 +62,6 @@ public class PlotsManager {
         Plot plot = new Plot(playerName, playerUUID, spawnLoc);
         plotList.put(playerName, plot);
     }
-
-    public void addSubmittedItemStack(Plot plot)
-    {
-        // item creation outside of async
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
-        SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
-
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-
-                String plotOwnerName = plot.getOwnerName();
-
-                UUID targetUUID = UUID.fromString(plot.getOwnerUUID());
-                skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(targetUUID));
-
-                skullMeta.setDisplayName(Utils.translate("&4" + plotOwnerName + "&c's Plot Submission"));
-
-                List<String> itemLore = new ArrayList<String>() {{
-                    add("");
-                    add(Utils.translate("&7Click to teleport to"));
-                    add(Utils.translate("&4" + plotOwnerName + "&c's Plot"));
-                    add("");
-                    add(Utils.translate("&7Awaiting &aaccept &7or &cdeny"));
-                    add("");
-                }};
-
-                skullMeta.setLore(itemLore);
-                item.setItemMeta(skullMeta);
-
-                submittedItemStack.put(plot, item);
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
-    }
-
-    public void removeSubmittedItemStack(Plot plot)
-    {
-        submittedItemStack.remove(plot);
-    }
-
-    public ItemStack getSubmittedItemStack(Plot plot)
-    {
-        return submittedItemStack.remove(plot);
-    }
-
     public Plot get(String playerName) {
         return plotList.get(playerName);
     }

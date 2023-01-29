@@ -49,6 +49,7 @@ public class LocationsYAML {
         Set<String> pathTypes = new HashSet<String>() {{
             add("-spawn");
             add("-completion");
+            add("-portal");
         }};
 
         for (String pathType : pathTypes) {
