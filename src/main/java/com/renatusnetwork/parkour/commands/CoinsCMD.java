@@ -158,7 +158,7 @@ public class CoinsCMD implements CommandExecutor
                         coins = statsManager.get(target).getCoins();
 
                     if (exists)
-                        sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
+                        sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &e&lCoins"));
                     else
                         sender.sendMessage(Utils.translate("&c" + playerName + " &7has not joined the server"));
                 }
