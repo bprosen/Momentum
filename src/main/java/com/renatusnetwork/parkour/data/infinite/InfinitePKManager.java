@@ -69,22 +69,21 @@ public class InfinitePKManager {
                 infinitePK.setCurrentBlockLoc(startingLoc);
 
                 Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
-                Location portalLoc = Parkour.getLocationManager().get(SettingsManager.INFINITE_PORTAL_NAME);
 
                 // if they are at spawn prior to teleport, change original loc to setting
-                if (respawnLoc != null && portalLoc.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()) &&
-                    portalLoc.distance(player.getLocation()) <= 3)
+                if (fromPortal && respawnLoc != null)
                     infinitePK.setOriginalLoc(respawnLoc);
 
                 // prepare block and teleport
                 startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
                 playerStats.clearPotionEffects();
                 player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
+                // set to true
+                playerStats.setInfinitePK(true);
+
                 // immediately get new loc
                 doNextJump(player, true);
 
-                // set to true
-                playerStats.setInfinitePK(true);
             }
         }.runTask(Parkour.getPlugin());
     }
@@ -178,32 +177,9 @@ public class InfinitePKManager {
 
     public InfinitePKReward getReward(int score) { return rewards.get(score); }
 
-    public boolean hasReward(int score) { return rewards.get(score) != null; }
-
     public void addReward(InfinitePKReward infinitePKReward) { rewards.put(infinitePKReward.getScoreNeeded(), infinitePKReward); }
 
     public void clearRewards() { rewards.clear(); }
-
-    public InfinitePKReward getClosestRewardBelowScore(int score) {
-
-        // store closest globally
-        int closestRewardScore = -1;
-        InfinitePKReward closestReward = null;
-
-        for (Integer rewardsScore : rewards.keySet()) {
-            // if diff is > 0, that means they got the reward
-            int diff = score - rewardsScore;
-
-            if (diff >= 0 && rewardsScore > closestRewardScore)
-                closestRewardScore = rewardsScore;
-        }
-
-        // if > -1, that means they got a reward!
-        if (closestRewardScore > -1)
-            closestReward = rewards.get(closestRewardScore);
-
-        return closestReward;
-    }
 
     public List<InfinitePKReward> getApplicableRewards(int oldBestScore, int newBestScore) {
         List<InfinitePKReward> tempRewards = new ArrayList<>();

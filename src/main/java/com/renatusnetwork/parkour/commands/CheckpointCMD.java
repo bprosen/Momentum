@@ -61,6 +61,6 @@ public class CheckpointCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&c/checkpoint [teleport] &7Teleports you to your previous checkpoint"));
 
         if (player.hasPermission("rn-parkour.admin"))
-            player.sendMessage("&c/checkpoint list (player) &7Lists checkpoints the player has");
+            player.sendMessage(Utils.translate("&c/checkpoint list (player) &7Lists checkpoints the player has"));
     }
 }
