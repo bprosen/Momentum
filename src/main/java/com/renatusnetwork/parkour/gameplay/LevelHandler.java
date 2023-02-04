@@ -124,7 +124,17 @@ public class LevelHandler {
 
                     // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
                     if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
-                        Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
+                    {
+                        // async for database querying
+                        new BukkitRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
+                            }
+                        }.runTaskAsynchronously(Parkour.getPlugin());
+                    }
                 }
 
                 // give higher reward if prestiged
