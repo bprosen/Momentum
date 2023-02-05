@@ -832,9 +832,9 @@ public class LevelCMD implements CommandExecutor {
                         @Override
                         public void run()
                         {
-                            String levelName = a[0];
-                            String startDate = a[1];
-                            String endDate = a[2];
+                            String levelName = a[1];
+                            String startDate = a[2];
+                            String endDate = a[3];
 
                             Level level = Parkour.getLevelManager().get(levelName);
 
