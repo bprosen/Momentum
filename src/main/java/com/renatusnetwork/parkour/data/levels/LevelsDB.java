@@ -98,6 +98,15 @@ public class LevelsDB {
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
 
+    public static long getCompletionsBetweenDates(int levelID, String start, String end)
+    {
+        List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
+                "COUNT(*) AS total_completions",
+                " WHERE level_id=" + levelID + " AND completion_date >= '" + start + "' AND completion_date < '" + end + "'");
+
+        return Long.parseLong(globalResults.get(0).get("total_completions"));
+    }
+
     public static void updateReward(Level level) {
         String query = "UPDATE levels SET " +
                 "reward=" + level.getReward() + " " +

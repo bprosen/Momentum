@@ -823,7 +823,37 @@ public class LevelCMD implements CommandExecutor {
                             Parkour.getPluginLogger().info("Levels in data cache: " + levelCache.size());
                         }
                     }.runTaskAsynchronously(Parkour.getPlugin());
-                } else {
+                }
+                else if (a.length == 4 && a[0].equalsIgnoreCase("totalcompletions"))
+                {
+                    // asyncify since big db searching
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            String levelName = a[0];
+                            String startDate = a[1];
+                            String endDate = a[2];
+
+                            Level level = Parkour.getLevelManager().get(levelName);
+
+                            if (level != null)
+                            {
+                                long totalCompletions = LevelsDB.getCompletionsBetweenDates(level.getID(), startDate, endDate);
+
+                                sender.sendMessage(Utils.translate(
+                                        "&c" + level.getFormattedTitle() + " &7between &a" + startDate + " &7and &a" + endDate +
+                                                " &7has &a" + Utils.formatNumber(totalCompletions) + " &7Completions"));
+                            }
+                            else
+                            {
+                                sender.sendMessage(Utils.translate("&cThe level &4" + levelName + " &cdoes not exist"));
+                            }
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
+                }
+                else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
                 }
@@ -867,6 +897,8 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("toggleascendance"));
         sender.sendMessage(getHelp("resetcheckpoint"));
         sender.sendMessage(getHelp("resetcheckpoints"));
+        sender.sendMessage(getHelp("cleanleveldatadb"));
+        sender.sendMessage(getHelp("totalcompletions"));
     }
 
     private static String getHelp(String cmd) {
@@ -932,6 +964,10 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level resetcheckpoint <level> <player>  &7Resets level checkpoint for single player");
             case "resetcheckpoints":
                 return Utils.translate("&a/level resetcheckpoints <level>  &7Resets ALL checkpoints for specific level");
+            case "cleanleveldatadb":
+                return Utils.translate("&a/level cleanleveldatadb  &7Cleans invalid data");
+            case "totalcompletions":
+                return Utils.translate("&a/level totalcompletions <level> <startDate> <endDate>  &7Gets total number of completions between two dates (YYYY-MM-DD)");
         }
         return "";
     }
