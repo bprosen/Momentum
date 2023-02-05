@@ -59,7 +59,7 @@ public class StatsCMD implements CommandExecutor {
                         if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &4" +
-                                    Utils.shortStyleNumber(lbPosition.getTotalCompletionsCount()) + " &c" +
+                                    Utils.formatNumber(lbPosition.getTotalCompletionsCount()) + " &c" +
                                     lbPosition.getFormattedTitle()));
                             lbPositionNum++;
                         }
@@ -83,7 +83,7 @@ public class StatsCMD implements CommandExecutor {
                         if (entry != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &3" +
-                                    Utils.shortStyleNumber(entry.getValue()) + " &b" +
+                                    Utils.formatNumber(entry.getValue()) + " &b" +
                                     entry.getKey()));
                             lbPositionNum++;
                         }
@@ -248,7 +248,7 @@ public class StatsCMD implements CommandExecutor {
                 if (entry != null) {
                     sender.sendMessage(Utils.translate(" &7" +
                             lbPositionNum + " &6" +
-                            Utils.shortStyleNumber(entry.getValue()) + " &7" +
+                            Utils.formatNumber(entry.getValue()) + " &7" +
                             entry.getKey()));
                     lbPositionNum++;
                 }
