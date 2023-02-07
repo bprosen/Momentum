@@ -738,6 +738,13 @@ public class LevelCMD implements CommandExecutor {
                                 levelManager.removeTotalLevelCompletion();
                                 level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
 
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        StatsDB.loadLeaderboard(level);
+                                    }
+                                }.runTaskLaterAsynchronously(Parkour.getPlugin(), 5);
+
                                 sender.sendMessage(Utils.translate("&cYou removed all of &4" + playerName + "&c's completions for &4" + levelName));
                             } else {
                                 sender.sendMessage(Utils.translate("&4" + playerName + " &chas yet to complete &4" + levelName));

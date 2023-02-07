@@ -278,8 +278,9 @@ public class Level {
                 return;
 
             // Compare completion against scoreboard
-            if (leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed()
-                    > levelCompletion.getCompletionTimeElapsed()) {
+            if (leaderboardCache.size() < 10 ||
+                leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+            {
 
                 LevelCompletion completionToRemove = null;
                 boolean completionSlower = false;
