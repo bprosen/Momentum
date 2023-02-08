@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.events.EventType;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -226,7 +227,7 @@ public class Level {
         this.isRankUpLevel = isRankupLevel;
     }
 
-    public void sortNewCompletion(LevelCompletion levelCompletion) {
+    public void sortNewCompletion(Level level, LevelCompletion levelCompletion) {
         List<LevelCompletion> newLeaderboard = new ArrayList<>(leaderboardCache);
 
         if (newLeaderboard.size() > 0) {
@@ -263,10 +264,22 @@ public class Level {
         } else
             newLeaderboard.add(0, levelCompletion);
 
+        // broadcast when record is beaten
+        if (newLeaderboard.get(0).getPlayerName().equals(levelCompletion.getPlayerName()))
+        {
+            double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
+
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage(Utils.translate("&e✦ &d&lRECORD BROKEN &e✦"));
+            Bukkit.broadcastMessage(Utils.translate("&d" + levelCompletion.getPlayerName() +
+                                                         " &7has the new &8" + level.getFormattedTitle() +
+                                                         " &7record with &a" + completionTime + "s"));
+            Bukkit.broadcastMessage("");
+        }
         leaderboardCache = newLeaderboard;
     }
 
-    public void addCompletion(Player player, LevelCompletion levelCompletion) {
+    public void addCompletion(Player player, Level level, LevelCompletion levelCompletion) {
         if (totalCompletionsCount < 0)
             totalCompletionsCount = 0;
 
@@ -297,7 +310,7 @@ public class Level {
                 else if (completionSlower)
                     return;
 
-                sortNewCompletion(levelCompletion);
+                sortNewCompletion(level, levelCompletion);
             }
         }
         else
