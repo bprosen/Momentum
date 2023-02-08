@@ -99,6 +99,13 @@ public class StatsManager {
     public void enteredAscendance(PlayerStats playerStats)
     {
         ascendancePlayerList.add(playerStats);
+
+        // if is ascendance, toggle NV on
+        if (!playerStats.hasNVStatus())
+        {
+            playerStats.setNVStatus(true);
+            StatsDB.updatePlayerNightVision(playerStats);
+        }
     }
 
     public void leftAscendance(PlayerStats playerStats)

@@ -12,6 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 
@@ -40,33 +41,61 @@ public class RateCMD implements CommandExecutor {
             if (level == null)
                 level = Parkour.getLevelManager().getFromTitle(levelName);
 
-            if (level != null) {
+            if (level != null)
+            {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats.getLevelCompletionsCount(level.getName()) > 0) {
-                    if (!RatingDB.hasRatedLevel(player.getUniqueId().toString(), level.getID())) {
-                        // menu
-                        String menuName = "rate_level";
-                        MenuManager menuManager = Parkour.getMenuManager();
-                        if (menuManager.exists(menuName)) {
 
-                            Inventory inventory = menuManager.getInventory(menuName, 1);
-                            if (inventory != null) {
-                                // copy it into new inv with new title
-                                Inventory newInv = Bukkit.createInventory(null, inventory.getSize(), Utils.translate(
-                                        inventory.getTitle().replace("%level_name%", level.getFormattedTitle())));
-                                newInv.setContents(inventory.getContents());
+                int levelID = level.getID();
+                String levelTitle = level.getFormattedTitle();
 
-                                player.openInventory(newInv);
-                                menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
-                            } else {
-                                player.sendMessage(Utils.translate("&cError loading the inventory"));
+                if (playerStats.getLevelCompletionsCount(level.getName()) > 0)
+                {
+                    // run in async for data searching since it is heavy
+                    new BukkitRunnable()
+                    {
+                        public void run() {
+
+                            if (!RatingDB.hasRatedLevel(player.getUniqueId().toString(), levelID))
+                            {
+                                // then switch back to sync for inventory creation
+                                new BukkitRunnable()
+                                {
+                                    public void run()
+                                    {
+                                        // menu
+                                        String menuName = "rate_level";
+                                        MenuManager menuManager = Parkour.getMenuManager();
+                                        if (menuManager.exists(menuName))
+                                        {
+                                            Inventory inventory = menuManager.getInventory(menuName, 1);
+                                            if (inventory != null)
+                                            {
+                                                // copy it into new inv with new title
+                                                Inventory newInv = Bukkit.createInventory(null, inventory.getSize(), Utils.translate(
+                                                        inventory.getTitle().replace("%level_name%", levelTitle)));
+                                                newInv.setContents(inventory.getContents());
+
+                                                player.openInventory(newInv);
+                                                menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
+                                            }
+                                            else
+                                            {
+                                                player.sendMessage(Utils.translate("&cError loading the inventory"));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
+                                        }
+                                    }
+                                }.runTask(Parkour.getPlugin());
                             }
-                        } else {
-                            player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
+                            else
+                            {
+                                player.sendMessage(Utils.translate("&cYou have already rated this level"));
+                            }
                         }
-                    } else {
-                        player.sendMessage(Utils.translate("&cYou have already rated this level"));
-                    }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
                 } else {
                     player.sendMessage(Utils.translate("&cYou have not yet completed &c" + level.getFormattedTitle()
                             + " &cyet to be able to rate it!"));

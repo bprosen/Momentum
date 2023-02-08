@@ -63,7 +63,7 @@ public class Scoreboard {
             EventManager eventManager = Parkour.getEventManager();
 
             board.add(Utils.translate("&c&lRenatus Network"));
-            board.add(Utils.translate("&7"));
+            board.add("");
 
             String coinBalance = Utils.translate("  &e&lCoins &6" + (int) playerStats.getCoins());
             board.add(coinBalance);
@@ -160,6 +160,16 @@ public class Scoreboard {
                         // add scoreboard
                         board.add(formatSpacing(Utils.translate("&8&lAscendance")));
                         board.add(formatSpacing(Utils.translate("&7Explore for Rewards")));
+
+                        // do time if in a timed level
+                        if (playerStats.getLevelStartTime() > 0)
+                        {
+                            board.add("");
+                            double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+
+                            String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                            board.add(formatSpacing(timing));
+                        }
                     } else {
 
                         // normal scoreboard
