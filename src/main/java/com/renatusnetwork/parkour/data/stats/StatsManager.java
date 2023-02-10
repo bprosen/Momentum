@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.perks.Perk;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -14,6 +15,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -165,6 +167,18 @@ public class StatsManager {
     {
         StatsDB.updateCoins(playerStats, playerStats.getCoins() + coins);
         playerStats.addCoins(coins);
+    }
+
+    public void addRecord(PlayerStats playerStats, int currentRecords)
+    {
+        StatsDB.updateRecordsName(playerStats.getPlayerName(), currentRecords + 1);
+        playerStats.setRecords(currentRecords + 1);
+    }
+
+    public void removeRecord(PlayerStats playerStats, int currentRecords)
+    {
+        StatsDB.updateRecordsName(playerStats.getPlayerName(), currentRecords - 1);
+        playerStats.setRecords(currentRecords - 1);
     }
 
     public void loadGlobalPersonalCompletionsLB() {
@@ -365,7 +379,8 @@ public class StatsManager {
                                     continue;
 
                                 // now add the last part of the level stats
-                                loreString = loreString.replace("%total_completions%", Utils.formatNumber(playerStats.getTotalLevelCompletions()))
+                                loreString = loreString.replace("%records%", Utils.formatNumber(playerStats.getRecords()))
+                                        .replace("%total_completions%", Utils.formatNumber(playerStats.getTotalLevelCompletions()))
                                         .replace("%levels_completed%", Utils.formatNumber(playerStats.getIndividualLevelsBeaten()))
                                         .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
                                         .replace("%rated_levels_count%", playerStats.getRatedLevelsCount() + "");
@@ -417,5 +432,49 @@ public class StatsManager {
             opener.closeInventory();
             opener.openInventory(newInventory);
         }
+    }
+
+    public String createChatHover(PlayerStats playerStats)
+    {
+        String playerName = playerStats.getPlayerName();
+        double coins = playerStats.getCoins();
+        int hours = playerStats.getPlayer().getTicksLived() / 72000;
+
+        Clan clan = playerStats.getClan();
+        String clanString = "&cNone";
+        if (clan != null)
+            clanString = clan.getTag();
+
+        Rank rank = playerStats.getRank();
+        int prestiges = playerStats.getPrestiges();
+        int bestInfinite = playerStats.getInfinitePKScore();
+
+        int records = playerStats.getRecords();
+        String favoriteLevel = playerStats.getMostCompletedLevel();
+        Level level = Parkour.getLevelManager().get(favoriteLevel);
+
+        if (level != null)
+            favoriteLevel = level.getFormattedTitle();
+
+        int totalCompletions = playerStats.getTotalLevelCompletions();
+        int levelsRated = playerStats.getRatedLevelsCount();
+        int raceWins = playerStats.getRaceWins();
+        int raceLosses = playerStats.getRaceLosses();
+
+        String hover = Utils.translate(
+                     "&7Name » &f" + playerName + "\n" +
+                     "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
+                     "&7Hours » &b" + Utils.formatNumber(hours) + "\n\n" +
+                     "&7Clan » &e" + clanString + "\n" +
+                     "&7Rank » &a" + rank.getRankTitle() + "\n" +
+                     "&7Prestige » &5" + prestiges + "\n" +
+                     "&7Best Infinite » &d" + Utils.formatNumber(bestInfinite) + "\n\n" +
+                     "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
+                     "&7Favorite Level » &2" + favoriteLevel + "\n" +
+                     "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
+                     "&7Rated Level » &3" + Utils.formatNumber(levelsRated) + "\n" +
+                     "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses
+        );
+        return hover;
     }
 }

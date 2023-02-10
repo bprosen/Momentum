@@ -72,6 +72,7 @@ public class TablesDB {
                 "race_losses SMALLINT default 0, " +
                 "night_vision BIT DEFAULT 0, " +
                 "grinding BIT DEFAULT 0, " +
+                "records SMALLINT default 0, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

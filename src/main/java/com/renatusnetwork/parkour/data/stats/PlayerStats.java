@@ -34,6 +34,7 @@ public class PlayerStats {
     private int raceWins = 0;
     private int raceLosses = 0;
     private int ratedLevelsCount;
+    private int records;
     private int gainedPerksCount = 0;
     private float raceWinRate = 0.00f;
     private float prestigeMultiplier = 1.00f;
@@ -190,6 +191,10 @@ public class PlayerStats {
     public ItemStack getChestplateSavedFromElytra() { return chestplateSavedFromElytra; }
 
     public void setChestplateSavedFromElytra(ItemStack chestplate) { chestplateSavedFromElytra = chestplate; }
+
+    public int getRecords() { return records; }
+
+    public void setRecords(int records) { this.records = records; }
 
     //
     // Spectator Section

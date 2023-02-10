@@ -30,7 +30,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding",
+                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -153,6 +153,10 @@ public class StatsDB {
                 // Set to true if 1 (true)
                 if (Integer.parseInt(playerResult.get("grinding")) == 1)
                     playerStats.toggleGrinding();
+
+                // set records
+                int records = Integer.parseInt(playerResult.get("records"));
+                playerStats.setRecords(records);
             }
         } else {
             insertPlayerID(playerStats);
@@ -262,6 +266,42 @@ public class StatsDB {
 
         String query = "UPDATE players SET coins=" + coins + " WHERE player_name='" + playerName + "'";
         Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void updateRecordsName(String playerName, int records)
+    {
+        if (records < 0)
+            records = 0;
+
+        String query = "UPDATE players SET records=" + records + " WHERE player_name='" + playerName + "'";
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void addRecordsName(String playerName)
+    {
+        int records = StatsDB.getRecordsFromName(playerName);
+        updateRecordsName(playerName, records + 1);
+    }
+
+    public static void removeRecordsName(String playerName)
+    {
+        int records = StatsDB.getRecordsFromName(playerName);
+        updateRecordsName(playerName, records - 1);
+    }
+    public static int getRecordsFromName(String playerName)
+    {
+        int records = 0;
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "players",
+                "records",
+                " WHERE player_name='" + playerName + "'"
+        );
+
+        for (Map<String, String> playerResult : playerResults)
+            records = Integer.parseInt(playerResult.get("records"));
+
+        return records;
     }
 
     public static double getCoinsFromName(String playerName)

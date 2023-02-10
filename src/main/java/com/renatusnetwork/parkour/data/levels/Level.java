@@ -4,12 +4,14 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventType;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -227,10 +229,11 @@ public class Level {
         this.isRankUpLevel = isRankupLevel;
     }
 
-    public void sortNewCompletion(Level level, LevelCompletion levelCompletion) {
+    public void sortNewCompletion(LevelCompletion levelCompletion) {
         List<LevelCompletion> newLeaderboard = new ArrayList<>(leaderboardCache);
 
-        if (newLeaderboard.size() > 0) {
+        if (newLeaderboard.size() > 0)
+        {
             newLeaderboard.add(levelCompletion);
 
             boolean done = false;
@@ -264,24 +267,15 @@ public class Level {
         } else
             newLeaderboard.add(0, levelCompletion);
 
-        // broadcast when record is beaten
-        if (newLeaderboard.get(0).getPlayerName().equals(levelCompletion.getPlayerName()))
-        {
-            double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
-
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(Utils.translate("&e✦ &d&lRECORD BROKEN &e✦"));
-            Bukkit.broadcastMessage(Utils.translate("&d" + levelCompletion.getPlayerName() +
-                                                         " &7has the new &8" + level.getFormattedTitle() +
-                                                         " &7record with &a" + completionTime + "s"));
-            Bukkit.broadcastMessage("");
-        }
         leaderboardCache = newLeaderboard;
     }
 
     public void addCompletion(Player player, Level level, LevelCompletion levelCompletion) {
         if (totalCompletionsCount < 0)
             totalCompletionsCount = 0;
+
+        boolean alreadyFirstPlace = false;
+        boolean firstCompletion = false;
 
         totalCompletionsCount += 1;
 
@@ -294,28 +288,105 @@ public class Level {
             if (leaderboardCache.size() < 10 ||
                 leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
             {
+                LevelCompletion firstPlace = leaderboardCache.get(0);
 
-                LevelCompletion completionToRemove = null;
-                boolean completionSlower = false;
-
-                for (LevelCompletion completion : leaderboardCache) {
-                    if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
-                        if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                            completionToRemove = completion;
-                        else
-                            completionSlower = true;
+                // check for first place
+                if (firstPlace.getPlayerName().equalsIgnoreCase(player.getName()) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                {
+                    leaderboardCache.remove(firstPlace);
+                    alreadyFirstPlace = true;
                 }
-                if (completionToRemove != null)
-                    leaderboardCache.remove(completionToRemove);
-                else if (completionSlower)
-                    return;
+                // otherwise, search for where it is
+                else
+                {
+                    LevelCompletion completionToRemove = null;
+                    boolean completionSlower = false;
 
-                sortNewCompletion(level, levelCompletion);
+                    for (LevelCompletion completion : leaderboardCache) {
+                        if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
+                            if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                                completionToRemove = completion;
+                            else
+                                completionSlower = true;
+                    }
+                    if (completionToRemove != null)
+                        leaderboardCache.remove(completionToRemove);
+                    else if (completionSlower)
+                        return;
+                }
+                sortNewCompletion(levelCompletion);
             }
         }
         else
         {
             leaderboardCache.add(levelCompletion);
+            firstCompletion = true;
+        }
+        doRecordModification(leaderboardCache, levelCompletion, level, alreadyFirstPlace, firstCompletion);
+    }
+
+    public void doRecordModification(List<LevelCompletion> newLeaderboard, LevelCompletion levelCompletion, Level level, boolean alreadyFirstPlace, boolean firstCompletion)
+    {
+        String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
+
+        // if first completion, make it record set
+        if (firstCompletion)
+            brokenRecord = "&e✦ &d&lRECORD SET &e✦";
+
+        // broadcast when record is beaten
+        if (newLeaderboard.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
+        {
+
+            double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
+
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage(Utils.translate(brokenRecord));
+            Bukkit.broadcastMessage(Utils.translate("&d" + levelCompletion.getPlayerName() +
+                    " &7has the new &8" + level.getFormattedTitle() +
+                    " &7record with &a" + completionTime + "s"));
+            Bukkit.broadcastMessage("");
+
+            if (!alreadyFirstPlace)
+            {
+                // update new #1 records
+                PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName());
+
+                if (playerStats != null)
+                    Parkour.getStatsManager().addRecord(playerStats, playerStats.getRecords());
+                else
+                {
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            StatsDB.addRecordsName(levelCompletion.getPlayerName());
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
+                }
+
+                // if more than 1, remove
+                if (newLeaderboard.size() > 1)
+                {
+                    LevelCompletion previousRecord = newLeaderboard.get(1);
+
+                    PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getPlayerName());
+
+                    if (previousStats != null)
+                        Parkour.getStatsManager().removeRecord(previousStats, previousStats.getRecords());
+                    else
+                    {
+                        new BukkitRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                StatsDB.removeRecordsName(previousRecord.getPlayerName());
+                            }
+                        }.runTaskAsynchronously(Parkour.getPlugin());
+                    }
+                }
+            }
         }
     }
 

@@ -340,11 +340,24 @@ public class LevelCMD implements CommandExecutor {
                             List<LevelCompletion> completions = level.getLeaderboard();
 
                             if (row <= completions.size() && row > 0) {
+
                                 int name = row - 1;
                                 LevelCompletion levelCompletion = completions.get(name);
                                 int time = (int) levelCompletion.getCompletionTimeElapsed();
                                 // get player ID for specific deletion on no timer based levels
                                 int playerID = StatsDB.getPlayerID(levelCompletion.getPlayerName());
+
+                                // if deleting record
+                                if (name == 0)
+                                {
+                                    // update records
+                                    PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName());
+
+                                    if (playerStats != null)
+                                        Parkour.getStatsManager().removeRecord(playerStats, playerStats.getRecords());
+                                    else
+                                        StatsDB.removeRecordsName(levelCompletion.getPlayerName());
+                                }
 
                                 Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" +
                                         level.getID() + " AND time_taken=" + time + " AND player_id=" + playerID);
@@ -356,6 +369,18 @@ public class LevelCMD implements CommandExecutor {
                                 new BukkitRunnable() {
                                     public void run() {
                                         StatsDB.loadLeaderboard(level);
+
+                                        if (!level.getLeaderboard().isEmpty())
+                                        {
+                                            String newFirstPlace = level.getLeaderboard().get(0).getPlayerName();
+                                            PlayerStats playerStats = Parkour.getStatsManager().getByName(newFirstPlace);
+
+                                            // if not null, use stats manager
+                                            if (playerStats != null)
+                                                playerStats.setRecords(playerStats.getRecords() + 1);
+
+                                            StatsDB.addRecordsName(newFirstPlace);
+                                        }
                                     }
                                 }.runTaskLaterAsynchronously(Parkour.getPlugin(), 5);
                             } else {
@@ -720,6 +745,20 @@ public class LevelCMD implements CommandExecutor {
                         if (playerID > -1) {
                             if (StatsDB.hasCompleted(playerID, level.getID())) {
 
+                                List<LevelCompletion> leaderboard = level.getLeaderboard();
+
+                                // if deleting record
+                                if (!leaderboard.isEmpty() && leaderboard.get(0).getPlayerName().equalsIgnoreCase(playerName))
+                                {
+                                    // update records
+                                    PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
+
+                                    if (playerStats != null)
+                                        Parkour.getStatsManager().removeRecord(playerStats, playerStats.getRecords());
+                                    else
+                                        StatsDB.removeRecordsName(playerName);
+                                }
+
                                 int totalCompletions = StatsDB.getTotalCompletions(playerName);
                                 Parkour.getDatabaseManager().add(
                                         "UPDATE players SET level_completions=" + (totalCompletions - 1) +
@@ -742,6 +781,18 @@ public class LevelCMD implements CommandExecutor {
                                     @Override
                                     public void run() {
                                         StatsDB.loadLeaderboard(level);
+
+                                        if (!level.getLeaderboard().isEmpty())
+                                        {
+                                            String newFirstPlace = level.getLeaderboard().get(0).getPlayerName();
+                                            PlayerStats playerStats = Parkour.getStatsManager().getByName(newFirstPlace);
+
+                                            // if not null, use stats manager
+                                            if (playerStats != null)
+                                                playerStats.setRecords(playerStats.getRecords() + 1);
+
+                                            StatsDB.addRecordsName(newFirstPlace);
+                                        }
                                     }
                                 }.runTaskLaterAsynchronously(Parkour.getPlugin(), 5);
 
@@ -857,6 +908,51 @@ public class LevelCMD implements CommandExecutor {
                             {
                                 sender.sendMessage(Utils.translate("&cThe level &4" + levelName + " &cdoes not exist"));
                             }
+                        }
+                    }.runTaskAsynchronously(Parkour.getPlugin());
+                }
+                else if (a.length == 1 && a[0].equalsIgnoreCase("syncrecords"))
+                {
+                    // asyncify since big iteration
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            HashMap<String, Integer> recordsMap = new HashMap<>();
+
+                            for (Level level : Parkour.getLevelManager().getLevels().values())
+                            {
+                               if (!level.getLeaderboard().isEmpty())
+                               {
+                                   String recordHolder = level.getLeaderboard().get(0).getPlayerName();
+
+                                   // add to map
+                                   if (recordsMap.containsKey(recordHolder))
+                                       recordsMap.replace(recordHolder, recordsMap.get(recordHolder) + 1);
+                                   else
+                                       recordsMap.put(recordHolder, 1);
+
+                               }
+                            }
+
+                            if (!recordsMap.isEmpty())
+                            {
+                                // reset
+                                Parkour.getDatabaseManager().run("UPDATE players SET records=0");
+
+                                for (Map.Entry<String, Integer> entry : recordsMap.entrySet())
+                                {
+                                    PlayerStats playerStats = Parkour.getStatsManager().getByName(entry.getKey());
+
+                                    // if not null, use stats manager
+                                    if (playerStats != null)
+                                        playerStats.setRecords(entry.getValue());
+
+                                    StatsDB.updateRecordsName(entry.getKey(), entry.getValue());
+                                }
+                            }
+                            sender.sendMessage(Utils.translate("&7Synced &a" + recordsMap.size() + " &7player's records"));
                         }
                     }.runTaskAsynchronously(Parkour.getPlugin());
                 }

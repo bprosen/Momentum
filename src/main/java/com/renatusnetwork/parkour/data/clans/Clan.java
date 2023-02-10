@@ -151,4 +151,9 @@ public class Clan {
     public List<ClanMember> getMembers() {
         return members;
     }
+
+    public boolean equals(Clan clan)
+    {
+        return this.getOwner().getPlayerName().equalsIgnoreCase(clan.getOwner().getPlayerName());
+    }
 }
