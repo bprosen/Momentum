@@ -1,7 +1,6 @@
 package com.renatusnetwork.parkour.data.stats;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -10,26 +9,18 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
-import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Statistic;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.util.*;
 
 public class StatsManager {
@@ -42,6 +33,8 @@ public class StatsManager {
 
     private LinkedHashMap<String, Double> coinsLB = new LinkedHashMap<>(
             Parkour.getSettingsManager().max_coins_leaderboard_size);
+
+    private boolean loadingLeaderboards = false;
 
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
@@ -93,6 +86,11 @@ public class StatsManager {
 
         return null;
     }
+
+    public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
+
+    public void toggleLoadingLeaderboards() { loadingLeaderboards = !loadingLeaderboards; }
+
 
     public HashMap<String, PlayerStats> getPlayerStats() {
         return (HashMap<String, PlayerStats>) playerStatsList.clone();

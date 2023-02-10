@@ -472,9 +472,55 @@ public class StatsDB {
     }
 
     public static void loadLeaderboards() {
+
+        StatsManager statsManager = Parkour.getStatsManager();
+
+        statsManager.toggleLoadingLeaderboards();
+
         for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet()) {
             if (entry.getValue() != null && entry.getKey() != null)
                 loadLeaderboard(entry.getValue());
+        }
+
+        syncRecords();
+        statsManager.toggleLoadingLeaderboards();
+    }
+
+    public static void syncRecords()
+    {
+        HashMap<String, Integer> recordsMap = new HashMap<>();
+
+        for (Level level : Parkour.getLevelManager().getLevels().values())
+        {
+            if (!level.getLeaderboard().isEmpty())
+            {
+                String recordHolder = level.getLeaderboard().get(0).getPlayerName();
+
+                // add to map
+                if (recordsMap.containsKey(recordHolder))
+                    recordsMap.replace(recordHolder, recordsMap.get(recordHolder) + 1);
+                else
+                    recordsMap.put(recordHolder, 1);
+
+            }
+        }
+
+        if (!recordsMap.isEmpty())
+        {
+            // reset
+            Parkour.getDatabaseManager().run("UPDATE players SET records=0");
+
+            for (Map.Entry<String, Integer> entry : recordsMap.entrySet())
+            {
+                PlayerStats playerStats = Parkour.getStatsManager().getByName(entry.getKey());
+
+                // if not null, use stats manager
+                if (playerStats != null)
+                    playerStats.setRecords(entry.getValue());
+
+                StatsDB.updateRecordsName(entry.getKey(), entry.getValue());
+            }
+            Parkour.getPluginLogger().info("Synced " + recordsMap.size() + " level records");
         }
     }
 
@@ -491,7 +537,6 @@ public class StatsDB {
                         " AND time_taken > 0" +
                         " ORDER BY time_taken" +
                         " ASC LIMIT 500"
-
         );
 
         List<LevelCompletion> levelCompletions = new ArrayList<>();

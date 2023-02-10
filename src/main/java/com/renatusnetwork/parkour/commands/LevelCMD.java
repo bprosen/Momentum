@@ -919,40 +919,8 @@ public class LevelCMD implements CommandExecutor {
                         @Override
                         public void run()
                         {
-                            HashMap<String, Integer> recordsMap = new HashMap<>();
-
-                            for (Level level : Parkour.getLevelManager().getLevels().values())
-                            {
-                               if (!level.getLeaderboard().isEmpty())
-                               {
-                                   String recordHolder = level.getLeaderboard().get(0).getPlayerName();
-
-                                   // add to map
-                                   if (recordsMap.containsKey(recordHolder))
-                                       recordsMap.replace(recordHolder, recordsMap.get(recordHolder) + 1);
-                                   else
-                                       recordsMap.put(recordHolder, 1);
-
-                               }
-                            }
-
-                            if (!recordsMap.isEmpty())
-                            {
-                                // reset
-                                Parkour.getDatabaseManager().run("UPDATE players SET records=0");
-
-                                for (Map.Entry<String, Integer> entry : recordsMap.entrySet())
-                                {
-                                    PlayerStats playerStats = Parkour.getStatsManager().getByName(entry.getKey());
-
-                                    // if not null, use stats manager
-                                    if (playerStats != null)
-                                        playerStats.setRecords(entry.getValue());
-
-                                    StatsDB.updateRecordsName(entry.getKey(), entry.getValue());
-                                }
-                            }
-                            sender.sendMessage(Utils.translate("&7Synced &a" + recordsMap.size() + " &7player's records"));
+                            StatsDB.syncRecords();
+                            sender.sendMessage(Utils.translate("&7Synced level records"));
                         }
                     }.runTaskAsynchronously(Parkour.getPlugin());
                 }

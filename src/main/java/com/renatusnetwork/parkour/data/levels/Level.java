@@ -270,7 +270,7 @@ public class Level {
         leaderboardCache = newLeaderboard;
     }
 
-    public void addCompletion(Player player, Level level, LevelCompletion levelCompletion) {
+    public void addCompletion(String playerName, LevelCompletion levelCompletion) {
         if (totalCompletionsCount < 0)
             totalCompletionsCount = 0;
 
@@ -279,11 +279,11 @@ public class Level {
 
         totalCompletionsCount += 1;
 
+        if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
+            return;
+
         if (!leaderboardCache.isEmpty())
         {
-            if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
-                return;
-
             // Compare completion against scoreboard
             if (leaderboardCache.size() < 10 ||
                 leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
@@ -291,7 +291,7 @@ public class Level {
                 LevelCompletion firstPlace = leaderboardCache.get(0);
 
                 // check for first place
-                if (firstPlace.getPlayerName().equalsIgnoreCase(player.getName()) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
                 {
                     leaderboardCache.remove(firstPlace);
                     alreadyFirstPlace = true;
@@ -303,7 +303,7 @@ public class Level {
                     boolean completionSlower = false;
 
                     for (LevelCompletion completion : leaderboardCache) {
-                        if (completion.getPlayerName().equalsIgnoreCase(player.getName()))
+                        if (completion.getPlayerName().equalsIgnoreCase(playerName))
                             if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
                                 completionToRemove = completion;
                             else
@@ -322,10 +322,11 @@ public class Level {
             leaderboardCache.add(levelCompletion);
             firstCompletion = true;
         }
-        doRecordModification(leaderboardCache, levelCompletion, level, alreadyFirstPlace, firstCompletion);
+        if (!Parkour.getStatsManager().isLoadingLeaderboards())
+            doRecordModification(levelCompletion, alreadyFirstPlace, firstCompletion);
     }
 
-    public void doRecordModification(List<LevelCompletion> newLeaderboard, LevelCompletion levelCompletion, Level level, boolean alreadyFirstPlace, boolean firstCompletion)
+    public void doRecordModification(LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)
     {
         String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
 
@@ -334,7 +335,7 @@ public class Level {
             brokenRecord = "&e✦ &d&lRECORD SET &e✦";
 
         // broadcast when record is beaten
-        if (newLeaderboard.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
+        if (leaderboardCache.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
         {
 
             double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
@@ -342,11 +343,11 @@ public class Level {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage(Utils.translate(brokenRecord));
             Bukkit.broadcastMessage(Utils.translate("&d" + levelCompletion.getPlayerName() +
-                    " &7has the new &8" + level.getFormattedTitle() +
+                    " &7has the new &8" + getFormattedTitle() +
                     " &7record with &a" + completionTime + "s"));
             Bukkit.broadcastMessage("");
 
-            Parkour.getLevelManager().doRecordBreakingFirework(level.respawnLocation);
+            Parkour.getLevelManager().doRecordBreakingFirework(respawnLocation);
             if (!alreadyFirstPlace)
             {
                 // update new #1 records
@@ -367,9 +368,9 @@ public class Level {
                 }
 
                 // if more than 1, remove
-                if (newLeaderboard.size() > 1)
+                if (leaderboardCache.size() > 1)
                 {
-                    LevelCompletion previousRecord = newLeaderboard.get(1);
+                    LevelCompletion previousRecord = leaderboardCache.get(1);
 
                     PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getPlayerName());
 

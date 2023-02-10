@@ -198,7 +198,7 @@ public class MenuItemFormatter {
             // only show rating if above 5
             if (featuredLevel.getRatingsCount() >= 5) {
                 itemLore.add(Utils.translate("  &6" + featuredLevel.getRating() + " &7Rating"));
-                itemLore.add(Utils.translate("    &7Out of &e" + featuredLevel.getRatingsCount() + " &7ratings"));
+                itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(featuredLevel.getRatingsCount()) + " &7ratings"));
             }
 
             // Personal Level Stats Section
@@ -210,7 +210,7 @@ public class MenuItemFormatter {
 
                 itemLore.add("");
 
-                String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
+                String beatenMessage = Utils.translate("&7Beaten &2" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
                 if (levelCompletionsCount > 1)
                     beatenMessage += "s";
 
@@ -315,7 +315,7 @@ public class MenuItemFormatter {
                 // only show rating if above 5
                 if (level.getRatingsCount() >= 5) {
                     itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
-                    itemLore.add(Utils.translate("    &7Out of &e" + level.getRatingsCount() + " &7ratings"));
+                    itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
                 }
 
                 // Required Levels Section
@@ -340,7 +340,7 @@ public class MenuItemFormatter {
 
                     itemLore.add("");
 
-                    String beatenMessage = Utils.translate("&7Beaten &2" + levelCompletionsCount + " &7Time");
+                    String beatenMessage = Utils.translate("&7Beaten &2" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
                     if (levelCompletionsCount > 1)
                         beatenMessage += "s";
 

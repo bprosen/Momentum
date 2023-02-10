@@ -6,7 +6,8 @@ public class LevelCompletion {
     private long completionTimeElapsed; // time elapsed
     private String playerName;
 
-    public LevelCompletion(long timeOfCompletion, long completionTimeElapsed) {
+    public LevelCompletion(long timeOfCompletion, long completionTimeElapsed)
+    {
         this.timeOfCompletion = timeOfCompletion;
         if (completionTimeElapsed < 72000000L)
             this.completionTimeElapsed = completionTimeElapsed;

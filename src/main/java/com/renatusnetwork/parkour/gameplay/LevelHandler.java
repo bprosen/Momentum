@@ -95,7 +95,8 @@ public class LevelHandler {
         }.runTaskAsynchronously(Parkour.getPlugin());
 
         levelManager.addTotalLevelCompletion();
-        level.addCompletion(player, level, levelCompletion); // Update totalLevelCompletionsCount
+
+        level.addCompletion(player.getName(), levelCompletion); // Update totalLevelCompletionsCount
 
         // run commands if there is any
         if (level.hasCommands()) {

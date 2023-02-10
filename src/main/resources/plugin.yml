@@ -84,3 +84,6 @@ commands:
   coins:
     description: "RN-Parkour coins command"
     aliases: [c, coin]
+  records:
+    description: "RN-Parkour records command"
+    aliases: [levelrecords]
