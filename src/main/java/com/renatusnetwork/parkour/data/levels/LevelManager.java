@@ -10,8 +10,9 @@ import com.renatusnetwork.parkour.data.menus.MenusYAML;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.*;
+import org.bukkit.entity.Firework;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -286,6 +287,33 @@ public class LevelManager {
                 return level;
 
         return null;
+    }
+
+    public void doRecordBreakingFirework(Location location)
+    {
+
+        Firework firework = location.getWorld().spawn(location, Firework.class);
+        FireworkMeta meta = firework.getFireworkMeta();
+
+        meta.clearEffects();
+
+        // build the firework and then set the new one
+        FireworkEffect effect = FireworkEffect.builder()
+                .flicker(true)
+                .trail(true)
+                .with(FireworkEffect.Type.BURST)
+                .withColor(Color.PURPLE)
+                .withFade(Color.FUCHSIA)
+                .build();
+
+        meta.addEffect(effect);
+        firework.setFireworkMeta(meta);
+
+        new BukkitRunnable() {
+            public void run() {
+                firework.detonate();
+            }
+        }.runTaskLater(Parkour.getPlugin(), 20);
     }
 
     public long getTotalLevelCompletions() { return totalLevelCompletions; }

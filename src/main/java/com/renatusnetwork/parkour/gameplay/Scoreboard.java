@@ -63,7 +63,7 @@ public class Scoreboard {
             EventManager eventManager = Parkour.getEventManager();
 
             board.add(Utils.translate("&c&lRenatus Network"));
-            board.add("");
+            board.add(Utils.translate("&7"));
 
             String coinBalance = Utils.translate("  &e&lCoins &6" + (int) playerStats.getCoins());
             board.add(coinBalance);
@@ -109,7 +109,7 @@ public class Scoreboard {
                     String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
                     board.add(formatSpacing(timing));
                 }
-                board.add("");
+                board.add(Utils.translate("&7"));
 
                 // add wins, losses, winrate
                 board.add(formatSpacing(Utils.translate("&6Your W/L &e" +
@@ -123,7 +123,7 @@ public class Scoreboard {
 
                 board.add(Utils.translate("  &e&lEvent &2&l" + eventManager.formatName(eventManager.getEventType())));
                 board.add(Utils.translate("  &e&lPlayers &6" + eventManager.getParticipants().size()));
-                board.add("");
+                board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&6&lTime Left")));
                 board.add(formatSpacing(Utils.translate("&7" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
 
@@ -159,12 +159,11 @@ public class Scoreboard {
 
                         // add scoreboard
                         board.add(formatSpacing(Utils.translate("&8&lAscendance")));
-                        board.add(formatSpacing(Utils.translate("&7Explore for Rewards")));
+                        board.add(formatSpacing(Utils.translate("&7Exploring")));
 
                         // do time if in a timed level
                         if (playerStats.getLevelStartTime() > 0)
                         {
-                            board.add("");
                             double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
                             String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";

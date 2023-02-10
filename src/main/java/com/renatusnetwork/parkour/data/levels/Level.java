@@ -346,6 +346,7 @@ public class Level {
                     " &7record with &a" + completionTime + "s"));
             Bukkit.broadcastMessage("");
 
+            Parkour.getLevelManager().doRecordBreakingFirework(level.respawnLocation);
             if (!alreadyFirstPlace)
             {
                 // update new #1 records

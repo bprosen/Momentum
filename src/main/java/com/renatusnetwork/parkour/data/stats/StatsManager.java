@@ -113,6 +113,13 @@ public class StatsManager {
     public void leftAscendance(PlayerStats playerStats)
     {
         ascendancePlayerList.remove(playerStats);
+
+        // if is ascendance, toggle NV on
+        if (playerStats.hasNVStatus())
+        {
+            playerStats.setNVStatus(false);
+            StatsDB.updatePlayerNightVision(playerStats);
+        }
     }
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
