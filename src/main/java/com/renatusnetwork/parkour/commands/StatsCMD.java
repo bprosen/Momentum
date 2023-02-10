@@ -214,7 +214,7 @@ public class StatsCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&cNo timed completions to display"));
 
                     int totalCompletionsCount = level.getTotalCompletionsCount();
-                    String outOfMessage = Utils.translate("&7Out of &2" + totalCompletionsCount);
+                    String outOfMessage = Utils.translate("&7Out of &2" + Utils.formatNumber(totalCompletionsCount));
 
                     sender.sendMessage(outOfMessage);
                 } else {
