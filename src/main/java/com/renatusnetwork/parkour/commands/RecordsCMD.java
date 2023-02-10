@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,45 +19,29 @@ public class RecordsCMD implements CommandExecutor
     {
         if (sender instanceof Player)
         {
+            Player player = (Player) sender;
+
             if (a.length == 0)
             {
-                Player player = (Player) sender;
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                int records = playerStats.getRecords();
-
                 player.sendMessage(Utils.translate("&9&lYour Records"));
+                sendStats(player, player);
+            }
+            else if (a.length == 1)
+            {
+                String targetName = a[0];
+                Player target = Bukkit.getPlayer(targetName);
 
-                // only continue if they have records!
-                if (records > 0)
+                if (target != null)
                 {
-                    int currentFound = 0;
-
-                    // iterate through all levels
-                    for (Level level : Parkour.getLevelManager().getLevels().values())
-                    {
-                        // stop when we have all the records we wanted
-                        if (records > currentFound)
-                        {
-                            List<LevelCompletion> leaderboard = level.getLeaderboard();
-
-                            // if not empty, keep going
-                            if (!leaderboard.isEmpty() && leaderboard.get(0).getPlayerName().equalsIgnoreCase(player.getName()))
-                            {
-                                // print to player and increment
-                                long time = leaderboard.get(0).getCompletionTimeElapsed();
-
-                                player.sendMessage(Utils.translate("&a" + level.getFormattedTitle() + " &7" + time + "s"));
-                                currentFound++;
-                            }
-                        }
-                        else
-                            break;
-                    }
+                    player.sendMessage(Utils.translate("&9&l" + targetName + "'s Records"));
+                    sendStats(player, target);
                 }
                 else
-                {
-                    player.sendMessage(Utils.translate("&7None"));
-                }
+                    player.sendMessage(Utils.translate("&4" + targetName + " &cis not online!"));
+            }
+            else
+            {
+                sendHelp(player);
             }
         }
         else
@@ -64,5 +49,50 @@ public class RecordsCMD implements CommandExecutor
             sender.sendMessage("Console cannot do this");
         }
         return false;
+    }
+
+    private void sendHelp(Player player)
+    {
+        player.sendMessage(Utils.translate("&9Records Help"));
+        player.sendMessage(Utils.translate("&a/records  &7View your own records"));
+        player.sendMessage(Utils.translate("&a/records (player) &7View their records"));
+    }
+
+    private void sendStats(Player sender, Player target)
+    {
+        PlayerStats playerStats = Parkour.getStatsManager().get(target);
+        int records = playerStats.getRecords();
+
+        // only continue if they have records!
+        if (records > 0)
+        {
+            int currentFound = 0;
+
+            // iterate through all levels
+            for (Level level : Parkour.getLevelManager().getLevels().values())
+            {
+                // stop when we have all the records we wanted
+                if (records > currentFound)
+                {
+                    List<LevelCompletion> leaderboard = level.getLeaderboard();
+
+                    // if not empty, keep going
+                    if (!leaderboard.isEmpty() && leaderboard.get(0).getPlayerName().equalsIgnoreCase(target.getName()))
+                    {
+                        // print to player and increment
+                        long time = leaderboard.get(0).getCompletionTimeElapsed();
+
+                        sender.sendMessage(Utils.translate("&a" + level.getFormattedTitle() + " &7" + time + "s"));
+                        currentFound++;
+                    }
+                }
+                else
+                    break;
+            }
+        }
+        else
+        {
+            sender.sendMessage(Utils.translate("&7None"));
+        }
     }
 }
