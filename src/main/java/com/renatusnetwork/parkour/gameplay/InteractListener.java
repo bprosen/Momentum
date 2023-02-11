@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
@@ -116,6 +117,10 @@ public class InteractListener implements Listener {
                                     if (!level.getPotionEffects().isEmpty()) {
 
                                         playerStats.clearPotionEffects();
+
+                                        // if has nv status, add nv
+                                        if (playerStats.hasNVStatus())
+                                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 
                                         for (PotionEffect potionEffect : level.getPotionEffects())
                                             player.addPotionEffect(potionEffect);
