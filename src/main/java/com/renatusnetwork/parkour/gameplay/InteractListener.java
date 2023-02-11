@@ -123,7 +123,10 @@ public class InteractListener implements Listener {
                                             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 
                                         for (PotionEffect potionEffect : level.getPotionEffects())
-                                            player.addPotionEffect(potionEffect);
+                                        {
+                                            if (playerStats.hasNVStatus() || potionEffect.getType() != PotionEffectType.NIGHT_VISION)
+                                                player.addPotionEffect(potionEffect);
+                                        }
                                     }
                                     confirmMap.remove(player.getName());
 
