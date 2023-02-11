@@ -98,5 +98,9 @@ public class RecordsCMD implements CommandExecutor
                 sender.sendMessage(Utils.translate("&7None"));
             }
         }
+        else
+        {
+            sender.sendMessage(Utils.translate("&cStill loading leaderboards..."));
+        }
     }
 }
