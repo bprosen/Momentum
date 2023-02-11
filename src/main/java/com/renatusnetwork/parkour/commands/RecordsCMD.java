@@ -60,39 +60,43 @@ public class RecordsCMD implements CommandExecutor
 
     private void sendStats(Player sender, Player target)
     {
-        PlayerStats playerStats = Parkour.getStatsManager().get(target);
-        int records = playerStats.getRecords();
-
-        // only continue if they have records!
-        if (records > 0)
+        if (!Parkour.getStatsManager().isLoadingLeaderboards())
         {
-            int currentFound = 0;
+            PlayerStats playerStats = Parkour.getStatsManager().get(target);
+            int records = playerStats.getRecords();
 
-            // iterate through all levels
-            for (Level level : Parkour.getLevelManager().getLevels().values())
+            // only continue if they have records!
+            if (records > 0)
             {
-                // stop when we have all the records we wanted
-                if (records > currentFound)
+                int currentFound = 0;
+
+                // iterate through all levels
+                for (Level level : Parkour.getLevelManager().getLevels().values())
                 {
-                    List<LevelCompletion> leaderboard = level.getLeaderboard();
-
-                    // if not empty, keep going
-                    if (!leaderboard.isEmpty() && leaderboard.get(0).getPlayerName().equalsIgnoreCase(target.getName()))
+                    // stop when we have all the records we wanted
+                    if (records > currentFound)
                     {
-                        // print to player and increment
-                        long time = leaderboard.get(0).getCompletionTimeElapsed();
+                        List<LevelCompletion> leaderboard = level.getLeaderboard();
 
-                        sender.sendMessage(Utils.translate("&a" + level.getFormattedTitle() + " &7" + time + "s"));
-                        currentFound++;
+                        // if not empty, keep going
+                        if (!leaderboard.isEmpty() && leaderboard.get(0).getPlayerName().equalsIgnoreCase(target.getName()))
+                        {
+                            // print to player and increment
+                            long time = leaderboard.get(0).getCompletionTimeElapsed();
+
+                            sender.sendMessage(Utils.translate("&a" + level.getFormattedTitle() + " &7" + (((double) time) / 1000) + "s"));
+                            currentFound++;
+                        }
                     }
+                    else
+                        break;
                 }
-                else
-                    break;
+                sender.sendMessage(Utils.translate("&e✦ " + records + " &7Records"));
             }
-        }
-        else
-        {
-            sender.sendMessage(Utils.translate("&7None"));
+            else
+            {
+                sender.sendMessage(Utils.translate("&7None"));
+            }
         }
     }
 }

@@ -197,26 +197,34 @@ public class StatsCMD implements CommandExecutor {
                     level = Parkour.getLevelManager().getFromTitle(levelName);
 
                 // then check if it is still null
-                if (level != null) {
+                if (level != null)
+                {
+                    if (!Parkour.getStatsManager().isLoadingLeaderboards())
+                    {
+                        sender.sendMessage(Utils.translate(level.getFormattedTitle() + " &7Leaderboard"));
+                        List<LevelCompletion> completions = level.getLeaderboard();
 
-                    sender.sendMessage(Utils.translate(level.getFormattedTitle() + " &7Leaderboard"));
-                    List<LevelCompletion> completions = level.getLeaderboard();
+                        if (completions.size() > 0)
+                            for (int i = 0; i <= completions.size() - 1; i++)
+                            {
+                                LevelCompletion levelCompletion = completions.get(i);
+                                int rank = i + 1;
+                                sender.sendMessage(Utils.translate(" &7" + rank + " &2" +
+                                        (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" +
+                                        levelCompletion.getPlayerName()));
+                            }
+                        else
+                            sender.sendMessage(Utils.translate("&cNo timed completions to display"));
 
-                    if (completions.size() > 0)
-                        for (int i = 0; i <= completions.size() - 1; i++) {
-                            LevelCompletion levelCompletion = completions.get(i);
-                            int rank = i + 1;
-                            sender.sendMessage(Utils.translate(" &7" + rank + " &2" +
-                                    (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" +
-                                    levelCompletion.getPlayerName()));
-                        }
+                        int totalCompletionsCount = level.getTotalCompletionsCount();
+                        String outOfMessage = Utils.translate("&7Out of &2" + Utils.formatNumber(totalCompletionsCount));
+
+                        sender.sendMessage(outOfMessage);
+                    }
                     else
-                        sender.sendMessage(Utils.translate("&cNo timed completions to display"));
-
-                    int totalCompletionsCount = level.getTotalCompletionsCount();
-                    String outOfMessage = Utils.translate("&7Out of &2" + Utils.formatNumber(totalCompletionsCount));
-
-                    sender.sendMessage(outOfMessage);
+                    {
+                        sender.sendMessage(Utils.translate("&cLeaderboards are still loading... check back soon"));
+                    }
                 } else {
                     sender.sendMessage(Utils.translate("&7No level named '&c" + levelName + "&7' exists"));
                 }

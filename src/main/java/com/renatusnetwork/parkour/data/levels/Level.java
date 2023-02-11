@@ -282,48 +282,51 @@ public class Level {
         if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
             return;
 
-        if (!leaderboardCache.isEmpty())
-        {
-            // Compare completion against scoreboard
-            if (leaderboardCache.size() < 10 ||
-                leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-            {
-                LevelCompletion firstPlace = leaderboardCache.get(0);
-
-                // check for first place
-                if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                {
-                    leaderboardCache.remove(firstPlace);
-                    alreadyFirstPlace = true;
-                }
-                // otherwise, search for where it is
-                else
-                {
-                    LevelCompletion completionToRemove = null;
-                    boolean completionSlower = false;
-
-                    for (LevelCompletion completion : leaderboardCache) {
-                        if (completion.getPlayerName().equalsIgnoreCase(playerName))
-                            if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                                completionToRemove = completion;
-                            else
-                                completionSlower = true;
-                    }
-                    if (completionToRemove != null)
-                        leaderboardCache.remove(completionToRemove);
-                    else if (completionSlower)
-                        return;
-                }
-                sortNewCompletion(levelCompletion);
-            }
-        }
-        else
-        {
-            leaderboardCache.add(levelCompletion);
-            firstCompletion = true;
-        }
         if (!Parkour.getStatsManager().isLoadingLeaderboards())
+        {
+            if (!leaderboardCache.isEmpty())
+            {
+                // Compare completion against scoreboard
+                if (leaderboardCache.size() < 10 ||
+                        leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                {
+                    LevelCompletion firstPlace = leaderboardCache.get(0);
+
+                    // check for first place
+                    if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                    {
+                        leaderboardCache.remove(firstPlace);
+                        alreadyFirstPlace = true;
+                    }
+                    // otherwise, search for where it is
+                    else
+                    {
+                        LevelCompletion completionToRemove = null;
+                        boolean completionSlower = false;
+
+                        for (LevelCompletion completion : leaderboardCache)
+                        {
+                            if (completion.getPlayerName().equalsIgnoreCase(playerName))
+                                if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                                    completionToRemove = completion;
+                                else
+                                    completionSlower = true;
+                        }
+                        if (completionToRemove != null)
+                            leaderboardCache.remove(completionToRemove);
+                        else if (completionSlower)
+                            return;
+                    }
+                    sortNewCompletion(levelCompletion);
+                }
+            }
+            else
+            {
+                leaderboardCache.add(levelCompletion);
+                firstCompletion = true;
+            }
             doRecordModification(levelCompletion, alreadyFirstPlace, firstCompletion);
+        }
     }
 
     public void doRecordModification(LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)

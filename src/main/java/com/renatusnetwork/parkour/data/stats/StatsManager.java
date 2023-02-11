@@ -456,10 +456,13 @@ public class StatsManager {
 
         int records = playerStats.getRecords();
         String favoriteLevel = playerStats.getMostCompletedLevel();
+
         Level level = Parkour.getLevelManager().get(favoriteLevel);
 
         if (level != null)
             favoriteLevel = level.getFormattedTitle();
+        else
+            favoriteLevel = "None";
 
         int totalCompletions = playerStats.getTotalLevelCompletions();
         int levelsRated = playerStats.getRatedLevelsCount();

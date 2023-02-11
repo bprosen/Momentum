@@ -60,6 +60,7 @@ public class ChatListener implements Listener
             }
             else
             {
+
                 String formatted = String.format(event.getFormat(), player.getDisplayName(), msg);
 
                 // create components
