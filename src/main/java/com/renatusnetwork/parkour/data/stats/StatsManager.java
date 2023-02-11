@@ -89,7 +89,7 @@ public class StatsManager {
 
     public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
 
-    public void toggleLoadingLeaderboards() { loadingLeaderboards = !loadingLeaderboards; }
+    public void toggleLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
 
 
     public HashMap<String, PlayerStats> getPlayerStats() {

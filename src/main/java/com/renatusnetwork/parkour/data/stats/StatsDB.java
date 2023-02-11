@@ -471,19 +471,16 @@ public class StatsDB {
         }
     }
 
-    public static void loadLeaderboards() {
+    public static void loadLeaderboards()
+    {
+        Parkour.getStatsManager().toggleLoadingLeaderboards(true);
 
-        StatsManager statsManager = Parkour.getStatsManager();
-
-        statsManager.toggleLoadingLeaderboards();
-
-        for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet()) {
-            if (entry.getValue() != null && entry.getKey() != null)
-                loadLeaderboard(entry.getValue());
-        }
+        for (Level level : Parkour.getLevelManager().getLevels().values())
+            if (level != null)
+                loadLeaderboard(level);
 
         syncRecords();
-        statsManager.toggleLoadingLeaderboards();
+        Parkour.getStatsManager().toggleLoadingLeaderboards(false);
     }
 
     public static void syncRecords()
