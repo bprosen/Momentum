@@ -522,43 +522,25 @@ public class StatsDB {
     }
 
     public static void loadLeaderboard(Level level) {
-
+        // Artificial limit of 500
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "completions",
                 "player.player_name, " +
-                        "MIN(time_taken) AS fastest_time, " +
-                        "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
+                        "MIN(time_taken) AS fastest_time",
                 "JOIN players player" +
-                        " on completions.player_id=player.player_id" +
-                        " WHERE completions.level_id=" + level.getID() +
-                        " AND fastest_time > 0" +
-                        " GROUP BY completions.player_id" +
+                        " ON completions.player_id=player.player_id" +
+                        " WHERE level_id=" + level.getID() +
+                        " AND time_taken > 0" +
+                        " GROUP BY player.player_name" +
                         " ORDER BY fastest_time" +
-                        " ASC LIMIT 10"
+                        " LIMIT 10"
         );
 
-        List<LevelCompletion> levelCompletions = new ArrayList<>();
-        Set<String> addedPlayers = new HashSet<>(); // used to avoid duplicate positions
+        ArrayList<LevelCompletion> leaderboard = new ArrayList<>();
 
-        for (Map<String, String> levelResult : levelsResults) {
+        for (Map<String, String> levelResult : levelsResults)
+            leaderboard.add(new LevelCompletion(levelResult.get("player_name"), Long.parseLong(levelResult.get("fastest_time"))));
 
-            if (levelCompletions.size() >= 10)
-                break;
-
-            String playerName = levelResult.get("player_name");
-
-            // if not added already, add to leaderboard
-            if (!addedPlayers.contains(playerName)) {
-                LevelCompletion levelCompletion = new LevelCompletion(
-                        Long.parseLong(levelResult.get("date")),
-                        Long.parseLong(levelResult.get("fastest_time"))
-                );
-
-                levelCompletion.setPlayerName(playerName);
-                levelCompletions.add(levelCompletion);
-                addedPlayers.add(playerName);
-            }
-        }
-        level.setLeaderboardCache(levelCompletions);
+        level.setLeaderboardCache(leaderboard);
     }
 }

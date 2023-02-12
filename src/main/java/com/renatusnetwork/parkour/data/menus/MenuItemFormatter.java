@@ -257,28 +257,24 @@ public class MenuItemFormatter {
             boolean enchant = true;
             for (Level level : levelsInMenu)
             {
-                if (playerStats.getLevelCompletionsCount(level.getName()) < 1) {
+                if (playerStats.getLevelCompletionsCount(level.getName()) < 1)
                     enchant = false;
-                    break;
-                }
                 else
                     count++;
             }
 
 
             ItemMeta itemMeta = item.getItemMeta();
-            List<String> lore = itemMeta.getLore();
-
-            // add completed lore
-            lore.add("\n");
-            lore.add(ChatColor.getLastColors(menu.getFormattedTitleBase()) + count + "/" + levelsInMenu.size());
+            itemMeta.setDisplayName(Utils.translate(
+                    itemMeta.getDisplayName() + " &7(&a" + (int) (((double) count / levelsInMenu.size()) * 100) + "%&7)"));
 
             // if enchanting, add durability and hide it for glow effect
-            if (enchant) {
+            if (enchant)
+            {
                 itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                item.setItemMeta(itemMeta);
             }
+            item.setItemMeta(itemMeta);
         }
         return item;
     }
