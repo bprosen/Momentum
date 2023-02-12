@@ -276,6 +276,7 @@ public class Level {
 
         boolean alreadyFirstPlace = false;
         boolean firstCompletion = false;
+        boolean validCompletion = false;
 
         totalCompletionsCount += 1;
 
@@ -318,6 +319,7 @@ public class Level {
                             return;
                     }
                     sortNewCompletion(levelCompletion);
+                    validCompletion = true;
                 }
             }
             else
@@ -325,7 +327,9 @@ public class Level {
                 leaderboardCache.add(levelCompletion);
                 firstCompletion = true;
             }
-            doRecordModification(levelCompletion, alreadyFirstPlace, firstCompletion);
+            // only do record mod if it is a valid or first completion
+            if (validCompletion || firstCompletion)
+                doRecordModification(levelCompletion, alreadyFirstPlace, firstCompletion);
         }
     }
 
