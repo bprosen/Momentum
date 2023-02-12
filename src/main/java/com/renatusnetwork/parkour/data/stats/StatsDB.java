@@ -522,18 +522,19 @@ public class StatsDB {
     }
 
     public static void loadLeaderboard(Level level) {
-        // Artificial limit of 500
+
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "completions",
                 "player.player_name, " +
-                        "time_taken, " +
+                        "MIN(time_taken) AS fastest_time, " +
                         "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
                 "JOIN players player" +
                         " on completions.player_id=player.player_id" +
                         " WHERE completions.level_id=" + level.getID() +
-                        " AND time_taken > 0" +
-                        " ORDER BY time_taken" +
-                        " ASC LIMIT 500"
+                        " AND fastest_time > 0" +
+                        " GROUP BY completions.player_id" +
+                        " ORDER BY fastest_time" +
+                        " ASC LIMIT 10"
         );
 
         List<LevelCompletion> levelCompletions = new ArrayList<>();
@@ -550,7 +551,7 @@ public class StatsDB {
             if (!addedPlayers.contains(playerName)) {
                 LevelCompletion levelCompletion = new LevelCompletion(
                         Long.parseLong(levelResult.get("date")),
-                        Long.parseLong(levelResult.get("time_taken"))
+                        Long.parseLong(levelResult.get("fastest_time"))
                 );
 
                 levelCompletion.setPlayerName(playerName);

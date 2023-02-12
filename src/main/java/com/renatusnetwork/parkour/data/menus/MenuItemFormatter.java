@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
@@ -248,19 +249,32 @@ public class MenuItemFormatter {
         ItemStack item = menuItem.getItem().clone();
         Set<Level> levelsInMenu = Parkour.getLevelManager().getLevelsFromMenu(menu);
 
-        if (levelsInMenu != null && !levelsInMenu.isEmpty()) {
+        if (levelsInMenu != null && !levelsInMenu.isEmpty())
+        {
+            int count = 0;
 
             // more optimized: start as true and if a level is not completed, toggle to false and break
             boolean enchant = true;
             for (Level level : levelsInMenu)
+            {
                 if (playerStats.getLevelCompletionsCount(level.getName()) < 1) {
                     enchant = false;
                     break;
                 }
+                else
+                    count++;
+            }
+
+
+            ItemMeta itemMeta = item.getItemMeta();
+            List<String> lore = itemMeta.getLore();
+
+            // add completed lore
+            lore.add("\n");
+            lore.add(ChatColor.getLastColors(menu.getFormattedTitleBase()) + count + "/" + levelsInMenu.size());
 
             // if enchanting, add durability and hide it for glow effect
             if (enchant) {
-                ItemMeta itemMeta = item.getItemMeta();
                 itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 item.setItemMeta(itemMeta);
