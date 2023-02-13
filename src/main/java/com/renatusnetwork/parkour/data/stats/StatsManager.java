@@ -13,12 +13,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -116,6 +118,7 @@ public class StatsManager {
         if (playerStats.hasNVStatus())
         {
             playerStats.setNVStatus(false);
+            playerStats.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             StatsDB.updatePlayerNightVision(playerStats);
         }
     }

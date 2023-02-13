@@ -526,21 +526,38 @@ public class StatsDB {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 "completions",
                 "player.player_name, " +
-                        "MIN(time_taken) AS fastest_time",
+                        "time_taken, " +
+                        "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
                 "JOIN players player" +
                         " ON completions.player_id=player.player_id" +
                         " WHERE level_id=" + level.getID() +
                         " AND time_taken > 0" +
-                        " GROUP BY player.player_name" +
-                        " ORDER BY fastest_time" +
-                        " LIMIT 10"
+                        " ORDER BY time_taken" +
+                        " ASC LIMIT 500"
         );
 
-        ArrayList<LevelCompletion> leaderboard = new ArrayList<>();
+        List<LevelCompletion> levelCompletions = new ArrayList<>();
+        Set<String> addedPlayers = new HashSet<>(); // used to avoid duplicate positions
 
-        for (Map<String, String> levelResult : levelsResults)
-            leaderboard.add(new LevelCompletion(levelResult.get("player_name"), Long.parseLong(levelResult.get("fastest_time"))));
+        for (Map<String, String> levelResult : levelsResults) {
 
-        level.setLeaderboardCache(leaderboard);
+            if (levelCompletions.size() >= 10)
+                break;
+
+            String playerName = levelResult.get("player_name");
+
+            // if not added already, add to leaderboard
+            if (!addedPlayers.contains(playerName)) {
+                LevelCompletion levelCompletion = new LevelCompletion(
+                        Long.parseLong(levelResult.get("date")),
+                        Long.parseLong(levelResult.get("time_taken"))
+                );
+
+                levelCompletion.setPlayerName(playerName);
+                levelCompletions.add(levelCompletion);
+                addedPlayers.add(playerName);
+            }
+        }
+        level.setLeaderboardCache(levelCompletions);
     }
 }
