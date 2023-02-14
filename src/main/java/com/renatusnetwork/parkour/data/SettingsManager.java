@@ -138,7 +138,7 @@ public class SettingsManager {
         prestige_multiplier_per_prestige = settings.getInt("prestiges.multiplier_per_prestige");
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
-        max_records_leaderboard_size = settings.getInt("records.max_leaderboard.size");
+        max_records_leaderboard_size = settings.getInt("records.max_leaderboard_size");
         min_race_bet_amount = settings.getInt("races.min_bet_amount");
         ascendant_realm_world = settings.getString("ascendance.realm_world");
         rage_quit_price = settings.getDouble("rage_quit.price");
