@@ -247,7 +247,7 @@ public class StatsManager {
 
             for (Map<String, String> recordResult : recordsResult) {
                 String playerName = recordResult.get("player_name");
-                int records = Integer.parseInt(recordResult.get("coins"));
+                int records = Integer.parseInt(recordResult.get("records"));
 
                 // if they have more than 0 completions, add (reset stats case)
                 if (records > 0)
