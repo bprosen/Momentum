@@ -26,6 +26,14 @@ public class RecordsCMD implements CommandExecutor
                 player.sendMessage(Utils.translate("&9&lYour Records"));
                 sendStats(player, player);
             }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("top"))
+            {
+                StatsCMD.printRecordsLB(sender);
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
+            {
+                sendHelp(player);
+            }
             else if (a.length == 1)
             {
                 String targetName = a[0];
@@ -56,6 +64,8 @@ public class RecordsCMD implements CommandExecutor
         player.sendMessage(Utils.translate("&9Records Help"));
         player.sendMessage(Utils.translate("&a/records  &7View your own records"));
         player.sendMessage(Utils.translate("&a/records (player) &7View their records"));
+        player.sendMessage(Utils.translate("&a/records top  &7Prints the records leaderboard"));
+        player.sendMessage(Utils.translate("&a/records help  &7Prints this screen"));
     }
 
     private void sendStats(Player sender, Player target)

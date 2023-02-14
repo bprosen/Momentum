@@ -36,6 +36,9 @@ public class StatsManager {
     private LinkedHashMap<String, Double> coinsLB = new LinkedHashMap<>(
             Parkour.getSettingsManager().max_coins_leaderboard_size);
 
+    private LinkedHashMap<String, Integer> recordsLB = new LinkedHashMap<>(
+            Parkour.getSettingsManager().max_records_leaderboard_size);
+
     private boolean loadingLeaderboards = false;
 
     public StatsManager(Plugin plugin) {
@@ -51,6 +54,7 @@ public class StatsManager {
                 StatsDB.loadLeaderboards();
                 loadGlobalPersonalCompletionsLB();
                 loadCoinsLB();
+                loadRecordsLB();
             }
         }.runTaskAsynchronously(plugin);
 
@@ -61,6 +65,7 @@ public class StatsManager {
                 loadGlobalPersonalCompletionsLB();
                 loadOnlinePerksGainedCount();
                 loadCoinsLB();
+                loadRecordsLB();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
 
@@ -231,10 +236,34 @@ public class StatsManager {
         }
     }
 
+    public void loadRecordsLB() {
+        recordsLB.clear();
+
+        try {
+
+            // find the highest top 10 completion stat
+            List<Map<String, String>> recordsResult = DatabaseQueries.getResults("players", "player_name, records",
+                    " ORDER BY records DESC LIMIT " + Parkour.getSettingsManager().max_records_leaderboard_size);
+
+            for (Map<String, String> recordResult : recordsResult) {
+                String playerName = recordResult.get("player_name");
+                int records = Integer.parseInt(recordResult.get("coins"));
+
+                // if they have more than 0 completions, add (reset stats case)
+                if (records > 0)
+                    recordsLB.put(playerName, records);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public LinkedHashMap<String, Double> getCoinsLB()
     {
         return coinsLB;
     }
+
+    public LinkedHashMap<String, Integer> getRecordsLB() { return recordsLB; }
 
     public LinkedHashMap<String, Integer> getGlobalPersonalCompletionsLB() {
         return globalPersonalCompletionsLB;

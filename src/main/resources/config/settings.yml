@@ -17,6 +17,9 @@ levels:
 stats:
   max_coins_leaderboard_size: 10
 
+records:
+  max_leaderboard_size: 10
+
 ascendance:
   realm_world: "ascendant_realm"
   hub_level: "ascendantrealm"

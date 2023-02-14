@@ -182,6 +182,8 @@ public class StatsCMD implements CommandExecutor {
                 // level lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("coins")) {
                 printCoinsLB(sender);
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("records")) {
+                printRecordsLB(sender);
             } else {
 
                 // allow ability to get from title or name
@@ -238,6 +240,7 @@ public class StatsCMD implements CommandExecutor {
             sender.sendMessage(Utils.translate("&6/stats players  &7Gets Players Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats levels  &7Gets Levels Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats coins  &7Gets coins leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats records  &7Gets records leaderboard"));
         }
         return true;
     }
@@ -270,6 +273,37 @@ public class StatsCMD implements CommandExecutor {
             }
         } else {
             sender.sendMessage(Utils.translate("&cCoins lb not loaded or no lb positions"));
+        }
+    }
+
+    public static void printRecordsLB(CommandSender sender)
+    {
+        LinkedHashMap<String, Integer> recordsLB = Parkour.getStatsManager().getRecordsLB();
+
+        if (!recordsLB.isEmpty()) {
+
+            sender.sendMessage(Utils.translate("&9Records &7Leaderboard"));
+
+            int lbPositionNum = 1;
+            for (Map.Entry<String, Integer> entry : recordsLB.entrySet()) {
+
+                if (entry != null) {
+                    sender.sendMessage(Utils.translate(" &7" +
+                            lbPositionNum + " &9" +
+                            Utils.formatNumber(entry.getValue()) + " &3" +
+                            entry.getKey()));
+                    lbPositionNum++;
+                }
+            }
+
+            // if player, send personal total
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                sender.sendMessage(Utils.translate("&7You have &e✦ " + Utils.formatNumber(
+                        Parkour.getStatsManager().get(player).getRecords()) + " &7Records"));
+            }
+        } else {
+            sender.sendMessage(Utils.translate("&cRecords lb not loaded or no lb positions"));
         }
     }
 }
