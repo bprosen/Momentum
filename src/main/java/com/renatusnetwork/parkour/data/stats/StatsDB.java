@@ -157,6 +157,8 @@ public class StatsDB {
                 // set records
                 int records = Integer.parseInt(playerResult.get("records"));
                 playerStats.setRecords(records);
+
+                updateBoughtLevels(playerStats);
             }
         } else {
             insertPlayerID(playerStats);
@@ -363,6 +365,37 @@ public class StatsDB {
         return playerID;
     }
 
+    public static void updateBoughtLevels(PlayerStats playerStats)
+    {
+        if (playerStats != null)
+        {
+            HashSet<String> boughtLevels = new HashSet<>();
+
+            List<Map<String, String>> boughtResults = DatabaseQueries.getResults(
+                    "bought_levels",
+                    "level_name",
+                    "WHERE uuid='" + playerStats.getUUID() + "'"
+            );
+
+            for (Map<String, String> boughtResult : boughtResults)
+                boughtLevels.add(boughtResult.get("level_name"));
+        }
+    }
+
+    public static void addBoughtLevel(PlayerStats playerStats, String boughtLevel)
+    {
+        String query = "INSERT INTO bought_levels " +
+                "(uuid, player_name, level_name)" +
+                " VALUES " +
+                "('" +
+                playerStats.getUUID() + "', '" +
+                playerStats.getPlayerName() + "', '" +
+                boughtLevel +
+                "')"
+        ;
+
+        Parkour.getDatabaseManager().add(query);
+    }
     /*
      * Completions Section
      */

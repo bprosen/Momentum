@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.menus;
 
+import com.comphenix.protocol.PacketType;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
@@ -11,6 +12,7 @@ import com.renatusnetwork.parkour.data.plots.PlotsDB;
 import com.renatusnetwork.parkour.data.ranks.RanksDB;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -18,7 +20,12 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class MenuItemAction {
@@ -274,16 +281,114 @@ public class MenuItemAction {
         Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
         if (level != null)
-            performLevelTeleport(playerStats, player, level);
+        {
+            // go through price buying if not featured, non null item, has price and has not bought level
+            if (!level.isFeaturedLevel() && menuItem != null && level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()))
+                performLevelBuying(playerStats, player, level, menuItem);
+            else
+                performLevelTeleport(playerStats, player, level);
+        }
     }
 
-    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
-        if (!playerStats.inRace()) {
-            if (playerStats.getPlayerToSpectate() == null) {
-                if (!playerStats.isEventParticipant()) {
-                    if (!playerStats.isInInfinitePK()) {
-                        if (level.hasRequiredLevels(playerStats)) {
+    public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
+    {
+        MenuManager menuManager = Parkour.getMenuManager();
+        String menuName = menuItem.getMenuName();
 
+        if (!menuManager.isBuyingLevel(player.getName(), level))
+        {
+            double coins = playerStats.getCoins();
+            int total = menuManager.getTotalBuyingLevelsCost(player.getName());
+
+            if (coins >= total + level.getPrice())
+            {
+                ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 5);
+                ItemMeta itemMeta = itemStack.getItemMeta();
+
+                itemMeta.setDisplayName(Utils.translate(
+                        "&7Click to confirm purchase of &a" + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"
+                ));
+
+                itemMeta.setLore(new ArrayList<String>() {{
+                    add(Utils.translate(" &cThis will also confirm all other selected purchases"));
+                }});
+
+                itemStack.setItemMeta(itemMeta);
+
+                Inventory inventory = menuManager.getInventory(menuName, menuItem.getPageNumber());
+                inventory.setItem(menuItem.getSlot(), itemStack);
+
+                menuManager.addBuyingLevel(player.getName(), level);
+            }
+            else
+            {
+                // this is where it creates a item telling them they cannot buy this!
+                ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 14);
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                itemMeta.setDisplayName(Utils.translate("&cYou do not have enough coins to buy " + level.getFormattedTitle()));
+
+                int remaining = (int) ((total + level.getPrice()) - coins);
+
+                itemMeta.setLore(new ArrayList<String>() {{
+                    add(Utils.translate(" &7You need &6" + Utils.formatNumber(remaining) + " &7more &eCoins"));
+                }});
+
+                itemStack.setItemMeta(itemMeta);
+
+                Inventory inventory = Parkour.getMenuManager().getInventory(menuName, menuItem.getPageNumber());
+                inventory.setItem(menuItem.getSlot(), itemStack);
+
+                // reset item after 5 seconds
+                new BukkitRunnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        inventory.setItem(menuItem.getSlot(), menuItem.getItem());
+                    }
+                }.runTaskLater(Parkour.getPlugin(), 20 * 5);
+            }
+        }
+        else
+        {
+            // where the levels are bought
+            HashSet<Level> levels = menuManager.getBuyingLevels(player.getName());
+            int totalCoins = menuManager.getTotalBuyingLevelsCost(player.getName());
+
+            // add to db/cache
+            for (Level boughtLevels : (Level[]) levels.toArray())
+            {
+                StatsDB.addBoughtLevel(playerStats, level.getName());
+                playerStats.buyLevel(boughtLevels.getName());
+            }
+            Parkour.getStatsManager().removeCoins(playerStats, totalCoins); // remove all coins
+
+            // do not teleport if bought more than one!
+            if (levels.size() > 1)
+            {
+                // update and open inventory
+                Inventory inventory = Parkour.getMenuManager().getInventory(menuName, menuItem.getPageNumber());
+                player.openInventory(inventory);
+                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menuName, menuItem.getPageNumber());
+            }
+            else
+            {
+                // teleport if only one
+                performLevelTeleport(playerStats, player, level);
+            }
+        }
+    }
+    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
+        if (!playerStats.inRace())
+        {
+            if (playerStats.getPlayerToSpectate() == null)
+            {
+                if (!playerStats.isEventParticipant())
+                {
+                    if (!playerStats.isInInfinitePK())
+                    {
+                        if (level.hasRequiredLevels(playerStats))
+                        {
                             player.closeInventory();
 
                             // if the level has perm node, and player does not have perm node
@@ -310,14 +415,11 @@ public class MenuItemAction {
                                 playerStats.resetPracticeMode();
 
                             Location spawn = playerStats.getCheckpoint(level.getName());
-                            if (spawn != null)
-                            {
+                            if (spawn != null) {
                                 playerStats.setCurrentCheckpoint(spawn);
                                 Parkour.getCheckpointManager().teleportToCP(playerStats);
                                 player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
-                            }
-                            else
-                            {
+                            } else {
                                 player.teleport(level.getStartLocation());
                                 player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                         + level.getFormattedTitle()));

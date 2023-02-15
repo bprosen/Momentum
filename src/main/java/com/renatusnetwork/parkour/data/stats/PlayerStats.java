@@ -50,6 +50,7 @@ public class PlayerStats {
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> checkpoints = new HashMap<>();
+    private HashSet<String> boughtLevels = new HashSet<>();
 
     public PlayerStats(Player player) {
         this.player = player;
@@ -195,6 +196,16 @@ public class PlayerStats {
     public int getRecords() { return records; }
 
     public void setRecords(int records) { this.records = records; }
+
+    public boolean hasBoughtLevel(String levelName)
+    {
+        return boughtLevels.contains(levelName);
+    }
+
+    public void buyLevel(String levelName)
+    {
+        boughtLevels.add(levelName);
+    }
 
     //
     // Spectator Section

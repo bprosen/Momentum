@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.menus;
 
+import com.renatusnetwork.parkour.data.levels.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Menu {
@@ -16,6 +18,7 @@ public class Menu {
     private String title;
     private int pageCount;
     private boolean updating;
+
     private ItemStack selectItem;
 
     private Map<Integer, MenuPage> pageMap = new HashMap<>();

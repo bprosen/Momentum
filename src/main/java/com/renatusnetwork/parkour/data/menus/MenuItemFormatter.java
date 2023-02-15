@@ -305,9 +305,14 @@ public class MenuItemFormatter {
             // do not show all the below info if not a rankup level
             if (!rankUpLevel) {
 
-                // Click To Go and Reward Section
-                itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()
-                        .replace("&l", "").replace("&o", "")));
+                // show they need to buy it
+                if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()))
+                {
+                    itemLore.add(Utils.translate("&cClick to buy " + level.getFormattedTitle() + " &cfor &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"));
+                    itemLore.add(Utils.translate(" &7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
+                }
+                else
+                    itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()));
 
                 // Item Title Section
                 if (level.getPlayersInLevel() > 0)

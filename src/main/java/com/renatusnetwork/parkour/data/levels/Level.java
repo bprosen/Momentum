@@ -22,7 +22,8 @@ public class Level {
 
     private String name;
     private String title;
-    private int reward = 0;
+    private int reward;
+    private int price;
     private float rating;
     private int ratingsCount;
     private Location startLocation;
@@ -165,6 +166,8 @@ public class Level {
     public float getRating() {
         return rating;
     }
+
+    public int getPrice() { return price; }
 
     public int getRatingsCount() { return ratingsCount; }
 
@@ -465,6 +468,7 @@ public class Level {
             elytraLevel = LevelsYAML.isElytraLevel(name);
             dropperLevel = LevelsYAML.isDropperLevel(name);
             ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
+            price = LevelsYAML.getPrice(name);
         }
     }
 

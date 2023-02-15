@@ -315,6 +315,16 @@ public class LevelsYAML {
         return Material.matchMaterial(levelsFile.getString(levelName + ".race.menu_item"));
     }
 
+    public static int getPrice(String levelName)
+    {
+        int price = 0;
+
+        if (isSet(levelName, "price"))
+            price = levelsFile.getInt(levelName + ".price");
+
+        return price;
+    }
+
     public static List<String> getCommands(String levelName) {
         List<String> tempList = new ArrayList<>();
 

@@ -8,6 +8,8 @@ import java.util.List;
 
 public class MenuItem {
 
+    private String name;
+    private int pageNumber;
     private int slot;
     private ItemStack item;
     private String title;
@@ -19,6 +21,8 @@ public class MenuItem {
     private List<String> consoleCommands;
 
     MenuItem(Menu menu, MenuPage menuPage, int slot) {
+        this.name = menu.getName();
+        this.pageNumber = menuPage.getPageNumber();
         this.slot = slot;
 
         load(menu, menuPage);
@@ -34,6 +38,13 @@ public class MenuItem {
         consoleCommands = MenusYAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), slot);
         glow = MenusYAML.getGlow(menu.getName(), menuPage.getPageNumber(), slot);
     }
+
+    public String getMenuName()
+    {
+        return name;
+    }
+
+    public int getPageNumber() { return pageNumber; }
 
     public int getSlot() {
         return slot;

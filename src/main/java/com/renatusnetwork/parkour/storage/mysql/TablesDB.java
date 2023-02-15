@@ -37,6 +37,10 @@ public class TablesDB {
 
         if (!tableNames.contains("ratings"))
             createRatings(database);
+
+        if (!tableNames.contains("bought_levels"))
+            createPurchasedLevels(database);
+
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -171,6 +175,16 @@ public class TablesDB {
                 "level_id INT NOT NULL, " +
                 "rating TINYINT NOT NULL" +
                 ")";
+
+        database.run(sqlQuery);
+    }
+
+    private static void createPurchasedLevels(DatabaseManager database)
+    {
+        String sqlQuery = "CREATE TABLE bought_levels(" +
+                "uuid CHAR(36) NOT NUll, " +
+                "player_name VARCHAR(16) NOT NULL, " +
+                "level_name VARCHAR(30) NOT NULL)";
 
         database.run(sqlQuery);
     }
