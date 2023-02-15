@@ -151,7 +151,7 @@ public class RecordsCMD implements CommandExecutor
         }
         else
         {
-            sender.sendMessage(Utils.translate("&cStill loading leaderboards..."));
+            sender.sendMessage(Utils.translate("&cStill loading records..."));
         }
     }
 }
