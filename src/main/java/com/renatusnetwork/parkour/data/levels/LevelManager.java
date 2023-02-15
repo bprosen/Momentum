@@ -49,6 +49,11 @@ public class LevelManager {
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
 
+    public void loadGlobalLevelCompletions()
+    {
+        totalLevelCompletions = LevelsDB.getGlobalCompletions();
+    }
+
     public void load(String levelName) {
         boolean exists = exists(levelName);
 

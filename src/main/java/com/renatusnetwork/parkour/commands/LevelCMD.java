@@ -104,6 +104,7 @@ public class LevelCMD implements CommandExecutor {
                         public void run() {
                             StatsDB.loadTotalCompletions();
                             StatsDB.loadLeaderboards();
+                            Parkour.getLevelManager().loadGlobalLevelCompletions();
                         }
                     }.runTaskAsynchronously(Parkour.getPlugin());
 
