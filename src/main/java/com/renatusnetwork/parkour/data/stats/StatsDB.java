@@ -453,6 +453,19 @@ public class StatsDB {
         return -1;
     }
 
+    public static int getCompletionsFromLevel(String playerName, int levelID)
+    {
+        int playerID = getPlayerID(playerName);
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults("completions", "COUNT(*) AS total_level_completions",
+                " WHERE player_id=" + playerID + " AND level_id=" + levelID);
+
+        for (Map<String, String> playerResult : playerResults)
+            return Integer.parseInt(playerResult.get("total_level_completions"));
+
+        return -1;
+    }
+
     public static void removeCompletions(int playerID, int levelID) {
 
         String query = "DELETE FROM completions WHERE player_id=" + playerID + " AND level_id=" + levelID;

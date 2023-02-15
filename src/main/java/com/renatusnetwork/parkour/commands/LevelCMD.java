@@ -734,7 +734,7 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
-                } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletion")) {
+                } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletions")) {
                     String playerName = a[1];
                     String levelName = a[2].toLowerCase();
 
@@ -760,8 +760,12 @@ public class LevelCMD implements CommandExecutor {
                                 }
 
                                 int totalCompletions = StatsDB.getTotalCompletions(playerName);
+                                int levelCompletions = StatsDB.getCompletionsFromLevel(playerName, level.getID());
+
+                                int newTotal = totalCompletions - levelCompletions;
+
                                 Parkour.getDatabaseManager().add(
-                                        "UPDATE players SET level_completions=" + (totalCompletions - 1) +
+                                        "UPDATE players SET level_completions=" + newTotal +
                                                 " WHERE player_name='" + playerName + "'");
 
                                 StatsDB.removeCompletions(playerID, level.getID());
@@ -961,7 +965,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("listratings"));
         sender.sendMessage(getHelp("togglewater"));
         sender.sendMessage(getHelp("rename"));
-        sender.sendMessage(getHelp("delcompletion"));
+        sender.sendMessage(getHelp("delcompletions"));
         sender.sendMessage(getHelp("setrespawny"));
         sender.sendMessage(getHelp("toggleelytra"));
         sender.sendMessage(getHelp("toggledropper"));
@@ -1021,8 +1025,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level");
             case "rename":
                 return Utils.translate("&a/level rename <level> <newLevelName>  &7Renames a level's name to a new name");
-            case "delcompletion":
-                return Utils.translate("&a/level delcompletion <player> <levelName>  &7Deletes ALL the completions of a player for a level");
+            case "delcompletions":
+                return Utils.translate("&a/level delcompletions <player> <levelName>  &7Deletes ALL the completions of a player for a level");
             case "setrespawny":
                 return Utils.translate("&a/level setrespawny <level> <respawnY>  &7Sets level respawn y");
             case "toggleelytra":

@@ -98,7 +98,7 @@ public class ClanCMD implements CommandExecutor {
                                     targetClan.setXP(newXp);
                                     // update in db
                                     ClansDB.setClanXP(newXp, targetClan.getID());
-                                    player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
+                                    player.sendMessage(Utils.translate("&eYou set &6&l" + targetClan.getTag() + "&e's" +
                                             " XP to &6" + newXp));
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot set negative xp!"));
@@ -127,7 +127,7 @@ public class ClanCMD implements CommandExecutor {
                                     targetClan.setTotalGainedXP(newXP);
                                     // update in db
                                     ClansDB.setTotalGainedClanXP(newXP, targetClan.getID());
-                                    player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
+                                    player.sendMessage(Utils.translate("&eYou set &6&l" + targetClan.getTag() + "&e's" +
                                             " Total XP to &6" + newXP));
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot set negative xp!"));
