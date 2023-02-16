@@ -60,60 +60,6 @@ public class MenuManager {
         return menuMap.get(menuName);
     }
 
-    public boolean isBuyingLevel(String playerName, Level level)
-    {
-        boolean result = false;
-
-        if (buyingLevels.containsKey(playerName))
-        {
-            HashSet<Level> levelsSet = buyingLevels.get(playerName);
-            result = levelsSet.contains(level);
-        }
-
-        return result;
-    }
-
-    public void addBuyingLevel(String playerName, Level level)
-    {
-        HashSet<Level> newList;
-
-        if (buyingLevels.containsKey(playerName))
-        {
-            newList = buyingLevels.get(playerName);
-            newList.add(level);
-        }
-        else
-        {
-            newList = new HashSet<Level>() {{
-                add(level);
-            }};
-        }
-
-        buyingLevels.put(playerName, newList);
-    }
-
-    public int getTotalBuyingLevelsCost(String playerName)
-    {
-        HashSet<Level> levels = buyingLevels.get(playerName);
-        int totalCost = 0;
-
-        if (levels != null)
-            for (Level level : (Level[]) levels.toArray())
-                totalCost += level.getPrice();
-
-        return totalCost;
-    }
-
-    public HashSet<Level> getBuyingLevels(String playerName)
-    {
-        return buyingLevels.get(playerName);
-    }
-
-    public void clearBuyingLevels(String playerName)
-    {
-        buyingLevels.remove(playerName);
-    }
-
     public Menu getMenuFromStartingChars(String input) {
         for (Menu menu : menuMap.values())
             if (input.startsWith(menu.getName()))

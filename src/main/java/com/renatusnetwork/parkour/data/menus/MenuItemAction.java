@@ -5,6 +5,7 @@ import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.levels.RatingDB;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.plots.Plot;
@@ -19,16 +20,18 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class MenuItemAction {
+
+    private static HashMap<String, List<BukkitTask>> activeCancels = new HashMap<>();
 
     private static void runCommands(Player player, List<String> commands, List<String> consoleCommands) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -283,7 +286,9 @@ public class MenuItemAction {
         if (level != null)
         {
             // go through price buying if not featured, non null item, has price and has not bought level
-            if (!level.isFeaturedLevel() && menuItem != null && level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()))
+            if (!level.isFeaturedLevel() &&
+                menuItem != null && level.getPrice() > 0 &&
+                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                 performLevelBuying(playerStats, player, level, menuItem);
             else
                 performLevelTeleport(playerStats, player, level);
@@ -292,13 +297,13 @@ public class MenuItemAction {
 
     public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
     {
-        MenuManager menuManager = Parkour.getMenuManager();
+        LevelManager levelManager = Parkour.getLevelManager();
         String menuName = menuItem.getMenuName();
 
-        if (!menuManager.isBuyingLevel(player.getName(), level))
+        if (!levelManager.isBuyingLevel(player.getName(), level))
         {
             double coins = playerStats.getCoins();
-            int total = menuManager.getTotalBuyingLevelsCost(player.getName());
+            int total = levelManager.getTotalBuyingLevelsCost(player.getName());
 
             if (coins >= total + level.getPrice())
             {
@@ -306,26 +311,47 @@ public class MenuItemAction {
                 ItemMeta itemMeta = itemStack.getItemMeta();
 
                 itemMeta.setDisplayName(Utils.translate(
-                        "&7Click to confirm purchase of &a" + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"
+                        "&cClick to confirm &a" + level.getFormattedTitle() + " &cfor &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"
                 ));
 
-                itemMeta.setLore(new ArrayList<String>() {{
-                    add(Utils.translate(" &cThis will also confirm all other selected purchases"));
-                }});
+                List<String> loreString = new ArrayList<String>() {{
+                    add(Utils.translate(" &7This will also confirm all other selected purchases"));
+                    add(Utils.translate(" &7For a total of &6" + Utils.formatNumber(total + level.getPrice()) + " &eCoins"));
+                }};
+                List<Integer> slots = levelManager.getBuyingLevelsSlots(player.getName());
+                Inventory openInventory = player.getOpenInventory().getTopInventory();
+
+                Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                newInventory.setContents(openInventory.getContents()); // set contents
+
+                // update current bought lore
+                for (int slot : slots)
+                {
+                    ItemStack boughtItem = openInventory.getItem(slot);
+                    ItemMeta boughtMeta = boughtItem.getItemMeta();
+
+                    boughtMeta.setLore(loreString);
+
+                    boughtItem.setItemMeta(boughtMeta);
+
+                    newInventory.setItem(slot, boughtItem);
+                }
+
+                itemMeta.setLore(loreString);
 
                 itemStack.setItemMeta(itemMeta);
+                newInventory.setItem(menuItem.getSlot(), itemStack);
 
-                Inventory inventory = menuManager.getInventory(menuName, menuItem.getPageNumber());
-                inventory.setItem(menuItem.getSlot(), itemStack);
+                player.openInventory(newInventory); // open new inv
 
-                menuManager.addBuyingLevel(player.getName(), level);
+                levelManager.addBuyingLevel(player.getName(), level, menuItem.getSlot());
             }
             else
             {
                 // this is where it creates a item telling them they cannot buy this!
                 ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 14);
                 ItemMeta itemMeta = itemStack.getItemMeta();
-                itemMeta.setDisplayName(Utils.translate("&cYou do not have enough coins to buy " + level.getFormattedTitle()));
+                itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getFormattedTitle()));
 
                 int remaining = (int) ((total + level.getPrice()) - coins);
 
@@ -335,30 +361,62 @@ public class MenuItemAction {
 
                 itemStack.setItemMeta(itemMeta);
 
-                Inventory inventory = Parkour.getMenuManager().getInventory(menuName, menuItem.getPageNumber());
-                inventory.setItem(menuItem.getSlot(), itemStack);
+                Inventory openInventory = player.getOpenInventory().getTopInventory();
 
-                // reset item after 5 seconds
-                new BukkitRunnable()
-                {
-                    @Override
-                    public void run()
+                Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                newInventory.setContents(openInventory.getContents()); // set contents
+                newInventory.setItem(menuItem.getSlot(), itemStack);
+
+                player.openInventory(newInventory);
+
+                List<BukkitTask> runnables = activeCancels.get(player.getName());
+
+                if (runnables == null)
+                    runnables = new ArrayList<>();
+
+                runnables.add(
+                    // reset item after 5 seconds
+                    new BukkitRunnable()
                     {
-                        inventory.setItem(menuItem.getSlot(), menuItem.getItem());
-                    }
-                }.runTaskLater(Parkour.getPlugin(), 20 * 5);
+                        @Override
+                        public void run()
+                        {
+                            if (player != null && player.getOpenInventory() != null &&
+                                player.getOpenInventory().getTopInventory().getName().equalsIgnoreCase(newInventory.getName()))
+                            {
+                                player.openInventory(openInventory); // open old inventory
+
+                                List<BukkitTask> remainingRunnables = activeCancels.get(player.getName());
+
+                                // if any left, cancel and remove the rest
+                                if (remainingRunnables != null)
+                                {
+                                    for (BukkitTask task : remainingRunnables)
+                                        task.cancel();
+
+                                    activeCancels.remove(player.getName());
+                                }
+                            }
+                            else
+                            {
+                                activeCancels.remove(player.getName());
+                            }
+                        }
+                    }.runTaskLater(Parkour.getPlugin(), 20 * 5)
+                );
+                activeCancels.put(player.getName(), runnables); // put into active cancels
             }
         }
         else
         {
             // where the levels are bought
-            HashSet<Level> levels = menuManager.getBuyingLevels(player.getName());
-            int totalCoins = menuManager.getTotalBuyingLevelsCost(player.getName());
+            Collection<Level> levels = levelManager.getBuyingLevels(player.getName()).values();
+            int totalCoins = levelManager.getTotalBuyingLevelsCost(player.getName());
 
             // add to db/cache
-            for (Level boughtLevels : (Level[]) levels.toArray())
+            for (Level boughtLevels : levels)
             {
-                StatsDB.addBoughtLevel(playerStats, level.getName());
+                StatsDB.addBoughtLevel(playerStats, boughtLevels.getName());
                 playerStats.buyLevel(boughtLevels.getName());
             }
             Parkour.getStatsManager().removeCoins(playerStats, totalCoins); // remove all coins
@@ -376,6 +434,8 @@ public class MenuItemAction {
                 // teleport if only one
                 performLevelTeleport(playerStats, player, level);
             }
+
+            levelManager.removeBuyingLevel(player.getName());
         }
     }
     public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {

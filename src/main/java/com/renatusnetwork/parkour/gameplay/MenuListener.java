@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.menus.Menu;
 import com.renatusnetwork.parkour.data.menus.MenuItem;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
@@ -14,8 +15,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
@@ -41,7 +45,7 @@ public class MenuListener implements Listener {
 
                 Player player = (Player) event.getWhoClicked();
 
-                if (menuItem != null && menuItem.getItem().getType() == currentItem.getType()) {
+                if (menuItem != null && (menuItem.getItem().getType() == currentItem.getType() || Parkour.getLevelManager().isBuyingLevelMenu(player.getName()))) {
                     MenuItemAction.perform(player, menuItem);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                 } else {
@@ -132,6 +136,27 @@ public class MenuListener implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onMenuClose(InventoryCloseEvent event)
+    {
+        LevelManager levelManager = Parkour.getLevelManager();
+        String name = event.getPlayer().getName();
+
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                Inventory openedInventory = event.getInventory();
+                Inventory nextInventory = event.getPlayer().getOpenInventory().getTopInventory();
+
+                // remove from buying level list
+                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName()) && levelManager.isBuyingLevelMenu(name))
+                    levelManager.removeBuyingLevel(name);
+            }
+        }.runTaskLater(Parkour.getPlugin(), 1);
     }
 
     @EventHandler

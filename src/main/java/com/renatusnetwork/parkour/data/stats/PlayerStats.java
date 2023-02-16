@@ -207,6 +207,8 @@ public class PlayerStats {
         boughtLevels.add(levelName);
     }
 
+    public void setBoughtLevels(HashSet<String> levels) { boughtLevels = levels ; }
+
     //
     // Spectator Section
     //

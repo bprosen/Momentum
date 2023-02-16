@@ -306,10 +306,10 @@ public class MenuItemFormatter {
             if (!rankUpLevel) {
 
                 // show they need to buy it
-                if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()))
+                if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                 {
-                    itemLore.add(Utils.translate("&cClick to buy " + level.getFormattedTitle() + " &cfor &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"));
-                    itemLore.add(Utils.translate(" &7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
+                    itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"));
+                    itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
                 }
                 else
                     itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()));

@@ -379,6 +379,8 @@ public class StatsDB {
 
             for (Map<String, String> boughtResult : boughtResults)
                 boughtLevels.add(boughtResult.get("level_name"));
+
+            playerStats.setBoughtLevels(boughtLevels);
         }
     }
 

@@ -30,6 +30,8 @@ public class LevelManager {
     private LinkedHashSet<Level> topRatedLevelsLB = new LinkedHashSet<>
             (Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
 
+    private HashMap<String, HashMap<Integer, Level>> buyingLevels = new HashMap<>();
+
     public LevelManager(Plugin plugin) {
         this.levelDataCache = LevelsDB.getDataCache();
 
@@ -191,6 +193,83 @@ public class LevelManager {
             }
         }
     }
+
+    public boolean isBuyingLevel(String playerName, Level level)
+    {
+        boolean result = false;
+
+        if (buyingLevels.containsKey(playerName))
+        {
+            HashMap<Integer, Level> levelsSet = buyingLevels.get(playerName);
+            result = levelsSet.containsValue(level);
+        }
+
+        return result;
+    }
+
+    public void addBuyingLevel(String playerName, Level level, int slot)
+    {
+        HashMap<Integer, Level> newMap;
+
+        if (buyingLevels.containsKey(playerName))
+        {
+            newMap = buyingLevels.get(playerName);
+            newMap.put(slot, level);
+        }
+        else
+        {
+            newMap = new HashMap<Integer, Level>() {{
+                put(slot, level);
+            }};
+        }
+
+        buyingLevels.put(playerName, newMap);
+    }
+
+    public int getTotalBuyingLevelsCost(String playerName)
+    {
+        HashMap<Integer, Level> levels = buyingLevels.get(playerName);
+        int totalCost = 0;
+
+        if (levels != null)
+            for (Level level : levels.values())
+                totalCost += level.getPrice();
+
+        return totalCost;
+    }
+
+    public void removeBuyingLevel(String playerName)
+    {
+        buyingLevels.remove(playerName);
+    }
+
+    public boolean isBuyingLevelMenu(String playerName)
+    {
+        return buyingLevels.containsKey(playerName);
+    }
+
+    public List<Integer> getBuyingLevelsSlots(String playerName)
+    {
+        HashMap<Integer, Level> levels = buyingLevels.get(playerName);
+        List<Integer> levelsToBuy = new ArrayList<>();
+
+        // if non null, add all from keyset
+        if (levels != null)
+            levels.keySet().forEach(value -> levelsToBuy.add(value));
+
+        return levelsToBuy;
+    }
+
+    public HashMap<Integer, Level> getBuyingLevels(String playerName)
+    {
+        return buyingLevels.get(playerName);
+    }
+
+    public void clearBuyingLevels(String playerName)
+    {
+        buyingLevels.remove(playerName);
+    }
+
 
     public Set<Level> getLevelsInAllMenus() {
         Set<Level> levelsInMenus = new HashSet<>();
