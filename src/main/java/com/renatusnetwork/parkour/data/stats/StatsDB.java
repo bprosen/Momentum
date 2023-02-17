@@ -398,6 +398,25 @@ public class StatsDB {
 
         Parkour.getDatabaseManager().add(query);
     }
+
+    public static void removeBoughtLevel(String playerName, String boughtLevel)
+    {
+        String query = "DELETE FROM bought_levels WHERE player_name='" + playerName + "' AND level_name='" + boughtLevel + "'";
+
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static boolean hasBoughtLevel(String playerName, String boughtLevel)
+    {
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "bought_levels",
+                "uuid",
+                " WHERE player_name='" + playerName + "' AND level_name='" + boughtLevel + "'"
+        );
+
+        return !playerResults.isEmpty();
+    }
+
     /*
      * Completions Section
      */

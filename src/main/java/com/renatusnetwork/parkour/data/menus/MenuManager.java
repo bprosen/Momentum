@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -22,6 +23,7 @@ public class MenuManager {
 
     private HashMap<String, Menu> menuMap = new HashMap<>();
     private HashMap<String, HashSet<Level>> buyingLevels = new HashMap<>();
+    private HashMap<String, CancelTasks> cancelTasks = new HashMap<>();
 
     public MenuManager() {
         load();
@@ -54,6 +56,49 @@ public class MenuManager {
 
     public boolean exists(String menuName) {
         return menuMap.containsKey(menuName);
+    }
+
+    public CancelTasks getCancelTasks(String playerName)
+    {
+        return cancelTasks.get(playerName);
+    }
+
+    public boolean hasCancelTasks(String playerName)
+    {
+        return cancelTasks.containsKey(playerName);
+    }
+
+    public void removeCancelTasks(String playerName)
+    {
+        cancelTasks.remove(playerName);
+    }
+
+    public boolean hasCancelledItem(String playerName, int slot)
+    {
+        boolean result = false;
+
+        CancelTasks cancelTask = cancelTasks.get(playerName);
+
+        if (cancelTask != null)
+            result = cancelTask.hasItemInSlot(slot);
+
+        return result;
+    }
+
+    public void addActiveCancel(String playerName, Inventory inventory, int slot, ItemStack itemStack, BukkitTask task) {
+
+        CancelTasks menu = cancelTasks.get(playerName);
+
+        // if non null, add task
+        if (menu != null)
+            menu.addSlot(slot, itemStack, task);
+        else
+        {
+            CancelTasks cancelled = new CancelTasks(inventory);
+            cancelled.addSlot(slot, itemStack, task);
+
+            cancelTasks.put(playerName, cancelled);
+        }
     }
 
     public Menu getMenu(String menuName) {

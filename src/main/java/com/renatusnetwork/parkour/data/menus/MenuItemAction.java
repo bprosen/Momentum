@@ -1,9 +1,7 @@
 package com.renatusnetwork.parkour.data.menus;
 
-import com.comphenix.protocol.PacketType;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.levels.RatingDB;
@@ -20,7 +18,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -30,8 +27,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 
 public class MenuItemAction {
-
-    private static HashMap<String, List<BukkitTask>> activeCancels = new HashMap<>();
 
     private static void runCommands(Player player, List<String> commands, List<String> consoleCommands) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -297,13 +292,15 @@ public class MenuItemAction {
 
     public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
     {
-        LevelManager levelManager = Parkour.getLevelManager();
+        MenuManager menuManager = Parkour.getMenuManager();
         String menuName = menuItem.getMenuName();
+        LevelManager levelManager = Parkour.getLevelManager();
 
         if (!levelManager.isBuyingLevel(player.getName(), level))
         {
             double coins = playerStats.getCoins();
             int total = levelManager.getTotalBuyingLevelsCost(player.getName());
+            Inventory openInventory = player.getOpenInventory().getTopInventory();;
 
             if (coins >= total + level.getPrice())
             {
@@ -319,7 +316,6 @@ public class MenuItemAction {
                     add(Utils.translate(" &7For a total of &6" + Utils.formatNumber(total + level.getPrice()) + " &eCoins"));
                 }};
                 List<Integer> slots = levelManager.getBuyingLevelsSlots(player.getName());
-                Inventory openInventory = player.getOpenInventory().getTopInventory();
 
                 Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
                 newInventory.setContents(openInventory.getContents()); // set contents
@@ -345,66 +341,77 @@ public class MenuItemAction {
                 player.openInventory(newInventory); // open new inv
 
                 levelManager.addBuyingLevel(player.getName(), level, menuItem.getSlot());
+
+                // set last edited
+                CancelTasks cancelTask = menuManager.getCancelTasks(player.getName());
+                if (cancelTask != null)
+                    cancelTask.setLastEditedInventory(newInventory);
             }
             else
             {
-                // this is where it creates a item telling them they cannot buy this!
-                ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 14);
-                ItemMeta itemMeta = itemStack.getItemMeta();
-                itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getFormattedTitle()));
+                boolean alreadyExists = menuManager.hasCancelledItem(player.getName(), menuItem.getSlot());
 
-                int remaining = (int) ((total + level.getPrice()) - coins);
+                if (!alreadyExists)
+                {
+                    // this is where it creates a item telling them they cannot buy this!
+                    ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 14);
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getFormattedTitle()));
 
-                itemMeta.setLore(new ArrayList<String>() {{
-                    add(Utils.translate(" &7You need &6" + Utils.formatNumber(remaining) + " &7more &eCoins"));
-                }});
+                    int remaining = (int) ((total + level.getPrice()) - coins);
 
-                itemStack.setItemMeta(itemMeta);
+                    itemMeta.setLore(new ArrayList<String>() {{
+                        add(Utils.translate(" &7You need &6" + Utils.formatNumber(remaining) + " &7more &eCoins"));
+                    }});
 
-                Inventory openInventory = player.getOpenInventory().getTopInventory();
+                    itemStack.setItemMeta(itemMeta);
 
-                Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
-                newInventory.setContents(openInventory.getContents()); // set contents
-                newInventory.setItem(menuItem.getSlot(), itemStack);
+                    ItemStack preCancelItem = openInventory.getItem(menuItem.getSlot());
 
-                player.openInventory(newInventory);
+                    Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                    newInventory.setContents(openInventory.getContents()); // set contents
+                    newInventory.setItem(menuItem.getSlot(), itemStack);
 
-                List<BukkitTask> runnables = activeCancels.get(player.getName());
+                    player.openInventory(newInventory);
 
-                if (runnables == null)
-                    runnables = new ArrayList<>();
-
-                runnables.add(
-                    // reset item after 5 seconds
-                    new BukkitRunnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if (player != null && player.getOpenInventory() != null &&
-                                player.getOpenInventory().getTopInventory().getName().equalsIgnoreCase(newInventory.getName()))
+                    menuManager.addActiveCancel(player.getName(), newInventory, menuItem.getSlot(), preCancelItem,
+                            // reset item after 5 seconds
+                            new BukkitRunnable()
                             {
-                                player.openInventory(openInventory); // open old inventory
-
-                                List<BukkitTask> remainingRunnables = activeCancels.get(player.getName());
-
-                                // if any left, cancel and remove the rest
-                                if (remainingRunnables != null)
+                                @Override
+                                public void run()
                                 {
-                                    for (BukkitTask task : remainingRunnables)
-                                        task.cancel();
+                                    if (player != null && menuManager.hasCancelTasks(player.getName()) && player.getOpenInventory() != null &&
+                                            player.getOpenInventory().getTopInventory().getName().equalsIgnoreCase(openInventory.getName()))
+                                    {
+                                        CancelTasks cancelled = menuManager.getCancelTasks(player.getName());
 
-                                    activeCancels.remove(player.getName());
+                                        // if any left, cancel and remove the rest
+                                        if (cancelled != null)
+                                        {
+                                            Inventory lastEditedInventory = cancelled.getLastEditedInventory();
+
+                                            Inventory revertInventory = Bukkit.createInventory(null, lastEditedInventory.getSize(), lastEditedInventory.getTitle());
+                                            revertInventory.setContents(lastEditedInventory.getContents()); // set contents
+
+                                            // cancel tasks
+                                            for (BukkitTask task : cancelled.getCancelledSlots())
+                                                task.cancel();
+
+                                            // restore inventory
+                                            for (Map.Entry<Integer, ItemStack> entry : cancelled.getBeforeCancelItems().entrySet())
+                                                revertInventory.setItem(entry.getKey(), entry.getValue());
+
+                                            // open reverted inventory
+                                            player.openInventory(revertInventory);
+                                        }
+
+                                    }
+                                    menuManager.removeCancelTasks(player.getName());
                                 }
-                            }
-                            else
-                            {
-                                activeCancels.remove(player.getName());
-                            }
-                        }
-                    }.runTaskLater(Parkour.getPlugin(), 20 * 5)
-                );
-                activeCancels.put(player.getName(), runnables); // put into active cancels
+                            }.runTaskLater(Parkour.getPlugin(), 20 * 5)
+                    );
+                }
             }
         }
         else
@@ -434,10 +441,9 @@ public class MenuItemAction {
                 // teleport if only one
                 performLevelTeleport(playerStats, player, level);
             }
-
-            levelManager.removeBuyingLevel(player.getName());
         }
     }
+
     public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace())
         {

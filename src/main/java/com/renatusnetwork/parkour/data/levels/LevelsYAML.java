@@ -325,6 +325,11 @@ public class LevelsYAML {
         return price;
     }
 
+    public static void setPrice(String levelName, int price) {
+        levelsFile.set(levelName + ".price", price);
+        commit(levelName);
+    }
+
     public static List<String> getCommands(String levelName) {
         List<String> tempList = new ArrayList<>();
 

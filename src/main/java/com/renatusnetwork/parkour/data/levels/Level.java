@@ -169,6 +169,8 @@ public class Level {
 
     public int getPrice() { return price; }
 
+    public void setPrice(int price) { this.price = price; }
+
     public int getRatingsCount() { return ratingsCount; }
 
     public void setRatingsCount(int ratingsCount) { this.ratingsCount = ratingsCount; }

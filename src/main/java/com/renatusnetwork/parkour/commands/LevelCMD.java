@@ -929,7 +929,115 @@ public class LevelCMD implements CommandExecutor {
                         }
                     }.runTaskAsynchronously(Parkour.getPlugin());
                 }
-                else {
+                else if (a.length == 3 && a[0].equalsIgnoreCase("setprice"))
+                {
+                    String levelName = a[1];
+
+                    if (Utils.isInteger(a[2]))
+                    {
+                        int price = Integer.parseInt(a[2]);
+                        Level level = levelManager.get(levelName);
+
+                        if (level != null)
+                        {
+                            level.setPrice(price);
+                            LevelsYAML.setPrice(levelName, price);
+                            sender.sendMessage(Utils.translate("&7You set the price of &c" + level.getFormattedTitle() + " &7to &6" + Utils.formatNumber(price) + " &e&lCoins"));
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&c'&4" + levelName + "&c' is not a valid level"));
+                        }
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid integer"));
+                    }
+                }
+                else if (a.length == 3 && a[0].equalsIgnoreCase("addboughtlevel"))
+                {
+                    Level level = levelManager.get(a[2]);
+
+                    if (level != null)
+                    {
+                        if (level.getPrice() > 0)
+                        {
+                            Player target = Bukkit.getPlayer(a[1]);
+
+                            if (target != null)
+                            {
+                                PlayerStats targetStats = Parkour.getStatsManager().get(target);
+
+                                if (!targetStats.hasBoughtLevel(level.getName()))
+                                {
+                                    targetStats.buyLevel(level.getName());
+                                    StatsDB.addBoughtLevel(targetStats, level.getName());
+
+                                    sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + " &7to &4" + a[1] + "&c's &7bought levels"));
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' has already bought &4" + level.getFormattedTitle() + "&c!"));
+                                }
+                            }
+                            else
+                            {
+                                sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not online"));
+                            }
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&c'&4" + level.getFormattedTitle() + "&c' is not a buyable level"));
+                        }
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid level"));
+                    }
+                }
+                else if (a.length == 3 && a[0].equalsIgnoreCase("removeboughtlevel"))
+                {
+                    Level level = levelManager.get(a[2]);
+
+                    if (level != null)
+                    {
+                        new BukkitRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                if (StatsDB.isPlayerInDatabase(a[1]))
+                                {
+                                    if (StatsDB.hasBoughtLevel(a[1], level.getName()))
+                                    {
+                                        PlayerStats targetStats = Parkour.getStatsManager().getByName(a[1]);
+
+                                        // if non null, remove bought level
+                                        if (targetStats != null)
+                                            targetStats.removeBoughtLevel(level.getName());
+
+                                        StatsDB.removeBoughtLevel(a[1], level.getName());
+                                        sender.sendMessage(Utils.translate("&7You have removed &c" + level.getFormattedTitle() + " &7from &4" + a[1] + "&c's &7bought levels"));
+                                    }
+                                    else
+                                    {
+                                        sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' has not bought &4" + level.getFormattedTitle() + "&c!"));
+                                    }
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' has not joined the server!"));
+                                }
+                            }
+                        }.runTaskAsynchronously(Parkour.getPlugin());
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid level"));
+                    }
+                }
+                else
+                {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                     sendHelp(sender);
                 }
@@ -975,6 +1083,9 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("resetcheckpoints"));
         sender.sendMessage(getHelp("cleanleveldatadb"));
         sender.sendMessage(getHelp("totalcompletions"));
+        sender.sendMessage(getHelp("setprice"));
+        sender.sendMessage(getHelp("addboughtlevel"));
+        sender.sendMessage(getHelp("removeboughtlevel"));
     }
 
     private static String getHelp(String cmd) {
@@ -1044,6 +1155,12 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level cleanleveldatadb  &7Cleans invalid data");
             case "totalcompletions":
                 return Utils.translate("&a/level totalcompletions <level> <startDate> <endDate>  &7Gets total number of completions between two dates (YYYY-MM-DD)");
+            case "setprice":
+                return Utils.translate("&a/level setprice <level> <price>  &7Sets the level's price");
+            case "addboughtlevel":
+                return Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player");
+            case "removeboughtlevel":
+                return Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player");
         }
         return "";
     }

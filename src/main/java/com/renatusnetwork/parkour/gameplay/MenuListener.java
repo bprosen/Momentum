@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.gameplay;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
+import com.renatusnetwork.parkour.data.menus.CancelTasks;
 import com.renatusnetwork.parkour.data.menus.Menu;
 import com.renatusnetwork.parkour.data.menus.MenuItem;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
@@ -20,7 +21,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class MenuListener implements Listener {
@@ -152,9 +155,24 @@ public class MenuListener implements Listener {
                 Inventory openedInventory = event.getInventory();
                 Inventory nextInventory = event.getPlayer().getOpenInventory().getTopInventory();
 
-                // remove from buying level list
-                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName()) && levelManager.isBuyingLevelMenu(name))
-                    levelManager.removeBuyingLevel(name);
+                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName()))
+                {
+                    // remove buying
+                    if (levelManager.isBuyingLevelMenu(name))
+                        levelManager.removeBuyingLevel(name);
+
+                    // cancelled tasks
+                    CancelTasks cancelTasks = Parkour.getMenuManager().getCancelTasks(name);
+
+                    // if not null and contains, we need to cancel remaining tasks!
+                    if (cancelTasks != null && cancelTasks.getCancelledSlots() != null)
+                    {
+                        for (BukkitTask task : cancelTasks.getCancelledSlots())
+                            task.cancel();
+
+                        Parkour.getMenuManager().removeCancelTasks(name); // remove
+                    }
+                }
             }
         }.runTaskLater(Parkour.getPlugin(), 1);
     }
