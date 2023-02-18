@@ -300,7 +300,7 @@ public class MenuItemAction {
         {
             double coins = playerStats.getCoins();
             int total = levelManager.getTotalBuyingLevelsCost(player.getName());
-            Inventory openInventory = player.getOpenInventory().getTopInventory();;
+            Inventory openInventory = player.getOpenInventory().getTopInventory();
 
             if (coins >= total + level.getPrice())
             {
