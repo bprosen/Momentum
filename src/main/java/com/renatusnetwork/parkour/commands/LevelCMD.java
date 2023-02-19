@@ -1038,7 +1038,7 @@ public class LevelCMD implements CommandExecutor {
                 }
                 else if (a.length == 2 && a[0].equalsIgnoreCase("togglenew"))
                 {
-                    Level level = levelManager.get(a[2]);
+                    Level level = levelManager.get(a[1]);
 
                     if (level != null)
                     {
