@@ -137,7 +137,7 @@ public class InfinitePKManager {
                     player.sendMessage(Utils.translate(
                             "&7You have beaten your previous record of &d" +
                             Utils.formatNumber(playerStats.getInfinitePKScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
-                            "&7Awarded &e" + ((int) Math.ceil(score / 2f)) + " Coins"
+                            "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
                     ));
 
                     if (doRewardsMsg) {
@@ -162,7 +162,7 @@ public class InfinitePKManager {
             } else if (!disconnected) {
                 player.sendMessage(Utils.translate(
                         "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + playerStats.getInfinitePKScore() + ")\n" +
-                             "&7Awarded &e" + ((int) Math.ceil(score / 2f)) + " Coins"
+                             "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
                 ));
             }
             // deposit score
