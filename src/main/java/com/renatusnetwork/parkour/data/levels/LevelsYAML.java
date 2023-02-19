@@ -325,6 +325,26 @@ public class LevelsYAML {
         return price;
     }
 
+    public static boolean getNewLevel(String levelName)
+    {
+        boolean result = false;
+
+        if (isSet(levelName, "new"))
+            result = levelsFile.getBoolean(levelName + ".new");
+
+        return result;
+    }
+
+    public static void setNewLevel(String levelName, boolean result)
+    {
+        if (result)
+            levelsFile.set(levelName + ".new", result);
+        else
+            levelsFile.set(levelName + ".new", null); // remove
+
+        commit(levelName);
+    }
+
     public static void setPrice(String levelName, int price) {
         levelsFile.set(levelName + ".price", price);
         commit(levelName);

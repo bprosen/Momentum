@@ -43,11 +43,6 @@ public class CancelTasks
         cancelledSlots.add(task);
     }
 
-    public ItemStack getItem(int slot)
-    {
-        return beforeCancel.get(slot);
-    }
-
     public HashMap<Integer, ItemStack> getBeforeCancelItems()
     {
         return beforeCancel;

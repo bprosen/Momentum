@@ -1036,6 +1036,21 @@ public class LevelCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid level"));
                     }
                 }
+                else if (a.length == 2 && a[0].equalsIgnoreCase("togglenew"))
+                {
+                    Level level = levelManager.get(a[2]);
+
+                    if (level != null)
+                    {
+                        level.toggleNewLevel();
+                        LevelsYAML.setNewLevel(level.getName(), level.isNewLevel());
+                        sender.sendMessage(Utils.translate("&7You have set the new level value of &c" + level.getFormattedTitle() + " &7to: &c" + level.isNewLevel()));
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid level"));
+                    }
+                }
                 else
                 {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -1086,6 +1101,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(getHelp("setprice"));
         sender.sendMessage(getHelp("addboughtlevel"));
         sender.sendMessage(getHelp("removeboughtlevel"));
+        sender.sendMessage(getHelp("togglenew"));
     }
 
     private static String getHelp(String cmd) {
@@ -1161,6 +1177,8 @@ public class LevelCMD implements CommandExecutor {
                 return Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player");
             case "removeboughtlevel":
                 return Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player");
+            case "togglenew":
+                return Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)");
         }
         return "";
     }

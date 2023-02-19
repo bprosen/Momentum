@@ -179,6 +179,11 @@ public class MenuItemFormatter {
 
             // Item Title Section
             String formattedTitle = Utils.translate("&cFeatured &7- " + featuredLevel.getFormattedTitle());
+
+            // add new if new level!
+            if (featuredLevel.isNewLevel())
+                formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
+
             if (featuredLevel.getPlayersInLevel() > 0)
                 formattedTitle += Utils.translate(" &7(" + featuredLevel.getPlayersInLevel() + " Playing)");
 
@@ -304,6 +309,10 @@ public class MenuItemFormatter {
 
             // do not show all the below info if not a rankup level
             if (!rankUpLevel) {
+
+                // add new if new level!
+                if (level.isNewLevel())
+                    formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
                 // show they need to buy it
                 if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)

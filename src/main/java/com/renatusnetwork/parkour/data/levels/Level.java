@@ -41,6 +41,7 @@ public class Level {
     private boolean liquidResetPlayer = true;
     private boolean elytraLevel = false;
     private boolean dropperLevel = false;
+    private boolean newLevel = false;
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
@@ -471,6 +472,7 @@ public class Level {
             dropperLevel = LevelsYAML.isDropperLevel(name);
             ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
             price = LevelsYAML.getPrice(name);
+            newLevel = LevelsYAML.getNewLevel(name);
         }
     }
 
@@ -489,6 +491,10 @@ public class Level {
     public boolean isElytraLevel() { return elytraLevel; }
 
     public boolean isDropperLevel() { return dropperLevel; }
+
+    public boolean isNewLevel() { return newLevel; }
+
+    public void toggleNewLevel() { newLevel = !newLevel; }
 
     public boolean isAscendanceLevel() { return ascendanceLevel; }
 
