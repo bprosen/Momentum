@@ -4,14 +4,14 @@ import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
-import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.data.stats.StatsManager;
+import com.renatusnetwork.parkour.data.stats.*;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -335,6 +335,8 @@ public class RaceManager {
 
             // remove from list
             runningRaceList.remove(raceObject);
+
+            Parkour.getStatsManager().runGGTimer();
         }
     }
 
@@ -391,10 +393,12 @@ public class RaceManager {
         String opponentString;
 
         if (bet) {
-            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + Utils.formatNumber(betAmount));
+            opponentString = Utils.translate(
+                    "&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + Utils.formatNumber(betAmount) + "&7! &a&nClick here to accept the race&r"
+            );
             senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + Utils.formatNumber(betAmount));
         } else {
-            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request");
+            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request&7! &a&nClick here to accept the race&r");
             senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request");
         }
 
@@ -402,9 +406,14 @@ public class RaceManager {
             senderString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
             opponentString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
         }
+
+        TextComponent opponentComponent = new TextComponent(TextComponent.fromLegacyText(opponentString));
+        opponentComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&aClick to accept!"))));
+        opponentComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/race accept " + player1.getPlayer().getName()));
+
         // send made messages
         player1.getPlayer().sendMessage(senderString);
-        player2.getPlayer().sendMessage(opponentString);
+        player2.getPlayer().spigot().sendMessage(opponentComponent); // send clickable
 
         RaceRequest raceRequest = new RaceRequest(player1, player2);
 
@@ -417,8 +426,6 @@ public class RaceManager {
             raceRequest.setBet(betAmount);
 
         raceRequests.add(raceRequest);
-
-        player2.getPlayer().sendMessage(Utils.translate("&7Type &c/race accept " + player1.getPlayer().getName() + " &7within &c30 seconds &7to accept"));
 
         new BukkitRunnable() {
             @Override

@@ -84,6 +84,9 @@ public class SettingsManager {
     public double rage_quit_price;
     public List<String> rage_quit_messages;
 
+    public int default_gg_timer;
+    public int default_gg_coin_reward;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -144,7 +147,8 @@ public class SettingsManager {
         rage_quit_price = settings.getDouble("rage_quit.price");
         rage_quit_messages = settings.getStringList("rage_quit.messages");
         ascendance_hub_level = settings.getString("ascendance.hub_level");
-
+        default_gg_timer = settings.getInt("gg.default_timer_in_seconds");
+        default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic

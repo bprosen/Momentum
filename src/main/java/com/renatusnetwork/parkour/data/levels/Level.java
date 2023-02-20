@@ -9,13 +9,11 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Level {
@@ -350,7 +348,6 @@ public class Level {
         // broadcast when record is beaten
         if (leaderboardCache.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
         {
-
             double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
 
             Bukkit.broadcastMessage("");
@@ -402,6 +399,8 @@ public class Level {
                     }
                 }
             }
+            // do gg run
+            Parkour.getStatsManager().runGGTimer();
         }
     }
 

@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -38,6 +39,9 @@ public class StatsManager {
 
     private LinkedHashMap<String, Integer> recordsLB = new LinkedHashMap<>(
             Parkour.getSettingsManager().max_records_leaderboard_size);
+
+    private HashSet<String> saidGG = new HashSet<>();
+    private BukkitTask task = null;
 
     private boolean loadingLeaderboards = false;
 
@@ -162,6 +166,36 @@ public class StatsManager {
     public void remove(PlayerStats playerStats) {
         playerStatsList.remove(playerStats.getPlayerName());
         ascendancePlayerList.remove(playerStats);
+    }
+
+    public void addGG(PlayerStats playerStats)
+    {
+        if (task != null && !saidGG.contains(playerStats.getPlayerName()))
+        {
+            saidGG.add(playerStats.getPlayerName());
+            playerStats.getPlayer().sendMessage(Utils.translate("&6" + Parkour.getSettingsManager().default_gg_coin_reward + " &eCoin &7reward for saying &3&lGG&b!"));
+            Parkour.getStatsManager().addCoins(playerStats, Parkour.getSettingsManager().default_gg_coin_reward);
+        }
+    }
+
+    public void runGGTimer()
+    {
+        if (task != null)
+            // cancel and rerun timer
+            task.cancel();
+
+        task = new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                if (!saidGG.isEmpty())
+                    Bukkit.broadcastMessage(Utils.translate("&3" + saidGG.size() + " &bplayers said &3&lGG&b!"));
+
+                saidGG.clear();
+                task = null;
+            }
+        }.runTaskLater(Parkour.getPlugin(), Parkour.getSettingsManager().default_gg_timer * 20);
     }
 
     public void updateCoins(PlayerStats playerStats, double coins)

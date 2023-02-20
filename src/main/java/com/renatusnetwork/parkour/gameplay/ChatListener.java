@@ -71,6 +71,10 @@ public class ChatListener implements Listener
                 // broadcast and log
                 Bukkit.spigot().broadcast(mainComponent);
                 Bukkit.getServer().getConsoleSender().sendMessage(mainComponent.toLegacyText());
+
+                // add to gg if they say it
+                if (ChatColor.stripColor(msg).equalsIgnoreCase("gg"))
+                    Parkour.getStatsManager().addGG(playerStats);
             }
         }
     }

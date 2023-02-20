@@ -200,6 +200,11 @@ public class StatsDB {
         Parkour.getDatabaseManager().asyncRun("UPDATE plots SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
+
+        // update in bought levels
+        Parkour.getDatabaseManager().asyncRun("UPDATE bought_levels SET " +
+                "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_name='" + oldName + "'");
     }
 
     public static void updatePlayerSpectatable(PlayerStats playerStats) {
@@ -382,6 +387,21 @@ public class StatsDB {
 
             playerStats.setBoughtLevels(boughtLevels);
         }
+    }
+
+    public static void addBoughtLevel(String UUID, String playerName, String boughtLevel)
+    {
+        String query = "INSERT INTO bought_levels " +
+                "(uuid, player_name, level_name)" +
+                " VALUES " +
+                "('" +
+                UUID + "', '" +
+                playerName + "', '" +
+                boughtLevel +
+                "')"
+                ;
+
+        Parkour.getDatabaseManager().add(query);
     }
 
     public static void addBoughtLevel(PlayerStats playerStats, String boughtLevel)

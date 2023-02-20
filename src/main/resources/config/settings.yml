@@ -7,6 +7,9 @@ database:
   username: ""
   password: ""
 
+gg:
+  default_timer_in_seconds: 10
+  default_coin_reward: 10
 levels:
   message:
     completion: "&7Rewarded &6%reward% Coins &7for %title% &7in &a%time% &2(&a%completions%&2)"

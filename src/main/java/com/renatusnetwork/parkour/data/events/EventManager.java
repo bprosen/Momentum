@@ -2,7 +2,6 @@ package com.renatusnetwork.parkour.data.events;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -18,7 +17,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -132,6 +130,8 @@ public class EventManager {
                 reward = (int) (runningEvent.getLevel().getReward() * playerStats.getPrestigeMultiplier());
 
             Parkour.getStatsManager().addCoins(playerStats, reward);
+
+            Parkour.getStatsManager().runGGTimer();
         }
 
         if (forceEnded)
