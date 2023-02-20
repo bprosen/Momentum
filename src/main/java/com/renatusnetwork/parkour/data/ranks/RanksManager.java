@@ -151,6 +151,7 @@ public class RanksManager {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2f, 0f);
 
         Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
+        Parkour.getStatsManager().runGGTimer();
     }
 
     public void doPrestige(Player player) {
@@ -186,6 +187,7 @@ public class RanksManager {
                                                      " &7They have prestiged &6" +
                                                      playerStats.getPrestiges() + " " + endingString + "!"));
         Bukkit.broadcastMessage("");
+        Parkour.getStatsManager().runGGTimer();
     }
 
     public HashMap<String, Rank> getRankList() {

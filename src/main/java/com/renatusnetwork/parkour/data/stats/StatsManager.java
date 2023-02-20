@@ -553,7 +553,7 @@ public class StatsManager {
                      "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
                      "&7Favorite Level » &2" + favoriteLevel + "\n" +
                      "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
-                     "&7Rated Level » &3" + Utils.formatNumber(levelsRated) + "\n" +
+                     "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
                      "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses
         );
         return hover;
