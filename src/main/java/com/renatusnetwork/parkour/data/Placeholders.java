@@ -59,12 +59,7 @@ public class Placeholders extends PlaceholderExpansion
                 case "rank":
                     return playerStats.getRank() == null ? "None" : Utils.translate(playerStats.getRank().getRankTitle());
                 case "clan":
-                {
-                    if (playerStats.getClan() != null)
-                        return playerStats.getClan().getTag();
-                    else
-                        return "None";
-                }
+                    return playerStats.getClan() == null ? "None" : playerStats.getClan().getTag();
                 case "total_completions":
                     return Utils.formatNumber(playerStats.getTotalLevelCompletions());
                 case "race_wins":
