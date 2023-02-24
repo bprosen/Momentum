@@ -5,6 +5,7 @@ version: ${project.version}
 author: [CrazySeanPC, xxBen]
 
 depend: [TitleAPI, Vault, WorldGuard, EasyScoreboards, ProtocolLib, WorldEdit]
+softdepend: [PlaceholderAPI]
 
 commands:
   level:

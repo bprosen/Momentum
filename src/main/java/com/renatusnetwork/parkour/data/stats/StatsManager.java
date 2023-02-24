@@ -184,7 +184,7 @@ public class StatsManager {
             // cancel and rerun timer
             task.cancel();
 
-        task = new BukkitRunnable()
+            task = new BukkitRunnable()
         {
             @Override
             public void run()

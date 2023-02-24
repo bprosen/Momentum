@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
+import com.renatusnetwork.parkour.data.Placeholders;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
@@ -21,6 +22,7 @@ import com.renatusnetwork.parkour.storage.ConfigManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.utils.dependencies.ProtocolLib;
 import com.sk89q.worldedit.WorldEdit;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -56,15 +58,21 @@ public class Parkour extends JavaPlugin {
         registerEvents();
         registerCommands();
 
+        // load all classes
+        loadClasses();
+
         // check before loading classes
         if (!ProtocolLib.setupProtocol()) {
-            getLogger().info("ProtocolLib v4.7.0 not found or disabled");
+            getLogger().info("ProtocolLib not found or disabled");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        // load all classes
-        loadClasses();
+        // register placeholders
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+            new Placeholders().register();
+        else
+            getLogger().info("Placeholder not found, not able to initialize placeholders");
 
         // initialize packet listeners
         PacketListener.loadListeners(this);

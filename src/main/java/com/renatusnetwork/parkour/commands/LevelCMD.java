@@ -1048,7 +1048,7 @@ public class LevelCMD implements CommandExecutor {
                     }
                     else
                     {
-                        sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid level"));
+                        sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not a valid level"));
                     }
                 }
                 else
