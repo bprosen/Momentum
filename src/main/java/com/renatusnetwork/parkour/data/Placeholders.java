@@ -1,13 +1,12 @@
 package com.renatusnetwork.parkour.data;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
-
-import java.lang.reflect.UndeclaredThrowableException;
 
 public class Placeholders extends PlaceholderExpansion
 {
@@ -58,7 +57,7 @@ public class Placeholders extends PlaceholderExpansion
                 case "coins":
                     return Utils.formatNumber((int) playerStats.getCoins());
                 case "rank":
-                    return Utils.translate(playerStats.getRank().getRankTitle());
+                    return playerStats.getRank() == null ? "None" : Utils.translate(playerStats.getRank().getRankTitle());
                 case "clan":
                 {
                     if (playerStats.getClan() != null)
