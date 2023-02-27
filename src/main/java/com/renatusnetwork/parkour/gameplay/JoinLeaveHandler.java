@@ -54,6 +54,9 @@ public class JoinLeaveHandler implements Listener {
                         " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
 
+        // set inventory
+        Utils.setHotbar(player);
+
         new BukkitRunnable() {
             @Override
             public void run() {

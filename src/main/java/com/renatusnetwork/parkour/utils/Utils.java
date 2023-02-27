@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.utils;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class Utils {
@@ -151,5 +153,12 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static void setHotbar(Player player)
+    {
+        // loop through and set
+        for (Map.Entry<Integer, ItemStack> entry : Parkour.getSettingsManager().customJoinInventory.entrySet())
+            player.getInventory().setItem(entry.getKey(), entry.getValue());
     }
 }

@@ -32,6 +32,8 @@ public class MenuListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Menu menu = Parkour.getMenuManager().getMenuFromTitle(event.getInventory().getTitle());
 
+        Player player = (Player) event.getWhoClicked();
+
         if (menu != null) {
             event.setCancelled(true);
             ItemStack currentItem = event.getCurrentItem();
@@ -45,8 +47,6 @@ public class MenuListener implements Listener {
                         Utils.getTrailingInt(event.getInventory().getTitle()),
                         event.getSlot()
                 );
-
-                Player player = (Player) event.getWhoClicked();
 
                 if (menuItem != null && (menuItem.getItem().getType() == currentItem.getType() || Parkour.getLevelManager().isBuyingLevelMenu(player.getName()))) {
                     MenuItemAction.perform(player, menuItem);
@@ -138,6 +138,10 @@ public class MenuListener implements Listener {
                     }
                 }
             }
+        }
+        else if (!player.isOp() && !player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+        {
+            event.setCancelled(true);
         }
     }
 

@@ -1,11 +1,16 @@
 package com.renatusnetwork.parkour.data;
 
+import com.mysql.cj.exceptions.UnableToConnectException;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,6 +92,8 @@ public class SettingsManager {
     public int default_gg_timer;
     public int default_gg_coin_reward;
 
+    public HashMap<Integer, ItemStack> customJoinInventory;
+
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -158,6 +165,38 @@ public class SettingsManager {
             infinitepk_portal_respawn = new Location(Bukkit.getWorld(infinitePKSplit[0]),
                     Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]),
                     Float.parseFloat(infinitePKSplit[4]), Float.parseFloat(infinitePKSplit[5]));
+        }
+
+        customJoinInventory = new HashMap<>();
+
+        // hotbar length!
+        for (int i = 0; i < 9; i++)
+        {
+            if (settings.isConfigurationSection("join_inventory." + i))
+            {
+                // set if type exists
+                ItemStack itemStack;
+                if (settings.isSet("join_inventory." + i + ".item.type"))
+                    itemStack = new ItemStack(Material.matchMaterial(settings.getString("join_inventory." + i + ".item.material")), 1, (short) 3);
+                else
+                    itemStack = new ItemStack(Material.matchMaterial(settings.getString("join_inventory." + i + ".item.material")));
+
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                itemMeta.setDisplayName(Utils.translate(settings.getString("join_inventory." + i + ".item.title")));
+
+                // lore
+                List<String> lore = settings.getStringList("join_inventory." + i + ".item.lore");
+                List<String> tempLore = new ArrayList<>();
+
+                for (String string : lore)
+                    tempLore.add(Utils.translate(string));
+
+                itemMeta.setLore(tempLore);
+
+                itemStack.setItemMeta(itemMeta);
+
+                customJoinInventory.put(i, itemStack);
+            }
         }
     }
 }

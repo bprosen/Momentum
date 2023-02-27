@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.menus.MenuManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.PlayerHider;
@@ -15,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
@@ -83,6 +85,30 @@ public class InteractListener implements Listener {
                 event.setCancelled(true);
                 Parkour.getCheckpointManager().teleportToCP(Parkour.getStatsManager().get(player));
 
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile"))) {
+                event.setCancelled(true);
+
+                String menuName = "profile";
+                int pageNumber = 1;
+                MenuManager menuManager = Parkour.getMenuManager();
+
+                if (menuManager.exists(menuName))
+                {
+                    Inventory inventory = menuManager.getInventory(menuName, pageNumber);
+                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                    if (inventory != null)
+                    {
+                        player.openInventory(inventory);
+                        menuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
+                        Parkour.getStatsManager().loadProfile(playerStats, player);
+                        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+                    }
+                    else
+                    {
+                        player.sendMessage(Utils.translate("&cError loading the inventory"));
+                    }
+                }
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
 
                 event.setCancelled(true);

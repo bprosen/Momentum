@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.gameplay;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,6 +39,10 @@ public class WorldChangeListener implements Listener {
 
                 // clear potion effects
                 playerStats.clearPotionEffects();
+
+                if (event.getFrom().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                    // reset hotbar
+                    Utils.setHotbar(player);
             }
         }
     }

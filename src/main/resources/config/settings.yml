@@ -23,6 +23,39 @@ stats:
 records:
   max_leaderboard_size: 10
 
+join_inventory:
+  '0':
+    item:
+      material: SKULL_ITEM
+      type: 3
+      title: "&aYour Profile"
+      lore:
+        - '&7Click me to view your own profile'
+  '4':
+    item:
+      material: PRISMARINE_CRYSTALS
+      title: '&b&lParkour &7Levels'
+      lore:
+        - '&7Right click to open up'
+        - ' &7the &bParkour &7Levels menu'
+  '8':
+    item:
+      material: REDSTONE_TORCH_ON
+      title: '&2Players &7» &2Enabled'
+  '5':
+    item:
+      material: GOLD_PLATE
+      title: '&eLast Checkpoint'
+      lore:
+        - '&7Right click to teleport'
+        - ' &7to your last checkpoint'
+  '3':
+    item:
+      material: WOOD_DOOR
+      title: '&cReset'
+      lore:
+        - '&7Right click to reset'
+        - ' &7your current level progress'
 ascendance:
   realm_world: "ascendant_realm"
   hub_level: "ascendantrealm"
