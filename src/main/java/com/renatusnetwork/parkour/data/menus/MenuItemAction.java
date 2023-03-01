@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.levels.RatingDB;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.plots.PlotsDB;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.ranks.RanksDB;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -467,6 +468,18 @@ public class MenuItemAction {
                             if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
                                 player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                                 return;
+                            }
+
+                            if (level.needsRank())
+                            {
+                                Rank rank = level.getRequiredRank();
+
+                                if (!Parkour.getRanksManager().isPastRank(playerStats, rank))
+                                {
+                                    Rank nextRank = Parkour.getRanksManager().getNextRank(rank);
+                                    player.sendMessage(Utils.translate("&cYou need to be " + nextRank.getRankTitle() + " &cto play this level"));
+                                    return;
+                                }
                             }
 
                             playerStats.clearPotionEffects();

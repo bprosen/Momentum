@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -54,6 +55,8 @@ public class Level {
     private int totalCompletionsCount = 0;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
     private List<String> commands = new ArrayList<>();
+
+    private Rank requiredRank;
 
     private boolean ascendanceLevel = false;
 
@@ -472,8 +475,13 @@ public class Level {
             ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
             price = LevelsYAML.getPrice(name);
             newLevel = LevelsYAML.getNewLevel(name);
+            requiredRank = LevelsYAML.getRankRequired(name);
         }
     }
+
+    public boolean needsRank() { return requiredRank != null; }
+
+    public Rank getRequiredRank() { return requiredRank; }
 
     public void setLeaderboardCache(List<LevelCompletion> levelCompletions) {
         leaderboardCache = levelCompletions;

@@ -24,11 +24,7 @@ public class RecordsCMD implements CommandExecutor
         {
             Player player = (Player) sender;
 
-            if (a.length == 0)
-            {
-                sendStats(player, player.getName(), false);
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("top"))
+            if (a.length == 1 && a[0].equalsIgnoreCase("top"))
             {
                 StatsCMD.printRecordsLB(sender);
             }
@@ -36,25 +32,68 @@ public class RecordsCMD implements CommandExecutor
             {
                 sendHelp(player);
             }
-            else if (a.length == 1)
+            else if (a.length >= 0 && a.length <= 2)
             {
-                String targetName = a[0];
-                Player target = Bukkit.getPlayer(targetName);
-
-                if (target == null)
+                if (a.length == 0)
                 {
-                    // if not online, we run the async offline records check
-                    new BukkitRunnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            sendStats(player, targetName, true);
-                        }
-                    }.runTaskAsynchronously(Parkour.getPlugin());
+                    sendStats(player, player.getName(), false, 1, false);
                 }
                 else
-                    sendStats(player, target.getName(), false); // do normal getter for online
+                {
+                    String arg = a[0];
+                    String targetName = player.getName();
+                    boolean pageOnSelf = false;
+
+                    // if length 2, by default arg = page number and a[0] = target
+                    if (a.length == 2)
+                    {
+                        arg = a[1];
+                        targetName = a[0];
+                    }
+
+                    int page = 1;
+                    // if arg is an int, cast it to the page!
+                    if (Utils.isInteger(arg))
+                    {
+                        page = Integer.parseInt(arg);
+
+                        // dont allow negative pages
+                        if (page < 1)
+                            page = 1;
+
+                        // if the args length is 1, they did the command on self or if the page number is less than 100
+                        if (a.length == 1)
+                        {
+                            if (page >= 100)
+                                targetName = a[0];
+                            else
+                                pageOnSelf = true;
+                        }
+                    }
+                    // if not integer and length 1, target name is a[0]
+                    else if (a.length == 1)
+                        targetName = a[0];
+
+                    Player target = Bukkit.getPlayer(targetName);
+
+                    if (target == null)
+                    {
+                        // if not online, we run the async offline records check, inner classes
+                        int finalPage = page;
+                        boolean finalPageOnSelf = pageOnSelf;
+                        String finalTargetName = targetName;
+
+                        new BukkitRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                sendStats(player, finalTargetName, true, finalPage, finalPageOnSelf);
+                            }
+                        }.runTaskAsynchronously(Parkour.getPlugin());
+                    } else
+                        sendStats(player, target.getName(), false, page, pageOnSelf); // do normal getter for online
+                }
             }
             else
             {
@@ -77,7 +116,7 @@ public class RecordsCMD implements CommandExecutor
         player.sendMessage(Utils.translate("&3/records help  &7Prints this screen"));
     }
 
-    private void sendStats(Player sender, String targetName, boolean offline)
+    private void sendStats(Player sender, String targetName, boolean offline, int page, boolean pageOnSelf)
     {
         // make sure we are not loading lbs
         if (!Parkour.getStatsManager().isLoadingLeaderboards())
@@ -103,7 +142,7 @@ public class RecordsCMD implements CommandExecutor
             }
 
             // make sure they exist first
-            if (exists)
+            if (exists || pageOnSelf)
             {
                 // if they are equal, we print out "Your records"
                 if (sender.getName().equalsIgnoreCase(targetName))
@@ -115,12 +154,15 @@ public class RecordsCMD implements CommandExecutor
                 if (records > 0)
                 {
                     int currentFound = 0;
+                    int max = page * 10;
+
+                    String[] messageStr = new String[max];
 
                     // iterate through all levels
                     for (Level level : Parkour.getLevelManager().getLevels().values())
                     {
                         // stop when we have all the records we wanted
-                        if (records > currentFound)
+                        if (records > currentFound && max > currentFound)
                         {
                             List<LevelCompletion> leaderboard = level.getLeaderboard();
 
@@ -130,13 +172,28 @@ public class RecordsCMD implements CommandExecutor
                                 // print to player and increment
                                 long time = leaderboard.get(0).getCompletionTimeElapsed();
 
-                                sender.sendMessage(Utils.translate("&a" + level.getFormattedTitle() + " &7" + (((double) time) / 1000) + "s"));
+                                messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + " &7" + (((double) time) / 1000) + "s");
                                 currentFound++;
                             }
                         }
                         else
                             break;
                     }
+
+                    int i = max - 10;
+
+                    if (messageStr[i] == null)
+                        sender.sendMessage(Utils.translate("&7No page exists"));
+                    else
+                    // send page
+                    for (; i < max; i++)
+                        if (messageStr[i] != null)
+                            sender.sendMessage(messageStr[i]);
+
+                    // send next page option
+                    if (records > max)
+                        sender.sendMessage(Utils.translate("&9/records " + targetName + " " + (page + 1)));
+
                     sender.sendMessage(Utils.translate("&e✦ " + records + " &7Records"));
                 }
                 else

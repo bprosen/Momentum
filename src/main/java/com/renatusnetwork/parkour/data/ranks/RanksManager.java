@@ -194,10 +194,24 @@ public class RanksManager {
         return rankList;
     }
 
-    public boolean isMaxRank(Rank rank) {
-        if (rank.getRankId() == getMaxRank().getRankId())
-            return true;
-        return false;
+    public boolean isMaxRank(Rank rank)
+    {
+        return rank.getRankId() == getMaxRank().getRankId();
+    }
+
+    public Rank getNextRank(Rank current)
+    {
+        Rank rank = current;
+
+        if (!isMaxRank(rank))
+            rank = get(current.getRankId() + 1);
+
+        return rank;
+    }
+
+    public boolean isPastRank(PlayerStats playerStats, Rank current)
+    {
+        return playerStats.getPrestiges() != 0 || current.getRankId() < playerStats.getRank().getRankId();
     }
 
     public Rank getMaxRank() {

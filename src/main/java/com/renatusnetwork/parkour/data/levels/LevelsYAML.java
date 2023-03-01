@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -333,6 +334,16 @@ public class LevelsYAML {
             result = levelsFile.getBoolean(levelName + ".new");
 
         return result;
+    }
+
+    public static Rank getRankRequired(String levelName)
+    {
+        Rank rank = null;
+
+        if (isSet(levelName, "required_rank"))
+            rank = Parkour.getRanksManager().get(levelsFile.getString(levelName + ".required_rank"));
+
+        return rank;
     }
 
     public static void setNewLevel(String levelName, boolean result)

@@ -314,6 +314,15 @@ public class MenuItemFormatter {
                 if (level.isNewLevel())
                     formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
+                if (level.needsRank())
+                {
+                    if (!Parkour.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))
+                    {
+                        // show whats required
+                        Rank nextRank = Parkour.getRanksManager().getNextRank(level.getRequiredRank());
+                        itemLore.add(Utils.translate("&cRequires " + nextRank.getRankTitle()));
+                    }
+                }
                 // show they need to buy it
                 if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                 {
