@@ -146,7 +146,7 @@ public class Scoreboard {
                     Rank rank = playerStats.getRank();
 
                     // null check their rank to avoid NPE and same with next rank
-                    if (rank != null) {
+                    if (playerStats.inRankUp() && rank != null) {
                         Rank nextRank = Parkour.getRanksManager().get(rank.getRankId() + 1);
                         if (nextRank != null) {
                             board.add(formatSpacing(Utils.translate("&cRankup Level")));

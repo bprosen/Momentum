@@ -112,7 +112,9 @@ public class LevelHandler {
         // used for playing sound!
         int beforeClanLevel = -1;
 
-        if (!rankUpLevel) {
+        if (rankUpLevel && playerStats.inRankUp())
+            Parkour.getRanksManager().doRankUp(player);
+        else
             // only broadcast and give xp/coins if it is not a forced completion
             if (!forcedCompletion) {
 
@@ -175,9 +177,6 @@ public class LevelHandler {
             } else {
                 player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
             }
-        } else {
-            Parkour.getRanksManager().doRankUp(player);
-        }
 
         // run teleport and location management if not forced completion
         if (!forcedCompletion) {

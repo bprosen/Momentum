@@ -91,7 +91,7 @@ public class MenuItemAction {
             else if (typeValue.equals("featured-level"))
                 performLevelTeleport(Parkour.getStatsManager().get(player.getUniqueId().toString()),
                         player,
-                        Parkour.getLevelManager().getFeaturedLevel());
+                        Parkour.getLevelManager().getFeaturedLevel(), false);
             else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
                      typeValue.equals("cleartrail") || typeValue.equals("clearnick"))
                 performCosmeticsClear(player, typeValue, menuItem);
@@ -271,7 +271,7 @@ public class MenuItemAction {
         if (levelName != null) {
             Level level = Parkour.getLevelManager().get(levelName);
             if (level != null)
-                performLevelTeleport(playerStats, player, level);
+                performLevelTeleport(playerStats, player, level, true);
         }
     }
 
@@ -287,7 +287,7 @@ public class MenuItemAction {
                 !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                 performLevelBuying(playerStats, player, level, menuItem);
             else
-                performLevelTeleport(playerStats, player, level);
+                performLevelTeleport(playerStats, player, level, false);
         }
     }
 
@@ -440,12 +440,12 @@ public class MenuItemAction {
             else
             {
                 // teleport if only one
-                performLevelTeleport(playerStats, player, level);
+                performLevelTeleport(playerStats, player, level, false);
             }
         }
     }
 
-    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
+    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level, boolean rankUp) {
         if (!playerStats.inRace())
         {
             if (playerStats.getPlayerToSpectate() == null)
@@ -469,6 +469,8 @@ public class MenuItemAction {
                                 player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                                 return;
                             }
+
+                            playerStats.setRankUpMode(rankUp);
 
                             if (level.needsRank())
                             {
@@ -554,7 +556,7 @@ public class MenuItemAction {
 
                 // make sure the area they are spawning in is a level
                 if (level != null)
-                    performLevelTeleport(Parkour.getStatsManager().get(player), player, level);
+                    performLevelTeleport(Parkour.getStatsManager().get(player), player, level, false);
             }
         }
     }
