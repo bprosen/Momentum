@@ -47,7 +47,6 @@ public class PlayerStats {
     private int totalLevelCompletions = 0;
     private boolean nightVision = false;
     private boolean grinding = false;
-    private boolean inRankup = false;
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> checkpoints = new HashMap<>();
@@ -295,10 +294,6 @@ public class PlayerStats {
     public float getPrestigeMultiplier() { return prestigeMultiplier; }
 
     public void setPrestigeMultiplier(float prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
-
-    public boolean inRankUp() { return inRankup; }
-
-    public void setRankUpMode(boolean result) { inRankup = result; }
 
     //
     // Practice Mode Section

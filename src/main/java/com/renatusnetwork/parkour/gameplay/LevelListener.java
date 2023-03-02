@@ -102,7 +102,7 @@ public class LevelListener implements Listener {
 
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
-                    LevelHandler.startedLevel(player);
+                    playerStats.startedLevel();
                 }
             } else if (block.getType() == Material.GOLD_PLATE) {
                 // gold plate = checkpoint
@@ -205,7 +205,8 @@ public class LevelListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSignClick(PlayerInteractEvent event) {
         if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
-             && event.getClickedBlock().getType().equals(Material.WALL_SIGN)) {
+             && event.getClickedBlock().getType().equals(Material.WALL_SIGN)
+             && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
 
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
@@ -217,20 +218,16 @@ public class LevelListener implements Listener {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 Level level = playerStats.getLevel();
 
-                // level null check
-                if (level != null) {
-                    // update if in ascendance realm
-                    if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world)) {
-
-                        // check region null
-                        ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
-                        if (region != null) {
-
-                            Level levelTo = Parkour.getLevelManager().get(region.getId());
-                            // make sure the area they are spawning in is a level and not equal
-                            if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
-                                playerStats.setLevel(levelTo);
-                        }
+                if (level != null)
+                {
+                    // check region null
+                    ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
+                    if (region != null)
+                    {
+                        Level levelTo = Parkour.getLevelManager().get(region.getId());
+                        // make sure the area they are spawning in is a level and not equal
+                        if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                            playerStats.setLevel(levelTo);
                     }
                     LevelHandler.levelCompletion(player, playerStats.getLevel().getName());
                 }
@@ -309,18 +306,6 @@ public class LevelListener implements Listener {
                 playerStats.resetCurrentCheckpoint();
                 playerStats.resetLevel();
             }
-        }
-
-        if (playerStats != null &&
-            playerStats.getPlayerToSpectate() == null &&
-            !playerStats.hasCurrentCheckpoint() &&
-            playerStats.getPracticeLocation() == null) {
-
-            // extra condition to make sure race level timers do not stop once the race has started
-            if (playerStats.inLevel() && playerStats.getLevel().isRaceLevel())
-                return;
-
-            playerStats.disableLevelStartTime();
         }
     }
 }

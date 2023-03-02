@@ -112,7 +112,7 @@ public class LevelHandler {
         // used for playing sound!
         int beforeClanLevel = -1;
 
-        if (rankUpLevel && playerStats.inRankUp())
+        if (rankUpLevel)
             Parkour.getRanksManager().doRankUp(player);
         else
             // only broadcast and give xp/coins if it is not a forced completion
@@ -263,14 +263,6 @@ public class LevelHandler {
 
             if (loc != null)
                 player.teleport(loc);
-        }
-    }
-
-    static void startedLevel(Player player) {
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-        if (playerStats != null && playerStats.getPlayerToSpectate() == null) {
-            playerStats.startedLevel();
         }
     }
 }

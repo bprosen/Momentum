@@ -42,7 +42,6 @@ public class PracticeCMD implements CommandExecutor {
                                     PracticeHandler.resetPlayer(player, true);
                                 } else if (player.isOnGround()) {
                                     playerStats.setPracticeMode(player.getLocation());
-                                    playerStats.disableLevelStartTime();
                                     player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));

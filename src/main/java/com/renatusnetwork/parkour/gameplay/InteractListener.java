@@ -139,6 +139,7 @@ public class InteractListener implements Listener {
                                     Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
 
                                     playerStats.resetPracticeMode();
+                                    playerStats.disableLevelStartTime();
 
                                     if (!level.getPotionEffects().isEmpty()) {
 
