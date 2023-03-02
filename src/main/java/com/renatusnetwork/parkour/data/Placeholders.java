@@ -66,6 +66,8 @@ public class Placeholders extends PlaceholderExpansion
                     return Utils.formatNumber(playerStats.getRaceWins());
                 case "race_losses":
                     return Utils.formatNumber(playerStats.getRaceLosses());
+                case "best_infinite":
+                    return Utils.formatNumber(playerStats.getInfinitePKScore());
             }
         }
 
