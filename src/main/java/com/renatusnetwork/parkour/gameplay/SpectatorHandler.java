@@ -72,6 +72,15 @@ public class SpectatorHandler {
                         Parkour.getStatsManager().toggleOnElytra(playerStats);
                 }
             }
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    // double tp 1tick to prevent exploits
+                    player.teleport(loc);
+                }
+            }.runTaskLater(Parkour.getPlugin(), 1);
         }
     }
 

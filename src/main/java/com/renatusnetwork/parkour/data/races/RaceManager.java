@@ -62,7 +62,8 @@ public class RaceManager {
             player1.getPlayer().teleport(selectedLevel.getRaceLocation1());
             player2.getPlayer().teleport(selectedLevel.getRaceLocation2());
 
-            if (bet) {
+            if (bet)
+            {
                 statsManager.removeCoins(player1, betAmount);
                 statsManager.removeCoins(player2, betAmount);
             }
@@ -265,7 +266,7 @@ public class RaceManager {
 
             // give winner money and take from loser if betted on race
             if (raceObject.hasBet())
-                statsManager.removeCoins(winnerStats, (raceObject.getBet() * 2));
+                statsManager.addCoins(winnerStats, (raceObject.getBet() * 2));
 
             // check if winner is player 1, then teleport accordingly, otherwise they are player 2
             if (raceObject.isPlayer1(winner)) {
