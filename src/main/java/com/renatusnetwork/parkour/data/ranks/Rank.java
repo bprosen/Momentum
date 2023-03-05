@@ -6,10 +6,12 @@ public class Rank {
     private int rankId;
     private double rankUpPrice;
     private String rankTitle;
+    private String shortRankTitle;
 
-    public Rank(String rankName, String ranktitle, int rankId, double rankUpPrice) {
+    public Rank(String rankName, String rankTitle, String shortRankTitle, int rankId, double rankUpPrice) {
         this.rankName = rankName;
-        this.rankTitle = ranktitle;
+        this.rankTitle = rankTitle;
+        this.shortRankTitle = shortRankTitle;
         this.rankId = rankId;
         this.rankUpPrice = rankUpPrice;
     }
@@ -27,4 +29,6 @@ public class Rank {
     }
 
     public String getRankTitle() { return rankTitle; }
+
+    public String getShortRankTitle() { return shortRankTitle; }
 }

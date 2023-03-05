@@ -45,7 +45,6 @@ public class LevelCMD implements CommandExecutor {
                                 sender.sendMessage(Utils.translate("&7You are not in a level"));
                         } else {
                             sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                            sender.sendMessage(getHelp("show"));
                         }
                     }
                 } else if (a[0].equalsIgnoreCase("list")) { // subcommand: list
@@ -75,7 +74,6 @@ public class LevelCMD implements CommandExecutor {
                         }
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("create"));
                     }
                 } else if (a[0].equalsIgnoreCase("delete")) { // subcommand: delete
                     if (a.length == 2) {
@@ -89,7 +87,6 @@ public class LevelCMD implements CommandExecutor {
                         }
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("delete"));
                     }
                 } else if (a[0].equalsIgnoreCase("load")) { // subcommand: load
                     Parkour.getConfigManager().load("levels");
@@ -124,14 +121,12 @@ public class LevelCMD implements CommandExecutor {
                             } else {
                                 sender.sendMessage(Utils.translate("&2" + levelName + "&7's current title: &2" +
                                                    LevelsYAML.getTitle(levelName)));
-                                sender.sendMessage(getHelp("title"));
                             }
                         } else {
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                         }
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("title"));
                     }
                 } else if (a[0].equalsIgnoreCase("reward")) { //subcommand: reward
                     if (a.length > 1) {
@@ -146,22 +141,18 @@ public class LevelCMD implements CommandExecutor {
                                     sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's reward to &6" + a[2]));
                                 } else {
                                     sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
-                                    sender.sendMessage(getHelp("reward"));
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&2" + levelName + "&7's current reward: &6" + level.getReward()));
-                                sender.sendMessage(getHelp("reward"));
                             }
                         } else
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("reward"));
                     }
                 } else if (a[0].equalsIgnoreCase("startloc")) { //subcommand: startloc
                     if (a.length < 2) {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("startloc"));
                     } else {
                         String levelName = a[1].toLowerCase();
 
@@ -187,7 +178,6 @@ public class LevelCMD implements CommandExecutor {
                 } else if (a[0].equalsIgnoreCase("completionloc")) { //subcommand: completionloc
                     if (a.length < 2) {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("completionloc"));
                     } else {
                         String levelName = a[1].toLowerCase();
 
@@ -244,13 +234,11 @@ public class LevelCMD implements CommandExecutor {
                             } else {
                                 sender.sendMessage(Utils.translate("&2" + levelName + "&7's current message: "
                                                   + LevelsYAML.getMessage(levelName)));
-                                sender.sendMessage(getHelp("message"));
                             }
                         } else
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + "&7does not exist"));
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("message"));
                     }
                 } else if (a[0].equalsIgnoreCase("completions")) { //subcommand: completions
                     if (a.length > 1) {
@@ -263,18 +251,15 @@ public class LevelCMD implements CommandExecutor {
                                     sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's max completions to &2" + a[2]));
                                 } else {
                                     sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
-                                    sender.sendMessage(getHelp("completions"));
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&2" + levelName + "&7's current max " +
                                                    "completions: &2" + LevelsYAML.getMaxCompletions(levelName)));
-                                sender.sendMessage(getHelp("completions"));
                             }
                         } else
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + "&7 does not exist"));
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("completions"));
                     }
                 } else if (a[0].equalsIgnoreCase("broadcast")) { //subcommand: broadcast
                     if (a.length > 1) {
@@ -291,7 +276,6 @@ public class LevelCMD implements CommandExecutor {
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("broadcast"));
                     }
                 } else if (a[0].equalsIgnoreCase("requires")) { //subcommand: requires
                     if (a.length > 1) {
@@ -318,14 +302,9 @@ public class LevelCMD implements CommandExecutor {
                             level = levelManager.get(levelName);
                             sender.sendMessage(Utils.translate("&2" + levelName + "&7's required levels: &2" +
                                                String.join("&7, &2", level.getRequiredLevels())));
-
-                            if (a.length != 3)
-                                sender.sendMessage(getHelp("requires"));
                         } else {
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                         }
-                    } else {
-                        sender.sendMessage(getHelp("requires"));
                     }
                 } else if (a[0].equalsIgnoreCase("removetime") && a.length == 3) {
 
@@ -408,18 +387,15 @@ public class LevelCMD implements CommandExecutor {
                                                        "score modifier to &6" + a[2]));
                                 } else {
                                     sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
-                                    sender.sendMessage(getHelp("modifier"));
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&2" + levelName + "&7's current score modifier:" +
                                                    " &6" + level.getScoreModifier()));
-                                sender.sendMessage(getHelp("modifier"));
                             }
                         } else
                             sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
                     } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters"));
-                        sender.sendMessage(getHelp("modifier"));
                     }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("raceset")) {
 
@@ -1066,120 +1042,41 @@ public class LevelCMD implements CommandExecutor {
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&aTo apply changes use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
-        sender.sendMessage(getHelp("list"));
-        sender.sendMessage(getHelp("load"));
-        sender.sendMessage(getHelp("remove"));
-        sender.sendMessage(getHelp("create"));
-        sender.sendMessage(getHelp("delete"));
-        sender.sendMessage(getHelp("title"));
-        sender.sendMessage(getHelp("reward"));
-        sender.sendMessage(getHelp("startloc"));
-        sender.sendMessage(getHelp("completionloc"));
-        sender.sendMessage(getHelp("message"));
-        sender.sendMessage(getHelp("completions"));
-        sender.sendMessage(getHelp("broadcast"));
-        sender.sendMessage(getHelp("requires"));
-        sender.sendMessage(getHelp("modifier"));
-        sender.sendMessage(getHelp("removetime"));
-        sender.sendMessage(getHelp("raceset"));
-        sender.sendMessage(getHelp("forcecompletion"));
-        sender.sendMessage(getHelp("addrating"));
-        sender.sendMessage(getHelp("removerating"));
-        sender.sendMessage(getHelp("hasrated"));
-        sender.sendMessage(getHelp("listratings"));
-        sender.sendMessage(getHelp("togglewater"));
-        sender.sendMessage(getHelp("rename"));
-        sender.sendMessage(getHelp("delcompletions"));
-        sender.sendMessage(getHelp("setrespawny"));
-        sender.sendMessage(getHelp("toggleelytra"));
-        sender.sendMessage(getHelp("toggledropper"));
-        sender.sendMessage(getHelp("toggleascendance"));
-        sender.sendMessage(getHelp("resetcheckpoint"));
-        sender.sendMessage(getHelp("resetcheckpoints"));
-        sender.sendMessage(getHelp("cleanleveldatadb"));
-        sender.sendMessage(getHelp("totalcompletions"));
-        sender.sendMessage(getHelp("setprice"));
-        sender.sendMessage(getHelp("addboughtlevel"));
-        sender.sendMessage(getHelp("removeboughtlevel"));
-        sender.sendMessage(getHelp("togglenew"));
-    }
-
-    private static String getHelp(String cmd) {
-        switch (cmd.toLowerCase()) {
-            case "show":
-                return Utils.translate("&a/level show  &7Show level information");
-            case "list":
-                return Utils.translate("&a/level list  &7List levels loaded in memory");
-            case "create":
-                return Utils.translate("&a/level create <level>  &7Create a level");
-            case "load":
-                return Utils.translate("&a/level load  &7Loads levels.yml then levels");
-            case "delete":
-                return Utils.translate("&a/level delete <level>  &7Delete a level");
-            case "title":
-                return Utils.translate("&a/level title <level> [title]  &7View/Set a level's title");
-            case "reward":
-                return Utils.translate("&a/level reward <level> [reward]  &7View/Set a level's reward");
-            case "startloc":
-                return Utils.translate("&a/level startloc <level>  &7Sets the start to your location");
-            case "completionloc":
-                return Utils.translate("&a/level completionloc <leveL>  &7Sets the completion to your location");
-            case "message":
-                return Utils.translate("&a/level message <level> [message]  &7View/Set completion message");
-            case "completions":
-                return Utils.translate("&a/level completions <level> [completions]  &7View/Set max completions");
-            case "broadcast":
-                return Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion");
-            case "requires":
-                return Utils.translate("&a/level requires <level> <levelTheyNeed>  &7Add/Remove required level");
-            case "modifier":
-                return Utils.translate("&a/level modifier <level> [modifier]  &7View/Set Score Modifier");
-            case "removetime":
-                return Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time " +
-                                      "from a level's leaderboard");
-            case "raceset":
-                return Utils.translate("&a/level raceset <level> <player1/player2>  &7Sets the race location for player 1 or 2");
-            case "forcecompletion":
-                return Utils.translate("&a/level forcecompletion <player> <level>  &7Force completion for player");
-            case "addrating":
-                return Utils.translate("&a/level addrating <level> <rating (0-5)>  &7Adds a rating to a level (ADMIN WAY NOT /rate)");
-            case "removerating":
-                return Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name");
-            case "hasrated":
-                return Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating");
-            case "listratings":
-                return Utils.translate("&a/level listratings <level> [rating (0-5)] &7Tells you all the ratings for a level with optional 0-5 specification");
-            case "togglewater":
-                return Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level");
-            case "rename":
-                return Utils.translate("&a/level rename <level> <newLevelName>  &7Renames a level's name to a new name");
-            case "delcompletions":
-                return Utils.translate("&a/level delcompletions <player> <levelName>  &7Deletes ALL the completions of a player for a level");
-            case "setrespawny":
-                return Utils.translate("&a/level setrespawny <level> <respawnY>  &7Sets level respawn y");
-            case "toggleelytra":
-                return Utils.translate("&a/level toggleelytra <level>  &7Sets level elytra");
-            case "toggledropper":
-                return Utils.translate("&a/level toggledropper <level>  &7Sets level as dropper");
-            case "toggleascendance":
-                return Utils.translate("&a/level toggleascendance <level>  &7Sets level as ascendance level");
-            case "resetcheckpoint":
-                return Utils.translate("&a/level resetcheckpoint <level> <player>  &7Resets level checkpoint for single player");
-            case "resetcheckpoints":
-                return Utils.translate("&a/level resetcheckpoints <level>  &7Resets ALL checkpoints for specific level");
-            case "cleanleveldatadb":
-                return Utils.translate("&a/level cleanleveldatadb  &7Cleans invalid data");
-            case "totalcompletions":
-                return Utils.translate("&a/level totalcompletions <level> <startDate> <endDate>  &7Gets total number of completions between two dates (YYYY-MM-DD)");
-            case "setprice":
-                return Utils.translate("&a/level setprice <level> <price>  &7Sets the level's price");
-            case "addboughtlevel":
-                return Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player");
-            case "removeboughtlevel":
-                return Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player");
-            case "togglenew":
-                return Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)");
-        }
-        return "";
+        sender.sendMessage(Utils.translate("&a/level show  &7Show level information"));
+        sender.sendMessage(Utils.translate("&a/level list  &7List levels loaded in memory"));
+        sender.sendMessage(Utils.translate("&a/level create <level>  &7Create a level"));
+        sender.sendMessage(Utils.translate("&a/level load  &7Loads levels.yml then levels"));
+        sender.sendMessage(Utils.translate("&a/level delete <level>  &7Delete a level"));
+        sender.sendMessage(Utils.translate("&a/level title <level> [title]  &7View/Set a level's title"));
+        sender.sendMessage(Utils.translate("&a/level reward <level> [reward]  &7View/Set a level's reward"));
+        sender.sendMessage(Utils.translate("&a/level startloc <level>  &7Sets the start to your location"));
+        sender.sendMessage(Utils.translate("&a/level completionloc <leveL>  &7Sets the completion to your location"));
+        sender.sendMessage(Utils.translate("&a/level message <level> [message]  &7View/Set completion message"));
+        sender.sendMessage(Utils.translate("&a/level completions <level> [completions]  &7View/Set max completions"));
+        sender.sendMessage(Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion"));
+        sender.sendMessage(Utils.translate("&a/level requires <level> <levelTheyNeed>  &7Add/Remove required level"));
+        sender.sendMessage(Utils.translate("&a/level modifier <level> [modifier]  &7View/Set Score Modifier"));
+        sender.sendMessage(Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time from a level's leaderboard"));
+        sender.sendMessage(Utils.translate("&a/level raceset <level> <player1/player2>  &7Sets the race location for player 1 or 2"));
+        sender.sendMessage(Utils.translate("&a/level forcecompletion <player> <level>  &7Force completion for player"));
+        sender.sendMessage(Utils.translate("&a/level addrating <level> <rating (0-5)>  &7Adds a rating to a level (ADMIN WAY NOT /rate)"));
+        sender.sendMessage(Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name"));
+        sender.sendMessage(Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating"));
+        sender.sendMessage(Utils.translate("&a/level listratings <level> [rating (0-5)] &7Tells you all the ratings for a level with optional 0-5 specification"));
+        sender.sendMessage(Utils.translate("&a/level togglewater <level>  &7Toggles the water from respawning you in a level"));
+        sender.sendMessage(Utils.translate("&a/level rename <level> <newLevelName>  &7Renames a level's name to a new name"));
+        sender.sendMessage(Utils.translate("&a/level delcompletions <player> <levelName>  &7Deletes ALL the completions of a player for a level"));
+        sender.sendMessage(Utils.translate("&a/level setrespawny <level> <respawnY>  &7Sets level respawn y"));
+        sender.sendMessage(Utils.translate("&a/level toggleelytra <level>  &7Sets level elytra"));
+        sender.sendMessage(Utils.translate("&a/level toggledropper <level>  &7Sets level as dropper"));
+        sender.sendMessage(Utils.translate("&a/level toggleascendance <level>  &7Sets level as ascendance level"));
+        sender.sendMessage(Utils.translate("&a/level resetcheckpoint <level> <player>  &7Resets level checkpoint for single player"));
+        sender.sendMessage(Utils.translate("&a/level resetcheckpoints <level>  &7Resets ALL checkpoints for specific level"));
+        sender.sendMessage(Utils.translate("&a/level cleanleveldatadb  &7Cleans invalid data"));
+        sender.sendMessage(Utils.translate("&a/level totalcompletions <level> <startDate> <endDate>  &7Gets total number of completions between two dates (YYYY-MM-DD)"));
+        sender.sendMessage(Utils.translate("&a/level setprice <level> <price>  &7Sets the level's price"));
+        sender.sendMessage(Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player"));
+        sender.sendMessage(Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player"));
+        sender.sendMessage(Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)"));
     }
 }

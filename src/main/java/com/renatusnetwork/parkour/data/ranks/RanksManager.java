@@ -45,10 +45,11 @@ public class RanksManager {
     public void add(String rankName) {
         // get from YAML
         String rankTitle = RanksYAML.getRankTitle(rankName);
+        String shortRankTitle = RanksYAML.getShortenedRankTitle(rankName);
         int rankId = RanksYAML.getRankId(rankName);
         double rankUpPrice = RanksYAML.getRankUpPrice(rankName);
 
-        Rank rank = new Rank(rankName, rankTitle, rankId, rankUpPrice);
+        Rank rank = new Rank(rankName, rankTitle, shortRankTitle, rankId, rankUpPrice);
         rankList.put(rankName, rank);
     }
 
@@ -74,15 +75,6 @@ public class RanksManager {
 
     public Set<String> getNames() {
         return rankList.keySet();
-    }
-
-    public Set<Integer> getIDs() {
-        Set<Integer> tempList = new HashSet<>();
-
-        for (Rank rank : rankList.values())
-            tempList.add(rank.getRankId());
-
-        return tempList;
     }
 
     public void remove(String rankName) {

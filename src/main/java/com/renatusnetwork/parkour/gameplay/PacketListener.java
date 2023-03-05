@@ -153,7 +153,11 @@ public class PacketListener implements Listener {
             public void onPacketReceiving(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
                 Player player = event.getPlayer();
+
+                double playerX = packet.getDoubles().read(0);
                 double playerY = packet.getDoubles().read(1);
+                double playerZ = packet.getDoubles().read(2);
+
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 // null check jic
@@ -174,17 +178,10 @@ public class PacketListener implements Listener {
                     }
                     else if (!playerStats.inLevel())
                     {
-                        if (locationManager.isNearPortal(
-                                packet.getDoubles().read(0), playerY, packet.getDoubles().read(2),
-                                1,
-                                PortalType.INFINITE
-                        ))
+                        if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.INFINITE))
                             infinitePKManager.startPK(playerStats, true);
-                        else if (locationManager.isNearPortal(
-                                packet.getDoubles().read(0), playerY, packet.getDoubles().read(2),
-                                1,
-                                PortalType.ASCENDANCE
-                        )) {
+                        else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.ASCENDANCE))
+                        {
                             Level level = Parkour.getLevelManager().get(Parkour.getSettingsManager().ascendance_hub_level);
                             if (level != null) {
                                 // force sync
@@ -202,30 +199,32 @@ public class PacketListener implements Listener {
                         Level level = playerStats.getLevel();
 
                         // if level is not null, they are not spectating, it has a respawn y, and the y is greater than or equal to player y, respawn
-                        if (level != null)
-                            if (playerStats.getPlayerToSpectate() == null && level.hasRespawnY() && level.getRespawnY() >= playerY) {
-                                // run in sync due to teleporting
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        // teleport
-                                        if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
-                                            Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                        else if (playerStats.inRace()) {
-                                            Race race = Parkour.getRaceManager().get(player);
-                                            if (race != null) {
-                                                if (race.isPlayer1(player))
-                                                    race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
-                                                    // swap tp to loc 2 if player 2
-                                                else
-                                                    race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
-                                            }
+                        if (level != null && playerStats.getPlayerToSpectate() == null && level.hasRespawnY() && level.getRespawnY() >= playerY)
+                        {
+                            // run in sync due to teleporting
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    // teleport
+                                    if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
+                                        Parkour.getCheckpointManager().teleportToCP(playerStats);
+                                    else if (playerStats.inRace())
+                                    {
+                                        Race race = Parkour.getRaceManager().get(player);
+                                        if (race != null)
+                                        {
+                                            if (race.isPlayer1(player))
+                                                race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
+                                                // swap tp to loc 2 if player 2
+                                            else
+                                                race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
                                         }
-                                        else
-                                            LevelHandler.respawnPlayer(event.getPlayer(), level);
                                     }
-                                }.runTask(plugin);
-                            }
+                                    else
+                                        LevelHandler.respawnPlayer(event.getPlayer(), level);
+                                }
+                            }.runTask(plugin);
+                        }
                     }
                 }
             }

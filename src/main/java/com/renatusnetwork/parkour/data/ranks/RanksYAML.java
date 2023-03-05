@@ -39,6 +39,16 @@ public class RanksYAML {
         return null;
     }
 
+    public static String getShortenedRankTitle(String rankName)
+    {
+        String title = null;
+
+        if (isSection(rankName))
+            title = ranksConfig.getString(rankName + ".shortened-title");
+
+        return title;
+    }
+
     public static int getRankId(String rankName) {
         if (isSection(rankName)) {
             int rankId = ranksConfig.getInt(rankName + ".id");

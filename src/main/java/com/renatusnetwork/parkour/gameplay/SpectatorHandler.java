@@ -77,10 +77,10 @@ public class SpectatorHandler {
                 @Override
                 public void run()
                 {
-                    // double tp 1tick to prevent exploits
+                    // double tp tick to prevent exploits
                     player.teleport(loc);
                 }
-            }.runTaskLater(Parkour.getPlugin(), 1);
+            }.runTaskLater(Parkour.getPlugin(), 3);
         }
     }
 
