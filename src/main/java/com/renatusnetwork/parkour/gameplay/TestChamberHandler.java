@@ -59,7 +59,7 @@ public class TestChamberHandler implements Listener {
         }
         else if (location.getBlock().getRelative(BlockFace.DOWN).getType() == Material.SPONGE)
         {
-            player.setVelocity(new Vector(location.getX(), 1.5D, 0.0D));
+            player.setVelocity(new Vector(player.getVelocity().getX(), 1.5D, 0.0D));
             player.playSound(location, Sound.ENTITY_FIREWORK_LARGE_BLAST, 10.0F, 20.0F);
         }
         else if (location.getBlock().getRelative(BlockFace.DOWN).getType() == Material.NETHERRACK)
