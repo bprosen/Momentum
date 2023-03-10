@@ -1027,6 +1027,35 @@ public class LevelCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not a valid level"));
                     }
                 }
+                else if (a.length == 3 && a[0].equalsIgnoreCase("setdifficulty"))
+                {
+                    Level level = levelManager.get(a[1]);
+
+                    if (level != null)
+                    {
+                        if (Utils.isInteger(a[2]))
+                        {
+                            int difficulty = Integer.parseInt(a[2]);
+
+                            if (difficulty > 10)
+                                difficulty = 10;
+
+                            if (difficulty < 1)
+                                difficulty = 1;
+
+                            LevelsYAML.setDifficulty(level.getName(), difficulty);
+                            sender.sendMessage(Utils.translate("&7You have set the difficulty of &c" + level.getFormattedTitle() + " &7to &c" + difficulty));
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid integer"));
+                        }
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not a valid level"));
+                    }
+                }
                 else
                 {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -1078,5 +1107,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player"));
         sender.sendMessage(Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player"));
         sender.sendMessage(Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)"));
+        sender.sendMessage(Utils.translate("&a/level setdifficulty <level> <difficulty>  &7Sets the difficulty of the level"));
     }
 }

@@ -336,6 +336,52 @@ public class MenuItemFormatter {
                 if (level.getPlayersInLevel() > 0)
                     formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
 
+                if (level.getDifficulty() > -1) // has difficulty
+                {
+                    String difficultyStr = "  ";
+                    int difficulty = level.getDifficulty();
+
+                    // determine what color we need to utilize
+                    switch (difficulty)
+                    {
+                        case 10:
+                        case 9:
+                            difficultyStr += "&4";
+                            break;
+                        case 8:
+                        case 7:
+                            difficultyStr += "&c";
+                            break;
+                        case 6:
+                        case 5:
+                            difficultyStr += "&6";
+                            break;
+                        case 4:
+                        case 3:
+                            difficultyStr += "&e";
+                            break;
+                        case 2:
+                        case 1:
+                            difficultyStr += "&a";
+                            break;
+                    }
+
+                    boolean pastDifficulty = false;
+
+                    // difficulty goes up to 10
+                    for (int i = 1; i <= 10; i++)
+                    {
+                        // if not past, and we go past difficulty, change to gray
+                        if (!pastDifficulty && difficulty < i) {
+                            pastDifficulty = true;
+                            difficultyStr += "&f";
+                        }
+                        difficultyStr += "|";
+                    }
+
+                    itemLore.add(Utils.translate(difficultyStr + " &7Difficulty"));
+                }
+
                 if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
                     itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
                             Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier()) + " Coin &7Reward"));
@@ -373,7 +419,7 @@ public class MenuItemFormatter {
 
                     itemLore.add("");
 
-                    String beatenMessage = Utils.translate("&7Beaten &2" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
+                    String beatenMessage = Utils.translate("&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
                     if (levelCompletionsCount > 1)
                         beatenMessage += "s";
 
@@ -381,19 +427,17 @@ public class MenuItemFormatter {
 
                     LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
                     if (fastestCompletion != null) {
-                        itemLore.add(Utils.translate("&7 Best Personal Time"));
-
                         double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
                         long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
 
-                        itemLore.add(Utils.translate("  &2" + completionTime + "s"));
+                        itemLore.add(Utils.translate("&7  Best Time &6" + completionTime + "s"));
 
                         // this makes it so it will not have " ago" if they just completed it
                         String timeSinceString;
                         if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
-                            timeSinceString = Utils.translate("   &7Just now");
+                            timeSinceString = Utils.translate("  &7Just now");
                         else
-                            timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
+                            timeSinceString = Utils.translate("  &7" + Time.elapsedShortened(timeSince, false) + "ago");
 
                         itemLore.add(timeSinceString);
                     }

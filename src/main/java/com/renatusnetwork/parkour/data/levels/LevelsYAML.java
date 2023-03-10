@@ -258,6 +258,30 @@ public class LevelsYAML {
         commit(levelName);
     }
 
+    public static void setDifficulty(String levelName, int difficulty)
+    {
+        levelsFile.set(levelName + ".difficulty", difficulty);
+        commit(levelName);
+    }
+
+    public static int getDifficulty(String levelName)
+    {
+        int difficulty = -1;
+
+        if (isSet(levelName, "difficulty"))
+        {
+            difficulty = levelsFile.getInt(levelName + ".difficulty");
+
+            if (difficulty < 1)
+                difficulty = 1;
+
+            if (difficulty > 10)
+                difficulty = 10;
+        }
+
+        return difficulty;
+    }
+
     public static boolean isDropperLevel(String levelName) {
         boolean dropper = false;
         if (isSet(levelName, "dropper"))

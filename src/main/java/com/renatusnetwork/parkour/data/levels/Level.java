@@ -60,6 +60,8 @@ public class Level {
 
     private boolean ascendanceLevel = false;
 
+    private int difficulty;
+
     public Level(String levelName) {
         this.name = levelName;
         load();
@@ -222,6 +224,8 @@ public class Level {
     }
 
     public boolean isEventLevel() { return eventLevel; }
+
+    public int getDifficulty() { return difficulty; }
 
     public EventType getEventType() {
         EventType event = null;
@@ -476,6 +480,7 @@ public class Level {
             price = LevelsYAML.getPrice(name);
             newLevel = LevelsYAML.getNewLevel(name);
             requiredRank = LevelsYAML.getRankRequired(name);
+            difficulty = LevelsYAML.getDifficulty(name);
         }
     }
 
