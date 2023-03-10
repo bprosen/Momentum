@@ -83,9 +83,9 @@ public class Utils {
         String result = String.valueOf((int) amount);
 
         if (amount >= 1000000.0)
-            result = formatDecimal(amount / 1000000) + "M";
+            result = ((int) amount / 1000000) + "M";
         else if (amount >= 1000.0)
-            result = formatDecimal(amount / 1000) + "k";
+            result = ((int) amount / 1000) + "k";
 
         return result;
     }

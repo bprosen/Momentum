@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.commands;
 
+import com.comphenix.protocol.PacketType;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
@@ -203,25 +204,50 @@ public class StatsCMD implements CommandExecutor {
                 {
                     if (!Parkour.getStatsManager().isLoadingLeaderboards())
                     {
-                        sender.sendMessage(Utils.translate(level.getFormattedTitle() + " &7Leaderboard"));
+                        sender.sendMessage(Utils.translate(
+                                level.getFormattedTitle() + " &7Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
+                        ));
+
                         List<LevelCompletion> completions = level.getLeaderboard();
+                        boolean onLB = false;
 
                         if (completions.size() > 0)
                             for (int i = 0; i <= completions.size() - 1; i++)
                             {
                                 LevelCompletion levelCompletion = completions.get(i);
                                 int rank = i + 1;
-                                sender.sendMessage(Utils.translate(" &7" + rank + " &2" +
-                                        (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" +
-                                        levelCompletion.getPlayerName()));
+                                String lbName = levelCompletion.getPlayerName();
+
+                                String lbString = " &7" + rank;
+
+                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbName))
+                                {
+                                    // we want to show it as blue if they are on it
+                                    onLB = true;
+                                    lbString += " &3" + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &b" + levelCompletion.getPlayerName();
+                                }
+                                else
+                                    lbString += " &2" + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" + levelCompletion.getPlayerName();
+
+                                sender.sendMessage(Utils.translate(lbString));
                             }
                         else
                             sender.sendMessage(Utils.translate("&cNo timed completions to display"));
 
-                        int totalCompletionsCount = level.getTotalCompletionsCount();
-                        String outOfMessage = Utils.translate("&7Out of &2" + Utils.formatNumber(totalCompletionsCount));
+                        if (!onLB && sender instanceof Player)
+                        {
+                            Player player = (Player) sender;
+                            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                        sender.sendMessage(outOfMessage);
+                            if (playerStats != null && playerStats.getLevelCompletionsCount(level.getName()) > 0)
+                            {
+                                // send your best if not on it and have beaten it
+                                LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level.getName());
+
+                                if (levelCompletion != null)
+                                    sender.sendMessage(Utils.translate("&7Your best is &2" + playerStats.getQuickestCompletion(level.getName())));
+                            }
+                        }
                     }
                     else
                     {

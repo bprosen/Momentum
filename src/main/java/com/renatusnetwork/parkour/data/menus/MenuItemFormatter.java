@@ -343,7 +343,7 @@ public class MenuItemFormatter {
                     itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
 
                 if (level.getTotalCompletionsCount() > 0)
-                    itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + " &7Completions"));
+                    itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Completions"));
 
                 // only show rating if above 5
                 if (level.getRatingsCount() >= 5) {
