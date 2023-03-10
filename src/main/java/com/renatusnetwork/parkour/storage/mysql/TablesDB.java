@@ -77,6 +77,7 @@ public class TablesDB {
                 "night_vision BIT DEFAULT 0, " +
                 "grinding BIT DEFAULT 0, " +
                 "records SMALLINT default 0, " +
+                "event_wins MEDIUMINT default 0, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

@@ -30,7 +30,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records",
+                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -157,6 +157,9 @@ public class StatsDB {
                 // set records
                 int records = Integer.parseInt(playerResult.get("records"));
                 playerStats.setRecords(records);
+
+                int eventWins = Integer.parseInt(playerResult.get("event_wins"));
+                playerStats.setEventWins(eventWins);
 
                 updateBoughtLevels(playerStats);
             }

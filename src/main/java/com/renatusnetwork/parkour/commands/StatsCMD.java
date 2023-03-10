@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.commands;
 import com.comphenix.protocol.PacketType;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
+import com.renatusnetwork.parkour.data.events.EventLBPosition;
 import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
@@ -180,6 +181,39 @@ public class StatsCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&cRace lb not loaded or no lb positions"));
                 }
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("events"))
+            {
+
+                LinkedHashSet<EventLBPosition> leaderboard = Parkour.getEventManager().getEventLeaderboard();
+
+                if (!leaderboard.isEmpty()) {
+
+                    sender.sendMessage(Utils.translate("&bEvent Wins &7Leaderboard"));
+
+                    int position = 1;
+                    for (EventLBPosition lbPosition : leaderboard)
+                    {
+                        if (lbPosition != null)
+                        {
+                            sender.sendMessage(Utils.translate(" &7" +
+                                    position + " &9" +
+                                    Utils.formatNumber(lbPosition.getWins()) + " &b" +
+                                    lbPosition.getName()));
+                        }
+                        position++;
+                    }
+
+                    if (sender instanceof Player)
+                    {
+                        Player player = (Player) sender;
+                        PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
+
+                        sender.sendMessage(Utils.translate("&7Your wins &b" + Utils.formatNumber(playerStats.getEventWins())));
+                    }
+                } else {
+                    sender.sendMessage(Utils.translate("&cEvent lb not loaded or no lb positions"));
+                }
                 // level lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("coins")) {
                 printCoinsLB(sender);
@@ -243,9 +277,11 @@ public class StatsCMD implements CommandExecutor {
                             {
                                 // send your best if not on it and have beaten it
                                 LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level.getName());
-
                                 if (levelCompletion != null)
-                                    sender.sendMessage(Utils.translate("&7Your best is &2" + playerStats.getQuickestCompletion(level.getName())));
+                                {
+                                    sender.sendMessage(Utils.translate("&7Your best is &2" +
+                                            (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s"));
+                                }
                             }
                         }
                     }
@@ -267,6 +303,7 @@ public class StatsCMD implements CommandExecutor {
             sender.sendMessage(Utils.translate("&6/stats levels  &7Gets Levels Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats coins  &7Gets coins leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats records  &7Gets records leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats events  &7Gets events leaderboard"));
         }
         return true;
     }

@@ -30,6 +30,7 @@ public class SettingsManager {
     public String signs_second_line_completion;
     public String signs_second_line_spawn;
 
+    public int max_event_leaderboard_size;
     public int clans_max_members;
     public int clans_price_create;
     public int clans_price_tag;
@@ -156,6 +157,7 @@ public class SettingsManager {
         ascendance_hub_level = settings.getString("ascendance.hub_level");
         default_gg_timer = settings.getInt("gg.default_timer_in_seconds");
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
+        max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic

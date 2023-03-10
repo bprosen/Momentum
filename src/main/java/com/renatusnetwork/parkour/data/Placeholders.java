@@ -72,7 +72,6 @@ public class Placeholders extends PlaceholderExpansion
                     return playerStats.getRank() == null ? "" : Utils.translate(playerStats.getRank().getShortRankTitle());
             }
         }
-
-        return null;
+        return "";
     }
 }

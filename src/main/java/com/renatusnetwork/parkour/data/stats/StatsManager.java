@@ -436,7 +436,8 @@ public class StatsManager {
                                         .replace("%infinite_score%", playerStats.getInfinitePKScore() + "")
                                         .replace("%race_wins%", playerStats.getRaceWins() + "")
                                         .replace("%race_losses%", playerStats.getRaceLosses() + "")
-                                        .replace("%race_winrate%", playerStats.getRaceWinRate() + "");
+                                        .replace("%race_winrate%", playerStats.getRaceWinRate() + "")
+                                        .replace("%event_wins%", playerStats.getEventWins() + "");
 
                                 // level stats, only add if the most completed level is not null
                                 Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
@@ -541,6 +542,7 @@ public class StatsManager {
         int levelsRated = playerStats.getRatedLevelsCount();
         int raceWins = playerStats.getRaceWins();
         int raceLosses = playerStats.getRaceLosses();
+        int eventWins = playerStats.getEventWins();
 
         String hover = Utils.translate(
                      "&7Name » &f" + playerName + "\n" +
@@ -554,7 +556,8 @@ public class StatsManager {
                      "&7Favorite Level » &2" + favoriteLevel + "\n" +
                      "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
                      "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
-                     "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses
+                     "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses + "\n" +
+                     "&7Event Wins » &b" + eventWins
         );
         return hover;
     }

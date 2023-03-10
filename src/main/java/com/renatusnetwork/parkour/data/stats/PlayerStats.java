@@ -47,6 +47,8 @@ public class PlayerStats {
     private int totalLevelCompletions = 0;
     private boolean nightVision = false;
     private boolean grinding = false;
+    private int eventWins;
+
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> checkpoints = new HashMap<>();
@@ -454,6 +456,12 @@ public class PlayerStats {
     public void leftEvent() {
         eventParticipant = false;
     }
+
+    public void setEventWins(int eventWins) { this.eventWins = eventWins; }
+
+    public void addEventWin() { eventWins++; }
+
+    public int getEventWins() { return eventWins; }
 
     //
     // Rated Levels Section

@@ -2,8 +2,11 @@ package com.renatusnetwork.parkour.data.events;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.races.RaceLBPosition;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldedit.*;
@@ -12,11 +15,15 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -32,6 +39,7 @@ public class EventManager {
     private Set<String> eliminated = new HashSet<>();
     // start millis according to system
     private long startTime = 0L;
+    private LinkedHashSet<EventLBPosition> eventLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_event_leaderboard_size);
 
     public EventManager() {
         startScheduler();
@@ -57,6 +65,40 @@ public class EventManager {
             }
         }.runTaskTimer(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().check_next_event_delay,
                                            20 * Parkour.getSettingsManager().check_next_event_delay);
+
+        // update global event wins every 3 mins
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                loadLeaderboard();
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 60, 20 * 180);
+    }
+
+    public void loadLeaderboard() {
+        try {
+
+            LinkedHashSet<EventLBPosition> leaderboard = eventLeaderboard;
+            leaderboard.clear();
+
+            List<Map<String, String>> winResults = DatabaseQueries.getResults(
+                    "players",
+                    "uuid, player_name, event_wins",
+                    " WHERE event_wins > 0" +
+                            " ORDER BY event_wins DESC" +
+                            " LIMIT " + Parkour.getSettingsManager().max_event_leaderboard_size);
+
+            for (Map<String, String> winResult : winResults) {
+                leaderboard.add(
+                        new EventLBPosition(
+                                winResult.get("uuid"), winResult.get("player_name"), Integer.parseInt(winResult.get("event_wins"))
+                        ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // method to start event
@@ -65,8 +107,14 @@ public class EventManager {
         startTime = System.currentTimeMillis();
 
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
-                " Event &7has begun! Type &b/event join &7to join!"));
+        String joinEvent = Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
+                        " Event &7has begun! &cClick here to join!");
+
+        TextComponent component = new TextComponent(TextComponent.fromLegacyText(joinEvent));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&bClick to join!"))));
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/event join"));
+
+        Bukkit.spigot().broadcast(component);
         Bukkit.broadcastMessage("");
 
         // start max time timer
@@ -95,8 +143,15 @@ public class EventManager {
                    (endTimeMillis - (20 * 1000 * Parkour.getSettingsManager().event_reminder_delay)) < System.currentTimeMillis()) {
 
                     Bukkit.broadcastMessage("");
-                    Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
-                            " Event &7is still running! Type &b/event join &7to join!"));
+                    String stillRunning = Utils.translate("&7A &b" + formatName(runningEvent.getEventType()) +
+                            " Event &7is still running! &cClick here to join!");
+
+                    TextComponent component = new TextComponent(TextComponent.fromLegacyText(stillRunning));
+                    component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&bClick to join!"))));
+                    component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/event join"));
+
+                    Bukkit.spigot().broadcast(component);
+
                     Bukkit.broadcastMessage("");
                 }
             }
@@ -120,7 +175,8 @@ public class EventManager {
         // clear all water if it was the rising water event
         clearWater();
 
-        if (winner != null) {
+        if (winner != null)
+        {
             PlayerStats playerStats = Parkour.getStatsManager().get(winner);
 
             // give higher reward if prestiged
@@ -132,6 +188,10 @@ public class EventManager {
             Parkour.getStatsManager().addCoins(playerStats, reward);
 
             Parkour.getStatsManager().runGGTimer();
+
+            // update wins
+            playerStats.addEventWin();
+            Parkour.getDatabaseManager().add("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
         }
 
         if (forceEnded)
@@ -393,5 +453,10 @@ public class EventManager {
             clearWater();
             runningEvent = null;
         }
+    }
+
+    public LinkedHashSet<EventLBPosition> getEventLeaderboard()
+    {
+        return eventLeaderboard;
     }
 }
