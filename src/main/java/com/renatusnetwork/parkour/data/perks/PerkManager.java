@@ -95,9 +95,12 @@ public class PerkManager {
         }
     }
 
-    public void setPerk(Perk perk, Player player) {
+    public void setPerk(Perk perk, PlayerStats playerStats)
+    {
+        Player player = playerStats.getPlayer();
         HashMap<String, ItemStack> items = perk.getItems();
         if (!items.isEmpty())
+        {
             for (Map.Entry<String, ItemStack> entry : items.entrySet())
                 switch (entry.getKey()) {
                     case "head":
@@ -113,5 +116,12 @@ public class PerkManager {
                         player.getInventory().setBoots(entry.getValue());
                         break;
                 }
+        }
+        else if (perk.isInfinitePKBlock())
+        {
+            // update in both stats and db
+            playerStats.setInfiniteBlock(perk.getInfinitePKBlock());
+            Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='" + perk.getInfinitePKBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
+        }
     }
 }

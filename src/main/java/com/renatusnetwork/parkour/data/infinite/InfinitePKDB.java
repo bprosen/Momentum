@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.infinite;
 
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;

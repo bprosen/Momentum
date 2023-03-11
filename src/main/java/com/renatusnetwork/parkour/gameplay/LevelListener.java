@@ -144,7 +144,7 @@ public class LevelListener implements Listener {
 
                             block.setType(Material.AIR);
                             player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
-                            Parkour.getInfinitePKManager().doNextJump(player, false);
+                            Parkour.getInfinitePKManager().doNextJump(playerStats, false);
                         }
                     }
                 }

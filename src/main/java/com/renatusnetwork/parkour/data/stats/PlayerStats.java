@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -48,6 +49,7 @@ public class PlayerStats {
     private boolean nightVision = false;
     private boolean grinding = false;
     private int eventWins;
+    private Material infiniteBlock;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
@@ -260,6 +262,10 @@ public class PlayerStats {
     public boolean isInInfinitePK() {
         return inInfinitePK;
     }
+
+    public Material getInfiniteBlock() { return infiniteBlock; }
+
+    public void setInfiniteBlock(Material infiniteBlock) { this.infiniteBlock = infiniteBlock; }
 
     //
     // Rank Section

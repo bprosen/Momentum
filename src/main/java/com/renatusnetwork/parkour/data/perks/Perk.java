@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.perks;
 
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,6 +14,8 @@ public class Perk {
     private String name;
     private String title;
     private HashMap<String, ItemStack> items;
+    private Material infinitePKBlock;
+
     private List<String> setRequirementsLore;
     private List<String> requirements;
     private List<String> requiredPermissions;
@@ -34,6 +37,7 @@ public class Perk {
             requiredPermissions = PerksYAML.getRequiredPermissions(name);
             price = PerksYAML.getPrice(name);
             setRequirementsLore = PerksYAML.getSetRequirementsLore(name);
+            infinitePKBlock = PerksYAML.getInfinitePKBlock(name);
         }
     }
 
@@ -48,6 +52,10 @@ public class Perk {
     public String getTitle() {
         return title;
     }
+
+    public boolean isInfinitePKBlock() { return infinitePKBlock != null; }
+
+    public Material getInfinitePKBlock() { return infinitePKBlock; }
 
     public String getFormattedTitle() {
         return Utils.translate(title);

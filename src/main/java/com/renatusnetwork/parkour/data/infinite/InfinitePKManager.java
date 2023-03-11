@@ -13,7 +13,10 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -75,14 +78,14 @@ public class InfinitePKManager {
                     infinitePK.setOriginalLoc(respawnLoc);
 
                 // prepare block and teleport
-                startingLoc.getBlock().setType(Material.QUARTZ_BLOCK);
+                startingLoc.getBlock().setType(playerStats.getInfiniteBlock());
                 playerStats.clearPotionEffects();
                 player.teleport(startingLoc.clone().add(0.5, 1, 0.5));
                 // set to true
                 playerStats.setInfinitePK(true);
 
                 // immediately get new loc
-                doNextJump(player, true);
+                doNextJump(playerStats, true);
 
             }
         }.runTask(Parkour.getPlugin());
@@ -230,17 +233,19 @@ public class InfinitePKManager {
         );
     }
 
-    public void doNextJump(Player player, boolean startingJump) {
+    public void doNextJump(PlayerStats playerStats, boolean startingJump)
+    {
+        Player player = playerStats.getPlayer();
         InfinitePK infinitePK = get(player.getName());
 
         if (infinitePK != null) {
 
             // go back if in any current blocks
             Location newLocation = findNextBlockSpawn(infinitePK.getCurrentBlockLoc(), infinitePK);
-            if (isLocInCurrentBlocks(newLocation)) {
-                doNextJump(player, startingJump);
-            } else {
-
+            if (isLocInCurrentBlocks(newLocation))
+                doNextJump(playerStats, startingJump);
+            else
+            {
                 // so they dont start at score of 1
                 if (!startingJump)
                     infinitePK.addScore();
@@ -249,14 +254,14 @@ public class InfinitePKManager {
                 if (infinitePK.getLastBlockLoc() != null) {
                     infinitePK.getLastBlockLoc().clone().add(0, 1, 0).getBlock().setType(Material.AIR);
                     infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
-                } else if (!startingJump) {
-                    infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
                 }
+                else if (!startingJump)
+                    infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
 
                 infinitePK.updateBlockLoc(newLocation);
 
                 // then set new
-                infinitePK.getCurrentBlockLoc().getBlock().setType(Material.QUARTZ_BLOCK);
+                infinitePK.getCurrentBlockLoc().getBlock().setType(playerStats.getInfiniteBlock());
                 infinitePK.getPressutePlateLoc().getBlock().setType(Material.IRON_PLATE);
 
                 if (!startingJump)

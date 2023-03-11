@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.menus;
 
+import com.comphenix.protocol.PacketType;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -93,7 +94,7 @@ public class MenuItemAction {
                         player,
                         Parkour.getLevelManager().getFeaturedLevel());
             else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
-                     typeValue.equals("cleartrail") || typeValue.equals("clearnick"))
+                     typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite"))
                 performCosmeticsClear(player, typeValue, menuItem);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
@@ -133,6 +134,15 @@ public class MenuItemAction {
                 // run clear cmds
                 if (menuItem.hasCommands())
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                break;
+            case "clearinfinite":
+                player.closeInventory();
+                player.sendMessage(Utils.translate("&cYou have cleared your current infinite block"));
+
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
+
+                Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
                 break;
         }
     }
@@ -236,7 +246,7 @@ public class MenuItemAction {
             if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
             {
                 player.closeInventory();
-                Parkour.getPerkManager().setPerk(perk, player);
+                Parkour.getPerkManager().setPerk(perk, playerStats);
 
                 // if has commands, run them
                 if (menuItem.hasCommands())

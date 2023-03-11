@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,7 +31,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins",
+                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins, infinite_block",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -160,6 +161,15 @@ public class StatsDB {
 
                 int eventWins = Integer.parseInt(playerResult.get("event_wins"));
                 playerStats.setEventWins(eventWins);
+
+                String infiniteBlock = playerResult.get("infinite_block");
+
+                // only set it if its non null or ""
+                if (infiniteBlock != null && !infiniteBlock.equals(""))
+                    playerStats.setInfiniteBlock(Material.matchMaterial(infiniteBlock));
+                else
+                    // default is quartz block otherwise
+                    playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
 
                 updateBoughtLevels(playerStats);
             }

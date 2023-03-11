@@ -63,6 +63,15 @@ public class PerksYAML {
         return items;
     }
 
+    public static Material getInfinitePKBlock(String perkName)
+    {
+        Material type = null;
+        if (isSet(perkName, "infinite_block"))
+            type = Material.matchMaterial(perksConfig.getString(perkName + ".infinite_block"));
+
+        return type;
+    }
+
     private static ItemStack createItem(String perkName, String armorType) {
 
         Material itemType = Material.matchMaterial(perksConfig.getString(perkName + ".items." + armorType + ".material"));

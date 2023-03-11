@@ -42,7 +42,7 @@ public class PerksCMD implements CommandExecutor {
                     return true;
                 }
 
-                Parkour.getPerkManager().setPerk(perk, player);
+                Parkour.getPerkManager().setPerk(perk, playerStats);
             } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
                 String perkList = "&7Perks List:";
 
