@@ -78,7 +78,7 @@ public class TablesDB {
                 "grinding BIT DEFAULT 0, " +
                 "records SMALLINT default 0, " +
                 "event_wins MEDIUMINT default 0, " +
-                "infinite_block VARCHAR(30) NOT NULL, " +
+                "infinite_block VARCHAR(30) DEFAULT '' NOT NULL, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 
