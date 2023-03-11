@@ -1,5 +1,7 @@
 package com.renatusnetwork.parkour.gameplay;
 
+import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.config.BBC;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -7,6 +9,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.eventbus.EventHandler;
@@ -28,14 +31,17 @@ public class SelectionListener {
            there are 3 stages, so only listen to before anything happens (avoid 3 event fires),
            make sure the player is the person executing and the world is the plot world
         */
-        if (event.getStage().toString().equalsIgnoreCase("BEFORE_CHANGE") && actor != null && actor.isPlayer() &&
-            event.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+        if (event.getStage() == EditSession.Stage.BEFORE_HISTORY &&
+            actor != null && actor.isPlayer() &&
+            event.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+        {
 
             // get bukkit player from name
             Player player = Bukkit.getPlayer(actor.getName());
 
             // only continue if not opped
-            if (player != null) {
+            if (player != null)
+            {
                 // if opped and bypassing plots, return
                 if (player.isOp() && Parkour.getStatsManager().get(player).isBypassingPlots())
                     return;
@@ -46,19 +52,21 @@ public class SelectionListener {
                     LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
                     Region region = session.getSelection(event.getWorld());
 
-                    if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player)) {
-                        // use FAWE api to cancel and send message
-                        event.setCancelled(true);
-
+                    if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player))
+                    {
                         // send bypass info if opped
                         String messageToSend = "&cThis WorldEdit selection is out of where you can build";
                         if (player.isOp())
                             messageToSend += " &7You can bypass this with &c/plot bypass";
 
                         player.sendMessage(Utils.translate(messageToSend));
+
+                        event.setCancelled(true);
                     }
-                } catch (IncompleteRegionException e) {
-                    // dont print stack track so we dont spam console with simple error
+                }
+                catch (IncompleteRegionException exception)
+                {
+                    // empty stack trace
                 }
             }
         }

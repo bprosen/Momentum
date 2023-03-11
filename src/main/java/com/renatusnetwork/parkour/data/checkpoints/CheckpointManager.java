@@ -5,7 +5,6 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
-import org.graalvm.compiler.core.common.util.Util;
 
 public class CheckpointManager {
 
