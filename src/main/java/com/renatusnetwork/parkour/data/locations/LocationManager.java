@@ -113,4 +113,6 @@ public class LocationManager {
         return get("spawn");
     }
 
+    public Location getTutorialLocation() { return get("tutorial"); }
+
 }

@@ -93,6 +93,8 @@ public class SettingsManager {
     public int default_gg_timer;
     public int default_gg_coin_reward;
 
+    public String tutorialLevelName;
+
     public HashMap<Integer, ItemStack> customJoinInventory;
 
     public SettingsManager(FileConfiguration settings) {
@@ -158,6 +160,8 @@ public class SettingsManager {
         default_gg_timer = settings.getInt("gg.default_timer_in_seconds");
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
+        tutorialLevelName = settings.getString("levels.tutorial_level");
+
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic

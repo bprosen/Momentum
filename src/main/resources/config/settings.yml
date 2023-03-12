@@ -16,6 +16,7 @@ levels:
     broadcast: "&a%player% &7has beaten %title%"
   featured_level_reward_multiplier: 1.50
   max_rated_levels_leaderboard_size: 10
+  tutorial_level: tutorial
 
 stats:
   max_coins_leaderboard_size: 10

@@ -191,10 +191,20 @@ public class MenuListener implements Listener {
 
             Menu menu = Parkour.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
 
-            if (menu != null) {
-                player.openInventory(Parkour.getMenuManager().getInventory(menu.getName(), 1));
-                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
-                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+            if (menu != null)
+            {
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                if (!playerStats.isInTutorial())
+                {
+                    player.openInventory(Parkour.getMenuManager().getInventory(menu.getName(), 1));
+                    Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
+                    player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+                }
+                else
+                {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
+                }
             }
         }
     }

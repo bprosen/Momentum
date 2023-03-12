@@ -50,6 +50,7 @@ public class PlayerStats {
     private boolean grinding = false;
     private int eventWins;
     private Material infiniteBlock;
+    private boolean inTutorial = false;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
@@ -96,6 +97,9 @@ public class PlayerStats {
 
     public void setNVStatus(boolean nightVision) { this.nightVision = nightVision; }
 
+    public boolean isInTutorial() { return inTutorial; }
+
+    public void toggleTutorial() { inTutorial = !inTutorial; }
 
     //
     // Coins Sections

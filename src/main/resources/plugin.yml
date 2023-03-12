@@ -88,3 +88,5 @@ commands:
   records:
     description: "RN-Parkour records command"
     aliases: [levelrecords]
+  tutorial:
+    description: "RN-Parkour tutorial command"

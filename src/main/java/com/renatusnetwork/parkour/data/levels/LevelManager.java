@@ -23,7 +23,8 @@ public class LevelManager {
     private HashMap<String, Level> levels = new HashMap<>();
     private HashMap<String, LevelData> levelDataCache;
     private HashMap<Menu, Set<Level>> menuLevels = new HashMap<>();
-    private Level featuredLevel = null;
+    private Level featuredLevel;
+    private Level tutorialLevel;
     private long totalLevelCompletions;
     private LinkedHashSet<Level> globalLevelCompletionsLB = new LinkedHashSet<>
             (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
@@ -39,6 +40,7 @@ public class LevelManager {
         loadLevelsInMenus();
         pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
+        tutorialLevel = get(Parkour.getSettingsManager().tutorialLevelName);
         startScheduler(plugin);
     }
 
@@ -259,6 +261,8 @@ public class LevelManager {
 
         return levelsToBuy;
     }
+
+    public Level getTutorialLevel() { return tutorialLevel; }
 
     public HashMap<Integer, Level> getBuyingLevels(String playerName)
     {

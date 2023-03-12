@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,11 +24,15 @@ public class SpawnCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        if (player.hasPermission("rn-parkour.admin")) {
-            if (a.length == 0) {
-                teleportToSpawn(player);
-            } else if (a.length == 1) {
+        if (player.hasPermission("rn-parkour.admin"))
+        {
+
+            if (a.length == 0)
+                teleportToSpawn(playerStats);
+            else if (a.length == 1)
+            {
 
                 String victim = a[0];
                 Player victimPlayer = Bukkit.getPlayer(victim);
@@ -37,21 +42,31 @@ public class SpawnCMD implements CommandExecutor {
                     return true;
                 }
 
-                teleportToSpawn(victimPlayer);
+                PlayerStats victimStats = Parkour.getStatsManager().get(victimPlayer);
+
+                checkTutorial(victimStats);
                 player.sendMessage(Utils.translate("&cYou teleported &4" + victim + " &cto spawn"));
             }
         } else if (a.length == 0) {
-            teleportToSpawn(player);
+            checkTutorial(playerStats);
         }
         return false;
     }
 
-    private void teleportToSpawn(Player player) {
+    private static void checkTutorial(PlayerStats playerStats)
+    {
+        // check for tutorial
+        if (!playerStats.isInTutorial())
+            teleportToSpawn(playerStats);
+        else
+            playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
+    }
+
+    public static void teleportToSpawn(PlayerStats playerStats) {
         Location loc = Parkour.getLocationManager().getLobbyLocation();
+        Player player = playerStats.getPlayer();
 
         if (loc != null) {
-
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (!playerStats.isEventParticipant()) {
                 if (!playerStats.inRace()) {
