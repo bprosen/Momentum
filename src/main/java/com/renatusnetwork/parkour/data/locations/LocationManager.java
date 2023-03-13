@@ -115,4 +115,5 @@ public class LocationManager {
 
     public Location getTutorialLocation() { return get("tutorial"); }
 
+    public Location getInfiniteMiddle() { return get("infinite_middle"); }
 }

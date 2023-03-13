@@ -50,6 +50,7 @@ public class LevelManager {
         for (String levelName : LevelsYAML.getNames())
             load(levelName);
 
+        tutorialLevel = get(Parkour.getSettingsManager().tutorialLevelName);
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
 

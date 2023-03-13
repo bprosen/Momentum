@@ -373,11 +373,11 @@ public class InfinitePKManager {
 
         // run through maxes, and flip if they hit it
         if ((directionType == InfinitePKDirection.FORWARDS &&
-           (((oldLocation.getX() + xIncrease) >= (locationManager.getLobbyLocation().getBlockX() + settingsManager.max_infinitepk_x)) ||
-           (oldLocation.getZ() + zIncrease) >= (locationManager.getLobbyLocation().getBlockZ() + settingsManager.max_infinitepk_z)))
+           (((oldLocation.getX() + xIncrease) >= (locationManager.getInfiniteMiddle().getBlockX() + settingsManager.max_infinitepk_x)) ||
+           (oldLocation.getZ() + zIncrease) >= (locationManager.getInfiniteMiddle().getBlockZ() + settingsManager.max_infinitepk_z)))
            || (directionType == InfinitePKDirection.BACKWARDS &&
-           (((oldLocation.getX() - xIncrease) <= (locationManager.getLobbyLocation().getBlockX() - settingsManager.max_infinitepk_x)) ||
-           (oldLocation.getZ() - zIncrease) <= (locationManager.getLobbyLocation().getBlockZ() - settingsManager.max_infinitepk_z)))) {
+           (((oldLocation.getX() - xIncrease) <= (locationManager.getInfiniteMiddle().getBlockX() - settingsManager.max_infinitepk_x)) ||
+           (oldLocation.getZ() - zIncrease) <= (locationManager.getInfiniteMiddle().getBlockZ() - settingsManager.max_infinitepk_z)))) {
 
             xIncrease *= -1;
             zIncrease *= -1;
@@ -400,16 +400,16 @@ public class InfinitePKManager {
         LocationManager locationManager = Parkour.getLocationManager();
 
         // make the box 6 less so it will never flip on the first one
-        int minX = locationManager.getLobbyLocation().getBlockX() - (settingsManager.max_infinitepk_x - 6);
-        int maxX = locationManager.getLobbyLocation().getBlockX() + (settingsManager.max_infinitepk_x - 6);
-        int minZ = locationManager.getLobbyLocation().getBlockZ() - (settingsManager.max_infinitepk_z - 6);
-        int maxZ = locationManager.getLobbyLocation().getBlockZ() + (settingsManager.max_infinitepk_z - 6);
+        int minX = locationManager.getInfiniteMiddle().getBlockX() - (settingsManager.max_infinitepk_x - 6);
+        int maxX = locationManager.getInfiniteMiddle().getBlockX() + (settingsManager.max_infinitepk_x - 6);
+        int minZ = locationManager.getInfiniteMiddle().getBlockZ() - (settingsManager.max_infinitepk_z - 6);
+        int maxZ = locationManager.getInfiniteMiddle().getBlockZ() + (settingsManager.max_infinitepk_z - 6);
 
         int foundX = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
         int foundZ = ThreadLocalRandom.current().nextInt(minZ, maxZ + 1);
 
         Location foundLoc = new Location(
-                locationManager.getLobbyLocation().getWorld(),
+                locationManager.getInfiniteMiddle().getWorld(),
                 foundX, settingsManager.infinitepk_starting_y, foundZ
         );
 

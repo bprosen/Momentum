@@ -295,6 +295,11 @@ public class LevelListener implements Listener {
                         }
                     }
                     playerStats.setLevel(levelTo);
+
+                    // enable tutorial if they tp to it and not in tutorial
+                    if (levelTo.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()) && !playerStats.isInTutorial())
+                        playerStats.toggleTutorial();
+
                 } else if (playerStats.inLevel())
                     resetLevel = true;
 
