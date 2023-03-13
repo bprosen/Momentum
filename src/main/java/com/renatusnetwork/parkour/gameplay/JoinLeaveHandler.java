@@ -90,6 +90,10 @@ public class JoinLeaveHandler implements Listener {
                                 if (level != null) {
                                     playerStats.setLevel(level);
 
+                                    // toggle tutorial
+                                    if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
+                                        playerStats.toggleTutorial();
+
                                     // if the level they are being added to is an ascendance level, add them to the list
                                     if (level.isAscendanceLevel())
                                         statsManager.enteredAscendance(playerStats);
