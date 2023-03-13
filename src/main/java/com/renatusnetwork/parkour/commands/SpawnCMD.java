@@ -30,7 +30,7 @@ public class SpawnCMD implements CommandExecutor {
         {
 
             if (a.length == 0)
-                teleportToSpawn(playerStats);
+                checkTutorial(playerStats);
             else if (a.length == 1)
             {
 
