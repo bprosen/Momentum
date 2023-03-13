@@ -298,7 +298,7 @@ public class LevelListener implements Listener {
 
                     // enable tutorial if they tp to it and not in tutorial
                     if (levelTo.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()) && !playerStats.isInTutorial())
-                        playerStats.toggleTutorial();
+                        playerStats.setTutorial(true);
 
                 } else if (playerStats.inLevel())
                     resetLevel = true;
@@ -306,10 +306,15 @@ public class LevelListener implements Listener {
             } else if (playerStats.inLevel())
                 resetLevel = true;
 
-            if (resetLevel) {
+            if (resetLevel)
+            {
                 // save checkpoint if had one
                 playerStats.resetCurrentCheckpoint();
                 playerStats.resetLevel();
+
+                // disable tutorial
+                if (playerStats.isInTutorial())
+                    playerStats.setTutorial(false);
             }
         }
     }

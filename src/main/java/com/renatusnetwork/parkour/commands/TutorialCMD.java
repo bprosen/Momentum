@@ -28,7 +28,7 @@ public class TutorialCMD implements CommandExecutor
 
                     // if they made it into tutorial, toggle it on
                     if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
-                        playerStats.toggleTutorial();
+                        playerStats.setTutorial(true);
                 }
                 else
                     player.sendMessage(Utils.translate("&cYou cannot enter the tutorial while in the tutorial"));
@@ -38,9 +38,11 @@ public class TutorialCMD implements CommandExecutor
                 if (playerStats.isInTutorial())
                 {
                     // tp to spawn
-                    playerStats.toggleTutorial();
+                    playerStats.setTutorial(false);
                     SpawnCMD.teleportToSpawn(playerStats);
-                    player.sendMessage(Utils.translate("\n&7Welcome to Parkour!\n"));
+                    player.sendMessage("");
+                    player.sendMessage(Utils.translate("&b&lWelcome to Parkour!"));
+                    player.sendMessage("");
                 }
                 else
                 {

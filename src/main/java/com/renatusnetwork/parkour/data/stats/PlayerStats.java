@@ -99,7 +99,7 @@ public class PlayerStats {
 
     public boolean isInTutorial() { return inTutorial; }
 
-    public void toggleTutorial() { inTutorial = !inTutorial; }
+    public void setTutorial(boolean tutorial) { inTutorial = tutorial; }
 
     //
     // Coins Sections
