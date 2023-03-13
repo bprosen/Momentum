@@ -83,6 +83,10 @@ public class LevelHandler {
                 elapsedTime
         );
 
+        // disable when complete
+        if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
+            playerStats.setTutorial(false);
+
         levelCompletion.setPlayerName(player.getName());
         playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
 
