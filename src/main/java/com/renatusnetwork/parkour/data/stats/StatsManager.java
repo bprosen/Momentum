@@ -45,8 +45,11 @@ public class StatsManager {
 
     private boolean loadingLeaderboards = false;
 
+    private int totalPlayers;
+
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
+        totalPlayers = StatsDB.getTotalPlayers();
     }
 
     private void startScheduler(Plugin plugin) {
@@ -102,6 +105,9 @@ public class StatsManager {
 
     public void toggleLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
 
+    public int getTotalPlayers() { return totalPlayers; }
+
+    public void addTotalPlayer() { totalPlayers++; }
 
     public HashMap<String, PlayerStats> getPlayerStats() {
         return (HashMap<String, PlayerStats>) playerStatsList.clone();

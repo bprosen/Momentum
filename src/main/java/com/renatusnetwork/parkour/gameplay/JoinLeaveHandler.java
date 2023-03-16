@@ -40,8 +40,12 @@ public class JoinLeaveHandler implements Listener {
             if (spawn != null)
             {
                 player.teleport(spawn);
+
+                StatsManager statsManager = Parkour.getStatsManager();
+
+                statsManager.addTotalPlayer();
                 Bukkit.broadcastMessage(Utils.translate(
-                        "&a&o" + player.getDisplayName() + "&7&o joined &b&l&oParkour &7&ofor the first time"
+                        "&7Welcome &a" + player.getDisplayName() + " &7to &b&lParkour &d#" + Utils.formatNumber(statsManager.getTotalPlayers())
                 ));
             }
         }

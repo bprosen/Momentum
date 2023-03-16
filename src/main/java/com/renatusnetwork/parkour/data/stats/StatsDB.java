@@ -179,6 +179,16 @@ public class StatsDB {
         }
     }
 
+    public static int getTotalPlayers()
+    {
+        int total;
+
+        List<Map<String, String>> results = DatabaseQueries.getResults("players", "COUNT(*) AS total", "");
+        total = Integer.parseInt(results.get(0).get("total"));
+
+        return total;
+    }
+
     private static void insertPlayerID(PlayerStats playerStats) {
         String query = "INSERT INTO players " +
                 "(uuid, player_name)" +
