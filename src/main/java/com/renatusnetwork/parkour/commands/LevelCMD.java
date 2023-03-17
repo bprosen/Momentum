@@ -1056,6 +1056,20 @@ public class LevelCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not a valid level"));
                     }
                 }
+                else if (a.length == 2 && a[0].equalsIgnoreCase("togglecooldown"))
+                {
+                    Level level = levelManager.get(a[1]);
+
+                    if (level != null)
+                    {
+                        LevelsYAML.toggleCooldown(level.getName());
+                        sender.sendMessage(Utils.translate("&7You have set the level " + level.getFormattedTitle() + " &7cooldown to &c" + level.hasCooldown()));
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not a valid level"));
+                    }
+                }
                 else
                 {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -1108,5 +1122,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player"));
         sender.sendMessage(Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)"));
         sender.sendMessage(Utils.translate("&a/level setdifficulty <level> <difficulty>  &7Sets the difficulty of the level"));
+        sender.sendMessage(Utils.translate("&a/level togglecooldown <level>  &7Toggles if the level has a cooldown"));
     }
 }

@@ -4,6 +4,7 @@ import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -16,6 +17,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
 import java.util.List;
 
 public class LevelHandler {
@@ -151,9 +154,18 @@ public class LevelHandler {
                 if (level.isFeaturedLevel())
                     reward = (int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier);
                 else if (prestiges > 0 && level.getReward() > 0)
+                {
                     reward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
 
+                    // set cooldown modifier last!
+                    if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
+                        reward *= (int) levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+                }
+
                 Parkour.getStatsManager().addCoins(playerStats, reward);
+
+                // add cooldown
+                levelManager.addLevelCooldown(player.getName(), level);
 
                 String messageFormatted = level.getFormattedMessage(playerStats);
                 if (elapsedTime > 0L && elapsedTime < 8388607L)

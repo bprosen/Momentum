@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.menus;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
@@ -382,11 +383,42 @@ public class MenuItemFormatter {
                     itemLore.add(Utils.translate(difficultyStr + " &7Difficulty"));
                 }
 
+                int oldReward = level.getReward();
+                int newReward = level.getReward();
+                boolean modified = false;
+                LevelCooldown cooldown = null;
+
                 if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                    itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
-                            Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier()) + " Coin &7Reward"));
+                {
+                    newReward *= playerStats.getPrestigeMultiplier();
+                    modified = true;
+                }
+
+                // set cooldown modifier last!
+                if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getPlayerName()))
+                {
+                    cooldown = Parkour.getLevelManager().getLevelCooldown(playerStats.getPlayerName());
+                    newReward *= cooldown.getModifier();
+                    modified = true;
+                }
+
+                // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
+                if (modified && oldReward != newReward)
+                {
+                    itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(oldReward) + "&6 " + Utils.formatNumber(newReward) + " Coin &7Reward"));
+
+                    // on cooldown!
+                    if (cooldown != null)
+                    {
+                        itemLore.add(Utils.translate("  &7On cooldown &6(-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%)"));
+                        itemLore.add(Utils.translate("    &7For " +
+                                Time.elapsedShortened((Parkour.getSettingsManager().cooldownCalendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
+                        );
+                    }
+                }
                 else
-                    itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
+                    itemLore.add(Utils.translate("  &6" + Utils.formatNumber(oldReward) + " Coin &7Reward"));
+
 
                 if (level.getTotalCompletionsCount() > 0)
                     itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Completions"));

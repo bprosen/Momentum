@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data;
 
 import com.mysql.cj.exceptions.UnableToConnectException;
+import com.mysql.cj.protocol.a.LocalTimeValueEncoder;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,6 +10,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -95,9 +100,13 @@ public class SettingsManager {
     public HashMap<Integer, ItemStack> customJoinInventory;
 
     public LinkedHashMap<Integer, Float> cooldownModifiers;
+    public Calendar cooldownCalendar;
+    public Calendar currentDate;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
+        currentDate = Calendar.getInstance();
+        currentDate.setTime(new Date());
     }
 
     public void load(FileConfiguration settings) {
@@ -212,5 +221,14 @@ public class SettingsManager {
             if (settings.isConfigurationSection("cooldowns." + i))
                 cooldownModifiers.put(i, (float) settings.getDouble("cooldowns." + i + ".modifier"));
             else break;
+
+        String[] time = settings.getString("cooldown_reset_time").split(":");
+
+        // set cooldown reset time
+        cooldownCalendar = Calendar.getInstance();
+        cooldownCalendar.set(Calendar.DAY_OF_YEAR, currentDate.get(Calendar.DAY_OF_YEAR) + 1); // next day
+        cooldownCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
+        cooldownCalendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
+
     }
 }

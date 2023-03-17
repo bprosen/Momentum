@@ -62,6 +62,8 @@ public class Level {
 
     private int difficulty;
 
+    private boolean cooldown;
+
     public Level(String levelName) {
         this.name = levelName;
         load();
@@ -481,8 +483,11 @@ public class Level {
             newLevel = LevelsYAML.getNewLevel(name);
             requiredRank = LevelsYAML.getRankRequired(name);
             difficulty = LevelsYAML.getDifficulty(name);
+            cooldown = LevelsYAML.hasCooldown(name);
         }
     }
+
+    public boolean hasCooldown() { return cooldown; }
 
     public boolean needsRank() { return requiredRank != null; }
 

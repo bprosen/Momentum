@@ -282,6 +282,13 @@ public class LevelsYAML {
         return difficulty;
     }
 
+    public static void toggleCooldown(String levelName)
+    {
+        boolean cooldown = hasCooldown(levelName);
+        levelsFile.set(levelName + ".cooldown", !cooldown);
+        commit(levelName);
+    }
+
     public static boolean hasCooldown(String levelName)
     {
         boolean cooldown = false;

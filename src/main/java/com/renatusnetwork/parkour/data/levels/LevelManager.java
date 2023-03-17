@@ -253,6 +253,28 @@ public class LevelManager {
         return buyingLevels.containsKey(playerName);
     }
 
+    public boolean inCooldownMap(String playerName)
+    {
+        return cooldowns.containsKey(playerName);
+    }
+
+    public LevelCooldown getLevelCooldown(String playerName)
+    {
+        return cooldowns.get(playerName);
+    }
+
+    public void addLevelCooldown(String playerName, Level level)
+    {
+        if (level.hasCooldown())
+        {
+            // add to both conditions
+            if (cooldowns.containsKey(playerName))
+                cooldowns.get(playerName).addCompletion();
+            else
+                cooldowns.put(playerName, new LevelCooldown(level));
+        }
+    }
+
     public List<Integer> getBuyingLevelsSlots(String playerName)
     {
         HashMap<Integer, Level> levels = buyingLevels.get(playerName);
