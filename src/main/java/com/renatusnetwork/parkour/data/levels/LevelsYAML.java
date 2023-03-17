@@ -282,17 +282,6 @@ public class LevelsYAML {
         return difficulty;
     }
 
-    public static boolean hasCooldown(String levelName)
-    {
-        boolean cooldown = false;
-
-        // get if set
-        if (isSet(levelName, "cooldown"))
-            cooldown = levelsFile.getBoolean(levelName + ".cooldown");
-
-        return cooldown;
-    }
-
     public static boolean isDropperLevel(String levelName) {
         boolean dropper = false;
         if (isSet(levelName, "dropper"))

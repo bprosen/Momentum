@@ -94,8 +94,6 @@ public class SettingsManager {
 
     public HashMap<Integer, ItemStack> customJoinInventory;
 
-    public LinkedHashMap<Integer, Float> cooldownModifiers;
-
     public SettingsManager(FileConfiguration settings) {
         load(settings);
     }
@@ -203,14 +201,5 @@ public class SettingsManager {
                 customJoinInventory.put(i, itemStack);
             }
         }
-
-        // need linked so sorted
-        cooldownModifiers = new LinkedHashMap<>();
-
-        // add cooldowns to hashmap through config
-        for (int i = 1;; i++)
-            if (settings.isConfigurationSection("cooldowns." + i))
-                cooldownModifiers.put(i, (float) settings.getDouble("cooldowns." + i + ".modifier"));
-            else break;
     }
 }
