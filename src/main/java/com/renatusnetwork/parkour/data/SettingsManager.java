@@ -9,10 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SettingsManager {
@@ -96,6 +93,8 @@ public class SettingsManager {
     public String tutorialLevelName;
 
     public HashMap<Integer, ItemStack> customJoinInventory;
+
+    public LinkedHashMap<Integer, Float> cooldownModifiers;
 
     public SettingsManager(FileConfiguration settings) {
         load(settings);
@@ -204,5 +203,14 @@ public class SettingsManager {
                 customJoinInventory.put(i, itemStack);
             }
         }
+
+        // need linked so sorted
+        cooldownModifiers = new LinkedHashMap<>();
+
+        // add cooldowns to hashmap through config
+        for (int i = 1;; i++)
+            if (settings.isConfigurationSection("cooldowns." + i))
+                cooldownModifiers.put(i, (float) settings.getDouble("cooldowns." + i + ".modifier"));
+            else break;
     }
 }
