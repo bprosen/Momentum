@@ -127,10 +127,10 @@ public class ClansManager {
         }
     }
 
-    public void doSplitClanReward(Clan clan, Player player, Level level) {
+    public void doSplitClanReward(Clan clan, Player player, Level level, int reward) {
 
         double percentage = (double) clan.getLevel() / 100;
-        double splitAmountPerMember = level.getReward() * percentage;
+        double splitAmountPerMember = reward * percentage;
 
         for (ClanMember clanMember : clan.getMembers()) {
             // make sure it is not given to the completioner
@@ -157,13 +157,13 @@ public class ClansManager {
         }
     }
 
-    public void doClanXPCalc(Clan clan, Player player, Level level) {
+    public void doClanXPCalc(Clan clan, Player player, int reward) {
         int min = Parkour.getSettingsManager().clan_calc_percent_min;
         int max = Parkour.getSettingsManager().clan_calc_percent_max;
 
         // get random percent
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
-        int clanXP = (int) (level.getReward() * percent);
+        int clanXP = (int) (reward * percent);
         int totalXP = clanXP + clan.getXP();
 
         // if max level, keep calculating xp

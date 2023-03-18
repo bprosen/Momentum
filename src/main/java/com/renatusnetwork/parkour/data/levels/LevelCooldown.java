@@ -1,9 +1,12 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
+import org.bukkit.Bukkit;
 
+import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 public class LevelCooldown
 {
@@ -28,15 +31,21 @@ public class LevelCooldown
     {
         completionsCount++;
 
-        Integer[] keys = (Integer[]) Parkour.getSettingsManager().cooldownModifiers.keySet().toArray();
+        Object[] keys = Parkour.getSettingsManager().cooldownModifiers.keySet().toArray();
+        boolean done = false;
 
         // do backwards iteration for algorithm
-        for (int i = keys.length - 1; i >= 0; i--)
+        for (int i = keys.length - 1; i >= 0 && !done; i--)
         {
+            int value = ((Integer) keys[i]).intValue();
+
             // if less than completions, calc modifier
-            if (keys[i].intValue() < completionsCount)
+            if (value <= completionsCount)
+            {
                 // calc from 1.00 - modifier
-                modifier = (float) (1.00 - Parkour.getSettingsManager().cooldownModifiers.get(keys[i].intValue()));
+                modifier = (float) (1.00 - Parkour.getSettingsManager().cooldownModifiers.get(value));
+                done = true;
+            }
         }
     }
 

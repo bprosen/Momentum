@@ -125,47 +125,23 @@ public class LevelHandler {
             // only broadcast and give xp/coins if it is not a forced completion
             if (!forcedCompletion) {
 
-                if (playerStats.getClan() != null) {
-                    beforeClanLevel = playerStats.getClan().getLevel();
-
-                    // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
-                    if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
-                        Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, level);
-
-                    // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
-                    if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
-                    {
-                        // async for database querying
-                        new BukkitRunnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
-                            }
-                        }.runTaskAsynchronously(Parkour.getPlugin());
-                    }
-                }
-
                 // give higher reward if prestiged
                 int prestiges = playerStats.getPrestiges();
                 int reward = level.getReward();
                 // if featured, set reward!
                 if (level.isFeaturedLevel())
-                    reward = (int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier);
-                else if (prestiges > 0 && level.getReward() > 0)
+                    reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
+                else
                 {
-                    reward = (int) (level.getReward() * playerStats.getPrestigeMultiplier());
+                    if (prestiges > 0 && level.getReward() > 0)
+                        reward *= playerStats.getPrestigeMultiplier();
 
                     // set cooldown modifier last!
                     if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
-                        reward *= (int) levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+                        reward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
                 }
 
                 Parkour.getStatsManager().addCoins(playerStats, reward);
-
-                // add cooldown
-                levelManager.addLevelCooldown(player.getName(), level);
 
                 String messageFormatted = level.getFormattedMessage(playerStats);
                 if (elapsedTime > 0L && elapsedTime < 8388607L)
@@ -190,6 +166,32 @@ public class LevelHandler {
 
                     Bukkit.broadcastMessage(broadcastMessage);
                 }
+
+                if (playerStats.getClan() != null) {
+                    beforeClanLevel = playerStats.getClan().getLevel();
+
+                    // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
+                    if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
+                        Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, reward);
+
+                    // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
+                    if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
+                    {
+                        // async for database querying
+                        int finalReward = reward; // inner class declaration
+                        new BukkitRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level, finalReward);
+                            }
+                        }.runTaskAsynchronously(Parkour.getPlugin());
+                    }
+                }
+
+                // add cooldown
+                levelManager.addLevelCooldown(player.getName(), level);
             } else {
                 player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
             }

@@ -1063,7 +1063,7 @@ public class LevelCMD implements CommandExecutor {
                     if (level != null)
                     {
                         LevelsYAML.toggleCooldown(level.getName());
-                        sender.sendMessage(Utils.translate("&7You have set the level " + level.getFormattedTitle() + " &7cooldown to &c" + level.hasCooldown()));
+                        sender.sendMessage(Utils.translate("&7You have set the level " + level.getFormattedTitle() + " &7cooldown to &c" + !level.hasCooldown()));
                     }
                     else
                     {

@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.gameplay;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
@@ -172,7 +173,7 @@ public class Scoreboard {
                     } else {
 
                         // normal scoreboard
-                        String rewardString;
+                        String rewardString = Utils.translate("&6" + level.getReward());
 
                         // add title and adjust rewardstring if it is a featured level
                         if (level.isFeaturedLevel()) {
@@ -181,11 +182,23 @@ public class Scoreboard {
                             // proper cast
                             rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " +
                                     ((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
-
-                        } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                            rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
+                        }
                         else
-                            rewardString = Utils.translate("&6" + level.getReward());
+                        {
+                            int newReward = level.getReward();
+
+                            if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+                                newReward *= playerStats.getPrestigeMultiplier();
+
+                            LevelManager levelManager = Parkour.getLevelManager();
+
+                            // set cooldown modifier last!
+                            if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()) && levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier() != 1.00)
+                                newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+
+                            if (newReward != level.getReward())
+                                rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + newReward);
+                        }
 
                         String title = level.getFormattedTitle();
                         board.add(formatSpacing(title));

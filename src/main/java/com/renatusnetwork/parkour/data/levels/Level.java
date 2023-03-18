@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -113,20 +114,31 @@ public class Level {
 
     public String getFormattedMessage(PlayerStats playerStats) {
         if (message != null) {
+            LevelManager levelManager = Parkour.getLevelManager();
             String returnMessage = Utils.translate(message);
 
             returnMessage = returnMessage.replace("%title%", getFormattedTitle());
 
-            if (playerStats.getPrestiges() > 0)
-                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
-                        Utils.formatNumber(reward) + "&6 " +
-                        Utils.formatNumber(reward * playerStats.getPrestigeMultiplier())));
-            else if (isFeaturedLevel())
+            if (isFeaturedLevel())
                 returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
                         Utils.formatNumber(reward) + "&6 " +
                         Utils.formatNumber((reward * Parkour.getSettingsManager().featured_level_reward_multiplier))));
             else
-                returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
+            {
+                int newReward = reward;
+
+                if (playerStats.getPrestiges() > 0)
+                    newReward *= playerStats.getPrestigeMultiplier();
+
+                if (hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()) && levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier() != 1.00)
+                    newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+
+                if (newReward != reward)
+                    returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
+                            Utils.formatNumber(reward) + "&6 " + Utils.formatNumber(newReward)));
+                else
+                    returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
+            }
 
             returnMessage = returnMessage.replace(
                     "%completions%",

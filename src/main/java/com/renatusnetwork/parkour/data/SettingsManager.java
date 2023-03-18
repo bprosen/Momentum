@@ -104,9 +104,9 @@ public class SettingsManager {
     public Calendar currentDate;
 
     public SettingsManager(FileConfiguration settings) {
-        load(settings);
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
+        load(settings);
     }
 
     public void load(FileConfiguration settings) {
@@ -216,13 +216,11 @@ public class SettingsManager {
         // need linked so sorted
         cooldownModifiers = new LinkedHashMap<>();
 
-        // add cooldowns to hashmap through config
-        for (int i = 1;; i++)
-            if (settings.isConfigurationSection("cooldowns." + i))
-                cooldownModifiers.put(i, (float) settings.getDouble("cooldowns." + i + ".modifier"));
-            else break;
+        Set<String> modifiers = settings.getConfigurationSection("cooldowns.modifiers").getKeys(false);
+        for (String modifier : modifiers)
+            cooldownModifiers.put(Integer.parseInt(modifier), (float) settings.getDouble("cooldowns.modifiers." + modifier + ".modifier"));
 
-        String[] time = settings.getString("cooldown_reset_time").split(":");
+        String[] time = settings.getString("cooldowns.reset_time").split(":");
 
         // set cooldown reset time
         cooldownCalendar = Calendar.getInstance();
