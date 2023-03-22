@@ -203,7 +203,7 @@ public class EventManager {
         else {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
-                    + " &7Event has ended! &b&l" + winner.getName() + " &7has won!"));
+                    + " &7Event has ended! &b&l" + winner.getDisplayName() + " &7has won!"));
             Bukkit.broadcastMessage("");
         }
 
