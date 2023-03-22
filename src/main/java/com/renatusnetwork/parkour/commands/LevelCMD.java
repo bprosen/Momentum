@@ -1056,6 +1056,11 @@ public class LevelCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&c'&4" + a[1] + "&c' is not a valid level"));
                     }
                 }
+                else if (a.length == 1 && a[0].equalsIgnoreCase("pickfeatured"))
+                {
+                   levelManager.pickFeatured();
+                   sender.sendMessage(Utils.translate("&7You have set the new featured to &c" + levelManager.getFeaturedLevel().getFormattedTitle()));
+                }
                 else
                 {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -1108,5 +1113,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player"));
         sender.sendMessage(Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)"));
         sender.sendMessage(Utils.translate("&a/level setdifficulty <level> <difficulty>  &7Sets the difficulty of the level"));
+        sender.sendMessage(Utils.translate("&a/level pickfeatured  &7Picks a new featured level"));
     }
 }
