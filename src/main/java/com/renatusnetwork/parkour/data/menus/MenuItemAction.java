@@ -27,6 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MenuItemAction {
 
@@ -90,16 +91,42 @@ public class MenuItemAction {
                 performPlotSubmission(player);
             // dont need to get from stats and can skip performLevelItem
             else if (typeValue.equals("featured-level"))
-                performLevelTeleport(Parkour.getStatsManager().get(player.getUniqueId().toString()),
-                        player,
-                        Parkour.getLevelManager().getFeaturedLevel());
+                performLevelTeleport(Parkour.getStatsManager().get(player), player, Parkour.getLevelManager().getFeaturedLevel());
             else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
                      typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite"))
                 performCosmeticsClear(player, typeValue, menuItem);
+            else if (typeValue.equals("random-level"))
+                performRandomLevel(Parkour.getStatsManager().get(player));
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performRandomLevel(PlayerStats playerStats)
+    {
+        Set<Level> menuLevels = Parkour.getLevelManager().getLevelsInAllMenus();
+        ArrayList<Level> chosenLevels = new ArrayList<>();
+
+        for (Level level : menuLevels)
+        {
+            boolean addLevel = true;
+
+            // cover all conditions that can stop a player from entering a level
+            if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName())) ||
+                (!level.getRequiredLevels().isEmpty() && !level.hasRequiredLevels(playerStats)) ||
+                (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermissionNode())) ||
+                (level.needsRank() && !Parkour.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))) && !level.isFeaturedLevel())
+                addLevel = false;
+
+            // make sure we do not add the level they are already in
+            if (addLevel && !(playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName())))
+                chosenLevels.add(level);
+        }
+
+        // tp them to randomly chosen level
+        Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
+        performLevelTeleport(playerStats, playerStats.getPlayer(), chosenLevel);
     }
 
     private static void performCosmeticsClear(Player player, String clearType, MenuItem menuItem) {
