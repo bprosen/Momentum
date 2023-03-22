@@ -100,8 +100,12 @@ public class SettingsManager {
     public HashMap<Integer, ItemStack> customJoinInventory;
 
     public LinkedHashMap<Integer, Float> cooldownModifiers;
+    public Calendar cooldownCalendar;
+    public Calendar currentDate;
 
     public SettingsManager(FileConfiguration settings) {
+        currentDate = Calendar.getInstance();
+        currentDate.setTime(new Date());
         load(settings);
     }
 
@@ -212,10 +216,16 @@ public class SettingsManager {
         // need linked so sorted
         cooldownModifiers = new LinkedHashMap<>();
 
-        // add cooldowns to hashmap through config
-        for (int i = 1;; i++)
-            if (settings.isConfigurationSection("cooldowns." + i))
-                cooldownModifiers.put(i, (float) settings.getDouble("cooldowns." + i + ".modifier"));
-            else break;
+        Set<String> modifiers = settings.getConfigurationSection("cooldowns.modifiers").getKeys(false);
+        for (String modifier : modifiers)
+            cooldownModifiers.put(Integer.parseInt(modifier), (float) settings.getDouble("cooldowns.modifiers." + modifier + ".modifier"));
+
+        String[] time = settings.getString("cooldowns.reset_time").split(":");
+
+        // set cooldown reset time
+        cooldownCalendar = Calendar.getInstance();
+        cooldownCalendar.set(Calendar.DAY_OF_YEAR, currentDate.get(Calendar.DAY_OF_YEAR) + 1); // next day
+        cooldownCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
+        cooldownCalendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
     }
 }

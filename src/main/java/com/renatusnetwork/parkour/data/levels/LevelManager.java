@@ -33,6 +33,8 @@ public class LevelManager {
 
     private HashMap<String, HashMap<Integer, Level>> buyingLevels = new HashMap<>();
 
+    private HashMap<String, LevelCooldown> cooldowns = new HashMap<>();
+
     public LevelManager(Plugin plugin) {
         this.levelDataCache = LevelsDB.getDataCache();
 
