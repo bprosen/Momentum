@@ -163,7 +163,7 @@ public class JoinLeaveHandler implements Listener {
 
         // if in dropper, respawn them
         if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel())
-            LevelHandler.respawnPlayer(player, playerStats.getLevel());
+            player.teleport(playerStats.getLevel().getStartLocation());
 
         // toggle off elytra armor
         Parkour.getStatsManager().toggleOffElytra(playerStats);

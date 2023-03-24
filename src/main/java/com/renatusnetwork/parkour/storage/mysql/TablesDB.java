@@ -79,6 +79,7 @@ public class TablesDB {
                 "records SMALLINT default 0, " +
                 "event_wins MEDIUMINT default 0, " +
                 "infinite_block VARCHAR(30) DEFAULT '' NOT NULL, " +
+                "fail_mode BIT DEFAULT 1, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

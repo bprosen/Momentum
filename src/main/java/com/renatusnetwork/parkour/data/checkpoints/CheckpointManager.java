@@ -66,10 +66,25 @@ public class CheckpointManager {
                                 loc.setPitch(playerStats.getPlayer().getLocation().getPitch());
                                 loc.setYaw(playerStats.getPlayer().getLocation().getYaw());
                             }
+
+                            if (loc.getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) &&
+                                playerStats.getPlayer().getLocation().distance(loc) > 1.0)
+                                playerStats.addFail();
+
                             playerStats.getPlayer().teleport(loc);
+
                             // if the level has a stored start loc (not spawn), tp them to it
-                        } else if (playerStats.getLevel() != null && Parkour.getLocationManager().exists(playerStats.getLevel().getName() + "-spawn"))
-                            playerStats.getPlayer().teleport(playerStats.getLevel().getStartLocation());
+                        }
+                        else if (playerStats.getLevel() != null && Parkour.getLocationManager().exists(playerStats.getLevel().getName() + "-spawn"))
+                        {
+                            loc = playerStats.getLevel().getStartLocation();
+
+                            if (loc.getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) &&
+                                playerStats.getPlayer().getLocation().distance(loc) > 1.0)
+                                playerStats.addFail();
+
+                            playerStats.getPlayer().teleport(loc);
+                        }
                         else
                             playerStats.getPlayer().sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
                     } else {

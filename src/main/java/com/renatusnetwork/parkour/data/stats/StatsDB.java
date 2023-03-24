@@ -31,7 +31,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins, infinite_block",
+                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins, infinite_block, fail_mode",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -170,6 +170,13 @@ public class StatsDB {
                 else
                     // default is quartz block otherwise
                     playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
+
+                // set fail mode, 0 == false, 1 == true
+                int failsToggled = Integer.parseInt(playerResult.get("fail_mode"));
+                if (failsToggled == 0)
+                    playerStats.setFailMode(false);
+                else
+                    playerStats.setFailMode(true);
 
                 updateBoughtLevels(playerStats);
             }

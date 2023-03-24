@@ -145,6 +145,9 @@ public class Level {
                     Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(name))
             );
 
+            if (playerStats.inFailMode())
+                returnMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
+
             return returnMessage;
         }
 
