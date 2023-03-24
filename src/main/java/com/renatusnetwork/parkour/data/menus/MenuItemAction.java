@@ -525,7 +525,6 @@ public class MenuItemAction {
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                             playerStats.resetCurrentCheckpoint(); // reset
-                            playerStats.resetFails();
 
                             // if in practice mode
                             if (playerStats.getPracticeLocation() != null)
@@ -543,6 +542,7 @@ public class MenuItemAction {
                             }
                             playerStats.setLevel(level);
                             playerStats.disableLevelStartTime();
+                            playerStats.resetFails();
 
                             if (!level.getPotionEffects().isEmpty()) {
                                 for (PotionEffect potionEffect : level.getPotionEffects())
