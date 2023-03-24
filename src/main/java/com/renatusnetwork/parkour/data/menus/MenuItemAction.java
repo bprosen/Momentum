@@ -525,6 +525,7 @@ public class MenuItemAction {
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                             playerStats.resetCurrentCheckpoint(); // reset
+                            playerStats.resetFails();
 
                             // if in practice mode
                             if (playerStats.getPracticeLocation() != null)

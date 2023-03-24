@@ -221,7 +221,7 @@ public class PacketListener implements Listener {
                                         }
                                     }
                                     else
-                                        LevelHandler.respawnPlayer(event.getPlayer(), level);
+                                        LevelHandler.respawnPlayer(playerStats, level);
                                 }
                             }.runTask(plugin);
                         }

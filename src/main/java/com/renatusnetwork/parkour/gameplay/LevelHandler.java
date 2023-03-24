@@ -162,7 +162,7 @@ public class LevelHandler {
                     messageFormatted = messageFormatted.replace("%time%", "-");
 
                 player.sendMessage(messageFormatted);
-                player.sendMessage(Utils.translate(" &7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle())));
 
                 // broadcast completed if it the featured level
@@ -260,13 +260,16 @@ public class LevelHandler {
     }
 
     // Respawn player if checkpoint isn't there
-    public static void respawnPlayer(Player player, Level level) {
+    public static void respawnPlayer(PlayerStats playerStats, Level level) {
         // make sure the water reset is toggled on
         if (level != null) {
             Location loc = level.getStartLocation();
 
             if (loc != null)
-                player.teleport(loc);
+            {
+                playerStats.addFail(); // used in multiple areas
+                playerStats.getPlayer().teleport(loc);
+            }
         }
     }
 }

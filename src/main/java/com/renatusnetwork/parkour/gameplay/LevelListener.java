@@ -77,7 +77,7 @@ public class LevelListener implements Listener {
                         if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
                             Parkour.getCheckpointManager().teleportToCP(playerStats);
                         else
-                            LevelHandler.respawnPlayer(player, level);
+                            LevelHandler.respawnPlayer(playerStats, level);
                     }
                 }
             }

@@ -80,6 +80,12 @@ public class Scoreboard {
                 board.add(clanString);
             }
 
+            int fails = playerStats.getFails();
+            if (!playerStats.isInInfinitePK() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
+                playerStats.getPlayerToSpectate() == null && playerStats.inLevel() && !playerStats.getLevel().isAscendanceLevel() &&
+                playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
+                board.add(Utils.translate("  &e&lFails &6" + fails));
+
             board.add(formatSpacing(Utils.translate("&7")));
 
             // spectator section of scoreboard

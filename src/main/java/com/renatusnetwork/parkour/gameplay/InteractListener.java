@@ -166,6 +166,7 @@ public class InteractListener implements Listener {
                                         confirmMap.remove(player.getName());
 
                                         player.teleport(level.getStartLocation());
+                                        playerStats.resetFails();
                                         player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
                                     }
                                 } else {

@@ -90,3 +90,6 @@ commands:
     aliases: [levelrecords]
   tutorial:
     description: "RN-Parkour tutorial command"
+  fails:
+    description: "RN-Parkour fails command"
+    aliases: [fail]

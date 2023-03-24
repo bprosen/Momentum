@@ -32,7 +32,7 @@ public class DamageListener implements Listener {
                     event.setCancelled(true);
                     // only run code if they are both participants, therefore respawn player
                     if (victimStats.isEventParticipant())
-                        LevelHandler.respawnPlayer(player, eventManager.getRunningEvent().getLevel());
+                        player.teleport(eventManager.getRunningEvent().getLevel().getStartLocation());
                 }
             // for elytra
             } else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
@@ -48,7 +48,7 @@ public class DamageListener implements Listener {
                     if (playerStats.hasCurrentCheckpoint())
                         Parkour.getCheckpointManager().teleportToCP(playerStats);
                     else
-                        LevelHandler.respawnPlayer(player, playerStats.getLevel());
+                        LevelHandler.respawnPlayer(playerStats, playerStats.getLevel());
                 }
             // for pvp event
             } else if (event instanceof EntityDamageByEntityEvent) {

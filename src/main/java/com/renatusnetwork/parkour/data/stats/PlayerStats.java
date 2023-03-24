@@ -51,6 +51,8 @@ public class PlayerStats {
     private int eventWins;
     private Material infiniteBlock;
     private boolean inTutorial = false;
+    private boolean failsToggled;
+    private int fails;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
@@ -306,6 +308,22 @@ public class PlayerStats {
     public float getPrestigeMultiplier() { return prestigeMultiplier; }
 
     public void setPrestigeMultiplier(float prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
+
+    //
+    // Fails Section
+    //
+    public void setFailMode(boolean failsToggled) { this.failsToggled = failsToggled; }
+    public boolean inFailMode() { return failsToggled; }
+
+    public int getFails() { return fails; }
+
+    public void addFail()
+    {
+        if (failsToggled && !inInfinitePK && !inTutorial && !inRace && !eventParticipant)
+            fails++;
+    }
+
+    public void resetFails() { fails = 0; }
 
     //
     // Practice Mode Section
