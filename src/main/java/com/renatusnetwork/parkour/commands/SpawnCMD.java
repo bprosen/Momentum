@@ -70,20 +70,24 @@ public class SpawnCMD implements CommandExecutor {
 
             if (!playerStats.isEventParticipant()) {
                 if (!playerStats.inRace()) {
-                    if (playerStats.getPlayerToSpectate() == null) {
-                        // toggle off elytra armor
-                        Parkour.getStatsManager().toggleOffElytra(playerStats);
+                    if (!playerStats.isInInfinitePK()) {
+                        if (playerStats.getPlayerToSpectate() == null) {
+                            // toggle off elytra armor
+                            Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                        player.teleport(loc);
+                            player.teleport(loc);
 
-                        playerStats.resetCurrentCheckpoint();
-                        playerStats.resetPracticeMode();
-                        playerStats.resetLevel();
+                            playerStats.resetCurrentCheckpoint();
+                            playerStats.resetPracticeMode();
+                            playerStats.resetLevel();
 
-                        playerStats.clearPotionEffects();
+                            playerStats.clearPotionEffects();
 
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                        }
                     } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
