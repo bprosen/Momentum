@@ -7,6 +7,9 @@ database:
   username: ""
   password: ""
 
+bank:
+  brilliant:
+    min_next_bid_percentage: 0.15
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10

@@ -103,6 +103,8 @@ public class SettingsManager {
     public Calendar cooldownCalendar;
     public Calendar currentDate;
 
+    public float brilliantNextBidMinimum;
+
     public SettingsManager(FileConfiguration settings) {
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
@@ -169,6 +171,7 @@ public class SettingsManager {
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
         tutorialLevelName = settings.getString("levels.tutorial_level");
+        brilliantNextBidMinimum = (float) settings.getDouble("bank.brilliant.min_next_bid_percentage");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");

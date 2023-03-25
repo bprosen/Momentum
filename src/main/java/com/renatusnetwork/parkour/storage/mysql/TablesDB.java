@@ -41,6 +41,9 @@ public class TablesDB {
         if (!tableNames.contains("bought_levels"))
             createPurchasedLevels(database);
 
+        if (!tableNames.contains("bank"))
+            createBank(database);
+
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -59,6 +62,16 @@ public class TablesDB {
         return tableNames;
     }
 
+    private static void createBank(DatabaseManager database)
+    {
+        String sqlQuery = "CREATE TABLE bank(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "player_name VARCHAR(16) NOT NULL," +
+                "type VARCHAR(20) NOT NULL, " +
+                "total_bid INT DEFAULT 0)";
+
+        database.run(sqlQuery);
+    }
     private static void createPlayers(DatabaseManager database) {
         String sqlQuery = "CREATE TABLE players(" +
                 "player_id INT NOT NULL AUTO_INCREMENT, " +
