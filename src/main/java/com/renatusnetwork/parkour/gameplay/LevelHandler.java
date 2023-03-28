@@ -185,7 +185,9 @@ public class LevelHandler {
         // run teleport and location management if not forced completion
         if (!forcedCompletion) {
 
-            Parkour.getStatsManager().toggleOffElytra(playerStats);
+            if (!playerStats.isGrinding())
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
             Parkour.getPluginLogger().info(playerStats.getPlayerName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
             // reset cp before teleport
@@ -218,7 +220,10 @@ public class LevelHandler {
 
             // If not rank up level or has a start location and is grinding, set to start loc
             if (!rankUpLevel && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
+            {
                 locationTo = level.getStartLocation();
+                playerStats.resetFails(); // reset fails in grinding
+            }
 
             ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
             Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
@@ -267,8 +272,8 @@ public class LevelHandler {
 
             if (loc != null)
             {
-                playerStats.addFail(); // used in multiple areas
                 playerStats.getPlayer().teleport(loc);
+                playerStats.addFail(); // used in multiple areas
             }
         }
     }
