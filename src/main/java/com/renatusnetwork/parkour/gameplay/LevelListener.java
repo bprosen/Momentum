@@ -227,9 +227,15 @@ public class LevelListener implements Listener {
                         Level levelTo = Parkour.getLevelManager().get(region.getId());
                         // make sure the area they are spawning in is a level and not equal
                         if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                        {
                             playerStats.setLevel(levelTo);
+
+                            // if they are glitching elytra -> !elytra, remove elytra!
+                            if (level.isElytraLevel() && !levelTo.isElytraLevel())
+                                Parkour.getStatsManager().toggleOffElytra(playerStats);
+                        }
                     }
-                    LevelHandler.levelCompletion(player, playerStats.getLevel().getName());
+                    LevelHandler.levelCompletion(player, level.getName());
                 }
             } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
                 Location lobby = Parkour.getLocationManager().getLobbyLocation();
