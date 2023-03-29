@@ -93,3 +93,5 @@ commands:
   fails:
     description: "RN-Parkour fails command"
     aliases: [fail]
+  join:
+    description: "RN-Parkour join command"

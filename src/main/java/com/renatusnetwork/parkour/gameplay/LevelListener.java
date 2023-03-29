@@ -227,7 +227,13 @@ public class LevelListener implements Listener {
                         Level levelTo = Parkour.getLevelManager().get(region.getId());
                         // make sure the area they are spawning in is a level and not equal
                         if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                        {
+                            // if they are glitching elytra -> !elytra, remove elytra!
+                            if (level.isElytraLevel() && !levelTo.isElytraLevel())
+                                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
                             playerStats.setLevel(levelTo);
+                        }
                     }
                     LevelHandler.levelCompletion(player, playerStats.getLevel().getName());
                 }
