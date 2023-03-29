@@ -1,6 +1,5 @@
 package com.renatusnetwork.parkour.commands;
 
-import com.mysql.cj.util.Util;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
@@ -40,10 +39,10 @@ public class JoinCMD implements CommandExecutor
                             boolean teleport = true;
 
                             // not all levels have a price, so do a boolean switch
-                            if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()))
+                            if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                             {
                                 teleport = false;
-                                player.sendMessage(Utils.translate("&cYou first need to buy " + level.getFormattedTitle() + " &cbefore doing /join"));
+                                player.sendMessage(Utils.translate("&cYou first need to buy " + level.getFormattedTitle() + " &cbefore doing &4/join " + targetStats.getPlayerName()));
                             }
 
                             // if still allowed, tp them!
@@ -52,7 +51,7 @@ public class JoinCMD implements CommandExecutor
                         }
                         else
                         {
-                            player.sendMessage(Utils.translate("&cYou cannot join an Ascendance level"));
+                            player.sendMessage(Utils.translate("&cYou cannot /join an Ascendance level"));
                         }
                     }
                     else
@@ -67,7 +66,7 @@ public class JoinCMD implements CommandExecutor
             }
             else
             {
-                player.sendMessage(Utils.translate("&cInvalid usage, &4/join (playerName)"));
+                player.sendMessage(Utils.translate("&cInvalid usage, do &4/join (playerName)"));
             }
         }
         return false;

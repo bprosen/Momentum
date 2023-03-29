@@ -235,7 +235,7 @@ public class LevelListener implements Listener {
                             playerStats.setLevel(levelTo);
                         }
                     }
-                    LevelHandler.levelCompletion(player, level.getName());
+                    LevelHandler.levelCompletion(player, playerStats.getLevel().getName());
                 }
             } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
                 Location lobby = Parkour.getLocationManager().getLobbyLocation();
