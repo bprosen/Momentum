@@ -8,7 +8,7 @@ public class ClansYAML {
     private static FileConfiguration clansConfig = Parkour.getConfigManager().get("clans");
 
     private static void commit() {
-        Parkour.getConfigManager().save("ranks");
+        Parkour.getConfigManager().save("clans");
     }
 
     public static boolean isSection(String rankName) {

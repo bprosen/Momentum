@@ -3,6 +3,8 @@ package com.renatusnetwork.parkour.data.menus;
 import com.comphenix.protocol.PacketType;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankItem;
+import com.renatusnetwork.parkour.data.bank.BankItemType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.levels.RatingDB;
@@ -69,6 +71,8 @@ public class MenuItemAction {
             performLevelItem(player, menuItem);
         else if (itemType.equals("teleport"))
             performTeleportItem(player, menuItem);
+        else if (itemType.equals("bank"))
+            performBankItem(player, menuItem);
         else if (itemType.equals("open"))
             // if it is rankup gui, do special method for it
             if (menuItem.getTypeValue().equals("rankup"))
@@ -101,6 +105,14 @@ public class MenuItemAction {
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performBankItem(PlayerStats playerStats, MenuItem menuItem)
+    {
+        BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
+        BankItem bankItem = Parkour.getBankManager().getItem(bankItemType);
+
+        // TODO: perform bid and checks
     }
 
     private static void performRandomLevel(PlayerStats playerStats)

@@ -1,0 +1,28 @@
+items:
+  RADIANT:
+    '1':
+      title: "&CTEST"
+    '2':
+      title: "&CTEST 2"
+    '3':
+      title: "&CTEST 3"
+    '4':
+      title: "&CTEST 4"
+  BRILLIANT:
+    '1':
+      title: "&4TEST"
+    '2':
+      title: "&4TEST 2"
+    '3':
+      title: "&4TEST 3"
+    '4':
+      title: "&4TEST 4"
+  LEGENDARY:
+    '1':
+      title: "&5TEST"
+    '2':
+      title: "&5TEST 2"
+    '3':
+      title: "&5TEST 3"
+    '4':
+      title: "&5TEST 4"

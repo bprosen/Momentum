@@ -12,6 +12,7 @@ public class BankItem
 {
     private BankItemType type;
     private long currentTotal;
+    private long nextBidMinimum;
     private String displayName;
     private String currentHolder;
 
@@ -43,7 +44,7 @@ public class BankItem
         this.currentHolder = playerStats.getPlayerName();
         this.currentTotal += amount;
 
-        broadcastNewBid(playerStats, amount);
+        calcMinimumNextBid();
     }
 
     public BankItemType getType()
@@ -56,9 +57,34 @@ public class BankItem
         return currentHolder;
     }
 
+    private void calcMinimumNextBid()
+    {
+        float bidMinimum = 0.0f;
+
+        switch (type)
+        {
+            case RADIANT:
+                bidMinimum = Parkour.getSettingsManager().radiantNextBidMinimum;
+                break;
+            case BRILLIANT:
+                bidMinimum = Parkour.getSettingsManager().brilliantNextBidMinimum;
+                break;
+            case LEGENDARY:
+                bidMinimum = Parkour.getSettingsManager().legendaryNextBidMinimum;
+                break;
+        }
+        nextBidMinimum = currentTotal + ((int) (currentTotal * bidMinimum));
+    }
+    public long getMinimumNextBid()
+    {
+        return nextBidMinimum;
+    }
+
+    public void setCurrentHolder(String currentHolder) { this.currentHolder = currentHolder; }
+
     public void broadcastNewBid(PlayerStats playerStats, int bidAmount)
     {
-        long nextBidAmount = currentTotal + ((int) (currentTotal * Parkour.getSettingsManager().brilliantNextBidMinimum));
+
 
         Bukkit.broadcastMessage(Utils.translate("&d&m-----------------------------------------------------------\n"));
         Bukkit.broadcastMessage(Utils.translate(" &d&lNEW BANK BID"));
@@ -66,8 +92,8 @@ public class BankItem
                 " &d" + playerStats.getPlayer().getDisplayName() + " &7put &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + displayName
         ));
         Bukkit.broadcastMessage(Utils.translate(" " + displayName + " &7total is now &6" + Utils.formatNumber(currentTotal) + "&eCoins &7in the &d&lBank"));
-        Bukkit.broadcastMessage(Utils.translate(" \n&7Next bid starts at &6" + Utils.formatNumber(nextBidAmount) + " &eCoins"));
-        Bukkit.broadcastMessage(Utils.translate(" &7Type &c/bank bid " + ChatColor.stripColor(displayName) + " &c(at least " + Utils.formatNumber(nextBidAmount)
+        Bukkit.broadcastMessage(Utils.translate(" \n&7Next bid starts at &6" + Utils.formatNumber(nextBidMinimum) + " &eCoins"));
+        Bukkit.broadcastMessage(Utils.translate(" &7Type &c/bank bid " + ChatColor.stripColor(displayName) + " &c(at least " + Utils.formatNumber(nextBidMinimum)
                 + ") &7to overtake &c" + playerStats.getPlayer().getDisplayName()));
         Bukkit.broadcastMessage(Utils.translate("\n&d&m----------------------------------------------------------"));
     }

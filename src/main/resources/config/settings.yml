@@ -8,7 +8,11 @@ database:
   password: ""
 
 bank:
+  radiant:
+    min_next_bid_percentage: 0.15
   brilliant:
+    min_next_bid_percentage: 0.15
+  legendary:
     min_next_bid_percentage: 0.15
 gg:
   default_timer_in_seconds: 10

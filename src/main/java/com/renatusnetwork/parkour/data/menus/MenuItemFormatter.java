@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.data.menus;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankItem;
+import com.renatusnetwork.parkour.data.bank.BankItemType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -30,6 +32,8 @@ public class MenuItemFormatter {
             return getLevel(playerStats, menuItem);
         if (menuItem.getType().equals("perk"))
             return getPerk(player, playerStats, menuItem);
+        if (menuItem.getType().equals("bank"))
+            return getBankItem(playerStats, menuItem);
         if (menuItem.getType().equals("open"))
             return enchantMenuItem(playerStats, menuItem, Parkour.getMenuManager().getMenu(menuItem.getTypeValue()));
         if (menuItem.getType().equals("type")) {
@@ -52,6 +56,15 @@ public class MenuItemFormatter {
         return menuItem.getItem();
     }
 
+    private static ItemStack getBankItem(PlayerStats playerStats, MenuItem menuItem)
+    {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
+        BankItem bankItem = Parkour.getBankManager().getItem(bankItemType);
+
+        // TODO: format bank item
+        return item;
+    }
     //
     // Perk Section
     //
