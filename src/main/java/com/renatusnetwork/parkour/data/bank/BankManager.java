@@ -13,24 +13,21 @@ public class BankManager
     {
         items = new HashMap<>();
 
-        chooseType(BankItemType.RADIANT);
-        chooseType(BankItemType.BRILLIANT);
-        chooseType(BankItemType.LEGENDARY);
+        // get random nums
+        int radiantNum = BankYAML.chooseBankItem(BankItemType.RADIANT);
+        int brilliantNum = BankYAML.chooseBankItem(BankItemType.BRILLIANT);
+        int legendaryNum = BankYAML.chooseBankItem(BankItemType.LEGENDARY);
+
+        // add into map as polymorphic
+        items.put(BankItemType.RADIANT, new RadiantItem(BankItemType.RADIANT, BankYAML.getTitle(BankItemType.RADIANT, radiantNum)));
+        items.put(BankItemType.BRILLIANT, new BrilliantItem(BankItemType.BRILLIANT, BankYAML.getTitle(BankItemType.BRILLIANT, brilliantNum)));
+        items.put(BankItemType.LEGENDARY, new RadiantItem(BankItemType.LEGENDARY, BankYAML.getTitle(BankItemType.LEGENDARY, legendaryNum)));
     }
 
     public BankItem getItem(BankItemType type)
     {
         return items.get(type);
     }
-
-    private void chooseType(BankItemType type)
-    {
-        int num = BankYAML.chooseBankItem(type);
-        String title = BankYAML.getTitle(type, num);
-
-        items.put(type, new BankItem(type, title)); // add to items
-    }
-
     public boolean isType(String typeName)
     {
         boolean result = false;

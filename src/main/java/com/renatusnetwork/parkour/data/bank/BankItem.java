@@ -8,11 +8,12 @@ import org.bukkit.ChatColor;
 
 import java.util.HashMap;
 
-public class BankItem
+public abstract class BankItem
 {
     private BankItemType type;
     private long currentTotal;
     private long nextBidMinimum;
+    private float minimumNextBidRate;
     private String displayName;
     private String currentHolder;
 
@@ -29,6 +30,9 @@ public class BankItem
         playerBids = BankDB.getBids(type);
     }
 
+    // abstract methods
+    public abstract void broadcastNewBid(PlayerStats playerStats, int bidAmount);
+
     public long getBid(String name)
     {
         return playerBids.get(name);
@@ -38,6 +42,16 @@ public class BankItem
     {
         return playerBids.containsKey(name);
     }
+
+    public String getDisplayName() { return displayName; }
+
+    public long getCurrentTotal() { return currentTotal; }
+
+    public long getNextBidMinimum() { return nextBidMinimum; }
+
+    public void setNextBidMinimum(long nextBidMinimum) { this.nextBidMinimum = nextBidMinimum; }
+
+    public void setMinimumNextBidRate(float minimumNextBidRate) { this.minimumNextBidRate = minimumNextBidRate; }
 
     public void addBid(PlayerStats playerStats, int amount)
     {
@@ -59,42 +73,13 @@ public class BankItem
 
     private void calcMinimumNextBid()
     {
-        float bidMinimum = 0.0f;
-
-        switch (type)
-        {
-            case RADIANT:
-                bidMinimum = Parkour.getSettingsManager().radiantNextBidMinimum;
-                break;
-            case BRILLIANT:
-                bidMinimum = Parkour.getSettingsManager().brilliantNextBidMinimum;
-                break;
-            case LEGENDARY:
-                bidMinimum = Parkour.getSettingsManager().legendaryNextBidMinimum;
-                break;
-        }
-        nextBidMinimum = currentTotal + ((int) (currentTotal * bidMinimum));
+        nextBidMinimum = currentTotal + ((int) (currentTotal * minimumNextBidRate));
     }
+
     public long getMinimumNextBid()
     {
         return nextBidMinimum;
     }
 
     public void setCurrentHolder(String currentHolder) { this.currentHolder = currentHolder; }
-
-    public void broadcastNewBid(PlayerStats playerStats, int bidAmount)
-    {
-
-
-        Bukkit.broadcastMessage(Utils.translate("&d&m-----------------------------------------------------------\n"));
-        Bukkit.broadcastMessage(Utils.translate(" &d&lNEW BANK BID"));
-        Bukkit.broadcastMessage(Utils.translate(
-                " &d" + playerStats.getPlayer().getDisplayName() + " &7put &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + displayName
-        ));
-        Bukkit.broadcastMessage(Utils.translate(" " + displayName + " &7total is now &6" + Utils.formatNumber(currentTotal) + "&eCoins &7in the &d&lBank"));
-        Bukkit.broadcastMessage(Utils.translate(" \n&7Next bid starts at &6" + Utils.formatNumber(nextBidMinimum) + " &eCoins"));
-        Bukkit.broadcastMessage(Utils.translate(" &7Type &c/bank bid " + ChatColor.stripColor(displayName) + " &c(at least " + Utils.formatNumber(nextBidMinimum)
-                + ") &7to overtake &c" + playerStats.getPlayer().getDisplayName()));
-        Bukkit.broadcastMessage(Utils.translate("\n&d&m----------------------------------------------------------"));
-    }
 }
