@@ -30,55 +30,9 @@ public class JoinCMD implements CommandExecutor
                     PlayerStats targetStats = Parkour.getStatsManager().get(target);
 
                     if (targetStats.inLevel())
-                    {
-                        Level level = targetStats.getLevel();
-
-                        // since ascendance is a free-roam map...
-                        if (!level.isAscendanceLevel())
-                        {
-                            if (!level.isRankUpLevel())
-                            {
-                                if (!level.isEventLevel())
-                                {
-                                    if (!level.isRaceLevel())
-                                    {
-                                        boolean teleport = true;
-
-                                        // not all levels have a price, so do a boolean switch
-                                        if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
-                                        {
-                                            teleport = false;
-                                            player.sendMessage(Utils.translate("&cYou first need to buy " + level.getFormattedTitle() + " &cbefore doing &4/join " + targetStats.getPlayerName()));
-                                        }
-
-                                        // if still allowed, tp them!
-                                        if (teleport)
-                                            MenuItemAction.performLevelTeleport(playerStats, player, level);
-                                    }
-                                    else
-                                    {
-                                        player.sendMessage(Utils.translate("&cYou cannot /join a Race level"));
-                                    }
-                                }
-                                else
-                                {
-                                    player.sendMessage(Utils.translate("&cYou cannot /join an Event level"));
-                                }
-                            }
-                            else
-                            {
-                                player.sendMessage(Utils.translate("&cYou cannot /join a Rankup level"));
-                            }
-                        }
-                        else
-                        {
-                            player.sendMessage(Utils.translate("&cYou cannot /join an Ascendance level"));
-                        }
-                    }
+                        Parkour.getLevelManager().teleportToLevel(playerStats, targetStats.getLevel());
                     else
-                    {
                         player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not in a level"));
-                    }
                 }
                 else
                 {
