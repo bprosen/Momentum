@@ -3,15 +3,14 @@ package com.renatusnetwork.parkour.data.levels;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventType;
 import com.renatusnetwork.parkour.data.locations.LocationsYAML;
-import com.renatusnetwork.parkour.data.menus.Menu;
-import com.renatusnetwork.parkour.data.menus.MenuItem;
-import com.renatusnetwork.parkour.data.menus.MenuPage;
-import com.renatusnetwork.parkour.data.menus.MenusYAML;
+import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -537,6 +536,53 @@ public class LevelManager {
 
             levelDataCache.remove(levelName);
             levels.remove(levelName);
+        }
+    }
+
+    public void teleportToLevel(PlayerStats playerStats, Level level)
+    {
+        Player player = playerStats.getPlayer();
+
+        // since ascendance is a free-roam map...
+        if (!level.isAscendanceLevel())
+        {
+            if (!level.isRankUpLevel())
+            {
+                if (!level.isEventLevel())
+                {
+                    if (!level.isRaceLevel())
+                    {
+                        boolean teleport = true;
+
+                        // not all levels have a price, so do a boolean switch
+                        if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                        {
+                            teleport = false;
+                            player.sendMessage(Utils.translate("&cYou first need to buy " + level.getFormattedTitle() + " &cbefore teleporting to it"));
+                        }
+
+                        // if still allowed, tp them!
+                        if (teleport)
+                            MenuItemAction.performLevelTeleport(playerStats, player, level);
+                    }
+                    else
+                    {
+                        player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
+                    }
+                }
+                else
+                {
+                    player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
+                }
+            }
+            else
+            {
+                player.sendMessage(Utils.translate("&cYou cannot teleport to a Rankup level"));
+            }
+        }
+        else
+        {
+            player.sendMessage(Utils.translate("&cYou cannot teleport to an Ascendance level"));
         }
     }
 

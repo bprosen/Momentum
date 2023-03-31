@@ -68,7 +68,7 @@ public class CheckpointManager {
                             }
 
                             if (loc.getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) &&
-                                playerStats.getPlayer().getLocation().distance(loc) > 1.0)
+                                playerStats.getPlayer().getLocation().distance(loc) > 1.0 && playerStats.getPracticeLocation() == null) // only add a fail when no practice
                                 playerStats.addFail();
 
                             playerStats.getPlayer().teleport(loc);

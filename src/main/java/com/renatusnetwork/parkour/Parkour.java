@@ -160,6 +160,7 @@ public class Parkour extends JavaPlugin {
         getCommand("tutorial").setExecutor(new TutorialCMD());
         getCommand("fails").setExecutor(new FailsCMD());
         getCommand("join").setExecutor(new JoinCMD());
+        getCommand("play").setExecutor(new PlayCMD());
     }
 
     private static void loadClasses() {

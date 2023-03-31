@@ -31,7 +31,7 @@ public class RateCMD implements CommandExecutor {
 
             // allow ability to get from title or name
             String levelName = a[0].toLowerCase();
-            if (a.length >= 1) {
+            if (a.length > 1) {
                 String[] split = Arrays.copyOfRange(a, 0, a.length);
                 levelName = String.join(" ", split);
             }
