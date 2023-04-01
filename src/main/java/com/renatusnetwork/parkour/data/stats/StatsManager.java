@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -443,7 +444,9 @@ public class StatsManager {
                                         .replace("%race_wins%", playerStats.getRaceWins() + "")
                                         .replace("%race_losses%", playerStats.getRaceLosses() + "")
                                         .replace("%race_winrate%", playerStats.getRaceWinRate() + "")
-                                        .replace("%event_wins%", playerStats.getEventWins() + "");
+                                        .replace("%event_wins%", playerStats.getEventWins() + "")
+                                        .replace("%hours%", Utils.formatNumber(playerStats.getPlayer().getTicksLived() / 72000))
+                                        .replace("%jumps%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
 
                                 // level stats, only add if the most completed level is not null
                                 Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
@@ -549,11 +552,13 @@ public class StatsManager {
         int raceWins = playerStats.getRaceWins();
         int raceLosses = playerStats.getRaceLosses();
         int eventWins = playerStats.getEventWins();
+        int jumps = playerStats.getPlayer().getStatistic(Statistic.JUMP);
 
         String hover = Utils.translate(
                      "&7Name » &f" + playerName + "\n" +
                      "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
-                     "&7Hours » &b" + Utils.formatNumber(hours) + "\n\n" +
+                     "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
+                     "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
                      "&7Clan » &e" + clanString + "\n" +
                      "&7Rank » &a" + rank.getRankTitle() + "\n" +
                      "&7Prestige » &5" + prestiges + "\n" +
