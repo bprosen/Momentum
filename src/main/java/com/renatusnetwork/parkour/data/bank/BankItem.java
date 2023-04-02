@@ -19,10 +19,11 @@ public abstract class BankItem
 
     private HashMap<String, Long> playerBids;
 
-    public BankItem(BankItemType type, String displayName)
+    public BankItem(BankItemType type, int minimumStartingBid, String displayName)
     {
         this.type = type;
         this.displayName = displayName;
+        this.nextBidMinimum = minimumStartingBid;
 
         currentTotal = 0;
         currentHolder = null;
@@ -49,8 +50,6 @@ public abstract class BankItem
 
     public long getNextBidMinimum() { return nextBidMinimum; }
 
-    public void setNextBidMinimum(long nextBidMinimum) { this.nextBidMinimum = nextBidMinimum; }
-
     public void setMinimumNextBidRate(float minimumNextBidRate) { this.minimumNextBidRate = minimumNextBidRate; }
 
     public void addBid(PlayerStats playerStats, int amount)
@@ -70,6 +69,8 @@ public abstract class BankItem
     {
         return currentHolder;
     }
+
+    public boolean hasCurrentHolder() { return currentHolder != null; }
 
     private void calcMinimumNextBid()
     {

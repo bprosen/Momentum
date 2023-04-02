@@ -102,6 +102,8 @@ public class MenusYAML {
             return "rate";
         if (isSet(menuName, itemPath + ".type"))
             return "type";
+        if (isSet(menuName, itemPath + ".bank"))
+            return "bank";
 
         return "display";
     }
@@ -121,6 +123,8 @@ public class MenusYAML {
             return menusConfig.getString(menuName + "." + itemPath + ".rate");
         if (isSet(menuName, itemPath + ".type"))
             return menusConfig.getString(menuName + "." + itemPath + ".type");
+        if (isSet(menuName, itemPath + ".bank"))
+            return menusConfig.getString(menuName + "." + itemPath + ".bank");
         return "";
     }
 

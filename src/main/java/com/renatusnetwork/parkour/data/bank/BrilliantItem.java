@@ -10,23 +10,24 @@ public class BrilliantItem extends BankItem
 {
     public BrilliantItem(BankItemType type, String displayName)
     {
-        super(type, displayName);
+        super(type, Parkour.getSettingsManager().brilliantMinimumBid, displayName);
         setMinimumNextBidRate(Parkour.getSettingsManager().brilliantNextBidMinimum);
     }
 
     @Override
     public void broadcastNewBid(PlayerStats playerStats, int bidAmount)
     {
-
-        Bukkit.broadcastMessage(Utils.translate("&d&m-----------------------------------------------------------\n"));
-        Bukkit.broadcastMessage(Utils.translate(" &d&lNEW &e&lBRILLIANT &d&lBANK BID"));
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+        Bukkit.broadcastMessage(Utils.translate("&d&lNEW &e&lBRILLIANT &d&lBANK BID"));
+        Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate(
-                " &d" + playerStats.getPlayer().getDisplayName() + " &7put &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + getDisplayName()
+                "&d" + playerStats.getPlayer().getDisplayName() + " &7put &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + getDisplayName()
         ));
-        Bukkit.broadcastMessage(Utils.translate(" " + getDisplayName() + " &7total is now &6" + Utils.formatNumber(getCurrentTotal()) + "&eCoins &7in the &d&lBank"));
-        Bukkit.broadcastMessage(Utils.translate(" \n&7Next bid starts at &6" + Utils.formatNumber(getMinimumNextBid()) + " &eCoins"));
-        Bukkit.broadcastMessage(Utils.translate(" &7Type &c/bank bid " + ChatColor.stripColor(getDisplayName()) + " &c(at least " + Utils.formatNumber(getNextBidMinimum())
-                + ") &7to overtake &c" + playerStats.getPlayer().getDisplayName()));
-        Bukkit.broadcastMessage(Utils.translate("\n&d&m----------------------------------------------------------"));
+        Bukkit.broadcastMessage(Utils.translate("  " + getDisplayName() + " &7total is now &6" + Utils.formatNumber(getCurrentTotal()) + " &eCoins &7in the &d&lBank"));
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage(Utils.translate("&7Next bid starts at &6" + Utils.formatNumber(getMinimumNextBid()) + " &eCoins"));
+        Bukkit.broadcastMessage(Utils.translate("  &7Come to the &d&lBank &7at &c/spawn"));
+        Bukkit.broadcastMessage(Utils.translate("  &7Bid at least &6" + Utils.formatNumber(getNextBidMinimum()) + " &eCoins &7to overtake " + playerStats.getPlayer().getDisplayName()));
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
     }
 }

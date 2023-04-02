@@ -72,7 +72,7 @@ public class MenuItemAction {
         else if (itemType.equals("teleport"))
             performTeleportItem(player, menuItem);
         else if (itemType.equals("bank"))
-            performBankItem(player, menuItem);
+            performBankItem(Parkour.getStatsManager().get(player), menuItem);
         else if (itemType.equals("open"))
             // if it is rankup gui, do special method for it
             if (menuItem.getTypeValue().equals("rankup"))
@@ -112,7 +112,8 @@ public class MenuItemAction {
         BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
         BankItem bankItem = Parkour.getBankManager().getItem(bankItemType);
 
-        // TODO: perform bid and checks
+        Parkour.getBankManager().bid(playerStats, (int) bankItem.getMinimumNextBid(), bankItemType);
+        playerStats.getPlayer().closeInventory();
     }
 
     private static void performRandomLevel(PlayerStats playerStats)

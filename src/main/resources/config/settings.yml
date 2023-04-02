@@ -10,10 +10,13 @@ database:
 bank:
   radiant:
     min_next_bid_percentage: 0.15
+    min_starting_bid: 100
   brilliant:
     min_next_bid_percentage: 0.15
+    min_starting_bid: 1000
   legendary:
     min_next_bid_percentage: 0.15
+    min_starting_bid: 3000
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10

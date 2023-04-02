@@ -61,8 +61,21 @@ public class MenuItemFormatter {
         ItemStack item = new ItemStack(menuItem.getItem());
         BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
         BankItem bankItem = Parkour.getBankManager().getItem(bankItemType);
+        ItemMeta itemMeta = item.getItemMeta();
 
-        // TODO: format bank item
+        itemMeta.setDisplayName(bankItem.getDisplayName());
+
+        List<String> lore = new ArrayList<>();
+        lore.add(Utils.translate("current bid: " + bankItem.getCurrentTotal()));
+
+        if (!bankItem.hasCurrentHolder())
+            lore.add(Utils.translate("&ccurrent holder: None"));
+        else
+            lore.add(Utils.translate("&ccurrent holder: " + bankItem.getCurrentHolder()));
+
+        itemMeta.setLore(lore);
+
+        item.setItemMeta(itemMeta);
         return item;
     }
     //

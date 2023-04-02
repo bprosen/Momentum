@@ -107,6 +107,10 @@ public class SettingsManager {
     public float brilliantNextBidMinimum;
     public float legendaryNextBidMinimum;
 
+    public int radiantMinimumBid;
+    public int brilliantMinimumBid;
+    public int legendaryMinimumBid;
+
     public SettingsManager(FileConfiguration settings) {
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
@@ -176,6 +180,9 @@ public class SettingsManager {
         radiantNextBidMinimum = (float) settings.getDouble("bank.radiant.min_next_bid_percentage");
         brilliantNextBidMinimum = (float) settings.getDouble("bank.brilliant.min_next_bid_percentage");
         legendaryNextBidMinimum = (float) settings.getDouble("bank.legendary.min_next_bid_percentage");
+        radiantMinimumBid = settings.getInt("bank.radiant.min_starting_bid");
+        brilliantMinimumBid = settings.getInt("bank.brilliant.min_starting_bid");
+        legendaryMinimumBid = settings.getInt("bank.legendary.min_starting_bid");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
