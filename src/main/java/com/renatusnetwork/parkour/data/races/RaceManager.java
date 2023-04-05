@@ -259,7 +259,7 @@ public class RaceManager {
 
             if (raceObject.hasBet())
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()
-                                        + " &7in a race for &6$" + Utils.formatNumber(raceObject.getBet()) + " &7on " + raceObject.getRaceLevel().getFormattedTitle()));
+                                        + " &7in a race for &6" + Utils.formatNumber(raceObject.getBet()) + " &eCoins &7on " + raceObject.getRaceLevel().getFormattedTitle()));
             else
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()
                                         + " &7in a race on " + raceObject.getRaceLevel().getFormattedTitle()));
