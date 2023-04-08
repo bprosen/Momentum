@@ -47,8 +47,10 @@ public class SaveCMD implements CommandExecutor
                                             // add here
                                             Parkour.getSavesManager().addSave(playerStats, player.getLocation(), level);
 
+                                            Utils.teleportToSpawn(playerStats); // tp to spawn
+
                                             player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getFormattedTitle()));
-                                            player.sendMessage(Utils.translate("&aWhen you come back to this level, you will teleport here"));
+                                            player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getFormattedTitle() + "&a, you will teleport at your save"));
                                         }
                                         else
                                         {

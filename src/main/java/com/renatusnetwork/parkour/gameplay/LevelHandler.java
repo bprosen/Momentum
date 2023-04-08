@@ -206,7 +206,7 @@ public class LevelHandler {
 
             // reset cp and saves before teleport
             Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
-            Parkour.getSavesManager().removeSave(playerStats, level);
+            Parkour.getSavesManager().removeSave(playerStats, level); // safety removal (likely will never actually execute)
 
             // clear potion effects
             playerStats.clearPotionEffects();
@@ -284,9 +284,6 @@ public class LevelHandler {
         // make sure the water reset is toggled on
         if (level != null) {
             Location loc = level.getStartLocation();
-
-            if (playerStats.hasSave(playerStats.getLevel().getName()))
-                Parkour.getSavesManager().removeSave(playerStats, level); // reset save (wont do anything if they dont have one)
 
             if (loc != null)
             {

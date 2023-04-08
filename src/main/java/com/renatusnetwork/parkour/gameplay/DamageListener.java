@@ -46,7 +46,7 @@ public class DamageListener implements Listener {
 
                     // just in case we use checkpoints for droppers at some point
                     if (playerStats.hasCurrentCheckpoint())
-                        Parkour.getCheckpointManager().teleportToCP(playerStats, playerStats.getLevel());
+                        Parkour.getCheckpointManager().teleportToCP(playerStats);
                     else
                         LevelHandler.respawnPlayer(playerStats, playerStats.getLevel());
                 }

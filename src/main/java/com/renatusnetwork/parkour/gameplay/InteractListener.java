@@ -88,7 +88,7 @@ public class InteractListener implements Listener {
 
                 event.setCancelled(true);
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                Parkour.getCheckpointManager().teleportToCP(playerStats, playerStats.getLevel());
+                Parkour.getCheckpointManager().teleportToCP(playerStats);
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile")))
             {
@@ -146,7 +146,6 @@ public class InteractListener implements Listener {
                                         confirmMap.get(player.getName()).cancel();
 
                                         Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
-                                        Parkour.getSavesManager().removeSave(playerStats, level);
 
                                         playerStats.resetPracticeMode();
                                         playerStats.disableLevelStartTime();
