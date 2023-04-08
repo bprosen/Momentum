@@ -1061,6 +1061,37 @@ public class LevelCMD implements CommandExecutor {
                    levelManager.pickFeatured();
                    sender.sendMessage(Utils.translate("&7You have set the new featured to &c" + levelManager.getFeaturedLevel().getFormattedTitle()));
                 }
+                else if (a.length == 3 && a[0].equalsIgnoreCase("resetsave"))
+                {
+                    String playerName = a[1];
+                    Player target = Bukkit.getPlayer(playerName);
+                    String levelName = a[2].toLowerCase();
+                    Level level = Parkour.getLevelManager().get(levelName);
+
+                    if (level != null)
+                    {
+                        PlayerStats playerStats = Parkour.getStatsManager().get(target);
+
+                        if (playerStats != null)
+                        {
+                            // if they have save
+                            if (playerStats.hasSave(levelName))
+                            {
+                                Parkour.getSavesManager().removeSave(playerStats, level);
+                                sender.sendMessage(Utils.translate("&7You have reset &c" + playerName + "'s &7save on &a" + level.getFormattedTitle()));
+                            }
+                            else
+                                sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a save for " + level.getFormattedTitle()));
+                        }
+                        else
+                        {
+                            Parkour.getDatabaseManager().add("DELETE FROM saves WHERE player_name='" + playerName + "' AND level_name='" + levelName + "'");
+                            sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online but any record has been deleted from the database"));
+                        }
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a level"));
+                    }
+                }
                 else
                 {
                     sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -1114,5 +1145,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level togglenew <level>  &7Toggles if the level is new (for menu and future updates)"));
         sender.sendMessage(Utils.translate("&a/level setdifficulty <level> <difficulty>  &7Sets the difficulty of the level"));
         sender.sendMessage(Utils.translate("&a/level pickfeatured  &7Picks a new featured level"));
+        sender.sendMessage(Utils.translate("&a/level resetsave <player> <level>  &7Resets a player's save for a specific level"));
     }
 }

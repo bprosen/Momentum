@@ -47,6 +47,9 @@ public class CheckpointManager {
                 if (!playerStats.isInInfinitePK()) {
                     if (playerStats.getPlayerToSpectate() == null) {
 
+                        if (playerStats.inLevel() && playerStats.hasSave(playerStats.getLevel().getName()))
+                            Parkour.getSavesManager().removeSave(playerStats, playerStats.getLevel()); // reset save (wont do anything if they dont have one)
+
                         Location loc = null;
                         boolean setDirection = false;
                         /*

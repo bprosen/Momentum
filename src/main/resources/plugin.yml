@@ -97,3 +97,6 @@ commands:
     description: "RN-Parkour join command"
   play:
     description: "RN-Parkour play command"
+  save:
+    description: "RN-Parkour save command"
+    aliases: [saveloc, savelevel, savelocation, saves]
