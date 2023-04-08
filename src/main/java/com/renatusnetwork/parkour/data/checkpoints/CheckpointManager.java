@@ -40,15 +40,12 @@ public class CheckpointManager {
         }
     }
 
-    public void teleportToCP(PlayerStats playerStats, Level level) {
+    public void teleportToCP(PlayerStats playerStats) {
 
         if (!playerStats.inRace()) {
             if (!playerStats.isEventParticipant()) {
                 if (!playerStats.isInInfinitePK()) {
                     if (playerStats.getPlayerToSpectate() == null) {
-
-                        if (playerStats.inLevel() && playerStats.hasSave(level.getName()))
-                            Parkour.getSavesManager().removeSave(playerStats, level); // reset save (wont do anything if they dont have one)
 
                         Location loc = null;
                         boolean setDirection = false;

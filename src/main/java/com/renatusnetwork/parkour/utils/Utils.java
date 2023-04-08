@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.utils;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -160,5 +161,43 @@ public class Utils {
         // loop through and set
         for (Map.Entry<Integer, ItemStack> entry : Parkour.getSettingsManager().customJoinInventory.entrySet())
             player.getInventory().setItem(entry.getKey(), entry.getValue());
+    }
+
+    public static void teleportToSpawn(PlayerStats playerStats) {
+        Location loc = Parkour.getLocationManager().getLobbyLocation();
+        Player player = playerStats.getPlayer();
+
+        if (loc != null) {
+
+            if (!playerStats.isEventParticipant()) {
+                if (!playerStats.inRace()) {
+                    if (!playerStats.isInInfinitePK()) {
+                        if (playerStats.getPlayerToSpectate() == null) {
+                            // toggle off elytra armor
+                            Parkour.getStatsManager().toggleOffElytra(playerStats);
+
+                            player.teleport(loc);
+
+                            playerStats.resetCurrentCheckpoint();
+                            playerStats.resetPracticeMode();
+                            playerStats.resetLevel();
+
+                            playerStats.clearPotionEffects();
+
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+            }
+        } else {
+            Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
+        }
     }
 }

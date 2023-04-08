@@ -39,7 +39,7 @@ public class TutorialCMD implements CommandExecutor
                 {
                     // tp to spawn
                     playerStats.setTutorial(false);
-                    SpawnCMD.teleportToSpawn(playerStats);
+                    Utils.teleportToSpawn(playerStats);
                     player.sendMessage("");
                     player.sendMessage(Utils.translate("&b&lWelcome to Parkour!"));
                     player.sendMessage("");

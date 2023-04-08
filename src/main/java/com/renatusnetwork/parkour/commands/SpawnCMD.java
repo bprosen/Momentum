@@ -57,46 +57,8 @@ public class SpawnCMD implements CommandExecutor {
     {
         // check for tutorial
         if (!playerStats.isInTutorial())
-            teleportToSpawn(playerStats);
+            Utils.teleportToSpawn(playerStats);
         else
             playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
-    }
-
-    public static void teleportToSpawn(PlayerStats playerStats) {
-        Location loc = Parkour.getLocationManager().getLobbyLocation();
-        Player player = playerStats.getPlayer();
-
-        if (loc != null) {
-
-            if (!playerStats.isEventParticipant()) {
-                if (!playerStats.inRace()) {
-                    if (!playerStats.isInInfinitePK()) {
-                        if (playerStats.getPlayerToSpectate() == null) {
-                            // toggle off elytra armor
-                            Parkour.getStatsManager().toggleOffElytra(playerStats);
-
-                            player.teleport(loc);
-
-                            playerStats.resetCurrentCheckpoint();
-                            playerStats.resetPracticeMode();
-                            playerStats.resetLevel();
-
-                            playerStats.clearPotionEffects();
-
-                        } else {
-                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
-                        }
-                    } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
-                    }
-                } else {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
-                }
-            } else {
-                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
-            }
-        } else {
-            Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
-        }
     }
 }
