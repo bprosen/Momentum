@@ -142,7 +142,7 @@ public class RanksManager {
         // play sound
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2f, 0f);
 
-        Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
+        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
         Parkour.getStatsManager().runGGTimer();
     }
 
@@ -175,7 +175,7 @@ public class RanksManager {
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
         Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(Utils.translate("&c&l" + player.getDisplayName() + " &7has just &6&lPRESTIGED&7!" +
+        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has just &6&lPRESTIGED&7!" +
                                                      " &7They have prestiged &6" +
                                                      playerStats.getPrestiges() + " " + endingString + "!"));
         Bukkit.broadcastMessage("");
