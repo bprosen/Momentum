@@ -87,7 +87,8 @@ public class InteractListener implements Listener {
             {
 
                 event.setCancelled(true);
-                Parkour.getCheckpointManager().teleportToCP(Parkour.getStatsManager().get(player));
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                Parkour.getCheckpointManager().teleportToCP(playerStats, playerStats.getLevel());
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile")))
             {

@@ -538,7 +538,7 @@ public class MenuItemAction {
                                 // only tp if dont have a save
                                 if (save == null)
                                 {
-                                    Parkour.getCheckpointManager().teleportToCP(playerStats);
+                                    Parkour.getCheckpointManager().teleportToCP(playerStats, level);
                                     player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                                 }
                             // tp to start if no save
