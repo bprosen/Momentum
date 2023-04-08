@@ -16,6 +16,7 @@ import com.renatusnetwork.parkour.data.perks.PerkManager;
 import com.renatusnetwork.parkour.data.plots.PlotsManager;
 import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.ranks.RanksManager;
+import com.renatusnetwork.parkour.data.saves.SavesManager;
 import com.renatusnetwork.parkour.gameplay.*;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.data.SettingsManager;
@@ -51,6 +52,7 @@ public class Parkour extends JavaPlugin {
     private static EventManager events;
     private static InfinitePKManager infinite;
     private static BankManager bank;
+    private static SavesManager saves;
 
     @Override
     public void onEnable() {
@@ -163,6 +165,7 @@ public class Parkour extends JavaPlugin {
         getCommand("fails").setExecutor(new FailsCMD());
         getCommand("join").setExecutor(new JoinCMD());
         getCommand("play").setExecutor(new PlayCMD());
+        getCommand("save").setExecutor(new SaveCMD());
     }
 
     private static void loadClasses() {
@@ -182,6 +185,7 @@ public class Parkour extends JavaPlugin {
         plots = new PlotsManager();
         events = new EventManager();
         protocol = ProtocolLibrary.getProtocolManager();
+        saves = new SavesManager();
         bank = new BankManager();
     }
 
@@ -203,6 +207,7 @@ public class Parkour extends JavaPlugin {
         protocol = null;
         bank = null;
         events = null;
+        saves = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -239,5 +244,6 @@ public class Parkour extends JavaPlugin {
     public static EventManager getEventManager() { return events; }
     public static InfinitePKManager getInfinitePKManager() { return infinite; }
     public static ProtocolManager getProtocolManager() { return protocol; }
+    public static SavesManager getSavesManager() { return saves; }
     public static BankManager getBankManager() { return bank; }
 }

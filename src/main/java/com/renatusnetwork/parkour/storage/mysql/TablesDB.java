@@ -44,6 +44,9 @@ public class TablesDB {
         if (!tableNames.contains("bank"))
             createBank(database);
 
+        if (!tableNames.contains("saves"))
+            createSaves(database);
+
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -201,6 +204,23 @@ public class TablesDB {
                 "uuid CHAR(36) NOT NUll, " +
                 "player_name VARCHAR(16) NOT NULL, " +
                 "level_name VARCHAR(30) NOT NULL)";
+
+        database.run(sqlQuery);
+    }
+
+    private static void createSaves(DatabaseManager database)
+    {
+        String sqlQuery = "CREATE TABLE saves(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "player_name VARCHAR(16) NOT NULL, " +
+                "level_name VARCHAR(30) NOT NULL, " +
+                "world VARCHAR(15) NOT NULL, " +
+                "x FLOAT NOT NULL, " +
+                "y FLOAT NOT NULL, " +
+                "z FLOAT NOT NULL, " +
+                "yaw FLOAT NOT NULL, " +
+                "pitch FLOAT NOT NULL" +
+                ")";
 
         database.run(sqlQuery);
     }

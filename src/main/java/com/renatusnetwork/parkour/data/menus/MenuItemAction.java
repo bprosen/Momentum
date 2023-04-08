@@ -543,16 +543,32 @@ public class MenuItemAction {
                             if (playerStats.getPracticeLocation() != null)
                                 playerStats.resetPracticeMode();
 
+                            Location save = playerStats.getSave(level.getName());
                             Location spawn = playerStats.getCheckpoint(level.getName());
                             if (spawn != null) {
                                 playerStats.setCurrentCheckpoint(spawn);
-                                Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
-                            } else {
+
+                                // only tp if dont have a save
+                                if (save == null)
+                                {
+                                    Parkour.getCheckpointManager().teleportToCP(playerStats);
+                                    player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                                }
+                            // tp to start if no save
+                            } else if (save == null) {
                                 player.teleport(level.getStartLocation());
                                 player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
                                         + level.getFormattedTitle()));
                             }
+
+                            // if they have a save
+                            if (save != null)
+                            {
+                                Parkour.getSavesManager().loadSave(playerStats, save, level);
+                                player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
+                                player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
+                            }
+
                             playerStats.setLevel(level);
                             playerStats.disableLevelStartTime();
                             playerStats.resetFails();

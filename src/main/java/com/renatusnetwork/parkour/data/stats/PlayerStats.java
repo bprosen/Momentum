@@ -58,6 +58,7 @@ public class PlayerStats {
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> checkpoints = new HashMap<>();
     private HashSet<String> boughtLevels = new HashSet<>();
+    private HashMap<String, Location> saves = new HashMap<>();
 
     public PlayerStats(Player player) {
         this.player = player;
@@ -392,6 +393,29 @@ public class PlayerStats {
     }
 
     public HashMap<String, Location> getCheckpoints() { return checkpoints; }
+
+    //
+    // Saves Section
+    //
+    public Location getSave(String levelName)
+    {
+        return saves.get(levelName);
+    }
+
+    public boolean hasSave(String levelName)
+    {
+        return saves.containsKey(levelName);
+    }
+
+    public void removeSave(String levelName)
+    {
+        saves.remove(levelName);
+    }
+
+    public void addSave(String levelName, Location location)
+    {
+        saves.put(levelName, location);
+    }
 
     //
     // Completions Section

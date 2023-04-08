@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.RaceManager;
+import com.renatusnetwork.parkour.data.saves.SavesDB;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
@@ -76,6 +77,7 @@ public class JoinLeaveHandler implements Listener {
 
                 // load checkpoints
                 CheckpointDB.loadCheckpoints(playerStats);
+                SavesDB.loadSaves(playerStats);
 
                 // run most of this in async (region lookup, stat editing, etc)
                 new BukkitRunnable() {
