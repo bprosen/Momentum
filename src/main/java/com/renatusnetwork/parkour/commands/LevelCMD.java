@@ -1084,7 +1084,7 @@ public class LevelCMD implements CommandExecutor {
 
                     if (level != null)
                     {
-                        PlayerStats playerStats = Parkour.getStatsManager().get(target);
+                        PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
 
                         if (playerStats != null)
                         {
