@@ -34,32 +34,46 @@ public class SaveCMD implements CommandExecutor
                             {
                                 if (!playerStats.isEventParticipant())
                                 {
-                                    if (!playerStats.inRace())
+                                    if (playerStats.getPlayerToSpectate() == null)
                                     {
-                                        if (player.isOnGround())
+                                        if (playerStats.getPracticeLocation() == null)
                                         {
-                                            // passed all checks then they can save!
+                                            if (!playerStats.inRace())
+                                            {
+                                                if (player.isOnGround())
+                                                {
+                                                    // passed all checks then they can save!
 
-                                            // remove here
-                                            if (playerStats.hasSave(level.getName()))
-                                                Parkour.getSavesManager().removeSave(playerStats, level);
+                                                    // remove here
+                                                    if (playerStats.hasSave(level.getName()))
+                                                        Parkour.getSavesManager().removeSave(playerStats, level);
 
-                                            // add here
-                                            Parkour.getSavesManager().addSave(playerStats, player.getLocation(), level);
+                                                    // add here
+                                                    Parkour.getSavesManager().addSave(playerStats, player.getLocation(), level);
 
-                                            Utils.teleportToSpawn(playerStats); // tp to spawn
+                                                    Utils.teleportToSpawn(playerStats); // tp to spawn
 
-                                            player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getFormattedTitle()));
-                                            player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getFormattedTitle() + "&a, you will teleport at your save"));
+                                                    player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getFormattedTitle()));
+                                                    player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getFormattedTitle() + "&a, you will teleport at your save"));
+                                                }
+                                                else
+                                                {
+                                                    player.sendMessage(Utils.translate("&cYou cannot save while in the air"));
+                                                }
+                                            }
+                                            else
+                                            {
+                                                player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                                            }
                                         }
                                         else
                                         {
-                                            player.sendMessage(Utils.translate("&cYou cannot save while in the air"));
+                                            player.sendMessage(Utils.translate("&cYou cannot do this while in /prac"));
                                         }
                                     }
                                     else
                                     {
-                                        player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                                        player.sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
                                     }
                                 }
                                 else
