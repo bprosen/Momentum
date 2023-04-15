@@ -128,46 +128,49 @@ public class InteractListener implements Listener {
                         if (!playerStats.isEventParticipant()) {
                             if (playerStats.getPlayerToSpectate() == null) {
                                 if (level != null) {
+                                    if (level.getStartLocation() != null) {
+                                        // gets if they have right clicked it already, if so, cancel the task and reset them
+                                        if (!confirmMap.containsKey(player.getName())) {
+                                            // otherwise, put them in and ask them to confirm within 5 seconds
+                                            player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
 
-                                    // gets if they have right clicked it already, if so, cancel the task and reset them
-                                    if (!confirmMap.containsKey(player.getName())) {
-                                        // otherwise, put them in and ask them to confirm within 5 seconds
-                                        player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+                                            confirmMap.put(player.getName(), new BukkitRunnable() {
+                                                public void run() {
+                                                    if (confirmMap.containsKey(player.getName())) {
+                                                        confirmMap.remove(player.getName());
+                                                        player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                                    }
+                                                }
+                                            }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                                        } else {
+                                            confirmMap.get(player.getName()).cancel();
 
-                                        confirmMap.put(player.getName(), new BukkitRunnable() {
-                                            public void run() {
-                                                if (confirmMap.containsKey(player.getName())) {
-                                                    confirmMap.remove(player.getName());
-                                                    player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                            Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
+
+                                            playerStats.resetPracticeMode();
+                                            playerStats.disableLevelStartTime();
+
+                                            if (!level.getPotionEffects().isEmpty()) {
+
+                                                playerStats.clearPotionEffects();
+
+                                                // if has nv status, add nv
+                                                if (playerStats.hasNVStatus())
+                                                    player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+
+                                                for (PotionEffect potionEffect : level.getPotionEffects()) {
+                                                    if (playerStats.hasNVStatus() || potionEffect.getType() != PotionEffectType.NIGHT_VISION)
+                                                        player.addPotionEffect(potionEffect);
                                                 }
                                             }
-                                        }.runTaskLater(Parkour.getPlugin(), 20 * 5));
-                                    } else {
-                                        confirmMap.get(player.getName()).cancel();
+                                            confirmMap.remove(player.getName());
 
-                                        Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
-
-                                        playerStats.resetPracticeMode();
-                                        playerStats.disableLevelStartTime();
-
-                                        if (!level.getPotionEffects().isEmpty()) {
-
-                                            playerStats.clearPotionEffects();
-
-                                            // if has nv status, add nv
-                                            if (playerStats.hasNVStatus())
-                                                player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-
-                                            for (PotionEffect potionEffect : level.getPotionEffects()) {
-                                                if (playerStats.hasNVStatus() || potionEffect.getType() != PotionEffectType.NIGHT_VISION)
-                                                    player.addPotionEffect(potionEffect);
-                                            }
+                                            player.teleport(level.getStartLocation());
+                                            playerStats.resetFails();
+                                            player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
                                         }
-                                        confirmMap.remove(player.getName());
-
-                                        player.teleport(level.getStartLocation());
-                                        playerStats.resetFails();
-                                        player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
+                                    } else {
+                                        player.sendMessage(Utils.translate("&cYou cannot reset a level with no start location"));
                                     }
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou are not in a level"));
