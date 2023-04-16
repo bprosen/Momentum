@@ -146,7 +146,7 @@ public class ClansManager {
 
                     onlineMember.sendMessage(Utils.translate("&6" + player.getName() + " &ehas completed &6" +
                             level.getFormattedTitle() + " &eand you received &6" + (percentage * 100) + "%" +
-                            " &eof the reward! &6($" + (int) splitAmountPerMember + ")"));
+                            " &eof the reward! &6" + Utils.formatNumber(splitAmountPerMember) + " &eCoins"));
                 }
                 else
                 {
