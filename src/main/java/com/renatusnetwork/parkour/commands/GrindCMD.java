@@ -30,7 +30,7 @@ public class GrindCMD implements CommandExecutor
                     playerStats.toggleGrinding();
                     StatsDB.updatePlayerGrinding(playerStats);
 
-                    player.sendMessage(Utils.translate("&a&lGrind &8» &7You have turned grind mode " + (playerStats.isGrinding() ? "&aOn" : "&cOff")));
+                    player.sendMessage(Utils.translate("&7You have turned grind mode " + (playerStats.isGrinding() ? "&aOn" : "&cOff")));
                 }
             }
         }
