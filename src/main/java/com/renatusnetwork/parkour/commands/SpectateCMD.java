@@ -50,8 +50,7 @@ public class SpectateCMD implements CommandExecutor {
                                                                 if (player.isOnGround()) {
 
                                                                     Location location = player.getLocation().clone();
-                                                                    if (location.getBlock().getType() == Material.AIR &&
-                                                                        location.add(0, 1, 0).getBlock().getType() == Material.AIR)
+                                                                    if (location.add(0, 1, 0).getBlock().getType() == Material.AIR)
                                                                     {
                                                                         boolean initialSpectate = true;
                                                                         if (spectatorStats.getPlayerToSpectate() != null) {
