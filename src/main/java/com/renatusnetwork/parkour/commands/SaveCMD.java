@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -42,19 +43,26 @@ public class SaveCMD implements CommandExecutor
                                             {
                                                 if (player.isOnGround())
                                                 {
-                                                    // passed all checks then they can save!
+                                                    if (player.getLocation().clone().add(0, 1, 0).getBlock().getType() == Material.AIR)
+                                                    {
+                                                        // passed all checks then they can save!
 
-                                                    // remove here
-                                                    if (playerStats.hasSave(level.getName()))
-                                                        Parkour.getSavesManager().removeSave(playerStats, level);
+                                                        // remove here
+                                                        if (playerStats.hasSave(level.getName()))
+                                                            Parkour.getSavesManager().removeSave(playerStats, level);
 
-                                                    // add here
-                                                    Parkour.getSavesManager().addSave(playerStats, player.getLocation(), level);
+                                                        // add here
+                                                        Parkour.getSavesManager().addSave(playerStats, player.getLocation(), level);
 
-                                                    Utils.teleportToSpawn(playerStats); // tp to spawn
+                                                        Utils.teleportToSpawn(playerStats); // tp to spawn
 
-                                                    player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getFormattedTitle()));
-                                                    player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getFormattedTitle() + "&a, you will teleport at your save"));
+                                                        player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getFormattedTitle()));
+                                                        player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getFormattedTitle() + "&a, you will teleport at your save"));
+                                                    }
+                                                    else
+                                                    {
+                                                        player.sendMessage(Utils.translate("&cYou cannot use /save when in a block"));
+                                                    }
                                                 }
                                                 else
                                                 {
