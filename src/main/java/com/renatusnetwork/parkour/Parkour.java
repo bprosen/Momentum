@@ -5,6 +5,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
 import com.renatusnetwork.parkour.data.Placeholders;
 import com.renatusnetwork.parkour.data.bank.BankManager;
+import com.renatusnetwork.parkour.data.blackmarket.BlackMarketEvent;
+import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
@@ -52,6 +54,7 @@ public class Parkour extends JavaPlugin {
     private static EventManager events;
     private static InfinitePKManager infinite;
     private static BankManager bank;
+    private static BlackMarketManager blackmarket;
     private static SavesManager saves;
 
     @Override
@@ -187,6 +190,7 @@ public class Parkour extends JavaPlugin {
         protocol = ProtocolLibrary.getProtocolManager();
         saves = new SavesManager();
         bank = new BankManager();
+        blackmarket = new BlackMarketManager();
     }
 
     private static void unloadClasses() {
@@ -208,6 +212,7 @@ public class Parkour extends JavaPlugin {
         bank = null;
         events = null;
         saves = null;
+        blackmarket = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -246,4 +251,5 @@ public class Parkour extends JavaPlugin {
     public static ProtocolManager getProtocolManager() { return protocol; }
     public static SavesManager getSavesManager() { return saves; }
     public static BankManager getBankManager() { return bank; }
+    public static BlackMarketManager getBlackMarketManager() { return blackmarket; }
 }
