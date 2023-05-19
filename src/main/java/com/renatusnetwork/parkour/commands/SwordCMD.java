@@ -36,7 +36,7 @@ public class SwordCMD implements CommandExecutor {
             }
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            ItemStack swordItem = Utils.getSwordIfExists(playerStats, player.getInventory());
+            ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
 
             // take away item
             if (swordItem != null) {

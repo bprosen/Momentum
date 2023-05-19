@@ -91,7 +91,7 @@ public class Utils {
         return result;
     }
 
-    public static ItemStack getSwordIfExists(PlayerStats playerStats, Inventory inventory) {
+    public static ItemStack getSwordIfExists(Inventory inventory) {
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ItemStack swordItem = null;
