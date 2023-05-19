@@ -91,7 +91,7 @@ public class Utils {
         return result;
     }
 
-    public static ItemStack getSwordIfExists(Inventory inventory) {
+    public static ItemStack getSwordIfExists(PlayerStats playerStats, Inventory inventory) {
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ItemStack swordItem = null;
@@ -99,9 +99,9 @@ public class Utils {
         // try to find the sword in their inventory
         for (ItemStack item : inventory.getContents()) {
 
-            if (item != null && item.getType() == settingsManager.sword_type &&
-                    item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                    item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.sword_title))) {
+            if (item != null &&
+                item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
+                item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.sword_title))) {
 
                 swordItem = item;
                 break;

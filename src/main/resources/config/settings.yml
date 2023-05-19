@@ -87,7 +87,37 @@ signs:
     completion: "To redeem"
     spawn: "To return to"
 setup-sword:
-  type: IRON_SWORD
+  prestiges:
+    '0':
+      type: WOOD_SWORD
+      enchanted: false
+    '1':
+      type: STONE_SWORD
+      enchanted: false
+    '2':
+      type: IRON_SWORD
+      enchanted: false
+    '3':
+      type: GOLD_SWORD
+      enchanted: false
+    '4':
+      type: DIAMOND_SWORD
+      enchanted: false
+    '5':
+      type: WOOD_SWORD
+      glow: true
+    '6':
+      type: STONE_SWORD
+      glow: true
+    '7':
+      type: IRON_SWORD
+      glow: true
+    '8':
+      type: GOLD_SWORD
+      glow: true
+    '9':
+      type: DIAMOND_SWORD
+      glow: true
   title: "&cSetup Sword"
   hotbar_slot: 1
 

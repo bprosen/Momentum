@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class SwordCMD implements CommandExecutor {
 
@@ -29,23 +31,25 @@ public class SwordCMD implements CommandExecutor {
             EventManager eventManager = Parkour.getEventManager();
             // if running and participant, cancel
             if (eventManager.isEventRunning() && eventManager.isParticipant(player)) {
-                player.sendMessage(Utils.translate("&cYou cannot do this "));
+                player.sendMessage(Utils.translate("&cYou cannot do this"));
                 return true;
             }
 
-            ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            ItemStack swordItem = Utils.getSwordIfExists(playerStats, player.getInventory());
 
             // take away item
             if (swordItem != null) {
                 player.getInventory().removeItem(swordItem);
                 player.sendMessage(Utils.translate("&7You took away your &cSetup Sword"));
             } else {
+                LinkedHashMap<Integer, ItemStack> swords = settingsManager.setup_swords;
+
                 // create item and give
-                swordItem = new ItemStack(settingsManager.sword_type);
-                ItemMeta itemMeta = swordItem.getItemMeta();
-                itemMeta.setDisplayName(Utils.translate(settingsManager.sword_title));
-                itemMeta.setLore(new ArrayList<String>() {{ add(Utils.translate("&7Use this to help out with precise setup!")); }});
-                swordItem.setItemMeta(itemMeta);
+                if (swords.containsKey(playerStats.getPrestiges()))
+                    swordItem = swords.get(playerStats.getPrestiges());
+                else
+                    swordItem = swords.get(swords.size() - 1); // its linked so safe to assume
 
                 player.getInventory().setItem(settingsManager.sword_hotbar_slot, swordItem);
                 player.sendMessage(Utils.translate("&7You have been given a &cSetup Sword"));

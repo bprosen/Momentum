@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -60,9 +62,9 @@ public class SettingsManager {
     public int half_heart_event_task_delay;
     public int rising_water_event_task_delay;
 
-    public Material sword_type;
-    public String sword_title;
+    public LinkedHashMap<Integer, ItemStack> setup_swords;
     public int sword_hotbar_slot;
+    public String sword_title;
 
     public int max_infinitepk_leaderboard_size;
     public int max_infinitepk_x;
@@ -148,8 +150,6 @@ public class SettingsManager {
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
-        sword_title = settings.getString("setup-sword.title");
-        sword_type = Material.matchMaterial(settings.getString("setup-sword.type"));
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         max_infinitepk_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
         max_infinitepk_x = settings.getInt("infinitepk.max_x");
@@ -241,5 +241,31 @@ public class SettingsManager {
         cooldownCalendar.set(Calendar.DAY_OF_YEAR, currentDate.get(Calendar.DAY_OF_YEAR) + 1); // next day
         cooldownCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
         cooldownCalendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
+
+        sword_title = Utils.translate(settings.getString("setup-sword.title"));
+        setup_swords = new LinkedHashMap<>(); // we want it in order!
+
+        for (int i = 0;; i++)
+        {
+            if (settings.isConfigurationSection("setup-sword.prestiges." + i))
+            {
+                ItemStack sword = new ItemStack(Material.matchMaterial(settings.getString("setup-sword.prestiges." + i + ".type")));
+                ItemMeta meta = sword.getItemMeta();
+                meta.setDisplayName(sword_title);
+
+                // set glow
+                if (settings.getBoolean("setup-sword.prestiges." + i + ".glow"))
+                {
+                    meta.addEnchant(Enchantment.DURABILITY, 1, true);
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                }
+
+                sword.setItemMeta(meta);
+
+                setup_swords.put(i, sword); // put in
+            }
+            else
+                break;
+        }
     }
 }
