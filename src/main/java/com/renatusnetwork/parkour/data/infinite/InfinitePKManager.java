@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.infinite;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.api.InfiniteEndEvent;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -91,88 +92,98 @@ public class InfinitePKManager {
         }.runTask(Parkour.getPlugin());
     }
 
-    public void endPK(Player player, boolean disconnected) {
+    public void endPK(Player player, boolean disconnected)
+    {
 
         InfinitePK infinitePK = get(player.getName());
-        if (infinitePK != null) {
+        if (infinitePK != null)
+        {
+            InfiniteEndEvent event = new InfiniteEndEvent(infinitePK.getScore());
+            Bukkit.getPluginManager().callEvent(event);
 
-            // run in sync because of packet listener running in async, need to remove blocks in sync
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    // tp in sync
-                    player.teleport(infinitePK.getOriginalLoc());
-                    // clear blocks and reset data
-                    infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
-                    infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
-                    infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
+            if (!event.isCancelled())
+            {
+                // run in sync because of packet listener running in async, need to remove blocks in sync
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        // tp in sync
+                        player.teleport(infinitePK.getOriginalLoc());
+                        // clear blocks and reset data
+                        infinitePK.getLastBlockLoc().getBlock().setType(Material.AIR);
+                        infinitePK.getPressutePlateLoc().getBlock().setType(Material.AIR);
+                        infinitePK.getCurrentBlockLoc().getBlock().setType(Material.AIR);
+                    }
+                }.runTask(Parkour.getPlugin());
+
+                int score = infinitePK.getScore();
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                boolean doRewardsMsg = false;
+                List<InfinitePKReward> rewards = null;
+
+                if (score > playerStats.getInfinitePKScore())
+                {
+                    rewards = getApplicableRewards(playerStats.getInfinitePKScore(), score);
+
+                    // dispatch command if not null and they havent gotten this reward yet
+                    if (!rewards.isEmpty()) {
+                        doRewardsMsg = true;
+
+                        // run in sync for safety
+                        for (InfinitePKReward reward : rewards) {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    // loop through and run commands of applicable rewards
+                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                                }
+                            }.runTask(Parkour.getPlugin());
+                        }
+                    }
                 }
-            }.runTask(Parkour.getPlugin());
 
-            int score = infinitePK.getScore();
-            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                if (isBestScore(player.getName(), score))
+                {
+                    // if they disconnected
+                    if (!disconnected) {
+                        player.sendMessage(Utils.translate(
+                                "&7You have beaten your previous record of &d" +
+                                        Utils.formatNumber(playerStats.getInfinitePKScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
+                                        "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
+                        ));
 
-            boolean doRewardsMsg = false;
-            List<InfinitePKReward> rewards = null;
-            if (score > playerStats.getInfinitePKScore()) {
-                rewards = getApplicableRewards(playerStats.getInfinitePKScore(), score);
+                        if (doRewardsMsg) {
+                            // we can safely assume since it will only be true if its not empty
+                            for (InfinitePKReward reward : rewards)
+                                player.sendMessage(Utils.translate(
+                                        " &7You received &d" + reward.getName() + " &d(Score of " + reward.getScoreNeeded() + ")"));
+                        }
+                    }
 
-                // dispatch command if not null and they havent gotten this reward yet
-                if (!rewards.isEmpty()) {
-                    doRewardsMsg = true;
+                    updateScore(player.getName(), score);
 
-                    // run in sync for safety
-                    for (InfinitePKReward reward : rewards) {
+                    // load leaderboard if they have a lb position
+                    if (scoreWillBeLB(score) || leaderboard.size() < Parkour.getSettingsManager().max_infinitepk_leaderboard_size) {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                // loop through and run commands of applicable rewards
-                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                                loadLeaderboard();
                             }
-                        }.runTask(Parkour.getPlugin());
+                        }.runTaskAsynchronously(Parkour.getPlugin());
                     }
-                }
-            }
-
-            if (isBestScore(player.getName(), score)) {
-                // if they disconnected
-                if (!disconnected) {
+                } else if (!disconnected) {
                     player.sendMessage(Utils.translate(
-                            "&7You have beaten your previous record of &d" +
-                            Utils.formatNumber(playerStats.getInfinitePKScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
-                            "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
+                            "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + playerStats.getInfinitePKScore() + ")\n" +
+                                    "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
                     ));
-
-                    if (doRewardsMsg) {
-                        // we can safely assume since it will only be true if its not empty
-                        for (InfinitePKReward reward : rewards)
-                            player.sendMessage(Utils.translate(
-                        " &7You received &d" + reward.getName() + " &d(Score of " + reward.getScoreNeeded() + ")"));
-                    }
                 }
+                // deposit reward from listener (default = score)
+                Parkour.getStatsManager().addCoins(playerStats, event.getReward());
 
-                updateScore(player.getName(), score);
-
-                // load leaderboard if they have a lb position
-                if (scoreWillBeLB(score) || leaderboard.size() < Parkour.getSettingsManager().max_infinitepk_leaderboard_size) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            loadLeaderboard();
-                        }
-                    }.runTaskAsynchronously(Parkour.getPlugin());
-                }
-            } else if (!disconnected) {
-                player.sendMessage(Utils.translate(
-                        "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + playerStats.getInfinitePKScore() + ")\n" +
-                             "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
-                ));
+                playerStats.setInfinitePK(false);
+                participants.remove(player.getName());
             }
-            // deposit score
-            Parkour.getStatsManager().addCoins(playerStats, score);
-
-            playerStats.setInfinitePK(false);
-            participants.remove(player.getName());
         }
     }
 

@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.events;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.api.ParkourEventEndEvent;
 import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
@@ -168,43 +169,49 @@ public class EventManager {
         maxRunTimer.cancel();
         reminderTimer.cancel();
 
-        // then remove all participants
-        removeAllParticipants(false);
-        // clear eliminated list
-        eliminated.clear();
-        // clear all water if it was the rising water event
-        clearWater();
+        ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(winner, runningEvent.getLevel().getReward());
+        Bukkit.getPluginManager().callEvent(parkourEventEndEvent);
 
-        if (winner != null)
+        if (!parkourEventEndEvent.isCancelled())
         {
-            PlayerStats playerStats = Parkour.getStatsManager().get(winner);
+            // then remove all participants
+            removeAllParticipants(false);
+            // clear eliminated list
+            eliminated.clear();
+            // clear all water if it was the rising water event
+            clearWater();
 
-            // give higher reward if prestiged
-            int prestiges = playerStats.getPrestiges();
-            int reward = runningEvent.getLevel().getReward();
-            if (prestiges > 0 && runningEvent.getLevel().getReward() > 0)
-                reward = (int) (runningEvent.getLevel().getReward() * playerStats.getPrestigeMultiplier());
+            if (winner != null)
+            {
+                PlayerStats playerStats = Parkour.getStatsManager().get(winner);
 
-            Parkour.getStatsManager().addCoins(playerStats, reward);
+                // give higher reward if prestiged
+                int prestiges = playerStats.getPrestiges();
+                int reward = parkourEventEndEvent.getReward();
 
-            Parkour.getStatsManager().runGGTimer();
+                if (prestiges > 0 && reward > 0)
+                    reward *= playerStats.getPrestigeMultiplier();
 
-            // update wins
-            playerStats.addEventWin();
-            Parkour.getDatabaseManager().add("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
-        }
+                Parkour.getStatsManager().addCoins(playerStats, reward);
+                Parkour.getStatsManager().runGGTimer();
 
-        if (forceEnded)
-            Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
-                    + " &7Event has been force ended!"));
-        else if (ranOutOfTime)
-            Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
-                    + " &7Event has gone on too long! Nobody beat it in time :("));
-        else {
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
-                    + " &7Event has ended! &b&l" + winner.getDisplayName() + " &7has won!"));
-            Bukkit.broadcastMessage("");
+                // update wins
+                playerStats.addEventWin();
+                Parkour.getDatabaseManager().add("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
+            }
+
+            if (forceEnded)
+                Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
+                        + " &7Event has been force ended!"));
+            else if (ranOutOfTime)
+                Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
+                        + " &7Event has gone on too long! Nobody beat it in time :("));
+            else {
+                Bukkit.broadcastMessage("");
+                Bukkit.broadcastMessage(Utils.translate("&7A &b" + formatName(runningEvent.getEventType())
+                        + " &7Event has ended! &b&l" + winner.getDisplayName() + " &7has won!"));
+                Bukkit.broadcastMessage("");
+            }
         }
 
         // null the running event last
