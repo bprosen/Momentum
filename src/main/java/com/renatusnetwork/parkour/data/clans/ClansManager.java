@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.clans;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.api.ClanXPRewardEvent;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -157,78 +158,88 @@ public class ClansManager {
         }
     }
 
-    public void doClanXPCalc(Clan clan, Player player, int reward) {
+    public void doClanXPCalc(Clan clan, Player player, int reward)
+    {
+
         int min = Parkour.getSettingsManager().clan_calc_percent_min;
         int max = Parkour.getSettingsManager().clan_calc_percent_max;
 
         // get random percent
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
         int clanXP = (int) (reward * percent);
-        int totalXP = clanXP + clan.getXP();
 
-        // if max level, keep calculating xp
-        if (clan.isMaxLevel()) {
-            clan.addXP(clanXP);
-            ClansDB.setClanXP(totalXP, clan.getID());
-            sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
-                                Utils.formatNumber(clanXP) + " &eXP for your clan!" +
-                                " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()), null);
+        ClanXPRewardEvent event = new ClanXPRewardEvent(clan, clanXP);
 
-        // level them up
-        } else if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
+        if (!event.isCancelled())
+        {
+            clanXP = event.getXP(); // override from event
 
-            // left over after level up
-            int clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
-            int newLevel = clan.getLevel() + 1;
+            int totalXP = clanXP + clan.getXP();
 
-            // this is the section that will determine if they will skip any levels
-            for (int i = clan.getLevel(); i < ClansYAML.getMaxLevel(); i++) {
-                // this means they are still above the next level amount
-                if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel)) {
+            // if max level, keep calculating xp
+            if (clan.isMaxLevel()) {
+                clan.addXP(clanXP);
+                ClansDB.setClanXP(totalXP, clan.getID());
+                sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
+                        Utils.formatNumber(clanXP) + " &eXP for your clan!" +
+                        " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()), null);
 
-                    // remove from overflow and add +1 level
-                    clanXPOverflow -= ClansYAML.getLevelUpPrice(newLevel);
-                    newLevel++;
-                } else {
-                    break;
+                // level them up
+            } else if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
+
+                // left over after level up
+                int clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
+                int newLevel = clan.getLevel() + 1;
+
+                // this is the section that will determine if they will skip any levels
+                for (int i = clan.getLevel(); i < ClansYAML.getMaxLevel(); i++) {
+                    // this means they are still above the next level amount
+                    if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel)) {
+
+                        // remove from overflow and add +1 level
+                        clanXPOverflow -= ClansYAML.getLevelUpPrice(newLevel);
+                        newLevel++;
+                    } else {
+                        break;
+                    }
                 }
+
+                // if > or = max level, manually set jic
+                if (newLevel >= ClansYAML.getMaxLevel())
+                    newLevel = ClansYAML.getMaxLevel();
+
+                clan.setLevel(newLevel);
+                sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
+
+                // play level up sound to online clan members
+                for (ClanMember clanMember : clan.getMembers()) {
+                    Player onlineMember = Bukkit.getPlayer(clanMember.getPlayerName());
+
+                    if (onlineMember != null)
+                        onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
+                }
+
+                // add rest of xp after leveling up
+                ClansDB.setClanLevel(newLevel, clan.getID());
+                ClansDB.setClanXP(clanXPOverflow, clan.getID());
+                clan.setXP(clanXPOverflow);
+
+                // add xp to clan
+            } else {
+                // otherwise add xp to cache and database
+                clan.addXP(clanXP);
+                ClansDB.setClanXP(totalXP, clan.getID());
+
+                long clanXPNeeded = ClansYAML.getLevelUpPrice(clan) - clan.getXP();
+
+                sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
+                        Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
+                        Utils.formatNumber(clanXPNeeded) + "&c)", null);
             }
-
-            // if > or = max level, manually set jic
-            if (newLevel >= ClansYAML.getMaxLevel())
-                newLevel = ClansYAML.getMaxLevel();
-
-            clan.setLevel(newLevel);
-            sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
-
-            // play level up sound to online clan members
-            for (ClanMember clanMember : clan.getMembers()) {
-                Player onlineMember = Bukkit.getPlayer(clanMember.getPlayerName());
-
-                if (onlineMember != null)
-                    onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
-            }
-
-            // add rest of xp after leveling up
-            ClansDB.setClanLevel(newLevel, clan.getID());
-            ClansDB.setClanXP(clanXPOverflow, clan.getID());
-            clan.setXP(clanXPOverflow);
-
-        // add xp to clan
-        } else {
-            // otherwise add xp to cache and database
-            clan.addXP(clanXP);
-            ClansDB.setClanXP(totalXP, clan.getID());
-
-            long clanXPNeeded = ClansYAML.getLevelUpPrice(clan) - clan.getXP();
-
-            sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
-                    Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
-                    Utils.formatNumber(clanXPNeeded) + "&c)", null);
+            // update total gained xp
+            ClansDB.setTotalGainedClanXP(clan.getTotalGainedXP() + clanXP, clan.getID());
+            clan.setTotalGainedXP(clan.getTotalGainedXP() + clanXP);
         }
-        // update total gained xp
-        ClansDB.setTotalGainedClanXP(clan.getTotalGainedXP() + clanXP, clan.getID());
-        clan.setTotalGainedXP(clan.getTotalGainedXP() + clanXP);
     }
 
     public void deleteClan(int clanID, boolean messageMembers) {
