@@ -179,18 +179,20 @@ public class LevelHandler {
 
                         // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
                         if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
-                            Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, level);
+                            Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, reward);
 
                         // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
                         if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
                         {
                             // async for database querying
+                            int finalReward = reward;
+
                             new BukkitRunnable()
                             {
                                 @Override
                                 public void run()
                                 {
-                                    Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level);
+                                    Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level, finalReward);
                                 }
                             }.runTaskAsynchronously(Parkour.getPlugin());
                         }
