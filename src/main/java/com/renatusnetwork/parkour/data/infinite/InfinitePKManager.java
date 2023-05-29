@@ -150,14 +150,14 @@ public class InfinitePKManager {
                         player.sendMessage(Utils.translate(
                                 "&7You have beaten your previous record of &d" +
                                         Utils.formatNumber(playerStats.getInfinitePKScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
-                                        "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
+                                        "&7Awarded &6" + Utils.formatNumber(event.getReward()) + " &eCoins"
                         ));
 
                         if (doRewardsMsg) {
                             // we can safely assume since it will only be true if its not empty
                             for (InfinitePKReward reward : rewards)
                                 player.sendMessage(Utils.translate(
-                                        " &7You received &d" + reward.getName() + " &d(Score of " + reward.getScoreNeeded() + ")"));
+                                        " &7You received &d" + reward.getName() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
                         }
                     }
 
@@ -174,8 +174,8 @@ public class InfinitePKManager {
                     }
                 } else if (!disconnected) {
                     player.sendMessage(Utils.translate(
-                            "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + playerStats.getInfinitePKScore() + ")\n" +
-                                    "&7Awarded &6" + ((int) Math.ceil(score / 2f)) + " &eCoins"
+                            "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + Utils.formatNumber(playerStats.getInfinitePKScore()) + ")\n" +
+                                    "&7Awarded &6" + Utils.formatNumber(event.getReward()) + " &eCoins"
                     ));
                 }
                 // deposit reward from listener (default = score)
