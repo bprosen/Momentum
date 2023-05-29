@@ -164,16 +164,16 @@ public class EventManager {
     public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime) {
         this.winner = winner;
 
-        // cancel schedulers first
-        runningEvent.getScheduler().cancel();
-        maxRunTimer.cancel();
-        reminderTimer.cancel();
-
         ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(winner, runningEvent.getLevel().getReward());
         Bukkit.getPluginManager().callEvent(parkourEventEndEvent);
 
         if (!parkourEventEndEvent.isCancelled())
         {
+            // cancel schedulers first
+            runningEvent.getScheduler().cancel();
+            maxRunTimer.cancel();
+            reminderTimer.cancel();
+
             // then remove all participants
             removeAllParticipants(false);
             // clear eliminated list
@@ -212,10 +212,10 @@ public class EventManager {
                         + " &7Event has ended! &b&l" + winner.getDisplayName() + " &7has won!"));
                 Bukkit.broadcastMessage("");
             }
-        }
 
-        // null the running event last
-        runningEvent = null;
+            // null the running event last
+            runningEvent = null;
+        }
     }
 
     public Event getRunningEvent() {
