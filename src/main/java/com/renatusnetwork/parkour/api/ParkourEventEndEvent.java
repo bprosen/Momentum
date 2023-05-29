@@ -14,6 +14,11 @@ public class ParkourEventEndEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
+    public static HandlerList getHandlerList()
+    {
+        return HANDLERS;
+    }
+
     public ParkourEventEndEvent(Player winner, int reward)
     {
         this.winner = winner;
