@@ -12,6 +12,11 @@ public class InfiniteEndEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
+    public static HandlerList getHandlerList()
+    {
+        return HANDLERS;
+    }
+
     public InfiniteEndEvent(int score)
     {
         this.reward = score;

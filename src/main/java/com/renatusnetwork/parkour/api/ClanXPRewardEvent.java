@@ -13,6 +13,11 @@ public class ClanXPRewardEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
+    public static HandlerList getHandlerList()
+    {
+        return HANDLERS;
+    }
+
     public ClanXPRewardEvent(Clan clan, int xp)
     {
         this.clan = clan;
