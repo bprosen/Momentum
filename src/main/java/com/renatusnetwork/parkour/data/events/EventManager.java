@@ -161,14 +161,15 @@ public class EventManager {
     }
 
     // method to end event
-    public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime) {
-        this.winner = winner;
-
+    public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime)
+    {
         ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(winner, runningEvent.getLevel().getReward());
         Bukkit.getPluginManager().callEvent(parkourEventEndEvent);
 
         if (!parkourEventEndEvent.isCancelled())
         {
+            this.winner = winner;
+
             // cancel schedulers first
             runningEvent.getScheduler().cancel();
             maxRunTimer.cancel();
