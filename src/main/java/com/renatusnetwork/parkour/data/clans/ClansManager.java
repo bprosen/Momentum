@@ -169,6 +169,7 @@ public class ClansManager {
         int clanXP = (int) (reward * percent);
 
         ClanXPRewardEvent event = new ClanXPRewardEvent(clan, clanXP);
+        Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled())
         {
