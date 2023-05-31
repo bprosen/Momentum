@@ -168,7 +168,7 @@ public class ClansManager {
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
         int clanXP = (int) (level.getReward() * percent);
 
-        ClanXPRewardEvent event = new ClanXPRewardEvent(clan, clanXP);
+        ClanXPRewardEvent event = new ClanXPRewardEvent(player, clan, clanXP);
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled())

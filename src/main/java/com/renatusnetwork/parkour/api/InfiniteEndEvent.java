@@ -1,5 +1,7 @@
 package com.renatusnetwork.parkour.api;
 
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -7,6 +9,7 @@ import org.bukkit.event.HandlerList;
 public class InfiniteEndEvent extends Event implements Cancellable
 {
 
+    private Player player;
     private int reward;
     private boolean cancelled;
 
@@ -17,10 +20,16 @@ public class InfiniteEndEvent extends Event implements Cancellable
         return HANDLERS;
     }
 
-    public InfiniteEndEvent(int score)
+    public InfiniteEndEvent(Player player, int score)
     {
+        this.player = player;
         this.reward = score;
         this.cancelled = false;
+    }
+
+    public Player getPlayer()
+    {
+        return player;
     }
 
     public void setReward(int reward)

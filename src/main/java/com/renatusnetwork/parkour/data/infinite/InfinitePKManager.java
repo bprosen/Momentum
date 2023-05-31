@@ -98,7 +98,7 @@ public class InfinitePKManager {
         InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null)
         {
-            InfiniteEndEvent event = new InfiniteEndEvent(infinitePK.getScore());
+            InfiniteEndEvent event = new InfiniteEndEvent(player, infinitePK.getScore());
             Bukkit.getPluginManager().callEvent(event);
 
             if (!event.isCancelled())

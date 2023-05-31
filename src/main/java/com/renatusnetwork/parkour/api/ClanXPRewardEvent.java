@@ -1,12 +1,15 @@
 package com.renatusnetwork.parkour.api;
 
 import com.renatusnetwork.parkour.data.clans.Clan;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class ClanXPRewardEvent extends Event implements Cancellable
 {
+    private Player player;
     private Clan clan;
     private int xp;
     private boolean cancelled;
@@ -18,11 +21,17 @@ public class ClanXPRewardEvent extends Event implements Cancellable
         return HANDLERS;
     }
 
-    public ClanXPRewardEvent(Clan clan, int xp)
+    public ClanXPRewardEvent(Player player, Clan clan, int xp)
     {
+        this.player = player;
         this.clan = clan;
         this.xp = xp;
         this.cancelled = false;
+    }
+
+    public Player getPlayer()
+    {
+        return player;
     }
 
     public Clan getClan() {
