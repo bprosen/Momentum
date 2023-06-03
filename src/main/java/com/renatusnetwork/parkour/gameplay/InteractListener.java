@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -189,6 +190,11 @@ public class InteractListener implements Listener {
                 {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
                 }
+            }
+            // Solstice addition!
+            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&e&lSolstice")))
+            {
+                Bukkit.dispatchCommand(player, "solstice");
             }
         }
     }
