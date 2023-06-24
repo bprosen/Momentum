@@ -134,6 +134,8 @@ public class RanksManager {
 
     public void doRankUp(Player player) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+        Utils.teleportToSpawn(playerStats);
         int newId = playerStats.getRank().getRankId() + 1;
         Rank rank = get(newId);
         playerStats.setRank(rank);
@@ -145,7 +147,6 @@ public class RanksManager {
 
         Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
         Parkour.getStatsManager().runGGTimer();
-        Utils.teleportToSpawn(playerStats);
     }
 
     public void doPrestige(Player player) {
