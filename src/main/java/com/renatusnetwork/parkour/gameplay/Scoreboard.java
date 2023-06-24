@@ -7,7 +7,6 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
-import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,7 +61,6 @@ public class Scoreboard {
             Level level = playerStats.getLevel();
             EventManager eventManager = Parkour.getEventManager();
 
-            board.add(Utils.translate("&c&lRenatus Network"));
             board.add(Utils.translate("&7"));
 
             String coinBalance = Utils.translate("  &e&lCoins &6" + (int) playerStats.getCoins());
@@ -212,15 +210,7 @@ public class Scoreboard {
                         board.add(formatSpacing(Utils.translate("&aGrinding")));
                 }
             }
-
-            // now run in sync to have proper scoreboard creation
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (playerStats != null && playerStats.getPlayer() != null)
-                        ScoreboardUtil.unrankedSidebarDisplay(playerStats.getPlayer(), board.toArray(new String[board.size()]));
-                }
-            }.runTask(Parkour.getPlugin());
+            playerStats.getBoard().updateLines(board); // update board lines
         }
     }
 }
