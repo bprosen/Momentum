@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.ranks;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.commands.SpawnCMD;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -144,6 +145,7 @@ public class RanksManager {
 
         Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
         Parkour.getStatsManager().runGGTimer();
+        Utils.teleportToSpawn(playerStats);
     }
 
     public void doPrestige(Player player) {
