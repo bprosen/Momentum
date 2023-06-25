@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Scoreboard {
 
-    private static int boardWidth = 21;
+    private static int boardWidth = 23;
 
     public static void startScheduler(Plugin plugin) {
         /*
@@ -65,7 +65,7 @@ public class Scoreboard {
             board.add(Utils.translate("&c&lRenatus Network"));
             board.add(Utils.translate("&7"));
 
-            String coinBalance = Utils.translate("  &e&lCoins &6" + Utils.shortStyleNumber(playerStats.getCoins()));
+            String coinBalance = Utils.translate("  &e&lCoins &6" + Utils.formatNumber(playerStats.getCoins()));
             board.add(coinBalance);
 
             // if they have a rank, show it
