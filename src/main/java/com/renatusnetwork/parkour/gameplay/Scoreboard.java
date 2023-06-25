@@ -178,7 +178,7 @@ public class Scoreboard {
                     } else {
 
                         // normal scoreboard
-                        String rewardString;
+                        String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
 
                         // add title and adjust rewardstring if it is a featured level
                         if (level.isFeaturedLevel()) {
@@ -203,7 +203,7 @@ public class Scoreboard {
                                 newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
 
                             if (newReward != level.getReward())
-                                rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.translate(newReward));
+                                rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(newReward));
                         }
 
                         String title = level.getFormattedTitle();
