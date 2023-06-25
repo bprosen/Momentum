@@ -25,9 +25,9 @@ public class LevelManager {
     private Level featuredLevel;
     private Level tutorialLevel;
     private long totalLevelCompletions;
-    private LinkedHashSet<Level> globalLevelCompletionsLB = new LinkedHashSet<>
+    private HashMap<Integer, Level> globalLevelCompletionsLB = new HashMap<>
             (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
-    private LinkedHashSet<Level> topRatedLevelsLB = new LinkedHashSet<>
+    private HashMap<Integer, Level> topRatedLevelsLB = new HashMap<>
             (Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
 
     private HashMap<String, HashMap<Integer, Level>> buyingLevels = new HashMap<>();
@@ -413,10 +413,11 @@ public class LevelManager {
     public void loadTopRatedLevelsLB() {
         try {
 
-            LinkedHashSet<Level> temporaryLB = new LinkedHashSet<>();
             Level highestLevel = null;
             Set<String> addedLevels = new HashSet<>();
             int lbSize = 0;
+            topRatedLevelsLB.clear();
+            int leaderboardPos = 1;
 
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
                 for (Level level : levels.values())
@@ -431,39 +432,33 @@ public class LevelManager {
                     addedLevels.add(highestLevel.getName());
                     // add to temp lb
                     if (highestLevel.getRating() > 0.00)
-                        temporaryLB.add(highestLevel);
+                    {
+                        topRatedLevelsLB.put(leaderboardPos, highestLevel);
+                        leaderboardPos++;
+                    }
 
                     highestLevel = null;
                 }
             }
-            // quickly swap
-            topRatedLevelsLB.clear();
-            topRatedLevelsLB.addAll(temporaryLB);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public LinkedHashSet<Level> getTopRatedLevelsLB() { return topRatedLevelsLB; }
+    public HashMap<Integer, Level> getTopRatedLevelsLB() { return topRatedLevelsLB; }
 
-    /*
-        section for global LEVEL completions (level, not personal based)
-    */
-    public boolean isGlobalLevelCompletionsLBSpot(Level level) {
-        return globalLevelCompletionsLB.contains(level);
-    }
-
-    public LinkedHashSet<Level> getGlobalLevelCompletionsLB() {
+    public HashMap<Integer, Level> getGlobalLevelCompletionsLB() {
         return globalLevelCompletionsLB;
     }
 
     public void loadGlobalLevelCompletionsLB() {
         try {
-
-            LinkedHashSet<Level> temporaryLB = new LinkedHashSet<>();
             Level highestLevel = null;
             Set<String> addedLevels = new HashSet<>();
             int lbSize = 0;
+            int leaderboardPos = 1;
+
+            globalLevelCompletionsLB.clear();
 
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
 
@@ -474,16 +469,15 @@ public class LevelManager {
                         highestLevel = level;
 
                 // null check jic
-                if (highestLevel != null) {
-                    temporaryLB.add(highestLevel);
+                if (highestLevel != null)
+                {
+                    globalLevelCompletionsLB.put(leaderboardPos, highestLevel);
                     addedLevels.add(highestLevel.getName());
                     highestLevel = null;
+                    leaderboardPos++;
                 }
                 lbSize++;
             }
-            // quickly swap
-            globalLevelCompletionsLB.clear();
-            globalLevelCompletionsLB.addAll(temporaryLB);
         } catch (Exception e) {
             e.printStackTrace();
         }

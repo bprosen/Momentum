@@ -27,7 +27,7 @@ public class RaceManager {
     private Set<Race> runningRaceList = new HashSet<>();
     private Set<RaceRequest> raceRequests = new HashSet<>();
     private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
-    private LinkedHashSet<RaceLBPosition> raceLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_race_leaderboard_size);
+    private HashMap<Integer, RaceLBPosition> raceLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_race_leaderboard_size);
 
     public RaceManager() {
         new BukkitRunnable() {
@@ -344,13 +344,11 @@ public class RaceManager {
     public boolean scoreWillBeLB(int score) {
         int lowestWins = 0;
         // gets lowest score
-        for (RaceLBPosition raceLBPosition : raceLeaderboard)
+        for (RaceLBPosition raceLBPosition : raceLeaderboard.values())
             if (lowestWins == 0 || raceLBPosition.getWins() < lowestWins)
                 lowestWins = raceLBPosition.getWins();
 
-        if (lowestWins <= score)
-            return true;
-        return false;
+        return lowestWins <= score;
     }
 
     public Race get(Player player) {
@@ -581,7 +579,7 @@ public class RaceManager {
     public void loadLeaderboard() {
         try {
 
-            LinkedHashSet<RaceLBPosition> leaderboard = getLeaderboard();
+            HashMap<Integer, RaceLBPosition> leaderboard = getLeaderboard();
             leaderboard.clear();
 
             List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
@@ -591,11 +589,12 @@ public class RaceManager {
                             " ORDER BY race_wins DESC" +
                             " LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
 
+            int leaderboardPos = 1;
             outer: for (Map<String, String> scoreResult : scoreResults) {
 
                 // quick loop to make sure there are no duplicates
-                for (RaceLBPosition raceLBPosition : leaderboard)
-                    if (raceLBPosition.getName().equalsIgnoreCase(scoreResult.get("player_name")))
+                for (RaceLBPosition entry : leaderboard.values())
+                    if (entry.getName().equalsIgnoreCase(scoreResult.get("player_name")))
                         continue outer;
 
                 int wins = Integer.parseInt(scoreResult.get("race_wins"));
@@ -608,17 +607,18 @@ public class RaceManager {
                 else
                     winRate = wins;
 
-                leaderboard.add(
+                leaderboard.put(leaderboardPos,
                         new RaceLBPosition(
                                 scoreResult.get("player_name"),
                                 wins,
                                 winRate)
                 );
+                leaderboardPos++;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public LinkedHashSet<RaceLBPosition> getLeaderboard() { return raceLeaderboard; }
+    public HashMap<Integer, RaceLBPosition> getLeaderboard() { return raceLeaderboard; }
 }

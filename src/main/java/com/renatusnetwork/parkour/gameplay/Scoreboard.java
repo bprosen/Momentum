@@ -28,7 +28,7 @@ public class Scoreboard {
             public void run() {
                 displayScoreboards();
             }
-        }.runTaskTimerAsynchronously(plugin, 20, 10);
+        }.runTaskTimerAsynchronously(plugin, 20, 2);
     }
 
     private static String getSpaces(int length) {

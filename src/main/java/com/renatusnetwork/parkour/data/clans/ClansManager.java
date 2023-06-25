@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ClansManager {
 
     private HashMap<String, Clan> clans = new HashMap<>();
-    private LinkedHashSet<Clan> clansLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
+    private ArrayList<Clan> clansLeaderboard = new ArrayList<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
     private HashMap<String, Clan> clanChat = new HashMap<>();
     private Set<String> chatSpy = new HashSet<>();
 
@@ -96,7 +96,7 @@ public class ClansManager {
                 clanMember.setPlayerName(newName);
     }
 
-    public LinkedHashSet<Clan> getLeaderboard() { return clansLeaderboard; }
+    public ArrayList<Clan> getLeaderboard() { return clansLeaderboard; }
 
     public void loadLeaderboard() {
         try {

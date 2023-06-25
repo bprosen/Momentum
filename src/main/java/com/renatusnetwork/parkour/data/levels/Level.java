@@ -41,6 +41,8 @@ public class Level {
     private boolean elytraLevel = false;
     private boolean dropperLevel = false;
     private boolean newLevel = false;
+    private boolean tcLevel = false;
+
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
     private boolean raceLevel = false;
@@ -479,6 +481,7 @@ public class Level {
             respawnY = LevelsYAML.getRespawnY(name);
             elytraLevel = LevelsYAML.isElytraLevel(name);
             dropperLevel = LevelsYAML.isDropperLevel(name);
+            tcLevel = LevelsYAML.isTCLevel(name);
             ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
             price = LevelsYAML.getPrice(name);
             newLevel = LevelsYAML.getNewLevel(name);
@@ -506,6 +509,8 @@ public class Level {
     public boolean isElytraLevel() { return elytraLevel; }
 
     public boolean isDropperLevel() { return dropperLevel; }
+
+    public boolean isTCLevel() { return tcLevel; }
 
     public boolean isNewLevel() { return newLevel; }
 

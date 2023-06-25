@@ -7,8 +7,7 @@ import com.renatusnetwork.parkour.data.events.EventLBPosition;
 import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
-import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.*;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,7 +28,7 @@ public class StatsCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&5Infinite Parkour &7Leaderboard"));
 
                     int position = 1;
-                    for (InfinitePKLBPosition lbPosition : Parkour.getInfinitePKManager().getLeaderboard()) {
+                    for (InfinitePKLBPosition lbPosition : Parkour.getInfinitePKManager().getLeaderboard().values()) {
                         if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     position + " &5" +
@@ -49,7 +48,7 @@ public class StatsCMD implements CommandExecutor {
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("levels")) {
 
-                LinkedHashSet<Level> globalLevelCompletionsLB = Parkour.getLevelManager().getGlobalLevelCompletionsLB();
+                Collection<Level> globalLevelCompletionsLB = Parkour.getLevelManager().getGlobalLevelCompletionsLB().values();
 
                 if (!globalLevelCompletionsLB.isEmpty()) {
 
@@ -73,20 +72,20 @@ public class StatsCMD implements CommandExecutor {
             // players
             } else if (a.length == 1 && a[0].equalsIgnoreCase("players")) {
 
-                LinkedHashMap<String, Integer> globalPersonalCompletionsLB = Parkour.getStatsManager().getGlobalPersonalCompletionsLB();
+                HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB = Parkour.getStatsManager().getGlobalPersonalCompletionsLB();
 
                 if (!globalPersonalCompletionsLB.isEmpty()) {
 
                     sender.sendMessage(Utils.translate("&3Player Completions &7Leaderboard"));
 
                     int lbPositionNum = 1;
-                    for (Map.Entry<String, Integer> entry : globalPersonalCompletionsLB.entrySet()) {
+                    for (GlobalPersonalLBPosition globalPersonalLBPosition : globalPersonalCompletionsLB.values()) {
 
-                        if (entry != null) {
+                        if (globalPersonalLBPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &3" +
-                                    Utils.formatNumber(entry.getValue()) + " &b" +
-                                    entry.getKey()));
+                                    Utils.formatNumber(globalPersonalLBPosition.getCompletions()) + " &b" +
+                                    globalPersonalLBPosition.getName()));
                             lbPositionNum++;
                         }
                     }
@@ -102,15 +101,15 @@ public class StatsCMD implements CommandExecutor {
             // clans lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("clans")) {
 
-                LinkedHashSet<Clan> clansLB = Parkour.getClansManager().getLeaderboard();
+                ArrayList<Clan> clansLB = Parkour.getClansManager().getLeaderboard();
 
                 if (!clansLB.isEmpty()) {
 
                     sender.sendMessage(Utils.translate("&6Clan Total XP &7Leaderboard"));
                     int lbPositionNum = 1;
-                    for (Clan clan : clansLB) {
 
-                        if (clan != null && clan.getOwner().getPlayerName() != null) {
+                    for (Clan clan : clansLB) {
+                        if (clan != null && clan.getOwner() != null && clan.getOwner().getPlayerName() != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &6" +
                                     Utils.shortStyleNumber(clan.getTotalGainedXP()) + " &e" +
@@ -124,7 +123,7 @@ public class StatsCMD implements CommandExecutor {
             // top rated lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("toprated")) {
 
-                LinkedHashSet<Level> topRatedLB = Parkour.getLevelManager().getTopRatedLevelsLB();
+                Collection<Level> topRatedLB = Parkour.getLevelManager().getTopRatedLevelsLB().values();
 
                 if (!topRatedLB.isEmpty()) {
 
@@ -147,14 +146,14 @@ public class StatsCMD implements CommandExecutor {
             // race lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("races")) {
 
-                LinkedHashSet<RaceLBPosition> leaderboard = Parkour.getRaceManager().getLeaderboard();
+                HashMap<Integer, RaceLBPosition> leaderboard = Parkour.getRaceManager().getLeaderboard();
 
                 if (!leaderboard.isEmpty()) {
 
                     sender.sendMessage(Utils.translate("&8Races &7Leaderboard"));
 
                     int position = 1;
-                    for (RaceLBPosition lbPosition : leaderboard) {
+                    for (RaceLBPosition lbPosition : leaderboard.values()) {
                         if (lbPosition != null) {
 
                             // just for my sanity of proper grammar
@@ -185,14 +184,14 @@ public class StatsCMD implements CommandExecutor {
             else if (a.length == 1 && a[0].equalsIgnoreCase("events"))
             {
 
-                LinkedHashSet<EventLBPosition> leaderboard = Parkour.getEventManager().getEventLeaderboard();
+                HashMap<Integer, EventLBPosition> leaderboard = Parkour.getEventManager().getEventLeaderboard();
 
                 if (!leaderboard.isEmpty()) {
 
                     sender.sendMessage(Utils.translate("&bEvent Wins &7Leaderboard"));
 
                     int position = 1;
-                    for (EventLBPosition lbPosition : leaderboard)
+                    for (EventLBPosition lbPosition : leaderboard.values())
                     {
                         if (lbPosition != null)
                         {
@@ -310,20 +309,20 @@ public class StatsCMD implements CommandExecutor {
 
     public static void printCoinsLB(CommandSender sender)
     {
-        LinkedHashMap<String, Double> coinsLB = Parkour.getStatsManager().getCoinsLB();
+        HashMap<Integer, CoinsLBPosition> coinsLB = Parkour.getStatsManager().getCoinsLB();
 
         if (!coinsLB.isEmpty()) {
 
             sender.sendMessage(Utils.translate("&eCoins &7Leaderboard"));
 
             int lbPositionNum = 1;
-            for (Map.Entry<String, Double> entry : coinsLB.entrySet()) {
+            for (CoinsLBPosition coinsLBPosition : coinsLB.values()) {
 
-                if (entry != null) {
+                if (coinsLBPosition != null) {
                     sender.sendMessage(Utils.translate(" &7" +
                             lbPositionNum + " &6" +
-                            Utils.formatNumber(entry.getValue()) + " &7" +
-                            entry.getKey()));
+                            Utils.formatNumber(coinsLBPosition.getCoins()) + " &7" +
+                            coinsLBPosition.getName()));
                     lbPositionNum++;
                 }
             }
@@ -341,20 +340,20 @@ public class StatsCMD implements CommandExecutor {
 
     public static void printRecordsLB(CommandSender sender)
     {
-        LinkedHashMap<String, Integer> recordsLB = Parkour.getStatsManager().getRecordsLB();
+        HashMap<Integer, RecordsLBPosition> recordsLB = Parkour.getStatsManager().getRecordsLB();
 
         if (!recordsLB.isEmpty()) {
 
             sender.sendMessage(Utils.translate("&9Records &7Leaderboard"));
 
             int lbPositionNum = 1;
-            for (Map.Entry<String, Integer> entry : recordsLB.entrySet()) {
+            for (RecordsLBPosition recordsLBPosition : recordsLB.values()) {
 
-                if (entry != null) {
+                if (recordsLBPosition != null) {
                     sender.sendMessage(Utils.translate(" &7" +
                             lbPositionNum + " &9" +
-                            Utils.formatNumber(entry.getValue()) + " &3" +
-                            entry.getKey()));
+                            Utils.formatNumber(recordsLBPosition.getRecords()) + " &3" +
+                            recordsLBPosition.getName()));
                     lbPositionNum++;
                 }
             }
