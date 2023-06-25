@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Scoreboard {
 
-    private static int boardWidth = 23;
+    private static int boardWidth = 21;
 
     public static void startScheduler(Plugin plugin) {
         /*
@@ -63,12 +63,12 @@ public class Scoreboard {
 
             board.add(Utils.translate("&7"));
 
-            String coinBalance = Utils.translate("  &e&lCoins &6" + (int) playerStats.getCoins());
+            String coinBalance = Utils.translate("  &e&lCoins &6" + Utils.shortStyleNumber(playerStats.getCoins()));
             board.add(coinBalance);
 
             // if they have a rank, show it
             if (playerStats.getRank() != null) {
-                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
+                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getShortRankTitle());
                 board.add(rankString);
             }
 
@@ -183,13 +183,13 @@ public class Scoreboard {
                             board.add(formatSpacing(Utils.translate("&dFeatured Level")));
 
                             // proper cast
-                            rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " +
-                                    ((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
+                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
+                                    (Utils.formatNumber(level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
 
                         } else if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                            rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + ((int) (level.getReward() * playerStats.getPrestigeMultiplier())));
+                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + (Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier())));
                         else
-                            rewardString = Utils.translate("&6" + level.getReward());
+                            rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
 
                         String title = level.getFormattedTitle();
                         board.add(formatSpacing(title));

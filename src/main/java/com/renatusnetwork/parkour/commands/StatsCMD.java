@@ -101,14 +101,14 @@ public class StatsCMD implements CommandExecutor {
             // clans lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("clans")) {
 
-                ArrayList<Clan> clansLB = Parkour.getClansManager().getLeaderboard();
+                HashMap<Integer, Clan> clansLB = Parkour.getClansManager().getLeaderboard();
 
                 if (!clansLB.isEmpty()) {
 
                     sender.sendMessage(Utils.translate("&6Clan Total XP &7Leaderboard"));
                     int lbPositionNum = 1;
 
-                    for (Clan clan : clansLB) {
+                    for (Clan clan : clansLB.values()) {
                         if (clan != null && clan.getOwner() != null && clan.getOwner().getPlayerName() != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &6" +
@@ -150,20 +150,15 @@ public class StatsCMD implements CommandExecutor {
 
                 if (!leaderboard.isEmpty()) {
 
-                    sender.sendMessage(Utils.translate("&8Races &7Leaderboard"));
+                    sender.sendMessage(Utils.translate("&8Race Wins &7Leaderboard"));
 
                     int position = 1;
                     for (RaceLBPosition lbPosition : leaderboard.values()) {
                         if (lbPosition != null) {
 
-                            // just for my sanity of proper grammar
-                            String winMsg = "win";
-                            if (lbPosition.getWins() > 1)
-                                winMsg += "s";
-
                             sender.sendMessage(Utils.translate(" &7" +
                                     position + " &8" +
-                                    lbPosition.getWins() + " " + winMsg + " &7" +
+                                    lbPosition.getWins() + " &7" +
                                     lbPosition.getName() + " &8(" +
                                     lbPosition.getWinRate() + ")"));
                         }

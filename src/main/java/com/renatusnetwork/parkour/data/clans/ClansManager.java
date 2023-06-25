@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ClansManager {
 
     private HashMap<String, Clan> clans = new HashMap<>();
-    private ArrayList<Clan> clansLeaderboard = new ArrayList<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
+    private HashMap<Integer, Clan> clansLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
     private HashMap<String, Clan> clanChat = new HashMap<>();
     private Set<String> chatSpy = new HashSet<>();
 
@@ -96,15 +96,16 @@ public class ClansManager {
                 clanMember.setPlayerName(newName);
     }
 
-    public ArrayList<Clan> getLeaderboard() { return clansLeaderboard; }
+    public HashMap<Integer, Clan> getLeaderboard() { return clansLeaderboard; }
 
     public void loadLeaderboard() {
         try {
 
             Clan highestXPClan = null;
             Set<Clan> alreadyAddedClans = new HashSet<>();
-            LinkedHashSet<Clan> temporaryClanLB = new LinkedHashSet<>();
             int lbSize = 0;
+            clansLeaderboard.clear();
+            int lbPos = 1;
 
             while (Parkour.getSettingsManager().max_clans_leaderboard_size > lbSize) {
                 // loop through and make sure they are not already added, and higher than previous
@@ -114,15 +115,13 @@ public class ClansManager {
                         highestXPClan = clan;
 
                 if (highestXPClan != null) {
-                    temporaryClanLB.add(highestXPClan);
                     alreadyAddedClans.add(highestXPClan);
+                    clansLeaderboard.put(lbPos, highestXPClan);
                     highestXPClan = null;
+                    lbPos++;
                 }
                 lbSize++;
             }
-            // clear and then add all from temporary (fast swap)
-            clansLeaderboard.clear();
-            clansLeaderboard.addAll(temporaryClanLB);
         } catch (Exception e) {
             e.printStackTrace();
         }
