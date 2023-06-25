@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class InfinitePKManager {
 
     private HashMap<String, InfinitePK> participants = new HashMap<>();
-    private LinkedHashSet<InfinitePKLBPosition> leaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
+    private HashMap<Integer, InfinitePKLBPosition> leaderboard = new HashMap<>(Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
     private LinkedHashMap<Integer, InfinitePKReward> rewards = new LinkedHashMap<>(); // linked so order stays
 
     public InfinitePKManager() {
@@ -436,7 +436,7 @@ public class InfinitePKManager {
     public void loadLeaderboard() {
         try {
 
-            LinkedHashSet<InfinitePKLBPosition> leaderboard = getLeaderboard();
+            HashMap<Integer, InfinitePKLBPosition> leaderboard = getLeaderboard();
             leaderboard.clear();
 
             List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
@@ -446,13 +446,15 @@ public class InfinitePKManager {
                             " ORDER BY infinitepk_score DESC" +
                             " LIMIT " + Parkour.getSettingsManager().max_infinitepk_leaderboard_size);
 
+            int lbPos = 1;
             for (Map<String, String> scoreResult : scoreResults) {
-                leaderboard.add(
+                leaderboard.put(lbPos,
                         new InfinitePKLBPosition(
                                 scoreResult.get("uuid"),
                                 scoreResult.get("player_name"),
                                 Integer.parseInt(scoreResult.get("infinitepk_score")))
                 );
+                lbPos++;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -469,7 +471,7 @@ public class InfinitePKManager {
     }
 
     public InfinitePKLBPosition getLeaderboardPosition(String playerName) {
-        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard.values())
             if (infinitePKLBPosition.getName().equalsIgnoreCase(playerName))
                 return infinitePKLBPosition;
 
@@ -477,7 +479,7 @@ public class InfinitePKManager {
     }
 
     public boolean isLBPosition(String playerName) {
-        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard.values())
             if (infinitePKLBPosition.getName().equalsIgnoreCase(playerName))
                 return true;
 
@@ -487,7 +489,7 @@ public class InfinitePKManager {
     public boolean scoreWillBeLB(int score) {
         int lowestScore = 0;
         // gets lowest score
-        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard)
+        for (InfinitePKLBPosition infinitePKLBPosition : leaderboard.values())
             if (lowestScore == 0 || infinitePKLBPosition.getScore() < lowestScore)
                 lowestScore = infinitePKLBPosition.getScore();
 
@@ -501,7 +503,7 @@ public class InfinitePKManager {
             endPK(infinitePK.getPlayer(), true);
     }
 
-    public LinkedHashSet<InfinitePKLBPosition> getLeaderboard() {
+    public HashMap<Integer, InfinitePKLBPosition> getLeaderboard() {
         return leaderboard;
     }
 

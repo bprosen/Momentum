@@ -52,7 +52,7 @@ public class InfiniteCMD implements CommandExecutor {
                 if (Utils.isInteger(a[2])) {
                     int position = Integer.parseInt(a[2]);
                     // can cast with confidence
-                    InfinitePKLBPosition lbPosition = (InfinitePKLBPosition) infinitePKManager.getLeaderboard().toArray()[position - 1];
+                    InfinitePKLBPosition lbPosition = (InfinitePKLBPosition) infinitePKManager.getLeaderboard().values().toArray()[position - 1];
 
                     if (lbPosition != null) {
                         player.sendMessage(Utils.translate(

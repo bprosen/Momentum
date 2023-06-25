@@ -4,6 +4,8 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.ranks.Rank;
+import com.renatusnetwork.parkour.utils.Utils;
+import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -54,6 +56,8 @@ public class PlayerStats {
     private boolean failsToggled;
     private int fails;
 
+    private FastBoard board;
+
     private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
     private HashMap<String, Long> perks = new HashMap<>();
     private HashMap<String, Location> checkpoints = new HashMap<>();
@@ -64,16 +68,16 @@ public class PlayerStats {
         this.player = player;
         this.UUID = player.getUniqueId().toString();
         this.playerName = player.getName();
+
+        board = new FastBoard(player); // load board
+        board.updateTitle(Utils.translate("&c&lRenatus Network"));
     }
 
     //
     // Player Info Section
     //
     public boolean isLoaded() {
-        if (playerID > 0)
-            return true;
-
-        return false;
+        return playerID > 0;
     }
 
     public Player getPlayer() {
@@ -91,6 +95,8 @@ public class PlayerStats {
     public void setPlayerID(int playerID) {
         this.playerID = playerID;
     }
+
+    public FastBoard getBoard() { return board; }
 
     public int getPlayerID() {
         return playerID;

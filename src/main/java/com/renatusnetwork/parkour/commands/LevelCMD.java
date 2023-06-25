@@ -700,6 +700,17 @@ public class LevelCMD implements CommandExecutor {
                     } else {
                         sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                     }
+                } else if (a.length == 2 && a[0].equalsIgnoreCase("toggletc")) {
+                    String levelName = a[1].toLowerCase();
+                    Level level = levelManager.get(levelName);
+
+                    if (level != null) {
+                        LevelsYAML.toggleTCLevel(levelName);
+                        sender.sendMessage(Utils.translate("&7You have set &c" + level.getFormattedTitle() +
+                                "&7 as a tc level to &c" + LevelsYAML.isTCLevel(levelName)));
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                    }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("toggleascendance")) {
                     String levelName = a[1].toLowerCase();
                     Level level = levelManager.get(levelName);
@@ -1161,5 +1172,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level togglecooldown <level>  &7Toggles if the level has a cooldown"));
         sender.sendMessage(Utils.translate("&a/level pickfeatured  &7Picks a new featured level"));
         sender.sendMessage(Utils.translate("&a/level resetsave <player> <level>  &7Resets a player's save for a specific level"));
+        sender.sendMessage(Utils.translate("&a/level toggletc <level>  &7Sets level as tc"));
     }
 }

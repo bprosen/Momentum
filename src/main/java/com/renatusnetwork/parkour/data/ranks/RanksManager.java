@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.ranks;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.commands.SpawnCMD;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -133,6 +134,8 @@ public class RanksManager {
 
     public void doRankUp(Player player) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+        Utils.teleportToSpawn(playerStats);
         int newId = playerStats.getRank().getRankId() + 1;
         Rank rank = get(newId);
         playerStats.setRank(rank);

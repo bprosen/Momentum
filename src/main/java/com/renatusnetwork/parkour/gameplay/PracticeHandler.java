@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
@@ -26,6 +27,11 @@ public class PracticeHandler {
 
         player.teleport(playerStats.getPracticeLocation());
         playerStats.resetPracticeMode();
+
+        ItemStack item = Utils.getPracPlateIfExists(player.getInventory());
+
+        if (item != null)
+            player.getInventory().remove(item);
 
         if (message)
             player.sendMessage(Utils.translate("&2You have disabled practice mode"));

@@ -174,6 +174,8 @@ public class JoinLeaveHandler implements Listener {
         clansManager.toggleClanChat(player.getName(), null);
         clansManager.toggleChatSpy(player.getName(), true);
 
+        playerStats.getBoard().delete();
+
         // finally, remove them from the stats list
         Parkour.getStatsManager().remove(playerStats);
     }

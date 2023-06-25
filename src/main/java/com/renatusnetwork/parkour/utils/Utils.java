@@ -110,6 +110,25 @@ public class Utils {
         return swordItem;
     }
 
+    public static ItemStack getPracPlateIfExists(Inventory inventory) {
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        ItemStack pracItem = null;
+
+        // try to find the sword in their inventory
+        for (ItemStack item : inventory.getContents()) {
+
+            if (item != null && item.getType() == settingsManager.prac_type &&
+                    item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
+                    item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.prac_title))) {
+
+                pracItem = item;
+                break;
+            }
+        }
+        return pracItem;
+    }
+
     public static String translate(String msg) {
         return ChatColor.translateAlternateColorCodes('&', msg);
     }

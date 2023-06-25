@@ -99,6 +99,10 @@ public class SettingsManager {
 
     public String tutorialLevelName;
 
+    public int prac_hotbar_slot;
+    public String prac_title;
+    public Material prac_type;
+
     public HashMap<Integer, ItemStack> customJoinInventory;
 
     public LinkedHashMap<Integer, Float> cooldownModifiers;
@@ -177,6 +181,9 @@ public class SettingsManager {
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
         tutorialLevelName = settings.getString("levels.tutorial_level");
+        prac_title = settings.getString("practice-plate.title");
+        prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
+        prac_hotbar_slot = settings.getInt("practice-plate.hotbar_slot");
         radiantNextBidMinimum = (float) settings.getDouble("bank.radiant.min_next_bid_percentage");
         brilliantNextBidMinimum = (float) settings.getDouble("bank.brilliant.min_next_bid_percentage");
         legendaryNextBidMinimum = (float) settings.getDouble("bank.legendary.min_next_bid_percentage");

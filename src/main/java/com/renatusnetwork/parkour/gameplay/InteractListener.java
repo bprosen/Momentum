@@ -191,6 +191,10 @@ public class InteractListener implements Listener {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
                 }
             }
+            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Parkour.getSettingsManager().prac_title)))
+            {
+                Parkour.getCheckpointManager().teleportToPracCP(Parkour.getStatsManager().get(player));
+            }
             // Solstice addition!
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&e&lSolstice")))
             {

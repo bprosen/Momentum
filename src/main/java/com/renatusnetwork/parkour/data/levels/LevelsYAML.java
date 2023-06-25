@@ -308,6 +308,20 @@ public class LevelsYAML {
         return dropper;
     }
 
+    public static boolean isTCLevel(String levelName) {
+        boolean tc = false;
+        if (isSet(levelName, "tc"))
+            tc = levelsFile.getBoolean(levelName + ".tc");
+
+        return tc;
+    }
+
+    public static void toggleTCLevel(String levelName) {
+        boolean tc = isTCLevel(levelName);
+        levelsFile.set(levelName + ".tc", !tc);
+        commit(levelName);
+    }
+
     public static void toggleDropperLevel(String levelName) {
         boolean dropper = isDropperLevel(levelName);
         levelsFile.set(levelName + ".dropper", !dropper);

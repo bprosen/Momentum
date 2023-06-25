@@ -32,13 +32,13 @@ public class StatsManager {
     private HashMap<String, PlayerStats> playerStatsList = new HashMap<>();
     private HashSet<PlayerStats> ascendancePlayerList = new HashSet<>();
 
-    private LinkedHashMap<String, Integer> globalPersonalCompletionsLB = new LinkedHashMap<>
+    private HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB = new LinkedHashMap<>
             (Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
 
-    private LinkedHashMap<String, Double> coinsLB = new LinkedHashMap<>(
+    private HashMap<Integer, CoinsLBPosition> coinsLB = new LinkedHashMap<>(
             Parkour.getSettingsManager().max_coins_leaderboard_size);
 
-    private LinkedHashMap<String, Integer> recordsLB = new LinkedHashMap<>(
+    private HashMap<Integer, RecordsLBPosition> recordsLB = new LinkedHashMap<>(
             Parkour.getSettingsManager().max_records_leaderboard_size);
 
     private HashSet<String> saidGG = new HashSet<>();
@@ -250,13 +250,18 @@ public class StatsManager {
             List<Map<String, String>> playerCompletions = DatabaseQueries.getResults("players", "player_name, level_completions",
                     " ORDER BY level_completions DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
 
-                for (Map<String, String> playerCompletionStat : playerCompletions) {
-                    int completions = Integer.parseInt(playerCompletionStat.get("level_completions"));
-                    // if they have more than 0 completions, add (reset stats case)
-                    if (completions > 0)
-                        // add playername to completion in map
-                        globalPersonalCompletionsLB.put(playerCompletionStat.get("player_name"), completions);
+            int lbPos = 1;
+
+            for (Map<String, String> playerCompletionStat : playerCompletions) {
+                int completions = Integer.parseInt(playerCompletionStat.get("level_completions"));
+                // if they have more than 0 completions, add (reset stats case)
+                if (completions > 0)
+                {
+                    // add playername to completion in map
+                    globalPersonalCompletionsLB.put(lbPos, new GlobalPersonalLBPosition(playerCompletionStat.get("player_name"), completions));
+                    lbPos++;
                 }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -271,13 +276,17 @@ public class StatsManager {
             List<Map<String, String>> coinsResults = DatabaseQueries.getResults("players", "player_name, coins",
                     " ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
 
+            int lbPos = 1;
             for (Map<String, String> coinsResult : coinsResults) {
                 String playerName = coinsResult.get("player_name");
                 double coins = Double.parseDouble(coinsResult.get("coins"));
 
                 // if they have more than 0 completions, add (reset stats case)
                 if (coins > 0)
-                    coinsLB.put(playerName, coins);
+                {
+                    coinsLB.put(lbPos, new CoinsLBPosition(playerName, coins));
+                    lbPos++;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -293,27 +302,31 @@ public class StatsManager {
             List<Map<String, String>> recordsResult = DatabaseQueries.getResults("players", "player_name, records",
                     " ORDER BY records DESC LIMIT " + Parkour.getSettingsManager().max_records_leaderboard_size);
 
+            int lbPos = 1;
             for (Map<String, String> recordResult : recordsResult) {
                 String playerName = recordResult.get("player_name");
                 int records = Integer.parseInt(recordResult.get("records"));
 
                 // if they have more than 0 completions, add (reset stats case)
                 if (records > 0)
-                    recordsLB.put(playerName, records);
+                {
+                    recordsLB.put(lbPos, new RecordsLBPosition(playerName, records));
+                    lbPos++;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public LinkedHashMap<String, Double> getCoinsLB()
+    public HashMap<Integer, CoinsLBPosition> getCoinsLB()
     {
         return coinsLB;
     }
 
-    public LinkedHashMap<String, Integer> getRecordsLB() { return recordsLB; }
+    public HashMap<Integer, RecordsLBPosition> getRecordsLB() { return recordsLB; }
 
-    public LinkedHashMap<String, Integer> getGlobalPersonalCompletionsLB() {
+    public HashMap<Integer, GlobalPersonalLBPosition> getGlobalPersonalCompletionsLB() {
         return globalPersonalCompletionsLB;
     }
 

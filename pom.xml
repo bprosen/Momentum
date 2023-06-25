@@ -33,6 +33,36 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+                            <finalName>${project.name}-${project.version}</finalName>
+                            <artifactSet>
+                                <includes>
+                                    <include>fr.mrmicky:*</include>
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>fr.mrmicky.fastboard</pattern>
+                                    <shadedPattern>com.renatusnetwork.parkour</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -105,11 +135,9 @@
         </dependency>
 
         <dependency>
-            <groupId>me.winterguardian</groupId>
-            <artifactId>easyscoreboards</artifactId>
-            <version>1.1.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/EasyScoreboards.jar</systemPath>
+            <groupId>fr.mrmicky</groupId>
+            <artifactId>fastboard</artifactId>
+            <version>2.0.0</version>
         </dependency>
 
         <dependency>

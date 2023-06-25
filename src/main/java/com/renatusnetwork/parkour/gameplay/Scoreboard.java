@@ -8,7 +8,6 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
-import me.winterguardian.easyscoreboards.ScoreboardUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -18,7 +17,7 @@ import java.util.List;
 
 public class Scoreboard {
 
-    private static int boardWidth = 23;
+    private static int boardWidth = 21;
 
     public static void startScheduler(Plugin plugin) {
         /*
@@ -30,7 +29,7 @@ public class Scoreboard {
             public void run() {
                 displayScoreboards();
             }
-        }.runTaskTimerAsynchronously(plugin, 20, 10);
+        }.runTaskTimerAsynchronously(plugin, 20, 2);
     }
 
     private static String getSpaces(int length) {
@@ -66,12 +65,12 @@ public class Scoreboard {
             board.add(Utils.translate("&c&lRenatus Network"));
             board.add(Utils.translate("&7"));
 
-            String coinBalance = Utils.translate("  &e&lCoins &6" + (int) playerStats.getCoins());
+            String coinBalance = Utils.translate("  &e&lCoins &6" + Utils.shortStyleNumber(playerStats.getCoins()));
             board.add(coinBalance);
 
             // if they have a rank, show it
             if (playerStats.getRank() != null) {
-                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
+                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getShortRankTitle());
                 board.add(rankString);
             }
 
@@ -179,15 +178,16 @@ public class Scoreboard {
                     } else {
 
                         // normal scoreboard
-                        String rewardString = Utils.translate("&6" + level.getReward());
+                        String rewardString;
 
                         // add title and adjust rewardstring if it is a featured level
                         if (level.isFeaturedLevel()) {
                             board.add(formatSpacing(Utils.translate("&dFeatured Level")));
 
                             // proper cast
-                            rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " +
-                                    ((int) (level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
+                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
+                                    (Utils.formatNumber(level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
+
                         }
                         else
                         {
@@ -203,7 +203,7 @@ public class Scoreboard {
                                 newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
 
                             if (newReward != level.getReward())
-                                rewardString = Utils.translate("&c&m" + level.getReward() + "&6 " + newReward);
+                                rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.translate(newReward));
                         }
 
                         String title = level.getFormattedTitle();
@@ -225,15 +225,7 @@ public class Scoreboard {
                         board.add(formatSpacing(Utils.translate("&aGrinding")));
                 }
             }
-
-            // now run in sync to have proper scoreboard creation
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (playerStats != null && playerStats.getPlayer() != null)
-                        ScoreboardUtil.unrankedSidebarDisplay(playerStats.getPlayer(), board.toArray(new String[board.size()]));
-                }
-            }.runTask(Parkour.getPlugin());
+            playerStats.getBoard().updateLines(board); // update board lines
         }
     }
 }

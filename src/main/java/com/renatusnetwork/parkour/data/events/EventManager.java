@@ -40,7 +40,7 @@ public class EventManager {
     private Set<String> eliminated = new HashSet<>();
     // start millis according to system
     private long startTime = 0L;
-    private LinkedHashSet<EventLBPosition> eventLeaderboard = new LinkedHashSet<>(Parkour.getSettingsManager().max_event_leaderboard_size);
+    private HashMap<Integer, EventLBPosition> eventLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_event_leaderboard_size);
 
     public EventManager() {
         startScheduler();
@@ -81,7 +81,7 @@ public class EventManager {
     public void loadLeaderboard() {
         try {
 
-            LinkedHashSet<EventLBPosition> leaderboard = eventLeaderboard;
+            HashMap<Integer, EventLBPosition> leaderboard = eventLeaderboard;
             leaderboard.clear();
 
             List<Map<String, String>> winResults = DatabaseQueries.getResults(
@@ -91,11 +91,15 @@ public class EventManager {
                             " ORDER BY event_wins DESC" +
                             " LIMIT " + Parkour.getSettingsManager().max_event_leaderboard_size);
 
+            int leaderboardPos = 1;
+
             for (Map<String, String> winResult : winResults) {
-                leaderboard.add(
+                leaderboard.put(leaderboardPos,
                         new EventLBPosition(
                                 winResult.get("uuid"), winResult.get("player_name"), Integer.parseInt(winResult.get("event_wins"))
                         ));
+
+                leaderboardPos++;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -463,7 +467,7 @@ public class EventManager {
         }
     }
 
-    public LinkedHashSet<EventLBPosition> getEventLeaderboard()
+    public HashMap<Integer, EventLBPosition> getEventLeaderboard()
     {
         return eventLeaderboard;
     }
