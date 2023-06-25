@@ -92,6 +92,10 @@ public class SettingsManager {
 
     public String tutorialLevelName;
 
+    public int prac_hotbar_slot;
+    public String prac_title;
+    public Material prac_type;
+
     public HashMap<Integer, ItemStack> customJoinInventory;
 
     public SettingsManager(FileConfiguration settings) {
@@ -158,6 +162,9 @@ public class SettingsManager {
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
         tutorialLevelName = settings.getString("levels.tutorial_level");
+        prac_title = settings.getString("practice-plate.title");
+        prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
+        prac_hotbar_slot = settings.getInt("practice-plate.hotbar_slot");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");

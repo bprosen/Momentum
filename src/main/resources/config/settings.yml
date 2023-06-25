@@ -69,7 +69,10 @@ setup-sword:
   type: IRON_SWORD
   title: "&cSetup Sword"
   hotbar_slot: 1
-
+practice-plate:
+  type: IRON_PLATE
+  title: "&6Practice Checkpoint"
+  hotbar_slot: 2
 clans:
   max_members: 5
   split_reward_min_needed: 300

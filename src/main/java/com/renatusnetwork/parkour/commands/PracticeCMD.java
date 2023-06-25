@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -8,6 +9,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
 
 public class PracticeCMD implements CommandExecutor {
 
@@ -42,6 +47,16 @@ public class PracticeCMD implements CommandExecutor {
                                     PracticeHandler.resetPlayer(player, true);
                                 } else if (player.isOnGround()) {
                                     playerStats.setPracticeMode(player.getLocation());
+
+                                    SettingsManager settingsManager = Parkour.getSettingsManager();
+                                    // create item and give
+                                    ItemStack pracItem = new ItemStack(settingsManager.prac_type);
+                                    ItemMeta itemMeta = pracItem.getItemMeta();
+                                    itemMeta.setDisplayName(Utils.translate(settingsManager.prac_title));
+                                    pracItem.setItemMeta(itemMeta);
+
+                                    player.getInventory().setItem(settingsManager.prac_hotbar_slot, pracItem);
+
                                     player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));
