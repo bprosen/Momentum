@@ -2,10 +2,7 @@ package com.renatusnetwork.parkour.storage.mysql;
 
 import com.renatusnetwork.parkour.Parkour;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +38,8 @@ public class DatabaseQueries {
             query = query + " " + trailingSQL;
 
         try {
-            Statement statement = Parkour.getDatabaseManager().get().get().createStatement();
-            ResultSet results = statement.executeQuery(query);
+            PreparedStatement statement = Parkour.getDatabaseManager().get().get().prepareStatement(query);
+            ResultSet results = statement.executeQuery();
 
             while (results.next())
                 finalResults.add(resultSetToMap(results));
@@ -57,4 +54,20 @@ public class DatabaseQueries {
         return finalResults;
     }
 
+    public static ResultSet getRawResults(String query)
+    {
+        try {
+            PreparedStatement statement = Parkour.getDatabaseManager().get().get().prepareStatement(query);
+            return statement.executeQuery();
+
+        } catch (SQLException exception) {
+            Parkour.getPluginLogger().severe(
+                    "ERROR: Occurred within DatabaseQueries.getRawResults(" + query + ")"
+            );
+            Parkour.getPluginLogger().severe("ERROR:  query='" + query + "'");
+            Parkour.getPluginLogger().severe("ERROR:   exception=" + exception.getLocalizedMessage());
+        }
+
+        return null;
+    }
 }

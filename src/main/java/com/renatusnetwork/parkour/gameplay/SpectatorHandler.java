@@ -16,16 +16,6 @@ import java.util.Map;
 
 public class SpectatorHandler {
 
-    public static void startScheduler(Plugin plugin) {
-
-        // update any current spectators every second
-        new BukkitRunnable() {
-            public void run() {
-                updateSpectators();
-            }
-        }.runTaskTimer(plugin, 20, 20);
-    }
-
     public static void spectateToPlayer(Player spectator, Player player, boolean initialSpectate) {
         if (player.isOnline() && spectator.isOnline()) {
 

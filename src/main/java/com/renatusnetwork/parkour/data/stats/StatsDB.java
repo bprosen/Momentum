@@ -13,6 +13,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class StatsDB {
@@ -597,11 +599,65 @@ public class StatsDB {
     {
         Parkour.getStatsManager().toggleLoadingLeaderboards(true);
 
-        for (Level level : Parkour.getLevelManager().getLevels().values())
-            if (level != null)
-                loadLeaderboard(level);
+        ResultSet results = DatabaseQueries.getRawResults(
+                "SELECT c.level_id, l.level_name, p.player_name, c.time_taken, c.completion_date " +
+                "FROM (" +
+                "  SELECT *, ROW_NUMBER() OVER (PARTITION BY level_id ORDER BY time_taken) AS row_num" +
+                "  FROM (" +
+                "    SELECT level_id, player_id, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
+                "    FROM completions" +
+                "    WHERE time_taken > 0" +
+                "    GROUP BY level_id, player_id" +
+                "  ) AS grouped_completions" +
+                ") AS c " +
+                "JOIN players p ON c.player_id = p.player_id " +
+                "JOIN levels l ON c.level_id = l.level_id " +
+                "WHERE c.row_num <= 10 " +
+                "ORDER BY c.level_id, c.time_taken;"
+        );
 
-        syncRecords();
+        if (results != null)
+        {
+            // default values
+            int currentID = -1;
+            Level currentLevel = null;
+            List<LevelCompletion> currentLB = new ArrayList<>();
+
+            try
+            {
+                while (results.next())
+                {
+                    int levelID = results.getInt("level_id");
+
+                    if (currentID != levelID)
+                    {
+                        // if not at the start (level is null), set LB
+                        if (currentLevel != null)
+                            currentLevel.setLeaderboardCache(currentLB);
+
+                        // initialize
+                        currentLB = new ArrayList<>();
+                        currentLevel = Parkour.getLevelManager().get(results.getString("level_name"));
+
+                        // adjust
+                        currentID = levelID;
+                    }
+
+                    // create completion
+                    LevelCompletion levelCompletion = new LevelCompletion(results.getLong("completion_date"), results.getLong("time_taken"));
+                    levelCompletion.setPlayerName(results.getString("player_name"));
+
+                    currentLB.add(levelCompletion);
+                }
+            }
+            catch (SQLException exception)
+            {
+                exception.printStackTrace();
+            }
+
+            // sync records afterwards
+            syncRecords();
+        }
         Parkour.getStatsManager().toggleLoadingLeaderboards(false);
     }
 

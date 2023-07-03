@@ -227,13 +227,16 @@ public class Placeholders extends PlaceholderExpansion
                             // stats type!
                             if (level != null)
                             {
-                                LevelCompletion completion = level.getLeaderboard().get(posInt - 1); // adjust for index
+                                if (!Parkour.getStatsManager().isLoadingLeaderboards())
+                                {
+                                    LevelCompletion completion = level.getLeaderboard().get(posInt - 1); // adjust for index
 
-                                // return name or value
-                                if (value.equals("name"))
-                                    return completion.getPlayerName();
-                                else if (value.equals("time"))
-                                    return String.valueOf(((double) completion.getCompletionTimeElapsed()) / 1000);
+                                    // return name or value
+                                    if (value.equals("name"))
+                                        return completion.getPlayerName();
+                                    else if (value.equals("time"))
+                                        return String.valueOf(((double) completion.getCompletionTimeElapsed()) / 1000);
+                                }
                             }
                             else
                             {
