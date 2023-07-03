@@ -166,8 +166,43 @@ public class PacketListener implements Listener {
                     InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
                     LocationManager locationManager = Parkour.getLocationManager();
 
+                    // if spectating
+                    if (playerStats.getPlayerToSpectate() != null)
+                    {
+                        PlayerStats beingSpectated = playerStats.getPlayerToSpectate();
+
+                        if (beingSpectated != null && beingSpectated.getPlayer().isOnline() && beingSpectated.isSpectatable() &&
+                                !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                        {
+
+                            if (!beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) ||
+                                    playerStats.getPlayer().getLocation().distance(beingSpectated.getPlayer().getLocation()) > 20)
+
+                                // run in sync due to teleporting
+                                new BukkitRunnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        SpectatorHandler.spectateToPlayer(playerStats.getPlayer(), beingSpectated.getPlayer(), false);
+                                    }
+                                }.runTask(Parkour.getPlugin());
+                        }
+                        else
+                        {
+                            // run in sync due to teleporting
+                            new BukkitRunnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    SpectatorHandler.removeSpectatorMode(playerStats);
+                                }
+                            }.runTask(Parkour.getPlugin());
+                        }
+                    }
                     // if in infinite parkour
-                    if (playerStats.isInInfinitePK())
+                    else if (playerStats.isInInfinitePK())
                     {
                         InfinitePK infinitePK = infinitePKManager.get(player.getName());
 
@@ -198,8 +233,8 @@ public class PacketListener implements Listener {
                     {
                         Level level = playerStats.getLevel();
 
-                        // if level is not null, they are not spectating, it has a respawn y, and the y is greater than or equal to player y, respawn
-                        if (level != null && playerStats.getPlayerToSpectate() == null && level.hasRespawnY() && level.getRespawnY() >= playerY)
+                        // if level is not null, it has a respawn y, and the y is greater than or equal to player y, respawn
+                        if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY)
                         {
                             // run in sync due to teleporting
                             new BukkitRunnable() {

@@ -86,7 +86,6 @@ public class Parkour extends JavaPlugin {
 
         // start schedulers and any settings
         Scoreboard.startScheduler(plugin);
-        SpectatorHandler.startScheduler(plugin);
         stats.addUnloadedPlayers();
 
         getLogger().info("RN-Parkour Enabled");
