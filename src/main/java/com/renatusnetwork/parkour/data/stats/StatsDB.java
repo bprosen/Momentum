@@ -649,6 +649,10 @@ public class StatsDB {
 
                     currentLB.add(levelCompletion);
                 }
+
+                // this makes it so the last level in the results will still get the leaderboard set
+                if (currentLevel != null)
+                    currentLevel.setLeaderboardCache(currentLB);
             }
             catch (SQLException exception)
             {
