@@ -284,7 +284,7 @@ public class MenuItemAction {
             {
                 int playerBalance = (int) playerStats.getCoins();
 
-                if (playerBalance > perk.getPrice())
+                if (playerBalance >= perk.getPrice())
                 {
                     Parkour.getStatsManager().removeCoins(playerStats, perk.getPrice());
                     Parkour.getPerkManager().bought(playerStats, perk);
