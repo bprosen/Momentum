@@ -458,7 +458,7 @@ public class StatsManager {
                                         .replace("%race_losses%", playerStats.getRaceLosses() + "")
                                         .replace("%race_winrate%", playerStats.getRaceWinRate() + "")
                                         .replace("%event_wins%", playerStats.getEventWins() + "")
-                                        .replace("%hours%", Utils.formatNumber(playerStats.getPlayer().getTicksLived() / 72000))
+                                        .replace("%hours%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000))
                                         .replace("%jumps%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
 
                                 // level stats, only add if the most completed level is not null
@@ -539,7 +539,7 @@ public class StatsManager {
     {
         String playerName = playerStats.getPlayerName();
         double coins = playerStats.getCoins();
-        int hours = playerStats.getPlayer().getTicksLived() / 72000;
+        int hours = playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000;
 
         Clan clan = playerStats.getClan();
         String clanString = "&cNone";
@@ -547,6 +547,10 @@ public class StatsManager {
             clanString = clan.getTag();
 
         Rank rank = playerStats.getRank();
+        String rankString = "&cNone";
+        if (rank != null)
+            rankString = rank.getRankTitle();
+
         int prestiges = playerStats.getPrestiges();
         int bestInfinite = playerStats.getInfinitePKScore();
 
@@ -573,7 +577,7 @@ public class StatsManager {
                      "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
                      "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
                      "&7Clan » &e" + clanString + "\n" +
-                     "&7Rank » &a" + rank.getRankTitle() + "\n" +
+                     "&7Rank » &a" + rankString + "\n" +
                      "&7Prestige » &5" + prestiges + "\n" +
                      "&7Best Infinite » &d" + Utils.formatNumber(bestInfinite) + "\n\n" +
                      "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
