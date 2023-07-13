@@ -73,10 +73,10 @@ public class SpectatorHandler {
         spectatorStats.setPlayerToSpectate(playerStats);
 
         // in case they /spectate while spectating
-        if (initialSpectate) {
+        if (initialSpectate)
+        {
             spectatorStats.setSpectateSpawn(spectator.getLocation());
             Parkour.getStatsManager().toggleOffElytra(spectatorStats);
-            PlayerHider.hidePlayer(spectator, true);
         }
 
         spectateToPlayer(spectator, player, initialSpectate);
@@ -87,30 +87,14 @@ public class SpectatorHandler {
         Player player = spectatorStats.getPlayer();
 
         spectatorStats.setPlayerToSpectate(null);
-        player.setFlying(false);
-        player.setAllowFlight(false);
-        PlayerHider.showPlayer(player, true);
-        respawnToLastLocation(spectatorStats);
-    }
 
-    public static void updateSpectators() {
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
-                updateSpectator(playerStats);
-    }
-
-    public static void updateSpectator(PlayerStats spectator) {
-        PlayerStats playerStats = spectator.getPlayerToSpectate();
-
-        if (playerStats != null && playerStats.getPlayer().isOnline() && playerStats.isSpectatable() &&
-            !playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-
-            if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(spectator.getPlayer().getWorld().getName()) ||
-                spectator.getPlayer().getLocation().distance(playerStats.getPlayer().getLocation()) > 20)
-                spectateToPlayer(spectator.getPlayer(), playerStats.getPlayer(), false);
-        } else {
-            removeSpectatorMode(spectator);
+        if (!player.isOp())
+        {
+            player.setFlying(false);
+            player.setAllowFlight(false);
         }
+
+        respawnToLastLocation(spectatorStats);
     }
 
     public static void shutdown() {

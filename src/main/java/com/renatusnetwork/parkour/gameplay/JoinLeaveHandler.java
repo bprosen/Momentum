@@ -149,7 +149,7 @@ public class JoinLeaveHandler implements Listener {
 
         // if left as hidden, remove them
         if (PlayerHider.containsPlayer(player))
-            PlayerHider.removeHiddenPlayer(player);
+            PlayerHider.showPlayer(player);
 
         // if event is running and they are a participant, remove
         if (playerStats.isEventParticipant())

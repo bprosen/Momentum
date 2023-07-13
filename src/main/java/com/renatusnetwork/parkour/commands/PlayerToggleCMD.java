@@ -19,10 +19,10 @@ public class PlayerToggleCMD implements CommandExecutor {
 
         if (a.length == 0)
             if (PlayerHider.containsPlayer(player)) {
-                PlayerHider.showPlayer(player, false);
+                PlayerHider.showPlayer(player);
                 player.sendMessage(Utils.translate("&aYou have turned on players"));
             } else if (!Parkour.getStatsManager().get(player.getUniqueId().toString()).isEventParticipant()) {
-                PlayerHider.hidePlayer(player, false);
+                PlayerHider.hidePlayer(player);
                 player.sendMessage(Utils.translate("&cYou have turned off players"));
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
