@@ -8,10 +8,10 @@ import java.util.Set;
 
 public class PlayerHider {
 
-    private static Set<String> hiddenPlayers = new HashSet<>();
+    private static Set<Player> hiddenPlayers = new HashSet<>();
 
     public static void hidePlayer(Player player) {
-        hiddenPlayers.add(player.getName());
+        hiddenPlayers.add(player);
 
         for (Player online : Bukkit.getOnlinePlayers())
             if (!online.isOp())
@@ -19,7 +19,7 @@ public class PlayerHider {
     }
 
     public static void showPlayer(Player player) {
-        hiddenPlayers.remove(player.getName());
+        hiddenPlayers.remove(player);
 
         for (Player online : Bukkit.getOnlinePlayers())
             if (!online.isOp())
@@ -27,12 +27,12 @@ public class PlayerHider {
     }
 
     public static boolean containsPlayer(Player player) {
-        return hiddenPlayers.contains(player.getName());
+        return hiddenPlayers.contains(player);
     }
 
     public static void hideHiddenPlayersFromJoined(Player playerJoined)
     {
-        for (String playerName : hiddenPlayers)
-            Bukkit.getPlayer(playerName).hidePlayer(playerJoined);
+        for (Player player : hiddenPlayers)
+            player.hidePlayer(playerJoined);
     }
 }
