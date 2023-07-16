@@ -233,7 +233,7 @@ public class Scoreboard {
             }
             // add ip
             board.add(Utils.translate("&7"));
-            board.add(formatSpacing(Utils.translate("&erenatus.cc")));
+            board.add(formatSpacing(Utils.translate("&6renatus.cc")));
 
             playerStats.getBoard().updateLines(board); // update board lines
         }
