@@ -233,33 +233,30 @@ public class PacketListener implements Listener {
                     {
                         Level level = playerStats.getLevel();
 
-                        // if level is not null, it has a respawn y, and the y is greater than or equal to player y, respawn
-                        if (level != null && level.hasRespawnY() && level.getRespawnY() >= playerY)
-                        {
-                            // run in sync due to teleporting
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
+                        // run in sync due to teleporting
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+
+                                // if level is not null, it has a respawn y, and the y is greater than or equal to player y, respawn
+                                if (level != null && level.hasRespawnY() && level.getRespawnY() >= player.getLocation().getY()) {
                                     // teleport
                                     if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
                                         Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                    else if (playerStats.inRace())
-                                    {
+                                    else if (playerStats.inRace()) {
                                         Race race = Parkour.getRaceManager().get(player);
-                                        if (race != null)
-                                        {
+                                        if (race != null) {
                                             if (race.isPlayer1(player))
                                                 race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
                                                 // swap tp to loc 2 if player 2
                                             else
                                                 race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
                                         }
-                                    }
-                                    else
+                                    } else
                                         LevelHandler.respawnPlayer(playerStats, level);
                                 }
-                            }.runTask(plugin);
-                        }
+                            }
+                        }.runTask(plugin);
                     }
                 }
             }

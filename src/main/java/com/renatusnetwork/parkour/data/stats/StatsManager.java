@@ -111,7 +111,7 @@ public class StatsManager {
     public void addTotalPlayer() { totalPlayers++; }
 
     public HashMap<String, PlayerStats> getPlayerStats() {
-        return (HashMap<String, PlayerStats>) playerStatsList.clone();
+        return playerStatsList;
     }
 
     public void enteredAscendance(PlayerStats playerStats)
