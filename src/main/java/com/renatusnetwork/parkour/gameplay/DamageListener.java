@@ -60,12 +60,15 @@ public class DamageListener implements Listener {
         if (event.getEntity() instanceof Player && event.getDamager() instanceof Player)
         {
             Player player = (Player) event.getEntity();
+            Player damager = (Player) event.getDamager();
 
             EventManager eventManager = Parkour.getEventManager();
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            PlayerStats damagerStats = Parkour.getStatsManager().get(damager);
 
             // we only care about the one being damaged, make sure they are in the pvp event
-            if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.PVP && playerStats.isEventParticipant())
+            if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.PVP &&
+                playerStats.isEventParticipant() && damagerStats.isEventParticipant())
             {
                 // damage to 0
                 event.setDamage(0.0);
