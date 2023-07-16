@@ -50,25 +50,30 @@ public class DamageListener implements Listener {
                     else
                         LevelHandler.respawnPlayer(playerStats, playerStats.getLevel());
                 }
-            // for pvp event
-            } else if (event instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent entityDamageEvent = (EntityDamageByEntityEvent) event;
-
-                if (entityDamageEvent.getDamager() instanceof Player) {
-                    Player damager = (Player) entityDamageEvent.getDamager();
-
-                    if (!(eventManager.isEventRunning() &&
-                        eventManager.getEventType() == EventType.PVP &&
-                        eventManager.isParticipant(player) &&
-                        eventManager.isParticipant(damager))) {
-                        // cancel event
-                        entityDamageEvent.setCancelled(true);
-                    } else {
-                        // set damage to 0
-                        entityDamageEvent.setDamage(0.0);
-                    }
-                }
             }
+        }
+    }
+
+    @EventHandler
+    public void onDamageOther(EntityDamageByEntityEvent event)
+    {
+        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player)
+        {
+            Player player = (Player) event.getEntity();
+            Player damager = (Player) event.getDamager();
+
+            EventManager eventManager = Parkour.getEventManager();
+
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            PlayerStats damagerStats = Parkour.getStatsManager().get(damager);
+
+            if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.PVP &&
+                playerStats.isEventParticipant() && damagerStats.isEventParticipant())
+                // damage to 0
+                event.setDamage(0.0);
+            else
+                // cancel
+                event.setCancelled(true);
         }
     }
 }

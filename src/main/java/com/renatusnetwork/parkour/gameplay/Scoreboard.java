@@ -84,23 +84,24 @@ public class Scoreboard {
                 playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
                 board.add(Utils.translate("  &e&lFails &6" + fails));
 
-            board.add(formatSpacing(Utils.translate("&7")));
-
             // spectator section of scoreboard
             if (playerStats.getPlayerToSpectate() != null) {
 
+                board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getPlayerName())));
                 board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
 
                 // practice section of scoreboard
             } else if (playerStats.getPracticeLocation() != null) {
 
+                board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
                 board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
 
                 // race section of scoreboard
             } else if (playerStats.inRace()) {
 
+                board.add(Utils.translate("&7"));
                 Player opponent = Parkour.getRaceManager().get(playerStats.getPlayer()).getOpponent(playerStats.getPlayer());
                 PlayerStats opponentStats = Parkour.getStatsManager().get(opponent);
 
@@ -125,6 +126,7 @@ public class Scoreboard {
                 // event section of scoreboard
             } else if (playerStats.isEventParticipant()) {
 
+                board.add(Utils.translate("&7"));
                 board.add(Utils.translate("  &e&lEvent &2&l" + eventManager.formatName(eventManager.getEventType())));
                 board.add(Utils.translate("  &e&lPlayers &6" + eventManager.getParticipants().size()));
                 board.add(Utils.translate("&7"));
@@ -134,6 +136,7 @@ public class Scoreboard {
                 // infinite parkour section of scoreboard
             } else if (playerStats.isInInfinitePK()) {
 
+                board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
 
                 // add best if they have one
@@ -145,6 +148,9 @@ public class Scoreboard {
 
                 // level section of scoreboard
             } else if (level != null) {
+
+                board.add(Utils.translate("&7"));
+
                 // change the entire scoreboard if it is a rankup level
                 if (level.isRankUpLevel()) {
                     Rank rank = playerStats.getRank();
@@ -210,6 +216,10 @@ public class Scoreboard {
                         board.add(formatSpacing(Utils.translate("&aGrinding")));
                 }
             }
+            // add ip
+            board.add(Utils.translate("&7"));
+            board.add(formatSpacing(Utils.translate("&erenatus.cc")));
+
             playerStats.getBoard().updateLines(board); // update board lines
         }
     }

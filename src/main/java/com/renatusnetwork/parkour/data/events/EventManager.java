@@ -243,7 +243,7 @@ public class EventManager {
     }
 
     public boolean isParticipant(Player player) {
-        return get(player) != null;
+        return participants.containsKey(player.getName());
     }
 
     public void addParticipant(Player player) {
