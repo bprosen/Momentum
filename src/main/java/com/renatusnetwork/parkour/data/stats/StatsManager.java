@@ -158,20 +158,33 @@ public class StatsManager {
     }
 
     public void add(Player player) {
-        if (!exists(player.getUniqueId().toString())) {
+        if (!exists(player.getUniqueId().toString()))
+        {
             PlayerStats playerStats = new PlayerStats(player);
-            playerStatsList.put(player.getName(), playerStats);
+
+            // ensure thread safety
+            synchronized (playerStatsList)
+            {
+                playerStatsList.put(player.getName(), playerStats);
+            }
         }
     }
 
-    public void addUnloadedPlayers() {
+    public void addUnloadedPlayers()
+    {
         for (Player player : Bukkit.getOnlinePlayers())
             if (!exists(player.getUniqueId().toString()))
                 add(player);
     }
 
-    public void remove(PlayerStats playerStats) {
-        playerStatsList.remove(playerStats.getPlayerName());
+    public void remove(PlayerStats playerStats)
+    {
+        // ensure thread safety
+        synchronized (playerStatsList)
+        {
+            playerStatsList.remove(playerStats.getPlayerName());
+        }
+
         ascendancePlayerList.remove(playerStats);
     }
 

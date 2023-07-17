@@ -11,8 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Scoreboard {
 
@@ -49,9 +48,16 @@ public class Scoreboard {
         return input;
     }
 
-    public static void displayScoreboards() {
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-            displayScoreboard(playerStats);
+    public static void displayScoreboards()
+    {
+        Collection<PlayerStats> stats = Parkour.getStatsManager().getPlayerStats().values();
+
+        // ensure thread safety
+        synchronized (stats)
+        {
+            for (PlayerStats playerStats : stats)
+                displayScoreboard(playerStats);
+        }
     }
 
     private static void displayScoreboard(PlayerStats playerStats) {
