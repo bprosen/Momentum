@@ -445,9 +445,9 @@ public class PlotCMD implements CommandExecutor {
 
         if (!playerStats.inRace()) {
             if (!playerStats.isInInfinitePK()) {
-                if (playerStats.getPlayerToSpectate() == null) {
+                if (!playerStats.isSpectating()) {
                     if (!playerStats.isEventParticipant()) {
-                        if (playerStats.getPracticeLocation() == null) {
+                        if (!playerStats.inPracticeMode()) {
                             passes = true;
                         } else {
                             player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));

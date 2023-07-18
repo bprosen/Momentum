@@ -101,7 +101,7 @@ public class SpectatorHandler {
         for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
             
             PlayerStats playerStats = entry.getValue();
-            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPlayerToSpectate() != null)
+            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.isSpectating())
                 removeSpectatorMode(playerStats);
         }
     }

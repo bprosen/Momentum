@@ -23,7 +23,7 @@ public class WorldChangeListener implements Listener {
         PlayerStats playerStats = statsManager.get(player);
 
         // avoid all this code if spectating someone
-        if (playerStats.getPlayerToSpectate() == null) {
+        if (!playerStats.isSpectating()) {
             // if entering ascendance world, add to list to start tracking
             if (player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
                 statsManager.enteredAscendance(playerStats);

@@ -56,7 +56,7 @@ public class InfinitePKManager {
             public void run() {
 
                 // if from portal, prevent getting in via spectator
-                if (playerStats.isInInfinitePK() || (fromPortal && playerStats.getPlayerToSpectate() != null))
+                if (playerStats.isInInfinitePK() || (fromPortal && playerStats.isSpectating()))
                     return;
 
                 Player player = playerStats.getPlayer();

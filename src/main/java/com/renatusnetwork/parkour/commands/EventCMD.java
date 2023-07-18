@@ -35,8 +35,8 @@ public class EventCMD implements CommandExecutor {
                 // run through all the conditions that would not allow them to join
                 if (eventManager.isEventRunning()) {
                     if (!eventManager.isParticipant(player)) {
-                        if (playerStats.getPracticeLocation() == null) {
-                            if (playerStats.getPlayerToSpectate() == null) {
+                        if (!playerStats.inPracticeMode()) {
+                            if (!playerStats.isSpectating()) {
                                 if (!playerStats.inRace()) {
                                     if (!PlayerHider.containsPlayer(player)) {
                                         if (!playerStats.isInInfinitePK()) {
@@ -153,8 +153,8 @@ public class EventCMD implements CommandExecutor {
             // run through all the conditions that would not allow them to join
             if (eventManager.isEventRunning()) {
                 if (!eventManager.isParticipant(player)) {
-                    if (playerStats.getPracticeLocation() == null) {
-                        if (playerStats.getPlayerToSpectate() == null) {
+                    if (!playerStats.inPracticeMode()) {
+                        if (!playerStats.isSpectating()) {
                             if (!playerStats.inRace()) {
                                 if (!PlayerHider.containsPlayer(player)) {
                                     if (!playerStats.isInInfinitePK()) {

@@ -89,12 +89,12 @@ public class RaceCMD implements CommandExecutor {
             return false;
         }
 
-        if (player1.getPlayerToSpectate() != null) {
+        if (player1.isSpectating()) {
             player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
             return false;
         }
 
-        if (player1.getPracticeLocation() != null) {
+        if (player1.inPracticeMode()) {
             player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
             return false;
         }

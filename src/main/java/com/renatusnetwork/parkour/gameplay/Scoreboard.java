@@ -51,12 +51,12 @@ public class Scoreboard {
 
     public static void displayScoreboards()
     {
-        Collection<PlayerStats> stats = Parkour.getStatsManager().getPlayerStats().values();
+        HashMap<String, PlayerStats> stats = Parkour.getStatsManager().getPlayerStats();
 
         // ensure thread safety
         synchronized (stats)
         {
-            for (PlayerStats playerStats : stats)
+            for (PlayerStats playerStats : stats.values())
                 displayScoreboard(playerStats);
         }
     }
@@ -88,19 +88,19 @@ public class Scoreboard {
 
             int fails = playerStats.getFails();
             if (!playerStats.isInInfinitePK() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
-                playerStats.getPlayerToSpectate() == null && playerStats.inLevel() && !playerStats.getLevel().isAscendanceLevel() &&
+                !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendanceLevel() &&
                 playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
                 board.add(Utils.translate("  &e&lFails &6" + fails));
 
             // spectator section of scoreboard
-            if (playerStats.getPlayerToSpectate() != null) {
+            if (playerStats.isSpectating()) {
 
                 board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getPlayerName())));
                 board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
 
                 // practice section of scoreboard
-            } else if (playerStats.getPracticeLocation() != null) {
+            } else if (playerStats.inPracticeMode()) {
 
                 board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));

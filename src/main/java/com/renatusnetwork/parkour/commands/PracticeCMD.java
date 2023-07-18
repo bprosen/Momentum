@@ -30,7 +30,7 @@ public class PracticeCMD implements CommandExecutor {
 
             if (!(playerStats.getLevel() == null && !player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))) {
                 if (!playerStats.inRace()) {
-                    if (playerStats.getPlayerToSpectate() == null) {
+                    if (!playerStats.isSpectating()) {
                         if (!playerStats.isEventParticipant()) {
                             if (!playerStats.isInInfinitePK()) {
                                 // if it is a dropper level, disable /prac
@@ -43,9 +43,20 @@ public class PracticeCMD implements CommandExecutor {
                              check practice location first, if not null then reset or
                              then check if they are on ground then enable or cancel
                              */
-                                if (playerStats.getPracticeLocation() != null) {
+
+                                // case of /unprac
+                                if (label.equalsIgnoreCase("unprac"))
+                                {
+                                    if (playerStats.inPracticeMode())
+                                        PracticeHandler.resetPlayer(player, true);
+                                    else
+                                        player.sendMessage(Utils.translate("&cYou are not in practice mode"));
+                                }
+                                // in the case of /prac
+                                else if (playerStats.inPracticeMode())
                                     PracticeHandler.resetPlayer(player, true);
-                                } else if (player.isOnGround()) {
+                                else if (player.isOnGround())
+                                {
                                     playerStats.setPracticeMode(player.getLocation());
 
                                     SettingsManager settingsManager = Parkour.getSettingsManager();
@@ -76,7 +87,7 @@ public class PracticeCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot enter practice mode when not in a level"));
             }
-        } else if (a.length == 1 && (a[0].equalsIgnoreCase("go") || a[0].equalsIgnoreCase("tp"))) {
+        } else if (label.equalsIgnoreCase("prac") && a.length == 1 && (a[0].equalsIgnoreCase("go") || a[0].equalsIgnoreCase("tp"))) {
                 Parkour.getCheckpointManager().teleportToPracCP(playerStats);
         }
         return false;

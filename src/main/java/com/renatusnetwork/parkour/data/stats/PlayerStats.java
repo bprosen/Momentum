@@ -259,6 +259,8 @@ public class PlayerStats {
         return playerToSpectate;
     }
 
+    public boolean isSpectating() { return playerToSpectate != null; }
+
     //
     // InfinitePK Section
     //
@@ -293,9 +295,7 @@ public class PlayerStats {
 
     public boolean isLastRank() {
         // get if they are at last rank
-        if (rank != null && rank.getRankId() == Parkour.getRanksManager().getRankList().size())
-            return true;
-        return false;
+        return rank != null && rank.getRankId() == Parkour.getRanksManager().getRankList().size();
     }
 
     public void setRankUpStage(int rankUpStage) {
@@ -346,6 +346,8 @@ public class PlayerStats {
     public Location getPracticeLocation() {
         return practiceSpawn;
     }
+
+    public boolean inPracticeMode() { return practiceSpawn != null; }
 
     //
     // Clan Section

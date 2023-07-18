@@ -39,7 +39,7 @@ commands:
     description: "RN-Parkour spawn command"
   practice:
     description: "RN-Parkour practice command"
-    aliases: [prac]
+    aliases: [prac, unprac]
   race:
     description: "RN-Parkour race command"
     aliases: [races]

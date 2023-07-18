@@ -542,7 +542,7 @@ public class LevelManager {
                 if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
                     playerStats.resetLevel();
 
-                    if (playerStats.getPracticeLocation() != null)
+                    if (playerStats.inPracticeMode())
                         playerStats.resetPracticeMode();
 
                     if (playerStats.hasCurrentCheckpoint())

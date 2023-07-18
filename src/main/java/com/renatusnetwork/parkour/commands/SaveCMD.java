@@ -35,9 +35,9 @@ public class SaveCMD implements CommandExecutor
                             {
                                 if (!playerStats.isEventParticipant())
                                 {
-                                    if (playerStats.getPlayerToSpectate() == null)
+                                    if (!playerStats.isSpectating())
                                     {
-                                        if (playerStats.getPracticeLocation() == null)
+                                        if (!playerStats.inPracticeMode())
                                         {
                                             if (!playerStats.inRace())
                                             {
