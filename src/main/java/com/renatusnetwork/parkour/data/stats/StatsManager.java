@@ -157,14 +157,14 @@ public class StatsManager {
         return getByName(playerName) != null;
     }
 
-    public void add(Player player) {
-        if (!exists(player.getUniqueId().toString()))
+    public void add(Player player)
+    {
+        // ensure thread safety
+        synchronized (playerStatsList)
         {
-            PlayerStats playerStats = new PlayerStats(player);
-
-            // ensure thread safety
-            synchronized (playerStatsList)
+            if (!exists(player.getUniqueId().toString()))
             {
+                PlayerStats playerStats = new PlayerStats(player);
                 playerStatsList.put(player.getName(), playerStats);
             }
         }
