@@ -167,7 +167,7 @@ public class PacketListener implements Listener {
                     LocationManager locationManager = Parkour.getLocationManager();
 
                     // if spectating
-                    if (!playerStats.isSpectating())
+                    if (playerStats.isSpectating())
                     {
                         PlayerStats beingSpectated = playerStats.getPlayerToSpectate();
 
