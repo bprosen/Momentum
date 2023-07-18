@@ -85,7 +85,7 @@ public class JoinLeaveHandler implements Listener {
                     public void run() {
 
                         // if not spectating
-                        if (playerStats.getPlayerToSpectate() == null) {
+                        if (!playerStats.isSpectating()) {
                             // load level, checkpoint info here
                             ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
                             if (region != null) {
@@ -136,11 +136,11 @@ public class JoinLeaveHandler implements Listener {
         ClansManager clansManager = Parkour.getClansManager();
 
         // if left in spectator, remove it
-        if (playerStats.getPlayerToSpectate() != null)
+        if (playerStats.isSpectating())
             SpectatorHandler.removeSpectatorMode(playerStats);
 
         // if left in practice mode, reset it
-        if (playerStats.getPracticeLocation() != null)
+        if (playerStats.inPracticeMode())
             PracticeHandler.resetPlayer(player, false);
 
         // if left in race, end it

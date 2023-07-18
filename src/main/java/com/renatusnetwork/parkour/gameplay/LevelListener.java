@@ -66,7 +66,7 @@ public class LevelListener implements Listener {
                             race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
                     }
                 // if they are not spectating anyone, continue
-                } else if (playerStats.getPlayerToSpectate() == null) {
+                } else if (!playerStats.isSpectating()) {
                     Level level = playerStats.getLevel();
                     if (level != null && !level.isDropperLevel() && level.doesLiquidResetPlayer()) {
 
@@ -74,7 +74,7 @@ public class LevelListener implements Listener {
                         if (level.isElytraLevel())
                             player.setGliding(false);
 
-                        if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
+                        if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
                             Parkour.getCheckpointManager().teleportToCP(playerStats);
                         else
                             LevelHandler.respawnPlayer(playerStats, level);
@@ -97,7 +97,7 @@ public class LevelListener implements Listener {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 if (playerStats != null && playerStats.inLevel() &&
-                    playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null &&
+                    !playerStats.inPracticeMode() && !playerStats.isSpectating() &&
                     !playerStats.hasCurrentCheckpoint()) {
 
                     // cancel so no click sound and no hogging plate
@@ -107,7 +107,7 @@ public class LevelListener implements Listener {
             } else if (block.getType() == Material.GOLD_PLATE) {
                 // gold plate = checkpoint
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats != null && playerStats.getLevel() != null && playerStats.getPracticeLocation() == null && playerStats.getPlayerToSpectate() == null) {
+                if (playerStats != null && playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating()) {
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
 
@@ -265,7 +265,7 @@ public class LevelListener implements Listener {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // this is mainly QOL for staff!
-        if (playerStats != null && playerStats.getPlayerToSpectate() == null &&
+        if (playerStats != null && !playerStats.isSpectating() &&
            !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff")) {
 
             // boolean for resetting level

@@ -28,11 +28,11 @@ public class LevelHandler {
         Level level = Parkour.getLevelManager().get(levelName);
 
         // if playerstats and level exists
-        if (playerStats != null && playerStats.getPlayerToSpectate() == null && level != null) {
+        if (playerStats != null && !playerStats.isSpectating() && level != null) {
             // if they do have the required level
             if (level.hasRequiredLevels(playerStats)) {
                 // if does not have a practice location
-                if (playerStats.getPracticeLocation() == null) {
+                if (!playerStats.inPracticeMode()) {
 
                     int playerLevelCompletions = playerStats.getLevelCompletionsCount(levelName);
 

@@ -14,7 +14,7 @@ public class PracticeHandler {
         for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
 
             PlayerStats playerStats = entry.getValue();
-            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.getPracticeLocation() != null) {
+            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.inPracticeMode()) {
                 playerStats.getPlayer().teleport(playerStats.getPracticeLocation());
                 playerStats.resetPracticeMode();
             }

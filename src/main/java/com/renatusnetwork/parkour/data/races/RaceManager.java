@@ -448,25 +448,25 @@ public class RaceManager {
             boolean doingBet = raceRequest.hasBet();
             double betAmount = raceRequest.getBet();
 
-            if (player1.getPlayerToSpectate() != null) {
+            if (player1.isSpectating()) {
                 player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
                 removeRequest(raceRequest);
                 return;
             }
 
-            if (player2.getPlayerToSpectate() != null) {
+            if (player2.isSpectating()) {
                 player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while they are in spectator"));
                 removeRequest(raceRequest);
                 return;
             }
 
-            if (player1.getPracticeLocation() != null) {
+            if (player1.inPracticeMode()) {
                 player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                 removeRequest(raceRequest);
                 return;
             }
 
-            if (player2.getPracticeLocation() != null) {
+            if (player2.inPracticeMode()) {
                 player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while they are in practice mode"));
                 removeRequest(raceRequest);
                 return;

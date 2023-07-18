@@ -167,7 +167,7 @@ public class PacketListener implements Listener {
                     LocationManager locationManager = Parkour.getLocationManager();
 
                     // if spectating
-                    if (playerStats.getPlayerToSpectate() != null)
+                    if (!playerStats.isSpectating())
                     {
                         PlayerStats beingSpectated = playerStats.getPlayerToSpectate();
 
@@ -241,7 +241,7 @@ public class PacketListener implements Listener {
                                 // if level is not null, it has a respawn y, and the y is greater than or equal to player y, respawn
                                 if (level != null && level.hasRespawnY() && level.getRespawnY() >= player.getLocation().getY()) {
                                     // teleport
-                                    if (playerStats.hasCurrentCheckpoint() || playerStats.getPracticeLocation() != null)
+                                    if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
                                         Parkour.getCheckpointManager().teleportToCP(playerStats);
                                     else if (playerStats.inRace()) {
                                         Race race = Parkour.getRaceManager().get(player);

@@ -485,7 +485,7 @@ public class MenuItemAction {
     public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
         if (!playerStats.inRace())
         {
-            if (playerStats.getPlayerToSpectate() == null)
+            if (!playerStats.isSpectating())
             {
                 if (!playerStats.isEventParticipant())
                 {
@@ -527,7 +527,7 @@ public class MenuItemAction {
                             playerStats.resetCurrentCheckpoint(); // reset
 
                             // if in practice mode
-                            if (playerStats.getPracticeLocation() != null)
+                            if (playerStats.inPracticeMode())
                                 playerStats.resetPracticeMode();
 
                             Location save = playerStats.getSave(level.getName());

@@ -42,7 +42,7 @@ public class SpectateCMD implements CommandExecutor {
                                 if (!player.getName().equalsIgnoreCase(playerStats.getPlayer().getName())) {
                                     if (playerStats.isSpectatable()) {
                                         if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-                                            if (spectatorStats.getPracticeLocation() == null) {
+                                            if (!spectatorStats.inPracticeMode()) {
                                                 if (!spectatorStats.inRace()) {
                                                     if (!spectatorStats.isEventParticipant()) {
                                                         if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
@@ -53,7 +53,7 @@ public class SpectateCMD implements CommandExecutor {
                                                                     if (location.add(0, 1, 0).getBlock().getType() == Material.AIR)
                                                                     {
                                                                         boolean initialSpectate = true;
-                                                                        if (spectatorStats.getPlayerToSpectate() != null) {
+                                                                        if (spectatorStats.isSpectating()) {
                                                                             initialSpectate = false;
 
                                                                             /*
@@ -111,7 +111,7 @@ public class SpectateCMD implements CommandExecutor {
                             }
                         }
                     // if they just run /spectate
-                    } else if (spectatorStats.getPlayerToSpectate() != null) {
+                    } else if (spectatorStats.isSpectating()) {
                         SpectatorHandler.removeSpectatorMode(spectatorStats);
                     } else {
                         sendHelp(sender);

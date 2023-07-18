@@ -191,7 +191,7 @@ public class Utils {
             if (!playerStats.isEventParticipant()) {
                 if (!playerStats.inRace()) {
                     if (!playerStats.isInInfinitePK()) {
-                        if (playerStats.getPlayerToSpectate() == null) {
+                        if (!playerStats.isSpectating()) {
                             // toggle off elytra armor
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 

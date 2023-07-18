@@ -44,7 +44,7 @@ public class InteractListener implements Listener {
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 event.getClickedBlock() != null &&
                 event.getClickedBlock().getState().getData() instanceof Openable &&
-                Parkour.getStatsManager().get(player).getPlayerToSpectate() != null) {
+                Parkour.getStatsManager().get(player).isSpectating()) {
                 event.setCancelled(true);
                 return;
             }
@@ -127,7 +127,7 @@ public class InteractListener implements Listener {
                 if (!playerStats.isInTutorial()) {
                     if (!playerStats.inRace()) {
                         if (!playerStats.isEventParticipant()) {
-                            if (playerStats.getPlayerToSpectate() == null) {
+                            if (!playerStats.isSpectating()) {
                                 if (level != null) {
                                     if (level.getStartLocation() != null) {
                                         // gets if they have right clicked it already, if so, cancel the task and reset them

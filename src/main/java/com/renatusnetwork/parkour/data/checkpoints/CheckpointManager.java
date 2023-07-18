@@ -24,8 +24,8 @@ public class CheckpointManager {
     public void teleportToPracCP(PlayerStats playerStats) {
         if (!playerStats.inRace()) {
             if (!playerStats.isEventParticipant()) {
-                if (playerStats.getPlayerToSpectate() == null) {
-                    if (playerStats.getPracticeLocation() != null)
+                if (!playerStats.isSpectating()) {
+                    if (playerStats.inPracticeMode())
                         playerStats.getPlayer().teleport(playerStats.getPracticeLocation());
                     else
                         playerStats.getPlayer().sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
@@ -45,7 +45,7 @@ public class CheckpointManager {
         if (!playerStats.inRace()) {
             if (!playerStats.isEventParticipant()) {
                 if (!playerStats.isInInfinitePK()) {
-                    if (playerStats.getPlayerToSpectate() == null) {
+                    if (!playerStats.isSpectating()) {
 
                         Location loc = null;
                         boolean setDirection = false;
@@ -54,9 +54,9 @@ public class CheckpointManager {
                          if not then check if the loc is checkpoint and
                          adjust the x and z to teleport to middle
                          */
-                        if (playerStats.getPracticeLocation() != null)
+                        if (playerStats.inPracticeMode())
                             loc = playerStats.getPracticeLocation().clone();
-                        else if (playerStats.getCurrentCheckpoint() != null) {
+                        else if (playerStats.hasCurrentCheckpoint()) {
                             loc = playerStats.getCurrentCheckpoint().clone().add(0.5, 0, 0.5);
                             setDirection = true;
                         }
