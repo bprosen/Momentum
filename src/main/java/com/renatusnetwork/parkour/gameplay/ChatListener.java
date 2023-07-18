@@ -52,7 +52,7 @@ public class ChatListener implements Listener
                         PlayerStats spyStats = Parkour.getStatsManager().get(spyPlayer);
                         Clan spyClan = spyStats.getClan();
 
-                        if (spyClan != null && !spyClan.equals(playerStats.getClan()))
+                        if (spyClan == null || !spyClan.equals(playerStats.getClan()))
                             spyPlayer.sendMessage(Utils.translate("&6CS " + playerStats.getClan().getTag() + " &e" +
                                     player.getDisplayName() + " &7" + msg));
                     }
