@@ -319,7 +319,7 @@ public class PlotCMD implements CommandExecutor {
         Player target = Bukkit.getPlayer(a[1]);
 
         if (target == null) {
-            player.sendMessage(Utils.translate("&4" + target.getName() + " &cis not online!"));
+            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
             return;
         }
 
