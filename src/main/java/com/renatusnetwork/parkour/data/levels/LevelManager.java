@@ -1,12 +1,10 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.locations.LocationsYAML;
 import com.renatusnetwork.parkour.data.menus.*;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -329,31 +327,12 @@ public class LevelManager {
         return tempList;
     }
 
-    public List<Level> getPvPEventLevels() {
+    public List<Level> getEventLevelsFromType(EventType eventType)
+    {
         List<Level> tempList = new ArrayList<>();
 
         for (Level level : getEventLevels())
-            if (level.getEventType() == EventType.PVP)
-                tempList.add(level);
-
-        return tempList;
-    }
-
-    public List<Level> getRisingWaterEventLevels() {
-        List<Level> tempList = new ArrayList<>();
-
-        for (Level level : getEventLevels())
-            if (level.getEventType() == EventType.RISING_WATER)
-                tempList.add(level);
-
-        return tempList;
-    }
-
-    public List<Level> getFallingAnvilEventLevels() {
-        List<Level> tempList = new ArrayList<>();
-
-        for (Level level : getEventLevels())
-            if (level.getEventType() == EventType.FALLING_ANVIL)
+            if (level.getEventType() == eventType)
                 tempList.add(level);
 
         return tempList;

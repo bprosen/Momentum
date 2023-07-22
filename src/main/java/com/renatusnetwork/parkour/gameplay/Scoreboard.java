@@ -68,7 +68,6 @@ public class Scoreboard {
             Level level = playerStats.getLevel();
             EventManager eventManager = Parkour.getEventManager();
 
-            board.add(Utils.translate("&c&lRenatus Network"));
             board.add(Utils.translate("&7"));
 
             String coinBalance = Utils.translate("  &e&lCoins &6" + Utils.formatNumber(playerStats.getCoins()));
@@ -135,8 +134,8 @@ public class Scoreboard {
             } else if (playerStats.isEventParticipant()) {
 
                 board.add(Utils.translate("&7"));
-                board.add(Utils.translate("  &e&lEvent &2&l" + eventManager.formatName(eventManager.getEventType())));
-                board.add(Utils.translate("  &e&lPlayers &6" + eventManager.getParticipants().size()));
+                board.add(formatSpacing(Utils.translate("&2&l" + eventManager.getRunningEvent().getFormattedName())));
+                board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
                 board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&6&lTime Left")));
                 board.add(formatSpacing(Utils.translate("&7" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));

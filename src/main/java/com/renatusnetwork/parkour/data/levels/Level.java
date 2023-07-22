@@ -1,7 +1,7 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -10,7 +10,6 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 

@@ -1,14 +1,14 @@
 package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.events.EventManager;
-import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.events.types.Event;
+import com.renatusnetwork.parkour.data.events.types.EventType;
+import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
 import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -26,9 +26,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.potion.PotionEffect;
-
-import java.util.List;
 
 public class LevelListener implements Listener {
 
@@ -45,16 +42,13 @@ public class LevelListener implements Listener {
                 EventManager eventManager = Parkour.getEventManager();
 
                 // if they are participant and fall into water, eliminate them
-                if (eventManager.isEventRunning() &&
-                    playerStats.isEventParticipant() &&
-                    eventManager.getEventType() == EventType.RISING_WATER &&
-                    eventManager.isStartCoveredInWater()) {
-
+                if (eventManager.isEventRunning() && playerStats.isEventParticipant() &&
+                    eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())
+                {
                     eventManager.doFireworkExplosion(player.getLocation());
                     eventManager.removeParticipant(player, false);
                     eventManager.addEliminated(player);
                     player.sendMessage(Utils.translate("&7You are &beliminated &7out of the event!"));
-
                 } else if (playerStats.inRace()) {
 
                     Race race = Parkour.getRaceManager().get(player);

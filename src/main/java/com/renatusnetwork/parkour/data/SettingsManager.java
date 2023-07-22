@@ -58,8 +58,7 @@ public class SettingsManager {
     public int min_players_online;
     public double anvil_spawn_percentage;
     public int anvil_spawn_y_above_start_y;
-    public int pvp_event_task_delay;
-    public int half_heart_event_task_delay;
+    public int falling_anvil_event_task_delay;
     public int rising_water_event_task_delay;
 
     public LinkedHashMap<Integer, ItemStack> setup_swords;
@@ -149,8 +148,7 @@ public class SettingsManager {
         min_players_online = settings.getInt("event.min_players_online");
         anvil_spawn_percentage = settings.getDouble("event.anvil_spawn_percentage");
         anvil_spawn_y_above_start_y = settings.getInt("event.anvil_spawn_y_above_start_y");
-        pvp_event_task_delay = settings.getInt("event.task_delay.pvp");
-        half_heart_event_task_delay = settings.getInt("event.task_delay.half_heart");
+        falling_anvil_event_task_delay = settings.getInt("event.task_delay.falling_anvil");
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");

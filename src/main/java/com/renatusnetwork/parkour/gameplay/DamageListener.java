@@ -2,9 +2,8 @@ package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
-import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +22,7 @@ public class DamageListener implements Listener {
             // for anvil event
             if (event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
                 // only run code if event is running and type HALF_HEART
-                if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.FALLING_ANVIL) {
+                if (eventManager.isEventRunning() && eventManager.isFallingAnvilEvent()) {
 
                     Player victim = (Player) event.getEntity();
                     PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
@@ -67,7 +66,7 @@ public class DamageListener implements Listener {
             PlayerStats damagerStats = Parkour.getStatsManager().get(damager);
 
             // we only care about the one being damaged, make sure they are in the pvp event
-            if (eventManager.isEventRunning() && eventManager.getEventType() == EventType.PVP &&
+            if (eventManager.isEventRunning() && eventManager.isPvPEvent() &&
                 playerStats.isEventParticipant() && damagerStats.isEventParticipant())
             {
                 // damage to 0

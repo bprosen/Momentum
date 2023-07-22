@@ -1,7 +1,7 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.events.EventType;
+import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import org.bukkit.Bukkit;
