@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
+import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.ranks.Rank;
@@ -139,6 +140,12 @@ public class Scoreboard {
                 board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&6&lTime Left")));
                 board.add(formatSpacing(Utils.translate("&7" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
+
+                if (eventManager.isAscentEvent())
+                {
+                    board.add(Utils.translate(""));
+                    board.add(formatSpacing(Utils.translate("&e&lLevel &6" + ((AscentEvent) eventManager.getRunningEvent()).getLevelID(playerStats.getPlayer()))));
+                }
 
                 // infinite parkour section of scoreboard
             } else if (playerStats.isInInfinitePK()) {

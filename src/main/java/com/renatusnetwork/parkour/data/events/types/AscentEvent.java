@@ -30,7 +30,7 @@ public class AscentEvent extends Event
         levels.remove(player);
     }
 
-    public int getLevel(Player player)
+    public int getLevelID(Player player)
     {
         return levels.get(player);
     }
