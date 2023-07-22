@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
+import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.events.types.Event;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
@@ -42,13 +43,20 @@ public class LevelListener implements Listener {
                 EventManager eventManager = Parkour.getEventManager();
 
                 // if they are participant and fall into water, eliminate them
-                if (eventManager.isEventRunning() && playerStats.isEventParticipant() &&
-                    eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())
+                if (eventManager.isEventRunning() && playerStats.isEventParticipant())
                 {
-                    eventManager.doFireworkExplosion(player.getLocation());
-                    eventManager.removeParticipant(player, false);
-                    eventManager.addEliminated(player);
-                    player.sendMessage(Utils.translate("&7You are &beliminated &7out of the event!"));
+                    if (eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())
+                    {
+                        eventManager.doFireworkExplosion(player.getLocation());
+                        eventManager.removeParticipant(player, false);
+                        eventManager.addEliminated(player);
+                        player.sendMessage(Utils.translate("&7You are &beliminated &7out of the event!"));
+                    }
+                    else if (eventManager.isAscentEvent())
+                    {
+                        // level down
+                        ((AscentEvent) eventManager.getRunningEvent()).levelDown(player);
+                    }
                 } else if (playerStats.inRace()) {
 
                     Race race = Parkour.getRaceManager().get(player);
@@ -117,19 +125,23 @@ public class LevelListener implements Listener {
                     else
                         setCheckpoint(player, playerStats, block.getLocation());
                 }
-            } else if (block.getType() == Material.IRON_PLATE) {
+            }
+            else if (block.getType() == Material.IRON_PLATE)
+            {
                 // iron plate = infinite pk or race end
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                if (playerStats != null) {
+                if (playerStats != null)
+                {
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
+                    EventManager eventManager = Parkour.getEventManager();
 
                     // end if in race
                     if (playerStats.inRace())
                         Parkour.getRaceManager().endRace(player);
-                    else if (playerStats.isInInfinitePK()) {
-
+                    else if (playerStats.isInInfinitePK())
+                    {
                         // prevent double clicking
                         InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getName());
 
@@ -140,6 +152,11 @@ public class LevelListener implements Listener {
                             player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
                             Parkour.getInfinitePKManager().doNextJump(playerStats, false);
                         }
+                    }
+                    else if (eventManager.isEventRunning() && playerStats.isEventParticipant() && eventManager.isAscentEvent())
+                    {
+                        // level up
+                        ((AscentEvent) eventManager.getRunningEvent()).levelUp(player);
                     }
                 }
             }

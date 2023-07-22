@@ -194,9 +194,33 @@ public class LevelsYAML {
 
     public static boolean getLiquidResetSetting(String levelName) {
         // WE WANT DEFAULT TO BE TRUE!
-        if (isSet(levelName, "liquids_reset_players"))
-            return false;
-        return true;
+        return !isSet(levelName, "liquids_reset_players");
+    }
+
+    public static HashMap<Integer, Location> getAscentLevelLocations(String levelName)
+    {
+        HashMap<Integer, Location> locations = new HashMap<>();
+
+        if (levelsFile.isList(levelName + ".ascent_locations"))
+        {
+            List<String> ascentLocations = levelsFile.getStringList(levelName + ".ascent_locations");
+            int id = 1;
+
+            for (String location : ascentLocations)
+            {
+                String[] split = location.split(":");
+
+                locations.put(id, new Location(Parkour.getSettingsManager().main_world,
+                            Double.parseDouble(split[0]),
+                            Double.parseDouble(split[1]),
+                            Double.parseDouble(split[2]),
+                            Float.parseFloat(split[3]),
+                            Float.parseFloat(split[4]))
+                );
+                id++;
+            }
+        }
+        return locations;
     }
 
     public static List<PotionEffect> getPotionEffects(String levelName) {

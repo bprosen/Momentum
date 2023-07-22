@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -25,6 +26,7 @@ public class SettingsManager {
     public static final String INFINITE_PORTAL_NAME = "infinite-portal";
     public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
 
+    public World main_world;
     public String levels_message_completion;
     public String levels_message_broadcast;
     public double featured_level_reward_multiplier;
@@ -123,6 +125,7 @@ public class SettingsManager {
     }
 
     public void load(FileConfiguration settings) {
+        main_world = Bukkit.getWorld(settings.getString("main_world"));
         levels_message_completion = settings.getString("levels.message.completion");
         levels_message_broadcast = settings.getString("levels.message.broadcast");
         signs_first_line = settings.getString("signs.first_line");

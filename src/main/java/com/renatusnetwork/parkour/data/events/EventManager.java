@@ -238,6 +238,11 @@ public class EventManager {
         playerStats.setLevel(runningEvent.getLevel());
         playerStats.disableLevelStartTime();
         playerStats.joinedEvent();
+
+        // add to map
+        if (isAscentEvent())
+            ((AscentEvent) runningEvent).add(eventParticipant);
+
         player.teleport(runningEvent.getLevel().getStartLocation());
 
         // remove active effects
@@ -283,6 +288,9 @@ public class EventManager {
         playerStats.leftEvent();
         player.teleport(eventParticipant.getOriginalLocation());
         player.setHealth(20.0);
+
+        if (isAscentEvent())
+            ((AscentEvent) runningEvent).remove(eventParticipant);
 
         if (!disconnected && winner != null)
             TitleAPI.sendTitle(eventParticipant.getPlayer(), 10, 80, 10,
