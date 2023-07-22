@@ -86,6 +86,8 @@ public class SettingsManager {
 
     public int max_prestige_multiplier;
     public int prestige_multiplier_per_prestige;
+    public double base_prestige_cost;
+    public double additional_cost_per_prestige;
 
     public double min_race_bet_amount;
 
@@ -170,6 +172,8 @@ public class SettingsManager {
         max_coins_leaderboard_size = settings.getInt("stats.max_coins_leaderboard_size");
         max_prestige_multiplier = settings.getInt("prestiges.max_multiplier");
         prestige_multiplier_per_prestige = settings.getInt("prestiges.multiplier_per_prestige");
+        base_prestige_cost = settings.getDouble("prestiges.base_prestige_cost");
+        additional_cost_per_prestige = settings.getDouble("prestiges.additional_cost_per_prestige");
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
         max_records_leaderboard_size = settings.getInt("records.max_leaderboard_size");

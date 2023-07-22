@@ -79,8 +79,6 @@ public class Placeholders extends PlaceholderExpansion
                     return String.valueOf(playerStats.getRaceWinRate());
                 case "best_infinite":
                     return Utils.formatNumber(playerStats.getInfinitePKScore());
-                case "shortened_rank":
-                    return playerStats.getRank() == null ? "" : Utils.translate(playerStats.getRank().getShortRankTitle());
                 case "event_wins":
                     return Utils.formatNumber(playerStats.getEventWins());
             }

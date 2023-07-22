@@ -26,33 +26,23 @@ public class RankupCMD implements CommandExecutor {
 
         if (a.length == 0) {
             if (playerStats.isLastRank()) {
-                player.sendMessage(Utils.translate("&cYou are at last rank!"));
+                player.sendMessage(Utils.translate("&cYou are at last rank! Use /prestige to reset!"));
                 return true;
             }
 
-            String menuName = null;
-            // stage 1, meaning coin rankup part
-            if (playerStats.getRankUpStage() == 1)
-                menuName = "coin-rankup";
-            // stage 2, meaning level rankup part
-            else if (playerStats.getRankUpStage() == 2) {
-                // get if it is a single level style rankup (expert and up)
-                if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
-                    menuName = "single-level-rankup";
-                else
-                    menuName = "double-level-rankup";
-            }
+            String menuName = "rankup";
 
-            if (menuManager.exists(menuName)) {
-
+            if (menuManager.exists(menuName))
+            {
                 Inventory inventory = menuManager.getInventory(menuName, 1);
 
-                if (inventory != null) {
+                if (inventory != null)
+                {
                     player.openInventory(inventory);
                     menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
-                } else {
-                    sender.sendMessage(Utils.translate("&cError loading the inventory"));
                 }
+                else
+                    sender.sendMessage(Utils.translate("&cError loading the inventory"));
             } else {
                 sender.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
             }

@@ -13,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 
@@ -31,7 +32,7 @@ public class RankCMD implements CommandExecutor {
         if (player.hasPermission("rn-parkour.admin")) {
             if (a.length == 0) {
                 sendRank(player);
-            } else if (a.length == 3 && a[0].equalsIgnoreCase("set")) {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("setrank")) {
 
                 Player victim = Bukkit.getPlayer(a[1]);
                 String rankName = a[2];
@@ -69,7 +70,6 @@ public class RankCMD implements CommandExecutor {
                         RanksYAML.create(rankName);
                         RanksYAML.setRankID(rankName, ranksManager.getRankList().size() + 1);
                         RanksYAML.setRankTitle(rankName, rankTitle);
-                        RanksYAML.setRankUpPrice(rankName, rankUpPrice);
 
                         // create object
                         ranksManager.add(rankName);
@@ -101,34 +101,17 @@ public class RankCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
-
-                Parkour.getConfigManager().load("ranks");
-                sender.sendMessage(Utils.translate("&7Loaded &cranks.yml &7from disk"));
-                Parkour.getRanksManager().load();
-                sender.sendMessage(Utils.translate("&7Loaded ranks from &cranks.yml&7, &c" +
-                        Parkour.getRanksManager().getNames().size() + " &7total"));
-
-            } else if (a.length == 3 && a[0].equalsIgnoreCase("setstage")) {
-
-                Player victim = Bukkit.getPlayer(a[1]);
-
-                if (victim == null) {
-                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
-                    return true;
-                }
-
-                if (Utils.isInteger(a[2])) {
-                    int stage = Integer.parseInt(a[2]);
-
-                    // can only be stage 1 or stage 2
-                    if (stage == 1 || stage == 2) {
-                        RanksDB.updateStage(victim.getUniqueId(), stage);
-                        Parkour.getStatsManager().get(player).setRankUpStage(stage);
-                        player.sendMessage(Utils.translate("&cYou updated &4" + victim.getName() + "'s Stage &cto &4" + stage));
-                    } else {
-                        player.sendMessage(Utils.translate("&cYou cannot set a stage that does not exist (1 or 2 only)"));
+                new BukkitRunnable() {
+                    @Override
+                    public void run()
+                    {
+                        Parkour.getConfigManager().load("ranks");
+                        sender.sendMessage(Utils.translate("&7Loaded &cranks.yml &7from disk"));
+                        Parkour.getRanksManager().load();
+                        sender.sendMessage(Utils.translate("&7Loaded ranks from &cranks.yml&7, &c" +
+                                Parkour.getRanksManager().getNames().size() + " &7total"));
                     }
-                }
+                }.runTaskAsynchronously(Parkour.getPlugin());
             } else if (a.length == 3 && a[0].equalsIgnoreCase("setprestiges")) {
                 // check if they have joined parkour
                 if (StatsDB.isPlayerInDatabase(a[1])) {
@@ -209,8 +192,7 @@ public class RankCMD implements CommandExecutor {
         player.sendMessage(getHelp("load"));
         player.sendMessage(getHelp("create"));
         player.sendMessage(getHelp("remove"));
-        player.sendMessage(getHelp("set"));
-        player.sendMessage(getHelp("setstage"));
+        player.sendMessage(getHelp("setrank"));
         player.sendMessage(getHelp("setprestiges"));
     }
 
@@ -231,9 +213,7 @@ public class RankCMD implements CommandExecutor {
             case "remove":
                 return Utils.translate("&c/ranks remove <rankName>  &7Removes a rank from config/database and rank players down in the rank");
             case "set":
-                return Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank");
-            case "setstage":
-                return Utils.translate("&c/ranks setstage <player> <stage>  &7Sets players stage in rankup (1/2)");
+                return Utils.translate("&c/ranks setrank <player> <rankName>  &7Sets players rank");
             case "setprestiges":
                 return Utils.translate("&c/ranks setprestiges <player> <amount>  &7Sets players prestiges from database and cache");
             case "help":

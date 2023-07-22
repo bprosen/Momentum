@@ -1,20 +1,23 @@
 package com.renatusnetwork.parkour.data.ranks;
 
+import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.levels.Level;
+
 public class Rank {
 
     private String rankName;
     private int rankId;
-    private double rankUpPrice;
     private String rankTitle;
-    private String shortRankTitle;
+    private Level rankupLevel;
 
-    public Rank(String rankName, String rankTitle, String shortRankTitle, int rankId, double rankUpPrice) {
+    public Rank(String rankName, String rankTitle, int rankId) {
         this.rankName = rankName;
         this.rankTitle = rankTitle;
-        this.shortRankTitle = shortRankTitle;
         this.rankId = rankId;
-        this.rankUpPrice = rankUpPrice;
+        this.rankupLevel = Parkour.getLevelManager().get(RanksYAML.getRankUpLevel(rankName));
     }
+
+    public Level getRankupLevel() { return rankupLevel; }
 
     public String getRankName() {
         return rankName;
@@ -24,11 +27,5 @@ public class Rank {
         return rankId;
     }
 
-    public double getRankUpPrice() {
-        return rankUpPrice;
-    }
-
     public String getRankTitle() { return rankTitle; }
-
-    public String getShortRankTitle() { return shortRankTitle; }
 }

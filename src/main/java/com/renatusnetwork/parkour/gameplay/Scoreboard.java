@@ -76,7 +76,7 @@ public class Scoreboard {
 
             // if they have a rank, show it
             if (playerStats.getRank() != null) {
-                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getShortRankTitle());
+                String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
                 board.add(rankString);
             }
 
@@ -171,10 +171,12 @@ public class Scoreboard {
 
                     // null check their rank to avoid NPE and same with next rank
                     if (rank != null) {
-                        Rank nextRank = Parkour.getRanksManager().get(rank.getRankId() + 1);
-                        if (nextRank != null) {
-                            board.add(formatSpacing(Utils.translate("&cRankup Level")));
-                            board.add(formatSpacing(Utils.translate("&7To &a" + nextRank.getRankTitle())));
+                        Rank nextRank = Parkour.getRanksManager().getNextRank(rank);
+
+                        if (nextRank != null)
+                        {
+                            board.add(Utils.translate("  &c&lRankup"));
+                            board.add(Utils.translate("  &a" + rank.getRankTitle() + " &7-> &a" + nextRank.getRankTitle()));
                         }
                     }
                 } else {

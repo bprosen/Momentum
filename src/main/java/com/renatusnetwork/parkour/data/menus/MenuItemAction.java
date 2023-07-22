@@ -64,43 +64,46 @@ public class MenuItemAction {
 
     public static void perform(Player player, MenuItem menuItem) {
         String itemType = menuItem.getType();
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         if (itemType.equals("perk"))
             performPerkItem(player, menuItem);
         else if (itemType.equals("level"))
-            performLevelItem(player, menuItem);
+        {
+            if (menuItem.getTypeValue().equals("featured"))
+                performLevelTeleport(playerStats, player, Parkour.getLevelManager().getFeaturedLevel());
+            else if (menuItem.getTypeValue().equals("rankup"))
+                performLevelTeleport(playerStats, player, playerStats.getRank().getRankupLevel());
+            else if (menuItem.getTypeValue().equals("random"))
+                performRandomLevel(playerStats);
+            else
+                performLevelItem(player, menuItem);
+        }
         else if (itemType.equals("teleport"))
             performTeleportItem(player, menuItem);
         else if (itemType.equals("bank"))
-            performBankItem(Parkour.getStatsManager().get(player), menuItem);
+            performBankItem(playerStats, menuItem);
         else if (itemType.equals("open"))
-            // if it is rankup gui, do special method for it
-            if (menuItem.getTypeValue().equals("rankup"))
-                performRankupOpen(player, menuItem);
+        {
+            if (menuItem.getTypeValue().equals("rankup") && playerStats.isLastRank())
+            {
+                player.sendMessage(Utils.translate("&cYou are at last rank! Use /prestige to reset!"));
+                player.closeInventory();
+            }
             else
                 performOpenItem(player, menuItem);
+        }
         else if (itemType.equals("rate"))
             performLevelRate(player, menuItem);
-        else if (itemType.equals("type")) {
-
+        else if (itemType.equals("type"))
+        {
             // certain conditions of types for rankup
             String typeValue = menuItem.getTypeValue();
-            if (typeValue.equals("coin-rankup"))
-                performRankupItem(player);
-            else if (typeValue.equals("rankup-level-1")
-                    || typeValue.equals("rankup-level-2")
-                    || typeValue.equals("rankup-level"))
-                performLevelRankUpItem(player, menuItem);
-            else if (typeValue.equals("submit-plot"))
+            if (typeValue.equals("submit-plot"))
                 performPlotSubmission(player);
-            // dont need to get from stats and can skip performLevelItem
-            else if (typeValue.equals("featured-level"))
-                performLevelTeleport(Parkour.getStatsManager().get(player), player, Parkour.getLevelManager().getFeaturedLevel());
             else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
                      typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite"))
                 performCosmeticsClear(player, typeValue, menuItem);
-            else if (typeValue.equals("random-level"))
-                performRandomLevel(Parkour.getStatsManager().get(player));
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
@@ -184,44 +187,6 @@ public class MenuItemAction {
 
                 Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
                 break;
-        }
-    }
-    private static void performRankupOpen(Player player, MenuItem menuItem) {
-
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-        if (playerStats.isLastRank()) {
-            player.closeInventory();
-            player.sendMessage(Utils.translate("&cYou are at last rank!"));
-            return;
-        }
-
-        String menuName = null;
-        if (playerStats.getRankUpStage() == 1)
-            menuName = "coin-rankup";
-            // stage 2, meaning level rankup part
-        else if (playerStats.getRankUpStage() == 2) {
-            // get if it is a single level style rankup (expert and up)
-            if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
-                menuName = "single-level-rankup";
-            else
-                menuName = "double-level-rankup";
-        }
-
-        if (menuName != null) {
-            Menu menu = Parkour.getMenuManager().getMenu(menuName);
-
-            if (menu != null) {
-                int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
-
-                Inventory inventory = Parkour.getMenuManager().getInventory(menu.getName(), pageNumber);
-
-                if (inventory != null) {
-                    player.closeInventory();
-                    player.openInventory(inventory);
-                    Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
-                }
-            }
         }
     }
 
@@ -308,20 +273,6 @@ public class MenuItemAction {
                         runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
                 }
             }
-        }
-    }
-
-    private static void performLevelRankUpItem(Player player, MenuItem menuItem) {
-
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        String rankName = playerStats.getRank().getRankName();
-        String levelType = menuItem.getTypeValue();
-        String levelName = RanksYAML.getRankUpLevel(rankName, levelType);
-
-        if (levelName != null) {
-            Level level = Parkour.getLevelManager().get(levelName);
-            if (level != null)
-                performLevelTeleport(playerStats, player, level);
         }
     }
 
@@ -639,48 +590,6 @@ public class MenuItemAction {
                 player.openInventory(inventory);
                 Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
             }
-        }
-    }
-
-    private static void performRankupItem(Player player) {
-
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-        double playerBalance = playerStats.getCoins();
-
-        if (playerBalance >= playerStats.getRank().getRankUpPrice()) {
-            player.closeInventory();
-            // remove amount
-            Parkour.getStatsManager().removeCoins(playerStats, playerStats.getRank().getRankUpPrice());
-            // change to next stage
-            RanksDB.updateStage(player.getUniqueId(), 2);
-            playerStats.setRankUpStage(2);
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
-
-            String menuName;
-            // open level menu
-            if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
-                menuName = "single-level-rankup";
-            else
-                menuName = "double-level-rankup";
-
-            MenuManager menuManager = Parkour.getMenuManager();
-
-            if (menuManager.exists(menuName)) {
-
-                Inventory inventory = menuManager.getInventory(menuName, 1);
-                if (inventory != null) {
-                    player.closeInventory();
-                    player.openInventory(inventory);
-                    menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
-                } else {
-                    player.sendMessage(Utils.translate("&cError loading the inventory"));
-                }
-            }
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
-            player.sendMessage(Utils.translate("  &7You need &4$" +
-                    Utils.formatNumber(playerStats.getRank().getRankUpPrice() - playerBalance) + " &7more!"));
-            player.closeInventory();
         }
     }
 }

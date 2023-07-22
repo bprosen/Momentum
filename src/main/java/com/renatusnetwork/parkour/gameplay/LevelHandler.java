@@ -54,7 +54,7 @@ public class LevelHandler {
                                 else
                                     player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
 
-                            } else if (playerStats.getRankUpStage() == 2)
+                            } else
                                 dolevelCompletion(playerStats, player, level, levelName, true, false);
                         } else {
                             // if in race

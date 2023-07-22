@@ -193,8 +193,10 @@ completions:
   global_personal_completions_leaderboard:
     max_size: 10
 prestiges:
-  max_multiplier: 25
-  multiplier_per_prestige: 5
+  max_multiplier: 30
+  multiplier_per_prestige: 10
+  base_prestige_cost: 1000000.0
+  additional_cost_per_prestige: 1000000.0
 races:
   max_leaderboard_size: 10
   min_bet_amount: 100.0

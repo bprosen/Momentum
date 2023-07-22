@@ -38,17 +38,6 @@ public class RanksYAML {
         }
         return null;
     }
-
-    public static String getShortenedRankTitle(String rankName)
-    {
-        String title = null;
-
-        if (isSection(rankName))
-            title = ranksConfig.getString(rankName + ".shortened-title");
-
-        return title;
-    }
-
     public static int getRankId(String rankName) {
         if (isSection(rankName)) {
             int rankId = ranksConfig.getInt(rankName + ".id");
@@ -57,19 +46,9 @@ public class RanksYAML {
         return 0;
     }
 
-    public static double getRankUpPrice(String rankName) {
-        if (isSection(rankName)) {
-            double rankId = ranksConfig.getDouble(rankName + ".rankup-price");
-            return rankId;
-        }
-        return 0.0;
-    }
-
-    public static String getRankUpLevel(String rankName, String levelType) {
-        if (isSet(rankName, levelType)) {
-            String rankUpLevel = ranksConfig.getString(rankName + "." + levelType);
-            return rankUpLevel;
-        }
+    public static String getRankUpLevel(String rankName) {
+        if (isSet(rankName, "rankup_level"))
+            return ranksConfig.getString(rankName + ".rankup_level");
         return null;
     }
 
@@ -92,19 +71,6 @@ public class RanksYAML {
             ranksConfig.set(rankName + ".id", rankId);
             commit();
         }
-    }
-
-    public static void setRankUpPrice(String rankName, double rankUpPrice) {
-        if (exists(rankName)) {
-            ranksConfig.set(rankName + ".rankup-price", rankUpPrice);
-            commit();
-        }
-    }
-
-    public static boolean isSingleLevelRankup(String rankName) {
-        if (isSet(rankName, "single-level-rankup"))
-            return ranksConfig.getBoolean(rankName + ".single-level-rankup");
-        return false;
     }
 
     public static void remove(String rankName) {

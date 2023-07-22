@@ -41,7 +41,6 @@ public class PlayerStats {
     private int gainedPerksCount = 0;
     private float raceWinRate = 0.00f;
     private float prestigeMultiplier = 1.00f;
-    private int rankUpStage;
     private int individualLevelsBeaten;
     private int infinitePKScore = 0;
     private boolean inInfinitePK = false;
@@ -296,14 +295,6 @@ public class PlayerStats {
     public boolean isLastRank() {
         // get if they are at last rank
         return rank != null && rank.getRankId() == Parkour.getRanksManager().getRankList().size();
-    }
-
-    public void setRankUpStage(int rankUpStage) {
-        this.rankUpStage = rankUpStage;
-    }
-
-    public int getRankUpStage() {
-        return rankUpStage;
     }
 
     public int getPrestiges() { return prestiges; }

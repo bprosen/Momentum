@@ -46,11 +46,9 @@ public class RanksManager {
     public void add(String rankName) {
         // get from YAML
         String rankTitle = RanksYAML.getRankTitle(rankName);
-        String shortRankTitle = RanksYAML.getShortenedRankTitle(rankName);
         int rankId = RanksYAML.getRankId(rankName);
-        double rankUpPrice = RanksYAML.getRankUpPrice(rankName);
 
-        Rank rank = new Rank(rankName, rankTitle, shortRankTitle, rankId, rankUpPrice);
+        Rank rank = new Rank(rankName, rankTitle, rankId);
         rankList.put(rankName, rank);
     }
 
@@ -136,12 +134,11 @@ public class RanksManager {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         Utils.teleportToSpawn(playerStats);
+
         int newId = playerStats.getRank().getRankId() + 1;
         Rank rank = get(newId);
         playerStats.setRank(rank);
-        playerStats.setRankUpStage(1);
         RanksDB.updateRank(player.getUniqueId(), newId);
-        RanksDB.updateStage(player.getUniqueId(), 1);
         // play sound
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2f, 0f);
 
@@ -149,12 +146,15 @@ public class RanksManager {
         Parkour.getStatsManager().runGGTimer();
     }
 
-    public void doPrestige(Player player) {
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+    public void doPrestige(PlayerStats playerStats, double cost)
+    {
+        Player player = playerStats.getPlayer();
         Rank defaultRank = get(1);
         // update cache and database
         playerStats.setRank(defaultRank);
         playerStats.addPrestige();
+
+        Parkour.getStatsManager().removeCoins(playerStats, cost);
 
         // update prestige multiplier
         float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
