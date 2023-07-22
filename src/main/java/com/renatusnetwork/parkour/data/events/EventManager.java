@@ -241,7 +241,7 @@ public class EventManager {
 
         // add to map
         if (isAscentEvent())
-            ((AscentEvent) runningEvent).add(eventParticipant);
+            ((AscentEvent) runningEvent).add(player);
 
         player.teleport(runningEvent.getLevel().getStartLocation());
 
@@ -290,7 +290,7 @@ public class EventManager {
         player.setHealth(20.0);
 
         if (isAscentEvent())
-            ((AscentEvent) runningEvent).remove(eventParticipant);
+            ((AscentEvent) runningEvent).remove(player);
 
         if (!disconnected && winner != null)
             TitleAPI.sendTitle(eventParticipant.getPlayer(), 10, 80, 10,
