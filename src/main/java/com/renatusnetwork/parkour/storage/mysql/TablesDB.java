@@ -178,7 +178,7 @@ public class TablesDB {
         String sqlQuery = "CREATE TABLE ratings(" +
                 "uuid CHAR(36) NOT NULL, " +
                 "player_name VARCHAR(16) NOT NULL, " +
-                "level_id INT NOT NULL, " +
+                "level_name VARCHAR(30) NOT NULL, " +
                 "rating TINYINT NOT NULL" +
                 ")";
 

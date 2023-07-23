@@ -36,6 +36,7 @@ public class LevelManager {
         this.levelDataCache = LevelsDB.getDataCache();
 
         load(); // Loads levels from configuration
+        loadRatings();
         loadLevelsInMenus();
         pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
@@ -92,6 +93,22 @@ public class LevelManager {
                         else
                             // if level was just removed from only config, then reset their level
                             playerStats.resetLevel();
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
+    }
+
+    private void loadRatings()
+    {
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                for (Level level : levels.values())
+                {
+                    level.setRating(RatingDB.getAverageRating(level.getID()));
+                    level.setRatingsCount(RatingDB.getTotalRatings(level.getID()));
+                }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
