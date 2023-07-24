@@ -1,10 +1,9 @@
 package com.renatusnetwork.parkour.data.menus;
 
-import com.comphenix.protocol.PacketType;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.bank.BankItem;
-import com.renatusnetwork.parkour.data.bank.BankItemType;
+import com.renatusnetwork.parkour.data.bank.types.BankItem;
+import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.levels.RatingDB;
@@ -12,8 +11,6 @@ import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.plots.PlotsDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
-import com.renatusnetwork.parkour.data.ranks.RanksDB;
-import com.renatusnetwork.parkour.data.ranks.RanksYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;

@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.bank;
+package com.renatusnetwork.parkour.data.bank.types;
 
 public enum BankItemType
 {

@@ -1,6 +1,10 @@
 package com.renatusnetwork.parkour.data.bank;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.types.BankItem;
+import com.renatusnetwork.parkour.data.bank.types.BankItemType;
+import com.renatusnetwork.parkour.data.bank.types.BrilliantItem;
+import com.renatusnetwork.parkour.data.bank.types.RadiantItem;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 

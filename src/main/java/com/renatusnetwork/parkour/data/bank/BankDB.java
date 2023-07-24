@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.bank;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.scheduler.BukkitRunnable;

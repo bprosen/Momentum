@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.bank;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;

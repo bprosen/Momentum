@@ -1,10 +1,9 @@
-package com.renatusnetwork.parkour.data.bank;
+package com.renatusnetwork.parkour.data.bank.types;
 
-import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankDB;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 import java.util.HashMap;
 
@@ -17,22 +16,22 @@ public abstract class BankItem
     private String displayName;
     private String currentHolder;
 
+    private String formattedType;
+
     private HashMap<String, Long> playerBids;
 
-    public BankItem(BankItemType type, int minimumStartingBid, String displayName)
+    public BankItem(BankItemType type, int minimumStartingBid, String displayName, String formattedType)
     {
         this.type = type;
         this.displayName = displayName;
         this.nextBidMinimum = minimumStartingBid;
+        this.formattedType = formattedType;
 
         currentTotal = 0;
         currentHolder = null;
 
         playerBids = BankDB.getBids(type);
     }
-
-    // abstract methods
-    public abstract void broadcastNewBid(PlayerStats playerStats, int bidAmount);
 
     public long getBid(String name)
     {
@@ -43,6 +42,8 @@ public abstract class BankItem
     {
         return playerBids.containsKey(name);
     }
+
+    public String getFormattedType() { return formattedType; }
 
     public String getDisplayName() { return displayName; }
 
@@ -83,4 +84,17 @@ public abstract class BankItem
     }
 
     public void setCurrentHolder(String currentHolder) { this.currentHolder = currentHolder; }
+
+    public void broadcastNewBid(PlayerStats playerStats, int bidAmount)
+    {
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+        Bukkit.broadcastMessage(Utils.translate(" &d&lNEW " + formattedType + " &d&lBANK BID"));
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage(Utils.translate(
+                " &d" + playerStats.getPlayer().getDisplayName() + " &7put &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + getDisplayName()
+        ));
+        Bukkit.broadcastMessage(Utils.translate("   " + getDisplayName() + " &7total is now &6" + Utils.formatNumber(getCurrentTotal()) + " &eCoins &7in the " + formattedType + " &d&lBank"));
+        Bukkit.broadcastMessage(Utils.translate("   &7Bid &6" + Utils.formatNumber(getMinimumNextBid()) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+    }
 }
