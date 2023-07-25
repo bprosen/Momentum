@@ -28,9 +28,9 @@ public class CoinsCMD implements CommandExecutor
 
         // COINS
         if (a.length == 1 && a[0].equalsIgnoreCase("top"))
-        {
             StatsCMD.printCoinsLB(sender);
-        }
+        else if (a.length == 1 && a[0].equalsIgnoreCase("total"))
+            sender.sendMessage(Utils.translate("&7There are &6" + String.format("%,d", Parkour.getStatsManager().getTotalCoins()) + " &eCoins"));
         // coins set
         else if (a.length == 3 && (
                 a[0].equalsIgnoreCase("set") ||

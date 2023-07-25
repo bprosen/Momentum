@@ -25,6 +25,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class StatsManager {
@@ -47,6 +49,7 @@ public class StatsManager {
     private boolean loadingLeaderboards = false;
 
     private int totalPlayers;
+    private long totalCoins;
 
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
@@ -63,6 +66,7 @@ public class StatsManager {
                 loadGlobalPersonalCompletionsLB();
                 loadCoinsLB();
                 loadRecordsLB();
+                loadTotalCoins();
             }
         }.runTaskAsynchronously(plugin);
 
@@ -74,6 +78,7 @@ public class StatsManager {
                 loadOnlinePerksGainedCount();
                 loadCoinsLB();
                 loadRecordsLB();
+                loadTotalCoins();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
 
@@ -253,6 +258,23 @@ public class StatsManager {
     {
         StatsDB.updateRecordsName(playerStats.getPlayerName(), currentRecords - 1);
         playerStats.setRecords(currentRecords - 1);
+    }
+
+    public long getTotalCoins() { return totalCoins; }
+
+    public void loadTotalCoins()
+    {
+        try
+        {
+            ResultSet result = DatabaseQueries.getRawResults("SELECT SUM(coins) AS total_coins FROM players");
+
+            if (result != null)
+                totalCoins = result.getLong("total_coins");
+        }
+        catch (SQLException exception)
+        {
+            exception.printStackTrace();
+        }
     }
 
     public void loadGlobalPersonalCompletionsLB() {
