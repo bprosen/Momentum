@@ -121,7 +121,10 @@ public class StatsManager {
 
     public void enteredAscendance(PlayerStats playerStats)
     {
-        ascendancePlayerList.add(playerStats);
+        synchronized (ascendancePlayerList)
+        {
+            ascendancePlayerList.add(playerStats);
+        }
 
         // if is ascendance, toggle NV on
         if (!playerStats.hasNVStatus())
@@ -133,7 +136,10 @@ public class StatsManager {
 
     public void leftAscendance(PlayerStats playerStats)
     {
-        ascendancePlayerList.remove(playerStats);
+        synchronized (ascendancePlayerList)
+        {
+            ascendancePlayerList.remove(playerStats);
+        }
 
         // if is ascendance, toggle NV on
         if (playerStats.hasNVStatus())
@@ -190,7 +196,10 @@ public class StatsManager {
             playerStatsList.remove(playerStats.getPlayerName());
         }
 
-        ascendancePlayerList.remove(playerStats);
+        synchronized (ascendancePlayerList)
+        {
+            ascendancePlayerList.remove(playerStats);
+        }
     }
 
     public void addGG(PlayerStats playerStats)
@@ -418,26 +427,29 @@ public class StatsManager {
     public void updateAscendancePlayers()
     {
 
-        for (PlayerStats playerStats : ascendancePlayerList)
+        synchronized (ascendancePlayerList)
         {
-            ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
-            if (region != null) {
-                Level level = Parkour.getLevelManager().get(region.getId());
+            for (PlayerStats playerStats : ascendancePlayerList)
+            {
+                ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
+                if (region != null) {
+                    Level level = Parkour.getLevelManager().get(region.getId());
 
-                // if their level is not the same as what they moved to, then update it
-                if (level != null && level.isAscendanceLevel() &&
-                        playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
-                {
-                    playerStats.resetCurrentCheckpoint();
+                    // if their level is not the same as what they moved to, then update it
+                    if (level != null && level.isAscendanceLevel() &&
+                            playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                    {
+                        playerStats.resetCurrentCheckpoint();
 
-                    // load checkpoint into cache
-                    Location checkpoint = playerStats.getCheckpoint(level.getName());
+                        // load checkpoint into cache
+                        Location checkpoint = playerStats.getCheckpoint(level.getName());
 
-                    if (checkpoint != null)
-                        playerStats.setCurrentCheckpoint(checkpoint);
+                        if (checkpoint != null)
+                            playerStats.setCurrentCheckpoint(checkpoint);
 
-                    playerStats.setLevel(level);
-                    playerStats.disableLevelStartTime();
+                        playerStats.setLevel(level);
+                        playerStats.disableLevelStartTime();
+                    }
                 }
             }
         }
