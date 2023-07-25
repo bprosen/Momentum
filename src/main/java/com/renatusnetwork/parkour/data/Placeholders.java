@@ -52,6 +52,8 @@ public class Placeholders extends PlaceholderExpansion
     {
         if (placeholder.equals("global_completions"))
             return Utils.formatNumber(Parkour.getLevelManager().getTotalLevelCompletions());
+        else if (placeholder.equals("total_coins"))
+            return String.format("%,d", Parkour.getStatsManager().getTotalCoins());
 
         PlayerStats playerStats = statsManager.get(player);
 

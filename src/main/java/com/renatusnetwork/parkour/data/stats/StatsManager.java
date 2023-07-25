@@ -25,6 +25,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class StatsManager {
@@ -47,6 +49,7 @@ public class StatsManager {
     private boolean loadingLeaderboards = false;
 
     private int totalPlayers;
+    private long totalCoins;
 
     public StatsManager(Plugin plugin) {
         startScheduler(plugin);
@@ -63,6 +66,7 @@ public class StatsManager {
                 loadGlobalPersonalCompletionsLB();
                 loadCoinsLB();
                 loadRecordsLB();
+                loadTotalCoins();
             }
         }.runTaskAsynchronously(plugin);
 
@@ -74,6 +78,7 @@ public class StatsManager {
                 loadOnlinePerksGainedCount();
                 loadCoinsLB();
                 loadRecordsLB();
+                loadTotalCoins();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
 
@@ -116,7 +121,10 @@ public class StatsManager {
 
     public void enteredAscendance(PlayerStats playerStats)
     {
-        ascendancePlayerList.add(playerStats);
+        synchronized (ascendancePlayerList)
+        {
+            ascendancePlayerList.add(playerStats);
+        }
 
         // if is ascendance, toggle NV on
         if (!playerStats.hasNVStatus())
@@ -128,7 +136,10 @@ public class StatsManager {
 
     public void leftAscendance(PlayerStats playerStats)
     {
-        ascendancePlayerList.remove(playerStats);
+        synchronized (ascendancePlayerList)
+        {
+            ascendancePlayerList.remove(playerStats);
+        }
 
         // if is ascendance, toggle NV on
         if (playerStats.hasNVStatus())
@@ -185,7 +196,10 @@ public class StatsManager {
             playerStatsList.remove(playerStats.getPlayerName());
         }
 
-        ascendancePlayerList.remove(playerStats);
+        synchronized (ascendancePlayerList)
+        {
+            ascendancePlayerList.remove(playerStats);
+        }
     }
 
     public void addGG(PlayerStats playerStats)
@@ -253,6 +267,23 @@ public class StatsManager {
     {
         StatsDB.updateRecordsName(playerStats.getPlayerName(), currentRecords - 1);
         playerStats.setRecords(currentRecords - 1);
+    }
+
+    public long getTotalCoins() { return totalCoins; }
+
+    public void loadTotalCoins()
+    {
+        try
+        {
+            ResultSet result = DatabaseQueries.getRawResults("SELECT SUM(coins) AS total_coins FROM players");
+
+            if (result != null && result.next())
+                totalCoins = result.getLong("total_coins");
+        }
+        catch (SQLException exception)
+        {
+            exception.printStackTrace();
+        }
     }
 
     public void loadGlobalPersonalCompletionsLB() {
@@ -396,26 +427,29 @@ public class StatsManager {
     public void updateAscendancePlayers()
     {
 
-        for (PlayerStats playerStats : ascendancePlayerList)
+        synchronized (ascendancePlayerList)
         {
-            ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
-            if (region != null) {
-                Level level = Parkour.getLevelManager().get(region.getId());
+            for (PlayerStats playerStats : ascendancePlayerList)
+            {
+                ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
+                if (region != null) {
+                    Level level = Parkour.getLevelManager().get(region.getId());
 
-                // if their level is not the same as what they moved to, then update it
-                if (level != null && level.isAscendanceLevel() &&
-                        playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
-                {
-                    playerStats.resetCurrentCheckpoint();
+                    // if their level is not the same as what they moved to, then update it
+                    if (level != null && level.isAscendanceLevel() &&
+                            playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                    {
+                        playerStats.resetCurrentCheckpoint();
 
-                    // load checkpoint into cache
-                    Location checkpoint = playerStats.getCheckpoint(level.getName());
+                        // load checkpoint into cache
+                        Location checkpoint = playerStats.getCheckpoint(level.getName());
 
-                    if (checkpoint != null)
-                        playerStats.setCurrentCheckpoint(checkpoint);
+                        if (checkpoint != null)
+                            playerStats.setCurrentCheckpoint(checkpoint);
 
-                    playerStats.setLevel(level);
-                    playerStats.disableLevelStartTime();
+                        playerStats.setLevel(level);
+                        playerStats.disableLevelStartTime();
+                    }
                 }
             }
         }
