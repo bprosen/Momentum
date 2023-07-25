@@ -1,21 +1,23 @@
 package com.renatusnetwork.parkour.data.bank;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.bank.types.BankItem;
-import com.renatusnetwork.parkour.data.bank.types.BankItemType;
-import com.renatusnetwork.parkour.data.bank.types.BrilliantItem;
-import com.renatusnetwork.parkour.data.bank.types.RadiantItem;
+import com.renatusnetwork.parkour.data.bank.types.*;
+import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BankManager
 {
     private HashMap<BankItemType, BankItem> items;
+    private Jackpot currentJackpot;
 
     public BankManager()
     {
+        currentJackpot = null;
         items = new HashMap<>();
 
         // get random nums
@@ -30,6 +32,47 @@ public class BankManager
                 new BrilliantItem(BankItemType.BRILLIANT, BankYAML.getTitle(BankItemType.BRILLIANT, brilliantNum)));
         items.put(BankItemType.LEGENDARY,
                 new RadiantItem(BankItemType.LEGENDARY, BankYAML.getTitle(BankItemType.LEGENDARY, legendaryNum)));
+    }
+
+    private void runScheduler()
+    {
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                if (ThreadLocalRandom.current().nextInt(0, 10) == 0) // 10% chance every 6 hours
+                    doJackpot();
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 21600, 20 * 21600);
+    }
+
+    public void doJackpot()
+    {
+        ArrayList<Level> tempList = new ArrayList<>();
+
+        for (Level level : Parkour.getLevelManager().getLevelsInAllMenus())
+            if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() < 20000)
+                tempList.add(level);
+
+        Level level = tempList.get(new Random().nextInt(tempList.size()));
+        long totalBalance = totalBalanceInBank();
+
+    }
+
+    public boolean isJackpotRunning()
+    {
+        return currentJackpot != null;
+    }
+
+    public long totalBalanceInBank()
+    {
+        long balance = 0;
+
+        for (BankItem bankItem : items.values())
+            balance = bankItem.getCurrentTotal();
+
+        return balance;
     }
 
     public BankItem getItem(BankItemType type)
