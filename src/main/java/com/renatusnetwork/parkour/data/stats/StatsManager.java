@@ -277,7 +277,7 @@ public class StatsManager {
         {
             ResultSet result = DatabaseQueries.getRawResults("SELECT SUM(coins) AS total_coins FROM players");
 
-            if (result != null)
+            if (result != null && result.next())
                 totalCoins = result.getLong("total_coins");
         }
         catch (SQLException exception)
