@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
@@ -113,9 +114,11 @@ public class Level {
 
     public boolean doesLiquidResetPlayer() { return liquidResetPlayer; }
 
-    public String getFormattedMessage(PlayerStats playerStats) {
+    public String getFormattedMessage(PlayerStats playerStats, boolean isJackpotReward) {
         if (message != null) {
             LevelManager levelManager = Parkour.getLevelManager();
+            BankManager bankManager = Parkour.getBankManager();
+
             String returnMessage = Utils.translate(message);
 
             returnMessage = returnMessage.replace("%title%", getFormattedTitle());
@@ -124,6 +127,12 @@ public class Level {
                 returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
                         Utils.formatNumber(reward) + "&6 " +
                         Utils.formatNumber((reward * Parkour.getSettingsManager().featured_level_reward_multiplier))));
+            else if (isJackpotReward)
+            {
+                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
+                        Utils.formatNumber(reward) + "&6 " +
+                        Utils.formatNumber(reward + bankManager.getJackpot().getBonus())));
+            }
             else
             {
                 int newReward = reward;

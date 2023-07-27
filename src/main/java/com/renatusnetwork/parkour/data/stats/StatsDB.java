@@ -238,6 +238,11 @@ public class StatsDB {
         Parkour.getDatabaseManager().asyncRun("UPDATE saves SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
+
+        // update in bank
+        Parkour.getDatabaseManager().asyncRun("UPDATE bank SET " +
+                "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_name='" + oldName + "'");
     }
 
     public static void updatePlayerSpectatable(PlayerStats playerStats) {

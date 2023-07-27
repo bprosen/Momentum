@@ -9,7 +9,7 @@ public class RadiantItem extends BankItem
 {
     public RadiantItem(BankItemType type, String displayName)
     {
-        super(type, Parkour.getSettingsManager().radiantMinimumBid, displayName, "&a&lRadiant");
+        super(type, Parkour.getSettingsManager().radiantMinimumBid, displayName, "&e&lRadiant");
         setMinimumNextBidRate(Parkour.getSettingsManager().radiantNextBidMinimum);
     }
 }

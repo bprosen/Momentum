@@ -139,6 +139,8 @@ public class LevelHandler {
                     // give higher reward if prestiged
                     int prestiges = playerStats.getPrestiges();
                     int reward = event.getReward();
+                    boolean isJackpotReward = false;
+
                     // if featured, set reward!
                     if (level.isFeaturedLevel())
                         reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
@@ -148,11 +150,12 @@ public class LevelHandler {
                             !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
                     {
                         Jackpot jackpot = bankManager.getJackpot();
+                        isJackpotReward = true;
 
                         // add coins and add to completed, as well as broadcast completion
                         Parkour.getStatsManager().addCoins(playerStats, jackpot.getBonus());
                         jackpot.addCompleted(player.getName());
-                        jackpot.broadcastCompletion(player.getName());
+                        jackpot.broadcastCompletion(player);
                     }
                     // modifier section
                     else
@@ -166,7 +169,7 @@ public class LevelHandler {
                     }
                     Parkour.getStatsManager().addCoins(playerStats, reward);
 
-                    String messageFormatted = level.getFormattedMessage(playerStats);
+                    String messageFormatted = level.getFormattedMessage(playerStats, isJackpotReward);
                     if (elapsedTime > 0L && elapsedTime < 8388607L)
                         messageFormatted = messageFormatted.replace("%time%", time);
                     else

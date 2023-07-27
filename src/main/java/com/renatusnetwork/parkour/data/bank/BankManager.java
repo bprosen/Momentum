@@ -55,14 +55,15 @@ public class BankManager
 
             for (Level level : Parkour.getLevelManager().getLevelsInAllMenus())
                 // only allow levels with reward > 0 and <= 5000
-                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() <= 5000)
+                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.isRankUpLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() <= 5000)
                     tempList.add(level);
 
             Level level = tempList.get(new Random().nextInt(tempList.size()));
             long totalBalance = totalBalanceInBank();
 
-            if (totalBalance > 1000000)
-                totalBalance = 1000000;
+            // max of 6.25 mill = 50k bonus
+            if (totalBalance > 6250000)
+                totalBalance = 6250000;
 
             int bonus = (int) (20 * Math.sqrt(totalBalance));
 
@@ -110,7 +111,7 @@ public class BankManager
         long balance = 0;
 
         for (BankItem bankItem : items.values())
-            balance = bankItem.getCurrentTotal();
+            balance += bankItem.getCurrentTotal();
 
         return balance;
     }

@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class BankItem
 {
@@ -31,6 +32,26 @@ public abstract class BankItem
         currentHolder = null;
 
         playerBids = BankDB.getBids(type);
+
+        if (!playerBids.isEmpty())
+            restoreHighestBid();
+    }
+
+    private void restoreHighestBid()
+    {
+        Map.Entry<String, Long> highestBid = null;
+
+        for (Map.Entry<String, Long> bids : playerBids.entrySet())
+        {
+            if (highestBid == null || highestBid.getValue() < bids.getValue())
+                highestBid = bids;
+        }
+
+        if (highestBid != null)
+        {
+            currentTotal = highestBid.getValue();
+            currentHolder = highestBid.getKey();
+        }
     }
 
     public long getBid(String name)

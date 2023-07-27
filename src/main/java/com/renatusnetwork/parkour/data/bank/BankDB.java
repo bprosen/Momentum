@@ -36,8 +36,16 @@ public class BankDB
                 if (hasBid(playerStats, type))
                 {
                     Parkour.getDatabaseManager().add(
-                            "UPDATE bank SET=" + bidAmount + " WHERE type='" + type.toString() + "' AND uuid='" + playerStats.getPlayerName() + "'"
+                            "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND player_name='" + playerStats.getPlayerName() + "'"
                     );
+                }
+                else
+                {
+                    Parkour.getDatabaseManager().add(
+                            "INSERT INTO bank (uuid, player_name, type, total_bid) VALUES ('" +
+                            playerStats.getUUID() + "','" +
+                            playerStats.getPlayerName() + "','" +
+                            type + "'," + bidAmount + ")");
                 }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());

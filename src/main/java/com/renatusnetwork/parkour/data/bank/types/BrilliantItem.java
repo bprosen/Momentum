@@ -9,7 +9,7 @@ public class BrilliantItem extends BankItem
 {
     public BrilliantItem(BankItemType type, String displayName)
     {
-        super(type, Parkour.getSettingsManager().brilliantMinimumBid, displayName, "&e&lBrilliant");
+        super(type, Parkour.getSettingsManager().brilliantMinimumBid, displayName, "&a&lBrilliant");
         setMinimumNextBidRate(Parkour.getSettingsManager().brilliantNextBidMinimum);
     }
 }
