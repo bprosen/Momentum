@@ -18,6 +18,8 @@ bank:
   legendary:
     min_next_bid_percentage: 0.15
     min_starting_bid: 3000
+  jackpot:
+    length: 1800 # in seconds
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10

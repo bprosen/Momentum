@@ -3,6 +3,8 @@ package com.renatusnetwork.parkour.gameplay;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.LevelCompletionEvent;
+import com.renatusnetwork.parkour.data.bank.BankManager;
+import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
@@ -132,12 +134,27 @@ public class LevelHandler {
                 // only broadcast and give xp/coins if it is not a forced completion
                 if (!forcedCompletion) {
 
+                    BankManager bankManager = Parkour.getBankManager();
+
                     // give higher reward if prestiged
                     int prestiges = playerStats.getPrestiges();
                     int reward = event.getReward();
                     // if featured, set reward!
                     if (level.isFeaturedLevel())
                         reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
+                    // jackpot section
+                    else if (bankManager.isJackpotRunning() &&
+                            bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                            !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
+                    {
+                        Jackpot jackpot = bankManager.getJackpot();
+
+                        // add coins and add to completed, as well as broadcast completion
+                        Parkour.getStatsManager().addCoins(playerStats, jackpot.getBonus());
+                        jackpot.addCompleted(player.getName());
+                        jackpot.broadcastCompletion(player.getName());
+                    }
+                    // modifier section
                     else
                     {
                         if (prestiges > 0 && level.getReward() > 0)
@@ -147,7 +164,6 @@ public class LevelHandler {
                         if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
                             reward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
                     }
-
                     Parkour.getStatsManager().addCoins(playerStats, reward);
 
                     String messageFormatted = level.getFormattedMessage(playerStats);

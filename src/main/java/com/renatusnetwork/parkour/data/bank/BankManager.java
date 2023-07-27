@@ -42,24 +42,64 @@ public class BankManager
             public void run()
             {
                 if (ThreadLocalRandom.current().nextInt(0, 10) == 0) // 10% chance every 6 hours
-                    doJackpot();
+                    startJackpot();
             }
         }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 21600, 20 * 21600);
     }
 
-    public void doJackpot()
+    public void startJackpot()
     {
-        ArrayList<Level> tempList = new ArrayList<>();
+        if (currentJackpot == null)
+        {
+            ArrayList<Level> tempList = new ArrayList<>();
 
-        for (Level level : Parkour.getLevelManager().getLevelsInAllMenus())
-            if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() < 20000)
-                tempList.add(level);
+            for (Level level : Parkour.getLevelManager().getLevelsInAllMenus())
+                // only allow levels with reward > 0 and <= 5000
+                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() <= 5000)
+                    tempList.add(level);
 
-        Level level = tempList.get(new Random().nextInt(tempList.size()));
-        long totalBalance = totalBalanceInBank();
+            Level level = tempList.get(new Random().nextInt(tempList.size()));
+            long totalBalance = totalBalanceInBank();
 
+            if (totalBalance > 1000000)
+                totalBalance = 1000000;
+
+            int bonus = (int) (20 * Math.sqrt(totalBalance));
+
+            currentJackpot = new Jackpot(level, bonus);
+            currentJackpot.start(); // begin jackpot
+        }
+        else
+        {
+            Parkour.getPluginLogger().info("Tried to start Jackpot with one already running");
+        }
     }
 
+    public void chooseJackpot(Level level, int bonus)
+    {
+        if (currentJackpot == null)
+        {
+            currentJackpot = new Jackpot(level, bonus);
+            currentJackpot.start();
+        }
+        else
+        {
+            Parkour.getPluginLogger().info("Tried to choose Jackpot with one already running");
+        }
+    }
+
+    public void endJackpot()
+    {
+        if (currentJackpot != null)
+        {
+            currentJackpot.end();
+            currentJackpot = null;
+        }
+        else
+        {
+            Parkour.getPluginLogger().info("Tried to end Jackpot with none currently running");
+        }
+    }
     public boolean isJackpotRunning()
     {
         return currentJackpot != null;
@@ -73,6 +113,11 @@ public class BankManager
             balance = bankItem.getCurrentTotal();
 
         return balance;
+    }
+
+    public Jackpot getJackpot()
+    {
+        return currentJackpot;
     }
 
     public BankItem getItem(BankItemType type)

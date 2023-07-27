@@ -3,6 +3,9 @@ package com.renatusnetwork.parkour.utils;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -218,5 +221,14 @@ public class Utils {
         } else {
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
         }
+    }
+
+    public static void broadcastClickableHoverableCMD(String message, String hoverMessage, String commandClick)
+    {
+        TextComponent component = new TextComponent(TextComponent.fromLegacyText(Utils.translate(message)));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate(hoverMessage))));
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandClick));
+
+        Bukkit.spigot().broadcast(component); // send clickable
     }
 }

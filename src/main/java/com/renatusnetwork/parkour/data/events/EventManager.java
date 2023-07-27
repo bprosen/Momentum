@@ -193,13 +193,7 @@ public class EventManager {
     public void broadcastComponent(String message)
     {
         Bukkit.broadcastMessage("");
-
-        TextComponent component = new TextComponent(TextComponent.fromLegacyText(message));
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&bClick to join!"))));
-        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/event join"));
-
-        Bukkit.spigot().broadcast(component);
-
+        Utils.broadcastClickableHoverableCMD(message, "&bClick to join!", "/event join");
         Bukkit.broadcastMessage("");
     }
 

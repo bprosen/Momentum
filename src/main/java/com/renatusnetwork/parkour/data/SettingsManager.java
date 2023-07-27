@@ -120,6 +120,8 @@ public class SettingsManager {
     public int brilliantMinimumBid;
     public int legendaryMinimumBid;
 
+    public int jackpotLength;
+
     public SettingsManager(FileConfiguration settings) {
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
@@ -195,6 +197,7 @@ public class SettingsManager {
         radiantMinimumBid = settings.getInt("bank.radiant.min_starting_bid");
         brilliantMinimumBid = settings.getInt("bank.brilliant.min_starting_bid");
         legendaryMinimumBid = settings.getInt("bank.legendary.min_starting_bid");
+        jackpotLength = settings.getInt("bank.jackpot.length");
 
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");

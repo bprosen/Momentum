@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.menus;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -276,13 +277,15 @@ public class MenuItemAction {
     private static void performLevelItem(Player player, MenuItem menuItem) {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
+        BankManager bankManager = Parkour.getBankManager();
 
         if (level != null)
         {
-            // go through price buying if not featured, non null item, has price and has not bought level
-            if (!level.isFeaturedLevel() &&
-                menuItem != null && level.getPrice() > 0 &&
-                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+            // go through price buying if not featured, non null item, has price and has not bought level, or not the jackpot level
+            if (menuItem != null && level.getPrice() > 0 &&
+                !level.isFeaturedLevel() &&
+                !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0))
                 performLevelBuying(playerStats, player, level, menuItem);
             else
                 performLevelTeleport(playerStats, player, level);

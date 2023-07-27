@@ -100,3 +100,6 @@ commands:
   save:
     description: "RN-Parkour save command"
     aliases: [saveloc, savelevel, savelocation, saves]
+  jackpot:
+    description: "RN-Parkour jackpot command"
+    aliases: [jp, sponsor]

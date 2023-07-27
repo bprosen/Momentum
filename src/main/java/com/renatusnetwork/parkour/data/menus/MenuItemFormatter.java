@@ -1,8 +1,10 @@
 package com.renatusnetwork.parkour.data.menus;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
+import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -320,8 +322,12 @@ public class MenuItemFormatter {
                     itemLore.add(Utils.translate("&cRequires " + nextRank.getRankTitle()));
                 }
             }
-            // show they need to buy it
-            if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+            BankManager bankManager = Parkour.getBankManager();
+
+            // show they need to buy it and it is not the jackpot level if it is running
+            if (!(bankManager.isJackpotRunning() &&
+                bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
+                level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
             {
                 itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"));
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
@@ -384,18 +390,31 @@ public class MenuItemFormatter {
             boolean modified = false;
             LevelCooldown cooldown = null;
 
-            if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+            // jackpot section
+            if (bankManager.isJackpotRunning() &&
+                bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
             {
-                newReward *= playerStats.getPrestigeMultiplier();
-                modified = true;
-            }
+                Jackpot jackpot = bankManager.getJackpot();
 
-            // set cooldown modifier last!
-            if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getPlayerName()))
-            {
-                cooldown = Parkour.getLevelManager().getLevelCooldown(playerStats.getPlayerName());
-                newReward *= cooldown.getModifier();
                 modified = true;
+                newReward = oldReward + jackpot.getBonus();
+            }
+            // only do these if jackpot is not running!
+            else
+            {
+
+                if (playerStats.getPrestiges() > 0 && level.getReward() > 0) {
+                    newReward *= playerStats.getPrestigeMultiplier();
+                    modified = true;
+                }
+
+                // set cooldown modifier last!
+                if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getPlayerName())) {
+                    cooldown = Parkour.getLevelManager().getLevelCooldown(playerStats.getPlayerName());
+                    newReward *= cooldown.getModifier();
+                    modified = true;
+                }
             }
 
             // set modified, extra check for times of when max prestige = +25% and cooldown = -25%

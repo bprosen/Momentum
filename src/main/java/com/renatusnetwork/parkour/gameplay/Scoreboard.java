@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankManager;
+import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -199,9 +201,11 @@ public class Scoreboard {
 
                         // normal scoreboard
                         String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
+                        BankManager bankManager = Parkour.getBankManager();
 
                         // add title and adjust rewardstring if it is a featured level
-                        if (level.isFeaturedLevel()) {
+                        if (level.isFeaturedLevel())
+                        {
                             board.add(formatSpacing(Utils.translate("&dFeatured Level")));
 
                             // proper cast
@@ -209,6 +213,18 @@ public class Scoreboard {
                                     (Utils.formatNumber(level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
 
                         }
+                        // jackpot section
+                        else if (bankManager.isJackpotRunning() &&
+                                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                                 !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
+                        {
+                            Jackpot jackpot = bankManager.getJackpot();
+
+                            board.add(formatSpacing(Utils.translate("&a&lJACKPOT LEVEL")));
+                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
+                                    Utils.formatNumber(level.getReward() + jackpot.getBonus()));
+                        }
+                        // modifier section
                         else
                         {
                             int newReward = level.getReward();
