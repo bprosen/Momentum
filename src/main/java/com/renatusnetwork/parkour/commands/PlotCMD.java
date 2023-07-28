@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.plots.PlotsDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.gameplay.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -404,7 +405,7 @@ public class PlotCMD implements CommandExecutor {
             // save checkpoint if had one
             playerStats.resetCurrentCheckpoint();
             playerStats.resetLevel();
-            playerStats.resetPracticeMode();
+            PracticeHandler.resetDataOnly(playerStats);
         }
     }
 

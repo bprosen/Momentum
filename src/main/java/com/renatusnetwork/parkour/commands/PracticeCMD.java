@@ -48,13 +48,13 @@ public class PracticeCMD implements CommandExecutor {
                                 if (label.equalsIgnoreCase("unprac"))
                                 {
                                     if (playerStats.inPracticeMode())
-                                        PracticeHandler.resetPlayer(player, true);
+                                        PracticeHandler.resetPlayer(playerStats, true);
                                     else
                                         player.sendMessage(Utils.translate("&cYou are not in practice mode"));
                                 }
                                 // in the case of /prac
                                 else if (playerStats.inPracticeMode())
-                                    PracticeHandler.resetPlayer(player, true);
+                                    PracticeHandler.resetPlayer(playerStats, true);
                                 else if (player.isOnGround())
                                 {
                                     playerStats.setPracticeMode(player.getLocation());

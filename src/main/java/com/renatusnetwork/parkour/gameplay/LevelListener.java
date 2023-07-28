@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.gameplay;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.events.types.Event;
@@ -10,6 +11,7 @@ import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -27,6 +29,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+
+import java.util.List;
 
 public class LevelListener implements Listener {
 
@@ -258,8 +264,7 @@ public class LevelListener implements Listener {
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                     playerStats.resetCurrentCheckpoint();
-
-                    playerStats.resetPracticeMode();
+                    PracticeHandler.resetDataOnly(playerStats);
                     playerStats.resetLevel();
 
                     playerStats.clearPotionEffects();
