@@ -156,7 +156,7 @@ public class LevelManager {
            to make sure it does not have required levels and has more than 0 coin reward
          */
         for (Level level : getLevelsInAllMenus()) {
-            if (level.getRequiredLevels().isEmpty() && !level.isDropperLevel() && level.getReward() > 0 && level.getReward() < 50000)
+            if (level.getRequiredLevels().isEmpty() && !level.hasPermissionNode() && !level.isDropperLevel() && level.getReward() > 0 && level.getReward() < 50000)
                 temporaryList.add(level);
         }
 
