@@ -55,7 +55,7 @@ public class BankManager
 
             for (Level level : Parkour.getLevelManager().getLevelsInAllMenus())
                 // only allow levels with reward > 0 and <= 5000
-                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.isRankUpLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() <= 5000)
+                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.hasPermissionNode() && !level.isRankUpLevel() && !level.isAscendanceLevel() && level.getReward() > 0 && level.getReward() <= 5000)
                     tempList.add(level);
 
             Level level = tempList.get(new Random().nextInt(tempList.size()));
