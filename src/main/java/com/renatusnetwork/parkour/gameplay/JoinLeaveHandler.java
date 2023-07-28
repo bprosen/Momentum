@@ -141,7 +141,7 @@ public class JoinLeaveHandler implements Listener {
 
         // if left in practice mode, reset it
         if (playerStats.inPracticeMode())
-            PracticeHandler.resetPlayer(player, false);
+            PracticeHandler.resetPlayer(playerStats, false);
 
         // if left in race, end it
         if (playerStats.inRace())

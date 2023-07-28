@@ -14,6 +14,7 @@ import com.renatusnetwork.parkour.data.ranks.RanksDB;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.gameplay.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -527,8 +528,7 @@ public class MenuItemAction {
                             playerStats.resetCurrentCheckpoint(); // reset
 
                             // if in practice mode
-                            if (playerStats.inPracticeMode())
-                                playerStats.resetPracticeMode();
+                            PracticeHandler.resetDataOnly(playerStats);
 
                             Location save = playerStats.getSave(level.getName());
                             Location spawn = playerStats.getCheckpoint(level.getName());

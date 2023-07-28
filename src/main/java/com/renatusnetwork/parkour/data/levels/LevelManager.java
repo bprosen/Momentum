@@ -7,10 +7,12 @@ import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.gameplay.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -532,14 +534,11 @@ public class LevelManager {
 
             // loop through and reset if applicable
             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName)) {
+                if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(levelName))
+                {
                     playerStats.resetLevel();
-
-                    if (playerStats.inPracticeMode())
-                        playerStats.resetPracticeMode();
-
-                    if (playerStats.hasCurrentCheckpoint())
-                        playerStats.resetCurrentCheckpoint();
+                    PracticeHandler.resetDataOnly(playerStats);
+                    playerStats.resetCurrentCheckpoint();
 
                     // toggle off elytra armor
                     Parkour.getStatsManager().toggleOffElytra(playerStats);

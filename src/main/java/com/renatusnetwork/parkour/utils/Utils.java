@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.utils;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.gameplay.PracticeHandler;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -198,9 +199,8 @@ public class Utils {
                             player.teleport(loc);
 
                             playerStats.resetCurrentCheckpoint();
-                            playerStats.resetPracticeMode();
+                            PracticeHandler.resetDataOnly(playerStats);
                             playerStats.resetLevel();
-
                             playerStats.clearPotionEffects();
 
                         } else {

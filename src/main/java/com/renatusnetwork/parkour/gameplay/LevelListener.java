@@ -26,6 +26,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
@@ -247,10 +248,8 @@ public class LevelListener implements Listener {
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                     playerStats.resetCurrentCheckpoint();
-
-                    playerStats.resetPracticeMode();
+                    PracticeHandler.resetDataOnly(playerStats);
                     playerStats.resetLevel();
-
                     playerStats.clearPotionEffects();
 
                     player.teleport(lobby);
