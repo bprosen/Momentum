@@ -23,9 +23,7 @@ public class RanksYAML {
     }
 
     public static boolean isSection(String rankName) {
-        if (ranksConfig.isConfigurationSection(rankName))
-            return true;
-        return false;
+        return (ranksConfig.isConfigurationSection(rankName));
     }
     public static boolean isSet(String rankName, String valuePath) {
         return ranksConfig.isSet(rankName + "." + valuePath);

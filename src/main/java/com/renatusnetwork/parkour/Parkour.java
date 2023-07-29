@@ -14,6 +14,8 @@ import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.perks.PerkManager;
 import com.renatusnetwork.parkour.data.plots.PlotsManager;
 import com.renatusnetwork.parkour.data.races.RaceManager;
@@ -56,6 +58,7 @@ public class Parkour extends JavaPlugin {
     private static BankManager bank;
     private static BlackMarketManager blackmarket;
     private static SavesManager saves;
+    private static ModifiersManager modifiers;
 
     @Override
     public void onEnable() {
@@ -191,6 +194,7 @@ public class Parkour extends JavaPlugin {
         saves = new SavesManager();
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
+        modifiers = new ModifiersManager();
     }
 
     private static void unloadClasses() {
@@ -213,6 +217,7 @@ public class Parkour extends JavaPlugin {
         events = null;
         saves = null;
         blackmarket = null;
+        modifiers = null;
     }
 
     public static Plugin getPlugin() { return plugin; }
@@ -252,4 +257,5 @@ public class Parkour extends JavaPlugin {
     public static SavesManager getSavesManager() { return saves; }
     public static BankManager getBankManager() { return bank; }
     public static BlackMarketManager getBlackMarketManager() { return blackmarket; }
+    public static ModifiersManager getModifiersManager() { return modifiers; }
 }

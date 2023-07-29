@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -27,6 +28,7 @@ public class StatsDB {
         loadCompletions(playerStats);
         PerksDB.loadPerks(playerStats);
         Parkour.getStatsManager().loadPerksGainedCount(playerStats);
+        loadModifiers(playerStats);
     }
 
     private static void loadPlayerID(PlayerStats playerStats) {
@@ -184,6 +186,29 @@ public class StatsDB {
         }
     }
 
+    private static void loadModifiers(PlayerStats playerStats)
+    {
+        ArrayList<Modifier> modifiers = new ArrayList<>();
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                "modifiers",
+                "*",
+                " WHERE uuid='" + playerStats.getUUID() + "'"
+        );
+
+        if (playerResults.size() > 0)
+        {
+            for (Map<String, String> playerResult : playerResults)
+            {
+                String modifierName = playerResult.get("modifier_name");
+
+                modifiers.add(Parkour.getModifiersManager().getModifier(modifierName));
+            }
+        }
+
+        playerStats.setModifiers(modifiers);
+    }
+
     public static int getTotalPlayers()
     {
         int total;
@@ -241,6 +266,11 @@ public class StatsDB {
 
         // update in bank
         Parkour.getDatabaseManager().asyncRun("UPDATE bank SET " +
+                "player_name='" + playerStats.getPlayerName() + "' " +
+                "WHERE player_name='" + oldName + "'");
+
+        // update in modifiers
+        Parkour.getDatabaseManager().asyncRun("UPDATE modifiers SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
     }

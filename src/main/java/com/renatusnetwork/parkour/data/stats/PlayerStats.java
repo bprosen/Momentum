@@ -1,8 +1,10 @@
 package com.renatusnetwork.parkour.data.stats;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
@@ -62,8 +64,10 @@ public class PlayerStats {
     private HashMap<String, Location> checkpoints = new HashMap<>();
     private HashSet<String> boughtLevels = new HashSet<>();
     private HashMap<String, Location> saves = new HashMap<>();
+    private HashMap<String, Modifier> modifiers = new HashMap<>();
 
-    public PlayerStats(Player player) {
+    public PlayerStats(Player player)
+    {
         this.player = player;
         this.UUID = player.getUniqueId().toString();
         this.playerName = player.getName();
@@ -539,6 +543,29 @@ public class PlayerStats {
 
     public void toggleGrinding() {
         grinding = !grinding;
+    }
+
+    //
+    // Modifier Section
+    //
+    public boolean hasModifier(String modifierName)
+    {
+        return modifiers.containsKey(modifierName);
+    }
+
+    public Collection<Modifier> getModifiers()
+    {
+        return modifiers.values();
+    }
+
+    public void setModifiers(Collection<Modifier> modifiersCollection)
+    {
+        // add to player
+        for (Modifier modifier : modifiersCollection)
+        {
+            if (modifier != null)
+                modifiers.put(modifier.getName(), modifier);
+        }
     }
 
     //

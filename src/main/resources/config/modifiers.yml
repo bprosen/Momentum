@@ -1,0 +1,4 @@
+modifier-1:
+  type: LEVEL_BOOSTER
+  display: "&a&lLevel Booster"
+  factor: 1.5

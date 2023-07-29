@@ -11,18 +11,18 @@ public class BlackMarketEvent
     private LinkedHashMap<PlayerStats, Integer> bids; // descending by bid amount
     private PlayerStats highestBidder;
     private int highestBid;
-    private BlackMarketItem blackMarketItem;
+    private BlackMarketArtifact blackMarketArtifact;
 
-    public BlackMarketEvent(BlackMarketItem blackMarketItem)
+    public BlackMarketEvent(BlackMarketArtifact blackMarketArtifact)
     {
         bids = new LinkedHashMap<>();
         players = new ArrayList<>();
-        this.blackMarketItem = blackMarketItem;
+        this.blackMarketArtifact = blackMarketArtifact;
     }
 
-    public BlackMarketItem getBlackMarketItem()
+    public BlackMarketArtifact getBlackMarketItem()
     {
-        return blackMarketItem;
+        return blackMarketArtifact;
     }
 
     public PlayerStats getHighestBidder()

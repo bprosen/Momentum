@@ -1,10 +1,10 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
-public class BlackMarketItem
+public class BlackMarketArtifact
 {
     private String displayName;
 
-    public BlackMarketItem()
+    public BlackMarketArtifact()
     {
 
     }

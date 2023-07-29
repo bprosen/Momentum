@@ -47,6 +47,9 @@ public class TablesDB {
         if (!tableNames.contains("saves"))
             createSaves(database);
 
+        if (!tableNames.contains("modifiers"))
+            createModifiers(database);
+
     }
 
     private static List<String> get(DatabaseConnection connection) {
@@ -63,6 +66,16 @@ public class TablesDB {
         }
 
         return tableNames;
+    }
+
+    private static void createModifiers(DatabaseManager database)
+    {
+        String sqlQuery = "CREATE TABLE modifiers(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "player_name VARCHAR(16) NOT NULL," +
+                "modifier_name VARCHAR(20) NOT NULL)";
+
+        database.run(sqlQuery);
     }
 
     private static void createBank(DatabaseManager database)

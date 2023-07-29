@@ -13,12 +13,12 @@ public class BlackMarketManager
 {
     private BlackMarketEvent running;
     private boolean inPreperation;
-    private ArrayList<BlackMarketItem> items;
+    private ArrayList<BlackMarketArtifact> artifacts;
 
     public BlackMarketManager()
     {
         inPreperation = false;
-        items = new ArrayList<>();
+        artifacts = new ArrayList<>();
         running = null;
     }
 
@@ -26,7 +26,7 @@ public class BlackMarketManager
     {
         if (!isRunning())
         {
-            running = new BlackMarketEvent(items.get(ThreadLocalRandom.current().nextInt(items.size())));
+            running = new BlackMarketEvent(artifacts.get(ThreadLocalRandom.current().nextInt(artifacts.size())));
 
             inPreperation = true;
 
