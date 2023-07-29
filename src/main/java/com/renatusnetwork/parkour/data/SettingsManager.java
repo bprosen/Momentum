@@ -122,6 +122,8 @@ public class SettingsManager {
 
     public int jackpotLength;
 
+    public int blackmarket_min_player_count;
+
     public SettingsManager(FileConfiguration settings) {
         currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
@@ -282,5 +284,7 @@ public class SettingsManager {
             else
                 break;
         }
+
+        blackmarket_min_player_count = settings.getInt("blackmarket.min_player_count");
     }
 }

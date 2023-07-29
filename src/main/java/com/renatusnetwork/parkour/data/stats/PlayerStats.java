@@ -552,4 +552,9 @@ public class PlayerStats {
             if (!(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION) && nightVision))
                 player.removePotionEffect(potionEffect.getType());
     }
+
+    public boolean equals(PlayerStats playerStats)
+    {
+        return playerStats.getPlayerName().equals(playerName);
+    }
 }

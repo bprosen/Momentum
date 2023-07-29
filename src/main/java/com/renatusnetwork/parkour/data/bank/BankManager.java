@@ -32,6 +32,8 @@ public class BankManager
                 new BrilliantItem(BankItemType.BRILLIANT, BankYAML.getTitle(BankItemType.BRILLIANT, brilliantNum)));
         items.put(BankItemType.LEGENDARY,
                 new RadiantItem(BankItemType.LEGENDARY, BankYAML.getTitle(BankItemType.LEGENDARY, legendaryNum)));
+
+        runScheduler();
     }
 
     private void runScheduler()
