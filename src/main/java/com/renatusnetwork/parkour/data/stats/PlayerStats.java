@@ -561,6 +561,8 @@ public class PlayerStats {
 
     public void setModifiers(Collection<Modifier> modifiersCollection)
     {
+        modifiers.clear();
+
         // add to player
         for (Modifier modifier : modifiersCollection)
         {

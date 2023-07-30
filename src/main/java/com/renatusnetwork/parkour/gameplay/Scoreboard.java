@@ -7,6 +7,8 @@ import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
@@ -220,9 +222,18 @@ public class Scoreboard {
                         {
                             Jackpot jackpot = bankManager.getJackpot();
 
+                            int jackpotReward = level.getReward() + jackpot.getBonus();
+
+                            if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
+                            {
+                                // downcast and boost
+                                Booster jackpotBooster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                                jackpotReward *= jackpotBooster.getMultiplier();
+                            }
+
                             board.add(formatSpacing(Utils.translate("&a&lJACKPOT LEVEL")));
                             rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
-                                    Utils.formatNumber(level.getReward() + jackpot.getBonus()));
+                                    Utils.formatNumber(jackpotReward));
                         }
                         // modifier section
                         else
@@ -231,6 +242,13 @@ public class Scoreboard {
 
                             if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
                                 newReward *= playerStats.getPrestigeMultiplier();
+
+                            if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                            {
+                                // downcast and boost
+                                Booster jackpotBooster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                                newReward *= jackpotBooster.getMultiplier();
+                            }
 
                             LevelManager levelManager = Parkour.getLevelManager();
 
