@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.handlers;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
@@ -26,7 +26,7 @@ import java.util.List;
 
 public class LevelHandler {
 
-    static void levelCompletion(Player player, String levelName) {
+    public static void levelCompletion(Player player, String levelName) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         EventManager eventManager = Parkour.getEventManager();
@@ -198,7 +198,7 @@ public class LevelHandler {
 
                         // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
                         if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
-                            Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), player, reward);
+                            Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), playerStats, reward);
 
                         // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
                         if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)

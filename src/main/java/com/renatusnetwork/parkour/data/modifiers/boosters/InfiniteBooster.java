@@ -1,9 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+
 public class InfiniteBooster extends Booster
 {
-    public InfiniteBooster(String name)
+    public InfiniteBooster(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
     }
 }

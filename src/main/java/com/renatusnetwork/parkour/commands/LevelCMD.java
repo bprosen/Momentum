@@ -1,14 +1,13 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.LocationsYAML;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.gameplay.LevelHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;

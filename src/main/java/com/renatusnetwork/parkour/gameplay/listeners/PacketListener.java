@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -17,6 +17,8 @@ import com.renatusnetwork.parkour.data.menus.MenuItemAction;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

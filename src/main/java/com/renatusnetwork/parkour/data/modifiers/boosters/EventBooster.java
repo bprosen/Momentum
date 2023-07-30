@@ -1,9 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+
 public class EventBooster extends Booster
 {
-    public EventBooster(String name)
+    public EventBooster(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
     }
 }

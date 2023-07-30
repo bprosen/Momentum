@@ -1,10 +1,12 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+
 public class JackpotBooster extends Booster
 {
 
-    public JackpotBooster(String name)
+    public JackpotBooster(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
     }
 }

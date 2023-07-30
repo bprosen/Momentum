@@ -1,9 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+
 public class PrestigeBooster extends Booster
 {
-    public PrestigeBooster(String name)
+    public PrestigeBooster(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
     }
 }

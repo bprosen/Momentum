@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
 import com.renatusnetwork.parkour.data.Placeholders;
 import com.renatusnetwork.parkour.data.bank.BankManager;
-import com.renatusnetwork.parkour.data.blackmarket.BlackMarketEvent;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
@@ -14,7 +13,6 @@ import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
-import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.perks.PerkManager;
 import com.renatusnetwork.parkour.data.plots.PlotsManager;
@@ -24,6 +22,9 @@ import com.renatusnetwork.parkour.data.saves.SavesManager;
 import com.renatusnetwork.parkour.gameplay.*;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
+import com.renatusnetwork.parkour.gameplay.listeners.*;
 import com.renatusnetwork.parkour.storage.ConfigManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.utils.dependencies.ProtocolLib;
@@ -115,9 +116,9 @@ public class Parkour extends JavaPlugin {
 
     private void registerEvents() {
         getServer().getPluginManager().registerEvents(new LevelListener(), this);
-        getServer().getPluginManager().registerEvents(new JoinLeaveHandler(), this);
+        getServer().getPluginManager().registerEvents(new JoinLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
-        getServer().getPluginManager().registerEvents(new TestChamberHandler(), this);
+        getServer().getPluginManager().registerEvents(new TestChamberListener(), this);
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new RespawnListener(), this);
         getServer().getPluginManager().registerEvents(new PacketListener(), this);

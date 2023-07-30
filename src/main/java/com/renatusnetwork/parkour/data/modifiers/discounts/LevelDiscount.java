@@ -1,9 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.discounts;
 
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+
 public class LevelDiscount extends Discount
 {
-    public LevelDiscount(String name)
+    public LevelDiscount(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
     }
 }

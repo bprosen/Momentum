@@ -3,7 +3,7 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.gameplay.SpectatorHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;

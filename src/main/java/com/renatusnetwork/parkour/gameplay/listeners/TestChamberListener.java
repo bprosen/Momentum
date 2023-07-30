@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.listeners;
 
 
 import com.renatusnetwork.parkour.Parkour;
@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-public class TestChamberHandler implements Listener {
+public class TestChamberListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {

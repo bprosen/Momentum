@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.handlers;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;

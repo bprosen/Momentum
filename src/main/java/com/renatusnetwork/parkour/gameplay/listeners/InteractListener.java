@@ -1,10 +1,10 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsManager;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;

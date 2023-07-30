@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
@@ -64,7 +65,7 @@ public class PlayerStats {
     private HashMap<String, Location> checkpoints = new HashMap<>();
     private HashSet<String> boughtLevels = new HashSet<>();
     private HashMap<String, Location> saves = new HashMap<>();
-    private HashMap<String, Modifier> modifiers = new HashMap<>();
+    private HashMap<ModifierTypes, Modifier> modifiers = new HashMap<>();
 
     public PlayerStats(Player player)
     {
@@ -548,9 +549,9 @@ public class PlayerStats {
     //
     // Modifier Section
     //
-    public boolean hasModifier(String modifierName)
+    public boolean hasModifier(ModifierTypes modifierTypes)
     {
-        return modifiers.containsKey(modifierName);
+        return modifiers.containsKey(modifierTypes);
     }
 
     public Collection<Modifier> getModifiers()
@@ -564,8 +565,13 @@ public class PlayerStats {
         for (Modifier modifier : modifiersCollection)
         {
             if (modifier != null)
-                modifiers.put(modifier.getName(), modifier);
+                modifiers.put(modifier.getType(), modifier);
         }
+    }
+
+    public Modifier getModifier(ModifierTypes modifierTypes)
+    {
+        return modifiers.get(modifierTypes);
     }
 
     //

@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;

@@ -6,18 +6,16 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import com.renatusnetwork.parkour.gameplay.PracticeHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class Utils {
 

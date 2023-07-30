@@ -98,7 +98,9 @@ public class InfinitePKManager {
         InfinitePK infinitePK = get(player.getName());
         if (infinitePK != null)
         {
-            InfiniteEndEvent event = new InfiniteEndEvent(player, infinitePK.getScore());
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+            InfiniteEndEvent event = new InfiniteEndEvent(playerStats, infinitePK.getScore());
             Bukkit.getPluginManager().callEvent(event);
 
             if (!event.isCancelled())
@@ -117,7 +119,6 @@ public class InfinitePKManager {
                 }.runTask(Parkour.getPlugin());
 
                 int score = infinitePK.getScore();
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 boolean doRewardsMsg = false;
                 List<InfinitePKReward> rewards = null;

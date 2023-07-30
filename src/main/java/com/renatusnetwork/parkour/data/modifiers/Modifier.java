@@ -6,9 +6,11 @@ public abstract class Modifier
 {
     private String name;
     private String displayName;
+    private ModifierTypes type;
 
-    public Modifier(String name)
+    public Modifier(ModifierTypes type, String name)
     {
+        this.type = type;
         this.name = name;
     }
 
@@ -21,6 +23,8 @@ public abstract class Modifier
     {
         return displayName;
     }
+
+    public ModifierTypes getType() { return type; }
 
     private void load()
     {

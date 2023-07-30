@@ -157,8 +157,10 @@ public class ClansManager {
         }
     }
 
-    public void doClanXPCalc(Clan clan, Player player, int reward)
+    public void doClanXPCalc(Clan clan, PlayerStats playerStats, int reward)
     {
+
+        Player player = playerStats.getPlayer();
 
         int min = Parkour.getSettingsManager().clan_calc_percent_min;
         int max = Parkour.getSettingsManager().clan_calc_percent_max;
@@ -167,7 +169,7 @@ public class ClansManager {
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
         int clanXP = (int) (reward * percent);
 
-        ClanXPRewardEvent event = new ClanXPRewardEvent(player, clan, clanXP);
+        ClanXPRewardEvent event = new ClanXPRewardEvent(playerStats, clan, clanXP);
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled())

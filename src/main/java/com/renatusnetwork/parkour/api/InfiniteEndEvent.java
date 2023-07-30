@@ -9,7 +9,7 @@ import org.bukkit.event.HandlerList;
 public class InfiniteEndEvent extends Event implements Cancellable
 {
 
-    private Player player;
+    private PlayerStats playerStats;
     private int reward;
     private boolean cancelled;
 
@@ -20,17 +20,19 @@ public class InfiniteEndEvent extends Event implements Cancellable
         return HANDLERS;
     }
 
-    public InfiniteEndEvent(Player player, int score)
+    public InfiniteEndEvent(PlayerStats playerStats, int score)
     {
-        this.player = player;
+        this.playerStats = playerStats;
         this.reward = score;
         this.cancelled = false;
     }
 
-    public Player getPlayer()
+    public PlayerStats getPlayerStats()
     {
-        return player;
+        return playerStats;
     }
+
+    public Player getPlayer() { return playerStats.getPlayer(); }
 
     public void setReward(int reward)
     {

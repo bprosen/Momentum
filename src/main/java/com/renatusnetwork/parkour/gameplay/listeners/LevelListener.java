@@ -1,17 +1,15 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
-import com.renatusnetwork.parkour.data.events.types.Event;
-import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
 import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsManager;
+import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -29,10 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-
-import java.util.List;
 
 public class LevelListener implements Listener {
 

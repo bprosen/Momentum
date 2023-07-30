@@ -1,13 +1,12 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.plots.PlotsDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.gameplay.PracticeHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

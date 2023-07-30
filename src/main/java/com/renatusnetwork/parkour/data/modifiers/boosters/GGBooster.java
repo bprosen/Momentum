@@ -1,9 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+
 public class GGBooster extends Booster
 {
-    public GGBooster(String name)
+    public GGBooster(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
     }
 }

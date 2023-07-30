@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.gameplay;
+package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;

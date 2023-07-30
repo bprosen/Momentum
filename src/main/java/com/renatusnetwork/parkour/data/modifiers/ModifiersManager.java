@@ -33,31 +33,31 @@ public class ModifiersManager
             switch (type)
             {
                 case GG_BOOSTER:
-                    modifiers.put(key, new GGBooster(key));
+                    modifiers.put(key, new GGBooster(ModifierTypes.GG_BOOSTER, key));
                     break;
                 case EVENT_BOOSTER:
-                    modifiers.put(key, new EventBooster(key));
+                    modifiers.put(key, new EventBooster(ModifierTypes.EVENT_BOOSTER, key));
                     break;
                 case LEVEL_BOOSTER:
-                    modifiers.put(key, new LevelBooster(key));
+                    modifiers.put(key, new LevelBooster(ModifierTypes.LEVEL_BOOSTER, key));
                     break;
                 case CLAN_XP_BOOSTER:
-                    modifiers.put(key, new ClanXPBooster(key));
+                    modifiers.put(key, new ClanXPBooster(ModifierTypes.CLAN_XP_BOOSTER, key));
                     break;
                 case JACKPOT_BOOSTER:
-                    modifiers.put(key, new JackpotBooster(key));
+                    modifiers.put(key, new JackpotBooster(ModifierTypes.JACKPOT_BOOSTER, key));
                     break;
                 case PRESTIGE_BOOSTER:
-                    modifiers.put(key, new PrestigeBooster(key));
+                    modifiers.put(key, new PrestigeBooster(ModifierTypes.PRESTIGE_BOOSTER, key));
                     break;
                 case LEVEL_DISCOUNT:
-                    modifiers.put(key, new LevelDiscount(key));
+                    modifiers.put(key, new LevelDiscount(ModifierTypes.LEVEL_DISCOUNT, key));
                     break;
                 case SHOP_DISCOUNT:
-                    modifiers.put(key, new ShopDiscount(key));
+                    modifiers.put(key, new ShopDiscount(ModifierTypes.SHOP_DISCOUNT, key));
                     break;
                 case INFINITE_BOOSTER:
-                    modifiers.put(key, new InfiniteBooster(key));
+                    modifiers.put(key, new InfiniteBooster(ModifierTypes.INFINITE_BOOSTER, key));
                     break;
             }
         }

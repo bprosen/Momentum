@@ -1,4 +1,8 @@
-modifier-1:
+booster-1:
   type: LEVEL_BOOSTER
   display: "&a&lLevel Booster"
-  factor: 1.5
+  multiplier: 1.5 # 50% boost
+discount-1:
+  type: SHOP_DISCOUNT
+  display: "&2&lShop Discount"
+  discount: 0.1 # 10% off

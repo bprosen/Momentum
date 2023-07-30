@@ -33,9 +33,9 @@ public class ModifiersYAML
         return modifiersConfig.getString(modifierName + ".display");
     }
 
-    public static float getFactor(String modifierName)
+    public static float getMultiplier(String modifierName)
     {
-        return (float) modifiersConfig.getDouble(modifierName + ".factor");
+        return (float) modifiersConfig.getDouble(modifierName + ".multiplier");
     }
 
     public static float getDiscountPercentage(String modifierName)

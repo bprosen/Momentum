@@ -60,7 +60,9 @@ public class EventManager {
     // method to end event
     public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime)
     {
-        ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(winner, runningEvent.getLevel().getReward());
+        PlayerStats playerStats = Parkour.getStatsManager().get(winner);
+
+        ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(playerStats, runningEvent.getLevel().getReward());
         Bukkit.getPluginManager().callEvent(parkourEventEndEvent);
 
         if (!parkourEventEndEvent.isCancelled())
@@ -79,8 +81,6 @@ public class EventManager {
 
             if (winner != null)
             {
-                PlayerStats playerStats = Parkour.getStatsManager().get(winner);
-
                 // give higher reward if prestiged
                 int prestiges = playerStats.getPrestiges();
                 int reward = parkourEventEndEvent.getReward();

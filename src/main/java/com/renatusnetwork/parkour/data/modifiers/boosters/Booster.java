@@ -1,21 +1,22 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersYAML;
 
 public abstract class Booster extends Modifier
 {
-    private float factor;
+    private float multiplier;
 
-    public Booster(String name)
+    public Booster(ModifierTypes type, String name)
     {
-        super(name);
+        super(type, name);
 
-        this.factor = ModifiersYAML.getFactor(name);
+        this.multiplier = ModifiersYAML.getMultiplier(name);
     }
 
-    public float getFactor()
+    public float getMultiplier()
     {
-        return factor;
+        return multiplier;
     }
 }
