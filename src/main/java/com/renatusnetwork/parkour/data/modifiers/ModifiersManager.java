@@ -56,6 +56,9 @@ public class ModifiersManager
                 case SHOP_DISCOUNT:
                     modifiers.put(key, new ShopDiscount(key));
                     break;
+                case INFINITE_BOOSTER:
+                    modifiers.put(key, new InfiniteBooster(key));
+                    break;
             }
         }
     }
