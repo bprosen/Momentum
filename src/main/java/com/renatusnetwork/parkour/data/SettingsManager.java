@@ -26,6 +26,7 @@ public class SettingsManager {
     public static final String INFINITE_PORTAL_NAME = "infinite-portal";
     public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
 
+    public World main_world;
     public String levels_message_completion;
     public String levels_message_broadcast;
     public double featured_level_reward_multiplier;
@@ -85,6 +86,8 @@ public class SettingsManager {
 
     public int max_prestige_multiplier;
     public int prestige_multiplier_per_prestige;
+    public double base_prestige_cost;
+    public double additional_cost_per_prestige;
 
     public double min_race_bet_amount;
 
@@ -243,48 +246,5 @@ public class SettingsManager {
                 customJoinInventory.put(i, itemStack);
             }
         }
-
-        // need linked so sorted
-        cooldownModifiers = new LinkedHashMap<>();
-
-        Set<String> modifiers = settings.getConfigurationSection("cooldowns.modifiers").getKeys(false);
-        for (String modifier : modifiers)
-            cooldownModifiers.put(Integer.parseInt(modifier), (float) settings.getDouble("cooldowns.modifiers." + modifier + ".modifier"));
-
-        String[] time = settings.getString("cooldowns.reset_time").split(":");
-
-        // set cooldown reset time
-        cooldownCalendar = Calendar.getInstance();
-        cooldownCalendar.set(Calendar.DAY_OF_YEAR, currentDate.get(Calendar.DAY_OF_YEAR) + 1); // next day
-        cooldownCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
-        cooldownCalendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
-
-        sword_title = Utils.translate(settings.getString("setup-sword.title"));
-        setup_swords = new LinkedHashMap<>(); // we want it in order!
-
-        for (int i = 0;; i++)
-        {
-            if (settings.isConfigurationSection("setup-sword.prestiges." + i))
-            {
-                ItemStack sword = new ItemStack(Material.matchMaterial(settings.getString("setup-sword.prestiges." + i + ".type")));
-                ItemMeta meta = sword.getItemMeta();
-                meta.setDisplayName(sword_title);
-
-                // set glow
-                if (settings.getBoolean("setup-sword.prestiges." + i + ".glow"))
-                {
-                    meta.addEnchant(Enchantment.DURABILITY, 1, true);
-                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                }
-
-                sword.setItemMeta(meta);
-
-                setup_swords.put(i, sword); // put in
-            }
-            else
-                break;
-        }
-
-        blackmarket_min_player_count = settings.getInt("blackmarket.min_player_count");
     }
 }
