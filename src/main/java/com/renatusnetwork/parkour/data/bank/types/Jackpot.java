@@ -41,7 +41,7 @@ public class Jackpot
             reminderTask.cancel();
 
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
-        Bukkit.broadcastMessage(Utils.translate(" &6&lJACKPOT &e&lENDED"));
+        Bukkit.broadcastMessage(Utils.translate("&6&lJACKPOT &e&lENDED"));
 
         // grammar craziness
         String playersString = "player";
@@ -50,8 +50,8 @@ public class Jackpot
         if (playerCount > 1)
             playersString += "s";
 
-        Bukkit.broadcastMessage(Utils.translate(" &a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed the " + level.getFormattedTitle() + " &7level"));
-        Bukkit.broadcastMessage(Utils.translate(" &6" + Utils.formatNumber(completed.size() * (level.getReward() + bonus)) + " &eCoins &7were rewarded"));
+        Bukkit.broadcastMessage(Utils.translate("&a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed the " + level.getFormattedTitle() + " &7level"));
+        Bukkit.broadcastMessage(Utils.translate("&6" + Utils.formatNumber(completed.size() * (level.getReward() + bonus)) + " &eCoins &7were rewarded"));
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
     }
 
@@ -72,11 +72,11 @@ public class Jackpot
             public void run()
             {
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
-                Bukkit.broadcastMessage(Utils.translate(" &e&lBANK &6&lJACKPOT &e&lALERT"));
+                Bukkit.broadcastMessage(Utils.translate("&e&lBANK &6&lJACKPOT &e&lALERT"));
                 Bukkit.broadcastMessage("");
-                Bukkit.broadcastMessage(Utils.translate(" &7Complete &2" + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(bonus) + " &d&lBONUS &e&lCOINS"));
+                Bukkit.broadcastMessage(Utils.translate("&7Complete &2" + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(bonus) + " &d&lBONUS &e&lCOINS"));
                 broadcastJoinComponent();
-                Bukkit.broadcastMessage(Utils.translate(" &7There are &a" + (Math.round(millisLeft() / 1000f / 60f) + " minutes &7left to get the reward")));
+                Bukkit.broadcastMessage(Utils.translate("&7There are &a" + (Math.round(millisLeft() / 1000f / 60f) + " minutes &7left to get the reward")));
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
             }
         }.runTaskTimer(Parkour.getPlugin(), 1, 20 * 60 * 3); // every 3 minutes, one tick offset to cancel in time
@@ -106,14 +106,14 @@ public class Jackpot
     public void broadcastCompletion(Player player)
     {
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
-        Bukkit.broadcastMessage(Utils.translate(" &6&l" + player.getDisplayName() + " &e&lCOMPLETED THE &6&lJACKPOT"));
+        Bukkit.broadcastMessage(Utils.translate("&6&l" + player.getDisplayName() + " &e&lCOMPLETED THE &6&lJACKPOT"));
         broadcastJoinComponent();
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
     }
 
     private void broadcastJoinComponent()
     {
-        Utils.broadcastClickableHoverableCMD(" &7Type &a/jackpot play&7 or &aclick here&7 to join in", "&aClick me to play the &6&lJACKPOT", "/jackpot play");
+        Utils.broadcastClickableHoverableCMD("&7Type &a/jackpot play&7 or &aclick here&7 to join in", "&aClick me to play the &6&lJACKPOT", "/jackpot play");
     }
 
     private long millisLeft()
