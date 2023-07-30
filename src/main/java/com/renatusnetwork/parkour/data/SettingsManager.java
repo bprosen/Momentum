@@ -96,6 +96,8 @@ public class SettingsManager {
     public String prac_title;
     public Material prac_type;
 
+    public double minimum_pay_amount;
+
     public HashMap<Integer, ItemStack> customJoinInventory;
 
     public SettingsManager(FileConfiguration settings) {
@@ -165,7 +167,7 @@ public class SettingsManager {
         prac_title = settings.getString("practice-plate.title");
         prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
         prac_hotbar_slot = settings.getInt("practice-plate.hotbar_slot");
-
+        minimum_pay_amount = settings.getDouble("minimum_pay_amount");
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic

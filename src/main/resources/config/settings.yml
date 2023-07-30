@@ -7,6 +7,8 @@ database:
   username: ""
   password: ""
 
+minimum_pay_amount: 10.0
+
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10
