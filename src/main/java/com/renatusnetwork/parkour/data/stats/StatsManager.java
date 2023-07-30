@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.data.stats;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.api.ClanXPRewardEvent;
+import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -206,9 +208,19 @@ public class StatsManager {
     {
         if (task != null && !saidGG.contains(playerStats.getPlayerName()))
         {
-            saidGG.add(playerStats.getPlayerName());
-            playerStats.getPlayer().sendMessage(Utils.translate("&6" + Parkour.getSettingsManager().default_gg_coin_reward + " &eCoin &7reward for saying &3&lGG&b!"));
-            Parkour.getStatsManager().addCoins(playerStats, Parkour.getSettingsManager().default_gg_coin_reward);
+            int reward = Parkour.getSettingsManager().default_gg_coin_reward;
+
+            GGRewardEvent event = new GGRewardEvent(playerStats, reward);
+            Bukkit.getPluginManager().callEvent(event);
+
+            if (!event.isCancelled())
+            {
+                reward = event.getReward();
+
+                saidGG.add(playerStats.getPlayerName());
+                playerStats.getPlayer().sendMessage(Utils.translate("&6" + reward + " &eCoin &7reward for saying &3&lGG&b!"));
+                Parkour.getStatsManager().addCoins(playerStats, reward);
+            }
         }
     }
 
