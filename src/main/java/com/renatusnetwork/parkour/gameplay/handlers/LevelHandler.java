@@ -2,6 +2,8 @@ package com.renatusnetwork.parkour.gameplay.handlers;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.api.GGRewardEvent;
+import com.renatusnetwork.parkour.api.JackpotRewardEvent;
 import com.renatusnetwork.parkour.api.LevelCompletionEvent;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
@@ -150,12 +152,20 @@ public class LevelHandler {
                             !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
                     {
                         Jackpot jackpot = bankManager.getJackpot();
-                        isJackpotReward = true;
 
-                        // add coins and add to completed, as well as broadcast completion
-                        Parkour.getStatsManager().addCoins(playerStats, jackpot.getBonus());
-                        jackpot.addCompleted(player.getName());
-                        jackpot.broadcastCompletion(player);
+                        JackpotRewardEvent jackpotEvent = new JackpotRewardEvent(playerStats, jackpot.getLevel(), jackpot.getBonus());
+                        Bukkit.getPluginManager().callEvent(jackpotEvent);
+
+                        if (!jackpotEvent.isCancelled())
+                        {
+                            isJackpotReward = true;
+                            int bonus = jackpotEvent.getBonus();
+
+                            // add coins and add to completed, as well as broadcast completion
+                            Parkour.getStatsManager().addCoins(playerStats, bonus);
+                            jackpot.addCompleted(player.getName());
+                            jackpot.broadcastCompletion(player);
+                        }
                     }
                     // modifier section
                     else

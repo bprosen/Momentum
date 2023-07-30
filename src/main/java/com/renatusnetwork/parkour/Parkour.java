@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.renatusnetwork.parkour.api.JackpotRewardEvent;
 import com.renatusnetwork.parkour.commands.*;
 import com.renatusnetwork.parkour.data.Placeholders;
 import com.renatusnetwork.parkour.data.bank.BankManager;
@@ -136,6 +137,7 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EventEndListener(), this);
         getServer().getPluginManager().registerEvents(new LevelCompletionListener(), this);
         getServer().getPluginManager().registerEvents(new ClanXPListener(), this);
+        getServer().getPluginManager().registerEvents(new JackpotListener(), this);
 
         WorldEdit.getInstance().getEventBus().register(new SelectionListener());
 
