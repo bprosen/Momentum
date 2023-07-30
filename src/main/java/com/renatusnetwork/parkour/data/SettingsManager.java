@@ -26,7 +26,6 @@ public class SettingsManager {
     public static final String INFINITE_PORTAL_NAME = "infinite-portal";
     public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
 
-    public World main_world;
     public String levels_message_completion;
     public String levels_message_broadcast;
     public double featured_level_reward_multiplier;
@@ -86,8 +85,6 @@ public class SettingsManager {
 
     public int max_prestige_multiplier;
     public int prestige_multiplier_per_prestige;
-    public double base_prestige_cost;
-    public double additional_cost_per_prestige;
 
     public double min_race_bet_amount;
 
@@ -105,6 +102,8 @@ public class SettingsManager {
     public int prac_hotbar_slot;
     public String prac_title;
     public Material prac_type;
+
+    public double minimum_pay_amount;
 
     public HashMap<Integer, ItemStack> customJoinInventory;
 
@@ -201,6 +200,7 @@ public class SettingsManager {
         legendaryMinimumBid = settings.getInt("bank.legendary.min_starting_bid");
         jackpotLength = settings.getInt("bank.jackpot.length");
 
+        minimum_pay_amount = settings.getDouble("minimum_pay_amount");
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic

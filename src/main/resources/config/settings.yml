@@ -20,6 +20,8 @@ bank:
     min_starting_bid: 3000
   jackpot:
     length: 1800 # in seconds
+minimum_pay_amount: 10.0
+
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10
@@ -177,7 +179,7 @@ event:
   anvil_spawn_y_above_start_y: 40
   task_delay:
     pvp: 5
-    falling_anvil: 15
+    half_heart: 15
     rising_water: 100
 infinitepk:
   max_leaderboard_size: 10

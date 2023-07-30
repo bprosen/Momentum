@@ -103,3 +103,6 @@ commands:
   jackpot:
     description: "RN-Parkour jackpot command"
     aliases: [jp, sponsor]
+  pay:
+    description: "RN-Parkour pay command"
+    aliases: [etransfer]

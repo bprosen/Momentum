@@ -439,7 +439,6 @@ public class RaceManager {
 
     public void acceptRequest(PlayerStats player1, PlayerStats player2) {
 
-        StatsManager statsManager = Parkour.getStatsManager();
         RaceRequest raceRequest = getRequest(player1.getPlayer(), player2.getPlayer());
 
         // request exists

@@ -176,7 +176,7 @@ public class PacketListener implements Listener {
                         {
 
                             if (!beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) ||
-                                    playerStats.getPlayer().getLocation().distance(beingSpectated.getPlayer().getLocation()) > 20)
+                                    playerStats.getPlayer().getLocation().distance(beingSpectated.getPlayer().getLocation()) > 30)
 
                                 // run in sync due to teleporting
                                 new BukkitRunnable()
