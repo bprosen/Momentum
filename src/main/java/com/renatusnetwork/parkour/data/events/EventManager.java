@@ -91,6 +91,15 @@ public class EventManager {
                 Parkour.getStatsManager().addCoins(playerStats, reward);
                 Parkour.getStatsManager().runGGTimer();
 
+                String rewardMessage = "&7You have been rewarded ";
+                // means its a modified reward
+                if (reward != runningEvent.getLevel().getReward())
+                    rewardMessage += "&c&m" + Utils.formatNumber(runningEvent.getLevel().getReward()) + " &6" + Utils.formatNumber(reward) + " &eCoins";
+                else
+                    rewardMessage += "&6" + Utils.formatNumber(reward) + " &eCoins";
+                
+                playerStats.getPlayer().sendMessage(Utils.translate(rewardMessage));
+
                 // update wins
                 playerStats.addEventWin();
                 Parkour.getDatabaseManager().add("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");

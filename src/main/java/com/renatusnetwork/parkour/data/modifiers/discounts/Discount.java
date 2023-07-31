@@ -6,12 +6,17 @@ import com.renatusnetwork.parkour.data.modifiers.ModifiersYAML;
 
 public abstract class Discount extends Modifier
 {
-    private float discountPercentage;
+    private float discount;
 
     public Discount(ModifierTypes type, String name)
     {
         super(type, name);
 
-        this.discountPercentage = ModifiersYAML.getDiscountPercentage(name);
+        this.discount = ModifiersYAML.getDiscount(name);
+    }
+
+    public float getDiscount()
+    {
+        return discount;
     }
 }

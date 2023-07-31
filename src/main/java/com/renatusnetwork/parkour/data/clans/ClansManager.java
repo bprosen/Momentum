@@ -174,7 +174,16 @@ public class ClansManager {
 
         if (!event.isCancelled())
         {
+            int oldClanXP = clanXP;
             clanXP = event.getXP(); // override from event
+
+            String rewardString;
+
+            // its been boosted!
+            if (oldClanXP != clanXP)
+                rewardString = "&c&m" + Utils.formatNumber(oldClanXP) + " &6" + Utils.formatNumber(clanXP);
+            else
+                rewardString = "&6" + Utils.formatNumber(clanXP);
 
             int totalXP = clanXP + clan.getXP();
 
@@ -183,7 +192,7 @@ public class ClansManager {
                 clan.addXP(clanXP);
                 ClansDB.setClanXP(totalXP, clan.getID());
                 sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
-                        Utils.formatNumber(clanXP) + " &eXP for your clan!" +
+                        rewardString + " &eXP for your clan!" +
                         " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()), null);
 
                 // level them up
@@ -235,7 +244,7 @@ public class ClansManager {
                 long clanXPNeeded = ClansYAML.getLevelUpPrice(clan) - clan.getXP();
 
                 sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
-                        Utils.formatNumber(clanXP) + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
+                        rewardString + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
                         Utils.formatNumber(clanXPNeeded) + "&c)", null);
             }
             // update total gained xp

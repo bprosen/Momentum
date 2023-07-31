@@ -38,7 +38,7 @@ public class ModifiersYAML
         return (float) modifiersConfig.getDouble(modifierName + ".multiplier");
     }
 
-    public static float getDiscountPercentage(String modifierName)
+    public static float getDiscount(String modifierName)
     {
         float percent = (float) modifiersConfig.getDouble(modifierName + ".discount");
 

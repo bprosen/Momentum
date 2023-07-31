@@ -7,6 +7,8 @@ import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
@@ -30,7 +32,7 @@ public class MenuItemFormatter {
         if (menuItem.getType().equals("level"))
         {
             if (menuItem.getTypeValue().equals("featured"))
-                return getFeaturedLevel(playerStats, menuItem);
+                return getFeaturedLevel(playerStats, menuItem, menuItem.getItem());
 
             if (menuItem.getTypeValue().equals("rankup"))
                 return getRankUpLevel(playerStats, menuItem);
@@ -156,94 +158,16 @@ public class MenuItemFormatter {
         if (level != null) {
             // make it the featured in normal gui section too for consistency
             if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
-                return getFeaturedLevel(playerStats, menuItem);
+                return getFeaturedLevel(playerStats, menuItem, item);
             else
-                return createLevelItem(playerStats, level, menuItem, item, false);
+                return createLevelItem(playerStats, level, menuItem, item);
         }
         return item;
     }
 
-    // create a slightly different level item for featured level in gui
-    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem) {
-        Level featuredLevel = Parkour.getLevelManager().getFeaturedLevel();
-        ItemStack levelItem = menuItem.getItem();
-
-        if (featuredLevel != null) {
-            ItemMeta itemMeta = levelItem.getItemMeta();
-
-            // Existing Lore Section
-            List<String> itemLore = new ArrayList<>();
-
-            // Item Title Section
-            String formattedTitle = Utils.translate("&cFeatured &7- " + featuredLevel.getFormattedTitle());
-
-            // add new if new level!
-            if (featuredLevel.isNewLevel())
-                formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
-
-            if (featuredLevel.getPlayersInLevel() > 0)
-                formattedTitle += Utils.translate(" &7(" + featuredLevel.getPlayersInLevel() + " Playing)");
-
-            itemMeta.setDisplayName(formattedTitle);
-
-            // Click To Go and Reward Section
-            itemLore.add(Utils.translate("&7Click to go to " + featuredLevel.getFormattedTitle()
-                    .replace("&l", "").replace("&o", "")));
-
-            itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(featuredLevel.getReward()) +
-                                        "&r &6" + Utils.formatNumber(featuredLevel.getReward() *
-                                        Parkour.getSettingsManager().featured_level_reward_multiplier) +
-                                        " &6Coin &7Reward"));
-
-            if (featuredLevel.getTotalCompletionsCount() > 0)
-                itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(featuredLevel.getTotalCompletionsCount()) + " &7Completions"));
-
-            // only show rating if above 5
-            if (featuredLevel.getRatingsCount() >= 5) {
-                itemLore.add(Utils.translate("  &6" + featuredLevel.getRating() + " &7Rating"));
-                itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(featuredLevel.getRatingsCount()) + " &7ratings"));
-            }
-
-            // Personal Level Stats Section
-            int levelCompletionsCount = playerStats.getLevelCompletionsCount(featuredLevel.getName());
-            if (levelCompletionsCount > 0) {
-                // add glow effect to all levels they have completed
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-                itemLore.add("");
-
-                String beatenMessage = Utils.translate("&7Beaten &2" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
-                if (levelCompletionsCount > 1)
-                    beatenMessage += "s";
-
-                itemLore.add(beatenMessage);
-
-                LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(featuredLevel.getName());
-                if (fastestCompletion != null) {
-                    itemLore.add(Utils.translate("&7 Best Personal Time"));
-
-                    double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
-                    long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
-
-                    itemLore.add(Utils.translate("  &2" + completionTime + "s"));
-
-                    // this makes it so it will not have " ago" if they just completed it
-                    String timeSinceString;
-                    if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
-                        timeSinceString = Utils.translate("   &7Just now");
-                    else
-                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
-
-                    itemLore.add(timeSinceString);
-                }
-            }
-
-            // Sections over
-            itemMeta.setLore(itemLore);
-            levelItem.setItemMeta(itemMeta);
-        }
-        return levelItem;
+    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem, ItemStack itemStack)
+    {
+        return createLevelItem(playerStats, Parkour.getLevelManager().getTutorialLevel(), menuItem, itemStack);
     }
 
     private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu) {
@@ -264,7 +188,6 @@ public class MenuItemFormatter {
                 else
                     count++;
             }
-
 
             ItemMeta itemMeta = item.getItemMeta();
             itemMeta.setDisplayName(Utils.translate(
@@ -293,13 +216,13 @@ public class MenuItemFormatter {
             {
                 Level level = Parkour.getLevelManager().get(levelName);
 
-                return createLevelItem(playerStats, level, menuItem, item, true);
+                return createLevelItem(playerStats, level, menuItem, item);
             }
         }
         return null;
     }
 
-    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item, boolean rankUpLevel) {
+    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item) {
 
         if (level != null) {
 
@@ -309,7 +232,11 @@ public class MenuItemFormatter {
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
-            // add new if new level!
+            // add featured title
+            if (level.isFeaturedLevel())
+                formattedTitle = Utils.translate("&cFeatured " + formattedTitle);
+            else
+            // add new if new level! but dont show new if featured (too messy)
             if (level.isNewLevel())
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
@@ -399,13 +326,34 @@ public class MenuItemFormatter {
 
                 modified = true;
                 newReward = oldReward + jackpot.getBonus();
+
+                if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
+                {
+                    // downcast and boost
+                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                    newReward *= booster.getMultiplier();
+                }
             }
             // only do these if jackpot is not running!
             else
             {
+                // if featured
+                if (level.isFeaturedLevel())
+                {
+                    newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
+                    modified = true;
+                }
 
                 if (playerStats.getPrestiges() > 0 && level.getReward() > 0) {
                     newReward *= playerStats.getPrestigeMultiplier();
+                    modified = true;
+                }
+
+                if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                {
+                    // downcast and boost
+                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                    newReward *= booster.getMultiplier();
                     modified = true;
                 }
 
@@ -444,8 +392,8 @@ public class MenuItemFormatter {
                 itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
             }
 
-            // Required Levels Section
-            if (level.getRequiredLevels().size() > 0) {
+            // Required Levels Section, but only show it if not featured
+            if (level.getRequiredLevels().size() > 0 && !level.isFeaturedLevel()) {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Required Levels"));
 

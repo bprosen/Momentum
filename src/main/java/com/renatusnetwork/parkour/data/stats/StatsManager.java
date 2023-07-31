@@ -217,8 +217,15 @@ public class StatsManager {
             {
                 reward = event.getReward();
 
+                String rewardString;
+                // means its been boosted!
+                if (reward != Parkour.getSettingsManager().default_gg_coin_reward)
+                    rewardString = "&c&m" + Utils.formatNumber(Parkour.getSettingsManager().default_gg_coin_reward) + " &6" + Utils.formatNumber(reward);
+                else
+                    rewardString = "&6" + Utils.formatNumber(reward);
+
                 saidGG.add(playerStats.getPlayerName());
-                playerStats.getPlayer().sendMessage(Utils.translate("&6" + reward + " &eCoin &7reward for saying &3&lGG&b!"));
+                playerStats.getPlayer().sendMessage(Utils.translate(rewardString + " &eCoin &7reward for saying &3&lGG&b!"));
                 Parkour.getStatsManager().addCoins(playerStats, reward);
             }
         }

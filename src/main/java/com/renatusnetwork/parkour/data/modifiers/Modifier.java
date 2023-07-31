@@ -26,6 +26,11 @@ public abstract class Modifier
 
     public ModifierTypes getType() { return type; }
 
+    public boolean equals(Modifier modifier)
+    {
+        return modifier.getName().equals(name);
+    }
+
     private void load()
     {
         this.displayName = Utils.translate(ModifiersYAML.getDisplayName(name));

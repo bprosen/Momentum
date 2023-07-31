@@ -3,7 +3,9 @@ package com.renatusnetwork.parkour.data.modifiers;
 import com.renatusnetwork.parkour.data.modifiers.boosters.*;
 import com.renatusnetwork.parkour.data.modifiers.discounts.LevelDiscount;
 import com.renatusnetwork.parkour.data.modifiers.discounts.ShopDiscount;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class ModifiersManager
@@ -61,5 +63,24 @@ public class ModifiersManager
                     break;
             }
         }
+    }
+
+    public void addModifier(PlayerStats playerStats, Modifier modifier)
+    {
+        // add to cache and db
+        playerStats.addModifier(modifier);
+        ModifiersDB.addModifier(playerStats, modifier);
+    }
+
+    public void removeModifier(PlayerStats playerStats, Modifier modifier)
+    {
+        // remove from cache and db
+        playerStats.removeModifier(modifier);
+        ModifiersDB.removeModifier(playerStats, modifier);
+    }
+
+    public Collection<Modifier> getModifiers()
+    {
+        return modifiers.values();
     }
 }

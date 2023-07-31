@@ -2,6 +2,10 @@ booster-1:
   type: LEVEL_BOOSTER
   display: "&a&lLevel Booster"
   multiplier: 1.5 # 50% boost
+booster-2:
+  type: INFINITE_BOOSTER
+  display: "&2Infinite Booster"
+  multiplier: 1.25 # 25% boost
 discount-1:
   type: SHOP_DISCOUNT
   display: "&2&lShop Discount"

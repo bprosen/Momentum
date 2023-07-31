@@ -144,6 +144,15 @@ public class InfinitePKManager {
                     }
                 }
 
+                int coinReward = event.getReward();
+                String rewardString;
+
+                // modifier reward!
+                if (event.getReward() != score)
+                    rewardString = "&c&m" + Utils.formatNumber(score) + " &6" + Utils.formatNumber(coinReward);
+                else
+                    rewardString = "&6" + Utils.formatNumber(coinReward);
+
                 if (isBestScore(player.getName(), score))
                 {
                     // if they disconnected
@@ -151,7 +160,7 @@ public class InfinitePKManager {
                         player.sendMessage(Utils.translate(
                                 "&7You have beaten your previous record of &d" +
                                         Utils.formatNumber(playerStats.getInfinitePKScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
-                                        "&7Awarded &6" + Utils.formatNumber(event.getReward()) + " &eCoins"
+                                        "&7Awarded " + rewardString + " &eCoins"
                         ));
 
                         if (doRewardsMsg) {
@@ -176,11 +185,11 @@ public class InfinitePKManager {
                 } else if (!disconnected) {
                     player.sendMessage(Utils.translate(
                             "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + Utils.formatNumber(playerStats.getInfinitePKScore()) + ")\n" +
-                                    "&7Awarded &6" + Utils.formatNumber(event.getReward()) + " &eCoins"
+                                    "&7Awarded &6" + rewardString + " &eCoins"
                     ));
                 }
                 // deposit reward from listener (default = score)
-                Parkour.getStatsManager().addCoins(playerStats, event.getReward());
+                Parkour.getStatsManager().addCoins(playerStats, coinReward);
 
                 playerStats.setInfinitePK(false);
                 participants.remove(player.getName());

@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -28,7 +29,7 @@ public class StatsDB {
         loadCompletions(playerStats);
         PerksDB.loadPerks(playerStats);
         Parkour.getStatsManager().loadPerksGainedCount(playerStats);
-        loadModifiers(playerStats);
+        ModifiersDB.loadModifiers(playerStats);
     }
 
     private static void loadPlayerID(PlayerStats playerStats) {
@@ -184,29 +185,6 @@ public class StatsDB {
             insertPlayerID(playerStats);
             loadPlayerStats(playerStats);
         }
-    }
-
-    private static void loadModifiers(PlayerStats playerStats)
-    {
-        ArrayList<Modifier> modifiers = new ArrayList<>();
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "modifiers",
-                "*",
-                " WHERE uuid='" + playerStats.getUUID() + "'"
-        );
-
-        if (playerResults.size() > 0)
-        {
-            for (Map<String, String> playerResult : playerResults)
-            {
-                String modifierName = playerResult.get("modifier_name");
-
-                modifiers.add(Parkour.getModifiersManager().getModifier(modifierName));
-            }
-        }
-
-        playerStats.setModifiers(modifiers);
     }
 
     public static int getTotalPlayers()

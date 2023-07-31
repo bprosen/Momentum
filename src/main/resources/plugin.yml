@@ -106,3 +106,6 @@ commands:
   pay:
     description: "RN-Parkour pay command"
     aliases: [etransfer]
+  modifier:
+    description: "RN-Parkour modifier command"
+    aliases: [modifiers, booster, discount, boosters, discounts]

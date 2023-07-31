@@ -549,11 +549,37 @@ public class PlayerStats {
     //
     // Modifier Section
     //
+    public void addModifier(Modifier modifier)
+    {
+        // prevent same type (overwriting)
+        if (!hasModifier(modifier.getType()))
+            modifiers.put(modifier.getType(), modifier);
+    }
+
+    public void removeModifier(Modifier modifier)
+    {
+        modifiers.remove(modifier.getType());
+    }
+
     public boolean hasModifier(ModifierTypes modifierTypes)
     {
         return modifiers.containsKey(modifierTypes);
     }
 
+    public boolean hasModifierByName(Modifier targetModifier)
+    {
+        boolean result = false;
+
+        for (Modifier modifier : modifiers.values())
+        {
+            if (modifier.equals(targetModifier))
+            {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
     public Collection<Modifier> getModifiers()
     {
         return modifiers.values();
