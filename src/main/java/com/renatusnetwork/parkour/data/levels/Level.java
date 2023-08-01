@@ -28,7 +28,6 @@ public class Level {
     private int ratingsCount;
     private Location startLocation;
     private Location respawnLocation;
-    private String message;
     private int maxCompletions;
     private int playersInLevel = 0;
     private boolean broadcastCompletion;
@@ -106,68 +105,12 @@ public class Level {
         return respawnLocation;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public void toggleLiquidReset() { liquidResetPlayer = !liquidResetPlayer; }
 
     public boolean doesLiquidResetPlayer() { return liquidResetPlayer; }
 
-    public String getFormattedMessage(PlayerStats playerStats, boolean isJackpotReward) {
-        if (message != null) {
-            LevelManager levelManager = Parkour.getLevelManager();
-            BankManager bankManager = Parkour.getBankManager();
-
-            String returnMessage = Utils.translate(message);
-
-            returnMessage = returnMessage.replace("%title%", getFormattedTitle());
-
-            if (isFeaturedLevel())
-                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
-                        Utils.formatNumber(reward) + "&6 " +
-                        Utils.formatNumber((reward * Parkour.getSettingsManager().featured_level_reward_multiplier))));
-            else if (isJackpotReward)
-            {
-                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
-                        Utils.formatNumber(reward) + "&6 " +
-                        Utils.formatNumber(reward + bankManager.getJackpot().getBonus())));
-            }
-            else
-            {
-                int newReward = reward;
-
-                if (playerStats.getPrestiges() > 0)
-                    newReward *= playerStats.getPrestigeMultiplier();
-
-                if (hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()) && levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier() != 1.00)
-                    newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
-
-                if (newReward != reward)
-                    returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
-                            Utils.formatNumber(reward) + "&6 " + Utils.formatNumber(newReward)));
-                else
-                    returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
-            }
-
-            returnMessage = returnMessage.replace(
-                    "%completions%",
-                    Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(name))
-            );
-
-            if (playerStats.inFailMode())
-                returnMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
-
-            return returnMessage;
-        }
-
-        return "";
-    }
-
     public boolean hasPermissionNode() {
-        if (requiredPermissionNode != null)
-            return true;
-        return false;
+        return requiredPermissionNode != null;
     }
 
     public String getRequiredPermissionNode() {
@@ -465,11 +408,6 @@ public class Level {
                 respawnLocation = Parkour.getLocationManager().get(respawnLocationName);
             else
                 respawnLocation = Parkour.getLocationManager().get("spawn");
-
-            if (LevelsYAML.isSet(name, "message"))
-                message = LevelsYAML.getMessage(name);
-            else
-                message = Parkour.getSettingsManager().levels_message_completion;
 
             // this acts as a boolean for races
             if (LevelsYAML.isSection(name, "race")) {

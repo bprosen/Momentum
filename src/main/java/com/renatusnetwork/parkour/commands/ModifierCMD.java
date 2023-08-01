@@ -39,7 +39,7 @@ public class ModifierCMD implements CommandExecutor
                 if (a.length == 3 && (a[0].equalsIgnoreCase("add") || a[0].equalsIgnoreCase("remove")))
                 {
                     String playerName = a[1];
-                    String modifierName = a[1];
+                    String modifierName = a[2];
                     Player target = Bukkit.getPlayer(playerName);
 
                     if (target != null)
@@ -141,21 +141,21 @@ public class ModifierCMD implements CommandExecutor
 
         for (Modifier modifier : modifiers)
         {
-            String modifierString = "&c" + modifier.getName();
+            String modifierString = "&c" + modifier.getName() + " &7(" + modifier.getType() + " ";
 
             if (modifier instanceof Booster)
             {
                 Booster booster = (Booster) modifier;
-                modifierString += " &7(Multiplier " + booster.getMultiplier() + ")";
+                modifierString += "Multiplier " + booster.getMultiplier() + ")";
             }
             else if (modifier instanceof Discount)
             {
                 Discount discount = (Discount) modifier;
-                modifierString += " &7(Discount " + discount.getDiscount() + ")";
+                modifierString += "Discount " + discount.getDiscount() + ")";
             }
 
             // send with info about modifier
-            player.sendMessage(Utils.translate(" &c" + modifier.getName() + modifierString));
+            player.sendMessage(Utils.translate(" &c" + modifierString));
         }
     }
 

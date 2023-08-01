@@ -313,60 +313,54 @@ public class MenuItemFormatter {
             }
 
             int oldReward = level.getReward();
-            int newReward = level.getReward();
-            boolean modified = false;
+            int newReward = oldReward;
             LevelCooldown cooldown = null;
 
+            if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+            {
+                // downcast and boost
+                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                newReward *= booster.getMultiplier();
+            }
+
+            if (level.isFeaturedLevel())
+            {
+                newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
+            }
             // jackpot section
-            if (bankManager.isJackpotRunning() &&
+            else if (bankManager.isJackpotRunning() &&
                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
                 !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
             {
                 Jackpot jackpot = bankManager.getJackpot();
 
-                modified = true;
-                newReward = oldReward + jackpot.getBonus();
+                int bonus = jackpot.getBonus();
 
                 if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
                 {
                     // downcast and boost
                     Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
-                    newReward *= booster.getMultiplier();
+                    bonus *= booster.getMultiplier();
                 }
+                newReward += bonus;
             }
             // only do these if jackpot is not running!
             else
             {
-                // if featured
-                if (level.isFeaturedLevel())
-                {
-                    newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
-                    modified = true;
-                }
 
-                if (playerStats.getPrestiges() > 0 && level.getReward() > 0) {
+                if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
                     newReward *= playerStats.getPrestigeMultiplier();
-                    modified = true;
-                }
-
-                if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
-                {
-                    // downcast and boost
-                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
-                    newReward *= booster.getMultiplier();
-                    modified = true;
-                }
 
                 // set cooldown modifier last!
-                if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getPlayerName())) {
+                if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getPlayerName()))
+                {
                     cooldown = Parkour.getLevelManager().getLevelCooldown(playerStats.getPlayerName());
                     newReward *= cooldown.getModifier();
-                    modified = true;
                 }
             }
 
             // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
-            if (modified && oldReward != newReward)
+            if (oldReward != newReward)
             {
                 itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(oldReward) + "&6 " + Utils.formatNumber(newReward) + " Coin &7Reward"));
 

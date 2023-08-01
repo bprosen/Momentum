@@ -149,7 +149,7 @@ public class InfinitePKManager {
 
                 // modifier reward!
                 if (event.getReward() != score)
-                    rewardString = "&c&m" + Utils.formatNumber(score) + " &6" + Utils.formatNumber(coinReward);
+                    rewardString = "&c&m" + Utils.formatNumber(score) + "&6 " + Utils.formatNumber(coinReward);
                 else
                     rewardString = "&6" + Utils.formatNumber(coinReward);
 

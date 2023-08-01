@@ -38,7 +38,7 @@ public class ModifiersDB
         Parkour.getDatabaseManager().add("INSERT INTO modifiers (uuid, player_name, modifier_name) VALUES('" +
                 playerStats.getUUID() + "','" +
                 playerStats.getPlayerName() + "','" +
-                modifier.getName() + "'"
+                modifier.getName() + "')"
         );
     }
 

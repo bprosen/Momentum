@@ -181,7 +181,7 @@ public class ClansManager {
 
             // its been boosted!
             if (oldClanXP != clanXP)
-                rewardString = "&c&m" + Utils.formatNumber(oldClanXP) + " &6" + Utils.formatNumber(clanXP);
+                rewardString = "&c&m" + Utils.formatNumber(oldClanXP) + "&6 " + Utils.formatNumber(clanXP);
             else
                 rewardString = "&6" + Utils.formatNumber(clanXP);
 

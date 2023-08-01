@@ -220,7 +220,7 @@ public class StatsManager {
                 String rewardString;
                 // means its been boosted!
                 if (reward != Parkour.getSettingsManager().default_gg_coin_reward)
-                    rewardString = "&c&m" + Utils.formatNumber(Parkour.getSettingsManager().default_gg_coin_reward) + " &6" + Utils.formatNumber(reward);
+                    rewardString = "&c&m" + Utils.formatNumber(Parkour.getSettingsManager().default_gg_coin_reward) + "&6 " + Utils.formatNumber(reward);
                 else
                     rewardString = "&6" + Utils.formatNumber(reward);
 

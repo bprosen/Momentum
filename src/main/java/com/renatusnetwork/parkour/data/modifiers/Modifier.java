@@ -12,6 +12,8 @@ public abstract class Modifier
     {
         this.type = type;
         this.name = name;
+
+        load();
     }
 
     public String getName()

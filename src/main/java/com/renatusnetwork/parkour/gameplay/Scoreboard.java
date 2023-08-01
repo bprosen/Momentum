@@ -205,63 +205,57 @@ public class Scoreboard {
                         String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
                         BankManager bankManager = Parkour.getBankManager();
 
+                        int newReward = level.getReward();
+
+                        // always modify level booster
+                        if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                        {
+                            // downcast and boost
+                            Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                            newReward *= booster.getMultiplier();
+                        }
+
                         // add title and adjust rewardstring if it is a featured level
                         if (level.isFeaturedLevel())
                         {
                             board.add(formatSpacing(Utils.translate("&dFeatured Level")));
-
-                            // proper cast
-                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
-                                    (Utils.formatNumber(level.getReward() * Parkour.getSettingsManager().featured_level_reward_multiplier)));
-
+                            newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
                         }
-                        // jackpot section
                         else if (bankManager.isJackpotRunning() &&
                                  bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
                                  !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
                         {
                             Jackpot jackpot = bankManager.getJackpot();
-
-                            int jackpotReward = level.getReward() + jackpot.getBonus();
+                            int bonus = jackpot.getBonus();
 
                             if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
                             {
                                 // downcast and boost
-                                Booster jackpotBooster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
-                                jackpotReward *= jackpotBooster.getMultiplier();
+                                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                                bonus *= booster.getMultiplier();
                             }
+                            // add bonus multiplier
+                            newReward += bonus;
 
                             board.add(formatSpacing(Utils.translate("&a&lJACKPOT LEVEL")));
-                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
-                                    Utils.formatNumber(jackpotReward));
                         }
                         // modifier section
                         else
                         {
-                            int newReward = level.getReward();
-
                             if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
                                 newReward *= playerStats.getPrestigeMultiplier();
-
-                            if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
-                            {
-                                // downcast and boost
-                                Booster jackpotBooster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
-                                newReward *= jackpotBooster.getMultiplier();
-                            }
 
                             LevelManager levelManager = Parkour.getLevelManager();
 
                             // set cooldown modifier last!
                             if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()) && levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier() != 1.00)
                                 newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
-
-                            if (newReward != level.getReward())
-                                rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(newReward));
                         }
 
-                        String title = level.getFormattedTitle();
-                        board.add(formatSpacing(title));
+                        if (newReward != level.getReward())
+                            rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(newReward));
+
+                        board.add(formatSpacing(level.getFormattedTitle()));
                         board.add(formatSpacing(rewardString));
 
                         if (playerStats.getLevelStartTime() > 0) {

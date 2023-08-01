@@ -141,7 +141,6 @@ public class LevelHandler {
                     // give higher reward if prestiged
                     int prestiges = playerStats.getPrestiges();
                     int reward = event.getReward();
-                    boolean isJackpotReward = false;
 
                     // if featured, set reward!
                     if (level.isFeaturedLevel())
@@ -158,16 +157,15 @@ public class LevelHandler {
 
                         if (!jackpotEvent.isCancelled())
                         {
-                            isJackpotReward = true;
                             int bonus = jackpotEvent.getBonus();
 
                             // add coins and add to completed, as well as broadcast completion
-                            Parkour.getStatsManager().addCoins(playerStats, bonus);
                             jackpot.addCompleted(player.getName());
                             jackpot.broadcastCompletion(player);
+                            reward += bonus;
                         }
                     }
-                    // modifier section
+                    // prestige/cooldown section
                     else
                     {
                         if (prestiges > 0 && level.getReward() > 0)
@@ -177,15 +175,30 @@ public class LevelHandler {
                         if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
                             reward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
                     }
+
                     Parkour.getStatsManager().addCoins(playerStats, reward);
 
-                    String messageFormatted = level.getFormattedMessage(playerStats, isJackpotReward);
-                    if (elapsedTime > 0L && elapsedTime < 8388607L)
-                        messageFormatted = messageFormatted.replace("%time%", time);
-                    else
-                        messageFormatted = messageFormatted.replace("%time%", "-");
+                    String completionMessage = Utils.translate(Parkour.getSettingsManager().levels_message_completion);
 
-                    player.sendMessage(messageFormatted);
+                    completionMessage = completionMessage.replace("%title%", level.getFormattedTitle());
+
+                    if (level.getReward() != reward)
+                        completionMessage = completionMessage.replace("%reward%", Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(reward)));
+                    else
+                        completionMessage = completionMessage.replace("%reward%", Utils.formatNumber(reward));
+
+                    completionMessage = completionMessage.replace("%completions%",
+                            Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(levelName)));
+
+                    if (playerStats.inFailMode())
+                        completionMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
+
+                    if (elapsedTime > 0L && elapsedTime < 8388607L)
+                        completionMessage = completionMessage.replace("%time%", time);
+                    else
+                        completionMessage = completionMessage.replace("%time%", "-");
+
+                    player.sendMessage(completionMessage);
                     player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
                             + ChatColor.stripColor(level.getFormattedTitle())));
 
