@@ -35,7 +35,12 @@ public class ModifiersYAML
 
     public static float getMultiplier(String modifierName)
     {
-        return (float) modifiersConfig.getDouble(modifierName + ".multiplier");
+        float percent = (float) modifiersConfig.getDouble(modifierName + ".multiplier");
+
+        if (percent < 1.00)
+            percent = 1.00f;
+
+        return percent;
     }
 
     public static float getDiscount(String modifierName)

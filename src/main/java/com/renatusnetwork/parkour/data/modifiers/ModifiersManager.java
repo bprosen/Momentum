@@ -23,7 +23,7 @@ public class ModifiersManager
         return modifiers.get(name);
     }
 
-    private void load()
+    public void load()
     {
         modifiers = new HashMap<>();
 
@@ -48,9 +48,6 @@ public class ModifiersManager
                     break;
                 case JACKPOT_BOOSTER:
                     modifiers.put(key, new JackpotBooster(ModifierTypes.JACKPOT_BOOSTER, key));
-                    break;
-                case PRESTIGE_BOOSTER:
-                    modifiers.put(key, new PrestigeBooster(ModifierTypes.PRESTIGE_BOOSTER, key));
                     break;
                 case LEVEL_DISCOUNT:
                     modifiers.put(key, new LevelDiscount(ModifierTypes.LEVEL_DISCOUNT, key));

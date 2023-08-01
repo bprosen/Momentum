@@ -106,6 +106,9 @@ public class ModifierCMD implements CommandExecutor
                 else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
                 {
                     Parkour.getConfigManager().load("modifiers");
+                    Parkour.getModifiersManager().load();
+                    player.sendMessage(Utils.translate("&4modifiers.yml &chas been reloaded"));
+
                     HashMap<String, PlayerStats> players = Parkour.getStatsManager().getPlayerStats();
 
                     new BukkitRunnable()

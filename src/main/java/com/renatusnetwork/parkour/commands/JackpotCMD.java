@@ -30,6 +30,8 @@ public class JackpotCMD implements CommandExecutor
                     if (!jackpot.hasCompleted(player.getName()))
                         // tp to level
                         MenuItemAction.performLevelTeleport(Parkour.getStatsManager().get(player), player, jackpot.getLevel());
+                    else
+                        player.sendMessage(Utils.translate("&cYou have already completed the jackpot"));
                 }
                 else
                 {

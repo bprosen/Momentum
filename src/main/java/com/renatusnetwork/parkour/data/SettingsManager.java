@@ -164,6 +164,7 @@ public class SettingsManager {
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
+        sword_title = settings.getString("setup-sword.title");
         max_infinitepk_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
         max_infinitepk_x = settings.getInt("infinitepk.max_x");
         max_infinitepk_y = settings.getInt("infinitepk.max_y");

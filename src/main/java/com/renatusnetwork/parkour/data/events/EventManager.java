@@ -94,7 +94,7 @@ public class EventManager {
                 String rewardMessage = "&7You have been rewarded ";
                 // means its a modified reward
                 if (reward != runningEvent.getLevel().getReward())
-                    rewardMessage += "&c&m" + Utils.formatNumber(runningEvent.getLevel().getReward()) + " &6" + Utils.formatNumber(reward) + " &eCoins";
+                    rewardMessage += "&c&m" + Utils.formatNumber(runningEvent.getLevel().getReward()) + "&6 " + Utils.formatNumber(reward) + " &eCoins";
                 else
                     rewardMessage += "&6" + Utils.formatNumber(reward) + " &eCoins";
                 

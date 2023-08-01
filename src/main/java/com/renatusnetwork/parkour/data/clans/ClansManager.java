@@ -267,7 +267,7 @@ public class ClansManager {
                 if (clanPlayer != null) {
 
                     if (messageMembers) {
-                        clanPlayer.sendMessage(Utils.translate("&6&l" + clan.getOwner().getPlayerName() +
+                        clanPlayer.sendMessage(Utils.translate("&6" + clan.getOwner().getPlayerName() +
                                 " &ehas disbanded your &6&lClan &6" + clan.getTag()));
                     }
 

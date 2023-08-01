@@ -7,7 +7,6 @@ public enum ModifierTypes
     GG_BOOSTER,
     LEVEL_BOOSTER,
     JACKPOT_BOOSTER,
-    PRESTIGE_BOOSTER,
     INFINITE_BOOSTER,
 
     LEVEL_DISCOUNT,
