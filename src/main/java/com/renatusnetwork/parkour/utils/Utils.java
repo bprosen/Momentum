@@ -28,6 +28,11 @@ public class Utils {
         return loreFormatted;
     }
 
+    public static String getCoinFormat(int oldCoins, int newCoins)
+    {
+        return oldCoins != newCoins ? "&c&m" + Utils.formatNumber(oldCoins) + "&6 " + Utils.formatNumber(newCoins) : "&6" + Utils.formatNumber(oldCoins);
+    }
+
     public static boolean isInteger(String input) {
         try {
             Integer.parseInt(input);

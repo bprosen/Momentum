@@ -154,13 +154,7 @@ public class InfinitePKManager {
                     coinReward *= booster.getMultiplier();
                 }
 
-                String rewardString;
-
-                // modifier reward!
-                if (event.getReward() != score)
-                    rewardString = "&c&m" + Utils.formatNumber(score) + "&6 " + Utils.formatNumber(coinReward);
-                else
-                    rewardString = "&6" + Utils.formatNumber(coinReward);
+                String rewardString = Utils.getCoinFormat(score, coinReward);
 
                 if (isBestScore(player.getName(), score))
                 {

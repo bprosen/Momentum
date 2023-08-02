@@ -334,15 +334,6 @@ public class MenuItemAction {
                 price *= (1.00f - discount.getDiscount());
             }
 
-            String totalString = "&6" + Utils.formatNumber(total + price);
-            String priceString = "&6" + Utils.formatNumber(price);
-
-            if (oldTotal != total)
-                totalString = "&c&m" + Utils.formatNumber(oldTotal + oldPrice) + "&6 " + Utils.formatNumber(total + price);
-
-            if (oldPrice != price)
-                priceString = "&c&m" + Utils.formatNumber(oldPrice) + "&6 " + Utils.formatNumber(price);
-
             Inventory openInventory = player.getOpenInventory().getTopInventory();
 
             if (coins >= total + price)
@@ -351,12 +342,12 @@ public class MenuItemAction {
                 ItemMeta itemMeta = itemStack.getItemMeta();
 
                 itemMeta.setDisplayName(Utils.translate(
-                        "&cClick to confirm &a" + level.getFormattedTitle() + " &cfor " + priceString + " &eCoins"
+                        "&cClick to confirm &a" + level.getFormattedTitle() + " &cfor " + Utils.getCoinFormat(oldPrice, price) + " &eCoins"
                 ));
 
                 List<String> loreString = new ArrayList<>();
                 loreString.add(Utils.translate(" &7This will also confirm all other selected purchases"));
-                loreString.add(Utils.translate(" &7For a total of " + totalString + " &eCoins"));
+                loreString.add(Utils.translate(" &7For a total of " + Utils.getCoinFormat(oldTotal + oldPrice, total + price) + " &eCoins"));
 
                 List<Integer> slots = levelManager.getBuyingLevelsSlots(player.getName());
 

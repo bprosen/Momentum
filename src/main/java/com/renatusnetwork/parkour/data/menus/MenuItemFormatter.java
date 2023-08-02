@@ -95,6 +95,14 @@ public class MenuItemFormatter {
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
             itemMeta.setDisplayName(perk.getFormattedTitle());
 
+            int price = perk.getPrice();
+
+            if (playerStats.hasModifier(ModifierTypes.SHOP_DISCOUNT))
+            {
+                Discount discount = (Discount) playerStats.getModifier(ModifierTypes.SHOP_DISCOUNT);
+                price *= (1.00f - discount.getDiscount());
+            }
+
             // Ownership Status Section
             itemLore.add("");
             if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
@@ -105,24 +113,11 @@ public class MenuItemFormatter {
                 // Click to Buy Section
                 if (perk.getPrice() > 0) {
                     int playerBalance = (int) playerStats.getCoins();
-                    int price = perk.getPrice();
-
-                    if (playerStats.hasModifier(ModifierTypes.SHOP_DISCOUNT))
-                    {
-                        Discount discount = (Discount) playerStats.getModifier(ModifierTypes.SHOP_DISCOUNT);
-                        price *= (1.00f - discount.getDiscount());
-                    }
 
                     if (playerBalance > price)
                         itemLore.add(Utils.translate("&7  Click to buy "));
                     else
-                    {
-                        String requiredString = "&6" + (perk.getPrice() - playerBalance);
-                        if (price != perk.getPrice())
-                            requiredString = "&c&m" + (perk.getPrice() - playerBalance) + "&6 " + (price - playerBalance);
-
-                        itemLore.add(Utils.translate("&7  Requires " + requiredString + " &7more &6Coins"));
-                    }
+                        itemLore.add(Utils.translate("&7  Requires " + Utils.getCoinFormat(perk.getPrice() - playerBalance, price - playerBalance) + " &7more &eCoins"));
                 }
             }
 
@@ -148,8 +143,8 @@ public class MenuItemFormatter {
                             itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
                     }
 
-                    if (perk.getPrice() > 0)
-                        itemLore.add(Utils.translate("&7 - Pay &6" + Utils.formatNumber(perk.getPrice()) + " Coins"));
+                    if (price > 0)
+                        itemLore.add(Utils.translate("&7 - Pay " + Utils.getCoinFormat(perk.getPrice(), price) + " &eCoins"));
                 }
             }
 
@@ -276,12 +271,7 @@ public class MenuItemFormatter {
                     price *= (1.00f - discount.getDiscount());
                 }
 
-                String priceString = "&6" + Utils.formatNumber(level.getPrice());
-
-                if (price != level.getPrice())
-                    priceString = "&c&m" + Utils.formatNumber(level.getPrice()) + "&6 " + price;
-
-                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for " + priceString + " &eCoins"));
+                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
             }
             else

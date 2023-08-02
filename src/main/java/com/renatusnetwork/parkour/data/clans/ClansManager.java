@@ -186,18 +186,12 @@ public class ClansManager {
                 clanXP *= booster.getMultiplier();
             }
 
-            String rewardString;
-
-            // its been boosted!
-            if (oldClanXP != clanXP)
-                rewardString = "&c&m" + Utils.formatNumber(oldClanXP) + "&6 " + Utils.formatNumber(clanXP);
-            else
-                rewardString = "&6" + Utils.formatNumber(clanXP);
-
+            String rewardString = Utils.getCoinFormat(oldClanXP, clanXP);
             int totalXP = clanXP + clan.getXP();
 
             // if max level, keep calculating xp
-            if (clan.isMaxLevel()) {
+            if (clan.isMaxLevel())
+            {
                 clan.addXP(clanXP);
                 ClansDB.setClanXP(totalXP, clan.getID());
                 sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +

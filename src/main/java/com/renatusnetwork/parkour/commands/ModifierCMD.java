@@ -48,7 +48,7 @@ public class ModifierCMD implements CommandExecutor
 
                         if (modifier != null)
                         {
-                            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                            PlayerStats playerStats = Parkour.getStatsManager().get(target);
 
                             if (a[0].equalsIgnoreCase("add"))
                             {
@@ -96,7 +96,7 @@ public class ModifierCMD implements CommandExecutor
                     {
                         // list modifiers that the player has
                         player.sendMessage(Utils.translate("&4List of &c" + target.getName() + "&4's Modifiers"));
-                        listModifiers(player, Parkour.getStatsManager().get(player).getModifiers());
+                        listModifiers(player, Parkour.getStatsManager().get(target).getModifiers());
                     }
                     else
                     {

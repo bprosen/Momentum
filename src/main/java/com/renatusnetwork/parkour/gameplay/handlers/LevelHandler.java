@@ -197,12 +197,7 @@ public class LevelHandler {
                     String completionMessage = Utils.translate(Parkour.getSettingsManager().levels_message_completion);
 
                     completionMessage = completionMessage.replace("%title%", level.getFormattedTitle());
-
-                    if (level.getReward() != reward)
-                        completionMessage = completionMessage.replace("%reward%", Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(reward)));
-                    else
-                        completionMessage = completionMessage.replace("%reward%", Utils.formatNumber(reward));
-
+                    completionMessage = completionMessage.replace("%reward%", Utils.translate(Utils.getCoinFormat(level.getReward(), reward)));
                     completionMessage = completionMessage.replace("%completions%",
                             Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(levelName)));
 
