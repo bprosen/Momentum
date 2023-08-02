@@ -5,6 +5,8 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.ParkourEventEndEvent;
 import com.renatusnetwork.parkour.data.events.types.*;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -84,6 +86,12 @@ public class EventManager {
                 // give higher reward if prestiged
                 int prestiges = playerStats.getPrestiges();
                 int reward = parkourEventEndEvent.getReward();
+
+                if (playerStats.hasModifier(ModifierTypes.EVENT_BOOSTER))
+                {
+                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.EVENT_BOOSTER);
+                    reward *= booster.getMultiplier();
+                }
 
                 if (prestiges > 0 && reward > 0)
                     reward *= playerStats.getPrestigeMultiplier();

@@ -3,6 +3,9 @@ package com.renatusnetwork.parkour.data.clans;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.ClanXPRewardEvent;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
+import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
@@ -176,6 +179,12 @@ public class ClansManager {
         {
             int oldClanXP = clanXP;
             clanXP = event.getXP(); // override from event
+
+            if (playerStats.hasModifier(ModifierTypes.CLAN_XP_BOOSTER))
+            {
+                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.CLAN_XP_BOOSTER);
+                clanXP *= booster.getMultiplier();
+            }
 
             String rewardString;
 

@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
+import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.ranks.RanksYAML;
@@ -104,13 +105,23 @@ public class MenuItemFormatter {
                 // Click to Buy Section
                 if (perk.getPrice() > 0) {
                     int playerBalance = (int) playerStats.getCoins();
+                    int price = perk.getPrice();
 
-                    if (playerBalance > perk.getPrice())
+                    if (playerStats.hasModifier(ModifierTypes.SHOP_DISCOUNT))
+                    {
+                        Discount discount = (Discount) playerStats.getModifier(ModifierTypes.SHOP_DISCOUNT);
+                        price *= (1.00f - discount.getDiscount());
+                    }
+
+                    if (playerBalance > price)
                         itemLore.add(Utils.translate("&7  Click to buy "));
-                    else {
-                        int requiredCoins = perk.getPrice() - playerBalance;
+                    else
+                    {
+                        String requiredString = "&6" + (perk.getPrice() - playerBalance);
+                        if (price != perk.getPrice())
+                            requiredString = "&c&m" + (perk.getPrice() - playerBalance) + "&6 " + (price - playerBalance);
 
-                        itemLore.add(Utils.translate("&7  Requires &6" + Utils.formatNumber(requiredCoins) + " &7more &6Coins"));
+                        itemLore.add(Utils.translate("&7  Requires " + requiredString + " &7more &6Coins"));
                     }
                 }
             }
@@ -256,7 +267,21 @@ public class MenuItemFormatter {
                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
             {
-                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"));
+
+                int price = level.getPrice();
+
+                if (playerStats.hasModifier(ModifierTypes.LEVEL_DISCOUNT))
+                {
+                    Discount discount = (Discount) playerStats.getModifier(ModifierTypes.LEVEL_DISCOUNT);
+                    price *= (1.00f - discount.getDiscount());
+                }
+
+                String priceString = "&6" + Utils.formatNumber(level.getPrice());
+
+                if (price != level.getPrice())
+                    priceString = "&c&m" + Utils.formatNumber(level.getPrice()) + "&6 " + price;
+
+                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for " + priceString + " &eCoins"));
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
             }
             else

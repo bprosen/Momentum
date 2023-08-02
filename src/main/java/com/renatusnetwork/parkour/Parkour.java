@@ -132,12 +132,6 @@ public class Parkour extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CropGrowthListener(), this);
         getServer().getPluginManager().registerEvents(new BowListener(), this);
         getServer().getPluginManager().registerEvents(new GlideListener(), this);
-        getServer().getPluginManager().registerEvents(new GGRewardListener(), this);
-        getServer().getPluginManager().registerEvents(new InfiniteEndListener(), this);
-        getServer().getPluginManager().registerEvents(new EventEndListener(), this);
-        getServer().getPluginManager().registerEvents(new LevelCompletionListener(), this);
-        getServer().getPluginManager().registerEvents(new ClanXPListener(), this);
-        getServer().getPluginManager().registerEvents(new JackpotListener(), this);
 
         WorldEdit.getInstance().getEventBus().register(new SelectionListener());
 

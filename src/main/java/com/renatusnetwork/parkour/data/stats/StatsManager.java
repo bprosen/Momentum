@@ -6,6 +6,8 @@ import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -216,6 +218,12 @@ public class StatsManager {
             if (!event.isCancelled())
             {
                 reward = event.getReward();
+
+                if (playerStats.hasModifier(ModifierTypes.GG_BOOSTER))
+                {
+                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.GG_BOOSTER);
+                    reward *= booster.getMultiplier();
+                }
 
                 String rewardString;
                 // means its been boosted!

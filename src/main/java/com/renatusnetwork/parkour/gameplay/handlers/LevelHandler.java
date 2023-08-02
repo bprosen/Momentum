@@ -11,6 +11,8 @@ import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -142,6 +144,13 @@ public class LevelHandler {
                     int prestiges = playerStats.getPrestiges();
                     int reward = event.getReward();
 
+                    // level booster
+                    if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                    {
+                        Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                        reward *= booster.getMultiplier();
+                    }
+
                     // if featured, set reward!
                     if (level.isFeaturedLevel())
                         reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
@@ -158,6 +167,13 @@ public class LevelHandler {
                         if (!jackpotEvent.isCancelled())
                         {
                             int bonus = jackpotEvent.getBonus();
+
+                            // jackpot booster
+                            if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
+                            {
+                                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                                bonus *= booster.getMultiplier();
+                            }
 
                             // add coins and add to completed, as well as broadcast completion
                             jackpot.addCompleted(player.getName());

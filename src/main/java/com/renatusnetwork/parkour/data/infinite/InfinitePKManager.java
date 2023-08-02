@@ -4,6 +4,8 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.InfiniteEndEvent;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -145,6 +147,13 @@ public class InfinitePKManager {
                 }
 
                 int coinReward = event.getReward();
+
+                if (playerStats.hasModifier(ModifierTypes.INFINITE_BOOSTER))
+                {
+                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.INFINITE_BOOSTER);
+                    coinReward *= booster.getMultiplier();
+                }
+
                 String rewardString;
 
                 // modifier reward!
