@@ -1,14 +1,15 @@
 items:
-  RADIANT:
+  radiant:
     '1':
       title: "&CTEST"
+      modifier: booster-1
     '2':
       title: "&CTEST 2"
     '3':
       title: "&CTEST 3"
     '4':
       title: "&CTEST 4"
-  BRILLIANT:
+  brilliant:
     '1':
       title: "&4TEST"
     '2':
@@ -17,7 +18,7 @@ items:
       title: "&4TEST 3"
     '4':
       title: "&4TEST 4"
-  LEGENDARY:
+  legendary:
     '1':
       title: "&5TEST"
     '2':
@@ -26,3 +27,16 @@ items:
       title: "&5TEST 3"
     '4':
       title: "&5TEST 4"
+data:
+  radiant:
+    total: 0
+    holder: ""
+    modifier: ""
+  brilliant:
+    total: 0
+    holder: ""
+    modifier: ""
+  legendary:
+    total: 0
+    holder: ""
+    modifier: ""

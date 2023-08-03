@@ -118,9 +118,8 @@ public class MenuItemAction {
     private static void performBankItem(PlayerStats playerStats, MenuItem menuItem)
     {
         BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
-        BankItem bankItem = Parkour.getBankManager().getItem(bankItemType);
+        Parkour.getBankManager().bid(playerStats, bankItemType);
 
-        Parkour.getBankManager().bid(playerStats, (int) bankItem.getMinimumNextBid(), bankItemType);
         playerStats.getPlayer().closeInventory();
     }
 

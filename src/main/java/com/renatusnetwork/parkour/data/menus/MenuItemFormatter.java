@@ -62,7 +62,7 @@ public class MenuItemFormatter {
         itemMeta.setDisplayName(bankItem.getDisplayName());
 
         List<String> lore = new ArrayList<>();
-        lore.add(Utils.translate("current bid: " + bankItem.getCurrentTotal()));
+        lore.add(Utils.translate("current bid: " + bankItem.getTotalBalance()));
 
         if (!bankItem.hasCurrentHolder())
             lore.add(Utils.translate("&ccurrent holder: None"));

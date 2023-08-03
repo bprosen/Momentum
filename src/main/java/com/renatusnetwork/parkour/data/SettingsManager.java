@@ -114,10 +114,6 @@ public class SettingsManager {
     public Calendar cooldownCalendar;
     public Calendar currentDate;
 
-    public float radiantNextBidMinimum;
-    public float brilliantNextBidMinimum;
-    public float legendaryNextBidMinimum;
-
     public int radiantMinimumBid;
     public int brilliantMinimumBid;
     public int legendaryMinimumBid;
@@ -196,9 +192,6 @@ public class SettingsManager {
         prac_title = settings.getString("practice-plate.title");
         prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
         prac_hotbar_slot = settings.getInt("practice-plate.hotbar_slot");
-        radiantNextBidMinimum = (float) settings.getDouble("bank.radiant.min_next_bid_percentage");
-        brilliantNextBidMinimum = (float) settings.getDouble("bank.brilliant.min_next_bid_percentage");
-        legendaryNextBidMinimum = (float) settings.getDouble("bank.legendary.min_next_bid_percentage");
         radiantMinimumBid = settings.getInt("bank.radiant.min_starting_bid");
         brilliantMinimumBid = settings.getInt("bank.brilliant.min_starting_bid");
         legendaryMinimumBid = settings.getInt("bank.legendary.min_starting_bid");

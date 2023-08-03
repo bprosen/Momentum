@@ -10,13 +10,10 @@ database:
 main_world: "parkour"
 bank:
   radiant:
-    min_next_bid_percentage: 0.15
     min_starting_bid: 100
   brilliant:
-    min_next_bid_percentage: 0.15
     min_starting_bid: 1000
   legendary:
-    min_next_bid_percentage: 0.15
     min_starting_bid: 3000
   jackpot:
     length: 1800 # in seconds

@@ -3,8 +3,11 @@ package com.renatusnetwork.parkour.data.bank;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.types.*;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -27,11 +30,19 @@ public class BankManager
 
         // add into map as polymorphic
         items.put(BankItemType.RADIANT,
-                new RadiantItem(BankItemType.RADIANT, BankYAML.getTitle(BankItemType.RADIANT, radiantNum)));
+                new RadiantItem(BankItemType.RADIANT,
+                BankYAML.getTitle(BankItemType.RADIANT, radiantNum),
+                Parkour.getModifiersManager().getModifier(BankYAML.getModifier(BankItemType.RADIANT, radiantNum)));
+
         items.put(BankItemType.BRILLIANT,
-                new BrilliantItem(BankItemType.BRILLIANT, BankYAML.getTitle(BankItemType.BRILLIANT, brilliantNum)));
+                new BrilliantItem(BankItemType.BRILLIANT,
+                BankYAML.getTitle(BankItemType.BRILLIANT, brilliantNum),
+                Parkour.getModifiersManager().getModifier(BankYAML.getModifier(BankItemType.BRILLIANT, brilliantNum))));
+
         items.put(BankItemType.LEGENDARY,
-                new RadiantItem(BankItemType.LEGENDARY, BankYAML.getTitle(BankItemType.LEGENDARY, legendaryNum)));
+                new RadiantItem(BankItemType.LEGENDARY,
+                BankYAML.getTitle(BankItemType.LEGENDARY, legendaryNum),
+                Parkour.getModifiersManager().getModifier(BankYAML.getModifier(BankItemType.LEGENDARY, legendaryNum))));
 
         runScheduler();
     }
@@ -113,7 +124,7 @@ public class BankManager
         long balance = 0;
 
         for (BankItem bankItem : items.values())
-            balance += bankItem.getCurrentTotal();
+            balance += bankItem.getTotalBalance();
 
         return balance;
     }
@@ -143,26 +154,36 @@ public class BankManager
         return result;
     }
 
-    public void bid(PlayerStats playerStats, int bidAmount, BankItemType type)
+    public void bid(PlayerStats playerStats, BankItemType type)
     {
         BankItem bankItem = items.get(type);
 
         // make sure they do not bid on themselves
         if (!bankItem.hasCurrentHolder() || !bankItem.getCurrentHolder().equalsIgnoreCase(playerStats.getPlayerName()))
         {
-            int amountToRemove = bidAmount;
+            int bidAmount = bankItem.getNextBid();
 
-            // bid amount - their prev bid to adjust
-            if (bankItem.hasBid(playerStats.getPlayerName()))
-                amountToRemove -= bankItem.getBid(playerStats.getPlayerName());
-
-            if (playerStats.getCoins() >= bankItem.getNextBidMinimum())
+            if (playerStats.getCoins() >= bidAmount)
             {
-                Parkour.getStatsManager().removeCoins(playerStats, amountToRemove); // remove coins
+                String oldHolder = bankItem.getCurrentHolder();
+                Player player = Bukkit.getPlayer(oldHolder);
+                Modifier modifier = bankItem.getModifier();
+
+                // remove from cache
+                if (player != null)
+                    Parkour.getModifiersManager().removeModifier(Parkour.getStatsManager().get(player), modifier);
+                else
+                    // remove from db only
+                    Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
+
+                Parkour.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
                 bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder
                 bankItem.addBid(playerStats, bidAmount); // update in cache
                 bankItem.broadcastNewBid(playerStats, bidAmount); // broadcast bid
-                BankDB.updateBid(playerStats, type, bidAmount); // update in db
+                BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getPlayerName()); // update in config
+
+                // update player info
+                Parkour.getModifiersManager().addModifier(playerStats, bankItem.getModifier());
             }
             else
             {

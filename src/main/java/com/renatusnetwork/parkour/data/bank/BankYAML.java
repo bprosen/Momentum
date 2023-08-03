@@ -29,10 +29,11 @@ public class BankYAML
     public static int chooseBankItem(BankItemType type)
     {
         List<Integer> values = new ArrayList<>();
+        String lowerCase = type.toString().toLowerCase();
 
         for (int i = 1;; i++)
         {
-            if (isSection("items." + type.toString() + "." + i))
+            if (isSection("items." + lowerCase + "." + i))
                 values.add(i);
             else break;
         }
@@ -42,6 +43,33 @@ public class BankYAML
 
     public static String getTitle(BankItemType type, int bankItemNum)
     {
-        return bankConfig.getString("items." + type.toString() + "." + bankItemNum + ".title");
+        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + bankItemNum + ".title");
+    }
+
+    public static String getModifier(BankItemType type, int bankItemNum)
+    {
+        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + bankItemNum + ".modifier");
+    }
+
+    public static long getTotal(BankItemType type)
+    {
+        return bankConfig.getLong("data." + type.toString().toLowerCase() + ".total");
+    }
+
+    public static String getHolder(BankItemType type)
+    {
+        return bankConfig.getString("data." + type.toString().toLowerCase() + ".holder");
+    }
+
+    public static String getModifier(BankItemType type)
+    {
+        return bankConfig.getString("data." + type.toString().toLowerCase() + ".modifier");
+    }
+
+    public static void updateBid(BankItemType type, long newTotal, String newHolder)
+    {
+        bankConfig.set("data." + type + ".total", newTotal);
+        bankConfig.set("data." + type + ".holder", newHolder);
+        commit();
     }
 }

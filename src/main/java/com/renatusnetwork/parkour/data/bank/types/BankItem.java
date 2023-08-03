@@ -1,85 +1,50 @@
 package com.renatusnetwork.parkour.data.bank.types;
 
-import com.renatusnetwork.parkour.data.bank.BankDB;
+import com.renatusnetwork.parkour.data.bank.BankYAML;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public abstract class BankItem
 {
     private BankItemType type;
-    private long currentTotal;
-    private long nextBidMinimum;
-    private float minimumNextBidRate;
+    private long totalBalance;
+    private int nextBid;
     private String displayName;
     private String currentHolder;
-
     private String formattedType;
+    private Modifier modifier;
 
-    private HashMap<String, Long> playerBids;
-
-    public BankItem(BankItemType type, int minimumStartingBid, String displayName, String formattedType)
+    public BankItem(BankItemType type, int nextBid, String displayName, String formattedType, Modifier modifier)
     {
         this.type = type;
         this.displayName = displayName;
-        this.nextBidMinimum = minimumStartingBid;
+        this.nextBid = nextBid;
         this.formattedType = formattedType;
-
-        currentTotal = 0;
-        currentHolder = null;
-
-        playerBids = BankDB.getBids(type);
-
-        if (!playerBids.isEmpty())
-            restoreHighestBid();
+        this.totalBalance = BankYAML.getTotal(type);
+        this.currentHolder = BankYAML.getHolder(type);
+        this.modifier = modifier;
     }
 
-    private void restoreHighestBid()
-    {
-        Map.Entry<String, Long> highestBid = null;
-
-        for (Map.Entry<String, Long> bids : playerBids.entrySet())
-        {
-            if (highestBid == null || highestBid.getValue() < bids.getValue())
-                highestBid = bids;
-        }
-
-        if (highestBid != null)
-        {
-            currentTotal = highestBid.getValue();
-            currentHolder = highestBid.getKey();
-        }
-    }
-
-    public long getBid(String name)
-    {
-        return playerBids.get(name);
-    }
-
-    public boolean hasBid(String name)
-    {
-        return playerBids.containsKey(name);
-    }
-
-    public String getFormattedType() { return formattedType; }
+    public Modifier getModifier() { return modifier; }
 
     public String getDisplayName() { return displayName; }
 
-    public long getCurrentTotal() { return currentTotal; }
+    public long getTotalBalance() { return totalBalance; }
 
-    public long getNextBidMinimum() { return nextBidMinimum; }
-
-    public void setMinimumNextBidRate(float minimumNextBidRate) { this.minimumNextBidRate = minimumNextBidRate; }
+    public int getNextBid() { return nextBid; }
 
     public void addBid(PlayerStats playerStats, int amount)
     {
         this.currentHolder = playerStats.getPlayerName();
-        this.currentTotal += amount;
+        this.totalBalance += amount;
+        calcNextBid();
+    }
 
-        calcMinimumNextBid();
+    private void calcNextBid()
+    {
+        this.nextBid = (int) (Math.sqrt(100 * totalBalance));
     }
 
     public BankItemType getType()
@@ -94,28 +59,15 @@ public abstract class BankItem
 
     public boolean hasCurrentHolder() { return currentHolder != null; }
 
-    private void calcMinimumNextBid()
-    {
-        nextBidMinimum = currentTotal + ((int) (currentTotal * minimumNextBidRate));
-    }
-
-    public long getMinimumNextBid()
-    {
-        return nextBidMinimum;
-    }
-
     public void setCurrentHolder(String currentHolder) { this.currentHolder = currentHolder; }
 
     public void broadcastNewBid(PlayerStats playerStats, int bidAmount)
     {
         Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
-        Bukkit.broadcastMessage(Utils.translate(" &d&lNEW " + formattedType + " &d&lBANK BID"));
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(Utils.translate(
-                " &d" + playerStats.getPlayer().getDisplayName() + " &7put &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + getDisplayName()
-        ));
-        Bukkit.broadcastMessage(Utils.translate("   " + getDisplayName() + " &7total is now &6" + Utils.formatNumber(getCurrentTotal()) + " &eCoins &7in the " + formattedType + " &d&lBank"));
-        Bukkit.broadcastMessage(Utils.translate("   &7Bid &6" + Utils.formatNumber(getMinimumNextBid()) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
+        Bukkit.broadcastMessage(Utils.translate("&d&lNEW " + formattedType + " &d&lBANK BID"));
+        Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getPlayer().getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + getDisplayName()));
+        Bukkit.broadcastMessage(Utils.translate("&7Bid &6" + Utils.formatNumber(nextBid) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
+        Bukkit.broadcastMessage(Utils.translate( getDisplayName() + " &7total is now &6" + Utils.formatNumber(totalBalance) + " &eCoins &7in the " + formattedType + " &d&lBank"));
         Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
     }
 }
