@@ -185,7 +185,7 @@ public class Utils {
     public static void setHotbar(Player player)
     {
         // loop through and set
-        for (Map.Entry<Integer, ItemStack> entry : Parkour.getSettingsManager().customJoinInventory.entrySet())
+        for (Map.Entry<Integer, ItemStack> entry : Parkour.getSettingsManager().custom_join_inventory.entrySet())
             player.getInventory().setItem(entry.getKey(), entry.getValue());
     }
 

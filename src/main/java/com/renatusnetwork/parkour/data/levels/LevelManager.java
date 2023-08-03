@@ -41,7 +41,7 @@ public class LevelManager {
         loadLevelsInMenus();
         pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
-        tutorialLevel = get(Parkour.getSettingsManager().tutorialLevelName);
+        tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
         startScheduler(plugin);
     }
 
@@ -51,7 +51,7 @@ public class LevelManager {
         for (String levelName : LevelsYAML.getNames())
             load(levelName);
 
-        tutorialLevel = get(Parkour.getSettingsManager().tutorialLevelName);
+        tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
 

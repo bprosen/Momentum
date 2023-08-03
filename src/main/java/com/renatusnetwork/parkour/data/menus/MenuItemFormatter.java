@@ -384,7 +384,7 @@ public class MenuItemFormatter {
                 {
                     itemLore.add(Utils.translate("  &7On cooldown &6(-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%)"));
                     itemLore.add(Utils.translate("    &7For " +
-                            Time.elapsedShortened((Parkour.getSettingsManager().cooldownCalendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
+                            Time.elapsedShortened((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
                     );
                 }
             }

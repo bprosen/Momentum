@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.bank.types;
 
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.BankYAML;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -12,24 +13,28 @@ public abstract class BankItem
     private long totalBalance;
     private int nextBid;
     private String displayName;
-    private String currentHolder;
     private String formattedType;
+    private String currentHolder;
     private Modifier modifier;
 
-    public BankItem(BankItemType type, int nextBid, String displayName, String formattedType, Modifier modifier)
+    public BankItem(BankItemType type)
     {
         this.type = type;
-        this.displayName = displayName;
-        this.nextBid = nextBid;
-        this.formattedType = formattedType;
         this.totalBalance = BankYAML.getTotal(type);
         this.currentHolder = BankYAML.getHolder(type);
-        this.modifier = modifier;
+        this.modifier = Parkour.getModifiersManager().getModifier(BankYAML.getModifier(type));
     }
 
     public Modifier getModifier() { return modifier; }
 
+    public void setModifier(Modifier modifier) { this.modifier = modifier; }
+
     public String getDisplayName() { return displayName; }
+
+    public void setFormattedType(String formattedType)
+    {
+        this.formattedType = formattedType;
+    }
 
     public long getTotalBalance() { return totalBalance; }
 

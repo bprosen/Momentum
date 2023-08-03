@@ -18,7 +18,10 @@ bank:
   jackpot:
     length: 1800 # in seconds
 minimum_pay_amount: 10.0
-
+blackmarket:
+  reset_time:
+    day: sunday
+    hour: 15
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10

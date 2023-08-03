@@ -2,10 +2,10 @@ package com.renatusnetwork.parkour.data.bank;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BankYAML
@@ -26,29 +26,22 @@ public class BankYAML
         return bankConfig.isSet(pathName + "." + valuePath);
     }
 
-    public static int chooseBankItem(BankItemType type)
+    public static String chooseBankItem(BankItemType type)
     {
-        List<Integer> values = new ArrayList<>();
         String lowerCase = type.toString().toLowerCase();
+        List<String> keys = new ArrayList<>(bankConfig.getConfigurationSection("items." + lowerCase).getKeys(false));
 
-        for (int i = 1;; i++)
-        {
-            if (isSection("items." + lowerCase + "." + i))
-                values.add(i);
-            else break;
-        }
-
-        return values.get(ThreadLocalRandom.current().nextInt(values.size() - 1));
+        return keys.get(ThreadLocalRandom.current().nextInt(keys.size()));
     }
 
-    public static String getTitle(BankItemType type, int bankItemNum)
+    public static String getTitle(BankItemType type, String name)
     {
-        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + bankItemNum + ".title");
+        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + name + ".title");
     }
 
-    public static String getModifier(BankItemType type, int bankItemNum)
+    public static String getModifier(BankItemType type, String name)
     {
-        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + bankItemNum + ".modifier");
+        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + name + ".modifier");
     }
 
     public static long getTotal(BankItemType type)
@@ -70,6 +63,26 @@ public class BankYAML
     {
         bankConfig.set("data." + type + ".total", newTotal);
         bankConfig.set("data." + type + ".holder", newHolder);
+        commit();
+    }
+
+    public static void resetBid(BankItemType type, String modifierName)
+    {
+        bankConfig.set("data." + type + ".holder", "");
+
+        switch (type)
+        {
+            case RADIANT:
+                bankConfig.set("data." + type + ".total", Parkour.getSettingsManager().radiant_minimum_bid);
+                break;
+            case BRILLIANT:
+                bankConfig.set("data." + type + ".total", Parkour.getSettingsManager().brilliant_minimum_bid);
+                break;
+            case LEGENDARY:
+                bankConfig.set("data." + type + ".total", Parkour.getSettingsManager().legendary_minimum_bid);
+                break;
+        }
+        bankConfig.set("data." + type + ".modifier", modifierName);
         commit();
     }
 }

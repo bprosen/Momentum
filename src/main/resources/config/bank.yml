@@ -1,42 +1,44 @@
 items:
   radiant:
-    '1':
+    gg_booster:
       title: "&CTEST"
       modifier: booster-1
-    '2':
+    level_booster:
       title: "&CTEST 2"
-    '3':
+      modifier: booster-2
+    event_booster:
       title: "&CTEST 3"
-    '4':
-      title: "&CTEST 4"
+      modifier: booster-3
   brilliant:
-    '1':
-      title: "&4TEST"
-    '2':
-      title: "&4TEST 2"
-    '3':
-      title: "&4TEST 3"
-    '4':
-      title: "&4TEST 4"
+    gg_booster:
+      title: "&CTEST"
+      modifier: booster-1
+    level_booster:
+      title: "&CTEST 2"
+      modifier: booster-2
+    event_booster:
+      title: "&CTEST 3"
+      modifier: booster-3
   legendary:
-    '1':
-      title: "&5TEST"
-    '2':
-      title: "&5TEST 2"
-    '3':
-      title: "&5TEST 3"
-    '4':
-      title: "&5TEST 4"
+    gg_booster:
+      title: "&CTEST"
+      modifier: booster-1
+    level_booster:
+      title: "&CTEST 2"
+      modifier: booster-2
+    event_booster:
+      title: "&CTEST 3"
+      modifier: booster-3
 data:
   radiant:
     total: 0
     holder: ""
-    modifier: ""
+    item: gg_booster
   brilliant:
     total: 0
     holder: ""
-    modifier: ""
+    item: gg_booster
   legendary:
     total: 0
     holder: ""
-    modifier: ""
+    item: gg_booster

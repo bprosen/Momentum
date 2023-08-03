@@ -64,7 +64,7 @@ public class Jackpot
             {
                 end();
             }
-        }.runTaskLater(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().jackpotLength);
+        }.runTaskLater(Parkour.getPlugin(), 20 * Parkour.getSettingsManager().jackpot_length);
 
         reminderTask = new BukkitRunnable()
         {

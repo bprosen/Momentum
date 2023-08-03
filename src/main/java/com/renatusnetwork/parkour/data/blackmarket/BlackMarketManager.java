@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackMarketManager
@@ -20,8 +22,30 @@ public class BlackMarketManager
         inPreperation = false;
         artifacts = new ArrayList<>();
         running = null;
+
+        runScheduler();
     }
 
+    private void runScheduler()
+    {
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                Calendar bankCalendar = Parkour.getSettingsManager().black_market_reset_calendar;
+                Calendar currentCalendar = Calendar.getInstance();
+                currentCalendar.setTime(new Date());
+
+                // if bankCalendar is BEFORE current, run blackmarket!
+                if (bankCalendar.get(Calendar.DAY_OF_WEEK) == currentCalendar.get(Calendar.DAY_OF_WEEK) &&
+                    bankCalendar.get(Calendar.HOUR_OF_DAY) == currentCalendar.get(Calendar.HOUR_OF_DAY))
+                {
+                    start();
+                }
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 60 * 60, 20 * 60 * 60); // check every hour
+    }
     public void start()
     {
         if (!isRunning())
@@ -96,6 +120,17 @@ public class BlackMarketManager
 
             // TODO: reward here
             running = null;
+
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    // LOAD NEW BANK ITEMS!
+                    Parkour.getBankManager().resetItems();
+                    Parkour.getBankManager().broadcastReset();
+                }
+            }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
         }
         else
         {

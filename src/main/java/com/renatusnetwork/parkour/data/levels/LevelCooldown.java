@@ -31,7 +31,7 @@ public class LevelCooldown
     {
         completionsCount++;
 
-        Object[] keys = Parkour.getSettingsManager().cooldownModifiers.keySet().toArray();
+        Object[] keys = Parkour.getSettingsManager().cooldown_modifiers.keySet().toArray();
         boolean done = false;
 
         // do backwards iteration for algorithm
@@ -43,7 +43,7 @@ public class LevelCooldown
             if (value <= completionsCount)
             {
                 // calc from 1.00 - modifier
-                modifier = (float) (1.00 - Parkour.getSettingsManager().cooldownModifiers.get(value));
+                modifier = (float) (1.00 - Parkour.getSettingsManager().cooldown_modifiers.get(value));
                 done = true;
             }
         }

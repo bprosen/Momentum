@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data;
 
 import com.mysql.cj.exceptions.UnableToConnectException;
 import com.mysql.cj.protocol.a.LocalTimeValueEncoder;
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -100,7 +101,7 @@ public class SettingsManager {
     public int default_gg_timer;
     public int default_gg_coin_reward;
 
-    public String tutorialLevelName;
+    public String tutorial_level_name;
 
     public int prac_hotbar_slot;
     public String prac_title;
@@ -108,23 +109,24 @@ public class SettingsManager {
 
     public double minimum_pay_amount;
 
-    public HashMap<Integer, ItemStack> customJoinInventory;
+    public HashMap<Integer, ItemStack> custom_join_inventory;
 
-    public LinkedHashMap<Integer, Float> cooldownModifiers;
-    public Calendar cooldownCalendar;
-    public Calendar currentDate;
+    public LinkedHashMap<Integer, Float> cooldown_modifiers;
+    public Calendar cooldown_calendar;
 
-    public int radiantMinimumBid;
-    public int brilliantMinimumBid;
-    public int legendaryMinimumBid;
+    public int radiant_minimum_bid;
+    public int brilliant_minimum_bid;
+    public int legendary_minimum_bid;
 
-    public int jackpotLength;
+    public int jackpot_length;
 
     public int blackmarket_min_player_count;
 
+    public Calendar black_market_reset_calendar;
+
     public SettingsManager(FileConfiguration settings) {
-        currentDate = Calendar.getInstance();
-        currentDate.setTime(new Date());
+        cooldown_calendar = Calendar.getInstance();
+        cooldown_calendar.setTime(new Date());
         load(settings);
     }
 
@@ -188,16 +190,45 @@ public class SettingsManager {
         default_gg_timer = settings.getInt("gg.default_timer_in_seconds");
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
-        tutorialLevelName = settings.getString("levels.tutorial_level");
+        tutorial_level_name = settings.getString("levels.tutorial_level");
         prac_title = settings.getString("practice-plate.title");
         prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
         prac_hotbar_slot = settings.getInt("practice-plate.hotbar_slot");
-        radiantMinimumBid = settings.getInt("bank.radiant.min_starting_bid");
-        brilliantMinimumBid = settings.getInt("bank.brilliant.min_starting_bid");
-        legendaryMinimumBid = settings.getInt("bank.legendary.min_starting_bid");
-        jackpotLength = settings.getInt("bank.jackpot.length");
+        radiant_minimum_bid = settings.getInt("bank.radiant.min_starting_bid");
+        brilliant_minimum_bid = settings.getInt("bank.brilliant.min_starting_bid");
+        legendary_minimum_bid = settings.getInt("bank.legendary.min_starting_bid");
+        jackpot_length = settings.getInt("bank.jackpot.length");
 
         minimum_pay_amount = settings.getDouble("minimum_pay_amount");
+
+        black_market_reset_calendar = Calendar.getInstance();
+        String day = settings.getString("bank.reset_time.day");
+        switch (day)
+        {
+            case "sunday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                break;
+            case "monday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                break;
+            case "tuesday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                break;
+            case "wednesday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                break;
+            case "thursday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                break;
+            case "friday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                break;
+            case "saturday":
+                black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                break;
+        }
+        black_market_reset_calendar.set(Calendar.HOUR_OF_DAY, settings.getInt("bank.reset_time.hour"));
+
         // load the respawn point for infinite pk if they enter from spawn
         String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
         // need to null check jic
@@ -209,7 +240,7 @@ public class SettingsManager {
                     Float.parseFloat(infinitePKSplit[4]), Float.parseFloat(infinitePKSplit[5]));
         }
 
-        customJoinInventory = new HashMap<>();
+        custom_join_inventory = new HashMap<>();
 
         // hotbar length!
         for (int i = 0; i < 9; i++)
@@ -237,7 +268,7 @@ public class SettingsManager {
 
                 itemStack.setItemMeta(itemMeta);
 
-                customJoinInventory.put(i, itemStack);
+                custom_join_inventory.put(i, itemStack);
             }
         }
     }

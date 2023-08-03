@@ -21,30 +21,42 @@ public class BankManager
     public BankManager()
     {
         currentJackpot = null;
+
+        loadCache();
+        runScheduler();
+    }
+
+    public void resetItems()
+    {
+        // reset items
+        String radiantItem = BankYAML.chooseBankItem(BankItemType.RADIANT);
+        String brilliantItem = BankYAML.chooseBankItem(BankItemType.BRILLIANT);
+        String legendaryItem = BankYAML.chooseBankItem(BankItemType.LEGENDARY);
+
+        // reset info and set new modifier
+        BankYAML.resetBid(BankItemType.RADIANT, BankYAML.getModifier(BankItemType.RADIANT, radiantItem));
+        BankYAML.resetBid(BankItemType.BRILLIANT, BankYAML.getModifier(BankItemType.BRILLIANT, brilliantItem));
+        BankYAML.resetBid(BankItemType.LEGENDARY, BankYAML.getModifier(BankItemType.LEGENDARY, legendaryItem));
+
+        loadCache();
+    }
+
+    public void broadcastReset()
+    {
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+        Bukkit.broadcastMessage(Utils.translate("&d&lTHE BANK HAS BEEN RESET"));
+        Bukkit.broadcastMessage(Utils.translate("&7Head to &c/spawn &7to start bidding on the bank!"));
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+    }
+
+    private void loadCache()
+    {
         items = new HashMap<>();
 
-        // get random nums
-        int radiantNum = BankYAML.chooseBankItem(BankItemType.RADIANT);
-        int brilliantNum = BankYAML.chooseBankItem(BankItemType.BRILLIANT);
-        int legendaryNum = BankYAML.chooseBankItem(BankItemType.LEGENDARY);
-
         // add into map as polymorphic
-        items.put(BankItemType.RADIANT,
-                new RadiantItem(BankItemType.RADIANT,
-                BankYAML.getTitle(BankItemType.RADIANT, radiantNum),
-                Parkour.getModifiersManager().getModifier(BankYAML.getModifier(BankItemType.RADIANT, radiantNum)));
-
-        items.put(BankItemType.BRILLIANT,
-                new BrilliantItem(BankItemType.BRILLIANT,
-                BankYAML.getTitle(BankItemType.BRILLIANT, brilliantNum),
-                Parkour.getModifiersManager().getModifier(BankYAML.getModifier(BankItemType.BRILLIANT, brilliantNum))));
-
-        items.put(BankItemType.LEGENDARY,
-                new RadiantItem(BankItemType.LEGENDARY,
-                BankYAML.getTitle(BankItemType.LEGENDARY, legendaryNum),
-                Parkour.getModifiersManager().getModifier(BankYAML.getModifier(BankItemType.LEGENDARY, legendaryNum))));
-
-        runScheduler();
+        items.put(BankItemType.RADIANT, new RadiantItem());
+        items.put(BankItemType.BRILLIANT, new BrilliantItem());
+        items.put(BankItemType.LEGENDARY, new RadiantItem());
     }
 
     private void runScheduler()
