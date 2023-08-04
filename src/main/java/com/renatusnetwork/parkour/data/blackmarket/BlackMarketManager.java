@@ -121,14 +121,25 @@ public class BlackMarketManager
             // TODO: reward here
             running = null;
 
+            // ending schedulers
             new BukkitRunnable()
             {
                 @Override
                 public void run()
                 {
-                    // LOAD NEW BANK ITEMS!
-                    Parkour.getBankManager().resetItems();
-                    Parkour.getBankManager().broadcastReset();
+                    // run final jackpot 5 mins later
+                    Parkour.getBankManager().startJackpot();
+
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            // LOAD NEW BANK ITEMS!
+                            Parkour.getBankManager().resetItems();
+                            Parkour.getBankManager().broadcastReset();
+                        }
+                    }.runTaskLater(Parkour.getPlugin(), (20 * Parkour.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
                 }
             }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
         }

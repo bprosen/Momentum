@@ -13,5 +13,12 @@ public class BrilliantItem extends BankItem
     {
         super(BankItemType.BRILLIANT);
         setFormattedType("&aBrilliant");
+        setMinimumLock(Parkour.getSettingsManager().brilliant_lock_minimum);
+    }
+
+    @Override
+    public void calcNextBid()
+    {
+        setNextBid(20 * (int) Math.sqrt(getTotalBalance()));
     }
 }

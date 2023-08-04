@@ -13,5 +13,12 @@ public class LegendaryItem extends BankItem
     {
         super(BankItemType.LEGENDARY);
         setFormattedType("&4Legendary");
+        setMinimumLock(Parkour.getSettingsManager().legendary_lock_minimum);
+    }
+
+    @Override
+    public void calcNextBid()
+    {
+        setNextBid(30 * (int) Math.sqrt(getTotalBalance()));
     }
 }

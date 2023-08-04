@@ -46,4 +46,9 @@ public class ModifiersDB
     {
         Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE uuid='" + playerStats.getUUID() + "' AND modifier_name='" + modifier.getName() + "'");
     }
+
+    public static void removeModifierName(String playerName, Modifier modifier)
+    {
+        Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE player_name='" + playerName + "' AND modifier_name='" + modifier.getName() + "'");
+    }
 }

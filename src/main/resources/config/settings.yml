@@ -11,12 +11,17 @@ main_world: "parkour"
 bank:
   radiant:
     min_starting_bid: 100
+    min_lock: 10000
   brilliant:
     min_starting_bid: 1000
+    min_lock: 20000
   legendary:
     min_starting_bid: 3000
+    min_lock: 30000
   jackpot:
     length: 1800 # in seconds
+  lock_chance: 0.1 # 10% chance
+  lock_minutes: 10 # 10 minute lock time
 minimum_pay_amount: 10.0
 blackmarket:
   reset_time:

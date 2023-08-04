@@ -1,9 +1,12 @@
 package com.renatusnetwork.parkour.data.modifiers;
 
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.modifiers.boosters.*;
 import com.renatusnetwork.parkour.data.modifiers.discounts.LevelDiscount;
 import com.renatusnetwork.parkour.data.modifiers.discounts.ShopDiscount;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,6 +77,17 @@ public class ModifiersManager
         // remove from cache and db
         playerStats.removeModifier(modifier);
         ModifiersDB.removeModifier(playerStats, modifier);
+    }
+
+    public void removeModifierName(String playerName, Modifier modifier)
+    {
+        Player player = Bukkit.getPlayer(playerName);
+
+        // remove from cache if not null
+        if (player != null)
+            removeModifier(Parkour.getStatsManager().get(player), modifier);
+        else
+            ModifiersDB.removeModifierName(playerName, modifier);
     }
 
     public Collection<Modifier> getModifiers()

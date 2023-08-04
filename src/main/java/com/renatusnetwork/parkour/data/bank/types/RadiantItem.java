@@ -13,5 +13,12 @@ public class RadiantItem extends BankItem
     {
         super(BankItemType.RADIANT);
         setFormattedType("&eRadiant");
+        setMinimumLock(Parkour.getSettingsManager().radiant_lock_minimum);
+    }
+
+    @Override
+    public void calcNextBid()
+    {
+        setNextBid(10 * (int) Math.sqrt(getTotalBalance()));
     }
 }

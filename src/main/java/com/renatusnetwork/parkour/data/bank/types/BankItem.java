@@ -13,9 +13,11 @@ public abstract class BankItem
     private long totalBalance;
     private int nextBid;
     private String displayName;
+    private int minimumLock;
     private String formattedType;
     private String currentHolder;
     private Modifier modifier;
+    private boolean locked;
 
     public BankItem(BankItemType type)
     {
@@ -23,9 +25,32 @@ public abstract class BankItem
         this.totalBalance = BankYAML.getTotal(type);
         this.currentHolder = BankYAML.getHolder(type);
         this.modifier = Parkour.getModifiersManager().getModifier(BankYAML.getModifier(type));
+        this.locked = false;
     }
 
+    public boolean isLocked()
+    {
+        return locked;
+    }
+
+    public void setLocked(boolean isLocked)
+    {
+        this.locked = isLocked;
+    }
+
+    public String getFormattedType() { return formattedType; }
+
     public Modifier getModifier() { return modifier; }
+
+    public void setMinimumLock(int minimumLock)
+    {
+        this.minimumLock = minimumLock;
+    }
+
+    public int getMinimumLock()
+    {
+        return minimumLock;
+    }
 
     public void setModifier(Modifier modifier) { this.modifier = modifier; }
 
@@ -40,16 +65,16 @@ public abstract class BankItem
 
     public int getNextBid() { return nextBid; }
 
-    public void addBid(PlayerStats playerStats, int amount)
+    public void addTotal(int amount)
     {
-        this.currentHolder = playerStats.getPlayerName();
         this.totalBalance += amount;
-        calcNextBid();
     }
 
-    private void calcNextBid()
+    public abstract void calcNextBid();
+
+    public void setNextBid(int nextBid)
     {
-        this.nextBid = (int) (Math.sqrt(100 * totalBalance));
+        this.nextBid = nextBid;
     }
 
     public BankItemType getType()

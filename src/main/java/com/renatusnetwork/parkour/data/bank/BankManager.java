@@ -4,6 +4,8 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.types.*;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
+import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -28,6 +30,16 @@ public class BankManager
 
     public void resetItems()
     {
+        BankItem radiant = items.get(BankItemType.RADIANT);
+        BankItem brilliant = items.get(BankItemType.BRILLIANT);
+        BankItem legendary = items.get(BankItemType.LEGENDARY);
+        ModifiersManager modifiersManager = Parkour.getModifiersManager();
+
+        // remove modifiers
+        modifiersManager.removeModifierName(radiant.getCurrentHolder(), radiant.getModifier());
+        modifiersManager.removeModifierName(brilliant.getCurrentHolder(), brilliant.getModifier());
+        modifiersManager.removeModifierName(legendary.getCurrentHolder(), legendary.getModifier());
+
         // reset items
         String radiantItem = BankYAML.chooseBankItem(BankItemType.RADIANT);
         String brilliantItem = BankYAML.chooseBankItem(BankItemType.BRILLIANT);
@@ -56,7 +68,7 @@ public class BankManager
         // add into map as polymorphic
         items.put(BankItemType.RADIANT, new RadiantItem());
         items.put(BankItemType.BRILLIANT, new BrilliantItem());
-        items.put(BankItemType.LEGENDARY, new RadiantItem());
+        items.put(BankItemType.LEGENDARY, new LegendaryItem());
     }
 
     private void runScheduler()
@@ -173,38 +185,91 @@ public class BankManager
         // make sure they do not bid on themselves
         if (!bankItem.hasCurrentHolder() || !bankItem.getCurrentHolder().equalsIgnoreCase(playerStats.getPlayerName()))
         {
-            int bidAmount = bankItem.getNextBid();
-
-            if (playerStats.getCoins() >= bidAmount)
+            if (!bankItem.isLocked())
             {
-                String oldHolder = bankItem.getCurrentHolder();
-                Player player = Bukkit.getPlayer(oldHolder);
-                Modifier modifier = bankItem.getModifier();
+                int bidAmount = bankItem.getNextBid();
 
-                // remove from cache
-                if (player != null)
-                    Parkour.getModifiersManager().removeModifier(Parkour.getStatsManager().get(player), modifier);
+                if (playerStats.getCoins() >= bidAmount)
+                {
+
+                    boolean alreadyHasTier = false;
+
+                    // check through all items, for the items not currently being picked and if the current holder is the player, deny them (cant have two at once)
+                    for (BankItem item : items.values())
+                        if (item.getType() != type && item.getCurrentHolder().equalsIgnoreCase(playerStats.getPlayerName()))
+                            alreadyHasTier = true;
+
+                    if (!alreadyHasTier)
+                    {
+                        String oldHolder = bankItem.getCurrentHolder();
+                        Player player = Bukkit.getPlayer(oldHolder);
+
+                        Modifier modifier = bankItem.getModifier();
+
+                        // remove from cache
+                        if (player != null)
+                            Parkour.getModifiersManager().removeModifier(Parkour.getStatsManager().get(player), modifier);
+                        else
+                            // remove from db only
+                            Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
+
+                        Parkour.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
+                        bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder
+                        bankItem.addTotal(bidAmount); // update in cache
+                        bankItem.calcNextBid(); // calc next bid
+                        bankItem.broadcastNewBid(playerStats, bidAmount); // broadcast bid
+                        BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getPlayerName()); // update in config
+
+                        // update player info
+                        Parkour.getModifiersManager().addModifier(playerStats, bankItem.getModifier());
+
+                        // lock chance (has to be minimum and 10% chance)
+                        if (bankItem.getMinimumLock() < bankItem.getTotalBalance() && ThreadLocalRandom.current().nextInt(0, Parkour.getSettingsManager().lock_chance) == 0)
+                            lock(bankItem);
+                    }
+                    else
+                    {
+                        playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot hold two bank items at once!"));
+                    }
+                }
                 else
-                    // remove from db only
-                    Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
-
-                Parkour.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
-                bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder
-                bankItem.addBid(playerStats, bidAmount); // update in cache
-                bankItem.broadcastNewBid(playerStats, bidAmount); // broadcast bid
-                BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getPlayerName()); // update in config
-
-                // update player info
-                Parkour.getModifiersManager().addModifier(playerStats, bankItem.getModifier());
+                {
+                    playerStats.getPlayer().sendMessage(Utils.translate("&cYou do not have enough coins to raise the bid to &6" + Utils.formatNumber(bidAmount) + " &eCoins"));
+                }
             }
             else
             {
-                playerStats.getPlayer().sendMessage(Utils.translate("&cYou do not have enough coins to raise the bid to &6" + Utils.formatNumber(bidAmount) + " &eCoins"));
+                playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot bid when it is locked!"));
             }
         }
         else
         {
             playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot bid on yourself"));
         }
+    }
+
+    private void lock(BankItem bankItem)
+    {
+        // lock timer
+        bankItem.setLocked(true);
+
+        Bukkit.broadcastMessage("&d&m----------------------------------------");
+        Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " BANK HAS LOCKED"));
+        Bukkit.broadcastMessage(Utils.translate("&c" + bankItem.getCurrentHolder() + " &7gets the &d" + bankItem.getDisplayName()) + " &7for &d10 minutes");
+        Bukkit.broadcastMessage("&d&m----------------------------------------");
+
+        // unlock timer
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                Bukkit.broadcastMessage("&d&m----------------------------------------");
+                Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " BANK HAS UNLOCKED"));
+                Bukkit.broadcastMessage("&d&m----------------------------------------");
+
+                bankItem.setLocked(false);
+            }
+        }.runTaskLater(Parkour.getPlugin(), 20 * 60 * Parkour.getSettingsManager().lock_minutes);
     }
 }
