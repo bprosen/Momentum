@@ -117,10 +117,15 @@ public class MenuItemAction {
 
     private static void performBankItem(PlayerStats playerStats, MenuItem menuItem)
     {
-        BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
-        Parkour.getBankManager().bid(playerStats, bankItemType);
+        String typeValue = menuItem.getTypeValue();
 
-        playerStats.getPlayer().closeInventory();
+        if (!typeValue.endsWith("_total"))
+        {
+            BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue().toUpperCase());
+            Parkour.getBankManager().bid(playerStats, bankItemType);
+
+            playerStats.getPlayer().closeInventory();
+        }
     }
 
     private static void performRandomLevel(PlayerStats playerStats)

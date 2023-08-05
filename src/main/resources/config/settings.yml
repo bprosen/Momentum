@@ -24,7 +24,7 @@ bank:
   lock_minutes: 10 # 10 minute lock time
 minimum_pay_amount: 10.0
 blackmarket:
-  reset_time:
+  start_time:
     day: sunday
     hour: 15
 gg:

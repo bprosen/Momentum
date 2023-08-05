@@ -195,9 +195,9 @@ public class Parkour extends JavaPlugin {
         events = new EventManager();
         protocol = ProtocolLibrary.getProtocolManager();
         saves = new SavesManager();
+        modifiers = new ModifiersManager();
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
-        modifiers = new ModifiersManager();
     }
 
     private static void unloadClasses() {

@@ -39,6 +39,12 @@ public class BankYAML
         return bankConfig.getString("items." + type.toString().toLowerCase() + "." + name + ".title");
     }
 
+    public static String getTitle(BankItemType type)
+    {
+        String item = bankConfig.getString("data." + type.toString().toLowerCase() + ".item");
+        return getTitle(type, item);
+    }
+
     public static String getModifier(BankItemType type, String name)
     {
         return bankConfig.getString("items." + type.toString().toLowerCase() + "." + name + ".modifier");
@@ -49,6 +55,12 @@ public class BankYAML
         return bankConfig.getLong("data." + type.toString().toLowerCase() + ".total");
     }
 
+    public static String getDescription(BankItemType type)
+    {
+        String item = bankConfig.getString("data." + type.toString().toLowerCase() + ".item");
+        return bankConfig.getString("items." + type.toString().toLowerCase() + "." + item + ".description");
+    }
+
     public static String getHolder(BankItemType type)
     {
         return bankConfig.getString("data." + type.toString().toLowerCase() + ".holder");
@@ -56,33 +68,34 @@ public class BankYAML
 
     public static String getModifier(BankItemType type)
     {
-        return bankConfig.getString("data." + type.toString().toLowerCase() + ".modifier");
+        return getModifier(type, bankConfig.getString("data." + type.toString().toLowerCase() + ".item"));
     }
 
     public static void updateBid(BankItemType type, long newTotal, String newHolder)
     {
-        bankConfig.set("data." + type + ".total", newTotal);
-        bankConfig.set("data." + type + ".holder", newHolder);
+        bankConfig.set("data." + type.toString().toLowerCase() + ".total", newTotal);
+        bankConfig.set("data." + type.toString().toLowerCase() + ".holder", newHolder);
         commit();
     }
 
-    public static void resetBid(BankItemType type, String modifierName)
+    public static void resetBid(BankItemType type, String itemName)
     {
-        bankConfig.set("data." + type + ".holder", "");
+        String typeString = type.toString().toLowerCase();
+        bankConfig.set("data." + typeString + ".holder", "");
 
         switch (type)
         {
             case RADIANT:
-                bankConfig.set("data." + type + ".total", Parkour.getSettingsManager().radiant_minimum_bid);
+                bankConfig.set("data." + typeString + ".total", Parkour.getSettingsManager().radiant_minimum_bid);
                 break;
             case BRILLIANT:
-                bankConfig.set("data." + type + ".total", Parkour.getSettingsManager().brilliant_minimum_bid);
+                bankConfig.set("data." + typeString + ".total", Parkour.getSettingsManager().brilliant_minimum_bid);
                 break;
             case LEGENDARY:
-                bankConfig.set("data." + type + ".total", Parkour.getSettingsManager().legendary_minimum_bid);
+                bankConfig.set("data." + typeString + ".total", Parkour.getSettingsManager().legendary_minimum_bid);
                 break;
         }
-        bankConfig.set("data." + type + ".modifier", modifierName);
+        bankConfig.set("data." + typeString + ".item", itemName);
         commit();
     }
 }

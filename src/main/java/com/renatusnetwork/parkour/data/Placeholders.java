@@ -229,6 +229,9 @@ public class Placeholders extends PlaceholderExpansion
                             {
                                 if (!Parkour.getStatsManager().isLoadingLeaderboards())
                                 {
+                                    if (level.getLeaderboard().isEmpty())
+                                        return "N/A";
+
                                     LevelCompletion completion = level.getLeaderboard().get(posInt - 1); // adjust for index
 
                                     // return name or value

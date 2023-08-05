@@ -212,7 +212,7 @@ public class SettingsManager {
         lock_chance = (int) (100.0 * settings.getDouble("bank.lock_chance"));
         lock_minutes = settings.getInt("bank.lock_minutes");
         black_market_reset_calendar = Calendar.getInstance();
-        String day = settings.getString("bank.reset_time.day");
+        String day = settings.getString("blackmarket.start_time.day");
         switch (day)
         {
             case "sunday":

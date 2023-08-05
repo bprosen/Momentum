@@ -136,25 +136,29 @@ public class EventManager {
                     Random ran = new Random();
                     EventType eventType = eventTypes[ran.nextInt(eventTypes.length)];
                     List<Level> eventLevels = Parkour.getLevelManager().getEventLevelsFromType(eventType);
-                    Level eventLevel = eventLevels.get(ran.nextInt(eventLevels.size()));
 
-                    switch (eventType)
+                    if (!eventLevels.isEmpty())
                     {
-                        case PVP:
-                            startEvent(new PvPEvent(eventLevel));
-                            break;
-                        case RISING_WATER:
-                            startEvent(new RisingWaterEvent(eventLevel));
-                            break;
-                        case FALLING_ANVIL:
-                            startEvent(new FallingAnvilEvent(eventLevel));
-                            break;
-                        case ASCENT:
-                            startEvent(new AscentEvent(eventLevel));
-                            break;
-                        case MAZE:
-                            startEvent(new MazeEvent(eventLevel));
-                            break;
+                        Level eventLevel = eventLevels.get(ran.nextInt(eventLevels.size()));
+
+                        switch (eventType)
+                        {
+                            case PVP:
+                                startEvent(new PvPEvent(eventLevel));
+                                break;
+                            case RISING_WATER:
+                                startEvent(new RisingWaterEvent(eventLevel));
+                                break;
+                            case FALLING_ANVIL:
+                                startEvent(new FallingAnvilEvent(eventLevel));
+                                break;
+                            case ASCENT:
+                                startEvent(new AscentEvent(eventLevel));
+                                break;
+                            case MAZE:
+                                startEvent(new MazeEvent(eventLevel));
+                                break;
+                        }
                     }
                 }
             }

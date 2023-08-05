@@ -255,7 +255,7 @@ public class BankManager
 
         Bukkit.broadcastMessage("&d&m----------------------------------------");
         Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " BANK HAS LOCKED"));
-        Bukkit.broadcastMessage(Utils.translate("&c" + bankItem.getCurrentHolder() + " &7gets the &d" + bankItem.getDisplayName()) + " &7for &d10 minutes");
+        Bukkit.broadcastMessage(Utils.translate("&c" + bankItem.getCurrentHolder() + " &7gets the &d" + bankItem.getTitle()) + " &7for &d10 minutes");
         Bukkit.broadcastMessage("&d&m----------------------------------------");
 
         // unlock timer

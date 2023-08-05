@@ -55,21 +55,47 @@ public class MenuItemFormatter {
     private static ItemStack getBankItem(PlayerStats playerStats, MenuItem menuItem)
     {
         ItemStack item = new ItemStack(menuItem.getItem());
-        BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue());
-        BankItem bankItem = Parkour.getBankManager().getItem(bankItemType);
+        String typeValue = menuItem.getTypeValue();
         ItemMeta itemMeta = item.getItemMeta();
 
-        itemMeta.setDisplayName(bankItem.getDisplayName());
+        BankItemType bankItemType;
+        BankItem bankItem;
 
-        List<String> lore = new ArrayList<>();
-        lore.add(Utils.translate("current bid: " + bankItem.getTotalBalance()));
-
-        if (!bankItem.hasCurrentHolder())
-            lore.add(Utils.translate("&ccurrent holder: None"));
+        // if it ends in the total item, show it
+        if (typeValue.endsWith("_total"))
+        {
+            bankItemType = BankItemType.valueOf(typeValue.split("_total")[0].toUpperCase());
+            bankItem = Parkour.getBankManager().getItem(bankItemType);
+            itemMeta.setDisplayName(Utils.translate("&d&lThis Bank's Total"));
+            List<String> lore = new ArrayList<String>() {{ add(Utils.translate("&6" + Utils.formatNumber(bankItem.getTotalBalance()) + " &eCoins")); }};
+            itemMeta.setLore(lore);
+        }
         else
-            lore.add(Utils.translate("&ccurrent holder: " + bankItem.getCurrentHolder()));
+        {
+            bankItemType = BankItemType.valueOf(typeValue.toUpperCase());
+            bankItem = Parkour.getBankManager().getItem(bankItemType);
 
-        itemMeta.setLore(lore);
+            itemMeta.setDisplayName(Utils.translate(bankItem.getTitle()));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(Utils.translate("next bid: " + bankItem.getNextBid()));
+
+            if (!bankItem.hasCurrentHolder())
+                lore.add(Utils.translate("&ccurrent holder: None"));
+            else
+                lore.add(Utils.translate("&ccurrent holder: " + bankItem.getCurrentHolder()));
+
+            lore.add("");
+            lore.add(Utils.translate(bankItem.getTitle()));
+            lore.add(Utils.translate(bankItem.getDescription()));
+            itemMeta.setLore(lore);
+        }
+
+        // if glowing, add glow effect
+        if (menuItem.isGlowing()) {
+            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
 
         item.setItemMeta(itemMeta);
         return item;
