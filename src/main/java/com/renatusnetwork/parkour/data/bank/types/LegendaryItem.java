@@ -19,6 +19,11 @@ public class LegendaryItem extends BankItem
     @Override
     public void calcNextBid()
     {
-        setNextBid(30 * (int) Math.sqrt(getTotalBalance()));
+        long total = getTotalBalance();
+
+        if (total < Parkour.getSettingsManager().legendary_minimum_bid)
+            setNextBid(Parkour.getSettingsManager().legendary_minimum_bid);
+        else
+            setNextBid((int) (30 * Math.sqrt(total)));
     }
 }

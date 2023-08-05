@@ -29,6 +29,8 @@ public abstract class BankItem
         this.modifier = Parkour.getModifiersManager().getModifier(BankYAML.getModifier(type));
         this.description = BankYAML.getDescription(type);
         this.locked = false;
+
+        calcNextBid();
     }
 
     public boolean isLocked()
@@ -95,14 +97,4 @@ public abstract class BankItem
     public boolean hasCurrentHolder() { return currentHolder != null && !currentHolder.isEmpty(); }
 
     public void setCurrentHolder(String currentHolder) { this.currentHolder = currentHolder; }
-
-    public void broadcastNewBid(PlayerStats playerStats, int bidAmount)
-    {
-        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
-        Bukkit.broadcastMessage(Utils.translate("&d&lNEW " + formattedType + " &d&lBANK BID"));
-        Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getPlayer().getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + getTitle()));
-        Bukkit.broadcastMessage(Utils.translate("&7Bid &6" + Utils.formatNumber(nextBid) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
-        Bukkit.broadcastMessage(Utils.translate( getTitle() + " &7total is now &6" + Utils.formatNumber(totalBalance) + " &eCoins &7in the " + formattedType + " &d&lBank"));
-        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
-    }
 }

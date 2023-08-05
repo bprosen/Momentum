@@ -19,6 +19,11 @@ public class BrilliantItem extends BankItem
     @Override
     public void calcNextBid()
     {
-        setNextBid(20 * (int) Math.sqrt(getTotalBalance()));
+        long total = getTotalBalance();
+
+        if (total < Parkour.getSettingsManager().brilliant_minimum_bid)
+            setNextBid(Parkour.getSettingsManager().brilliant_minimum_bid);
+        else
+            setNextBid((int) (20 * Math.sqrt(total)));
     }
 }

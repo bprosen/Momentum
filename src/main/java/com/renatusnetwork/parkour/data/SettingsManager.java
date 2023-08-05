@@ -122,7 +122,7 @@ public class SettingsManager {
     public int brilliant_lock_minimum;
     public int legendary_lock_minimum;
 
-    public int lock_chance;
+    public float lock_chance;
     public int lock_minutes;
 
     public int jackpot_length;
@@ -206,10 +206,10 @@ public class SettingsManager {
         legendary_minimum_bid = settings.getInt("bank.legendary.min_starting_bid");
         jackpot_length = settings.getInt("bank.jackpot.length");
         radiant_lock_minimum = settings.getInt("bank.radiant.min_lock");
-        brilliant_minimum_bid = settings.getInt("bank.brilliant.min_lock");
-        legendary_minimum_bid = settings.getInt("bank.legendary.min_lock");
+        brilliant_lock_minimum = settings.getInt("bank.brilliant.min_lock");
+        legendary_lock_minimum = settings.getInt("bank.legendary.min_lock");
         minimum_pay_amount = settings.getDouble("minimum_pay_amount");
-        lock_chance = (int) (100.0 * settings.getDouble("bank.lock_chance"));
+        lock_chance = (float) settings.getDouble("bank.lock_chance");
         lock_minutes = settings.getInt("bank.lock_minutes");
         black_market_reset_calendar = Calendar.getInstance();
         String day = settings.getString("blackmarket.start_time.day");

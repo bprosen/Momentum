@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -217,15 +218,15 @@ public class BankManager
                         bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder
                         bankItem.addTotal(bidAmount); // update in cache
                         bankItem.calcNextBid(); // calc next bid
-                        bankItem.broadcastNewBid(playerStats, bidAmount); // broadcast bid
+                        broadcastNewBid(playerStats, bankItem, bidAmount); // broadcast bid
                         BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getPlayerName()); // update in config
 
                         // update player info
                         Parkour.getModifiersManager().addModifier(playerStats, bankItem.getModifier());
 
                         // lock chance (has to be minimum and 10% chance)
-                        if (bankItem.getMinimumLock() < bankItem.getTotalBalance() && ThreadLocalRandom.current().nextInt(0, Parkour.getSettingsManager().lock_chance) == 0)
-                            lock(bankItem);
+                        if (bankItem.getMinimumLock() < bankItem.getTotalBalance() && ThreadLocalRandom.current().nextDouble(0, 100) <= Parkour.getSettingsManager().lock_chance)
+                            lock(playerStats, bankItem);
                     }
                     else
                     {
@@ -248,15 +249,15 @@ public class BankManager
         }
     }
 
-    private void lock(BankItem bankItem)
+    private void lock(PlayerStats playerStats, BankItem bankItem)
     {
         // lock timer
         bankItem.setLocked(true);
 
-        Bukkit.broadcastMessage("&d&m----------------------------------------");
-        Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " BANK HAS LOCKED"));
-        Bukkit.broadcastMessage(Utils.translate("&c" + bankItem.getCurrentHolder() + " &7gets the &d" + bankItem.getTitle()) + " &7for &d10 minutes");
-        Bukkit.broadcastMessage("&d&m----------------------------------------");
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+        Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " &d&lBANK HAS LOCKED"));
+        Bukkit.broadcastMessage(Utils.translate("&c" + playerStats.getPlayer().getDisplayName() + " &7gets &d" + bankItem.getTitle() + " &7for &d" + Parkour.getSettingsManager().lock_minutes + " minutes"));
+        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
 
         // unlock timer
         new BukkitRunnable()
@@ -264,12 +265,44 @@ public class BankManager
             @Override
             public void run()
             {
-                Bukkit.broadcastMessage("&d&m----------------------------------------");
-                Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " BANK HAS UNLOCKED"));
-                Bukkit.broadcastMessage("&d&m----------------------------------------");
+                Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+                Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " &d&lBANK HAS UNLOCKED"));
+                Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
 
                 bankItem.setLocked(false);
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 60 * Parkour.getSettingsManager().lock_minutes);
+    }
+
+    private void broadcastNewBid(PlayerStats playerStats, BankItem item, int bidAmount)
+    {
+        // only for people in spawn
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                HashMap<String, PlayerStats> players = Parkour.getStatsManager().getPlayerStats();
+
+                // thread safety
+                synchronized (players)
+                {
+                    for (PlayerStats stats : players.values())
+                    {
+                        Player player = stats.getPlayer();
+
+                        // only send new bank bid to people in spawn
+                        if (!stats.inLevel() && player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().main_world.getName()))
+                        {
+                            player.sendMessage(Utils.translate("&d&m----------------------------------------"));
+                            player.sendMessage(Utils.translate("&d&lNEW " + item.getFormattedType() + " &d&lBANK BID"));
+                            player.sendMessage(Utils.translate("&d" + playerStats.getPlayer().getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + item.getTitle()));
+                            player.sendMessage(Utils.translate("&7Pay &6" + Utils.formatNumber(item.getNextBid()) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
+                            player.sendMessage(Utils.translate("&d&m----------------------------------------"));
+                        }
+                    }
+                }
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 }

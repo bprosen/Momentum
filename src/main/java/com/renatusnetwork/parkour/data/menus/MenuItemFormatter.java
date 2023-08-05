@@ -66,7 +66,7 @@ public class MenuItemFormatter {
         {
             bankItemType = BankItemType.valueOf(typeValue.split("_total")[0].toUpperCase());
             bankItem = Parkour.getBankManager().getItem(bankItemType);
-            itemMeta.setDisplayName(Utils.translate("&d&lThis Bank's Total"));
+            itemMeta.setDisplayName(Utils.translate(bankItem.getFormattedType() + " &d&lBank's Total"));
             List<String> lore = new ArrayList<String>() {{ add(Utils.translate("&6" + Utils.formatNumber(bankItem.getTotalBalance()) + " &eCoins")); }};
             itemMeta.setLore(lore);
         }
@@ -78,16 +78,25 @@ public class MenuItemFormatter {
             itemMeta.setDisplayName(Utils.translate(bankItem.getTitle()));
 
             List<String> lore = new ArrayList<>();
-            lore.add(Utils.translate("next bid: " + bankItem.getNextBid()));
 
-            if (!bankItem.hasCurrentHolder())
-                lore.add(Utils.translate("&ccurrent holder: None"));
-            else
-                lore.add(Utils.translate("&ccurrent holder: " + bankItem.getCurrentHolder()));
+            if (bankItem.isLocked())
+                lore.add(Utils.translate("&4&lLOCKED"));
 
             lore.add("");
-            lore.add(Utils.translate(bankItem.getTitle()));
+
+            lore.add(Utils.translate(bankItem.getTitle() + " &7Modifier"));
             lore.add(Utils.translate(bankItem.getDescription()));
+
+            lore.add("");
+
+            if (!bankItem.hasCurrentHolder())
+                lore.add(Utils.translate("&7Current Holder &dNone"));
+            else
+                lore.add(Utils.translate("&7Current Holder &d" + bankItem.getCurrentHolder()));
+
+            // next bid
+            lore.add(Utils.translate("&7Pay &6" + Utils.formatNumber(bankItem.getNextBid()) + " &eCoins &7to take"));
+
             itemMeta.setLore(lore);
         }
 

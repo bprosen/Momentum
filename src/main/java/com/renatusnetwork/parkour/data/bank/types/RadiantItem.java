@@ -19,6 +19,11 @@ public class RadiantItem extends BankItem
     @Override
     public void calcNextBid()
     {
-        setNextBid(10 * (int) Math.sqrt(getTotalBalance()));
+        long total = getTotalBalance();
+
+        if (total < Parkour.getSettingsManager().radiant_minimum_bid)
+            setNextBid(Parkour.getSettingsManager().radiant_minimum_bid);
+        else
+            setNextBid((int) (10 * Math.sqrt(total)));
     }
 }
