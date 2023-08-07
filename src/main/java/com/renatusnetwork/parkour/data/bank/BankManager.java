@@ -25,7 +25,7 @@ public class BankManager
     {
         currentJackpot = null;
 
-        loadCache();
+        load();
         runScheduler();
     }
 
@@ -51,7 +51,7 @@ public class BankManager
         BankYAML.resetBid(BankItemType.BRILLIANT, BankYAML.getModifier(BankItemType.BRILLIANT, brilliantItem));
         BankYAML.resetBid(BankItemType.LEGENDARY, BankYAML.getModifier(BankItemType.LEGENDARY, legendaryItem));
 
-        loadCache();
+        load();
     }
 
     public void broadcastReset()
@@ -62,7 +62,7 @@ public class BankManager
         Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
     }
 
-    private void loadCache()
+    public void load()
     {
         items = new HashMap<>();
 

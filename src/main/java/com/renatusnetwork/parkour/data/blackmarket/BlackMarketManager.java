@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackMarketManager
@@ -23,9 +24,14 @@ public class BlackMarketManager
         artifacts = new ArrayList<>();
         running = null;
 
+        load();
         runScheduler();
     }
 
+    public void load()
+    {
+
+    }
     private void runScheduler()
     {
         new BukkitRunnable()
@@ -84,14 +90,27 @@ public class BlackMarketManager
                     }
                     else
                     {
-                        // reminder for players to join
-                        Bukkit.broadcastMessage(Utils.translate("&8&m-------------------------------"));
-                        Bukkit.broadcastMessage(Utils.translate("&8&lBLACK MARKET"));
-                        Bukkit.broadcastMessage(Utils.translate(""));
-                        Bukkit.broadcastMessage(Utils.translate("&8Come to the hollow depths of &c/spawn"));
-                        Bukkit.broadcastMessage(Utils.translate("&8for a risky trade of illegal wares."));
-                        Bukkit.broadcastMessage(Utils.translate("&8You have &c" + timerCount + " minutes..."));
-                        Bukkit.broadcastMessage(Utils.translate("&8&m-------------------------------"));
+                        HashMap<String, PlayerStats> stats = Parkour.getStatsManager().getPlayerStats();
+
+                        synchronized (stats)
+                        {
+                            for (PlayerStats stat : stats.values())
+                            {
+                                if (!running.inEvent(stat))
+                                {
+                                    Player player = stat.getPlayer();
+
+                                    // reminder for players to join
+                                    player.sendMessage(Utils.translate("&8&m-------------------------------"));
+                                    player.sendMessage(Utils.translate("&8&lBLACK MARKET"));
+                                    player.sendMessage(Utils.translate(""));
+                                    player.sendMessage(Utils.translate("&8Come to the hollow depths of &c/spawn"));
+                                    player.sendMessage(Utils.translate("&8for a risky trade of illegal wares."));
+                                    player.sendMessage(Utils.translate("&8You have &c" + timerCount + " minutes..."));
+                                    player.sendMessage(Utils.translate("&8&m-------------------------------"));
+                                }
+                            }
+                        }
 
                         timerCount--;
                     }
@@ -109,39 +128,19 @@ public class BlackMarketManager
 
         if (isRunning())
         {
-            Bukkit.broadcastMessage(Utils.translate("&8&m-------------------------------"));
-            Bukkit.broadcastMessage(Utils.translate("&8&lBLACK MARKET"));
-            Bukkit.broadcastMessage(Utils.translate(""));
-            Bukkit.broadcastMessage(Utils.translate("&c" + running.getHighestBidder().getPlayer().getDisplayName() +  " &8has earned the &c" + running.getBlackMarketItem().getDisplayName()));
-            Bukkit.broadcastMessage(Utils.translate("&8for a staggering &6" + Utils.formatNumber(running.getHighestBid()) + " &eCoins&8."));
-            Bukkit.broadcastMessage(Utils.translate("&8Get out before the staff find you."));
-            Bukkit.broadcastMessage(Utils.translate("&cUntil our next sale..."));
-            Bukkit.broadcastMessage(Utils.translate("&8&m-------------------------------"));
+            running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
+            running.broadcastToPlayers(Utils.translate("&8&lBLACK MARKET"));
+            running.broadcastToPlayers(Utils.translate(""));
+            running.broadcastToPlayers(Utils.translate("&c" + running.getHighestBidder().getPlayer().getDisplayName() +  " &8has earned the &c" + running.getBlackMarketItem().getTitle()));
+            running.broadcastToPlayers(Utils.translate("&8for a staggering &6" + Utils.formatNumber(running.getHighestBid()) + " &eCoins&8."));
+            running.broadcastToPlayers(Utils.translate("&8Get out before the staff find you."));
+            running.broadcastToPlayers(Utils.translate("&cUntil our next sale..."));
+            running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
             // TODO: reward here
             running = null;
 
-            // ending schedulers
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
-                {
-                    // run final jackpot 5 mins later
-                    Parkour.getBankManager().startJackpot();
-
-                    new BukkitRunnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            // LOAD NEW BANK ITEMS!
-                            Parkour.getBankManager().resetItems();
-                            Parkour.getBankManager().broadcastReset();
-                        }
-                    }.runTaskLater(Parkour.getPlugin(), (20 * Parkour.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
-                }
-            }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
+            runEndingSchedulers();
         }
         else
         {
@@ -149,9 +148,102 @@ public class BlackMarketManager
         }
     }
 
+    public void forceEnd()
+    {
+        if (!isRunning())
+        {
+            // TODO: reward here
+            running = null;
+        }
+        else
+        {
+            Parkour.getPluginLogger().info("Tried to force end a Black Market event with none in-progress");
+        }
+    }
+
+    private void runEndingSchedulers()
+    {
+        // ending schedulers
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                // run final jackpot 5 mins later
+                Parkour.getBankManager().startJackpot();
+
+                new BukkitRunnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // LOAD NEW BANK ITEMS!
+                        Parkour.getBankManager().resetItems();
+                        Parkour.getBankManager().broadcastReset();
+                    }
+                }.runTaskLater(Parkour.getPlugin(), (20 * Parkour.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
+            }
+        }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
+    }
+
     private void beginEvent()
     {
+        if (running != null)
+        {
+            running.broadcastToPlayers(Utils.translate("&7Welcome, welcome, seekers of the forbidden. Step into the shadows, for tonight, the secrets of the underworld await you."));
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    running.broadcastToPlayers("&7The auction, a spectacle like no other. Hidden from the prying eyes of the staff, it unfolds here where no laws dare to penetrate. There, coveted artifacts, mystical relics, and powerful items change hands in a dance of secrecy.");
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
 
+                            running.broadcastToPlayers("&7These.. items.. They hold secrets veiled in ancient whispers, bestowing upon the buyer unique characteristics and buffs of untold origin.");
+                            new BukkitRunnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    showItem(); // show item
+                                    running.broadcastToPlayers("&7Behold, " + running.getBlackMarketItem().getTitle() + "! An artifact that " + running.getBlackMarketItem().getDescription() + ".");
+
+                                    new BukkitRunnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            running.broadcastToPlayers("&7Start your bids now.");
+                                            beginBiddingScene();
+                                        }
+                                    }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+                                }
+                            }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+                        }
+                    }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+                }
+            }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+        }
+    }
+
+    private void showItem()
+    {
+        if (running != null)
+        {
+
+        }
+    }
+
+    private void beginBiddingScene()
+    {
+        if (running != null)
+        {
+            running.beginBid();
+        }
     }
 
     public void increaseBid(PlayerStats playerStats, int bid)
@@ -167,23 +259,27 @@ public class BlackMarketManager
 
     public void playerJoined(PlayerStats playerStats)
     {
+        Player player = playerStats.getPlayer();
+
         if (isRunning())
         {
             // if the event is still waiting for players
             if (!inPreperation)
             {
-                Player player = playerStats.getPlayer();
-
                 player.sendMessage(Utils.translate("&8You're too late... the risk is too high to take you in."));
                 player.sendMessage(Utils.translate("&cCome early next time."));
             }
             else
                 running.addPlayer(playerStats);
         }
+        else
+            player.sendMessage(Utils.translate("&cThere is nothing to see here..."));
     }
 
-    public void playerLeft(PlayerStats playerStats)
+    public void playerLeft(PlayerStats playerStats, boolean disconnected)
     {
+        Player player = playerStats.getPlayer();
+
         if (isRunning())
         {
             running.removePlayer(playerStats);
@@ -192,6 +288,13 @@ public class BlackMarketManager
             if (running.isHighestBidder(playerStats))
                 running.highestBidderLeft();
         }
+        else if (!disconnected)
+            player.sendMessage(Utils.translate("&cYou have missed the opportunity of a lifetime."));
+    }
+
+    public boolean isInEvent(PlayerStats playerStats)
+    {
+        return isRunning() && running.inEvent(playerStats);
     }
 
     public boolean isRunning()

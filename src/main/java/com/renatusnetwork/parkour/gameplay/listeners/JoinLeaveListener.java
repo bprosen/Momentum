@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
@@ -134,6 +135,7 @@ public class JoinLeaveListener implements Listener {
         EventManager eventManager = Parkour.getEventManager();
         InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
         ClansManager clansManager = Parkour.getClansManager();
+        BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
 
         // if left in spectator, remove it
         if (playerStats.isSpectating())
@@ -146,6 +148,10 @@ public class JoinLeaveListener implements Listener {
         // if left in race, end it
         if (playerStats.inRace())
             raceManager.endRace(raceManager.get(player).getOpponent(player));
+
+        // if left in black market, remove them
+        if (blackMarketManager.isInEvent(playerStats))
+            blackMarketManager.playerLeft(playerStats, true);
 
         // if left as hidden, remove them
         if (PlayerHider.containsPlayer(player))

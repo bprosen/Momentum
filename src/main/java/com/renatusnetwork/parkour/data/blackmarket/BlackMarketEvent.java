@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,7 +9,8 @@ import java.util.Map;
 public class BlackMarketEvent
 {
     private ArrayList<PlayerStats> players;
-    private LinkedHashMap<PlayerStats, Integer> bids; // descending by bid amount
+    private boolean canBid;
+    private LinkedHashMap<PlayerStats, Integer> bids;
     private PlayerStats highestBidder;
     private int highestBid;
     private BlackMarketArtifact blackMarketArtifact;
@@ -17,7 +19,18 @@ public class BlackMarketEvent
     {
         bids = new LinkedHashMap<>();
         players = new ArrayList<>();
+        canBid = false;
         this.blackMarketArtifact = blackMarketArtifact;
+    }
+
+    public void beginBid()
+    {
+        canBid = true;
+    }
+
+    public void stopBid()
+    {
+        canBid = false;
     }
 
     public BlackMarketArtifact getBlackMarketItem()
@@ -51,7 +64,7 @@ public class BlackMarketEvent
 
         if (highestEntry == null)
         {
-            // TODO: force end
+            Parkour.getBlackMarketManager().forceEnd(); // force end
         }
         else
         {

@@ -1,16 +1,23 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
+
 public class BlackMarketArtifact
 {
-    private String displayName;
+    private String name;
+    private String title;
+    private String description;
 
-    public BlackMarketArtifact()
+    public BlackMarketArtifact(String name)
     {
-
+        this.name = name;
+        this.title = BlackMarketYAML.getTitle(name);
+        this.description = BlackMarketYAML.getDescription(name);
     }
 
-    public String getDisplayName()
+    public String getTitle()
     {
-        return displayName;
+        return title;
     }
+
+    public String getDescription() { return description; }
 }

@@ -109,3 +109,8 @@ commands:
   modifier:
     description: "RN-Parkour modifier command"
     aliases: [modifiers, booster, discount, boosters, discounts]
+  bank:
+    description: "RN-Parkour bank command"
+  blackmarket:
+    description: "RN-Parkour blackmarket command"
+    aliases: [market]

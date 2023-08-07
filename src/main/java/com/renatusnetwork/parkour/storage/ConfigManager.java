@@ -28,6 +28,7 @@ public class ConfigManager {
         initialize("rewards", plugin);
         initialize("bank", plugin);
         initialize("modifiers", plugin);
+        initialize("blackmarket", plugin);
     }
 
     private void initialize(String fileName, Plugin plugin) {
