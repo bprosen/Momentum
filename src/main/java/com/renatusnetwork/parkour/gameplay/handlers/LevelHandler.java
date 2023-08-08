@@ -64,7 +64,7 @@ public class LevelHandler {
                                 dolevelCompletion(playerStats, player, level, levelName, true, false);
                         } else {
                             // if in race
-                            Parkour.getRaceManager().endRace(player);
+                            Parkour.getRaceManager().endRace(player, false);
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou've reached the maximum number of completions"));
