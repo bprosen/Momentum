@@ -221,7 +221,7 @@ public class RaceManager {
         runningRaceList.remove(endedRace);
     }
 
-    public void endRace(Player winner) {
+    public void endRace(Player winner, boolean disconnected) {
 
         Race raceObject = get(winner);
 
@@ -242,7 +242,10 @@ public class RaceManager {
             if (winnerStats.getLevelCompletionsCount(raceObject.getRaceLevel().getName()) < 1)
                 winnerStats.setIndividualLevelsBeaten(winnerStats.getIndividualLevelsBeaten() + 1);
 
-            Long elapsedTime = (System.currentTimeMillis() - winnerStats.getLevelStartTime());
+            long elapsedTime = (System.currentTimeMillis() - winnerStats.getLevelStartTime());
+            if (disconnected)
+                elapsedTime = 0;
+
             LevelCompletion levelCompletion = new LevelCompletion(
                     System.currentTimeMillis(),
                     elapsedTime

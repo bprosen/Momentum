@@ -134,7 +134,7 @@ public class LevelListener implements Listener {
 
                     // end if in race
                     if (playerStats.inRace())
-                        Parkour.getRaceManager().endRace(player);
+                        Parkour.getRaceManager().endRace(player, false);
                     else if (playerStats.isInInfinitePK()) {
 
                         // prevent double clicking
