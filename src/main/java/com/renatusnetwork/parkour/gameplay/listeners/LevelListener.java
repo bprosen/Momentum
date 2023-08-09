@@ -192,10 +192,12 @@ public class LevelListener implements Listener {
         playerStats.addCheckpoint(playerStats.getLevel().getName(), location);
 
         String msgString = "&eYour checkpoint has been set";
-        if (playerStats.getLevelStartTime() > 0) {
+        if (playerStats.getLevelStartTime() > 0)
+        {
             double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-            msgString += " &7- &6" + (timeElapsed / 1000.0) + "s";
+            msgString += " &6(" + (timeElapsed / 1000.0) + "s)";
         }
+
         player.sendMessage(Utils.translate(msgString));
 
         // add to async queue
