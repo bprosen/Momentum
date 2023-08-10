@@ -231,7 +231,7 @@ public class BlackMarketEvent
 
     public void showItem()
     {
-        Location itemSpawn = Parkour.getSettingsManager().black_market_item_spawn;
+        Location itemSpawn = Parkour.getLocationManager().get(Parkour.getSettingsManager().blackmarket_item_spawn_loc);
         itemEntity = itemSpawn.getWorld().dropItem(itemSpawn.clone().add(0, 1, 0), getBlackMarketItem().getItemStack());
 
         // show item

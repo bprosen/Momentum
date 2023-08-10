@@ -62,15 +62,11 @@ public class LocationManager {
     }
 
     public boolean hasCompletionLocation(String levelName) {
-        if (exists(levelName + "-completion"))
-            return true;
-        return false;
+        return exists(levelName + "-completion");
     }
 
     public boolean hasSpawnLocation(String levelName) {
-        if (exists(levelName + "-spawn"))
-            return true;
-        return false;
+        return exists(levelName + "-spawn");
     }
 
     public boolean hasPortalLocation(String levelName)
@@ -114,6 +110,4 @@ public class LocationManager {
     }
 
     public Location getTutorialLocation() { return get("tutorial"); }
-
-    public Location getInfiniteMiddle() { return get("infinite-middle"); }
 }

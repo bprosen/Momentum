@@ -225,7 +225,10 @@ public class BlackMarketManager
                 player.sendMessage(Utils.translate("&cCome early next time."));
             }
             else
+            {
                 running.addPlayer(playerStats);
+                playerStats.getPlayer().teleport(Parkour.getLocationManager().get(Parkour.getSettingsManager().blackmarket_tp_loc));
+            }
         }
         else
             player.sendMessage(Utils.translate("&cThere is nothing to see here..."));

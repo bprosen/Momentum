@@ -74,7 +74,7 @@ public class InfinitePKManager {
 
                 infinitePK.setCurrentBlockLoc(startingLoc);
 
-                Location respawnLoc = Parkour.getSettingsManager().infinitepk_portal_respawn;
+                Location respawnLoc = Parkour.getLocationManager().get(Parkour.getSettingsManager().infinitepk_respawn_loc);
 
                 // if they are at spawn prior to teleport, change original loc to setting
                 if (fromPortal && respawnLoc != null)
@@ -395,13 +395,15 @@ public class InfinitePKManager {
             }
         }
 
+        Location middle = locationManager.get(Parkour.getSettingsManager().infinitepk_middle_loc);
+
         // run through maxes, and flip if they hit it
         if ((directionType == InfinitePKDirection.FORWARDS &&
-           (((oldLocation.getX() + xIncrease) >= (locationManager.getInfiniteMiddle().getBlockX() + settingsManager.max_infinitepk_x)) ||
-           (oldLocation.getZ() + zIncrease) >= (locationManager.getInfiniteMiddle().getBlockZ() + settingsManager.max_infinitepk_z)))
+           (((oldLocation.getX() + xIncrease) >= (middle.getBlockX() + settingsManager.max_infinitepk_x)) ||
+           (oldLocation.getZ() + zIncrease) >= (middle.getBlockZ() + settingsManager.max_infinitepk_z)))
            || (directionType == InfinitePKDirection.BACKWARDS &&
-           (((oldLocation.getX() - xIncrease) <= (locationManager.getInfiniteMiddle().getBlockX() - settingsManager.max_infinitepk_x)) ||
-           (oldLocation.getZ() - zIncrease) <= (locationManager.getInfiniteMiddle().getBlockZ() - settingsManager.max_infinitepk_z)))) {
+           (((oldLocation.getX() - xIncrease) <= (middle.getBlockX() - settingsManager.max_infinitepk_x)) ||
+           (oldLocation.getZ() - zIncrease) <= (middle.getBlockZ() - settingsManager.max_infinitepk_z)))) {
 
             xIncrease *= -1;
             zIncrease *= -1;
@@ -422,19 +424,19 @@ public class InfinitePKManager {
 
         SettingsManager settingsManager = Parkour.getSettingsManager();
         LocationManager locationManager = Parkour.getLocationManager();
+        Location middle = locationManager.get(Parkour.getSettingsManager().infinitepk_middle_loc);
 
         // make the box 6 less so it will never flip on the first one
-        int minX = locationManager.getInfiniteMiddle().getBlockX() - (settingsManager.max_infinitepk_x - 6);
-        int maxX = locationManager.getInfiniteMiddle().getBlockX() + (settingsManager.max_infinitepk_x - 6);
-        int minZ = locationManager.getInfiniteMiddle().getBlockZ() - (settingsManager.max_infinitepk_z - 6);
-        int maxZ = locationManager.getInfiniteMiddle().getBlockZ() + (settingsManager.max_infinitepk_z - 6);
+        int minX = middle.getBlockX() - (settingsManager.max_infinitepk_x - 6);
+        int maxX = middle.getBlockX() + (settingsManager.max_infinitepk_x - 6);
+        int minZ = middle.getBlockZ() - (settingsManager.max_infinitepk_z - 6);
+        int maxZ = middle.getBlockZ() + (settingsManager.max_infinitepk_z - 6);
 
         int foundX = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
         int foundZ = ThreadLocalRandom.current().nextInt(minZ, maxZ + 1);
 
         Location foundLoc = new Location(
-                locationManager.getInfiniteMiddle().getWorld(),
-                foundX, settingsManager.infinitepk_starting_y, foundZ
+                middle.getWorld(), foundX, settingsManager.infinitepk_starting_y, foundZ
         );
 
         // check if the location will be in the way, if so, go again
@@ -506,9 +508,7 @@ public class InfinitePKManager {
             if (lowestScore == 0 || infinitePKLBPosition.getScore() < lowestScore)
                 lowestScore = infinitePKLBPosition.getScore();
 
-        if (lowestScore <= score)
-            return true;
-        return false;
+        return lowestScore <= score;
     }
 
     public void shutdown() {

@@ -1,25 +1,15 @@
 package com.renatusnetwork.parkour.data;
 
-import com.mysql.cj.exceptions.UnableToConnectException;
-import com.mysql.cj.protocol.a.LocalTimeValueEncoder;
-import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SettingsManager {
 
@@ -76,7 +66,8 @@ public class SettingsManager {
     public int min_infinitepk_y;
     public float infinitepk_starting_pitch;
     public float infinitepk_starting_yaw;
-    public Location infinitepk_portal_respawn;
+    public String infinitepk_respawn_loc;
+    public String infinitepk_middle_loc;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -130,8 +121,10 @@ public class SettingsManager {
     public int blackmarket_min_player_count;
 
     public Calendar black_market_reset_calendar;
-    public Location black_market_item_spawn;
     public int seconds_before_ending_from_no_bids;
+
+    public String blackmarket_item_spawn_loc;
+    public String blackmarket_tp_loc;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -241,17 +234,6 @@ public class SettingsManager {
         }
         black_market_reset_calendar.set(Calendar.HOUR_OF_DAY, settings.getInt("bank.reset_time.hour"));
 
-        // load the respawn point for infinite pk if they enter from spawn
-        String infinitePKRespawn = settings.getString("infinitepk.portal_respawn");
-        // need to null check jic
-        if (infinitePKRespawn != null) {
-            String[] infinitePKSplit = infinitePKRespawn.split(":");
-
-            infinitepk_portal_respawn = new Location(Bukkit.getWorld(infinitePKSplit[0]),
-                    Double.parseDouble(infinitePKSplit[1]), Double.parseDouble(infinitePKSplit[2]), Double.parseDouble(infinitePKSplit[3]),
-                    Float.parseFloat(infinitePKSplit[4]), Float.parseFloat(infinitePKSplit[5]));
-        }
-
         custom_join_inventory = new HashMap<>();
 
         // hotbar length!
@@ -283,12 +265,11 @@ public class SettingsManager {
                 custom_join_inventory.put(i, itemStack);
             }
         }
-        World blackMarketItemWorld = Bukkit.getWorld(settings.getString("blackmarket.item_spawn_location.world"));
-        double blackMarketItemX = Double.parseDouble(settings.getString("blackmarket.item_spawn_location.x"));
-        double blackMarketItemY = Double.parseDouble(settings.getString("blackmarket.item_spawn_location.y"));
-        double blackMarketItemZ = Double.parseDouble(settings.getString("blackmarket.item_spawn_location.z"));
-
-        black_market_item_spawn = new Location(blackMarketItemWorld, blackMarketItemX, blackMarketItemY, blackMarketItemZ);
         seconds_before_ending_from_no_bids = settings.getInt("blackmarket.seconds_before_ending_from_no_bids");
+
+        blackmarket_tp_loc = settings.getString("blackmarket.item_spawn_location");
+        blackmarket_item_spawn_loc = settings.getString("blackmarket.tp_location");
+        infinitepk_middle_loc = settings.getString("infinitepk.infinite_middle_loc");
+        infinitepk_respawn_loc = settings.getString("infinitepk.infinite_respawn_loc");
     }
 }

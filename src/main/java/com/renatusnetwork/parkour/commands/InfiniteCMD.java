@@ -87,19 +87,6 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer"));
             }
-        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("setportalrespawn"))) {
-
-            Location loc = player.getLocation();
-            String locString = player.getWorld().getName() + ":" +
-                    loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" +
-                    loc.getYaw() + ":" + loc.getPitch();
-
-            // set and save
-            ConfigManager configManager = Parkour.getConfigManager();
-            configManager.get("settings").set("infinitepk.portal_respawn", locString);
-            configManager.save("settings");
-            Parkour.getSettingsManager().load(configManager.get("settings"));
-            player.sendMessage(Utils.translate("&7You set the portal respawn to your location"));
         } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
 
             Parkour.getInfinitePKManager().clearRewards();
@@ -173,9 +160,9 @@ public class InfiniteCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&5/infinite score lb <position>  &7Tells you the score of someone in <position> on the leaderboard"));
         player.sendMessage(Utils.translate("&5/infinite rewards  &7Tells you a list of the rewards and if you have them (crossed out)"));
 
-        if (player.hasPermission("rn-parkour.admin")) {
+        if (player.hasPermission("rn-parkour.admin"))
+        {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
-            player.sendMessage(Utils.translate("&5/infinite setportalrespawn  &7Sets the portal respawn to your location"));
             player.sendMessage(Utils.translate("&5/infinite loadrewards  &7Loads rewards from rewards.yml"));
         }
 

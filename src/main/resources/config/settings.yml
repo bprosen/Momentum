@@ -27,11 +27,8 @@ blackmarket:
   start_time:
     day: sunday
     hour: 15
-  item_spawn_location:
-    world: parkour
-    x: 0.0
-    y: 0.0
-    z: 0.0
+  item_spawn_location: "blackmarket-item-spawn"
+  tp_location: "blackmarket-spawn"
   seconds_before_ending_from_no_bids: 30 # time of which it will take of no bidding to end the black market
 gg:
   default_timer_in_seconds: 10
@@ -201,7 +198,8 @@ infinitepk:
   starting_y: 220
   starting_pitch: 0.0f
   starting_yaw: 0.0f
-  portal_respawn:
+  infinite_respawn_loc: "infinite-respawn"
+  infinite_middle_loc: "infinite-middle"
 completions:
   global_level_completions_leaderboard:
     max_size: 10
