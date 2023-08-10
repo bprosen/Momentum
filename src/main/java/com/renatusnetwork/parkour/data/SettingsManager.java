@@ -130,6 +130,8 @@ public class SettingsManager {
     public int blackmarket_min_player_count;
 
     public Calendar black_market_reset_calendar;
+    public Location black_market_item_spawn;
+    public int seconds_before_ending_from_no_bids;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -281,5 +283,12 @@ public class SettingsManager {
                 custom_join_inventory.put(i, itemStack);
             }
         }
+        World blackMarketItemWorld = Bukkit.getWorld(settings.getString("blackmarket.item_spawn_location.world"));
+        double blackMarketItemX = Double.parseDouble(settings.getString("blackmarket.item_spawn_location.x"));
+        double blackMarketItemY = Double.parseDouble(settings.getString("blackmarket.item_spawn_location.y"));
+        double blackMarketItemZ = Double.parseDouble(settings.getString("blackmarket.item_spawn_location.z"));
+
+        black_market_item_spawn = new Location(blackMarketItemWorld, blackMarketItemX, blackMarketItemY, blackMarketItemZ);
+        seconds_before_ending_from_no_bids = settings.getInt("blackmarket.seconds_before_ending_from_no_bids");
     }
 }

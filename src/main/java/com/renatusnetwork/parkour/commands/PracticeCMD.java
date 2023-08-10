@@ -30,48 +30,50 @@ public class PracticeCMD implements CommandExecutor {
                 if (!playerStats.inRace()) {
                     if (!playerStats.isSpectating()) {
                         if (!playerStats.isEventParticipant()) {
-                            if (!playerStats.isInInfinitePK()) {
-                                // if it is a dropper level, disable /prac
-                                if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
-                                    player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
-                                    return true;
-                                }
+                            if (!Parkour.getBlackMarketManager().isInEvent(playerStats)) {
+                                if (!playerStats.isInInfinitePK()) {
+                                    // if it is a dropper level, disable /prac
+                                    if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
+                                        player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
+                                        return true;
+                                    }
 
-                            /*
-                             check practice location first, if not null then reset or
-                             then check if they are on ground then enable or cancel
-                             */
+                                    /*
+                                     check practice location first, if not null then reset or
+                                     then check if they are on ground then enable or cancel
+                                     */
 
-                                // case of /unprac
-                                if (label.equalsIgnoreCase("unprac"))
-                                {
-                                    if (playerStats.inPracticeMode())
+                                    // case of /unprac
+                                    if (label.equalsIgnoreCase("unprac")) {
+                                        if (playerStats.inPracticeMode())
+                                            PracticeHandler.resetPlayer(playerStats, true);
+                                        else
+                                            player.sendMessage(Utils.translate("&cYou are not in practice mode"));
+                                    }
+                                    // in the case of /prac
+                                    else if (playerStats.inPracticeMode())
                                         PracticeHandler.resetPlayer(playerStats, true);
-                                    else
-                                        player.sendMessage(Utils.translate("&cYou are not in practice mode"));
-                                }
-                                // in the case of /prac
-                                else if (playerStats.inPracticeMode())
-                                    PracticeHandler.resetPlayer(playerStats, true);
-                                else if (player.isOnGround())
-                                {
-                                    playerStats.setPracticeMode(player.getLocation());
+                                    else if (player.isOnGround()) {
+                                        playerStats.setPracticeMode(player.getLocation());
 
-                                    SettingsManager settingsManager = Parkour.getSettingsManager();
-                                    // create item and give
-                                    ItemStack pracItem = new ItemStack(settingsManager.prac_type);
-                                    ItemMeta itemMeta = pracItem.getItemMeta();
-                                    itemMeta.setDisplayName(Utils.translate(settingsManager.prac_title));
-                                    pracItem.setItemMeta(itemMeta);
+                                        SettingsManager settingsManager = Parkour.getSettingsManager();
+                                        // create item and give
+                                        ItemStack pracItem = new ItemStack(settingsManager.prac_type);
+                                        ItemMeta itemMeta = pracItem.getItemMeta();
+                                        itemMeta.setDisplayName(Utils.translate(settingsManager.prac_title));
+                                        pracItem.setItemMeta(itemMeta);
 
-                                    player.getInventory().setItem(settingsManager.prac_hotbar_slot, pracItem);
+                                        player.getInventory().setItem(settingsManager.prac_hotbar_slot, pracItem);
 
-                                    player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                                        player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
+                                    } else {
+                                        player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));
+                                    }
                                 } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
                                 }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
                             }
                         } else {
                             player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));

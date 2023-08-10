@@ -2,12 +2,44 @@ items:
   test-1:
     title: "&cTest"
     description: "This is a test 1!"
+    starting_bid: 1000
+    next_bid_multiplier: 1.02
+    item:
+      material: DIRT
+      glow: true
+      title: "Test"
+      lore:
+        - "test"
   test-2:
     title: "&cTest"
     description: "This is a test 2!"
+    starting_bid: 1000
+    next_bid_multiplier: 1.02
+    item:
+      material: DIRT
+      glow: true
+      title: "Test"
+      lore:
+        - "test"
   test-3:
     title: "&cTest"
     description: "This is a test 3!"
+    starting_bid: 1000
+    next_bid_multiplier: 1.02
+    item:
+      material: DIRT
+      glow: true
+      title: "Test"
+      lore:
+        - "test"
   test-4:
     title: "&cTest"
     description: "This is a test 4!"
+    starting_bid: 1000
+    next_bid_multiplier: 1.02
+    item:
+      material: DIRT
+      glow: true
+      title: "Test"
+      lore:
+        - "test"

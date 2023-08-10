@@ -27,6 +27,12 @@ blackmarket:
   start_time:
     day: sunday
     hour: 15
+  item_spawn_location:
+    world: parkour
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  seconds_before_ending_from_no_bids: 30 # time of which it will take of no bidding to end the black market
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10

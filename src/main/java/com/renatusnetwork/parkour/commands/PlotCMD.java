@@ -447,10 +447,14 @@ public class PlotCMD implements CommandExecutor {
             if (!playerStats.isInInfinitePK()) {
                 if (!playerStats.isSpectating()) {
                     if (!playerStats.isEventParticipant()) {
-                        if (!playerStats.inPracticeMode()) {
-                            passes = true;
+                        if (!Parkour.getBlackMarketManager().isInEvent(playerStats)) {
+                            if (!playerStats.inPracticeMode()) {
+                                passes = true;
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                            }
                         } else {
-                            player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));

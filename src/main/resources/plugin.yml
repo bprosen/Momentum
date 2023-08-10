@@ -114,3 +114,5 @@ commands:
   blackmarket:
     description: "RN-Parkour blackmarket command"
     aliases: [market]
+  bid:
+    description: "RN-Parkour bid command"

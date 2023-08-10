@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -52,9 +53,18 @@ public class BlackMarketCMD implements CommandExecutor
 
             if (player != null)
             {
-                // add player
-                sender.sendMessage(Utils.translate("&7Added &c" + player.getName() + " &7to the &8&lBlack Market"));
-                blackMarketManager.playerJoined(Parkour.getStatsManager().get(player));
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                if (!playerStats.isSpectating())
+                {
+                    // add player
+                    sender.sendMessage(Utils.translate("&7Added &c" + player.getName() + " &7to the &8&lBlack Market"));
+                    blackMarketManager.playerJoined(Parkour.getStatsManager().get(player));
+                }
+                else
+                {
+                    sender.sendMessage(Utils.translate("&cCannot add spectating player: &4" + playerName));
+                }
             }
             else
             {

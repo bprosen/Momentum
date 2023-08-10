@@ -45,22 +45,23 @@ public class EventCMD implements CommandExecutor {
                                 if (!PlayerHider.containsPlayer(player)) {
                                     if (!playerStats.isInInfinitePK()) {
                                         if (!eventManager.isEliminated(player)) {
-                                            if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater()))
-                                            {
-                                                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
-                                                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+                                            if (!Parkour.getBlackMarketManager().isInEvent(playerStats)) {
+                                                if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())) {
+                                                    if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                                                        Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                                // remove sword item if they have it and the mode is pvp
-                                                ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
-                                                if (eventManager.isPvPEvent() && swordItem != null)
-                                                    player.getInventory().removeItem(swordItem);
+                                                    // remove sword item if they have it and the mode is pvp
+                                                    ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
+                                                    if (eventManager.isPvPEvent() && swordItem != null)
+                                                        player.getInventory().removeItem(swordItem);
 
-                                                eventManager.addParticipant(player);
-                                            }
-                                            else
-                                            {
-                                                player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
-                                                        "&cTherefore you cannot join this event"));
+                                                    eventManager.addParticipant(player);
+                                                } else {
+                                                    player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
+                                                            "&cTherefore you cannot join this event"));
+                                                }
+                                            } else {
+                                                player.sendMessage(Utils.translate("&cYou cannot join this event while in the Black Market"));
                                             }
                                         } else {
                                             player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));

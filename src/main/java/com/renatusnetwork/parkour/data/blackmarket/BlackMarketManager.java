@@ -4,8 +4,12 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +21,7 @@ public class BlackMarketManager
     private BlackMarketEvent running;
     private boolean inPreperation;
     private ArrayList<BlackMarketArtifact> artifacts;
+    private Item itemEntity;
 
     public BlackMarketManager()
     {
@@ -137,6 +142,17 @@ public class BlackMarketManager
             running.broadcastToPlayers(Utils.translate("&cUntil our next sale..."));
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
+            removeItem();
+
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    running.teleportToSpawn();
+                }
+            }.runTaskLater(Parkour.getPlugin(), 10 * 20); // teleport them all 10 seconds later
+
             // TODO: reward here
             running = null;
 
@@ -152,6 +168,8 @@ public class BlackMarketManager
     {
         if (!isRunning())
         {
+            removeItem();
+
             // TODO: reward here
             running = null;
         }
@@ -217,8 +235,8 @@ public class BlackMarketManager
                                         @Override
                                         public void run()
                                         {
-                                            running.broadcastToPlayers("&7Start your bids now.");
-                                            beginBiddingScene();
+                                            running.beginBid();
+                                            running.broadcastToPlayers("&7Start your bids now. Do &c/bid (at least " + Utils.formatNumber(running.getNextMinimumBid()) + ")");
                                         }
                                     }.runTaskLater(Parkour.getPlugin(), 20 * 10);
                                 }
@@ -234,15 +252,23 @@ public class BlackMarketManager
     {
         if (running != null)
         {
+            Location itemSpawn = Parkour.getSettingsManager().black_market_item_spawn;
+            itemEntity = itemSpawn.getWorld().dropItem(itemSpawn.clone().add(0, 1, 0), running.getBlackMarketItem().getItemStack());
 
+            // show item
+            itemEntity.setVelocity(new Vector(0, .2, 0));
+            itemEntity.setCustomName(Utils.translate(running.getBlackMarketItem().getTitle()));
+            itemEntity.setCustomNameVisible(true);
+            itemEntity.setPickupDelay(Integer.MAX_VALUE);
         }
     }
 
-    private void beginBiddingScene()
+    private void removeItem()
     {
-        if (running != null)
+        if (itemEntity != null)
         {
-            running.beginBid();
+            itemEntity.remove();
+            itemEntity = null;
         }
     }
 
@@ -254,6 +280,7 @@ public class BlackMarketManager
             running.broadcastToPlayers(Utils.translate(
                     "&c" + playerStats.getPlayer().getDisplayName() + " &8has increased the bid to &6" + Utils.formatNumber(bid) + " &eCoins"
             ));
+            running.broadcastToPlayers(Utils.translate("&8The next bid starts at &6" + Utils.formatNumber(running.getNextMinimumBid()) + " &eCoins"));
         }
     }
 
@@ -288,7 +315,8 @@ public class BlackMarketManager
             if (running.isHighestBidder(playerStats))
                 running.highestBidderLeft();
         }
-        else if (!disconnected)
+
+        if (!disconnected)
             player.sendMessage(Utils.translate("&cYou have missed the opportunity of a lifetime."));
     }
 
@@ -301,4 +329,7 @@ public class BlackMarketManager
     {
         return running != null;
     }
+
+    public BlackMarketEvent getRunningEvent() { return running; }
+
 }

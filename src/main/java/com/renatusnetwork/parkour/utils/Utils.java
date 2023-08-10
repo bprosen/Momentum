@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.utils;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -199,6 +200,11 @@ public class Utils {
                 if (!playerStats.inRace()) {
                     if (!playerStats.isInInfinitePK()) {
                         if (!playerStats.isSpectating()) {
+
+                            BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
+                            if (blackMarketManager.isInEvent(playerStats))
+                                blackMarketManager.playerLeft(playerStats, false); // remove from event
+
                             // toggle off elytra armor
                             Parkour.getStatsManager().toggleOffElytra(playerStats);
 

@@ -507,85 +507,88 @@ public class MenuItemAction {
                     {
                         if (level.hasRequiredLevels(playerStats))
                         {
-                            player.closeInventory();
-
-                            // if the level has perm node, and player does not have perm node
-                            if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
-                                player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
-                                return;
-                            }
-
-                            // if player is in level and their level is the level they clicked on, cancel
-                            if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
-                                player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
-                                return;
-                            }
-
-                            if (level.needsRank())
+                            if (!Parkour.getBlackMarketManager().isInEvent(playerStats))
                             {
-                                Rank rank = level.getRequiredRank();
 
-                                if (!Parkour.getRanksManager().isPastRank(playerStats, rank))
-                                {
-                                    Rank nextRank = Parkour.getRanksManager().getNextRank(rank);
-                                    player.sendMessage(Utils.translate("&cYou need to be " + nextRank.getRankTitle() + " &cto play this level"));
+                                player.closeInventory();
+
+                                // if the level has perm node, and player does not have perm node
+                                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
+                                    player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
                                     return;
                                 }
-                            }
 
-                            playerStats.clearPotionEffects();
-
-                            // toggle off if saved
-                            Parkour.getStatsManager().toggleOffElytra(playerStats);
-
-                            playerStats.resetCurrentCheckpoint(); // reset
-
-                            // if in practice mode
-                            PracticeHandler.resetDataOnly(playerStats);
-
-                            Location save = playerStats.getSave(level.getName());
-                            Location spawn = playerStats.getCheckpoint(level.getName());
-                            if (spawn != null) {
-                                playerStats.setCurrentCheckpoint(spawn);
-
-                                // only tp if dont have a save
-                                if (save == null)
-                                {
-                                    Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                    player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                                // if player is in level and their level is the level they clicked on, cancel
+                                if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
+                                    player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                                    return;
                                 }
-                            // tp to start if no save
-                            } else if (save == null) {
-                                player.teleport(level.getStartLocation());
-                                player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
-                                        + level.getFormattedTitle()));
+
+                                if (level.needsRank()) {
+                                    Rank rank = level.getRequiredRank();
+
+                                    if (!Parkour.getRanksManager().isPastRank(playerStats, rank)) {
+                                        Rank nextRank = Parkour.getRanksManager().getNextRank(rank);
+                                        player.sendMessage(Utils.translate("&cYou need to be " + nextRank.getRankTitle() + " &cto play this level"));
+                                        return;
+                                    }
+                                }
+
+                                playerStats.clearPotionEffects();
+
+                                // toggle off if saved
+                                Parkour.getStatsManager().toggleOffElytra(playerStats);
+
+                                playerStats.resetCurrentCheckpoint(); // reset
+
+                                // if in practice mode
+                                PracticeHandler.resetDataOnly(playerStats);
+
+                                Location save = playerStats.getSave(level.getName());
+                                Location spawn = playerStats.getCheckpoint(level.getName());
+                                if (spawn != null) {
+                                    playerStats.setCurrentCheckpoint(spawn);
+
+                                    // only tp if dont have a save
+                                    if (save == null) {
+                                        Parkour.getCheckpointManager().teleportToCP(playerStats);
+                                        player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                                    }
+                                    // tp to start if no save
+                                } else if (save == null) {
+                                    player.teleport(level.getStartLocation());
+                                    player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
+                                            + level.getFormattedTitle()));
+                                }
+
+                                // if they have a save
+                                if (save != null) {
+                                    Parkour.getSavesManager().loadSave(playerStats, save, level);
+                                    player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
+                                    player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
+                                }
+
+                                playerStats.setLevel(level);
+                                playerStats.disableLevelStartTime();
+                                playerStats.resetFails();
+
+                                if (!level.getPotionEffects().isEmpty()) {
+                                    for (PotionEffect potionEffect : level.getPotionEffects())
+                                        player.addPotionEffect(potionEffect);
+                                }
+
+                                if (level.isElytraLevel())
+                                    Parkour.getStatsManager().toggleOnElytra(playerStats);
+
+                                TitleAPI.sendTitle(
+                                        player, 10, 40, 10,
+                                        "",
+                                        level.getFormattedTitle()
+                                );
+                            } else {
+                                player.closeInventory();
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
                             }
-
-                            // if they have a save
-                            if (save != null)
-                            {
-                                Parkour.getSavesManager().loadSave(playerStats, save, level);
-                                player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
-                                player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
-                            }
-
-                            playerStats.setLevel(level);
-                            playerStats.disableLevelStartTime();
-                            playerStats.resetFails();
-
-                            if (!level.getPotionEffects().isEmpty()) {
-                                for (PotionEffect potionEffect : level.getPotionEffects())
-                                    player.addPotionEffect(potionEffect);
-                            }
-
-                            if (level.isElytraLevel())
-                                Parkour.getStatsManager().toggleOnElytra(playerStats);
-
-                            TitleAPI.sendTitle(
-                                    player, 10, 40, 10,
-                                    "",
-                                    level.getFormattedTitle()
-                            );
                         } else {
                             player.closeInventory();
                             player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
