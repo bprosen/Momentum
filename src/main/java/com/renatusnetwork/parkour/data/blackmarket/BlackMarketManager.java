@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -35,8 +36,13 @@ public class BlackMarketManager
 
     public void load()
     {
+        // clear first
+        artifacts.clear();
 
+        for (String name : BlackMarketYAML.getItemNames())
+            artifacts.add(new BlackMarketArtifact(name));
     }
+
     private void runScheduler()
     {
         new BukkitRunnable()

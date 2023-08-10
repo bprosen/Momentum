@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackMarketYAML
@@ -88,5 +89,10 @@ public class BlackMarketYAML
     public static float getNextBidMultiplier(String name)
     {
         return (float) blackmarketConfig.getDouble("items." + name + ".next_bid_multiplier");
+    }
+
+    public static Set<String> getItemNames()
+    {
+        return blackmarketConfig.getConfigurationSection("items").getKeys(false);
     }
 }
