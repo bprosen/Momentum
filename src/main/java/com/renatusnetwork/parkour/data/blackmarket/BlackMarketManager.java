@@ -22,7 +22,6 @@ public class BlackMarketManager
     private BlackMarketEvent running;
     private boolean inPreperation;
     private ArrayList<BlackMarketArtifact> artifacts;
-    private Item itemEntity;
 
     public BlackMarketManager()
     {
@@ -86,7 +85,7 @@ public class BlackMarketManager
 
                         // only start if met the minimum
                         if (running.getPlayerCount() >= Parkour.getSettingsManager().blackmarket_min_player_count)
-                            beginEvent();
+                            running.start();
                         else
                         {
                             // cancel because not enough players
@@ -148,16 +147,7 @@ public class BlackMarketManager
             running.broadcastToPlayers(Utils.translate("&cUntil our next sale..."));
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
-            removeItem();
-
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
-                {
-                    running.teleportToSpawn();
-                }
-            }.runTaskLater(Parkour.getPlugin(), 10 * 20); // teleport them all 10 seconds later
+            running.end();
 
             // TODO: reward here
             running = null;
@@ -174,7 +164,7 @@ public class BlackMarketManager
     {
         if (!isRunning())
         {
-            removeItem();
+            running.end();
 
             // TODO: reward here
             running = null;
@@ -208,74 +198,6 @@ public class BlackMarketManager
                 }.runTaskLater(Parkour.getPlugin(), (20 * Parkour.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
-    }
-
-    private void beginEvent()
-    {
-        if (running != null)
-        {
-            running.broadcastToPlayers(Utils.translate("&7Welcome, welcome, seekers of the forbidden. Step into the shadows, for tonight, the secrets of the underworld await you."));
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
-                {
-                    running.broadcastToPlayers("&7The auction, a spectacle like no other. Hidden from the prying eyes of the staff, it unfolds here where no laws dare to penetrate. There, coveted artifacts, mystical relics, and powerful items change hands in a dance of secrecy.");
-                    new BukkitRunnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-
-                            running.broadcastToPlayers("&7These.. items.. They hold secrets veiled in ancient whispers, bestowing upon the buyer unique characteristics and buffs of untold origin.");
-                            new BukkitRunnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    showItem(); // show item
-                                    running.broadcastToPlayers("&7Behold, " + running.getBlackMarketItem().getTitle() + "! An artifact that " + running.getBlackMarketItem().getDescription() + ".");
-
-                                    new BukkitRunnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            running.beginBid();
-                                            running.broadcastToPlayers("&7Start your bids now. Do &c/bid (at least " + Utils.formatNumber(running.getNextMinimumBid()) + ")");
-                                        }
-                                    }.runTaskLater(Parkour.getPlugin(), 20 * 10);
-                                }
-                            }.runTaskLater(Parkour.getPlugin(), 20 * 10);
-                        }
-                    }.runTaskLater(Parkour.getPlugin(), 20 * 10);
-                }
-            }.runTaskLater(Parkour.getPlugin(), 20 * 10);
-        }
-    }
-
-    private void showItem()
-    {
-        if (running != null)
-        {
-            Location itemSpawn = Parkour.getSettingsManager().black_market_item_spawn;
-            itemEntity = itemSpawn.getWorld().dropItem(itemSpawn.clone().add(0, 1, 0), running.getBlackMarketItem().getItemStack());
-
-            // show item
-            itemEntity.setVelocity(new Vector(0, .2, 0));
-            itemEntity.setCustomName(Utils.translate(running.getBlackMarketItem().getTitle()));
-            itemEntity.setCustomNameVisible(true);
-            itemEntity.setPickupDelay(Integer.MAX_VALUE);
-        }
-    }
-
-    private void removeItem()
-    {
-        if (itemEntity != null)
-        {
-            itemEntity.remove();
-            itemEntity = null;
-        }
     }
 
     public void increaseBid(PlayerStats playerStats, int bid)

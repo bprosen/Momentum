@@ -36,31 +36,39 @@ public class BidCMD implements CommandExecutor
                         // if the player is in the event
                         if (runningEvent.inEvent(playerStats))
                         {
-                            // if the player actually has the amount to bid
-                            if (playerStats.getCoins() >= amount)
+                            // make sure they dont try to bid early
+                            if (runningEvent.isBiddingAllowed())
                             {
-                                // if the amount meets the minimum
-                                if (amount >= runningEvent.getNextMinimumBid())
+                                // if the player actually has the amount to bid
+                                if (playerStats.getCoins() >= amount)
                                 {
-                                    // if they are not already the highest bidder
-                                    if (!runningEvent.getHighestBidder().equals(playerStats))
+                                    // if the amount meets the minimum
+                                    if (amount >= runningEvent.getNextMinimumBid())
                                     {
-                                        // increase bid!
-                                        blackMarketManager.increaseBid(playerStats, amount);
+                                        // if they are not already the highest bidder
+                                        if (!runningEvent.getHighestBidder().equals(playerStats))
+                                        {
+                                            // increase bid!
+                                            blackMarketManager.increaseBid(playerStats, amount);
+                                        }
+                                        else
+                                        {
+                                            player.sendMessage(Utils.translate("&cYou cannot outbid yourself"));
+                                        }
                                     }
                                     else
                                     {
-                                        player.sendMessage(Utils.translate("&cYou cannot outbid yourself"));
+                                        player.sendMessage(Utils.translate("&cThat is not the minimum, it must be at least &6" + Utils.formatNumber(runningEvent.getNextMinimumBid()) + " &eCoins"));
                                     }
                                 }
                                 else
                                 {
-                                    player.sendMessage(Utils.translate("&cThat is not the minimum, it must be at least &6" + Utils.formatNumber(runningEvent.getNextMinimumBid()) + " &eCoins"));
+                                    player.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(amount) + " &eCoins"));
                                 }
                             }
                             else
                             {
-                                player.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(amount) + " &eCoins"));
+                                player.sendMessage(Utils.translate("&cBidding is not allowed yet"));
                             }
                         }
                         else
