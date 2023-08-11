@@ -1,9 +1,11 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
+import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.BankYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.sk89q.commandbook.locations.TeleportSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
@@ -11,10 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlackMarketManager
@@ -40,6 +39,8 @@ public class BlackMarketManager
 
         for (String name : BlackMarketYAML.getItemNames())
             artifacts.add(new BlackMarketArtifact(name));
+
+        Parkour.getPluginLogger().info("Black Market items loaded: " + artifacts.size());
     }
 
     private void runScheduler()
@@ -69,6 +70,24 @@ public class BlackMarketManager
             running = new BlackMarketEvent(artifacts.get(ThreadLocalRandom.current().nextInt(artifacts.size())));
 
             inPreperation = true;
+
+            String prefix = Parkour.getSettingsManager().blackmarket_message_prefix;
+
+            // random messages for prep stage
+            List<String> randomDialogue = new ArrayList<String>()
+            {{
+                add(Utils.translate(prefix + " Never speak of the auction..."));
+                add(Utils.translate(prefix + " The first rule, a cardinal decree, is to never speak of the auction beyond these veiled walls..."));
+                add(Utils.translate(prefix + " To wield the artifacts of the auction is to embrace the enigma of balance. For each power granted by an artifact, an equivalent price is exacted."));
+                add(Utils.translate(prefix + " The unspoken command that governs all; never assume you know all the rules of the auction."));
+                add(Utils.translate(prefix + " Anticipation is in the air, the auction is a clandestine dance where seekers of the extraordinary come to collide with fate."));
+                add(Utils.translate(prefix + " Among the shadows, one must tread with caution."));
+                add(Utils.translate(prefix + " These artifacts hold the essence of untold realms."));
+                add(Utils.translate(prefix + " Embrace the consequences of your choices; every step taken, a web of destiny is woven."));
+                add(Utils.translate(prefix + " You may find answers to questions you never thought to ask."));
+                add(Utils.translate(prefix + " You hold the power to shape your destiny, but the artifacts hold the power to shape you."));
+                add(Utils.translate(prefix + " Safety is but an illusion in the dance of shadows."));
+            }};
 
             // begin timer before starting event
             new BukkitRunnable()
@@ -101,6 +120,7 @@ public class BlackMarketManager
                     else
                     {
                         HashMap<String, PlayerStats> stats = Parkour.getStatsManager().getPlayerStats();
+                        String random = randomDialogue.get(ThreadLocalRandom.current().nextInt(randomDialogue.size()));
 
                         synchronized (stats)
                         {
@@ -119,9 +139,14 @@ public class BlackMarketManager
                                     player.sendMessage(Utils.translate("&8You have &c" + timerCount + " minutes..."));
                                     player.sendMessage(Utils.translate("&8&m-------------------------------"));
                                 }
+                                else
+                                {
+                                    // random message for players
+                                    stat.getPlayer().sendMessage(Utils.translate(random));
+                                }
                             }
                         }
-
+                        randomDialogue.remove(random);
                         timerCount--;
                     }
                 }
@@ -135,23 +160,30 @@ public class BlackMarketManager
 
     public void end()
     {
-
         if (isRunning())
         {
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
             running.broadcastToPlayers(Utils.translate("&8&lBLACK MARKET"));
             running.broadcastToPlayers(Utils.translate(""));
-            running.broadcastToPlayers(Utils.translate("&c" + running.getHighestBidder().getPlayer().getDisplayName() +  " &8has earned the &c" + running.getBlackMarketItem().getTitle()));
-            running.broadcastToPlayers(Utils.translate("&8for a staggering &6" + Utils.formatNumber(running.getHighestBid()) + " &eCoins&8."));
+
+            if (running.hasHighestBidder())
+            {
+                running.broadcastToPlayers(Utils.translate("&c" + running.getHighestBidder().getPlayer().getDisplayName() +  " &8has earned the &c" + running.getBlackMarketItem().getTitle()));
+                running.broadcastToPlayers(Utils.translate("&8for a staggering &6" + Utils.formatNumber(running.getHighestBid()) + " &eCoins&8."));
+            }
+
             running.broadcastToPlayers(Utils.translate("&8Get out before the staff find you."));
             running.broadcastToPlayers(Utils.translate("&cUntil our next sale..."));
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
+            if (running.hasHighestBidder())
+            {
+                Parkour.getStatsManager().removeCoins(running.getHighestBidder(), running.getHighestBid());
+                // TODO: reward here
+            }
             running.end();
 
-            // TODO: reward here
             running = null;
-
             runEndingSchedulers();
         }
         else
@@ -162,11 +194,9 @@ public class BlackMarketManager
 
     public void forceEnd()
     {
-        if (!isRunning())
+        if (isRunning())
         {
             running.end();
-
-            // TODO: reward here
             running = null;
         }
         else
@@ -206,9 +236,9 @@ public class BlackMarketManager
         {
             running.increaseBid(playerStats, bid);
             running.broadcastToPlayers(Utils.translate(
-                    "&c" + playerStats.getPlayer().getDisplayName() + " &8has increased the bid to &6" + Utils.formatNumber(bid) + " &eCoins"
+                    Parkour.getSettingsManager().blackmarket_message_prefix + " &c" + playerStats.getPlayer().getDisplayName() + " &8has increased the bid to &6" + Utils.formatNumber(bid) + " &eCoins"
             ));
-            running.broadcastToPlayers(Utils.translate("&8The next bid starts at &6" + Utils.formatNumber(running.getNextMinimumBid()) + " &eCoins"));
+            running.broadcastToPlayers(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &8The next bid starts at &6" + Utils.formatNumber(running.getNextMinimumBid()) + " &eCoins"));
         }
     }
 
@@ -221,17 +251,18 @@ public class BlackMarketManager
             // if the event is still waiting for players
             if (!inPreperation)
             {
-                player.sendMessage(Utils.translate("&8You're too late... the risk is too high to take you in."));
-                player.sendMessage(Utils.translate("&cCome early next time."));
+                player.sendMessage(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &8You're too late... the risk is too high to take you in."));
+                player.sendMessage(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &cCome early next time."));
             }
             else
             {
                 running.addPlayer(playerStats);
                 playerStats.getPlayer().teleport(Parkour.getLocationManager().get(Parkour.getSettingsManager().blackmarket_tp_loc));
+                playerStats.setBlackMarket(true);
             }
         }
         else
-            player.sendMessage(Utils.translate("&cThere is nothing to see here..."));
+            player.sendMessage(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &cThere is nothing to see here..."));
     }
 
     public void playerLeft(PlayerStats playerStats, boolean disconnected)
@@ -241,6 +272,7 @@ public class BlackMarketManager
         if (isRunning())
         {
             running.removePlayer(playerStats);
+            playerStats.setBlackMarket(false);
 
             // remove highest bidder
             if (running.isHighestBidder(playerStats))
@@ -248,12 +280,7 @@ public class BlackMarketManager
         }
 
         if (!disconnected)
-            player.sendMessage(Utils.translate("&cYou have missed the opportunity of a lifetime."));
-    }
-
-    public boolean isInEvent(PlayerStats playerStats)
-    {
-        return isRunning() && running.inEvent(playerStats);
+            player.sendMessage(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &cYou have missed the opportunity of a lifetime."));
     }
 
     public boolean isRunning()

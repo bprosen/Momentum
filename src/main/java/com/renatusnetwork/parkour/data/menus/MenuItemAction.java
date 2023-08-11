@@ -507,7 +507,7 @@ public class MenuItemAction {
                     {
                         if (level.hasRequiredLevels(playerStats))
                         {
-                            if (!Parkour.getBlackMarketManager().isInEvent(playerStats))
+                            if (!playerStats.isInBlackMarket())
                             {
 
                                 player.closeInventory();

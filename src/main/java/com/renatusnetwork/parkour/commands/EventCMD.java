@@ -45,7 +45,7 @@ public class EventCMD implements CommandExecutor {
                                 if (!PlayerHider.containsPlayer(player)) {
                                     if (!playerStats.isInInfinitePK()) {
                                         if (!eventManager.isEliminated(player)) {
-                                            if (!Parkour.getBlackMarketManager().isInEvent(playerStats)) {
+                                            if (!playerStats.isInBlackMarket()) {
                                                 if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())) {
                                                     if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
                                                         Parkour.getStatsManager().toggleOffElytra(playerStats);

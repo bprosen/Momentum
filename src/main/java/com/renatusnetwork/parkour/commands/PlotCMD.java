@@ -447,7 +447,7 @@ public class PlotCMD implements CommandExecutor {
             if (!playerStats.isInInfinitePK()) {
                 if (!playerStats.isSpectating()) {
                     if (!playerStats.isEventParticipant()) {
-                        if (!Parkour.getBlackMarketManager().isInEvent(playerStats)) {
+                        if (!playerStats.isInBlackMarket()) {
                             if (!playerStats.inPracticeMode()) {
                                 passes = true;
                             } else {

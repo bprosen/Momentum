@@ -202,7 +202,7 @@ public class Utils {
                         if (!playerStats.isSpectating()) {
 
                             BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
-                            if (blackMarketManager.isInEvent(playerStats))
+                            if (playerStats.isInBlackMarket())
                                 blackMarketManager.playerLeft(playerStats, false); // remove from event
 
                             // toggle off elytra armor

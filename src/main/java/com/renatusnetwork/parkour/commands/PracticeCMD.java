@@ -30,7 +30,7 @@ public class PracticeCMD implements CommandExecutor {
                 if (!playerStats.inRace()) {
                     if (!playerStats.isSpectating()) {
                         if (!playerStats.isEventParticipant()) {
-                            if (!Parkour.getBlackMarketManager().isInEvent(playerStats)) {
+                            if (!playerStats.isInBlackMarket()) {
                                 if (!playerStats.isInInfinitePK()) {
                                     // if it is a dropper level, disable /prac
                                     if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {

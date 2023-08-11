@@ -30,6 +30,8 @@ blackmarket:
   item_spawn_location: "blackmarket-item-spawn"
   tp_location: "blackmarket-spawn"
   seconds_before_ending_from_no_bids: 30 # time of which it will take of no bidding to end the black market
+  min_player_count: 3
+  message_prefix: "&8&lThe Merchant &7→"
 gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10

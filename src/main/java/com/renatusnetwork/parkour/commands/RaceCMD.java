@@ -99,13 +99,13 @@ public class RaceCMD implements CommandExecutor {
             return false;
         }
 
-        if (Parkour.getBlackMarketManager().isInEvent(player1))
+        if (player1.isInBlackMarket())
         {
             player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
             return false;
         }
 
-        if (Parkour.getBlackMarketManager().isInEvent(player2))
+        if (player2.isInBlackMarket())
         {
             player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getPlayerName() + " &cis busy right now..."));
             return false;

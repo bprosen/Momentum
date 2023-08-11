@@ -125,6 +125,7 @@ public class SettingsManager {
 
     public String blackmarket_item_spawn_loc;
     public String blackmarket_tp_loc;
+    public String blackmarket_message_prefix;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -266,10 +267,11 @@ public class SettingsManager {
             }
         }
         seconds_before_ending_from_no_bids = settings.getInt("blackmarket.seconds_before_ending_from_no_bids");
-
-        blackmarket_tp_loc = settings.getString("blackmarket.item_spawn_location");
-        blackmarket_item_spawn_loc = settings.getString("blackmarket.tp_location");
+        blackmarket_min_player_count = settings.getInt("blackmarket.min_player_count");
+        blackmarket_item_spawn_loc = settings.getString("blackmarket.item_spawn_location");
+        blackmarket_tp_loc = settings.getString("blackmarket.tp_location");
         infinitepk_middle_loc = settings.getString("infinitepk.infinite_middle_loc");
         infinitepk_respawn_loc = settings.getString("infinitepk.infinite_respawn_loc");
+        blackmarket_message_prefix = settings.getString("blackmarket.message_prefix");
     }
 }

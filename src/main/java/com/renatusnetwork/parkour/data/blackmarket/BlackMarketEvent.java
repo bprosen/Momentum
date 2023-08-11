@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
+import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -37,27 +38,29 @@ public class BlackMarketEvent
 
     public void start()
     {
-        broadcastToPlayers(Utils.translate("&7Welcome, welcome, seekers of the forbidden. Step into the shadows, for tonight, the secrets of the underworld await you."));
+        String prefix = Parkour.getSettingsManager().blackmarket_message_prefix;
+
+        broadcastToPlayers(Utils.translate(prefix + " &7Welcome, welcome, seekers of the forbidden. Step into the shadows, for tonight, the secrets of the underworld await you."));
         new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                broadcastToPlayers("&7The auction, a spectacle like no other. Hidden from the prying eyes of the staff, it unfolds here where no laws dare to penetrate. There, coveted artifacts, mystical relics, and powerful items change hands in a dance of secrecy.");
+                broadcastToPlayers(Utils.translate(prefix + " &7The auction, a spectacle like no other. Hidden from the prying eyes of the staff, it unfolds here where no laws dare to penetrate. There, coveted artifacts, mystical relics, and powerful items change hands in a dance of secrecy."));
                 new BukkitRunnable()
                 {
                     @Override
                     public void run()
                     {
 
-                        broadcastToPlayers("&7These.. items.. They hold secrets veiled in ancient whispers, bestowing upon the buyer unique characteristics and buffs of untold origin.");
+                        broadcastToPlayers(Utils.translate(prefix + " &7These.. items.. They hold secrets veiled in ancient whispers, bestowing upon the buyer unique characteristics and buffs of untold origin."));
                         new BukkitRunnable()
                         {
                             @Override
                             public void run()
                             {
                                 showItem(); // show item
-                                broadcastToPlayers("&7Behold, " + getBlackMarketItem().getTitle() + "! An artifact that " + getBlackMarketItem().getDescription() + ".");
+                                broadcastToPlayers(Utils.translate(prefix + " &7Behold, " + getBlackMarketItem().getTitle() + "&7! An artifact that " + getBlackMarketItem().getDescription() + "."));
 
                                 new BukkitRunnable()
                                 {
@@ -66,7 +69,7 @@ public class BlackMarketEvent
                                     {
                                         canBid = true; // enable bidding
                                         startTimer();
-                                        broadcastToPlayers("&7Start your bids now. Do &c/bid (at least " + Utils.formatNumber(getNextMinimumBid()) + ")");
+                                        broadcastToPlayers(Utils.translate(prefix + " &7Start your bids now. Do &c/bid (at least " + Utils.formatNumber(getNextMinimumBid()) + ")"));
                                     }
                                 }.runTaskLater(Parkour.getPlugin(), 20 * 10);
                             }
@@ -91,7 +94,15 @@ public class BlackMarketEvent
             public void run()
             {
                 for (PlayerStats playerStats : players)
+                {
                     playerStats.getPlayer().teleport(Parkour.getLocationManager().getLobbyLocation()); // teleport to spawn
+
+                    if (hasHighestBidder())
+                        TitleAPI.sendTitle(playerStats.getPlayer(), 0, 20, 20,
+                                Utils.translate("&8&lBlack Market"), Utils.translate("&c" + highestBidder.getPlayer().getDisplayName() + " &7won!"));
+
+                    playerStats.setBlackMarket(false);
+                }
             }
         }.runTaskLater(Parkour.getPlugin(), 10 * 20); // teleport them all 10 seconds later
     }
@@ -118,9 +129,11 @@ public class BlackMarketEvent
 
     public int getHighestBid() { return highestBid; }
 
+    public boolean hasHighestBidder() { return highestBidder != null; }
+
     public boolean isHighestBidder(PlayerStats playerStats)
     {
-        return highestBidder.equals(playerStats);
+        return highestBidder != null && highestBidder.equals(playerStats);
     }
 
     public void highestBidderLeft()
@@ -140,12 +153,15 @@ public class BlackMarketEvent
         {
             highestBidder = highestEntry.getKey();
             highestBid = highestEntry.getValue();
+
             calcNextMinimumBid(highestBid); // change min bid
 
+            String prefix = Parkour.getSettingsManager().blackmarket_message_prefix;
+
             // broadcast change to players
-            broadcastToPlayers("&8The highest bidder missed out on the opportunity of a lifetime...");
-            broadcastToPlayers("&c" + highestBidder.getPlayer().getDisplayName() + " &8is the new highest bidder for &6" + Utils.formatNumber(highestBid) + " &eCoins");
-            broadcastToPlayers("&8Bid at least &6" + Utils.formatNumber(highestBid) + " &eCoins &8to overtake");
+            broadcastToPlayers(Utils.translate(prefix + " &8The highest bidder missed out on the opportunity of a lifetime..."));
+            broadcastToPlayers(Utils.translate(prefix + " &c" + highestBidder.getPlayer().getDisplayName() + " &8is the new highest bidder for &6" + Utils.formatNumber(highestBid) + " &eCoins"));
+            broadcastToPlayers(Utils.translate(prefix + " &8Bid at least &6" + Utils.formatNumber(nextMinimumBid) + " &eCoins &8to overtake"));
         }
     }
 
@@ -193,6 +209,8 @@ public class BlackMarketEvent
         return players.size();
     }
 
+    public ArrayList<PlayerStats> getPlayers() { return players; }
+
     private void startTimer()
     {
         // restart if found
@@ -217,7 +235,7 @@ public class BlackMarketEvent
                     case 3:
                     case 2:
                     case 1:
-                        broadcastToPlayers("&8There are &c" + secondsLeft + " &8seconds left to increase the bid to &6" + Utils.formatNumber(nextMinimumBid) + " &eCoins");
+                        broadcastToPlayers(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &8There are &c" + secondsLeft + " &8seconds left to increase the bid to &6" + Utils.formatNumber(nextMinimumBid) + " &eCoins"));
                         break;
                     case 0:
                         cancel();

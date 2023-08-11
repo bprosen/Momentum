@@ -55,6 +55,7 @@ public class PlayerStats {
     private int eventWins;
     private Material infiniteBlock;
     private boolean inTutorial = false;
+    private boolean inBlackmarket = false;
     private boolean failsToggled;
     private int fails;
 
@@ -74,7 +75,6 @@ public class PlayerStats {
         this.playerName = player.getName();
 
         board = new FastBoard(player); // load board
-        board.updateTitle(Utils.translate("&c&lRenatus Network"));
     }
 
     //
@@ -113,6 +113,10 @@ public class PlayerStats {
     public boolean isInTutorial() { return inTutorial; }
 
     public void setTutorial(boolean tutorial) { inTutorial = tutorial; }
+
+    public void setBlackMarket(boolean blackMarket) { inBlackmarket = blackMarket;}
+
+    public boolean isInBlackMarket() { return inBlackmarket; }
 
     //
     // Coins Sections

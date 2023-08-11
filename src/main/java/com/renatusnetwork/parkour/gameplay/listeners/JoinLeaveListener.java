@@ -150,7 +150,7 @@ public class JoinLeaveListener implements Listener {
             raceManager.endRace(raceManager.get(player).getOpponent(player), true);
 
         // if left in black market, remove them
-        if (blackMarketManager.isInEvent(playerStats))
+        if (playerStats.isInBlackMarket())
             blackMarketManager.playerLeft(playerStats, true);
 
         // if left as hidden, remove them

@@ -47,9 +47,9 @@ public class BankManager
         String legendaryItem = BankYAML.chooseBankItem(BankItemType.LEGENDARY);
 
         // reset info and set new modifier
-        BankYAML.resetBid(BankItemType.RADIANT, BankYAML.getModifier(BankItemType.RADIANT, radiantItem));
-        BankYAML.resetBid(BankItemType.BRILLIANT, BankYAML.getModifier(BankItemType.BRILLIANT, brilliantItem));
-        BankYAML.resetBid(BankItemType.LEGENDARY, BankYAML.getModifier(BankItemType.LEGENDARY, legendaryItem));
+        BankYAML.resetBid(BankItemType.RADIANT, radiantItem);
+        BankYAML.resetBid(BankItemType.BRILLIANT, brilliantItem);
+        BankYAML.resetBid(BankItemType.LEGENDARY, legendaryItem);
 
         load();
     }
