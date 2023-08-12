@@ -23,6 +23,7 @@ public class AscentEvent extends Event
     public void add(Player player)
     {
         levels.put(player, 1); // default
+        player.teleport(locations.get(1)); // tp
     }
 
     public void remove(Player player)
@@ -41,20 +42,30 @@ public class AscentEvent extends Event
         {
             int newLevel = levels.get(player) + 1;
 
-            levels.replace(player, newLevel);
+            if (!locations.containsKey(newLevel))
+                newLevel--;
+            else
+                levels.replace(player, newLevel);
+
             player.teleport(locations.get(newLevel));
         }
     }
 
     public void levelDown(Player player)
     {
+        int newLevel = levels.get(player);
+
         if (levels.containsKey(player) && levels.get(player) > 1) // min of 1
         {
-            int newLevel = levels.get(player) - 1;
-
+            newLevel--;
             levels.replace(player, newLevel);
-            player.teleport(locations.get(newLevel));
         }
+        player.teleport(locations.get(newLevel));
+    }
+
+    public int getLevelCount()
+    {
+        return locations.size();
     }
 
     @Override

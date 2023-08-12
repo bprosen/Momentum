@@ -182,7 +182,8 @@ public class Scoreboard {
 
                     if (eventManager.isAscentEvent()) {
                         board.add(Utils.translate(""));
-                        board.add(formatSpacing(Utils.translate("&e&lLevel &6" + ((AscentEvent) eventManager.getRunningEvent()).getLevelID(playerStats.getPlayer()))));
+                        AscentEvent event = (AscentEvent) eventManager.getRunningEvent();
+                        board.add(formatSpacing(Utils.translate("&e&lLevel &6" + event.getLevelID(playerStats.getPlayer()) + "/" + event.getLevelCount())));
                     }
 
                     // infinite parkour section of scoreboard

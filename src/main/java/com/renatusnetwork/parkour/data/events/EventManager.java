@@ -62,7 +62,9 @@ public class EventManager {
     // method to end event
     public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime)
     {
-        PlayerStats playerStats = Parkour.getStatsManager().get(winner);
+        PlayerStats playerStats = null;
+        if (winner != null)
+            playerStats = Parkour.getStatsManager().get(winner);
 
         ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(playerStats, runningEvent.getLevel().getReward());
         Bukkit.getPluginManager().callEvent(parkourEventEndEvent);
@@ -250,8 +252,10 @@ public class EventManager {
         // add to map
         if (isAscentEvent())
             ((AscentEvent) runningEvent).add(player);
-
-        player.teleport(runningEvent.getLevel().getStartLocation());
+        else if (isMazeEvent())
+            ((MazeEvent) runningEvent).respawn(player);
+        else
+            player.teleport(runningEvent.getLevel().getStartLocation());
 
         // remove active effects
         playerStats.clearPotionEffects();

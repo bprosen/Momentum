@@ -205,7 +205,7 @@ public class LevelsYAML {
         if (levelsFile.isConfigurationSection(levelName + ".event"))
         {
             int id = 1;
-            for (String location : levelsFile.getStringList(levelName + ".event.ascent_locations"))
+            for (String location : levelsFile.getStringList(levelName + ".event.level_spawns"))
             {
                 locations.put(id, Parkour.getLocationManager().get(location));
                 id++;
