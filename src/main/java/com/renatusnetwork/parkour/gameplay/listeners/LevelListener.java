@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.gameplay.listeners;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
+import com.renatusnetwork.parkour.data.events.types.MazeEvent;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
 import com.renatusnetwork.parkour.data.infinite.InfinitePK;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -56,6 +57,11 @@ public class LevelListener implements Listener {
                     {
                         // level down
                         ((AscentEvent) eventManager.getRunningEvent()).levelDown(player);
+                    }
+                    else if (eventManager.isMazeEvent())
+                    {
+                        // respawn
+                        ((MazeEvent) eventManager.getRunningEvent()).respawn(player);
                     }
                 } else if (playerStats.inRace()) {
 
@@ -153,10 +159,14 @@ public class LevelListener implements Listener {
                             Parkour.getInfinitePKManager().doNextJump(playerStats, false);
                         }
                     }
-                    else if (eventManager.isEventRunning() && playerStats.isEventParticipant() && eventManager.isAscentEvent())
+                    else if (eventManager.isEventRunning() && playerStats.isEventParticipant())
                     {
-                        // level up
-                        ((AscentEvent) eventManager.getRunningEvent()).levelUp(player);
+                        if (eventManager.isAscentEvent())
+                            // level up
+                            ((AscentEvent) eventManager.getRunningEvent()).levelUp(player);
+                        else if (eventManager.isMazeEvent())
+                            // end event!
+                            eventManager.endEvent(player, false, false);
                     }
                 }
             }

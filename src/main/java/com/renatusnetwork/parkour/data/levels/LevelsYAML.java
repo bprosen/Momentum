@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LevelsYAML {
 
@@ -107,8 +108,8 @@ public class LevelsYAML {
         // 10 is default
         int risingWaterY = 10;
 
-        if (exists(levelName) && isSet(levelName, "rising_water_y_below_starting"))
-            risingWaterY = levelsFile.getInt(levelName + ".rising_water_y_below_starting");
+        if (levelsFile.isConfigurationSection(levelName + ".event"))
+            risingWaterY = levelsFile.getInt(levelName + ".event.y_below_starting");
 
         return risingWaterY;
     }
@@ -201,25 +202,16 @@ public class LevelsYAML {
     {
         HashMap<Integer, Location> locations = new HashMap<>();
 
-        if (levelsFile.isList(levelName + ".ascent_locations"))
+        if (levelsFile.isConfigurationSection(levelName + ".event"))
         {
-            List<String> ascentLocations = levelsFile.getStringList(levelName + ".ascent_locations");
             int id = 1;
-
-            for (String location : ascentLocations)
+            for (String location : levelsFile.getStringList(levelName + ".event.ascent_locations"))
             {
-                String[] split = location.split(":");
-
-                locations.put(id, new Location(Parkour.getSettingsManager().main_world,
-                            Double.parseDouble(split[0]),
-                            Double.parseDouble(split[1]),
-                            Double.parseDouble(split[2]),
-                            Float.parseFloat(split[3]),
-                            Float.parseFloat(split[4]))
-                );
+                locations.put(id, Parkour.getLocationManager().get(location));
                 id++;
             }
         }
+
         return locations;
     }
 
@@ -252,9 +244,29 @@ public class LevelsYAML {
     }
 
     public static EventType getEventType(String levelName) {
-        if (levelsFile.isSet(levelName + ".event"))
-            return EventType.valueOf(levelsFile.getString(levelName + ".event"));
+        if (levelsFile.isConfigurationSection(levelName + ".event"))
+            return EventType.valueOf(levelsFile.getString(levelName + ".event.type").toUpperCase());
         return null;
+    }
+
+    public static Location getRandomMazeEventExit(String levelName) {
+        if (levelsFile.isConfigurationSection(levelName + ".event"))
+        {
+            List<String> locs = levelsFile.getStringList(levelName + ".event.exits");
+            return Parkour.getLocationManager().get(locs.get(ThreadLocalRandom.current().nextInt(locs.size())));
+        }
+        return null;
+    }
+
+    public static List<Location> getMazeRespawns(String levelName)
+    {
+        List<Location> locs = new ArrayList<>();
+
+        if (levelsFile.isConfigurationSection(levelName + ".event"))
+            for (String respawn : levelsFile.getStringList(levelName + ".event.respawns"))
+                locs.add(Parkour.getLocationManager().get(respawn));
+
+        return locs;
     }
 
     public static int getRespawnY(String levelName) {
