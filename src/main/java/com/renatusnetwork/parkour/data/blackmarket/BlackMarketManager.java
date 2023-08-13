@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import com.sk89q.commandbook.locations.TeleportSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -179,7 +180,7 @@ public class BlackMarketManager
             if (running.hasHighestBidder())
             {
                 Parkour.getStatsManager().removeCoins(running.getHighestBidder(), running.getHighestBid());
-                // TODO: reward here
+                reward(running.getHighestBidder());
             }
             running.end();
 
@@ -202,6 +203,14 @@ public class BlackMarketManager
         else
         {
             Parkour.getPluginLogger().info("Tried to force end a Black Market event with none in-progress");
+        }
+    }
+
+    private void reward(PlayerStats playerStats)
+    {
+        for (String command : running.getBlackMarketItem().getRewardCommands())
+        {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", playerStats.getPlayerName())); // send command
         }
     }
 

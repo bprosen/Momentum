@@ -95,4 +95,9 @@ public class BlackMarketYAML
     {
         return blackmarketConfig.getConfigurationSection("items").getKeys(false);
     }
+
+    public static List<String> getRewardCommands(String name)
+    {
+        return blackmarketConfig.getStringList("items." + name + ".reward_commands");
+    }
 }

@@ -2,6 +2,8 @@ package com.renatusnetwork.parkour.data.blackmarket;
 
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class BlackMarketArtifact
 {
     private String name;
@@ -10,6 +12,7 @@ public class BlackMarketArtifact
     private int startingBid;
     private float nextBidMultiplier;
     private ItemStack item;
+    private List<String> rewardCommands;
 
     public BlackMarketArtifact(String name)
     {
@@ -19,6 +22,7 @@ public class BlackMarketArtifact
         this.item = BlackMarketYAML.getItem(name);
         this.title = BlackMarketYAML.getTitle(name);
         this.description = BlackMarketYAML.getDescription(name);
+        this.rewardCommands = BlackMarketYAML.getRewardCommands(name);
     }
 
     public String getTitle()
@@ -40,4 +44,5 @@ public class BlackMarketArtifact
         return nextBidMultiplier;
     }
 
+    public List<String> getRewardCommands() { return rewardCommands; }
 }
