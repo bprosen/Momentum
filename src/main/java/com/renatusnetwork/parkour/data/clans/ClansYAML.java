@@ -32,11 +32,4 @@ public class ClansYAML {
             return clansConfig.getInt("clans." + level + ".xp-needed");
         return 0;
     }
-
-    public static int getMaxLevel() {
-        for (int i = 1;; i++) {
-            if (!isSection("clans." + i))
-                return i;
-        }
-    }
 }

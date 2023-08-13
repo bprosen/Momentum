@@ -131,6 +131,8 @@ public class TablesDB {
                 "clan_xp INT NOT NULL, " +
                 "total_gained_xp BIGINT NOT NULL, " +
                 "owner_player_id INT NOT NULL, " +
+                "max_level SMALLINT NOT NULL DEFAULT 5, " +
+                "max_members SMALLINT NOT NULL DEFAULT 5, " +
                 "PRIMARY KEY (clan_id)" +
                 ")";
 

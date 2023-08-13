@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.sk89q.worldedit.UnknownItemException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -17,8 +18,126 @@ public class ClanCMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
+        ClansManager clansManager = Parkour.getClansManager();
         if (a.length > 0) {
-            if (a[0].equalsIgnoreCase("stats")) {
+            if (a.length == 3 && a[0].equalsIgnoreCase("setmaxlevel"))
+            {
+                if (sender.hasPermission("rn-parkour.admin"))
+                {
+                    String clanName = a[1];
+                    if (Utils.isInteger(a[2]))
+                    {
+                        int newMaxLevel = Integer.parseInt(a[2]);
+
+                        Clan targetClan = Parkour.getClansManager().get(clanName);
+                        if (targetClan != null)
+                        {
+                            // make sure it is not negative level
+                            clansManager.updateMaxLevel(targetClan, newMaxLevel);
+                            sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
+                                    " Max Level to &6" + newMaxLevel));
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                        }
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
+                    }
+                }
+                else
+                {
+                    sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                }
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("setmaxmembers"))
+            {
+                if (sender.hasPermission("rn-parkour.admin"))
+                {
+                    String clanName = a[1];
+                    if (Utils.isInteger(a[2]))
+                    {
+                        int newMaxMembers = Integer.parseInt(a[2]);
+
+                        Clan targetClan = Parkour.getClansManager().get(clanName);
+                        if (targetClan != null)
+                        {
+                            int memberCount = targetClan.getMembers().size();
+                            if (memberCount <= newMaxMembers)
+                            {
+                                clansManager.updateMaxMembers(targetClan, newMaxMembers);
+                                sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
+                                        " Max Members to &6" + newMaxMembers));
+                            }
+                            else
+                            {
+                                sender.sendMessage(Utils.translate("&cYou cannot set &4" + targetClan.getTag() + "&c's max members to less than what they have (" + memberCount + ")"));
+                            }
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                        }
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
+                    }
+                }
+                else
+                {
+                    sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                }
+            }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("addmaxlevel"))
+            {
+                if (sender.hasPermission("rn-parkour.admin"))
+                {
+                    String clanName = a[1];
+                    Clan targetClan = Parkour.getClansManager().get(clanName);
+
+                    if (targetClan != null)
+                    {
+                        clansManager.updateMaxLevel(targetClan, targetClan.getMaxLevel() + 1);
+                        sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
+                                " Max Level to &6" + targetClan.getMaxLevel()));
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                    }
+                }
+                else
+                {
+                    sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                }
+            }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("addmaxmember"))
+            {
+                if (sender.hasPermission("rn-parkour.admin"))
+                {
+                    String clanName = a[1];
+                    Clan targetClan = Parkour.getClansManager().get(clanName);
+
+                    if (targetClan != null)
+                    {
+                        clansManager.updateMaxMembers(targetClan, targetClan.getMaxMembers() + 1);
+                        sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
+                                " Max Members to &6" + targetClan.getMaxMembers()));
+                    }
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                    }
+                }
+                else
+                {
+                    sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+                }
+            }
+            else if (a[0].equalsIgnoreCase("stats")) {
 
                 Clan targetClan;
 
@@ -49,6 +168,8 @@ public class ClanCMD implements CommandExecutor {
                     // send stats
                     sender.sendMessage(Utils.translate("&6&l" + targetClan.getTag() + "&e's Stats"));
                     sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
+                    sender.sendMessage(Utils.translate("  &cMax Level &4" + targetClan.getMaxLevel()));
+                    sender.sendMessage(Utils.translate("  &cMax Members &4" + targetClan.getMaxMembers()));
                     sender.sendMessage(Utils.translate("  &cTotal Clan XP &4" + Utils.shortStyleNumber(targetClan.getTotalGainedXP())));
 
                     // if max level, dont send needed to level up
@@ -170,7 +291,6 @@ public class ClanCMD implements CommandExecutor {
                     }
                 } else if (a.length == 1 && a[0].equalsIgnoreCase("chatspy")) {
                     if (player.hasPermission("rn-parkour.staff")) {
-                        ClansManager clansManager = Parkour.getClansManager();
 
                         clansManager.toggleChatSpy(player.getName(), false);
 
@@ -195,13 +315,12 @@ public class ClanCMD implements CommandExecutor {
 
                                 if (clanTagRequirements(clanTag, sender)) {
                                     Parkour.getStatsManager().removeCoins(playerStats, Parkour.getSettingsManager().clans_price_create);
-                                    Clan newClan = new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0);
+                                    Clan newClan = new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0, 5, 5);
                                     Parkour.getClansManager().add(newClan);
                                     ClansDB.newClan(newClan);
                                 }
                             } else {
                                 sender.sendMessage(Utils.translate("&cNo clan tag specified"));
-                                sender.sendMessage(getHelp("create"));
                             }
                         } else {
                             sender.sendMessage(Utils.translate("&cYou need &6" +
@@ -212,7 +331,6 @@ public class ClanCMD implements CommandExecutor {
                     }
                 } else if (a.length == 1 && a[0].equalsIgnoreCase("chat")) {
                     if (clan != null) {
-                        ClansManager clansManager = Parkour.getClansManager();
 
                         clansManager.toggleClanChat(player.getName(), clan);
 
@@ -247,7 +365,6 @@ public class ClanCMD implements CommandExecutor {
                                     }
                                 } else {
                                     sender.sendMessage(Utils.translate("&cNo clan tag specified"));
-                                    sender.sendMessage(getHelp("changetag"));
                                 }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou are not the owner of your clan"));
@@ -301,7 +418,7 @@ public class ClanCMD implements CommandExecutor {
                                 // if they already have an invite or not
                                 if (!clan.isInvited(victim.getUniqueId().toString())) {
 
-                                    int maxMembers = Parkour.getSettingsManager().clans_max_members;
+                                    int maxMembers = clan.getMaxMembers();
                                     if (clan.getMembers().size() < maxMembers) {
                                         // add an invite
                                         victim.sendMessage(Utils.translate("&6&l" + player.getName() + " &ehas sent you an" +
@@ -352,7 +469,7 @@ public class ClanCMD implements CommandExecutor {
 
                         Player victim = Bukkit.getPlayer(a[1]);
                         if (victim == null) {
-                            player.sendMessage(Utils.translate("&4" + victim.getName() + " &cis not online"));
+                            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
                             return true;
                         }
 
@@ -362,7 +479,7 @@ public class ClanCMD implements CommandExecutor {
                             // if they are invited
                             if (targetClan.isInvited(player.getUniqueId().toString())) {
 
-                                if (targetClan.getMembers().size() < Parkour.getSettingsManager().clans_max_members) {
+                                if (targetClan.getMembers().size() < targetClan.getMaxMembers()) {
                                     // add to clan and remove invite
                                     targetClan.addMember(new ClanMember(playerStats.getPlayerID(), playerStats.getUUID(), player.getName()));
                                     playerStats.setClan(targetClan);
@@ -525,64 +642,31 @@ public class ClanCMD implements CommandExecutor {
         }
     }
 
-    private static void sendHelp(CommandSender sender) {
-        sender.sendMessage(getHelp("stats")); // console friendly
-        sender.sendMessage(getHelp("create"));
-        sender.sendMessage(getHelp("invite"));
-        sender.sendMessage(getHelp("accept"));
-        sender.sendMessage(getHelp("leave"));
-        sender.sendMessage(getHelp("kick"));
-        sender.sendMessage(getHelp("disband"));
-        sender.sendMessage(getHelp("changetag"));
-        sender.sendMessage(getHelp("setowner"));
-        sender.sendMessage(getHelp("chat"));
+    private static void sendHelp(CommandSender sender)
+    {
+        sender.sendMessage(Utils.translate("&3/clan stats <clan>  &7Display clan statistics"));
+        sender.sendMessage(Utils.translate("&3/clan create <tag>  &7Create a clan &6" + Parkour.getSettingsManager().clans_price_create + " Coins"));
+        sender.sendMessage(Utils.translate("&3/clan changetag <tag>  &7Change clan tag &6" + Parkour.getSettingsManager().clans_price_tag + " Coins"));
+        sender.sendMessage(Utils.translate("&3/clan setowner <player>  &7Give your clan ownership"));
+        sender.sendMessage(Utils.translate("&3/clan kick <player>  &7Kick player from your clan"));
+        sender.sendMessage(Utils.translate("&3/clan invite <player>  &7Invite player to your clan"));
+        sender.sendMessage(Utils.translate("&3/clan accept <player>  &7Accept invite from player"));
+        sender.sendMessage(Utils.translate("&3/clan disband  &7Disband your clan"));
+        sender.sendMessage(Utils.translate("&3/clan leave  &7Leave your clan"));
+        sender.sendMessage(Utils.translate("&3/clan chat  &7Toggles clan chat"));
 
-        // send admin section
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (player.hasPermission("rn-parkour.admin")) {
-                sender.sendMessage(getHelp("setlevel"));
-                sender.sendMessage(getHelp("setxp"));
-                sender.sendMessage(getHelp("settotalxp"));
-                sender.sendMessage(getHelp("delete"));
-                sender.sendMessage(getHelp("chatspy"));
-            }
+        if (sender.hasPermission("rn-parkour.admin"))
+        {
+            sender.sendMessage(Utils.translate("&3/clan setxp <clan> <xp>  &7Sets clan XP"));
+            sender.sendMessage(Utils.translate("&3/clan setlevel <clan> <level>  &7Sets clan level"));
+            sender.sendMessage(Utils.translate("&3/clan delete <clan>  &7Deletes the clan"));
+            sender.sendMessage(Utils.translate("&3/clan settotalxp <clan>  &7Sets total XP of a clan"));
+            sender.sendMessage(Utils.translate("&3/clan setmaxlevel <clan> <maxLevel>  &7Sets the new max level of a clan (min of 5, default)"));
+            sender.sendMessage(Utils.translate("&3/clan setmaxmembers <clan> <maxMembers>  &7Sets the new max members of a clan (cannot set less than what they have)"));
+            sender.sendMessage(Utils.translate("&3/clan addmaxlevel <clan>  &7Adds 1 max level"));
+            sender.sendMessage(Utils.translate("&3/clan addmaxmember <clan>  &7Adds 1 max member"));
         }
-    }
-
-    private static String getHelp(String cmd) {
-        switch (cmd.toLowerCase()) {
-            case "stats":
-                return Utils.translate("&3/clan stats <clan>  &7Display clan statistics");
-            case "create":
-                return Utils.translate("&3/clan create <tag>  &7Create a clan &6" + Parkour.getSettingsManager().clans_price_create + " Coins");
-            case "changetag":
-                return Utils.translate("&3/clan changetag <tag>  &7Change clan tag &6" + Parkour.getSettingsManager().clans_price_tag + " Coins");
-            case "setowner":
-                return Utils.translate("&3/clan setowner <player>  &7Give your clan ownership");
-            case "kick":
-                return Utils.translate("&3/clan kick <player>  &7Kick player from your clan");
-            case "invite":
-                return Utils.translate("&3/clan invite <player>  &7Invite player to your clan");
-            case "accept":
-                return Utils.translate("&3/clan accept <player>  &7Accept invite from player");
-            case "disband":
-                return Utils.translate("&3/clan disband  &7Disband your clan");
-            case "leave":
-                return Utils.translate("&3/clan leave  &7Leave your clan");
-            case "setxp":
-                return Utils.translate("&3/clan setxp <clan> <xp>  &7Sets clan XP");
-            case "setlevel":
-                return Utils.translate("&3/clan setlevel <clan> <level>  &7Sets clan level");
-            case "delete":
-                return Utils.translate("&3/clan delete <clan>  &7Deletes the clan");
-            case "settotalxp":
-                return Utils.translate("&3/clan settotalxp <clan>  &7Sets total XP of a clan");
-            case "chat":
-                return Utils.translate("&3/clan chat  &7Toggles clan chat");
-            case "chatspy":
-                return Utils.translate("&3/clan chatspy  &7Toggle clan chatspy");
-        }
-        return "";
+        else if (sender.hasPermission("rn-parkour.staff"))
+            sender.sendMessage(Utils.translate("&3/clan chatspy  &7Toggle clan chatspy"));
     }
 }

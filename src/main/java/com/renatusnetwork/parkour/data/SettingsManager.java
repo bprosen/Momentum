@@ -29,6 +29,7 @@ public class SettingsManager {
 
     public int max_event_leaderboard_size;
     public int clans_max_members;
+    public int clans_max_level;
     public int clans_price_create;
     public int clans_price_tag;
     public int clans_tag_length_min;
@@ -142,6 +143,7 @@ public class SettingsManager {
         signs_second_line_completion = settings.getString("signs.second_line.completion");
         signs_second_line_spawn = settings.getString("signs.second_line.spawn");
         clans_max_members = settings.getInt("clans.max_members");
+        clans_max_level = settings.getInt("clans.max_level");
         clans_price_create = settings.getInt("clans.price.create");
         clans_price_tag = settings.getInt("clans.price.tag");
         clans_tag_length_min = settings.getInt("clans.tag_length.min");

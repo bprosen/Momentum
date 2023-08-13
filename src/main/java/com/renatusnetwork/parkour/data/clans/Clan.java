@@ -11,17 +11,20 @@ public class Clan {
     private int clanLevel;
     private int clanXP;
     private long totalGainedXP;
-
+    private int maxLevel;
+    private int maxMembers;
     private List<ClanMember> members = new ArrayList<>(); // Does not include the owner
     private List<String> invitedUUIDs = new ArrayList<>();
 
-    public Clan(int clanID, String clanTag, int clanOwnerID, int clanLevel, int clanXP, long totalGainedXP) {
+    public Clan(int clanID, String clanTag, int clanOwnerID, int clanLevel, int clanXP, long totalGainedXP, int maxLevel, int maxMembers) {
         this.ID = clanID;
         this.tag = clanTag;
         this.ownerID = clanOwnerID;
         this.clanLevel = clanLevel;
         this.clanXP = clanXP;
         this.totalGainedXP = totalGainedXP;
+        this.maxMembers = maxMembers;
+        this.maxLevel = maxLevel;
     }
 
     public void setID(int clanID) {
@@ -56,10 +59,29 @@ public class Clan {
 
     public void addXP(long clanXP) { this.clanXP += clanXP; }
 
-    public boolean isMaxLevel() {
-        if (clanLevel >= ClansYAML.getMaxLevel())
-            return true;
-        return false;
+    public boolean isMaxLevel()
+    {
+        return clanLevel == maxLevel;
+    }
+
+    public int getMaxLevel()
+    {
+        return maxLevel;
+    }
+
+    public int getMaxMembers()
+    {
+        return maxMembers;
+    }
+
+    public void setMaxLevel(int maxLevel)
+    {
+        this.maxLevel = maxLevel;
+    }
+
+    public void setMaxMembers(int maxMembers)
+    {
+        this.maxMembers = maxMembers;
     }
 
     public void setLevel(int level) {

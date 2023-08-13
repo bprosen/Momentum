@@ -14,7 +14,7 @@ public class ClansDB {
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "clans",
-                "clan_id, clan_tag, owner_player_id, clan_level, clan_xp, total_gained_xp",
+                "*",
                 ""
         );
 
@@ -26,7 +26,9 @@ public class ClansDB {
                             Integer.parseInt(result.get("owner_player_id")),
                             Integer.parseInt(result.get("clan_level")),
                             Integer.parseInt(result.get("clan_xp")),
-                            Long.parseLong(result.get("total_gained_xp"))
+                            Long.parseLong(result.get("total_gained_xp")),
+                            Integer.parseInt("max_level"),
+                            Integer.parseInt("max_members")
                     )
             );
 
@@ -185,6 +187,24 @@ public class ClansDB {
     public static void updateClanOwnerID(Clan clan) {
         String query = "UPDATE clans SET " +
                 "owner_player_id=" + clan.getOwnerID() +
+                " WHERE clan_id=" + clan.getID();
+
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void updateClanMaxLevel(Clan clan)
+    {
+        String query = "UPDATE clans SET " +
+                "max_level=" + clan.getMaxLevel() +
+                " WHERE clan_id=" + clan.getID();
+
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void updateClanMaxMembers(Clan clan)
+    {
+        String query = "UPDATE clans SET " +
+                "max_members=" + clan.getMaxMembers() +
                 " WHERE clan_id=" + clan.getID();
 
         Parkour.getDatabaseManager().add(query);

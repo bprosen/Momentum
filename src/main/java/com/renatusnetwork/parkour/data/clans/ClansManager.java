@@ -198,48 +198,13 @@ public class ClansManager {
                         rewardString + " &eXP for your clan!" +
                         " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()), null);
 
-                // level them up
-            } else if (totalXP > ClansYAML.getLevelUpPrice(clan)) {
-
-                // left over after level up
-                int clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
-                int newLevel = clan.getLevel() + 1;
-
-                // this is the section that will determine if they will skip any levels
-                for (int i = clan.getLevel(); i < ClansYAML.getMaxLevel(); i++) {
-                    // this means they are still above the next level amount
-                    if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel)) {
-
-                        // remove from overflow and add +1 level
-                        clanXPOverflow -= ClansYAML.getLevelUpPrice(newLevel);
-                        newLevel++;
-                    } else {
-                        break;
-                    }
-                }
-
-                // if > or = max level, manually set jic
-                if (newLevel >= ClansYAML.getMaxLevel())
-                    newLevel = ClansYAML.getMaxLevel();
-
-                clan.setLevel(newLevel);
-                sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
-
-                // play level up sound to online clan members
-                for (ClanMember clanMember : clan.getMembers()) {
-                    Player onlineMember = Bukkit.getPlayer(clanMember.getPlayerName());
-
-                    if (onlineMember != null)
-                        onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
-                }
-
-                // add rest of xp after leveling up
-                ClansDB.setClanLevel(newLevel, clan.getID());
-                ClansDB.setClanXP(clanXPOverflow, clan.getID());
-                clan.setXP(clanXPOverflow);
-
-                // add xp to clan
-            } else {
+            // level them up
+            }
+            else if (totalXP > ClansYAML.getLevelUpPrice(clan))
+                processClanLevelUp(clan, totalXP);
+            // add xp to clan
+            else
+            {
                 // otherwise add xp to cache and database
                 clan.addXP(clanXP);
                 ClansDB.setClanXP(totalXP, clan.getID());
@@ -295,6 +260,93 @@ public class ClansManager {
                 else
                     clanPlayer.sendMessage(Utils.translate(msg));
         }
+    }
+
+    public void updateMaxLevel(Clan clan, int newMaxLevel)
+    {
+        int oldMaxLevel = clan.getMaxLevel();
+
+        if (newMaxLevel > Parkour.getSettingsManager().clans_max_level)
+            newMaxLevel = Parkour.getSettingsManager().clans_max_level;
+
+        if (newMaxLevel < 5) // default max level
+            newMaxLevel = 5;
+
+        if (oldMaxLevel != newMaxLevel)
+        {
+            // update in cache and config
+            clan.setMaxLevel(newMaxLevel);
+            ClansDB.updateClanMaxLevel(clan);
+
+            int currLevel = clan.getLevel();
+
+            // process potential level up!
+            if (currLevel == oldMaxLevel) // means they were max!
+            {
+                processClanLevelUp(clan, clan.getXP());
+            }
+            else if (newMaxLevel < currLevel)
+            {
+                // means they went down in max level but were past the new max (force their level down)
+                clan.setLevel(clan.getMaxLevel());
+                ClansDB.setClanLevel(clan.getMaxLevel(), clan.getID());
+            }
+        }
+    }
+
+    private void processClanLevelUp(Clan clan, int totalXP)
+    {
+        // left over after level up
+        int clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
+        int newLevel = clan.getLevel() + 1;
+
+        // this is the section that will determine if they will skip any levels
+        for (int i = clan.getLevel(); i < clan.getMaxLevel(); i++)
+        {
+            // this means they are still above the next level amount
+            if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel))
+            {
+                // remove from overflow and add +1 level
+                clanXPOverflow -= ClansYAML.getLevelUpPrice(newLevel);
+                newLevel++;
+            }
+            else
+                break;
+        }
+
+        // if > or = max level, manually set jic
+        if (newLevel >= clan.getMaxLevel())
+            newLevel = clan.getMaxLevel();
+
+        clan.setLevel(newLevel);
+        sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
+
+        // play level up sound to online clan members
+        for (ClanMember clanMember : clan.getMembers())
+        {
+            Player onlineMember = Bukkit.getPlayer(clanMember.getPlayerName());
+
+            if (onlineMember != null)
+                onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
+        }
+
+        // add rest of xp after leveling up
+        ClansDB.setClanLevel(newLevel, clan.getID());
+        ClansDB.setClanXP(clanXPOverflow, clan.getID());
+        clan.setXP(clanXPOverflow);
+    }
+
+    public void updateMaxMembers(Clan clan, int newMaxMembers)
+    {
+        if (newMaxMembers > Parkour.getSettingsManager().clans_max_members)
+            newMaxMembers = Parkour.getSettingsManager().clans_max_members;
+
+        if (newMaxMembers < 5) // default max members
+            newMaxMembers = 5;
+
+        // update in cache and config
+        clan.setMaxMembers(newMaxMembers);
+        ClansDB.updateClanMaxMembers(clan);
     }
 
     private void startScheduler(Plugin plugin) {

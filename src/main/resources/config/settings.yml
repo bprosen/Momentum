@@ -141,7 +141,8 @@ practice-plate:
   title: "&6Practice Checkpoint"
   hotbar_slot: 2
 clans:
-  max_members: 5
+  max_members: 10
+  max_level: 10
   split_reward_min_needed: 300
   max_leaderboard_size: 10
   price:
