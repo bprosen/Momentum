@@ -100,24 +100,6 @@ public class BlackMarketEvent
             for (String message : blackMarketArtifact.getWinnerMessages())
                 highestBidder.getPlayer().sendMessage(Utils.translate(message)); // send msgs
         }
-
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-                for (PlayerStats playerStats : players)
-                {
-                    playerStats.getPlayer().teleport(Parkour.getLocationManager().getLobbyLocation()); // teleport to spawn
-
-                    if (hasHighestBidder())
-                        TitleAPI.sendTitle(playerStats.getPlayer(), 0, 20, 20,
-                                Utils.translate("&8&lBlack Market"), Utils.translate("&c" + highestBidder.getPlayer().getDisplayName() + " &7won!"));
-
-                    playerStats.setBlackMarket(false);
-                }
-            }
-        }.runTaskLater(Parkour.getPlugin(), 10 * 20); // teleport them all 10 seconds later
     }
 
     public int getNextMinimumBid()

@@ -178,9 +178,8 @@ public class BlackMarketManager
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
             running.end();
-
+            runEndingSchedulers(false);
             running = null;
-            runEndingSchedulers();
         }
         else
         {
@@ -193,6 +192,7 @@ public class BlackMarketManager
         if (isRunning())
         {
             running.end();
+            runEndingSchedulers(true);
             running = null;
         }
         else
@@ -201,29 +201,52 @@ public class BlackMarketManager
         }
     }
 
-    private void runEndingSchedulers()
+    private void runEndingSchedulers(boolean forceEnded)
     {
-        // ending schedulers
         new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                // run final jackpot 5 mins later
-                Parkour.getBankManager().startJackpot();
-
-                new BukkitRunnable()
+                for (PlayerStats playerStats : running.getPlayers())
                 {
-                    @Override
-                    public void run()
+                    playerStats.getPlayer().teleport(Parkour.getLocationManager().getLobbyLocation()); // teleport to spawn
+
+                    if (running.hasHighestBidder())
                     {
-                        // LOAD NEW BANK ITEMS!
-                        Parkour.getBankManager().resetItems();
-                        Parkour.getBankManager().broadcastReset();
+                        String display = running.getHighestBidder().getPlayer().getDisplayName();
+                        TitleAPI.sendTitle(playerStats.getPlayer(), 0, 20, 20,
+                                Utils.translate("&8&lBlack Market"), Utils.translate("&c" + display + " &7won!"));
                     }
-                }.runTaskLater(Parkour.getPlugin(), (20 * Parkour.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
+                    playerStats.setBlackMarket(false);
+                }
             }
-        }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
+        }.runTaskLater(Parkour.getPlugin(), 10 * 20); // teleport them all 10 seconds later
+
+        if (!forceEnded)
+        {
+            // ending schedulers, we only do these if the event ended normally
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    // run final jackpot 5 mins later
+                    Parkour.getBankManager().startJackpot();
+
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            // LOAD NEW BANK ITEMS!
+                            Parkour.getBankManager().resetItems();
+                            Parkour.getBankManager().broadcastReset();
+                        }
+                    }.runTaskLater(Parkour.getPlugin(), (20 * Parkour.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
+                }
+            }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 5); // 5 mins later
+        }
     }
 
     public void increaseBid(PlayerStats playerStats, int bid)
