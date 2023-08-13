@@ -13,6 +13,7 @@ public class BlackMarketArtifact
     private float nextBidMultiplier;
     private ItemStack item;
     private List<String> rewardCommands;
+    private List<String> winnerMessages;
 
     public BlackMarketArtifact(String name)
     {
@@ -23,6 +24,7 @@ public class BlackMarketArtifact
         this.title = BlackMarketYAML.getTitle(name);
         this.description = BlackMarketYAML.getDescription(name);
         this.rewardCommands = BlackMarketYAML.getRewardCommands(name);
+        this.winnerMessages = BlackMarketYAML.getWinnerMessages(name);
     }
 
     public String getTitle()
@@ -45,4 +47,6 @@ public class BlackMarketArtifact
     }
 
     public List<String> getRewardCommands() { return rewardCommands; }
+
+    public List<String> getWinnerMessages() { return winnerMessages; }
 }

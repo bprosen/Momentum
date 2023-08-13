@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -86,6 +87,18 @@ public class BlackMarketEvent
         {
             itemEntity.remove();
             itemEntity = null;
+        }
+
+        // coin removal, reward and message processing
+        if (hasHighestBidder())
+        {
+            Parkour.getStatsManager().removeCoins(highestBidder, highestBid);
+
+            for (String command : blackMarketArtifact.getRewardCommands())
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", highestBidder.getPlayerName())); // send command
+
+            for (String message : blackMarketArtifact.getWinnerMessages())
+                highestBidder.getPlayer().sendMessage(Utils.translate(message)); // send msgs
         }
 
         new BukkitRunnable()

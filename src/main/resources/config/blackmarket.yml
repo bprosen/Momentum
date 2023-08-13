@@ -10,6 +10,10 @@ items:
       title: "Test"
       lore:
         - "test"
+    reward_commands:
+      - "say test"
+    messages_to_winner:
+      - "&clol test"
   test-2:
     title: "&cTest"
     description: "This is a test 2!"
@@ -21,6 +25,10 @@ items:
       title: "Test"
       lore:
         - "test"
+    reward_commands:
+      - "say test"
+    messages_to_winner:
+      - "&clol test"
   test-3:
     title: "&cTest"
     description: "This is a test 3!"
@@ -32,6 +40,10 @@ items:
       title: "Test"
       lore:
         - "test"
+    reward_commands:
+      - "say test"
+    messages_to_winner:
+      - "&clol test"
   test-4:
     title: "&cTest"
     description: "This is a test 4!"
@@ -43,3 +55,7 @@ items:
       title: "Test"
       lore:
         - "test"
+    reward_commands:
+      - "say test"
+    messages_to_winner:
+      - "&clol test"

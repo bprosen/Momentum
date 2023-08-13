@@ -100,4 +100,9 @@ public class BlackMarketYAML
     {
         return blackmarketConfig.getStringList("items." + name + ".reward_commands");
     }
+
+    public static List<String> getWinnerMessages(String name)
+    {
+        return blackmarketConfig.getStringList("items." + name + ".messages_to_winner");
+    }
 }

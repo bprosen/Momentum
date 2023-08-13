@@ -177,11 +177,6 @@ public class BlackMarketManager
             running.broadcastToPlayers(Utils.translate("&cUntil our next sale..."));
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
-            if (running.hasHighestBidder())
-            {
-                Parkour.getStatsManager().removeCoins(running.getHighestBidder(), running.getHighestBid());
-                reward(running.getHighestBidder());
-            }
             running.end();
 
             running = null;
@@ -203,14 +198,6 @@ public class BlackMarketManager
         else
         {
             Parkour.getPluginLogger().info("Tried to force end a Black Market event with none in-progress");
-        }
-    }
-
-    private void reward(PlayerStats playerStats)
-    {
-        for (String command : running.getBlackMarketItem().getRewardCommands())
-        {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", playerStats.getPlayerName())); // send command
         }
     }
 
