@@ -3,6 +3,8 @@ package com.renatusnetwork.parkour.data.levels;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.events.types.EventType;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -375,6 +377,15 @@ public class Level {
                         }.runTaskAsynchronously(Parkour.getPlugin());
                     }
                 }
+            }
+            PlayerStats playerStats = Parkour.getStatsManager().get(levelCompletion.getPlayerName()); // get player that got record
+            if (playerStats.hasModifier(ModifierTypes.RECORD_BONUS))
+            {
+                Bonus bonus = (Bonus) playerStats.getModifier(ModifierTypes.RECORD_BONUS);
+
+                // add coins
+                Parkour.getStatsManager().addCoins(playerStats, bonus.getBonus());
+                playerStats.getPlayer().sendMessage(Utils.translate("&7You got &6" + Utils.formatNumber(bonus.getBonus()) + " &eCoins &7for getting the record!"));
             }
             // do gg run
             Parkour.getStatsManager().runGGTimer();

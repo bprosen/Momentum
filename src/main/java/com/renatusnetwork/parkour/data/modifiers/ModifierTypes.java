@@ -10,5 +10,7 @@ public enum ModifierTypes
     INFINITE_BOOSTER,
 
     LEVEL_DISCOUNT,
-    SHOP_DISCOUNT
+    SHOP_DISCOUNT,
+
+    RECORD_BONUS
 }

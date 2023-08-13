@@ -56,4 +56,15 @@ public class ModifiersYAML
 
         return percent;
     }
+
+    public static int getBonus(String modifierName)
+    {
+        int bonus = modifiersConfig.getInt(modifierName + ".bonus");
+
+        // adjust for impossibles
+        if (bonus < 1)
+            bonus = 1;
+
+        return bonus;
+    }
 }
