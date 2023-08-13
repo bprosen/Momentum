@@ -35,7 +35,7 @@ public class ClanCMD implements CommandExecutor {
                             // make sure it is not negative level
                             clansManager.updateMaxLevel(targetClan, newMaxLevel);
                             sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
-                                    " Max Level to &6" + newMaxLevel));
+                                    " Max Level to &6" + targetClan.getMaxLevel()));
                         }
                         else
                         {
@@ -69,7 +69,7 @@ public class ClanCMD implements CommandExecutor {
                             {
                                 clansManager.updateMaxMembers(targetClan, newMaxMembers);
                                 sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
-                                        " Max Members to &6" + newMaxMembers));
+                                        " Max Members to &6" + targetClan.getMaxMembers()));
                             }
                             else
                             {
@@ -95,18 +95,27 @@ public class ClanCMD implements CommandExecutor {
             {
                 if (sender.hasPermission("rn-parkour.admin"))
                 {
-                    String clanName = a[1];
-                    Clan targetClan = Parkour.getClansManager().get(clanName);
+                    String playerName = a[1];
+                    Player target = Bukkit.getPlayer(playerName);
 
-                    if (targetClan != null)
+                    if (target != null)
                     {
-                        clansManager.updateMaxLevel(targetClan, targetClan.getMaxLevel() + 1);
-                        sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
-                                " Max Level to &6" + targetClan.getMaxLevel()));
+                        Clan targetClan = Parkour.getStatsManager().get(target).getClan();
+
+                        if (targetClan != null)
+                        {
+                            clansManager.updateMaxLevel(targetClan, targetClan.getMaxLevel() + 1);
+                            sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
+                                    " Max Level to &6" + targetClan.getMaxLevel()));
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in a clan"));
+                        }
                     }
                     else
                     {
-                        sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                        sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
                     }
                 }
                 else
@@ -118,18 +127,27 @@ public class ClanCMD implements CommandExecutor {
             {
                 if (sender.hasPermission("rn-parkour.admin"))
                 {
-                    String clanName = a[1];
-                    Clan targetClan = Parkour.getClansManager().get(clanName);
+                    String playerName = a[1];
+                    Player target = Bukkit.getPlayer(playerName);
 
-                    if (targetClan != null)
+                    if (target != null)
                     {
-                        clansManager.updateMaxMembers(targetClan, targetClan.getMaxMembers() + 1);
-                        sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
-                                " Max Members to &6" + targetClan.getMaxMembers()));
+                        Clan targetClan = Parkour.getStatsManager().get(target).getClan();
+
+                        if (targetClan != null)
+                        {
+                            clansManager.updateMaxMembers(targetClan, targetClan.getMaxMembers() + 1);
+                            sender.sendMessage(Utils.translate("&eYou set &6" + targetClan.getTag() + "&e's" +
+                                    " Max Members to &6" + targetClan.getMaxMembers()));
+                        }
+                        else
+                        {
+                            sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in a clan"));
+                        }
                     }
                     else
                     {
-                        sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
+                        sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
                     }
                 }
                 else
@@ -166,10 +184,9 @@ public class ClanCMD implements CommandExecutor {
                 if (targetClan != null) {
 
                     // send stats
-                    sender.sendMessage(Utils.translate("&6&l" + targetClan.getTag() + "&e's Stats"));
+                    sender.sendMessage(Utils.translate("&6" + targetClan.getTag() + "&e's Stats"));
                     sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
                     sender.sendMessage(Utils.translate("  &cMax Level &4" + targetClan.getMaxLevel()));
-                    sender.sendMessage(Utils.translate("  &cMax Members &4" + targetClan.getMaxMembers()));
                     sender.sendMessage(Utils.translate("  &cTotal Clan XP &4" + Utils.shortStyleNumber(targetClan.getTotalGainedXP())));
 
                     // if max level, dont send needed to level up
@@ -182,7 +199,7 @@ public class ClanCMD implements CommandExecutor {
                     }
 
                     sender.sendMessage("");
-                    sender.sendMessage(Utils.translate( "&6Members &e" + targetClan.getMembers().size()));
+                    sender.sendMessage(Utils.translate( "&6Members &e" + targetClan.getMembers().size() + "/" + targetClan.getMaxMembers()));
 
                     for (ClanMember clanMember : targetClan.getMembers()) {
 
@@ -274,11 +291,18 @@ public class ClanCMD implements CommandExecutor {
                             if (targetClan != null) {
                                 // make sure it is actually a level
                                 if (ClansYAML.isSection("clans." + newLevel)) {
-                                    targetClan.setLevel(newLevel);
-                                    // update in db
-                                    ClansDB.setClanLevel(newLevel, targetClan.getID());
-                                    player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
-                                            " level to &6" + newLevel));
+                                    if (targetClan.getMaxLevel() >= newLevel)
+                                    {
+                                        targetClan.setLevel(newLevel);
+                                        // update in db
+                                        ClansDB.setClanLevel(newLevel, targetClan.getID());
+                                        player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's" +
+                                                " level to &6" + newLevel));
+                                    }
+                                    else
+                                    {
+                                        player.sendMessage(Utils.translate("&cYou cannot set the level beyond the clan's max (" + targetClan.getMaxLevel() + ")"));
+                                    }
                                 } else {
                                     player.sendMessage(Utils.translate("&cThat level does not exist!"));
                                 }
@@ -663,8 +687,8 @@ public class ClanCMD implements CommandExecutor {
             sender.sendMessage(Utils.translate("&3/clan settotalxp <clan>  &7Sets total XP of a clan"));
             sender.sendMessage(Utils.translate("&3/clan setmaxlevel <clan> <maxLevel>  &7Sets the new max level of a clan (min of 5, default)"));
             sender.sendMessage(Utils.translate("&3/clan setmaxmembers <clan> <maxMembers>  &7Sets the new max members of a clan (cannot set less than what they have)"));
-            sender.sendMessage(Utils.translate("&3/clan addmaxlevel <clan>  &7Adds 1 max level"));
-            sender.sendMessage(Utils.translate("&3/clan addmaxmember <clan>  &7Adds 1 max member"));
+            sender.sendMessage(Utils.translate("&3/clan addmaxlevel <playerName>  &7Adds 1 max level"));
+            sender.sendMessage(Utils.translate("&3/clan addmaxmember <playerName>  &7Adds 1 max member"));
         }
         else if (sender.hasPermission("rn-parkour.staff"))
             sender.sendMessage(Utils.translate("&3/clan chatspy  &7Toggle clan chatspy"));

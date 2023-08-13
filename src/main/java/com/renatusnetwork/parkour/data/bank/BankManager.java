@@ -10,6 +10,8 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -60,6 +62,7 @@ public class BankManager
         Bukkit.broadcastMessage(Utils.translate("&d&lTHE BANK HAS BEEN RESET"));
         Bukkit.broadcastMessage(Utils.translate("&7Head to &c/spawn &7to start bidding on the bank!"));
         Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+        Utils.playSound(Sound.ENTITY_PLAYER_LEVELUP);
     }
 
     public void load()
@@ -107,6 +110,7 @@ public class BankManager
 
             currentJackpot = new Jackpot(level, bonus);
             currentJackpot.start(); // begin jackpot
+            Utils.playSound(Sound.BLOCK_NOTE_PLING);
         }
         else
         {
@@ -220,6 +224,8 @@ public class BankManager
                         bankItem.calcNextBid(); // calc next bid
                         broadcastNewBid(playerStats, bankItem, bidAmount); // broadcast bid
                         BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getPlayerName()); // update in config
+                        playerStats.getPlayer().playSound(playerStats.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                        Utils.spawnFirework(playerStats.getPlayer().getLocation(), Color.PURPLE, Color.WHITE, true);
 
                         // update player info
                         Parkour.getModifiersManager().addModifier(playerStats, bankItem.getModifier());

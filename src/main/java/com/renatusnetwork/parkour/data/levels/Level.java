@@ -11,6 +11,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
@@ -336,7 +337,7 @@ public class Level {
                     " &7record with &a" + completionTime + "s"));
             Bukkit.broadcastMessage("");
 
-            Parkour.getLevelManager().doRecordBreakingFirework(respawnLocation);
+            Utils.spawnFirework(respawnLocation, Color.PURPLE, Color.FUCHSIA, true);
             if (!alreadyFirstPlace)
             {
                 // update new #1 records

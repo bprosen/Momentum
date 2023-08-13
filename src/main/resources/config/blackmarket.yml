@@ -8,8 +8,6 @@ items:
       material: DIRT
       glow: true
       title: "Test"
-      lore:
-        - "test"
     reward_commands:
       - "say test"
     messages_to_winner:
@@ -23,8 +21,6 @@ items:
       material: DIRT
       glow: true
       title: "Test"
-      lore:
-        - "test"
     reward_commands:
       - "say test"
     messages_to_winner:
@@ -38,8 +34,6 @@ items:
       material: DIRT
       glow: true
       title: "Test"
-      lore:
-        - "test"
     reward_commands:
       - "say test"
     messages_to_winner:
@@ -53,8 +47,6 @@ items:
       material: DIRT
       glow: true
       title: "Test"
-      lore:
-        - "test"
     reward_commands:
       - "say test"
     messages_to_winner:

@@ -397,33 +397,6 @@ public class LevelManager {
         return null;
     }
 
-    public void doRecordBreakingFirework(Location location)
-    {
-
-        Firework firework = location.getWorld().spawn(location, Firework.class);
-        FireworkMeta meta = firework.getFireworkMeta();
-
-        meta.clearEffects();
-
-        // build the firework and then set the new one
-        FireworkEffect effect = FireworkEffect.builder()
-                .flicker(true)
-                .trail(true)
-                .with(FireworkEffect.Type.BURST)
-                .withColor(Color.PURPLE)
-                .withFade(Color.FUCHSIA)
-                .build();
-
-        meta.addEffect(effect);
-        firework.setFireworkMeta(meta);
-
-        new BukkitRunnable() {
-            public void run() {
-                firework.detonate();
-            }
-        }.runTaskLater(Parkour.getPlugin(), 20);
-    }
-
     public long getTotalLevelCompletions() { return totalLevelCompletions; }
 
     public void addTotalLevelCompletion() { totalLevelCompletions++; }

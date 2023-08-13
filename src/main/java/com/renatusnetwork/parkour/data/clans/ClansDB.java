@@ -27,8 +27,8 @@ public class ClansDB {
                             Integer.parseInt(result.get("clan_level")),
                             Integer.parseInt(result.get("clan_xp")),
                             Long.parseLong(result.get("total_gained_xp")),
-                            Integer.parseInt("max_level"),
-                            Integer.parseInt("max_members")
+                            Integer.parseInt(result.get("max_level")),
+                            Integer.parseInt(result.get("max_members"))
                     )
             );
 

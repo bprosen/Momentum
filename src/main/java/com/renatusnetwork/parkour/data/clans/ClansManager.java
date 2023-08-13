@@ -281,9 +281,11 @@ public class ClansManager {
             int currLevel = clan.getLevel();
 
             // process potential level up!
-            if (currLevel == oldMaxLevel) // means they were max!
+            if (currLevel == oldMaxLevel && currLevel < newMaxLevel) // means they were max but not anymore!
             {
-                processClanLevelUp(clan, clan.getXP());
+                // means they can level up
+                if (ClansYAML.getLevelUpPrice(clan) <= clan.getXP())
+                    processClanLevelUp(clan, clan.getXP());
             }
             else if (newMaxLevel < currLevel)
             {

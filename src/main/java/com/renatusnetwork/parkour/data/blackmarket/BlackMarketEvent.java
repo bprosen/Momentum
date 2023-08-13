@@ -3,9 +3,11 @@ package com.renatusnetwork.parkour.data.blackmarket;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -39,6 +41,7 @@ public class BlackMarketEvent
     {
         String prefix = Parkour.getSettingsManager().blackmarket_message_prefix;
 
+        playSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE);
         broadcastToPlayers(Utils.translate(prefix + " &7Welcome, welcome, seekers of the forbidden. Step into the shadows, for tonight, the secrets of the underworld await you."));
         new BukkitRunnable()
         {
@@ -59,6 +62,7 @@ public class BlackMarketEvent
                             public void run()
                             {
                                 showItem(); // show item
+                                playSound(Sound.ENTITY_ENDERDRAGON_AMBIENT);
                                 broadcastToPlayers(Utils.translate(prefix + " &7Behold, " + getBlackMarketItem().getTitle() + "&7! An artifact that " + getBlackMarketItem().getDescription() + "."));
 
                                 new BukkitRunnable()
@@ -79,7 +83,7 @@ public class BlackMarketEvent
         }.runTaskLater(Parkour.getPlugin(), 20 * 10);
     }
 
-    public void end()
+    public void end(boolean forceEnded)
     {
         if (itemEntity != null)
         {
@@ -88,15 +92,18 @@ public class BlackMarketEvent
         }
 
         // coin removal, reward and message processing
-        if (hasHighestBidder())
+        if (!forceEnded && hasHighestBidder())
         {
             Parkour.getStatsManager().removeCoins(highestBidder, highestBid);
+            Player player = highestBidder.getPlayer();
 
             for (String command : blackMarketArtifact.getRewardCommands())
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", highestBidder.getPlayerName())); // send command
 
             for (String message : blackMarketArtifact.getWinnerMessages())
-                highestBidder.getPlayer().sendMessage(Utils.translate(message)); // send msgs
+                player.sendMessage(Utils.translate(message)); // send msgs
+
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
         }
     }
 
@@ -229,6 +236,7 @@ public class BlackMarketEvent
                     case 2:
                     case 1:
                         broadcastToPlayers(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &8There are &c" + secondsLeft + " &8seconds left to increase the bid to &6" + Utils.formatNumber(nextMinimumBid) + " &eCoins"));
+                        playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON);
                         break;
                     case 0:
                         cancel();
@@ -250,5 +258,12 @@ public class BlackMarketEvent
         itemEntity.setCustomName(Utils.translate(getBlackMarketItem().getTitle()));
         itemEntity.setCustomNameVisible(true);
         itemEntity.setPickupDelay(Integer.MAX_VALUE);
+        Utils.spawnFirework(itemSpawn, Color.BLACK, Color.GRAY, false);
+    }
+
+    public void playSound(Sound sound)
+    {
+        for (PlayerStats playerStats : players)
+            playerStats.getPlayer().playSound(playerStats.getPlayer().getLocation(), sound, 1.0F, 1.0F);
     }
 }

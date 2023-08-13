@@ -105,6 +105,7 @@ public class Parkour extends JavaPlugin {
         events.shutdown();
         races.shutdown();
         levels.shutdown();
+        blackmarket.shutdown();
 
         // close database and unload classes
         database.close();

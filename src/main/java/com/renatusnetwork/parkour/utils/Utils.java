@@ -9,9 +9,12 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import org.bukkit.*;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -239,5 +242,44 @@ public class Utils {
         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandClick));
 
         Bukkit.spigot().broadcast(component); // send clickable
+    }
+
+    public static void playSound(Sound sound)
+    {
+        for (Player player : Bukkit.getOnlinePlayers())
+            player.playSound(player.getLocation(), sound, 1.0F, 1.0F);
+    }
+
+    public static void spawnFirework(Location location, Color color, Color fadeColor, boolean secondDelay)
+    {
+        Firework firework = location.getWorld().spawn(location, Firework.class);
+        FireworkMeta meta = firework.getFireworkMeta();
+
+        meta.clearEffects();
+
+        // build the firework and then set the new one
+        FireworkEffect effect = FireworkEffect.builder()
+                .flicker(true)
+                .trail(true)
+                .with(FireworkEffect.Type.BURST)
+                .withColor(color)
+                .withFade(fadeColor)
+                .build();
+
+        meta.addEffect(effect);
+        firework.setFireworkMeta(meta);
+
+        if (secondDelay)
+            new BukkitRunnable() {
+            public void run() {
+                firework.detonate();
+            }
+        }.runTaskLater(Parkour.getPlugin(), 20);
+        else
+            new BukkitRunnable() {
+                public void run() {
+                    firework.detonate();
+                }
+            }.runTaskLater(Parkour.getPlugin(), 1);
     }
 }

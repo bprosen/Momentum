@@ -14,10 +14,7 @@ import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -48,7 +45,7 @@ public class LevelListener implements Listener {
                 {
                     if (eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())
                     {
-                        eventManager.doFireworkExplosion(player.getLocation());
+                        Utils.spawnFirework(player.getLocation(), Color.RED, Color.RED, false);
                         eventManager.removeParticipant(player, false);
                         eventManager.addEliminated(player);
                         player.sendMessage(Utils.translate("&7You are &beliminated &7out of the event!"));

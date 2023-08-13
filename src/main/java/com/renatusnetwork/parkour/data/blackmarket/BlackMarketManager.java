@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import com.sk89q.commandbook.locations.TeleportSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -89,6 +90,9 @@ public class BlackMarketManager
                 add(Utils.translate(prefix + " You hold the power to shape your destiny, but the artifacts hold the power to shape you."));
                 add(Utils.translate(prefix + " Safety is but an illusion in the dance of shadows."));
             }};
+
+            // plays to all online
+            Utils.playSound(Sound.ENTITY_WITHER_SPAWN);
 
             // begin timer before starting event
             new BukkitRunnable()
@@ -177,9 +181,8 @@ public class BlackMarketManager
             running.broadcastToPlayers(Utils.translate("&cUntil our next sale..."));
             running.broadcastToPlayers(Utils.translate("&8&m-------------------------------"));
 
-            running.end();
+            running.end(false);
             runEndingSchedulers(false);
-            running = null;
         }
         else
         {
@@ -191,9 +194,8 @@ public class BlackMarketManager
     {
         if (isRunning())
         {
-            running.end();
+            running.end(true);
             runEndingSchedulers(true);
-            running = null;
         }
         else
         {
@@ -210,16 +212,19 @@ public class BlackMarketManager
             {
                 for (PlayerStats playerStats : running.getPlayers())
                 {
-                    playerStats.getPlayer().teleport(Parkour.getLocationManager().getLobbyLocation()); // teleport to spawn
+                    Player player = playerStats.getPlayer();
+                    player.teleport(Parkour.getLocationManager().getLobbyLocation()); // teleport to spawn
 
                     if (running.hasHighestBidder())
                     {
                         String display = running.getHighestBidder().getPlayer().getDisplayName();
-                        TitleAPI.sendTitle(playerStats.getPlayer(), 0, 20, 20,
+                        TitleAPI.sendTitle(player, 0, 20, 20,
                                 Utils.translate("&8&lBlack Market"), Utils.translate("&c" + display + " &7won!"));
+                        player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F);
                     }
                     playerStats.setBlackMarket(false);
                 }
+                running = null;
             }
         }.runTaskLater(Parkour.getPlugin(), 10 * 20); // teleport them all 10 seconds later
 
@@ -276,6 +281,8 @@ public class BlackMarketManager
             else
             {
                 running.addPlayer(playerStats);
+                player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_AMBIENT, 1.0F, 1.0F); // play noise
+                TitleAPI.sendTitle(player, 20, 100, 20, "&8&lBlack Market", "&7We will be starting soon..."); // send title
                 playerStats.getPlayer().teleport(Parkour.getLocationManager().get(Parkour.getSettingsManager().blackmarket_tp_loc));
                 playerStats.setBlackMarket(true);
             }
@@ -309,4 +316,14 @@ public class BlackMarketManager
 
     public BlackMarketEvent getRunningEvent() { return running; }
 
+    public void shutdown()
+    {
+        if (isRunning())
+        {
+            running.end(true);
+
+            for (PlayerStats playerStats : running.getPlayers())
+                playerStats.getPlayer().teleport(Parkour.getLocationManager().getLobbyLocation()); // teleport to spawn
+        }
+    }
 }

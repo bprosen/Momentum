@@ -345,32 +345,6 @@ public class EventManager {
         eliminated.add(player.getName());
     }
 
-    public void doFireworkExplosion(Location location) {
-
-        Firework firework = location.getWorld().spawn(location, Firework.class);
-        FireworkMeta meta = firework.getFireworkMeta();
-
-        meta.clearEffects();
-
-        // build the firework and then set the new one
-        FireworkEffect effect = FireworkEffect.builder()
-                .flicker(false)
-                .trail(false)
-                .with(FireworkEffect.Type.BURST)
-                .withColor(Color.RED)
-                .withFade(Color.RED)
-                .build();
-
-        meta.addEffect(effect);
-        firework.setFireworkMeta(meta);
-
-        new BukkitRunnable() {
-            public void run() {
-                firework.detonate();
-            }
-        }.runTaskLater(Parkour.getPlugin(), 1);
-    }
-
     public long getTimeLeftMillis()
     {
         return (startTime + (Parkour.getSettingsManager().max_event_run_time * 1000)) - System.currentTimeMillis();

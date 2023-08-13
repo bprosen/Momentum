@@ -43,30 +43,7 @@ public class RageQuitCMD implements CommandExecutor {
                         randomMessages.get(random.nextInt(randomMessages.size()))
                         .replace("%player%", player.getDisplayName()));
 
-                // build firework
-                Firework firework = player.getWorld().spawn(player.getLocation(), Firework.class);
-                FireworkMeta meta = firework.getFireworkMeta();
-
-                meta.clearEffects();
-
-                // build the firework and then set the new one
-                FireworkEffect effect = FireworkEffect.builder()
-                        .flicker(true)
-                        .trail(true)
-                        .with(FireworkEffect.Type.BURST)
-                        .withColor(Color.WHITE)
-                        .withFade(Color.RED)
-                        .build();
-
-                meta.addEffect(effect);
-                firework.setFireworkMeta(meta);
-
-                // detonate 0.5 later
-                new BukkitRunnable() {
-                    public void run() {
-                        firework.detonate();
-                    }
-                }.runTaskLater(Parkour.getPlugin(), 10);
+                Utils.spawnFirework(player.getLocation(), Color.WHITE, Color.RED, true);
 
                 // broadcast and kick
                 Bukkit.broadcastMessage(randomMessage);
