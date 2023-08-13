@@ -154,6 +154,9 @@ public class JackpotCMD implements CommandExecutor
             player.sendMessage(Utils.translate("&2/jackpot choose <level name> <bonus amount>  &7Chooses a jackpot from level and bonus amount"));
         }
 
+        if (player.hasPermission("rn-parkour.jackpot.force"))
+            player.sendMessage(Utils.translate("&2/jackpot force  &7Allows you to force a jackpot &c&lONE TIME"));
+
         player.sendMessage(Utils.translate("&2/jackpot help  &7Displays this screen"));
     }
 }
