@@ -6,13 +6,20 @@ import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.HashMap;
 
 public class JackpotCMD implements CommandExecutor
 {
+    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
     {
@@ -37,6 +44,40 @@ public class JackpotCMD implements CommandExecutor
                 {
                     player.sendMessage(Utils.translate("&cThe jackpot is not running currently"));
                 }
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("force") && player.hasPermission("rn-parkour.jackpot.force"))
+            {
+                // USED FOR BLACK MARKET!
+                if (!bankManager.isJackpotRunning())
+                {
+                    if (!confirmMap.containsKey(player.getName()))
+                    {
+                        // otherwise, put them in and ask them to confirm within 5 seconds
+                        player.sendMessage("");
+                        player.sendMessage(Utils.translate("&cAre you sure you want to use &6&lJackpot &cforce? This will remove your one time use!"));
+                        player.sendMessage(Utils.translate("&cType &4/jackpot force &cagain to confirm"));
+                        player.sendMessage("");
+
+                        confirmMap.put(player.getName(), new BukkitRunnable() {
+                            public void run() {
+                                if (confirmMap.containsKey(player.getName()))
+                                {
+                                    confirmMap.remove(player.getName());
+                                    player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                }
+                            }
+                        }.runTaskLater(Parkour.getPlugin(), 20 * 10));
+                    }
+                    else
+                    {
+                        confirmMap.get(player.getName()).cancel();
+                        bankManager.startJackpot();
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Parkour.getSettingsManager().jackpot_force_remove_permission_cmd.replace("%player%", player.getName()));
+                        confirmMap.remove(player.getName());
+                    }
+                }
+                else
+                    player.sendMessage(Utils.translate("&cYou cannot do this when a jackpot is already running"));
             }
             else if (player.hasPermission("rn-parkour.admin"))
             {

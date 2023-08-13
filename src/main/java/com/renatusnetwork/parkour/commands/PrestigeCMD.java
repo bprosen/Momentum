@@ -58,17 +58,25 @@ public class PrestigeCMD implements CommandExecutor {
                 }
                 else if (playerStats.getCoins() >= cost)
                 {
-                    confirmMap.get(player.getName()).cancel();
                     rankManager.doPrestige(playerStats, cost);
-                    confirmMap.remove(player.getName());
+                    cancelTask(player);
                 }
                 else
+                {
                     player.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(cost) + " &eCoins&c!" +
                             " You need &6" + Utils.formatNumber(cost - playerStats.getCoins()) + " &cmore &eCoins"));
+                    cancelTask(player);
+                }
             } else
                 player.sendMessage(Utils.translate("&cYou cannot do this yet!" +
                                                         " You need to be Rank &4" + rankManager.getMaxRank().getRankTitle()));
         }
         return false;
+    }
+
+    private void cancelTask(Player player)
+    {
+        confirmMap.get(player.getName()).cancel();
+        confirmMap.remove(player.getName());
     }
 }

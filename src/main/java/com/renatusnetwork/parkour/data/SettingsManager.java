@@ -126,6 +126,7 @@ public class SettingsManager {
     public String blackmarket_item_spawn_loc;
     public String blackmarket_tp_loc;
     public String blackmarket_message_prefix;
+    public String jackpot_force_remove_permission_cmd;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -273,5 +274,6 @@ public class SettingsManager {
         infinitepk_middle_loc = settings.getString("infinitepk.infinite_middle_loc");
         infinitepk_respawn_loc = settings.getString("infinitepk.infinite_respawn_loc");
         blackmarket_message_prefix = settings.getString("blackmarket.message_prefix");
+        jackpot_force_remove_permission_cmd = settings.getString("bank.jackpot_force_remove_permission_cmd");
     }
 }
