@@ -7,15 +7,14 @@ public class InfinitePK {
 
     private Player player;
     private Location originalLoc;
-    private Location currentBlockLoc = null;
-    private Location lastBlockLoc = null;
+    private Location currentBlockLoc;
+    private Location lastBlockLoc;
     private int score = 0;
-    private InfinitePKDirection directionType;
 
-    public InfinitePK(Player player) {
+    public InfinitePK(Player player)
+    {
         this.player = player;
         this.originalLoc = player.getLocation();
-        this.directionType = InfinitePKDirection.FORWARDS;
     }
 
     public Player getPlayer() {
@@ -70,17 +69,4 @@ public class InfinitePK {
     }
 
     public Location getPressutePlateLoc() { return currentBlockLoc.clone().add(0, 1, 0); }
-
-    public InfinitePKDirection getDirectionType() { return this.directionType; }
-
-    public void setDirectionType(InfinitePKDirection directionType) {
-        this.directionType = directionType;
-    }
-
-    public void flipDirectionType() {
-        if (directionType == InfinitePKDirection.BACKWARDS)
-            directionType = InfinitePKDirection.FORWARDS;
-        else
-            directionType = InfinitePKDirection.BACKWARDS;
-    }
 }
