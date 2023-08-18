@@ -75,10 +75,8 @@ public abstract class Infinite
         if (plateBlock != null)
             plateBlock.setType(Material.AIR);
 
-        Location newPlateLocation = newLocation;
-        // get middle (in all cases this will work and not cause out of bounds)
-        if (type == InfiniteType.SPEEDRUN)
-            newPlateLocation = blocks.get(1).getLocation();
+        // second block will ALWAYS be the plate!
+        Location newPlateLocation = blocks.get(1).getLocation();
 
         plateBlock = newPlateLocation.add(0, 1, 0).getBlock();
         plateBlock.setType(Material.IRON_PLATE);
@@ -132,10 +130,7 @@ public abstract class Infinite
         return blocks.get(index);
     }
 
-    public Block getFirstBlock()
-    {
-        return blocks.get(0);
-    }
+    public Block getFirstBlock() { return blocks.get(0); }
 
     public Block getLastBlock()
     {

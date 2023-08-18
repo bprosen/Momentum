@@ -209,7 +209,7 @@ public class PacketListener implements Listener {
                         Infinite infinite = infiniteManager.get(player.getName());
 
                         // respawn infinite pk if below current block
-                        if ((infinite.getFirstBlock().getLocation().getBlockY() - 2) > player.getLocation().getBlockY())
+                        if ((infinite.getFirstBlock().getLocation().getBlockY() - 3) > player.getLocation().getBlockY())
                             infinite.respawn();
                         // if their loc
                     }
