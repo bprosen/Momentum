@@ -7,15 +7,13 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class Sprint extends Infinite
 {
-    private int timerMillis;
-    private long startingMillis;
+    private float timer;
     private BukkitTask task;
 
     public Sprint(PlayerStats playerStats)
     {
         super(playerStats, InfiniteType.SPRINT, 2);
-        this.timerMillis = Parkour.getSettingsManager().sprint_starting_timer * 1000;
-        this.startingMillis = System.currentTimeMillis();
+        this.timer = Parkour.getSettingsManager().sprint_starting_timer;
     }
 
     // by default respawn will end it
@@ -36,6 +34,9 @@ public class Sprint extends Infinite
     public void end()
     {
         super.end();
+
+        if (task != null)
+            task.cancel();
     }
 
     public void next()
@@ -49,32 +50,35 @@ public class Sprint extends Infinite
             if (getScore() > reductionScore)
                 newGain -= Parkour.getSettingsManager().reduction_factors.get(reductionScore);
 
-        timerMillis += (int) (newGain * 1000);
+        timer += newGain;
 
-        int maxMillis = Parkour.getSettingsManager().sprint_max_timer * 1000;
-        if (timerMillis > maxMillis)
-            timerMillis = maxMillis;
-
-        startTask();
+        int max = Parkour.getSettingsManager().sprint_max_timer;
+        if (timer > max)
+            timer = max;
     }
 
     public void startTask()
     {
-        if (task != null)
-            task.cancel();
 
         task = new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                Parkour.getInfiniteManager().endPK(getPlayer()); // end when time is up
+                timer -= 0.1f; // remove 1 second
+
+                // end
+                if (timer <= 0.0)
+                {
+                    cancel();
+                    Parkour.getInfiniteManager().endPK(getPlayer()); // end when time is up
+                }
             }
-        }.runTaskLater(Parkour.getPlugin(), 20 * ((startingMillis + timerMillis) - System.currentTimeMillis()) / 1000);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 2, 2);
     }
 
     public double getTimeLeft()
     {
-        return Math.round((((startingMillis + timerMillis) - System.currentTimeMillis()) / 1000f) * 10) / 10.0;
+        return Math.round(timer * 10) / 10.0;
     }
 }
