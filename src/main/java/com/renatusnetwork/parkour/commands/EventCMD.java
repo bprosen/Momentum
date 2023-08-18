@@ -43,7 +43,7 @@ public class EventCMD implements CommandExecutor {
                         if (!playerStats.isSpectating()) {
                             if (!playerStats.inRace()) {
                                 if (!PlayerHider.containsPlayer(player)) {
-                                    if (!playerStats.isInInfinitePK()) {
+                                    if (!playerStats.isInInfinite()) {
                                         if (!eventManager.isEliminated(player)) {
                                             if (!playerStats.isInBlackMarket()) {
                                                 if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())) {

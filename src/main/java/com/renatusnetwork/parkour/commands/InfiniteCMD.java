@@ -2,10 +2,10 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.*;
+import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.storage.ConfigManager;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,15 +24,15 @@ public class InfiniteCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
+        InfiniteManager infiniteManager = Parkour.getInfiniteManager();
 
         if (a.length >= 1 && a[0].equalsIgnoreCase("score")) {
             // other target
             if (a.length == 2) {
 
-                if (InfinitePKDB.hasScore(a[1])) {
+                if (InfiniteDB.hasScore(a[1])) {
 
-                    int score = InfinitePKDB.getScoreFromName(a[1]);
+                    int score = InfiniteDB.getScoreFromName(a[1]);
                     sender.sendMessage(Utils.translate("&c" + a[1] + " &7has a score of &6" + Utils.formatNumber(score)));
                 } else {
                     sender.sendMessage(Utils.translate("&c" + a[1] + " &7has not played &6Infinite Parkour &7before (score of 0)"));
@@ -42,8 +42,8 @@ public class InfiniteCMD implements CommandExecutor {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                if (playerStats != null && playerStats.getInfinitePKScore() > 0)
-                    sender.sendMessage(Utils.translate("&7You have a score of &6" + Utils.formatNumber(playerStats.getInfinitePKScore())));
+                if (playerStats != null && playerStats.getBestInfiniteScore() > 0)
+                    sender.sendMessage(Utils.translate("&7You have a score of &6" + Utils.formatNumber(playerStats.getBestInfiniteScore())));
                 else
                     sender.sendMessage(Utils.translate("&7You have yet to play &6Infinite Parkour &7(score of 0)"));
             // leaderboard
@@ -52,7 +52,7 @@ public class InfiniteCMD implements CommandExecutor {
                 if (Utils.isInteger(a[2])) {
                     int position = Integer.parseInt(a[2]);
                     // can cast with confidence
-                    InfinitePKLBPosition lbPosition = (InfinitePKLBPosition) infinitePKManager.getLeaderboard().values().toArray()[position - 1];
+                    InfiniteLBPosition lbPosition = (InfiniteLBPosition) infiniteManager.getLeaderboard().values().toArray()[position - 1];
 
                     if (lbPosition != null) {
                         player.sendMessage(Utils.translate(
@@ -68,15 +68,15 @@ public class InfiniteCMD implements CommandExecutor {
         // admin command for removing leaderboard position
         } else if (player.hasPermission("rn-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setscore"))) {
             if (Utils.isInteger(a[2])) {
-                if (InfinitePKDB.hasScore(a[1])) {
+                if (InfiniteDB.hasScore(a[1])) {
                     int score = Integer.parseInt(a[2]);
 
-                    infinitePKManager.updateScore(a[1], score);
+                    infiniteManager.updateScore(a[1], score);
                     // can run in async
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            infinitePKManager.loadLeaderboard();
+                            infiniteManager.loadLeaderboard();
                         }
                     }.runTaskAsynchronously(Parkour.getPlugin()); // load lb
 
@@ -89,14 +89,33 @@ public class InfiniteCMD implements CommandExecutor {
             }
         } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
 
-            Parkour.getInfinitePKManager().clearRewards();
+            Parkour.getInfiniteManager().clearRewards();
             InfiniteRewardsYAML.loadRewards();
             player.sendMessage(Utils.translate("&cYou have reloaded Infinite Parkour Rewards"));
 
+        }
+        else if (player.hasPermission("rn-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setmode")))
+        {
+            String targetName = a[1];
+            String mode = a[2];
+            InfiniteType infiniteType = InfiniteType.valueOf(mode.toUpperCase());
+
+            Player target = Bukkit.getPlayer(targetName);
+
+            if (target != null)
+            {
+                PlayerStats targetStats = Parkour.getStatsManager().get(target);
+                infiniteManager.changeType(targetStats, infiniteType);
+                player.sendMessage(Utils.translate("&7You changed &c" + targetName + "&7's infinite type to &4" + infiniteType));
+            }
+            else
+            {
+                player.sendMessage(Utils.translate("&4" + targetName + " &cis not online"));
+            }
         } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            if (!playerStats.isInInfinitePK()) {
+            if (!playerStats.isInInfinite()) {
                 if (!playerStats.isSpectating()) {
                     if (!playerStats.isEventParticipant()) {
                         if (!playerStats.inRace()) {
@@ -105,7 +124,7 @@ public class InfiniteCMD implements CommandExecutor {
                                 if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
                                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                infinitePKManager.startPK(playerStats, false);
+                                infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), false);
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                             }
@@ -123,7 +142,7 @@ public class InfiniteCMD implements CommandExecutor {
             }
         } else if (a.length == 1 && a[0].equalsIgnoreCase("rewards")) {
 
-            LinkedHashMap<Integer, InfinitePKReward> rewards = Parkour.getInfinitePKManager().getRewards();
+            LinkedHashMap<Integer, InfiniteReward> rewards = Parkour.getInfiniteManager().getRewards();
             player.sendMessage(Utils.translate("&5&lInfinite Parkour Rewards"));
 
             // if not empty continue
@@ -132,12 +151,12 @@ public class InfiniteCMD implements CommandExecutor {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 int position = 1;
 
-                for (InfinitePKReward reward : rewards.values()) {
+                for (InfiniteReward reward : rewards.values()) {
 
                     String msg = "&7" + position + " &5" + reward.getScoreNeeded() + " Score &7- &d" + reward.getName();
 
                     // send crossed out msg if their high score is more than the score needed
-                    if (playerStats.getInfinitePKScore() >= reward.getScoreNeeded())
+                    if (playerStats.getBestInfiniteScore() >= reward.getScoreNeeded())
                         msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score&7 - &d" + reward.getName();
 
                     player.sendMessage(Utils.translate(msg));
@@ -164,6 +183,7 @@ public class InfiniteCMD implements CommandExecutor {
         {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
             player.sendMessage(Utils.translate("&5/infinite loadrewards  &7Loads rewards from rewards.yml"));
+            player.sendMessage(Utils.translate("&5/infinite setmode <IGN> <type>  &7Set the mode of a player"));
         }
 
         player.sendMessage(Utils.translate("&5/infinite help  &7Shows you this display"));

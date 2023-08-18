@@ -25,7 +25,7 @@ public class InfiniteRewardsYAML {
                 String name = rewardsFile.getString("infinitepk." + key + ".name");
 
                 // make new object and add
-                Parkour.getInfinitePKManager().addReward(new InfinitePKReward(scoreNeeded, command, name));
+                Parkour.getInfiniteManager().addReward(new InfiniteReward(scoreNeeded, command, name));
             }
     }
 }

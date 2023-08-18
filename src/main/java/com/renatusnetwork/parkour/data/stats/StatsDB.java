@@ -3,6 +3,8 @@ package com.renatusnetwork.parkour.data.stats;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
+import com.renatusnetwork.parkour.data.infinite.types.Infinite;
+import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
@@ -36,7 +38,7 @@ public class StatsDB {
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
-                "player_id, player_name, coins, spectatable, clan_id, rank_id, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins, infinite_block, fail_mode",
+                "*",
                 " WHERE uuid='" + playerStats.getUUID() + "'"
         );
 
@@ -97,7 +99,7 @@ public class StatsDB {
                 playerStats.setPrestiges(prestiges);
 
                 int infinitePKScore = Integer.parseInt(playerResult.get("infinitepk_score"));
-                playerStats.setInfinitePKScore(infinitePKScore);
+                playerStats.setInfiniteScore(infinitePKScore);
 
                 // set total completions count
                 int completions = Integer.parseInt(playerResult.get("level_completions"));
@@ -178,6 +180,8 @@ public class StatsDB {
                     playerStats.setFailMode(false);
                 else
                     playerStats.setFailMode(true);
+
+                playerStats.setInfiniteType(InfiniteType.valueOf(playerResult.get("infinite_type").toUpperCase()));
 
                 updateBoughtLevels(playerStats);
             }
@@ -318,6 +322,12 @@ public class StatsDB {
             coins = 0;
 
         String query = "UPDATE players SET coins=" + coins + " WHERE player_name='" + playerName + "'";
+        Parkour.getDatabaseManager().add(query);
+    }
+
+    public static void updateInfiniteType(PlayerStats playerStats, InfiniteType newType)
+    {
+        String query = "UPDATE players SET infinite_type='" + newType.toString().toLowerCase() + "' WHERE player_id=" + playerStats.getPlayerID();
         Parkour.getDatabaseManager().add(query);
     }
 

@@ -5,7 +5,7 @@ import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.events.types.MazeEvent;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
-import com.renatusnetwork.parkour.data.infinite.InfinitePK;
+import com.renatusnetwork.parkour.data.infinite.types.Infinite;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -143,17 +143,16 @@ public class LevelListener implements Listener {
                     // end if in race
                     if (playerStats.inRace())
                         Parkour.getRaceManager().endRace(player, false);
-                    else if (playerStats.isInInfinitePK())
+                    else if (playerStats.isInInfinite())
                     {
                         // prevent double clicking
-                        InfinitePK infinitePK = Parkour.getInfinitePKManager().get(player.getName());
+                        Infinite infinite = Parkour.getInfiniteManager().get(player.getName());
+                        Location blockLoc = infinite.getPlateBlock().getLocation();
 
-                        if (infinitePK.getPressutePlateLoc().getBlockX() == block.getLocation().getBlockX() &&
-                                infinitePK.getPressutePlateLoc().getBlockZ() == block.getLocation().getBlockZ()) {
-
-                            block.setType(Material.AIR);
-                            player.playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
-                            Parkour.getInfinitePKManager().doNextJump(playerStats, false);
+                        if (blockLoc.getBlockX() == block.getLocation().getBlockX() && blockLoc.getBlockZ() == block.getLocation().getBlockZ())
+                        {
+                            infinite.addScore();
+                            infinite.next();
                         }
                     }
                     else if (eventManager.isEventRunning() && playerStats.isEventParticipant())

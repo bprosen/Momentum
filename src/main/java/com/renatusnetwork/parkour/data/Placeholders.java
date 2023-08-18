@@ -3,16 +3,13 @@ package com.renatusnetwork.parkour.data;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.events.EventLBPosition;
-import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
+import com.renatusnetwork.parkour.data.infinite.InfiniteLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
-import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.*;
 import com.renatusnetwork.parkour.utils.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
-
-import java.util.Map;
 
 public class Placeholders extends PlaceholderExpansion
 {
@@ -80,7 +77,7 @@ public class Placeholders extends PlaceholderExpansion
                 case "race_winrate":
                     return String.valueOf(playerStats.getRaceWinRate());
                 case "best_infinite":
-                    return Utils.formatNumber(playerStats.getInfinitePKScore());
+                    return Utils.formatNumber(playerStats.getBestInfiniteScore());
                 case "event_wins":
                     return Utils.formatNumber(playerStats.getEventWins());
             }
@@ -104,15 +101,15 @@ public class Placeholders extends PlaceholderExpansion
                     {
                         if (type.equals("infinite"))
                         {
-                            InfinitePKLBPosition infinitePKLBPosition = Parkour.getInfinitePKManager().getLeaderboard().get(posInt);
+                            InfiniteLBPosition infiniteLBPosition = Parkour.getInfiniteManager().getLeaderboard().get(posInt);
 
-                            if (infinitePKLBPosition != null)
+                            if (infiniteLBPosition != null)
                             {
                                 // return name or value
                                 if (value.equals("name"))
-                                    return infinitePKLBPosition.getName();
+                                    return infiniteLBPosition.getName();
                                 else if (value.equals("score"))
-                                    return Utils.formatNumber(infinitePKLBPosition.getScore());
+                                    return Utils.formatNumber(infiniteLBPosition.getScore());
                             }
                         }
                         else if (type.equals("races"))

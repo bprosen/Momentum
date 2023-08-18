@@ -1,10 +1,9 @@
 package com.renatusnetwork.parkour.commands;
 
-import com.comphenix.protocol.PacketType;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.events.EventLBPosition;
-import com.renatusnetwork.parkour.data.infinite.InfinitePKLBPosition;
+import com.renatusnetwork.parkour.data.infinite.InfiniteLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
 import com.renatusnetwork.parkour.data.stats.*;
@@ -24,11 +23,11 @@ public class StatsCMD implements CommandExecutor {
             // infinite pk lb
             if (a.length == 1 && a[0].equalsIgnoreCase("infinite")) {
 
-                if (!Parkour.getInfinitePKManager().getLeaderboard().isEmpty()) {
+                if (!Parkour.getInfiniteManager().getLeaderboard().isEmpty()) {
                     sender.sendMessage(Utils.translate("&5Infinite Parkour &7Leaderboard"));
 
                     int position = 1;
-                    for (InfinitePKLBPosition lbPosition : Parkour.getInfinitePKManager().getLeaderboard().values()) {
+                    for (InfiniteLBPosition lbPosition : Parkour.getInfiniteManager().getLeaderboard().values()) {
                         if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     position + " &5" +
@@ -41,7 +40,7 @@ public class StatsCMD implements CommandExecutor {
                     if (sender instanceof Player) {
                         Player player = (Player) sender;
                         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
-                        sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getInfinitePKScore())));
+                        sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getBestInfiniteScore())));
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&cInfinite Parkour lb not loaded or no lb positions"));

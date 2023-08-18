@@ -95,6 +95,7 @@ public class TablesDB {
                 "event_wins MEDIUMINT default 0, " +
                 "infinite_block VARCHAR(30) DEFAULT '' NOT NULL, " +
                 "fail_mode BIT DEFAULT 1, " +
+                "infinite_type VARCHAR(10) DEFAULT 'classic' NOT NULL, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 

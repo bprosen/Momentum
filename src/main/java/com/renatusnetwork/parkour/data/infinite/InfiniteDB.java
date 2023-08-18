@@ -1,12 +1,11 @@
 package com.renatusnetwork.parkour.data.infinite;
 
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
 
-public class InfinitePKDB {
+public class InfiniteDB {
 
     public static int getScore(String playerUUID) {
         List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "infinitepk_score",

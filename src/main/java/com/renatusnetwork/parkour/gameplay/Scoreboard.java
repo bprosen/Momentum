@@ -7,6 +7,10 @@ import com.renatusnetwork.parkour.data.blackmarket.BlackMarketEvent;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
+import com.renatusnetwork.parkour.data.infinite.types.Infinite;
+import com.renatusnetwork.parkour.data.infinite.types.Speedrun;
+import com.renatusnetwork.parkour.data.infinite.types.Sprint;
+import com.renatusnetwork.parkour.data.infinite.types.Timed;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
@@ -126,7 +130,7 @@ public class Scoreboard {
                 }
 
                 int fails = playerStats.getFails();
-                if (!playerStats.isInInfinitePK() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
+                if (!playerStats.isInInfinite() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
                         !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendanceLevel() &&
                         playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
                     board.add(Utils.translate("  &e&lFails &6" + fails));
@@ -187,17 +191,28 @@ public class Scoreboard {
                     }
 
                     // infinite parkour section of scoreboard
-                } else if (playerStats.isInInfinitePK()) {
+                } else if (playerStats.isInInfinite()) {
 
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
 
                     // add best if they have one
-                    String scoreString = "&7Score &d" + Parkour.getInfinitePKManager().get(playerStats.getPlayerName()).getScore();
-                    if (playerStats.getInfinitePKScore() > 0)
-                        scoreString += " &7(&dBest " + playerStats.getInfinitePKScore() + "&7)";
+                    String scoreString = "&7Score &d" + Parkour.getInfiniteManager().get(playerStats.getPlayerName()).getScore();
+                    if (playerStats.getBestInfiniteScore() > 0)
+                        scoreString += " &7(&dBest " + playerStats.getBestInfiniteScore() + "&7)";
+
+                    Infinite infinite = Parkour.getInfiniteManager().get(playerStats.getPlayerName());
 
                     board.add(formatSpacing(Utils.translate(scoreString)));
+
+                    double timeLeft = 0.0;
+                    if (infinite.isTimed())
+                        timeLeft = ((Timed) infinite).getTimeLeft();
+                    if (infinite.isSprint())
+                        timeLeft = ((Sprint) infinite).getTimeLeft();
+
+                    if (timeLeft > 0.0)
+                        board.add(formatSpacing(Utils.translate("&7Time Left &d" + timeLeft + "s")));
 
                     // level section of scoreboard
                 } else if (level != null) {

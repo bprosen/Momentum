@@ -201,7 +201,7 @@ public class Utils {
 
             if (!playerStats.isEventParticipant()) {
                 if (!playerStats.inRace()) {
-                    if (!playerStats.isInInfinitePK()) {
+                    if (!playerStats.isInInfinite()) {
                         if (!playerStats.isSpectating()) {
 
                             BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();

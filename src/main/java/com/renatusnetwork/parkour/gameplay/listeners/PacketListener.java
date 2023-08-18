@@ -8,8 +8,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.infinite.InfinitePK;
-import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
+import com.renatusnetwork.parkour.data.infinite.types.Infinite;
+import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.PortalType;
@@ -165,7 +165,7 @@ public class PacketListener implements Listener {
                 // null check jic
                 if (playerStats != null) {
 
-                    InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
+                    InfiniteManager infiniteManager = Parkour.getInfiniteManager();
                     LocationManager locationManager = Parkour.getLocationManager();
 
                     // if spectating
@@ -204,19 +204,19 @@ public class PacketListener implements Listener {
                         }
                     }
                     // if in infinite parkour
-                    else if (playerStats.isInInfinitePK())
+                    else if (playerStats.isInInfinite())
                     {
-                        InfinitePK infinitePK = infinitePKManager.get(player.getName());
+                        Infinite infinite = infiniteManager.get(player.getName());
 
-                        // end infinite pk if below current block
-                        if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
-                            infinitePKManager.endPK(infinitePK.getPlayer(), false);
+                        // respawn infinite pk if below current block
+                        if ((infinite.getFirstBlock().getLocation().getBlockY() - 2) > player.getLocation().getBlockY())
+                            infinite.respawn();
                         // if their loc
                     }
                     else if (!playerStats.inLevel())
                     {
                         if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.INFINITE))
-                            infinitePKManager.startPK(playerStats, true);
+                            infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), true);
                         else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.ASCENDANCE))
                         {
                             Level level = Parkour.getLevelManager().get(Parkour.getSettingsManager().ascendance_hub_level);

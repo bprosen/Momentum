@@ -2,7 +2,6 @@ package com.renatusnetwork.parkour;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.renatusnetwork.parkour.api.JackpotRewardEvent;
 import com.renatusnetwork.parkour.commands.*;
 import com.renatusnetwork.parkour.data.Placeholders;
 import com.renatusnetwork.parkour.data.bank.BankManager;
@@ -10,7 +9,7 @@ import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
-import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
+import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
@@ -56,7 +55,7 @@ public class Parkour extends JavaPlugin {
     private static PlotsManager plots;
     private static ProtocolManager protocol;
     private static EventManager events;
-    private static InfinitePKManager infinite;
+    private static InfiniteManager infinite;
     private static BankManager bank;
     private static BlackMarketManager blackmarket;
     private static SavesManager saves;
@@ -194,7 +193,7 @@ public class Parkour extends JavaPlugin {
         perks = new PerkManager(plugin);
         clans = new ClansManager(plugin);
         races = new RaceManager();
-        infinite = new InfinitePKManager();
+        infinite = new InfiniteManager();
         plots = new PlotsManager();
         events = new EventManager();
         protocol = ProtocolLibrary.getProtocolManager();
@@ -259,7 +258,7 @@ public class Parkour extends JavaPlugin {
     public static RanksManager getRanksManager() { return ranks; }
     public static PlotsManager getPlotsManager() { return plots; }
     public static EventManager getEventManager() { return events; }
-    public static InfinitePKManager getInfinitePKManager() { return infinite; }
+    public static InfiniteManager getInfiniteManager() { return infinite; }
     public static ProtocolManager getProtocolManager() { return protocol; }
     public static SavesManager getSavesManager() { return saves; }
     public static BankManager getBankManager() { return bank; }

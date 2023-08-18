@@ -5,7 +5,7 @@ import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
-import com.renatusnetwork.parkour.data.infinite.InfinitePKManager;
+import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.RaceManager;
@@ -133,7 +133,7 @@ public class JoinLeaveListener implements Listener {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         RaceManager raceManager = Parkour.getRaceManager();
         EventManager eventManager = Parkour.getEventManager();
-        InfinitePKManager infinitePKManager = Parkour.getInfinitePKManager();
+        InfiniteManager infiniteManager = Parkour.getInfiniteManager();
         ClansManager clansManager = Parkour.getClansManager();
         BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
 
@@ -162,8 +162,8 @@ public class JoinLeaveListener implements Listener {
             eventManager.removeParticipant(player, true);
 
         // if in infinite pk, end it
-        if (playerStats.isInInfinitePK())
-            infinitePKManager.endPK(player, true);
+        if (playerStats.isInInfinite())
+            infiniteManager.endPK(player);
 
         // if night vision is enabled, clear it
         if (playerStats.hasNVStatus())

@@ -46,7 +46,7 @@ public class SpectateCMD implements CommandExecutor {
                                                 if (!spectatorStats.inRace()) {
                                                     if (!spectatorStats.isEventParticipant()) {
                                                         if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-                                                            if (!spectatorStats.isInInfinitePK()) {
+                                                            if (!spectatorStats.isInInfinite()) {
                                                                 if (!playerStats.isInBlackMarket()) {
                                                                     if (player.isOnGround()) {
 

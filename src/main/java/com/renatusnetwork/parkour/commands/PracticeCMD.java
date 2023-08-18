@@ -31,7 +31,7 @@ public class PracticeCMD implements CommandExecutor {
                     if (!playerStats.isSpectating()) {
                         if (!playerStats.isEventParticipant()) {
                             if (!playerStats.isInBlackMarket()) {
-                                if (!playerStats.isInInfinitePK()) {
+                                if (!playerStats.isInInfinite()) {
                                     // if it is a dropper level, disable /prac
                                     if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
                                         player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));

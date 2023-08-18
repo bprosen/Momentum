@@ -527,7 +527,7 @@ public class StatsManager {
                                         .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
                                         .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
                                         .replace("%prestiges%", playerStats.getPrestiges() + "")
-                                        .replace("%infinite_score%", playerStats.getInfinitePKScore() + "")
+                                        .replace("%infinite_score%", playerStats.getBestInfiniteScore() + "")
                                         .replace("%race_wins%", playerStats.getRaceWins() + "")
                                         .replace("%race_losses%", playerStats.getRaceLosses() + "")
                                         .replace("%race_winrate%", playerStats.getRaceWinRate() + "")
@@ -626,7 +626,7 @@ public class StatsManager {
             rankString = rank.getRankTitle();
 
         int prestiges = playerStats.getPrestiges();
-        int bestInfinite = playerStats.getInfinitePKScore();
+        int bestInfinite = playerStats.getBestInfiniteScore();
 
         int records = playerStats.getRecords();
         String favoriteLevel = playerStats.getMostCompletedLevel();

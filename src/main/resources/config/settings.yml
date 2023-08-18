@@ -193,7 +193,7 @@ event:
     pvp: 5
     half_heart: 15
     rising_water: 100
-infinitepk:
+infinite:
   max_leaderboard_size: 10
   max_x: 100
   max_y: 240
@@ -204,6 +204,23 @@ infinitepk:
   starting_yaw: 0.0f
   infinite_respawn_loc: "infinite-respawn"
   infinite_middle_loc: "infinite-middle"
+  sprint:
+    starting_timer: 30
+    max_timer: 60
+    default_time_gain: 1.0 # 1 second
+    time_reduction_factors:
+      '100':
+        reduction: 0.2
+      '200':
+        reduction: 0.2
+      '300':
+        reduction: 0.2
+      '400':
+        reduction: 0.2
+      '500':
+        reduction: 0.1
+  timed:
+    timer: 60
 completions:
   global_level_completions_leaderboard:
     max_size: 10

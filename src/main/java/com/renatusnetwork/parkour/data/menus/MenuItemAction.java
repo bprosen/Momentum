@@ -503,7 +503,7 @@ public class MenuItemAction {
             {
                 if (!playerStats.isEventParticipant())
                 {
-                    if (!playerStats.isInInfinitePK())
+                    if (!playerStats.isInInfinite())
                     {
                         if (level.hasRequiredLevels(playerStats))
                         {

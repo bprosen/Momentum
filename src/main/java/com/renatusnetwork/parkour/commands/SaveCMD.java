@@ -23,7 +23,7 @@ public class SaveCMD implements CommandExecutor
             {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                if (!playerStats.isInInfinitePK())
+                if (!playerStats.isInInfinite())
                 {
                     if (playerStats.inLevel())
                     {

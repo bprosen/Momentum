@@ -44,7 +44,7 @@ public class CheckpointManager {
 
         if (!playerStats.inRace()) {
             if (!playerStats.isEventParticipant()) {
-                if (!playerStats.isInInfinitePK()) {
+                if (!playerStats.isInInfinite()) {
                     if (!playerStats.isSpectating()) {
 
                         Location loc = null;

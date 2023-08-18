@@ -59,16 +59,16 @@ public class SettingsManager {
     public int sword_hotbar_slot;
     public String sword_title;
 
-    public int max_infinitepk_leaderboard_size;
-    public int max_infinitepk_x;
-    public int max_infinitepk_y;
-    public int max_infinitepk_z;
-    public int infinitepk_starting_y;
-    public int min_infinitepk_y;
-    public float infinitepk_starting_pitch;
-    public float infinitepk_starting_yaw;
-    public String infinitepk_respawn_loc;
-    public String infinitepk_middle_loc;
+    public int max_infinite_leaderboard_size;
+    public int max_infinite_x;
+    public int max_infinite_y;
+    public int max_infinite_z;
+    public int infinite_starting_y;
+    public int min_infinite_y;
+    public float infinite_starting_pitch;
+    public float infinite_starting_yaw;
+    public String infinite_respawn_loc;
+    public String infinite_middle_loc;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -129,6 +129,13 @@ public class SettingsManager {
     public String blackmarket_message_prefix;
     public String jackpot_force_remove_permission_cmd;
 
+    public int sprint_starting_timer;
+    public int sprint_max_timer;
+    public float sprint_time_gain;
+    public LinkedHashMap<Integer, Float> reduction_factors;
+
+    public int timed_timer;
+
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
         cooldown_calendar.setTime(new Date());
@@ -169,14 +176,14 @@ public class SettingsManager {
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         sword_title = settings.getString("setup-sword.title");
-        max_infinitepk_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
-        max_infinitepk_x = settings.getInt("infinitepk.max_x");
-        max_infinitepk_y = settings.getInt("infinitepk.max_y");
-        max_infinitepk_z = settings.getInt("infinitepk.max_z");
-        min_infinitepk_y = settings.getInt("infinitepk.min_y");
-        infinitepk_starting_y = settings.getInt("infinitepk.starting_y");
-        infinitepk_starting_pitch = (float) settings.getDouble("infinitepk.starting_pitch");
-        infinitepk_starting_yaw = (float) settings.getDouble("infinitepk.starting_yaw");
+        max_infinite_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
+        max_infinite_x = settings.getInt("infinite.max_x");
+        max_infinite_y = settings.getInt("infinite.max_y");
+        max_infinite_z = settings.getInt("infinite.max_z");
+        min_infinite_y = settings.getInt("infinite.min_y");
+        infinite_starting_y = settings.getInt("infinite.starting_y");
+        infinite_starting_pitch = (float) settings.getDouble("infinite.starting_pitch");
+        infinite_starting_yaw = (float) settings.getDouble("infinite.starting_yaw");
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
         max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");
@@ -273,9 +280,19 @@ public class SettingsManager {
         blackmarket_min_player_count = settings.getInt("blackmarket.min_player_count");
         blackmarket_item_spawn_loc = settings.getString("blackmarket.item_spawn_location");
         blackmarket_tp_loc = settings.getString("blackmarket.tp_location");
-        infinitepk_middle_loc = settings.getString("infinitepk.infinite_middle_loc");
-        infinitepk_respawn_loc = settings.getString("infinitepk.infinite_respawn_loc");
+        infinite_middle_loc = settings.getString("infinite.infinite_middle_loc");
+        infinite_respawn_loc = settings.getString("infinite.infinite_respawn_loc");
         blackmarket_message_prefix = settings.getString("blackmarket.message_prefix");
         jackpot_force_remove_permission_cmd = settings.getString("bank.jackpot_force_remove_permission_cmd");
+        sprint_starting_timer = settings.getInt("infinite.sprint.starting_timer");
+        sprint_max_timer = settings.getInt("infinite.sprint.max_timer");
+        sprint_time_gain = settings.getInt("infinite.sprint.default_time_gain");
+        Set<String> keys = settings.getConfigurationSection("infinite.sprint.time_reduction_factors").getKeys(false);
+
+        reduction_factors = new LinkedHashMap<>();
+        for (String key : keys)
+            reduction_factors.put(Integer.parseInt(key), (float) settings.getDouble("infinite.time_reduction_factors." + key + ".reduction"));
+
+        timed_timer = settings.getInt("infinite.timed.timer");
     }
 }

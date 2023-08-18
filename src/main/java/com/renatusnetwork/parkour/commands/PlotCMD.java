@@ -444,7 +444,7 @@ public class PlotCMD implements CommandExecutor {
         boolean passes = false;
 
         if (!playerStats.inRace()) {
-            if (!playerStats.isInInfinitePK()) {
+            if (!playerStats.isInInfinite()) {
                 if (!playerStats.isSpectating()) {
                     if (!playerStats.isEventParticipant()) {
                         if (!playerStats.isInBlackMarket()) {

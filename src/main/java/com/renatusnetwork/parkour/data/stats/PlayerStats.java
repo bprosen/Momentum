@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.stats;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.clans.Clan;
+import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
@@ -45,8 +46,9 @@ public class PlayerStats {
     private float raceWinRate = 0.00f;
     private float prestigeMultiplier = 1.00f;
     private int individualLevelsBeaten;
-    private int infinitePKScore = 0;
-    private boolean inInfinitePK = false;
+    private int bestInfiniteScore = 0;
+    private boolean inInfinite = false;
+    private InfiniteType infiniteType;
     private boolean eventParticipant = false;
     private boolean bypassingPlots = false;
     private int totalLevelCompletions = 0;
@@ -272,23 +274,27 @@ public class PlayerStats {
     //
     // InfinitePK Section
     //
-    public void setInfinitePKScore(int infinitePKScore) {
-        this.infinitePKScore = infinitePKScore;
+    public void setInfiniteScore(int infiniteScore) {
+        this.bestInfiniteScore = infiniteScore;
     }
 
-    public int getInfinitePKScore() {
-        return infinitePKScore;
+    public int getBestInfiniteScore() {
+        return bestInfiniteScore;
     }
 
-    public void setInfinitePK(boolean inInfinitePK) { this.inInfinitePK = inInfinitePK; }
+    public void setInfinite(boolean inInfinite) { this.inInfinite = inInfinite; }
 
-    public boolean isInInfinitePK() {
-        return inInfinitePK;
+    public boolean isInInfinite() {
+        return inInfinite;
     }
 
     public Material getInfiniteBlock() { return infiniteBlock; }
 
     public void setInfiniteBlock(Material infiniteBlock) { this.infiniteBlock = infiniteBlock; }
+
+    public InfiniteType getInfiniteType() { return infiniteType; }
+
+    public void setInfiniteType(InfiniteType type) { this.infiniteType = type; }
 
     //
     // Rank Section
@@ -326,7 +332,7 @@ public class PlayerStats {
 
     public void addFail()
     {
-        if (failsToggled && !inInfinitePK && !inTutorial && !inRace && !eventParticipant)
+        if (failsToggled && !inInfinite && !inTutorial && !inRace && !eventParticipant)
             fails++;
     }
 
