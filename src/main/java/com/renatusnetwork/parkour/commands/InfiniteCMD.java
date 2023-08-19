@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.infinite.*;
 import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,10 +36,10 @@ public class InfiniteCMD implements CommandExecutor {
                 if (InfiniteDB.hasScore(type, a[2]))
                 {
                     int score = InfiniteDB.getScoreFromName(type, a[2]);
-                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a score of &6" + Utils.formatNumber(score)));
+                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(score)));
                 }
                 else
-                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has not played &6Infinite Parkour &7before (score of 0)"));
+                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has not played &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &5Infinite &7before (score of 0)"));
             // self
             }
             else if (a.length == 2)
@@ -46,9 +47,9 @@ public class InfiniteCMD implements CommandExecutor {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 if (playerStats != null && playerStats.getBestInfiniteScore() > 0)
-                    sender.sendMessage(Utils.translate("&7You have a score of &6" + Utils.formatNumber(playerStats.getBestInfiniteScore())));
+                    sender.sendMessage(Utils.translate("&7You have a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(playerStats.getBestInfiniteScore(type))));
                 else
-                    sender.sendMessage(Utils.translate("&7You have yet to play &6Infinite Parkour &7(score of 0)"));
+                    sender.sendMessage(Utils.translate("&7You have yet to play &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &5Infinite &7(score of 0)"));
             }
         // admin command for removing leaderboard position
         } else if (player.hasPermission("rn-parkour.admin") && (a.length == 4 && a[0].equalsIgnoreCase("setscore"))) {

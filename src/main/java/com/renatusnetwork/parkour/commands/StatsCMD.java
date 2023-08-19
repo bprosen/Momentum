@@ -26,13 +26,13 @@ public class StatsCMD implements CommandExecutor {
             if (a.length == 2 && a[0].equalsIgnoreCase("infinite"))
             {
                 String typeString = a[1];
-                boolean correct = true;
+                boolean correct = false;
 
                 // verify type
                 for (InfiniteType type : InfiniteType.values())
-                    if (!type.toString().equalsIgnoreCase(typeString))
+                    if (type.toString().equalsIgnoreCase(typeString))
                     {
-                        correct = false;
+                        correct = true;
                         break;
                     }
 
@@ -42,7 +42,7 @@ public class StatsCMD implements CommandExecutor {
 
                     if (!Parkour.getInfiniteManager().getLeaderboard(type).isEmpty())
                     {
-                        sender.sendMessage(Utils.translate("&d" + StringUtils.capitalize(typeString) + " &5Infinite &7Leaderboard"));
+                        sender.sendMessage(Utils.translate("&d" + StringUtils.capitalize(typeString.toLowerCase()) + " &5Infinite &7Leaderboard"));
 
                         int position = 1;
                         for (InfiniteLBPosition lbPosition : Parkour.getInfiniteManager().getLeaderboard(type).getLeaderboardPositions())
@@ -61,11 +61,11 @@ public class StatsCMD implements CommandExecutor {
                         {
                             Player player = (Player) sender;
                             PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
-                            sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getBestInfiniteScore())));
+                            sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getBestInfiniteScore(type))));
                         }
                     }
                     else
-                        sender.sendMessage(Utils.translate("&cInfinite Parkour lb not loaded or no lb positions"));
+                        sender.sendMessage(Utils.translate("&c" + StringUtils.capitalize(typeString.toLowerCase()) + " Infinite Parkour lb not loaded or no lb positions"));
                 }
                 else
                 {

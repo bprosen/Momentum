@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.api.ClanXPRewardEvent;
 import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
+import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
@@ -521,13 +522,17 @@ public class StatsManager {
                             Clan clan = playerStats.getClan();
                             for (String loreString : itemLore) {
 
+
                                 // rank and game stats item
                                 loreString = loreString.replace("%balance%", Utils.formatNumber(playerStats.getCoins()))
                                         .replace("%perks_gained%", playerStats.getGainedPerksCount() + "")
                                         .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
                                         .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
                                         .replace("%prestiges%", playerStats.getPrestiges() + "")
-                                        .replace("%infinite_score%", playerStats.getBestInfiniteScore() + "")
+                                        .replace("%infinite_classic_score%", playerStats.getBestInfiniteScore(InfiniteType.CLASSIC) + "")
+                                        .replace("%infinite_sprint_score%", playerStats.getBestInfiniteScore(InfiniteType.SPRINT) + "")
+                                        .replace("%infinite_speedrun_score%", playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN) + "")
+                                        .replace("%infinite_timed_score%", playerStats.getBestInfiniteScore(InfiniteType.TIMED) + "")
                                         .replace("%race_wins%", playerStats.getRaceWins() + "")
                                         .replace("%race_losses%", playerStats.getRaceLosses() + "")
                                         .replace("%race_winrate%", playerStats.getRaceWinRate() + "")
@@ -626,7 +631,10 @@ public class StatsManager {
             rankString = rank.getRankTitle();
 
         int prestiges = playerStats.getPrestiges();
-        int bestInfinite = playerStats.getBestInfiniteScore();
+        int bestClassicInfinite = playerStats.getBestInfiniteScore(InfiniteType.CLASSIC);
+        int bestSpeedrunInfinite = playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN);
+        int bestTimedInfinite = playerStats.getBestInfiniteScore(InfiniteType.TIMED);
+        int bestSprintInfinite = playerStats.getBestInfiniteScore(InfiniteType.SPRINT);
 
         int records = playerStats.getRecords();
         String favoriteLevel = playerStats.getMostCompletedLevel();
@@ -653,8 +661,11 @@ public class StatsManager {
                      "&7Clan » &e" + clanString + "\n" +
                      "&7Rank » &a" + rankString + "\n" +
                      "&7Prestige » &5" + prestiges + "\n" +
-                     "&7Best Infinite » &d" + Utils.formatNumber(bestInfinite) + "\n\n" +
-                     "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
+                     "&7Classic Infinite » &d" + Utils.formatNumber(bestClassicInfinite) + "\n" +
+                     "&7Speedrun Infinite » &d" + Utils.formatNumber(bestSpeedrunInfinite) + "\n" +
+                     "&7Timed Infinite » &d" + Utils.formatNumber(bestTimedInfinite) + "\n" +
+                     "&7Sprint Infinite » &d" + Utils.formatNumber(bestSprintInfinite) + "\n" +
+                     "\n&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
                      "&7Favorite Level » &2" + favoriteLevel + "\n" +
                      "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
                      "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +

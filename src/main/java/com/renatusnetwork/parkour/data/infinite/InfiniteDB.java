@@ -12,6 +12,7 @@ public class InfiniteDB
     public static int getScoreFromName(InfiniteType type, String playerName)
     {
         String dbTypeName = "infinite_" + type.toString().toLowerCase() + "_score";
+
         List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", dbTypeName,
                 " WHERE player_name='" + playerName + "'");
 

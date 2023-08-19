@@ -100,7 +100,7 @@ public class StatsDB {
 
                 for (InfiniteType type : InfiniteType.values())
                 {
-                    String typeString = "infinite_" + type + "_score";
+                    String typeString = "infinite_" + type.toString().toLowerCase() + "_score";
                     String scoreString = playerResult.get(typeString);
 
                     // set score

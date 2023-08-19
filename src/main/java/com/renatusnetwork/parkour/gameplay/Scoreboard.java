@@ -195,7 +195,7 @@ public class Scoreboard {
                 } else if (playerStats.isInInfinite()) {
 
                     board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString()) + " &5Infinite")));
+                    board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase()) + " &5Infinite")));
 
                     // add best if they have one
                     String scoreString = "&7Score &d" + Parkour.getInfiniteManager().get(playerStats.getPlayerName()).getScore();

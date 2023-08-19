@@ -15,6 +15,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -26,8 +27,18 @@ public class InfiniteManager {
     private HashMap<InfiniteType, InfiniteLB> leaderboards = new HashMap<>(Parkour.getSettingsManager().max_infinite_leaderboard_size);
     private LinkedHashMap<Integer, InfiniteReward> rewards = new LinkedHashMap<>(); // linked so order stays
 
-    public InfiniteManager() {
+    public InfiniteManager()
+    {
         startScheduler();
+        initLeaderboards();
+    }
+
+    public void initLeaderboards()
+    {
+        leaderboards.put(InfiniteType.CLASSIC, new InfiniteLB(InfiniteType.CLASSIC));
+        leaderboards.put(InfiniteType.SPEEDRUN, new InfiniteLB(InfiniteType.SPEEDRUN));
+        leaderboards.put(InfiniteType.SPRINT, new InfiniteLB(InfiniteType.SPRINT));
+        leaderboards.put(InfiniteType.TIMED, new InfiniteLB(InfiniteType.TIMED));
     }
 
     public void startScheduler() {
@@ -39,6 +50,14 @@ public class InfiniteManager {
                 InfiniteRewardsYAML.loadRewards();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
+
+        // update leaderboards every 3 minutes
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                loadLeaderboards();
+            }
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 5, 20 * 180);
     }
 
     public void startPK(PlayerStats playerStats, InfiniteType type, boolean fromPortal) {
@@ -166,12 +185,6 @@ public class InfiniteManager {
                 }
 
                 updateScore(player.getName(), playerStats.getInfiniteType(), score);
-
-                InfiniteLB leaderboard = leaderboards.get(playerStats.getInfiniteType());
-
-                // load leaderboard if they have a lb position
-                if (scoreWillBeLB(playerStats.getInfiniteType(), score) || leaderboard.size() < Parkour.getSettingsManager().max_infinite_leaderboard_size)
-                    leaderboard.loadLeaderboard();
             }
             else if (player.isOnline())
                 player.sendMessage(Utils.translate(
@@ -219,23 +232,20 @@ public class InfiniteManager {
         if (playerStats != null)
             playerStats.setInfiniteScore(score);
 
-        if (isLBPosition(type, playerName))
-            getLeaderboardPosition(type, playerName).setScore(score);
-
         Parkour.getDatabaseManager().add(
                 "UPDATE players SET infinite_" + type.toString().toLowerCase() + "_score=" + score + " WHERE player_name='" + playerName + "'"
         );
     }
 
-    public Location generateNextBlockLocation(Location oldLocation, Player player) {
-
+    public Location generateNextBlockLocation(Location oldLocation, Player player)
+    {
         LocationManager locationManager = Parkour.getLocationManager();
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        Vector facing = player.getLocation().getDirection().setY(0);
+        Location eyeLoc = player.getEyeLocation();
 
-        Location newLocation = oldLocation.clone().add(facing.multiply(random.nextInt(3, 6)));
+        Location newLocation = oldLocation.clone().add(eyeLoc.getDirection().setY(0).multiply(random.nextInt(3, 6)));
 
         return newLocation;
     }
@@ -244,7 +254,7 @@ public class InfiniteManager {
     {
         boolean empty = true;
 
-        for (Infinite infinite : participants.values())
+        outer: for (Infinite infinite : participants.values())
             for (Block block : infinite.getBlocks())
             {
                 Location blockLoc = block.getLocation();
@@ -254,7 +264,7 @@ public class InfiniteManager {
                     blockLoc.getBlockZ() == location.getBlockZ())
                 {
                     empty = false;
-                    break;
+                    break outer;
                 }
             }
 
@@ -298,41 +308,6 @@ public class InfiniteManager {
     public void loadLeaderboard(InfiniteType infiniteType)
     {
         leaderboards.get(infiniteType).loadLeaderboard();
-    }
-
-    public InfiniteLBPosition getLeaderboardPosition(InfiniteType type, String playerName)
-    {
-        InfiniteLB leaderboard = leaderboards.get(type);
-
-        for (InfiniteLBPosition infiniteLBPosition : leaderboard.getLeaderboardPositions())
-            if (infiniteLBPosition.getName().equalsIgnoreCase(playerName))
-                return infiniteLBPosition;
-
-        return null;
-    }
-
-    public boolean isLBPosition(InfiniteType type, String playerName)
-    {
-        InfiniteLB leaderboard = leaderboards.get(type);
-
-        for (InfiniteLBPosition infiniteLBPosition : leaderboard.getLeaderboardPositions())
-            if (infiniteLBPosition.getName().equalsIgnoreCase(playerName))
-                return true;
-
-        return false;
-    }
-
-    public boolean scoreWillBeLB(InfiniteType type, int score)
-    {
-        InfiniteLB leaderboard = leaderboards.get(type);
-
-        int lowestScore = 0;
-        // gets lowest score
-        for (InfiniteLBPosition infiniteLBPosition : leaderboard.getLeaderboardPositions())
-            if (lowestScore == 0 || infiniteLBPosition.getScore() < lowestScore)
-                lowestScore = infiniteLBPosition.getScore();
-
-        return lowestScore <= score;
     }
 
     public void shutdown() {
