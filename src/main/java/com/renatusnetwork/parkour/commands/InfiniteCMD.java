@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.*;
 import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -33,38 +34,43 @@ public class InfiniteCMD implements CommandExecutor {
             // other target
             if (a.length == 3)
             {
-                if (InfiniteDB.hasScore(type, a[2]))
+                Player target = Bukkit.getPlayer(a[2]);
+                if (target != null)
                 {
-                    int score = InfiniteDB.getScoreFromName(type, a[2]);
+                    int score = Parkour.getStatsManager().get(target).getBestInfiniteScore(type);
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(score)));
                 }
                 else
-                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has not played &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &5Infinite &7before (score of 0)"));
+                    sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not online"));
             // self
             }
             else if (a.length == 2)
             {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-                if (playerStats != null && playerStats.getBestInfiniteScore() > 0)
-                    sender.sendMessage(Utils.translate("&7You have a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(playerStats.getBestInfiniteScore(type))));
-                else
-                    sender.sendMessage(Utils.translate("&7You have yet to play &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &5Infinite &7(score of 0)"));
+                sender.sendMessage(Utils.translate("&7You have a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(playerStats.getBestInfiniteScore(type))));
             }
         // admin command for removing leaderboard position
         } else if (player.hasPermission("rn-parkour.admin") && (a.length == 4 && a[0].equalsIgnoreCase("setscore"))) {
             if (Utils.isInteger(a[3])) {
                 InfiniteType type = InfiniteType.valueOf(a[2].toUpperCase());
-                if (InfiniteDB.hasScore(type, a[1])) {
-                    int score = Integer.parseInt(a[3]);
+                new BukkitRunnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // run db in async
+                        if (StatsDB.isPlayerInDatabase(a[1]))
+                        {
+                            int score = Integer.parseInt(a[3]);
 
-                    infiniteManager.updateScore(a[1], type, score);
-                    infiniteManager.loadLeaderboard(type);
+                            infiniteManager.updateScore(a[1], type, score);
 
-                    player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's &c" + type + " &7score to &6" + score));
-                } else {
-                    player.sendMessage(Utils.translate("&c" + a[1] + " &7has not joined the server yet"));
-                }
+                            player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's &c" + type + " &7score to &6" + score));
+                        } else {
+                            player.sendMessage(Utils.translate("&c" + a[1] + " &7has not joined the server yet"));
+                        }
+                    }
+                }.runTaskAsynchronously(Parkour.getPlugin());
             } else {
                 player.sendMessage(Utils.translate("&c" + a[3] + " &7is not an integer"));
             }

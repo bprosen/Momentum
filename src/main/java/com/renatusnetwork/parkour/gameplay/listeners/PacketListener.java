@@ -210,7 +210,17 @@ public class PacketListener implements Listener {
 
                         // respawn infinite pk if below current block
                         if ((infinite.getFirstBlock().getLocation().getBlockY() - 3) > player.getLocation().getBlockY())
-                            infinite.respawn();
+                        {
+                            // force sync
+                            new BukkitRunnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    infinite.respawn();
+                                }
+                            }.runTask(Parkour.getPlugin());
+                        }
                         // if their loc
                     }
                     else if (!playerStats.inLevel())

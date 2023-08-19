@@ -314,7 +314,7 @@ public class StatsCMD implements CommandExecutor {
             }
         } else {
             sender.sendMessage(Utils.translate("&6/stats <levelName>  &7Gets level's Leaderboard"));
-            sender.sendMessage(Utils.translate("&6/stats infinite  &7Gets Infinite Leaderboard"));
+            sender.sendMessage(Utils.translate("&6/stats infinite <type>  &7Gets Infinite Type's Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats races  &7Gets Races Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats toprated  &7Gets Top Rated Levels Leaderboard"));
             sender.sendMessage(Utils.translate("&6/stats clans  &7Gets Clan XP Leaderboard"));

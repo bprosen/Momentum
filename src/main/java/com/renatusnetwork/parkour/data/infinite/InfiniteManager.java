@@ -121,16 +121,9 @@ public class InfiniteManager {
 
                 if (!event.isCancelled())
                 {
-                    // run in sync because of packet listener running in async, need to remove blocks in sync
-                    new BukkitRunnable() {
-                        @Override
-                        public void run()
-                        {
-                            // end and reward player
-                            infinite.end();
-                            rewardPlayer(playerStats, infinite, event.getReward());
-                        }
-                    }.runTask(Parkour.getPlugin());
+                    // end and reward player
+                    infinite.end();
+                    rewardPlayer(playerStats, infinite, event.getReward());
 
                     // load level info from region
                     Parkour.getLevelManager().regionLevelCheck(playerStats, player.getLocation());
@@ -230,7 +223,7 @@ public class InfiniteManager {
         PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
 
         if (playerStats != null)
-            playerStats.setInfiniteScore(score);
+            playerStats.setInfiniteScore(type, score);
 
         Parkour.getDatabaseManager().add(
                 "UPDATE players SET infinite_" + type.toString().toLowerCase() + "_score=" + score + " WHERE player_name='" + playerName + "'"

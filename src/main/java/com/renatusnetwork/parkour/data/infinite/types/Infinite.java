@@ -10,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -78,7 +79,10 @@ public abstract class Infinite
 
         plateBlock = newPlateLocation.add(0, 1, 0).getBlock();
         plateBlock.setType(Material.IRON_PLATE);
-        newPlateLocation.getWorld().spawnParticle(Particle.CLOUD, newPlateLocation.getX(), newPlateLocation.getY(), newPlateLocation.getZ(), 15);
+
+        Location last = getLastBlock().getLocation();
+
+        last.getWorld().spawnParticle(Particle.CLOUD, last.getBlockX() + 0.5, last.getBlockY() + 0.5, last.getBlockZ() + 0.5, 15);
         getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.35f, 2f);
 
     }
