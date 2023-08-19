@@ -71,7 +71,15 @@ public class Sprint extends Infinite
                 if (timer <= 0.0)
                 {
                     cancel();
-                    Parkour.getInfiniteManager().endPK(getPlayer()); // end when time is up
+                    // force sync
+                    new BukkitRunnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            Parkour.getInfiniteManager().endPK(getPlayer()); // end when time is up
+                        }
+                    }.runTask(Parkour.getPlugin());
                 }
             }
         }.runTaskTimerAsynchronously(Parkour.getPlugin(), 2, 2);
