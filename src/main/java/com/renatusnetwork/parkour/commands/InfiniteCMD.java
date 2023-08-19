@@ -26,66 +26,46 @@ public class InfiniteCMD implements CommandExecutor {
         Player player = (Player) sender;
         InfiniteManager infiniteManager = Parkour.getInfiniteManager();
 
-        if (a.length >= 1 && a[0].equalsIgnoreCase("score")) {
+        if (a.length >= 2 && a[0].equalsIgnoreCase("score"))
+        {
+            InfiniteType type = InfiniteType.valueOf(a[1].toUpperCase());
             // other target
-            if (a.length == 2) {
-
-                if (InfiniteDB.hasScore(a[1])) {
-
-                    int score = InfiniteDB.getScoreFromName(a[1]);
-                    sender.sendMessage(Utils.translate("&c" + a[1] + " &7has a score of &6" + Utils.formatNumber(score)));
-                } else {
-                    sender.sendMessage(Utils.translate("&c" + a[1] + " &7has not played &6Infinite Parkour &7before (score of 0)"));
+            if (a.length == 3)
+            {
+                if (InfiniteDB.hasScore(type, a[2]))
+                {
+                    int score = InfiniteDB.getScoreFromName(type, a[2]);
+                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a score of &6" + Utils.formatNumber(score)));
                 }
+                else
+                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7has not played &6Infinite Parkour &7before (score of 0)"));
             // self
-            } else if (a.length == 1) {
-
+            }
+            else if (a.length == 2)
+            {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 if (playerStats != null && playerStats.getBestInfiniteScore() > 0)
                     sender.sendMessage(Utils.translate("&7You have a score of &6" + Utils.formatNumber(playerStats.getBestInfiniteScore())));
                 else
                     sender.sendMessage(Utils.translate("&7You have yet to play &6Infinite Parkour &7(score of 0)"));
-            // leaderboard
-            } else if (a.length == 3 && a[1].equalsIgnoreCase("lb")) {
-
-                if (Utils.isInteger(a[2])) {
-                    int position = Integer.parseInt(a[2]);
-                    // can cast with confidence
-                    InfiniteLBPosition lbPosition = (InfiniteLBPosition) infiniteManager.getLeaderboard().values().toArray()[position - 1];
-
-                    if (lbPosition != null) {
-                        player.sendMessage(Utils.translate(
-                                "&c" + lbPosition.getName() + " &7is at &6spot " + position + " &7with a score of &6" + lbPosition.getScore())
-                        );
-                    } else {
-                        player.sendMessage(Utils.translate("&7Something went wrong... invalid position &6" + position));
-                    }
-                } else {
-                    player.sendMessage(Utils.translate("&c" + a[2] + " &7is not a position on the leaderboard! (1-10)"));
-                }
             }
         // admin command for removing leaderboard position
-        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setscore"))) {
-            if (Utils.isInteger(a[2])) {
-                if (InfiniteDB.hasScore(a[1])) {
-                    int score = Integer.parseInt(a[2]);
+        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 4 && a[0].equalsIgnoreCase("setscore"))) {
+            if (Utils.isInteger(a[3])) {
+                InfiniteType type = InfiniteType.valueOf(a[2].toUpperCase());
+                if (InfiniteDB.hasScore(type, a[1])) {
+                    int score = Integer.parseInt(a[3]);
 
-                    infiniteManager.updateScore(a[1], score);
-                    // can run in async
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            infiniteManager.loadLeaderboard();
-                        }
-                    }.runTaskAsynchronously(Parkour.getPlugin()); // load lb
+                    infiniteManager.updateScore(a[1], type, score);
+                    infiniteManager.loadLeaderboard(type);
 
-                    player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's score to &6" + score));
+                    player.sendMessage(Utils.translate("&7You have set &c" + a[1] + "&7's &c" + type + " &7score to &6" + score));
                 } else {
                     player.sendMessage(Utils.translate("&c" + a[1] + " &7has not joined the server yet"));
                 }
             } else {
-                player.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer"));
+                player.sendMessage(Utils.translate("&c" + a[3] + " &7is not an integer"));
             }
         } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
 
@@ -175,13 +155,12 @@ public class InfiniteCMD implements CommandExecutor {
 
     private void sendHelp(Player player) {
         player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
-        player.sendMessage(Utils.translate("&5/infinite score [IGN]  &7Tells you the score of yourself/someone else"));
-        player.sendMessage(Utils.translate("&5/infinite score lb <position>  &7Tells you the score of someone in <position> on the leaderboard"));
+        player.sendMessage(Utils.translate("&5/infinite score <type> [IGN]  &7Tells you the score of yourself/someone else"));
         player.sendMessage(Utils.translate("&5/infinite rewards  &7Tells you a list of the rewards and if you have them (crossed out)"));
 
         if (player.hasPermission("rn-parkour.admin"))
         {
-            player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <score>  &7Set the score of someone"));
+            player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <type> <score>  &7Set the type's score of someone"));
             player.sendMessage(Utils.translate("&5/infinite loadrewards  &7Loads rewards from rewards.yml"));
             player.sendMessage(Utils.translate("&5/infinite setmode <IGN> <type>  &7Set the mode of a player"));
         }

@@ -10,7 +10,7 @@ public class Timed extends Infinite
 
     public Timed(PlayerStats playerStats)
     {
-        super(playerStats, InfiniteType.TIMED, 2);
+        super(playerStats, 2);
         this.endMillis = System.currentTimeMillis() + (Parkour.getSettingsManager().timed_timer * 1000L);
     }
 

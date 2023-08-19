@@ -1,12 +1,14 @@
 package com.renatusnetwork.parkour.data.infinite;
 
-public class InfiniteLBPosition {
+public class InfiniteLBPosition
+{
 
     private String playerUUID;
     private String playerName;
     private int score;
 
-    public InfiniteLBPosition(String playerUUID, String playerName, int score) {
+    public InfiniteLBPosition(String playerUUID, String playerName, int score)
+    {
         this.playerUUID = playerUUID;
         this.playerName = playerName;
         this.score = score;

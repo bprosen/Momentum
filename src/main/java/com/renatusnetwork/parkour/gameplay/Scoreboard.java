@@ -19,6 +19,7 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -194,7 +195,7 @@ public class Scoreboard {
                 } else if (playerStats.isInInfinite()) {
 
                     board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&5Infinite Parkour")));
+                    board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString()) + " &5Infinite")));
 
                     // add best if they have one
                     String scoreString = "&7Score &d" + Parkour.getInfiniteManager().get(playerStats.getPlayerName()).getScore();

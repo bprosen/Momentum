@@ -14,7 +14,7 @@ public class Perk {
     private String name;
     private String title;
     private HashMap<String, ItemStack> items;
-    private Material infinitePKBlock;
+    private Material infiniteBlock;
 
     private List<String> setRequirementsLore;
     private List<String> requirements;
@@ -37,7 +37,7 @@ public class Perk {
             requiredPermissions = PerksYAML.getRequiredPermissions(name);
             price = PerksYAML.getPrice(name);
             setRequirementsLore = PerksYAML.getSetRequirementsLore(name);
-            infinitePKBlock = PerksYAML.getInfinitePKBlock(name);
+            infiniteBlock = PerksYAML.getInfinitePKBlock(name);
         }
     }
 
@@ -53,9 +53,9 @@ public class Perk {
         return title;
     }
 
-    public boolean isInfinitePKBlock() { return infinitePKBlock != null; }
+    public boolean isInfiniteBlock() { return infiniteBlock != null; }
 
-    public Material getInfinitePKBlock() { return infinitePKBlock; }
+    public Material getInfiniteBlock() { return infiniteBlock; }
 
     public String getFormattedTitle() {
         return Utils.translate(title);

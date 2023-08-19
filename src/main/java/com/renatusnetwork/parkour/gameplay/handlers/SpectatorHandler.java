@@ -47,21 +47,7 @@ public class SpectatorHandler {
                     Utils.translate("&7You are no longer spectating anyone"));
             playerStats.resetSpectateSpawn();
 
-            // region null check
-            ProtectedRegion region = WorldGuard.getRegion(loc);
-            if (region != null) {
-
-                Level level = Parkour.getLevelManager().get(region.getId());
-
-                // make sure the area they are spawning in is a level
-                if (level != null) {
-                    playerStats.setLevel(level);
-
-                    // if elytra level, toggle on
-                    if (playerStats.getLevel().isElytraLevel())
-                        Parkour.getStatsManager().toggleOnElytra(playerStats);
-                }
-            }
+            Parkour.getLevelManager().regionLevelCheck(playerStats, loc);
         }
     }
 

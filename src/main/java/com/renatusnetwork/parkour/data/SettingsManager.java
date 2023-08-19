@@ -176,7 +176,7 @@ public class SettingsManager {
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         sword_title = settings.getString("setup-sword.title");
-        max_infinite_leaderboard_size = settings.getInt("infinitepk.max_leaderboard_size");
+        max_infinite_leaderboard_size = settings.getInt("infinite.max_leaderboard_size");
         max_infinite_x = settings.getInt("infinite.max_x");
         max_infinite_y = settings.getInt("infinite.max_y");
         max_infinite_z = settings.getInt("infinite.max_z");

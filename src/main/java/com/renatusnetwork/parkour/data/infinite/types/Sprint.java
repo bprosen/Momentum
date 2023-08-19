@@ -12,7 +12,7 @@ public class Sprint extends Infinite
 
     public Sprint(PlayerStats playerStats)
     {
-        super(playerStats, InfiniteType.SPRINT, 2);
+        super(playerStats, 2);
         this.timer = Parkour.getSettingsManager().sprint_starting_timer;
     }
 

@@ -8,7 +8,7 @@ public class Speedrun extends Infinite
 {
     public Speedrun(PlayerStats playerStats)
     {
-        super(playerStats, InfiniteType.SPEEDRUN, 3);
+        super(playerStats, 3);
     }
 
     @Override

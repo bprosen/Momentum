@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.events.EventLBPosition;
 import com.renatusnetwork.parkour.data.infinite.InfiniteLBPosition;
+import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
 import com.renatusnetwork.parkour.data.stats.*;
@@ -76,8 +77,14 @@ public class Placeholders extends PlaceholderExpansion
                     return Utils.formatNumber(playerStats.getRaceLosses());
                 case "race_winrate":
                     return String.valueOf(playerStats.getRaceWinRate());
-                case "best_infinite":
-                    return Utils.formatNumber(playerStats.getBestInfiniteScore());
+                case "best_classic_infinite":
+                    return Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.CLASSIC));
+                case "best_sprint_infinite":
+                    return Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPRINT));
+                case "best_timed_infinite":
+                    return Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.TIMED));
+                case "best_speedrun_infinite":
+                    return Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN));
                 case "event_wins":
                     return Utils.formatNumber(playerStats.getEventWins());
             }
@@ -99,20 +106,7 @@ public class Placeholders extends PlaceholderExpansion
 
                     if (posInt >= 1 && posInt <= 10)
                     {
-                        if (type.equals("infinite"))
-                        {
-                            InfiniteLBPosition infiniteLBPosition = Parkour.getInfiniteManager().getLeaderboard().get(posInt);
-
-                            if (infiniteLBPosition != null)
-                            {
-                                // return name or value
-                                if (value.equals("name"))
-                                    return infiniteLBPosition.getName();
-                                else if (value.equals("score"))
-                                    return Utils.formatNumber(infiniteLBPosition.getScore());
-                            }
-                        }
-                        else if (type.equals("races"))
+                        if (type.equals("races"))
                         {
                             RaceLBPosition raceLBPosition = Parkour.getRaceManager().getLeaderboard().get(posInt);
 
@@ -247,6 +241,32 @@ public class Placeholders extends PlaceholderExpansion
                     else
                     {
                         return "Out of bounds of leaderboards";
+                    }
+                }
+            }
+            else if (split.length == 5)
+            {
+                String lbType = split[1];
+                String specification = split[2];
+                String position = split[3];
+                String value = split[4];
+
+                if (lbType.equals("infinite"))
+                {
+                    if (Utils.isInteger(position))
+                    {
+                        int posInt = Integer.parseInt(position);
+                        InfiniteType type = InfiniteType.valueOf(specification.toUpperCase());
+                        InfiniteLBPosition infiniteLBPosition = Parkour.getInfiniteManager().getLeaderboard(type).getLeaderboardPosition(posInt);
+
+                        if (infiniteLBPosition != null)
+                        {
+                            // return name or value
+                            if (value.equals("name"))
+                                return infiniteLBPosition.getName();
+                            else if (value.equals("score"))
+                                return Utils.formatNumber(infiniteLBPosition.getScore());
+                        }
                     }
                 }
             }

@@ -46,7 +46,6 @@ public class PlayerStats {
     private float raceWinRate = 0.00f;
     private float prestigeMultiplier = 1.00f;
     private int individualLevelsBeaten;
-    private int bestInfiniteScore = 0;
     private boolean inInfinite = false;
     private InfiniteType infiniteType;
     private boolean eventParticipant = false;
@@ -63,20 +62,32 @@ public class PlayerStats {
 
     private FastBoard board;
 
-    private HashMap<String, Set<LevelCompletion>> levelCompletionsMap = new HashMap<>();
-    private HashMap<String, Long> perks = new HashMap<>();
-    private HashMap<String, Location> checkpoints = new HashMap<>();
-    private HashSet<String> boughtLevels = new HashSet<>();
-    private HashMap<String, Location> saves = new HashMap<>();
-    private HashMap<ModifierTypes, Modifier> modifiers = new HashMap<>();
+    private HashMap<String, Set<LevelCompletion>> levelCompletionsMap;
+    private HashMap<String, Long> perks;
+    private HashMap<String, Location> checkpoints;
+    private HashSet<String> boughtLevels;
+    private HashMap<String, Location> saves;
+    private HashMap<ModifierTypes, Modifier> modifiers;
+    private HashMap<InfiniteType, Integer> bestInfiniteScores;
 
     public PlayerStats(Player player)
     {
         this.player = player;
         this.UUID = player.getUniqueId().toString();
         this.playerName = player.getName();
+        this.board = new FastBoard(player); // load board
 
-        board = new FastBoard(player); // load board
+        // load maps
+        this.levelCompletionsMap = new HashMap<>();
+        this.perks = new HashMap<>();
+        this.checkpoints = new HashMap<>();
+        this.boughtLevels = new HashSet<>();
+        this.saves = new HashMap<>();
+        this.modifiers = new HashMap<>();
+        this.bestInfiniteScores = new HashMap<>();
+
+        for (InfiniteType type : InfiniteType.values())
+            bestInfiniteScores.put(type, 0); // arbitrary to be replaced when stats load
     }
 
     //
@@ -255,9 +266,8 @@ public class PlayerStats {
         spectatable = setting;
     }
 
-    public boolean isSpectatable() {
-        if (playerToSpectate != null)
-            return false;
+    public boolean isSpectatable()
+    {
         return spectatable;
     }
 
@@ -274,12 +284,22 @@ public class PlayerStats {
     //
     // InfinitePK Section
     //
-    public void setInfiniteScore(int infiniteScore) {
-        this.bestInfiniteScore = infiniteScore;
+
+    public int getBestInfiniteScore(InfiniteType type) { return bestInfiniteScores.get(type); }
+
+    public int getBestInfiniteScore()
+    {
+        return bestInfiniteScores.get(infiniteType);
     }
 
-    public int getBestInfiniteScore() {
-        return bestInfiniteScore;
+    public void setInfiniteScore(int infiniteScore)
+    {
+        bestInfiniteScores.replace(infiniteType, infiniteScore);
+    }
+
+    public void setInfiniteScore(InfiniteType type, int infiniteScore)
+    {
+        bestInfiniteScores.replace(type, infiniteScore);
     }
 
     public void setInfinite(boolean inInfinite) { this.inInfinite = inInfinite; }

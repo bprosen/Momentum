@@ -98,8 +98,15 @@ public class StatsDB {
                 int prestiges = Integer.parseInt(playerResult.get("rank_prestiges"));
                 playerStats.setPrestiges(prestiges);
 
-                int infinitePKScore = Integer.parseInt(playerResult.get("infinitepk_score"));
-                playerStats.setInfiniteScore(infinitePKScore);
+                for (InfiniteType type : InfiniteType.values())
+                {
+                    String typeString = "infinite_" + type + "_score";
+                    String scoreString = playerResult.get(typeString);
+
+                    // set score
+                    if (scoreString != null)
+                        playerStats.setInfiniteScore(type, Integer.parseInt(scoreString));
+                }
 
                 // set total completions count
                 int completions = Integer.parseInt(playerResult.get("level_completions"));

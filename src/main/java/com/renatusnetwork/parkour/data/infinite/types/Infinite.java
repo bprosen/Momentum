@@ -17,7 +17,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class Infinite
 {
     private PlayerStats playerStats;
-    private InfiniteType type;
     private Location originalLoc;
     private Location startingLocation;
     private int infiniteBlocksSize;
@@ -25,11 +24,10 @@ public abstract class Infinite
     private Block plateBlock;
     private int score;
 
-    public Infinite(PlayerStats playerStats, InfiniteType type, int infiniteBlocksSize)
+    public Infinite(PlayerStats playerStats, int infiniteBlocksSize)
     {
         this.playerStats = playerStats;
         this.originalLoc = playerStats.getPlayer().getLocation();
-        this.type = type;
         this.infiniteBlocksSize = infiniteBlocksSize;
         this.blocks = new HashMap<>();
         this.startingLocation = Parkour.getInfiniteManager().findStartingLocation();

@@ -14,15 +14,15 @@ public class InfiniteRewardsYAML {
         Parkour.getConfigManager().load("rewards");
 
         // get int keys
-        for (String key : rewardsFile.getConfigurationSection("infinitepk").getKeys(false))
+        for (String key : rewardsFile.getConfigurationSection("infinite").getKeys(false))
             // if it is an int and .command and .name is set, add it
             if (Utils.isInteger(key) &&
-                rewardsFile.isSet("infinitepk." + key + ".command") &&
-                rewardsFile.isSet("infinitepk." + key + ".name")) {
+                rewardsFile.isSet("infinite." + key + ".command") &&
+                rewardsFile.isSet("infinite." + key + ".name")) {
 
                 int scoreNeeded = Integer.parseInt(key);
-                String command = rewardsFile.getString("infinitepk." + key + ".command");
-                String name = rewardsFile.getString("infinitepk." + key + ".name");
+                String command = rewardsFile.getString("infinite." + key + ".command");
+                String name = rewardsFile.getString("infinite." + key + ".name");
 
                 // make new object and add
                 Parkour.getInfiniteManager().addReward(new InfiniteReward(scoreNeeded, command, name));

@@ -7,6 +7,8 @@ import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
+import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -568,6 +570,31 @@ public class LevelManager {
         else
         {
             player.sendMessage(Utils.translate("&cYou cannot teleport to an Ascendance level"));
+        }
+    }
+
+    public void regionLevelCheck(PlayerStats playerStats, Location location)
+    {
+        // region null check
+        ProtectedRegion region = WorldGuard.getRegion(location);
+        if (region != null) {
+
+            Level level = Parkour.getLevelManager().get(region.getId());
+
+            // make sure the area they are spawning in is a level
+            if (level != null)
+            {
+                playerStats.setLevel(level);
+
+                // if elytra level, toggle on
+                if (playerStats.getLevel().isElytraLevel())
+                    Parkour.getStatsManager().toggleOnElytra(playerStats);
+
+                // if they have a cp, load it
+                Location checkpoint = playerStats.getCheckpoint(level.getName());
+                if (checkpoint != null)
+                    playerStats.setCurrentCheckpoint(checkpoint);
+            }
         }
     }
 

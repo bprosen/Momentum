@@ -7,7 +7,7 @@ public class Classic extends Infinite
 
     public Classic(PlayerStats playerStats)
     {
-        super(playerStats, InfiniteType.CLASSIC, 2);
+        super(playerStats, 2);
     }
 
     @Override

@@ -85,7 +85,10 @@ public class TablesDB {
                 "clan_id INT DEFAULT -1, " +
                 "rank_id INT DEFAULT 1, " +
                 "rank_prestiges TINYINT default 0, " +
-                "infinitepk_score INT default 0, " +
+                "infinite_classic_score INT default 0, " +
+                "infinite_speedrun_score INT default 0, " +
+                "infinite_sprint_score INT default 0, " +
+                "infinite_timed_score INT default 0, " +
                 "level_completions INT default 0, " +
                 "race_wins SMALLINT default 0, " +
                 "race_losses SMALLINT default 0, " +

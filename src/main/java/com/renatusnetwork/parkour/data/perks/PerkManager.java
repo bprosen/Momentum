@@ -117,11 +117,11 @@ public class PerkManager {
                         break;
                 }
         }
-        else if (perk.isInfinitePKBlock())
+        else if (perk.isInfiniteBlock())
         {
             // update in both stats and db
-            playerStats.setInfiniteBlock(perk.getInfinitePKBlock());
-            Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='" + perk.getInfinitePKBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
+            playerStats.setInfiniteBlock(perk.getInfiniteBlock());
+            Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='" + perk.getInfiniteBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
         }
     }
 }
