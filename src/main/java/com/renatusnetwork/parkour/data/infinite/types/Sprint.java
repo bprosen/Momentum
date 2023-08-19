@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.infinite.types;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
