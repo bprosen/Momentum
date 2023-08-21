@@ -46,7 +46,6 @@ public class InfiniteManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                loadLeaderboards();
                 InfiniteRewardsYAML.loadRewards();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
@@ -232,15 +231,69 @@ public class InfiniteManager {
 
     public Location generateNextBlockLocation(Location oldLocation, Player player)
     {
-        LocationManager locationManager = Parkour.getLocationManager();
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        Location eyeLoc = player.getEyeLocation();
 
-        Location newLocation = oldLocation.clone().add(eyeLoc.getDirection().setY(0).multiply(random.nextInt(3, 6)));
+        Vector playerDirection = player.getLocation().getDirection().setY(0).normalize(); // ignore y
 
-        return newLocation;
+        float min = settingsManager.infinite_distance_min;
+        float bound = settingsManager.infinite_distance_bound;
+
+        int randomY = random.nextInt(settingsManager.infinite_generation_y_min, settingsManager.infinite_generation_y_max + 1);
+
+        // need to be + 1 so it accounts for it
+        float newY = (float) oldLocation.getY() + random.nextInt(
+                settingsManager.infinite_generation_y_min, settingsManager.infinite_generation_y_max + 1
+        );
+
+        float minModifier = 1.0f;
+        float maxModifier = 1.0f;
+        float diff = 0.0f;
+        boolean notZero = false;
+
+        if (randomY > 0)
+        {
+            minModifier = settingsManager.infinite_generation_positive_y_min;
+            maxModifier = settingsManager.infinite_generation_positive_y_max;
+            diff = settingsManager.infinite_generation_positive_y_diff;
+            notZero = true;
+        }
+        else if (randomY < 0)
+        {
+            minModifier = settingsManager.infinite_generation_negative_y_min;
+            maxModifier = settingsManager.infinite_generation_negative_y_max;
+            diff = settingsManager.infinite_generation_negative_y_diff;
+            notZero = true;
+        }
+
+        min *= minModifier;
+        bound *= maxModifier;
+
+        // if it was modified and either the difference is less than th e min or the bound is <= min
+        if (notZero && (bound <= min || Math.abs(bound - min) < diff))
+            bound = min + diff;
+
+        // get random distance modifier
+        double distance = random.nextDouble(min, bound);
+
+        // get random angle
+        float angleBound = settingsManager.infinite_angle_bound;
+        double randomAngle = random.nextDouble(-Math.PI / angleBound, Math.PI / angleBound); // Adjust the range as needed
+
+        // rotate the vector by the random angle
+        double rotatedX = playerDirection.getX() * Math.cos(randomAngle) - playerDirection.getZ() * Math.sin(randomAngle);
+        double rotatedZ = playerDirection.getX() * Math.sin(randomAngle) + playerDirection.getZ() * Math.cos(randomAngle);
+
+        double newX = oldLocation.getX() + (distance * rotatedX);
+        double newZ = oldLocation.getZ() + (distance * rotatedZ);
+
+        Location newLocation = new Location(oldLocation.getWorld(), newX, newY, newZ);
+
+        if (oldLocation.distance(newLocation) >= Parkour.getSettingsManager().infinite_generation_jump_min_distance)
+            return newLocation;
+        else
+            return generateNextBlockLocation(oldLocation, player);
     }
 
     public boolean isLocationEmpty(Location location)

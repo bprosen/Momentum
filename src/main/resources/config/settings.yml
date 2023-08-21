@@ -221,6 +221,21 @@ infinite:
         reduction: 0.1
   timed:
     timer: 60
+  generation:
+    angle_bound: 5 # means it will choose a random angle betweeen -(Math.PI / angle_bound) and (Math.PI / angle_bound)
+    distance_min: 3.2
+    distance_bound: 4.85
+    y_min: -1
+    y_max: 1
+    positive_y:
+      min_modifier: 0.75
+      max_modifier: 0.45
+      minimum_difference: 0.5
+    negative_y:
+      min_modifier: 0.75
+      max_modifier: 0.45
+      minimum_difference: 1.0
+    jump_min_distance: 1.5
 completions:
   global_level_completions_leaderboard:
     max_size: 10

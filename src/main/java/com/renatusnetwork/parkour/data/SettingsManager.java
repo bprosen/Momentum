@@ -135,6 +135,20 @@ public class SettingsManager {
     public LinkedHashMap<Integer, Float> reduction_factors;
 
     public int timed_timer;
+    public float infinite_angle_bound;
+    public float infinite_distance_min;
+    public float infinite_distance_bound;
+    public int infinite_generation_y_min;
+    public int infinite_generation_y_max;
+
+    public float infinite_generation_positive_y_min;
+    public float infinite_generation_positive_y_max;
+    public float infinite_generation_positive_y_diff;
+    public float infinite_generation_negative_y_min;
+    public float infinite_generation_negative_y_max;
+    public float infinite_generation_negative_y_diff;
+
+    public float infinite_generation_jump_min_distance;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -294,5 +308,17 @@ public class SettingsManager {
             reduction_factors.put(Integer.parseInt(key), (float) settings.getDouble("infinite.time_reduction_factors." + key + ".reduction"));
 
         timed_timer = settings.getInt("infinite.timed.timer");
+        infinite_angle_bound = (float) settings.getDouble("infinite.generation.angle_bound");
+        infinite_distance_min = (float) settings.getDouble("infinite.generation.distance_min");
+        infinite_distance_bound = (float) settings.getDouble("infinite.generation.distance_bound");
+        infinite_generation_y_min = settings.getInt("infinite.generation.y_min");
+        infinite_generation_y_max = settings.getInt("infinite.generation.y_max");
+        infinite_generation_positive_y_min = (float) settings.getDouble("infinite.generation.positive_y.min_modifier");
+        infinite_generation_positive_y_max = (float) settings.getDouble("infinite.generation.positive_y.max_modifier");
+        infinite_generation_positive_y_diff = (float) settings.getDouble("infinite.generation.positive_y.minimum_difference");
+        infinite_generation_negative_y_min = (float) settings.getDouble("infinite.generation.negative_y.min_modifier");
+        infinite_generation_negative_y_max = (float) settings.getDouble("infinite.generation.negative_y.max_modifier");
+        infinite_generation_negative_y_diff = (float) settings.getDouble("infinite.generation.negative_y.minimum_difference");
+        infinite_generation_jump_min_distance = (float) settings.getDouble("infinite.generation.jump_min_distance");
     }
 }
