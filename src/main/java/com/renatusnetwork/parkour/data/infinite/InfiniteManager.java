@@ -240,26 +240,30 @@ public class InfiniteManager {
         float min = settingsManager.infinite_distance_min;
         float bound = settingsManager.infinite_distance_bound;
 
-        int randomY = random.nextInt(settingsManager.infinite_generation_y_min, settingsManager.infinite_generation_y_max + 1);
-
         // need to be + 1 so it accounts for it
-        float newY = (float) oldLocation.getY() + random.nextInt(
-                settingsManager.infinite_generation_y_min, settingsManager.infinite_generation_y_max + 1
-        );
+        float newY = (float) oldLocation.getY() + random.nextInt(settingsManager.infinite_generation_y_min, settingsManager.infinite_generation_y_max + 1);
+
+        // adjust the values if they are beyond the limits
+        if (newY > settingsManager.max_infinite_y)
+            newY--;
+        else if (newY < settingsManager.min_infinite_y)
+            newY++;
 
         float minModifier = 1.0f;
         float maxModifier = 1.0f;
         float diff = 0.0f;
         boolean notZero = false;
 
-        if (randomY > 0)
+        // if it is a +1
+        if (newY > oldLocation.getY())
         {
             minModifier = settingsManager.infinite_generation_positive_y_min;
             maxModifier = settingsManager.infinite_generation_positive_y_max;
             diff = settingsManager.infinite_generation_positive_y_diff;
             notZero = true;
         }
-        else if (randomY < 0)
+        // if it is a -1
+        else if (newY < oldLocation.getY())
         {
             minModifier = settingsManager.infinite_generation_negative_y_min;
             maxModifier = settingsManager.infinite_generation_negative_y_max;
@@ -281,6 +285,23 @@ public class InfiniteManager {
         float angleBound = settingsManager.infinite_angle_bound;
         double randomAngle = random.nextDouble(-Math.PI / angleBound, Math.PI / angleBound); // Adjust the range as needed
 
+        Location middle = Parkour.getLocationManager().get(Parkour.getSettingsManager().infinite_middle_loc);
+        int radiusX = settingsManager.infinite_soft_border_radius_x;
+        int radiusZ = settingsManager.infinite_soft_border_radius_z;
+
+        // they are at the soft border!
+        if (Math.abs(oldLocation.getX()) > (Math.abs(middle.getBlockX()) + radiusX) || Math.abs(oldLocation.getZ()) > (Math.abs(middle.getBlockZ()) + radiusZ))
+        {
+            float minAngle = settingsManager.infinite_soft_border_angle_min;
+            float maxAngle = settingsManager.infinite_soft_border_angle_max;
+
+            // get random angle based on the min/max
+            if (random.nextBoolean())
+                randomAngle = random.nextDouble(Math.PI / minAngle, Math.PI / maxAngle); // Adjust the range as needed
+            else
+                randomAngle = random.nextDouble(-Math.PI / maxAngle, -Math.PI / minAngle); // Adjust the range as needed, need to reverse by how division works
+        }
+
         // rotate the vector by the random angle
         double rotatedX = playerDirection.getX() * Math.cos(randomAngle) - playerDirection.getZ() * Math.sin(randomAngle);
         double rotatedZ = playerDirection.getX() * Math.sin(randomAngle) + playerDirection.getZ() * Math.cos(randomAngle);
@@ -290,10 +311,7 @@ public class InfiniteManager {
 
         Location newLocation = new Location(oldLocation.getWorld(), newX, newY, newZ);
 
-        if (oldLocation.distance(newLocation) >= Parkour.getSettingsManager().infinite_generation_jump_min_distance)
-            return newLocation;
-        else
-            return generateNextBlockLocation(oldLocation, player);
+        return newLocation;
     }
 
     public boolean isLocationEmpty(Location location)
@@ -323,14 +341,10 @@ public class InfiniteManager {
         LocationManager locationManager = Parkour.getLocationManager();
         Location middle = locationManager.get(Parkour.getSettingsManager().infinite_middle_loc);
 
-        // make the box 6 less so it will never flip on the first one
-        int minX = middle.getBlockX() - (settingsManager.max_infinite_x - 6);
-        int maxX = middle.getBlockX() + (settingsManager.max_infinite_x - 6);
-        int minZ = middle.getBlockZ() - (settingsManager.max_infinite_z - 6);
-        int maxZ = middle.getBlockZ() + (settingsManager.max_infinite_z - 6);
-
-        int foundX = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
-        int foundZ = ThreadLocalRandom.current().nextInt(minZ, maxZ + 1);
+        int radiusX = settingsManager.infinite_soft_border_radius_x;
+        int radiusZ = settingsManager.infinite_soft_border_radius_x;
+        int foundX = ThreadLocalRandom.current().nextInt(middle.getBlockX() - radiusX, middle.getBlockX() + radiusX + 1);
+        int foundZ = ThreadLocalRandom.current().nextInt(middle.getBlockZ() - radiusZ, middle.getBlockZ() + radiusZ + 1);
 
         Location foundLoc = new Location(
                 middle.getWorld(), foundX, settingsManager.infinite_starting_y, foundZ

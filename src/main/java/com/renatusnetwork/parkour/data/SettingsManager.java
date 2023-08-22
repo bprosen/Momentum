@@ -60,13 +60,11 @@ public class SettingsManager {
     public String sword_title;
 
     public int max_infinite_leaderboard_size;
-    public int max_infinite_x;
     public int max_infinite_y;
-    public int max_infinite_z;
     public int infinite_starting_y;
     public int min_infinite_y;
-    public float infinite_starting_pitch;
-    public float infinite_starting_yaw;
+    public int infinite_soft_border_radius_x;
+    public int infinite_soft_border_radius_z;
     public String infinite_respawn_loc;
     public String infinite_middle_loc;
 
@@ -136,6 +134,8 @@ public class SettingsManager {
 
     public int timed_timer;
     public float infinite_angle_bound;
+    public float infinite_soft_border_angle_min;
+    public float infinite_soft_border_angle_max;
     public float infinite_distance_min;
     public float infinite_distance_bound;
     public int infinite_generation_y_min;
@@ -147,8 +147,6 @@ public class SettingsManager {
     public float infinite_generation_negative_y_min;
     public float infinite_generation_negative_y_max;
     public float infinite_generation_negative_y_diff;
-
-    public float infinite_generation_jump_min_distance;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -191,13 +189,9 @@ public class SettingsManager {
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         sword_title = settings.getString("setup-sword.title");
         max_infinite_leaderboard_size = settings.getInt("infinite.max_leaderboard_size");
-        max_infinite_x = settings.getInt("infinite.max_x");
         max_infinite_y = settings.getInt("infinite.max_y");
-        max_infinite_z = settings.getInt("infinite.max_z");
         min_infinite_y = settings.getInt("infinite.min_y");
         infinite_starting_y = settings.getInt("infinite.starting_y");
-        infinite_starting_pitch = (float) settings.getDouble("infinite.starting_pitch");
-        infinite_starting_yaw = (float) settings.getDouble("infinite.starting_yaw");
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
         max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");
@@ -319,6 +313,9 @@ public class SettingsManager {
         infinite_generation_negative_y_min = (float) settings.getDouble("infinite.generation.negative_y.min_modifier");
         infinite_generation_negative_y_max = (float) settings.getDouble("infinite.generation.negative_y.max_modifier");
         infinite_generation_negative_y_diff = (float) settings.getDouble("infinite.generation.negative_y.minimum_difference");
-        infinite_generation_jump_min_distance = (float) settings.getDouble("infinite.generation.jump_min_distance");
+        infinite_soft_border_radius_x = settings.getInt("infinite.soft_border_radius_x");
+        infinite_soft_border_radius_z = settings.getInt("infinite.soft_border_radius_z");
+        infinite_soft_border_angle_min = (float) settings.getDouble("infinite.generation.soft_border_angle_min");
+        infinite_soft_border_angle_max = (float) settings.getDouble("infinite.generation.soft_border_angle_max");
     }
 }
