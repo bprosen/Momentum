@@ -147,9 +147,9 @@ public class ClansManager {
 
                     Parkour.getStatsManager().addCoins(memberStats, splitAmountPerMember);
 
-                    onlineMember.sendMessage(Utils.translate("&6" + player.getName() + " &ehas completed &6" +
-                            level.getFormattedTitle() + " &eand you received &6" + (percentage * 100) + "%" +
-                            " &eof the reward! &6" + Utils.formatNumber(splitAmountPerMember) + " &eCoins"));
+                    onlineMember.sendMessage(Utils.translate("&6" + player.getDisplayName() + " &7completed &6" +
+                            level.getFormattedTitle() + " &7and you received &6" + Utils.formatNumber(splitAmountPerMember)
+                            + " &eCoins &7from your clan"));
                 }
                 else
                 {
@@ -162,9 +162,6 @@ public class ClansManager {
 
     public void doClanXPCalc(Clan clan, PlayerStats playerStats, int reward)
     {
-
-        Player player = playerStats.getPlayer();
-
         int min = Parkour.getSettingsManager().clan_calc_percent_min;
         int max = Parkour.getSettingsManager().clan_calc_percent_max;
 
@@ -177,7 +174,6 @@ public class ClansManager {
 
         if (!event.isCancelled())
         {
-            int oldClanXP = clanXP;
             clanXP = event.getXP(); // override from event
 
             if (playerStats.hasModifier(ModifierTypes.CLAN_XP_BOOSTER))
@@ -185,8 +181,6 @@ public class ClansManager {
                 Booster booster = (Booster) playerStats.getModifier(ModifierTypes.CLAN_XP_BOOSTER);
                 clanXP *= booster.getMultiplier();
             }
-
-            String rewardString = Utils.getCoinFormat(oldClanXP, clanXP);
             int totalXP = clanXP + clan.getXP();
 
             // if max level, keep calculating xp
@@ -194,9 +188,6 @@ public class ClansManager {
             {
                 clan.addXP(clanXP);
                 ClansDB.setClanXP(totalXP, clan.getID());
-                sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
-                        rewardString + " &eXP for your clan!" +
-                        " Total XP &6&l" + Utils.shortStyleNumber(clan.getTotalGainedXP()), null);
 
             // level them up
             }
@@ -208,12 +199,6 @@ public class ClansManager {
                 // otherwise add xp to cache and database
                 clan.addXP(clanXP);
                 ClansDB.setClanXP(totalXP, clan.getID());
-
-                long clanXPNeeded = ClansYAML.getLevelUpPrice(clan) - clan.getXP();
-
-                sendMessageToMembers(clan, "&6" + player.getName() + " &ehas gained &6&l" +
-                        rewardString + " &eXP for your clan! &c(XP Needed to Level Up - &4" +
-                        Utils.formatNumber(clanXPNeeded) + "&c)", null);
             }
             // update total gained xp
             ClansDB.setTotalGainedClanXP(clan.getTotalGainedXP() + clanXP, clan.getID());
@@ -321,7 +306,7 @@ public class ClansManager {
             newLevel = clan.getMaxLevel();
 
         clan.setLevel(newLevel);
-        sendMessageToMembers(clan, "&eYour clan has leveled up to &6&lLevel " + newLevel, null);
+        sendMessageToMembers(clan, "&eYour clan has leveled up to &6Level " + newLevel, null);
 
         // play level up sound to online clan members
         for (ClanMember clanMember : clan.getMembers())
