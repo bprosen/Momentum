@@ -11,6 +11,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -163,6 +164,7 @@ public class InfiniteManager {
             }
 
             String rewardString = Utils.getCoinFormat(score, coinReward);
+            String formattedType = StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase());
 
             if (playerStats.getBestInfiniteScore() < score)
             {
@@ -170,7 +172,7 @@ public class InfiniteManager {
                 if (player.isOnline())
                 {
                     player.sendMessage(Utils.translate(
-                            "&7You have beaten your previous record of &d" +
+                            "&7You have beaten your previous &d" + formattedType + "&7 record of &d" +
                                     Utils.formatNumber(playerStats.getBestInfiniteScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
                                     "&7Awarded " + rewardString + " &eCoins"
                     ));
@@ -180,7 +182,7 @@ public class InfiniteManager {
             }
             else if (player.isOnline())
                 player.sendMessage(Utils.translate(
-                        "&7You failed at &d" + Utils.formatNumber(score) + " &5(Best is " + Utils.formatNumber(playerStats.getBestInfiniteScore()) + ")\n" +
+                        "&7You failed &d" + formattedType + "&7 at &d" + Utils.formatNumber(score) + " &5(Best is " + Utils.formatNumber(playerStats.getBestInfiniteScore()) + ")\n" +
                                 "&7Awarded &6" + rewardString + " &eCoins"
                 ));
             // deposit reward from listener (default = score)
