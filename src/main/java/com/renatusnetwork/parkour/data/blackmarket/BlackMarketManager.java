@@ -2,19 +2,12 @@ package com.renatusnetwork.parkour.data.blackmarket;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.bank.BankYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
-import com.sk89q.commandbook.locations.TeleportSession;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -102,7 +95,9 @@ public class BlackMarketManager
                 @Override
                 public void run()
                 {
-                    if (timerCount == 0)
+                    if (!isRunning())
+                        cancel();
+                    else if (timerCount == 0)
                     {
                         cancel();
                         inPreperation = false;
@@ -287,8 +282,6 @@ public class BlackMarketManager
                 playerStats.setBlackMarket(true);
             }
         }
-        else
-            player.sendMessage(Utils.translate(Parkour.getSettingsManager().blackmarket_message_prefix + " &cThere is nothing to see here..."));
     }
 
     public void playerLeft(PlayerStats playerStats, boolean disconnected)

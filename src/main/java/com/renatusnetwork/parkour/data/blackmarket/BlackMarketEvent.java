@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.data.blackmarket;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.*;
@@ -27,6 +29,7 @@ public class BlackMarketEvent
     private BlackMarketArtifact blackMarketArtifact;
     private BukkitTask taskTimer;
     private Item itemEntity;
+    private BukkitTask particleTask;
 
     public BlackMarketEvent(BlackMarketArtifact blackMarketArtifact)
     {
@@ -35,50 +38,90 @@ public class BlackMarketEvent
         this.canBid = false;
         this.blackMarketArtifact = blackMarketArtifact;
         this.nextMinimumBid = blackMarketArtifact.getStartingBid();
+
+        doParticlesAtPortal();
+    }
+
+    private void doParticlesAtPortal()
+    {
+        particleTask = new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                Location location = Parkour.getLocationManager().get(SettingsManager.BLACK_MARKET_PORTAL_NAME);
+                location.getWorld().spawnParticle(Particle.PORTAL, location, 10);
+            }
+        }.runTaskTimer(Parkour.getPlugin(), 20, 20); // every .5 seconds
+    }
+
+    private void endParticlesAtPortal()
+    {
+        if (particleTask != null)
+        {
+            particleTask.cancel();
+            particleTask = null;
+        }
     }
 
     public void start()
     {
         String prefix = Parkour.getSettingsManager().blackmarket_message_prefix;
 
+        BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
+
+        endParticlesAtPortal();
         playSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE);
         broadcastToPlayers(Utils.translate(prefix + " &7Welcome, welcome, seekers of the forbidden. Step into the shadows, for tonight, the secrets of the underworld await you."));
+        // need to check if it is still running at each stage
         new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                broadcastToPlayers(Utils.translate(prefix + " &7The auction, a spectacle like no other. Hidden from the prying eyes of the staff, it unfolds here where no laws dare to penetrate. There, coveted artifacts, mystical relics, and powerful items change hands in a dance of secrecy."));
-                new BukkitRunnable()
+                if (blackMarketManager.isRunning())
                 {
-                    @Override
-                    public void run()
+                    broadcastToPlayers(Utils.translate(prefix + " &7The auction, a spectacle like no other. Hidden from the prying eyes of the staff, it unfolds here where no laws dare to penetrate. There, coveted artifacts, mystical relics, and powerful items change hands in a dance of secrecy."));
+                    new BukkitRunnable()
                     {
-
-                        broadcastToPlayers(Utils.translate(prefix + " &7These.. items.. They hold secrets veiled in ancient whispers, bestowing upon the buyer unique characteristics and buffs of untold origin."));
-                        new BukkitRunnable()
+                        @Override
+                        public void run()
                         {
-                            @Override
-                            public void run()
-                            {
-                                showItem(); // show item
-                                playSound(Sound.ENTITY_ENDERDRAGON_AMBIENT);
-                                broadcastToPlayers(Utils.translate(prefix + " &7Behold, " + getBlackMarketItem().getTitle() + "&7! An artifact that " + getBlackMarketItem().getDescription() + "."));
 
+                            if (blackMarketManager.isRunning())
+                            {
+                                broadcastToPlayers(Utils.translate(prefix + " &7These.. items.. They hold secrets veiled in ancient whispers, bestowing upon the buyer unique characteristics and buffs of untold origin."));
                                 new BukkitRunnable()
                                 {
                                     @Override
                                     public void run()
                                     {
-                                        canBid = true; // enable bidding
-                                        startTimer();
-                                        broadcastToPlayers(Utils.translate(prefix + " &7Start your bids now. Do &c/bid (at least " + Utils.formatNumber(getNextMinimumBid()) + ")"));
+                                        if (blackMarketManager.isRunning())
+                                        {
+                                            showItem(); // show item
+                                            playSound(Sound.ENTITY_ENDERDRAGON_AMBIENT);
+                                            broadcastToPlayers(Utils.translate(prefix + " &7Behold, " + getBlackMarketItem().getTitle() + "&7! An artifact that " + getBlackMarketItem().getDescription() + "."));
+
+                                            new BukkitRunnable()
+                                            {
+                                                @Override
+                                                public void run()
+                                                {
+                                                    if (blackMarketManager.isRunning())
+                                                    {
+                                                        canBid = true; // enable bidding
+                                                        startTimer();
+                                                        broadcastToPlayers(Utils.translate(prefix + " &7Start your bids now. Do &c/bid (at least " + Utils.formatNumber(getNextMinimumBid()) + ")"));
+                                                    }
+                                                }
+                                            }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+                                        }
                                     }
                                 }.runTaskLater(Parkour.getPlugin(), 20 * 10);
                             }
-                        }.runTaskLater(Parkour.getPlugin(), 20 * 10);
-                    }
-                }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+                        }
+                    }.runTaskLater(Parkour.getPlugin(), 20 * 10);
+                }
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 10);
     }
@@ -90,6 +133,12 @@ public class BlackMarketEvent
             itemEntity.remove();
             itemEntity = null;
         }
+
+        // cancel if not null
+        if (taskTimer != null)
+            taskTimer.cancel();
+
+        endParticlesAtPortal();
 
         // coin removal, reward and message processing
         if (!forceEnded && hasHighestBidder())

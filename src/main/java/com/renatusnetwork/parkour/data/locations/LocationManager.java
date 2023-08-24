@@ -88,6 +88,9 @@ public class LocationManager {
             case ASCENDANCE:
                 portalLoc = locations.get(SettingsManager.ASCENDANCE_PORTAL_NAME);
                 break;
+            case BLACK_MARKET:
+                portalLoc = locations.get(SettingsManager.BLACK_MARKET_PORTAL_NAME);
+                break;
         }
 
         if (portalLoc != null) {

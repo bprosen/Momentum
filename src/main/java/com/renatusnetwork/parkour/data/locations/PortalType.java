@@ -3,5 +3,6 @@ package com.renatusnetwork.parkour.data.locations;
 public enum PortalType
 {
     INFINITE,
-    ASCENDANCE
+    ASCENDANCE,
+    BLACK_MARKET
 }

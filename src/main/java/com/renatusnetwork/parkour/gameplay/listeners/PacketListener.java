@@ -8,6 +8,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.infinite.types.Infinite;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -239,6 +240,21 @@ public class PacketListener implements Listener {
                                     }
                                 }.runTask(Parkour.getPlugin());
                             }
+                        }
+                        else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.BLACK_MARKET))
+                        {
+                            new BukkitRunnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
+
+                                    // only add if its running
+                                    if (blackMarketManager.isRunning())
+                                        Parkour.getBlackMarketManager().playerJoined(playerStats);
+                                }
+                            }.runTask(Parkour.getPlugin());
                         }
                     }
                     else

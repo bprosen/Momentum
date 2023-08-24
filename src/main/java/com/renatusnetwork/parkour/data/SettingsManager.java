@@ -16,6 +16,7 @@ public class SettingsManager {
     // constants
     public static final String INFINITE_PORTAL_NAME = "infinite-portal";
     public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
+    public static final String BLACK_MARKET_PORTAL_NAME = "black_market-portal";
 
     public World main_world;
     public String levels_message_completion;
