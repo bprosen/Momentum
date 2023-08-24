@@ -221,8 +221,6 @@ infinite:
     timer: 60
   generation:
     angle_bound: 5 # means it will choose a random angle betweeen -(Math.PI / angle_bound) and (Math.PI / angle_bound)
-    soft_border_angle_min: 4 # means it will go from pi / soft_border_angle_min to the value below (pi / soft_border_angle_max) or the negative version
-    soft_border_angle_max: 2
     distance_min: 3.2
     distance_bound: 4.85
     y_min: -1
@@ -235,6 +233,8 @@ infinite:
       min_modifier: 0.75
       max_modifier: 0.45
       minimum_difference: 1.0
+    angle_outside_border_min: 4
+    angle_outside_border_max: 6
 completions:
   global_level_completions_leaderboard:
     max_size: 10

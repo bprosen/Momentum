@@ -134,8 +134,6 @@ public class SettingsManager {
 
     public int timed_timer;
     public float infinite_angle_bound;
-    public float infinite_soft_border_angle_min;
-    public float infinite_soft_border_angle_max;
     public float infinite_distance_min;
     public float infinite_distance_bound;
     public int infinite_generation_y_min;
@@ -147,6 +145,9 @@ public class SettingsManager {
     public float infinite_generation_negative_y_min;
     public float infinite_generation_negative_y_max;
     public float infinite_generation_negative_y_diff;
+
+    public int infinite_angle_outside_border_min;
+    public int infinite_angle_outside_border_max;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -315,7 +316,7 @@ public class SettingsManager {
         infinite_generation_negative_y_diff = (float) settings.getDouble("infinite.generation.negative_y.minimum_difference");
         infinite_soft_border_radius_x = settings.getInt("infinite.soft_border_radius_x");
         infinite_soft_border_radius_z = settings.getInt("infinite.soft_border_radius_z");
-        infinite_soft_border_angle_min = (float) settings.getDouble("infinite.generation.soft_border_angle_min");
-        infinite_soft_border_angle_max = (float) settings.getDouble("infinite.generation.soft_border_angle_max");
+        infinite_angle_outside_border_min = settings.getInt("infinite.generation.angle_outside_border_min");
+        infinite_angle_outside_border_max = settings.getInt("infinite.generation.angle_outside_border_max");
     }
 }

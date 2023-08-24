@@ -4,10 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,6 +21,10 @@ public abstract class Infinite
     private HashMap<Integer, Block> blocks; // 0 index = block the player is on, 1 = next block, etc
     private Block plateBlock;
     private int score;
+    private boolean outsideBorder;
+    private double startAngle;
+    private double turningAngle;
+    private InfiniteTurnDirection turnDirection;
 
     public Infinite(PlayerStats playerStats, int infiniteBlocksSize)
     {
@@ -87,12 +88,54 @@ public abstract class Infinite
 
     }
 
+    public boolean isOutsideBorder()
+    {
+        return outsideBorder;
+    }
+
+    public void enterBorder(double currentAngle)
+    {
+        // init values
+        this.turningAngle = currentAngle;
+        this.startAngle = currentAngle;
+        this.outsideBorder = true;
+
+        // get random direction
+        InfiniteTurnDirection[] directions = InfiniteTurnDirection.values();
+        this.turnDirection = directions[ThreadLocalRandom.current().nextInt(directions.length)];
+    }
+
+    public void exitBorder()
+    {
+        this.outsideBorder = false;
+    }
+    public double turnAngle()
+    {
+        // only turn them if they are still flipping
+        if (Math.abs(turningAngle) < Math.abs(startAngle + Math.PI)) // if they have done less than a whole flip, turn them
+        {
+            int min = Parkour.getSettingsManager().infinite_angle_outside_border_min;
+            int max = Parkour.getSettingsManager().infinite_angle_outside_border_max;
+
+            // get random turn value
+            float turnBy = (float) (Math.PI / ThreadLocalRandom.current().nextInt(min, max + 1));
+
+            // do positive or negative respectively
+            if (turnDirection == InfiniteTurnDirection.NEGATIVE)
+                this.turningAngle -= turnBy;
+            else
+                this.turningAngle += turnBy;
+        }
+        return this.turningAngle;
+    }
+
     public Location getNextLocation()
     {
         Location newLocation;
 
+        // go until we find an empty location
         do
-            newLocation = Parkour.getInfiniteManager().generateNextBlockLocation(getLastBlock().getLocation(), getPlayer());
+            newLocation = Parkour.getInfiniteManager().generateNextBlockLocation(getLastBlock().getLocation(), getPlayer(), this);
         while (!Parkour.getInfiniteManager().isLocationEmpty(newLocation));
 
         return newLocation;

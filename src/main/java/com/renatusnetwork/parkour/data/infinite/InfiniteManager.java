@@ -229,13 +229,11 @@ public class InfiniteManager {
         );
     }
 
-    public Location generateNextBlockLocation(Location oldLocation, Player player)
+    public Location generateNextBlockLocation(Location oldLocation, Player player, Infinite infinite)
     {
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        Vector playerDirection = player.getLocation().getDirection().setY(0).normalize(); // ignore y
 
         float min = settingsManager.infinite_distance_min;
         float bound = settingsManager.infinite_distance_bound;
@@ -274,44 +272,67 @@ public class InfiniteManager {
         min *= minModifier;
         bound *= maxModifier;
 
-        // if it was modified and either the difference is less than th e min or the bound is <= min
+        // if it was modified and either the difference is less than the min or the bound is <= min
         if (notZero && (bound <= min || Math.abs(bound - min) < diff))
             bound = min + diff;
 
         // get random distance modifier
         double distance = random.nextDouble(min, bound);
+        double angle;
+        Vector locationVector;
 
-        // get random angle
-        float angleBound = settingsManager.infinite_angle_bound;
-        double randomAngle = random.nextDouble(-Math.PI / angleBound, Math.PI / angleBound); // Adjust the range as needed
-
-        Location middle = Parkour.getLocationManager().get(Parkour.getSettingsManager().infinite_middle_loc);
-        int radiusX = settingsManager.infinite_soft_border_radius_x;
-        int radiusZ = settingsManager.infinite_soft_border_radius_z;
-
-        // they are at the soft border!
-        if (Math.abs(oldLocation.getX()) > (Math.abs(middle.getBlockX()) + radiusX) || Math.abs(oldLocation.getZ()) > (Math.abs(middle.getBlockZ()) + radiusZ))
+        if (infinite.isOutsideBorder())
         {
-            float minAngle = settingsManager.infinite_soft_border_angle_min;
-            float maxAngle = settingsManager.infinite_soft_border_angle_max;
-
-            // get random angle based on the min/max
-            if (random.nextBoolean())
-                randomAngle = random.nextDouble(Math.PI / minAngle, Math.PI / maxAngle); // Adjust the range as needed
-            else
-                randomAngle = random.nextDouble(-Math.PI / maxAngle, -Math.PI / minAngle); // Adjust the range as needed, need to reverse by how division works
+            // turn angle and return it
+            angle = infinite.turnAngle();
+            Location middle = Parkour.getLocationManager().get(Parkour.getSettingsManager().infinite_middle_loc);
+            locationVector = oldLocation.toVector().subtract(middle.toVector()).setY(0).normalize();
+        }
+        else
+        {
+            // get random angle
+            angle = random.nextDouble(-Math.PI / settingsManager.infinite_angle_bound, Math.PI / settingsManager.infinite_angle_bound); // Adjust the range as needed
+            locationVector = player.getLocation().getDirection().setY(0).normalize(); // ignore y;
         }
 
-        // rotate the vector by the random angle
-        double rotatedX = playerDirection.getX() * Math.cos(randomAngle) - playerDirection.getZ() * Math.sin(randomAngle);
-        double rotatedZ = playerDirection.getX() * Math.sin(randomAngle) + playerDirection.getZ() * Math.cos(randomAngle);
+        // rotate the vector by the set angle
+        double rotatedX = locationVector.getX() * Math.cos(angle) - locationVector.getZ() * Math.sin(angle);
+        double rotatedZ = locationVector.getX() * Math.sin(angle) + locationVector.getZ() * Math.cos(angle);
 
+        // new x and z!
         double newX = oldLocation.getX() + (distance * rotatedX);
         double newZ = oldLocation.getZ() + (distance * rotatedZ);
 
         Location newLocation = new Location(oldLocation.getWorld(), newX, newY, newZ);
 
+        // if loc is outside border, continue
+        if (isOutsideBorder(newLocation))
+        {
+            // only enter border if they are outside of it!
+            if (!infinite.isOutsideBorder())
+                infinite.enterBorder(angle);
+        }
+        // if their new loc is not outside border but they were outside, then exit
+        else if (infinite.isOutsideBorder())
+            infinite.exitBorder();
+
         return newLocation;
+    }
+
+    public boolean isOutsideBorder(Location location)
+    {
+        int radiusX = Parkour.getSettingsManager().infinite_soft_border_radius_x;
+        int radiusZ = Parkour.getSettingsManager().infinite_soft_border_radius_z;
+        Location middle = Parkour.getLocationManager().get(Parkour.getSettingsManager().infinite_middle_loc);
+
+        double middleX = middle.getX();
+        double middleZ = middle.getZ();
+
+        // conditions where they are outside the border
+        return ((middleX + radiusX) < location.getX() ||
+                (middleX - radiusX) > location.getX() ||
+                (middleZ + radiusZ) < location.getZ() ||
+                (middleZ - radiusZ) > location.getZ());
     }
 
     public boolean isLocationEmpty(Location location)
@@ -341,8 +362,9 @@ public class InfiniteManager {
         LocationManager locationManager = Parkour.getLocationManager();
         Location middle = locationManager.get(Parkour.getSettingsManager().infinite_middle_loc);
 
-        int radiusX = settingsManager.infinite_soft_border_radius_x;
-        int radiusZ = settingsManager.infinite_soft_border_radius_x;
+        // make it so they will be anywhere in the border - 10 (so they do not go straight out of border)
+        int radiusX = settingsManager.infinite_soft_border_radius_x - 10;
+        int radiusZ = settingsManager.infinite_soft_border_radius_z - 10;
         int foundX = ThreadLocalRandom.current().nextInt(middle.getBlockX() - radiusX, middle.getBlockX() + radiusX + 1);
         int foundZ = ThreadLocalRandom.current().nextInt(middle.getBlockZ() - radiusZ, middle.getBlockZ() + radiusZ + 1);
 
