@@ -1,13 +1,12 @@
 package com.renatusnetwork.parkour.data;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.events.EventLBPosition;
-import com.renatusnetwork.parkour.data.infinite.InfiniteLBPosition;
-import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
+import com.renatusnetwork.parkour.data.infinite.leaderboard.InfiniteLBPosition;
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
 import com.renatusnetwork.parkour.data.stats.*;

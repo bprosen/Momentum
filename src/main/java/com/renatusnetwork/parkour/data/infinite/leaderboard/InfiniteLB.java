@@ -1,7 +1,7 @@
-package com.renatusnetwork.parkour.data.infinite;
+package com.renatusnetwork.parkour.data.infinite.leaderboard;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.scheduler.BukkitRunnable;
 

@@ -1,13 +1,10 @@
-package com.renatusnetwork.parkour.data.infinite.types;
+package com.renatusnetwork.parkour.data.infinite.gamemode;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.SettingsManager;
-import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;

@@ -2,7 +2,10 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.*;
-import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteReward;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewards;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewardsYAML;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -14,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 public class InfiniteCMD implements CommandExecutor {
@@ -74,10 +78,11 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&c" + a[3] + " &7is not an integer"));
             }
-        } else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards"))) {
+        }
+        else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards")))
+        {
 
-            Parkour.getInfiniteManager().clearRewards();
-            InfiniteRewardsYAML.loadRewards();
+            infiniteManager.loadAllRewards();
             player.sendMessage(Utils.translate("&cYou have reloaded Infinite Parkour Rewards"));
 
         }
@@ -127,30 +132,42 @@ public class InfiniteCMD implements CommandExecutor {
             } else {
                 player.sendMessage(Utils.translate("&cYou are already in infinite parkour"));
             }
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("rewards")) {
+        }
+        else if (a.length == 2 && a[0].equalsIgnoreCase("rewards"))
+        {
+            String typeName = a[1];
+            try
+            {
+                // get rewards
+                InfiniteType type = InfiniteType.valueOf(typeName.toUpperCase());
+                Collection<InfiniteReward> rewards = Parkour.getInfiniteManager().getRewards(type).getRewards();
 
-            LinkedHashMap<Integer, InfiniteReward> rewards = Parkour.getInfiniteManager().getRewards();
-            player.sendMessage(Utils.translate("&5&lInfinite Parkour Rewards"));
+                player.sendMessage(Utils.translate("&d&l" + StringUtils.capitalize(typeName.toLowerCase()) + " &5&lInfinite Rewards"));
 
-            // if not empty continue
-            if (!rewards.isEmpty()) {
+                // if not empty continue
+                if (!rewards.isEmpty())
+                {
+                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                    int position = 1;
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                int position = 1;
+                    for (InfiniteReward reward : rewards)
+                    {
+                        String msg = "&7" + position + " &5" + reward.getScoreNeeded() + " Score &7- &d" + reward.getName();
 
-                for (InfiniteReward reward : rewards.values()) {
+                        // send crossed out msg if their high score is more than the score needed
+                        if (playerStats.getBestInfiniteScore() >= reward.getScoreNeeded())
+                            msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score&7 - &d" + reward.getName();
 
-                    String msg = "&7" + position + " &5" + reward.getScoreNeeded() + " Score &7- &d" + reward.getName();
-
-                    // send crossed out msg if their high score is more than the score needed
-                    if (playerStats.getBestInfiniteScore() >= reward.getScoreNeeded())
-                        msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score&7 - &d" + reward.getName();
-
-                    player.sendMessage(Utils.translate(msg));
-                    position++;
+                        player.sendMessage(Utils.translate(msg));
+                        position++;
+                    }
                 }
-            } else {
-                player.sendMessage(Utils.translate("&dNo rewards available"));
+                else
+                    player.sendMessage(Utils.translate("&dNo rewards available"));
+            }
+            catch (IllegalArgumentException exception)
+            {
+                player.sendMessage(Utils.translate("&4" + typeName + " &cis not a infinite type"));
             }
         } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
             sendHelp(player);
@@ -163,7 +180,7 @@ public class InfiniteCMD implements CommandExecutor {
     private void sendHelp(Player player) {
         player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
         player.sendMessage(Utils.translate("&5/infinite score <type> [IGN]  &7Tells you the score of yourself/someone else"));
-        player.sendMessage(Utils.translate("&5/infinite rewards  &7Tells you a list of the rewards and if you have them (crossed out)"));
+        player.sendMessage(Utils.translate("&5/infinite rewards <type> &7Tells you a list of the rewards for the type and if you have them (crossed out)"));
 
         if (player.hasPermission("rn-parkour.admin"))
         {

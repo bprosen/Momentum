@@ -9,7 +9,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
-import com.renatusnetwork.parkour.data.infinite.types.Infinite;
+import com.renatusnetwork.parkour.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.locations.LocationManager;

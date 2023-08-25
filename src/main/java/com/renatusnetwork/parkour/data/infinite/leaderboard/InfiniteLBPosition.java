@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.infinite;
+package com.renatusnetwork.parkour.data.infinite.leaderboard;
 
 public class InfiniteLBPosition
 {

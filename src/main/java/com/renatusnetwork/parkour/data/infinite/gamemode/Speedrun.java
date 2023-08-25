@@ -1,6 +1,5 @@
-package com.renatusnetwork.parkour.data.infinite.types;
+package com.renatusnetwork.parkour.data.infinite.gamemode;
 
-import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import org.bukkit.Material;
 

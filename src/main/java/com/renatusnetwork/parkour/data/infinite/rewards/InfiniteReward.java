@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.infinite;
+package com.renatusnetwork.parkour.data.infinite.rewards;
 
 public class InfiniteReward {
 
@@ -6,7 +6,8 @@ public class InfiniteReward {
     private String command;
     private String name;
 
-    public InfiniteReward(int scoreNeeded, String command, String name) {
+    public InfiniteReward(int scoreNeeded, String command, String name)
+    {
         this.scoreNeeded = scoreNeeded;
         this.command = command;
         this.name = name;

@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.infinite.types;
+package com.renatusnetwork.parkour.data.infinite.gamemode;
 
 public enum InfiniteTurnDirection
 {

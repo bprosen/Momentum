@@ -3,20 +3,22 @@ package com.renatusnetwork.parkour.data.infinite;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.InfiniteEndEvent;
 import com.renatusnetwork.parkour.data.SettingsManager;
-import com.renatusnetwork.parkour.data.infinite.types.*;
+import com.renatusnetwork.parkour.data.infinite.gamemode.*;
+import com.renatusnetwork.parkour.data.infinite.leaderboard.InfiniteLB;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteReward;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewards;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewardsYAML;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -24,18 +26,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class InfiniteManager {
 
-    private HashMap<String, Infinite> participants = new HashMap<>();
-    private HashMap<InfiniteType, InfiniteLB> leaderboards = new HashMap<>(Parkour.getSettingsManager().max_infinite_leaderboard_size);
-    private LinkedHashMap<Integer, InfiniteReward> rewards = new LinkedHashMap<>(); // linked so order stays
+    private HashMap<String, Infinite> participants;
+    private HashMap<InfiniteType, InfiniteLB> leaderboards;
+    private HashMap<InfiniteType, InfiniteRewards> rewards;
 
     public InfiniteManager()
     {
+        this.participants = new HashMap<>();
+
         startScheduler();
         initLeaderboards();
     }
 
     public void initLeaderboards()
     {
+        this.leaderboards = new HashMap<>(Parkour.getSettingsManager().max_infinite_leaderboard_size);
+
         leaderboards.put(InfiniteType.CLASSIC, new InfiniteLB(InfiniteType.CLASSIC));
         leaderboards.put(InfiniteType.SPEEDRUN, new InfiniteLB(InfiniteType.SPEEDRUN));
         leaderboards.put(InfiniteType.SPRINT, new InfiniteLB(InfiniteType.SPRINT));
@@ -47,7 +53,7 @@ public class InfiniteManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                InfiniteRewardsYAML.loadRewards();
+                loadAllRewards();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
 
@@ -145,11 +151,11 @@ public class InfiniteManager {
         {
             Player player = playerStats.getPlayer();
             int score = infinite.getScore();
+            InfiniteType infiniteType = playerStats.getInfiniteType();
 
             if (score > playerStats.getBestInfiniteScore())
             {
-                // run in sync for safety
-                for (InfiniteReward reward : getApplicableRewards(playerStats.getBestInfiniteScore(), score))
+                for (InfiniteReward reward : getApplicableRewards(infiniteType, playerStats.getBestInfiniteScore(), score))
                 {
                     // loop through and run commands of applicable rewards
                     player.sendMessage(Utils.translate(" &7You received &d" + reward.getName() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
@@ -164,7 +170,7 @@ public class InfiniteManager {
             }
 
             String rewardString = Utils.getCoinFormat(score, coinReward);
-            String formattedType = StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase());
+            String formattedType = StringUtils.capitalize(infiniteType.toString().toLowerCase());
 
             if (playerStats.getBestInfiniteScore() < score)
             {
@@ -190,22 +196,32 @@ public class InfiniteManager {
         }
     }
 
-    public LinkedHashMap<Integer, InfiniteReward> getRewards() { return rewards; }
+    public InfiniteRewards getRewards(InfiniteType type) { return rewards.get(type); }
 
-    public InfiniteReward getReward(int score) { return rewards.get(score); }
+    public void loadAllRewards()
+    {
+        rewards = new HashMap<>();
 
-    public void addReward(InfiniteReward infiniteReward) { rewards.put(infiniteReward.getScoreNeeded(), infiniteReward); }
+        for (InfiniteType type : InfiniteType.values())
+            loadRewards(type);
+    }
 
-    public void clearRewards() { rewards.clear(); }
+    public void loadRewards(InfiniteType type)
+    {
+        rewards.put(type, new InfiniteRewards(type));
+    }
 
-    public List<InfiniteReward> getApplicableRewards(int oldBestScore, int newBestScore) {
+    public List<InfiniteReward> getApplicableRewards(InfiniteType type, int oldBestScore, int newBestScore)
+    {
         List<InfiniteReward> tempRewards = new ArrayList<>();
+        InfiniteRewards infiniteRewards = rewards.get(type);
 
-        for (Map.Entry<Integer, InfiniteReward> entry : rewards.entrySet()) {
-            int score = entry.getKey();
+        for (InfiniteReward reward : infiniteRewards.getRewards())
+        {
+            int score = reward.getScoreNeeded();
             // if score is greater than old and less than or = to new, then add
             if (score > oldBestScore && score <= newBestScore)
-                tempRewards.add(entry.getValue());
+                tempRewards.add(reward);
         }
         return tempRewards;
     }
@@ -394,12 +410,12 @@ public class InfiniteManager {
         leaderboards.get(infiniteType).loadLeaderboard();
     }
 
+    public InfiniteLB getLeaderboard(InfiniteType type) {
+        return leaderboards.get(type);
+    }
+
     public void shutdown() {
         for (Infinite infinite : participants.values())
             endPK(infinite.getPlayer());
-    }
-
-    public InfiniteLB getLeaderboard(InfiniteType type) {
-        return leaderboards.get(type);
     }
 }

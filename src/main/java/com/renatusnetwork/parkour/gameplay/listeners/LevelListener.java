@@ -5,7 +5,7 @@ import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.events.types.MazeEvent;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
-import com.renatusnetwork.parkour.data.infinite.types.Infinite;
+import com.renatusnetwork.parkour.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
