@@ -1,6 +1,9 @@
 package com.renatusnetwork.parkour.data;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.bank.BankManager;
+import com.renatusnetwork.parkour.data.bank.types.BankItem;
+import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.events.EventLBPosition;
 import com.renatusnetwork.parkour.data.infinite.InfiniteLBPosition;
@@ -48,6 +51,7 @@ public class Placeholders extends PlaceholderExpansion
     @Override
     public String onPlaceholderRequest(Player player, String placeholder)
     {
+        // general placeholders
         if (placeholder.equals("global_completions"))
             return Utils.formatNumber(Parkour.getLevelManager().getTotalLevelCompletions());
         else if (placeholder.equals("total_coins"))
@@ -55,7 +59,7 @@ public class Placeholders extends PlaceholderExpansion
 
         PlayerStats playerStats = statsManager.get(player);
 
-        // load if not null
+        // per player placeholders
         if (playerStats != null)
         {
             // all placeholders
@@ -90,6 +94,7 @@ public class Placeholders extends PlaceholderExpansion
             }
         }
 
+        // leaderboard placeholders
         if (placeholder.startsWith("lb"))
         {
             String[] split = placeholder.split("_");
@@ -268,6 +273,38 @@ public class Placeholders extends PlaceholderExpansion
                                 return Utils.formatNumber(infiniteLBPosition.getScore());
                         }
                     }
+                }
+            }
+        }
+        // bank section
+        else if (placeholder.startsWith("bank"))
+        {
+            String[] split = placeholder.split("_");
+
+            if (split.length == 3)
+            {
+                try
+                {
+                    // get type
+                    BankItemType bankType = BankItemType.valueOf(split[1]);
+                    BankItem item = Parkour.getBankManager().getItem(bankType);
+
+                    switch (split[2])
+                    {
+                        // current holder
+                        case "holder":
+                            return item.getCurrentHolder();
+                        // total of the bank item
+                        case "total":
+                            return Utils.formatNumber(item.getTotalBalance());
+                        // cost of next bid
+                        case "nextbid":
+                            return Utils.formatNumber(item.getNextBid());
+                    }
+                }
+                catch (IllegalArgumentException exception)
+                {
+                    return "Invalid bank type";
                 }
             }
         }
