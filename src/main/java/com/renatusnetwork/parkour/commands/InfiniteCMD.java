@@ -152,11 +152,11 @@ public class InfiniteCMD implements CommandExecutor {
 
                     for (InfiniteReward reward : rewards)
                     {
-                        String msg = "&7" + position + " &5" + reward.getScoreNeeded() + " Score &7- &d" + reward.getDisplay();
+                        String msg = "&7" + position + " &5" + Utils.formatNumber(reward.getScoreNeeded()) + " Score &7- &d" + reward.getDisplay();
 
                         // send crossed out msg if their high score is more than the score needed
                         if (playerStats.getBestInfiniteScore() >= reward.getScoreNeeded())
-                            msg = "&7" + position + " &5&m" + reward.getScoreNeeded() + " Score&7 - &d" + reward.getDisplay();
+                            msg = "&7" + position + " &5&m" + Utils.formatNumber(reward.getScoreNeeded()) + " Score&7 - &d" + reward.getDisplay();
 
                         player.sendMessage(Utils.translate(msg));
                         position++;
