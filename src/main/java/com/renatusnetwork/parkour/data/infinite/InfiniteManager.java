@@ -158,8 +158,11 @@ public class InfiniteManager {
                 for (InfiniteReward reward : getApplicableRewards(infiniteType, playerStats.getBestInfiniteScore(), score))
                 {
                     // loop through and run commands of applicable rewards
-                    player.sendMessage(Utils.translate(" &7You received &d" + reward.getName() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("%player%", player.getName()));
+                    player.sendMessage(Utils.translate(" &7You received &d" + reward.getDisplay() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
+
+                    // run commands
+                    for (String command : reward.getCommands())
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
                 }
             }
 

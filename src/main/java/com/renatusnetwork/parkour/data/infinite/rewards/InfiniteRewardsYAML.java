@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class InfiniteRewardsYAML {
@@ -15,7 +16,6 @@ public class InfiniteRewardsYAML {
 
     public static Set<InfiniteReward> getRewards(InfiniteType type)
     {
-
         // load before so new config
         Parkour.getConfigManager().load("rewards");
 
@@ -33,11 +33,11 @@ public class InfiniteRewardsYAML {
             {
 
                 int scoreNeeded = Integer.parseInt(key);
-                String command = rewardsFile.getString("infinite." + key + ".command");
-                String name = rewardsFile.getString("infinite." + key + ".name");
+                List<String> commands = rewardsFile.getStringList("infinite." + key + ".commands");
+                String display = rewardsFile.getString("infinite." + key + ".display");
 
                 // make new object and add
-                rewards.add(new InfiniteReward(scoreNeeded, command, name));
+                rewards.add(new InfiniteReward(scoreNeeded, commands, display));
             }
         return rewards;
     }

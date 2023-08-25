@@ -1,21 +1,23 @@
 package com.renatusnetwork.parkour.data.infinite.rewards;
 
+import java.util.List;
+
 public class InfiniteReward {
 
     private int scoreNeeded;
-    private String command;
-    private String name;
+    private List<String> commands;
+    private String display;
 
-    public InfiniteReward(int scoreNeeded, String command, String name)
+    public InfiniteReward(int scoreNeeded, List<String> commands, String display)
     {
         this.scoreNeeded = scoreNeeded;
-        this.command = command;
-        this.name = name;
+        this.commands = commands;
+        this.display = display;
     }
 
     public int getScoreNeeded() { return scoreNeeded; }
 
-    public String getCommand() { return command; }
+    public List<String> getCommands() { return commands; }
 
-    public String getName() { return name; }
+    public String getDisplay() { return display; }
 }
