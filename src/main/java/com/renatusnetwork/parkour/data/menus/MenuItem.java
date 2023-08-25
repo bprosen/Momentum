@@ -20,7 +20,7 @@ public class MenuItem {
     private List<String> commands;
     private List<String> consoleCommands;
 
-    MenuItem(Menu menu, MenuPage menuPage, int slot) {
+    public MenuItem(Menu menu, MenuPage menuPage, int slot) {
         this.name = menu.getName();
         this.pageNumber = menuPage.getPageNumber();
         this.slot = slot;

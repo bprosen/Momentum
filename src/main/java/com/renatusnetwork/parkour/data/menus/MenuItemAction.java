@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.api.ShopBuyEvent;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
+import com.renatusnetwork.parkour.data.infinite.types.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.levels.RatingDB;
@@ -24,6 +25,7 @@ import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -100,6 +102,8 @@ public class MenuItemAction {
         }
         else if (itemType.equals("rate"))
             performLevelRate(player, menuItem);
+        else if (itemType.equals("infinite-mode"))
+            performInfiniteModeChange(playerStats, menuItem);
         else if (itemType.equals("type"))
         {
             // certain conditions of types for rankup
@@ -113,6 +117,22 @@ public class MenuItemAction {
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performInfiniteModeChange(PlayerStats playerStats, MenuItem menuItem)
+    {
+        String formatted = StringUtils.capitalize(menuItem.getTypeValue().toLowerCase());
+        Player player = playerStats.getPlayer();
+
+        if (!playerStats.getInfiniteType().toString().equalsIgnoreCase(formatted))
+        {
+            Parkour.getInfiniteManager().changeType(playerStats, InfiniteType.valueOf(formatted.toUpperCase()));
+            player.sendMessage(Utils.translate("&7You changed your &5Infinite &7mode to &d" + formatted));
+        }
+        else
+            player.sendMessage(Utils.translate("&7You are already in the &5Infinite &7mode &d" + formatted));
+
+        player.closeInventory();
     }
 
     private static void performBankItem(PlayerStats playerStats, MenuItem menuItem)

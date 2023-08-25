@@ -22,7 +22,6 @@ import java.util.*;
 public class MenuManager {
 
     private HashMap<String, Menu> menuMap = new HashMap<>();
-    private HashMap<String, HashSet<Level>> buyingLevels = new HashMap<>();
     private HashMap<String, CancelTasks> cancelTasks = new HashMap<>();
 
     public MenuManager() {

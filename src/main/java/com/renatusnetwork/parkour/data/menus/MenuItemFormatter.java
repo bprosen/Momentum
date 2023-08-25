@@ -17,6 +17,7 @@ import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -44,15 +45,38 @@ public class MenuItemFormatter {
         if (menuItem.getType().equals("perk"))
             return getPerk(player, playerStats, menuItem);
         if (menuItem.getType().equals("bank"))
-            return getBankItem(playerStats, menuItem);
+            return getBankItem(menuItem);
         if (menuItem.getType().equals("open"))
             return enchantMenuItem(playerStats, menuItem, Parkour.getMenuManager().getMenu(menuItem.getTypeValue()));
+        if (menuItem.getType().equals("infinite-mode"))
+            return getInfiniteMode(playerStats, menuItem);
 
         // Add in some '%player%' and such formatters for lore
         return menuItem.getItem();
     }
 
-    private static ItemStack getBankItem(PlayerStats playerStats, MenuItem menuItem)
+    private static ItemStack getInfiniteMode(PlayerStats playerStats, MenuItem menuItem) {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        ItemMeta itemMeta = item.getItemMeta();
+
+        String infiniteMode = StringUtils.capitalize(menuItem.getTypeValue().toLowerCase());
+
+        itemMeta.setDisplayName(menuItem.getFormattedTitle());
+
+        // glow if equal
+        if (playerStats != null && playerStats.getInfiniteType() != null && playerStats.getInfiniteType().toString().equalsIgnoreCase(infiniteMode))
+        {
+            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+
+        itemMeta.setLore(menuItem.getFormattedLore());
+        item.setItemMeta(itemMeta);
+
+        return item;
+    }
+
+    private static ItemStack getBankItem(MenuItem menuItem)
     {
         ItemStack item = new ItemStack(menuItem.getItem());
         String typeValue = menuItem.getTypeValue();

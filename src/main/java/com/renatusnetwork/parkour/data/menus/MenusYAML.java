@@ -104,6 +104,8 @@ public class MenusYAML {
             return "type";
         if (isSet(menuName, itemPath + ".bank"))
             return "bank";
+        if (isSet(menuName, itemPath + ".infinite-mode"))
+            return "infinite-mode";
 
         return "display";
     }
@@ -125,6 +127,8 @@ public class MenusYAML {
             return menusConfig.getString(menuName + "." + itemPath + ".type");
         if (isSet(menuName, itemPath + ".bank"))
             return menusConfig.getString(menuName + "." + itemPath + ".bank");
+        if (isSet(menuName, itemPath + ".infinite-mode"))
+            return menusConfig.getString(menuName + "." + itemPath + ".infinite-mode");
         return "";
     }
 
