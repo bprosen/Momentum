@@ -57,13 +57,7 @@ public class PracticeCMD implements CommandExecutor {
                                         playerStats.setPracticeMode(player.getLocation());
 
                                         SettingsManager settingsManager = Parkour.getSettingsManager();
-                                        // create item and give
-                                        ItemStack pracItem = new ItemStack(settingsManager.prac_type);
-                                        ItemMeta itemMeta = pracItem.getItemMeta();
-                                        itemMeta.setDisplayName(Utils.translate(settingsManager.prac_title));
-                                        pracItem.setItemMeta(itemMeta);
-
-                                        player.getInventory().setItem(settingsManager.prac_hotbar_slot, pracItem);
+                                        player.getInventory().setItem(settingsManager.prac_hotbar_slot, settingsManager.prac_item);
 
                                         player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
                                     } else {

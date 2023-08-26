@@ -140,6 +140,10 @@ practice-plate:
   type: IRON_PLATE
   title: "&6Practice Checkpoint"
   hotbar_slot: 2
+leave-item:
+  type: REDSTONE
+  title: "&cLeave"
+  hotbar_slot: 6
 clans:
   max_members: 10
   max_level: 10

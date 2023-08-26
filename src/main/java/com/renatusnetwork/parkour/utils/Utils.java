@@ -102,7 +102,8 @@ public class Utils {
         return result;
     }
 
-    public static ItemStack getSwordIfExists(Inventory inventory) {
+    public static ItemStack getSwordIfExists(Inventory inventory)
+    {
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ItemStack swordItem = null;
@@ -112,7 +113,8 @@ public class Utils {
 
             if (item != null &&
                 item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.sword_title))) {
+                item.getItemMeta().getDisplayName().equalsIgnoreCase(settingsManager.sword_title))
+            {
 
                 swordItem = item;
                 break;
@@ -121,23 +123,37 @@ public class Utils {
         return swordItem;
     }
 
-    public static ItemStack getPracPlateIfExists(Inventory inventory) {
+    public static ItemStack getPracPlateIfExists(Inventory inventory)
+    {
         SettingsManager settingsManager = Parkour.getSettingsManager();
+        return getItemStackIfExists(inventory, settingsManager.prac_item);
+    }
 
-        ItemStack pracItem = null;
+    public static ItemStack getSpawnItemIfExists(Inventory inventory)
+    {
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+        return getItemStackIfExists(inventory, settingsManager.leave_item);
+    }
 
-        // try to find the sword in their inventory
-        for (ItemStack item : inventory.getContents()) {
+    private static ItemStack getItemStackIfExists(Inventory inventory, ItemStack searchItem)
+    {
 
-            if (item != null && item.getType() == settingsManager.prac_type &&
-                    item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                    item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(settingsManager.prac_title))) {
+        ItemStack foundItem = null;
 
-                pracItem = item;
-                break;
+        if (searchItem != null && searchItem.hasItemMeta() && searchItem.getItemMeta().hasDisplayName())
+        {
+            // try to find the sword in their inventory
+            for (ItemStack item : inventory.getContents())
+            {
+                if (item != null && item.getType() == searchItem.getType() && item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
+                        item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(searchItem.getItemMeta().getDisplayName())))
+                {
+                    foundItem = item;
+                    break;
+                }
             }
         }
-        return pracItem;
+        return foundItem;
     }
 
     public static String translate(String msg) {
@@ -198,37 +214,40 @@ public class Utils {
         Player player = playerStats.getPlayer();
 
         if (loc != null) {
+            if (!playerStats.isInTutorial()) {
+                if (!playerStats.isEventParticipant()) {
+                    if (!playerStats.inRace()) {
+                        if (!playerStats.isInInfinite()) {
+                            if (!playerStats.isSpectating()) {
 
-            if (!playerStats.isEventParticipant()) {
-                if (!playerStats.inRace()) {
-                    if (!playerStats.isInInfinite()) {
-                        if (!playerStats.isSpectating()) {
+                                BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
+                                if (playerStats.isInBlackMarket())
+                                    blackMarketManager.playerLeft(playerStats, false); // remove from event
 
-                            BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
-                            if (playerStats.isInBlackMarket())
-                                blackMarketManager.playerLeft(playerStats, false); // remove from event
+                                // toggle off elytra armor
+                                Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                            // toggle off elytra armor
-                            Parkour.getStatsManager().toggleOffElytra(playerStats);
+                                player.teleport(loc);
 
-                            player.teleport(loc);
+                                playerStats.resetCurrentCheckpoint();
+                                PracticeHandler.resetDataOnly(playerStats);
+                                playerStats.resetLevel();
+                                playerStats.clearPotionEffects();
 
-                            playerStats.resetCurrentCheckpoint();
-                            PracticeHandler.resetDataOnly(playerStats);
-                            playerStats.resetLevel();
-                            playerStats.clearPotionEffects();
-
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                            }
                         } else {
-                            player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
                         }
                     } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
+                        player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                     }
                 } else {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                    Parkour.getEventManager().removeParticipant(player, false); // remove if in event
                 }
             } else {
-                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
             }
         } else {
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");

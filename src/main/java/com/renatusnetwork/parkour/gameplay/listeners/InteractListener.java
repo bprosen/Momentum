@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.commands.EventCMD;
+import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -29,7 +31,8 @@ import java.util.HashMap;
 
 public class InteractListener implements Listener {
 
-    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
+    private HashMap<String, BukkitTask> resetConfirmMap = new HashMap<>();
+    private HashMap<String, BukkitTask> spawnConfirmMap = new HashMap<>();
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event)
@@ -56,7 +59,6 @@ public class InteractListener implements Listener {
 
             if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&2Players &7»")))
             {
-
                 event.setCancelled(true);
 
                 player.getInventory().removeItem(item);
@@ -86,7 +88,6 @@ public class InteractListener implements Listener {
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint")))
             {
-
                 event.setCancelled(true);
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 Parkour.getCheckpointManager().teleportToCP(playerStats);
@@ -119,7 +120,6 @@ public class InteractListener implements Listener {
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset")))
             {
-
                 event.setCancelled(true);
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 Level level = playerStats.getLevel();
@@ -131,20 +131,21 @@ public class InteractListener implements Listener {
                                 if (level != null) {
                                     if (level.getStartLocation() != null) {
                                         // gets if they have right clicked it already, if so, cancel the task and reset them
-                                        if (!confirmMap.containsKey(player.getName())) {
+                                        if (!resetConfirmMap.containsKey(player.getName())) {
                                             // otherwise, put them in and ask them to confirm within 5 seconds
-                                            player.sendMessage(Utils.translate("&6Are you sure you want to reset? Right click again to confirm"));
+                                            player.sendMessage(Utils.translate("&cAre you sure you want to reset? Right click again to confirm"));
 
-                                            confirmMap.put(player.getName(), new BukkitRunnable() {
+                                            resetConfirmMap.put(player.getName(), new BukkitRunnable() {
+                                                @Override
                                                 public void run() {
-                                                    if (confirmMap.containsKey(player.getName())) {
-                                                        confirmMap.remove(player.getName());
+                                                    if (resetConfirmMap.containsKey(player.getName())) {
+                                                        resetConfirmMap.remove(player.getName());
                                                         player.sendMessage(Utils.translate("&cYou did not confirm in time"));
                                                     }
                                                 }
                                             }.runTaskLater(Parkour.getPlugin(), 20 * 5));
                                         } else {
-                                            confirmMap.get(player.getName()).cancel();
+                                            resetConfirmMap.get(player.getName()).cancel();
 
                                             Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
 
@@ -164,7 +165,7 @@ public class InteractListener implements Listener {
                                                         player.addPotionEffect(potionEffect);
                                                 }
                                             }
-                                            confirmMap.remove(player.getName());
+                                            resetConfirmMap.remove(player.getName());
 
                                             player.teleport(level.getStartLocation());
                                             playerStats.resetFails();
@@ -193,7 +194,36 @@ public class InteractListener implements Listener {
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Parkour.getSettingsManager().prac_title)))
             {
+                event.setCancelled(true);
                 Parkour.getCheckpointManager().teleportToPracCP(Parkour.getStatsManager().get(player));
+            }
+            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Parkour.getSettingsManager().leave_title)))
+            {
+                event.setCancelled(true);
+
+                if (!spawnConfirmMap.containsKey(player.getName()))
+                {
+                    // otherwise, put them in and ask them to confirm within 5 seconds
+                    player.sendMessage(Utils.translate("&cAre you sure you want to leave? Right click again to confirm"));
+                    spawnConfirmMap.put(player.getName(), new BukkitRunnable()
+                    {
+                        @Override
+                        public void run() {
+                            if (spawnConfirmMap.containsKey(player.getName()))
+                            {
+                                spawnConfirmMap.remove(player.getName());
+                                player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                            }
+                        }
+                    }.runTaskLater(Parkour.getPlugin(), 20 * 5));
+                }
+                else
+                {
+                    spawnConfirmMap.get(player.getName()).cancel();
+                    spawnConfirmMap.remove(player.getName());
+
+                    Utils.teleportToSpawn(Parkour.getStatsManager().get(player));
+                }
             }
         }
     }

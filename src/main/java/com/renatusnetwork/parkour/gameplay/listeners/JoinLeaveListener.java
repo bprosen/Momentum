@@ -169,9 +169,15 @@ public class JoinLeaveListener implements Listener {
         if (playerStats.hasNVStatus())
             playerStats.clearPotionEffects();
 
-        // if in dropper, respawn them
-        if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel())
-            player.teleport(playerStats.getLevel().getStartLocation());
+        if (playerStats.inLevel())
+        {
+            // run reset logic
+            playerStats.resetLevel();
+
+            // if in dropper, respawn them
+            if (playerStats.getLevel().isDropperLevel())
+                player.teleport(playerStats.getLevel().getStartLocation());
+        }
 
         // toggle off elytra armor
         Parkour.getStatsManager().toggleOffElytra(playerStats);

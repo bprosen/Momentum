@@ -5,7 +5,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -97,6 +101,12 @@ public class SettingsManager {
     public int prac_hotbar_slot;
     public String prac_title;
     public Material prac_type;
+    public ItemStack prac_item;
+
+    public int leave_hotbar_slot;
+    public String leave_title;
+    public Material leave_type;
+    public ItemStack leave_item;
 
     public double minimum_pay_amount;
 
@@ -189,7 +199,31 @@ public class SettingsManager {
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
-        sword_title = settings.getString("setup-sword.title");
+        sword_title = Utils.translate(settings.getString("setup-sword.title"));
+
+        setup_swords = new LinkedHashMap<>(); // we want it in order!
+
+        ConfigurationSection section = settings.getConfigurationSection("setup-sword.prestiges");
+        for (String key : section.getKeys(false))
+        {
+            int keyInt = Integer.parseInt(key);
+
+            ItemStack sword = new ItemStack(Material.matchMaterial(section.getString(keyInt + ".type")));
+            ItemMeta meta = sword.getItemMeta();
+            meta.setDisplayName(sword_title);
+
+            // set glow
+            if (section.getBoolean(keyInt + ".glow"))
+            {
+                meta.addEnchant(Enchantment.DURABILITY, 1, true);
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+
+            sword.setItemMeta(meta);
+
+            setup_swords.put(keyInt, sword); // put in
+        }
+
         max_infinite_leaderboard_size = settings.getInt("infinite.max_leaderboard_size");
         max_infinite_y = settings.getInt("infinite.max_y");
         min_infinite_y = settings.getInt("infinite.min_y");
@@ -214,9 +248,24 @@ public class SettingsManager {
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
         max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
         tutorial_level_name = settings.getString("levels.tutorial_level");
-        prac_title = settings.getString("practice-plate.title");
+        prac_title = Utils.translate(settings.getString("practice-plate.title"));
         prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
         prac_hotbar_slot = settings.getInt("practice-plate.hotbar_slot");
+
+        prac_item = new ItemStack(prac_type);
+        ItemMeta meta = prac_item.getItemMeta();
+        meta.setDisplayName(prac_title);
+        prac_item.setItemMeta(meta);
+
+        leave_title = Utils.translate(settings.getString("leave-item.title"));
+        leave_type = Material.matchMaterial(settings.getString("leave-item.type"));
+        leave_hotbar_slot = settings.getInt("leave-item.hotbar_slot");
+
+        leave_item = new ItemStack(leave_type);
+        meta = leave_item.getItemMeta();
+        meta.setDisplayName(Utils.translate(leave_title));
+        leave_item.setItemMeta(meta);
+
         radiant_minimum_bid = settings.getInt("bank.radiant.min_starting_bid");
         brilliant_minimum_bid = settings.getInt("bank.brilliant.min_starting_bid");
         legendary_minimum_bid = settings.getInt("bank.legendary.min_starting_bid");

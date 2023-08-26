@@ -30,7 +30,7 @@ public class SpawnCMD implements CommandExecutor {
         {
 
             if (a.length == 0)
-                checkTutorial(playerStats);
+                Utils.teleportToSpawn(playerStats);
             else if (a.length == 1)
             {
 
@@ -44,21 +44,12 @@ public class SpawnCMD implements CommandExecutor {
 
                 PlayerStats victimStats = Parkour.getStatsManager().get(victimPlayer);
 
-                checkTutorial(victimStats);
+                Utils.teleportToSpawn(victimStats);
                 player.sendMessage(Utils.translate("&cYou teleported &4" + victim + " &cto spawn"));
             }
         } else if (a.length == 0) {
-            checkTutorial(playerStats);
+            Utils.teleportToSpawn(playerStats);
         }
         return false;
-    }
-
-    private static void checkTutorial(PlayerStats playerStats)
-    {
-        // check for tutorial
-        if (!playerStats.isInTutorial())
-            Utils.teleportToSpawn(playerStats);
-        else
-            playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
     }
 }

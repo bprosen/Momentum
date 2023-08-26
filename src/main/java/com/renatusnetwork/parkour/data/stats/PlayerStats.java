@@ -1,12 +1,14 @@
 package com.renatusnetwork.parkour.data.stats;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.ranks.Rank;
+import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -189,12 +191,32 @@ public class PlayerStats {
     //
     // Level Section
     //
-    public void setLevel(Level level) {
+    public void setLevel(Level level)
+    {
+        // only continue if non null
+        if (level != null)
+        {
+            if (level.isRaceLevel())
+                resetLevel(); // force the item removal
+            else
+            {
+                // set item
+                SettingsManager settingsManager = Parkour.getSettingsManager();
+                player.getInventory().setItem(settingsManager.leave_hotbar_slot, settingsManager.leave_item);
+            }
+        }
         this.level = level;
     }
 
-    public void resetLevel() {
+    public void resetLevel()
+    {
         level = null;
+
+        ItemStack itemStack = Utils.getSpawnItemIfExists(player.getInventory());
+
+        // remove if not null
+        if (itemStack != null)
+            player.getInventory().remove(itemStack);
     }
 
     public Level getLevel() {
