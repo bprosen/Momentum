@@ -34,6 +34,7 @@ public class InfiniteManager {
     {
         this.participants = new HashMap<>();
 
+        loadAllRewards();
         startScheduler();
         initLeaderboards();
     }
@@ -48,14 +49,8 @@ public class InfiniteManager {
         leaderboards.put(InfiniteType.TIMED, new InfiniteLB(InfiniteType.TIMED));
     }
 
-    public void startScheduler() {
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                loadAllRewards();
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
+    public void startScheduler()
+    {
 
         // update leaderboards every 3 minutes
         new BukkitRunnable() {
@@ -204,9 +199,15 @@ public class InfiniteManager {
     public void loadAllRewards()
     {
         rewards = new HashMap<>();
+        int sizeRewards = 0;
 
         for (InfiniteType type : InfiniteType.values())
+        {
             loadRewards(type);
+            sizeRewards += rewards.get(type).size();
+        }
+
+        Parkour.getPluginLogger().info("Infinite rewards loaded: " + sizeRewards);
     }
 
     public void loadRewards(InfiniteType type)

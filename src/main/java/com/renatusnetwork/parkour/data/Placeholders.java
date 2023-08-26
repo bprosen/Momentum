@@ -7,6 +7,8 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.events.EventLBPosition;
 import com.renatusnetwork.parkour.data.infinite.leaderboard.InfiniteLBPosition;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteReward;
+import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewards;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.RaceLBPosition;
 import com.renatusnetwork.parkour.data.stats.*;
@@ -62,7 +64,7 @@ public class Placeholders extends PlaceholderExpansion
         if (playerStats != null)
         {
             // all placeholders
-            switch (placeholder)
+            switch (placeholder.toLowerCase())
             {
                 case "records":
                     return Utils.formatNumber(playerStats.getRecords());
@@ -91,6 +93,60 @@ public class Placeholders extends PlaceholderExpansion
                 case "event_wins":
                     return Utils.formatNumber(playerStats.getEventWins());
             }
+
+            if (placeholder.startsWith("infinite-reward"))
+            {
+                /*
+                    rn-parkour_infinite-reward_classic_(score)_score <--- needed for strikethrough, seems redundant at first
+                    rn-parkour_infinite-reward_classic_(score)_display
+                 */
+                String[] split = placeholder.split("_");
+
+                if (split.length == 4)
+                {
+                    String infiniteType = split[1];
+                    String score = split[2];
+                    String value = split[3].toLowerCase();
+
+                    if (Utils.isInteger(score))
+                    {
+                        int scoreInt = Integer.parseInt(score);
+
+                        try
+                        {
+                            InfiniteRewards rewards = Parkour.getInfiniteManager().getRewards(InfiniteType.valueOf(infiniteType.toUpperCase()));
+
+                            // make sure not null
+                            if (rewards != null)
+                            {
+                                // get from score
+                                InfiniteReward reward = rewards.getReward(scoreInt);
+
+                                if (reward != null)
+                                {
+                                    switch (value)
+                                    {
+                                        case "score":
+                                            String scoreString = Utils.formatNumber(scoreInt);
+
+                                            // add strikethrough if they have it!
+                                            if (reward.hasReward(playerStats))
+                                                scoreString = "&m" + scoreString;
+
+                                            return scoreString;
+                                        case "display":
+                                            return Utils.translate(reward.getDisplay());
+                                    }
+                                }
+                            }
+                        }
+                        catch (IllegalArgumentException exception)
+                        {
+                            return "Invalid infinite type";
+                        }
+                    }
+                }
+            }
         }
 
         // leaderboard placeholders
@@ -102,7 +158,7 @@ public class Placeholders extends PlaceholderExpansion
             {
                 String type = split[1];
                 String position = split[2];
-                String value = split[3];
+                String value = split[3].toLowerCase();
 
                 if (Utils.isInteger(position))
                 {
@@ -250,10 +306,10 @@ public class Placeholders extends PlaceholderExpansion
             }
             else if (split.length == 5)
             {
-                String lbType = split[1];
+                String lbType = split[1].toLowerCase();
                 String specification = split[2];
                 String position = split[3];
-                String value = split[4];
+                String value = split[4].toLowerCase();
 
                 if (lbType.equals("infinite"))
                 {
@@ -285,10 +341,10 @@ public class Placeholders extends PlaceholderExpansion
                 try
                 {
                     // get type
-                    BankItemType bankType = BankItemType.valueOf(split[1]);
+                    BankItemType bankType = BankItemType.valueOf(split[1].toUpperCase());
                     BankItem item = Parkour.getBankManager().getItem(bankType);
 
-                    switch (split[2])
+                    switch (split[2].toLowerCase())
                     {
                         // current holder
                         case "holder":

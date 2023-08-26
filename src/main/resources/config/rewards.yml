@@ -1,4 +1,21 @@
 infinite:
-  10:
-    command: "say %player% hi"
-    name: "&8Funny Test"
+  classic:
+    10:
+      commands:
+      - "say %player% hi"
+      name: "&8Funny Test"
+  speedrun:
+    10:
+      commands:
+        - "say %player% hi"
+      name: "&8Funny Test"
+  timed:
+    10:
+      commands:
+        - "say %player% hi"
+      name: "&8Funny Test"
+  sprint:
+    10:
+      commands:
+        - "say %player% hi"
+      name: "&8Funny Test"

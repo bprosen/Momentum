@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class InfiniteCMD implements CommandExecutor {
 
@@ -81,7 +82,7 @@ public class InfiniteCMD implements CommandExecutor {
         }
         else if (player.hasPermission("rn-parkour.admin") && (a.length == 1 && a[0].equalsIgnoreCase("loadrewards")))
         {
-
+            Parkour.getConfigManager().load("rewards");
             infiniteManager.loadAllRewards();
             player.sendMessage(Utils.translate("&cYou have reloaded Infinite Parkour Rewards"));
 
@@ -140,7 +141,7 @@ public class InfiniteCMD implements CommandExecutor {
             {
                 // get rewards
                 InfiniteType type = InfiniteType.valueOf(typeName.toUpperCase());
-                Collection<InfiniteReward> rewards = Parkour.getInfiniteManager().getRewards(type).getRewards();
+                List<InfiniteReward> rewards = Parkour.getInfiniteManager().getRewards(type).getRewards();
 
                 player.sendMessage(Utils.translate("&d&l" + StringUtils.capitalize(typeName.toLowerCase()) + " &5&lInfinite Rewards"));
 
@@ -148,19 +149,22 @@ public class InfiniteCMD implements CommandExecutor {
                 if (!rewards.isEmpty())
                 {
                     PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                    int position = 1;
-
-                    for (InfiniteReward reward : rewards)
+                    if (playerStats != null && playerStats.isLoaded())
                     {
-                        String msg = "&7" + position + " &5" + Utils.formatNumber(reward.getScoreNeeded()) + " Score &7- &d" + reward.getDisplay();
 
-                        // send crossed out msg if their high score is more than the score needed
-                        if (playerStats.getBestInfiniteScore() >= reward.getScoreNeeded())
-                            msg = "&7" + position + " &5&m" + Utils.formatNumber(reward.getScoreNeeded()) + " Score&7 - &d" + reward.getDisplay();
+                        for (InfiniteReward reward : rewards)
+                        {
+                            String msg = "&5" + Utils.formatNumber(reward.getScoreNeeded()) + " Score&7 » &d" + reward.getDisplay();
 
-                        player.sendMessage(Utils.translate(msg));
-                        position++;
+                            // send crossed out msg if their high score is more than the score needed
+                            if (playerStats.getBestInfiniteScore(type) >= reward.getScoreNeeded())
+                                msg = "&5&m" + Utils.formatNumber(reward.getScoreNeeded()) + " Score&7 » &d" + reward.getDisplay();
+
+                            player.sendMessage(Utils.translate(msg));
+                        }
                     }
+                    else
+                        player.sendMessage(Utils.translate("&cSomething went wrong... try again in a few seconds"));
                 }
                 else
                     player.sendMessage(Utils.translate("&dNo rewards available"));

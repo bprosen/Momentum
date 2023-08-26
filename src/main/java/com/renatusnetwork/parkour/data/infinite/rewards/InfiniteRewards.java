@@ -2,13 +2,12 @@ package com.renatusnetwork.parkour.data.infinite.rewards;
 
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 public class InfiniteRewards
 {
     private InfiniteType type;
-    private HashMap<Integer, InfiniteReward> rewards;
+    private LinkedHashMap<Integer, InfiniteReward> rewards; // linked so order stays
 
     public InfiniteRewards(InfiniteType type)
     {
@@ -18,7 +17,7 @@ public class InfiniteRewards
 
     private void load()
     {
-        rewards = new HashMap<>();
+        rewards = new LinkedHashMap<>();
 
         // load into rewards cache
         for (InfiniteReward reward : InfiniteRewardsYAML.getRewards(type))
@@ -30,8 +29,16 @@ public class InfiniteRewards
         return rewards.get(scoreNeeded);
     }
 
-    public Collection<InfiniteReward> getRewards()
+    public List<InfiniteReward> getRewards()
     {
-        return rewards.values();
+        List<InfiniteReward> orderedRewards = new ArrayList<>();
+
+        // need to retain order!
+        for (int key : rewards.keySet())
+            orderedRewards.add(rewards.get(key));
+
+        return orderedRewards;
     }
+
+    public int size() { return rewards.size(); }
 }
