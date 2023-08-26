@@ -94,55 +94,61 @@ public class Placeholders extends PlaceholderExpansion
                     return Utils.formatNumber(playerStats.getEventWins());
             }
 
-            if (placeholder.startsWith("infinite-reward"))
+            // rewards section
+            if (placeholder.startsWith("rewards"))
             {
-                /*
-                    rn-parkour_infinite-reward_classic_(score)_score <--- needed for strikethrough, seems redundant at first
-                    rn-parkour_infinite-reward_classic_(score)_display
-                 */
                 String[] split = placeholder.split("_");
+                String rewardType = split[1];
 
-                if (split.length == 4)
+                // future proofing!
+                if (rewardType.equals("infinite"))
                 {
-                    String infiniteType = split[1];
-                    String score = split[2];
-                    String value = split[3].toLowerCase();
-
-                    if (Utils.isInteger(score))
+                    /*
+                    rn-parkour_rewards_infinite_classic_(score)_score <--- needed for strikethrough, seems redundant at first
+                    rn-parkour_rewards_infinite_classic_(score)_display
+                 */
+                    if (split.length == 5)
                     {
-                        int scoreInt = Integer.parseInt(score);
+                        String infiniteType = split[2];
+                        String score = split[3];
+                        String value = split[4].toLowerCase();
 
-                        try
+                        if (Utils.isInteger(score))
                         {
-                            InfiniteRewards rewards = Parkour.getInfiniteManager().getRewards(InfiniteType.valueOf(infiniteType.toUpperCase()));
+                            int scoreInt = Integer.parseInt(score);
 
-                            // make sure not null
-                            if (rewards != null)
+                            try
                             {
-                                // get from score
-                                InfiniteReward reward = rewards.getReward(scoreInt);
+                                InfiniteRewards rewards = Parkour.getInfiniteManager().getRewards(InfiniteType.valueOf(infiniteType.toUpperCase()));
 
-                                if (reward != null)
+                                // make sure not null
+                                if (rewards != null)
                                 {
-                                    switch (value)
+                                    // get from score
+                                    InfiniteReward reward = rewards.getReward(scoreInt);
+
+                                    if (reward != null)
                                     {
-                                        case "score":
-                                            String scoreString = Utils.formatNumber(scoreInt);
+                                        switch (value)
+                                        {
+                                            case "score":
+                                                String scoreString = Utils.formatNumber(scoreInt);
 
-                                            // add strikethrough if they have it!
-                                            if (reward.hasReward(playerStats))
-                                                scoreString = "&m" + scoreString;
+                                                // add strikethrough if they have it!
+                                                if (reward.hasReward(playerStats))
+                                                    scoreString = "&m" + scoreString;
 
-                                            return scoreString;
-                                        case "display":
-                                            return Utils.translate(reward.getDisplay());
+                                                return scoreString;
+                                            case "display":
+                                                return Utils.translate(reward.getDisplay());
+                                        }
                                     }
                                 }
                             }
-                        }
-                        catch (IllegalArgumentException exception)
-                        {
-                            return "Invalid infinite type";
+                            catch (IllegalArgumentException exception)
+                            {
+                                return "Invalid infinite type";
+                            }
                         }
                     }
                 }
