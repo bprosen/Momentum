@@ -3,7 +3,6 @@ package com.renatusnetwork.parkour;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
-import com.renatusnetwork.parkour.data.Placeholders;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
@@ -15,6 +14,7 @@ import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.perks.PerkManager;
+import com.renatusnetwork.parkour.data.placeholders.*;
 import com.renatusnetwork.parkour.data.plots.PlotsManager;
 import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.ranks.RanksManager;
@@ -61,6 +61,8 @@ public class Parkour extends JavaPlugin {
     private static SavesManager saves;
     private static ModifiersManager modifiers;
 
+    private Placeholders placeholders;
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -81,7 +83,7 @@ public class Parkour extends JavaPlugin {
 
         // register placeholders
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
-            new Placeholders().register();
+            registerPlaceholders();
         else
             getLogger().info("Placeholder not found, not able to initialize placeholders");
 
@@ -109,6 +111,7 @@ public class Parkour extends JavaPlugin {
         // close database and unload classes
         database.close();
         unloadClasses();
+        unregisterPlaceholders();
 
         getLogger().info("RN-Parkour Disabled");
 
@@ -224,6 +227,16 @@ public class Parkour extends JavaPlugin {
         saves = null;
         blackmarket = null;
         modifiers = null;
+    }
+
+    private void registerPlaceholders()
+    {
+        placeholders = new Placeholders();
+        placeholders.register();
+    }
+    private void unregisterPlaceholders()
+    {
+        placeholders.unregister();
     }
 
     public static Plugin getPlugin() { return plugin; }
