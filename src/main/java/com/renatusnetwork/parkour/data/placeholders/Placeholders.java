@@ -28,9 +28,6 @@ public class Placeholders extends PlaceholderExpansion
     @Override
     public @NotNull String onPlaceholderRequest(Player player, String placeholder)
     {
-        if (!placeholder.contains("_"))
-            Bukkit.broadcastMessage(placeholder);
-
         String type = placeholder.substring(0, placeholder.indexOf("_"));
         String placeholderString = placeholder.substring(placeholder.indexOf("_") + 1);
 
