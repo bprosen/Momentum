@@ -322,16 +322,23 @@ public class Placeholders extends PlaceholderExpansion
                     if (Utils.isInteger(position))
                     {
                         int posInt = Integer.parseInt(position);
-                        InfiniteType type = InfiniteType.valueOf(specification.toUpperCase());
-                        InfiniteLBPosition infiniteLBPosition = Parkour.getInfiniteManager().getLeaderboard(type).getLeaderboardPosition(posInt);
-
-                        if (infiniteLBPosition != null)
+                        try
                         {
-                            // return name or value
-                            if (value.equals("name"))
-                                return infiniteLBPosition.getName();
-                            else if (value.equals("score"))
-                                return Utils.formatNumber(infiniteLBPosition.getScore());
+                            InfiniteType type = InfiniteType.valueOf(specification.toUpperCase());
+                            InfiniteLBPosition infiniteLBPosition = Parkour.getInfiniteManager().getLeaderboard(type).getLeaderboardPosition(posInt);
+
+                            if (infiniteLBPosition != null)
+                            {
+                                // return name or value
+                                if (value.equals("name"))
+                                    return infiniteLBPosition.getName();
+                                else if (value.equals("score"))
+                                    return Utils.formatNumber(infiniteLBPosition.getScore());
+                            }
+                        }
+                        catch (IllegalArgumentException exception)
+                        {
+                            return "Invalid infinite type";
                         }
                     }
                 }
