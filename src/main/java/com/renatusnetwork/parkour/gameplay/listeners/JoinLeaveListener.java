@@ -171,12 +171,12 @@ public class JoinLeaveListener implements Listener {
 
         if (playerStats.inLevel())
         {
-            // run reset logic
-            playerStats.resetLevel();
-
             // if in dropper, respawn them
             if (playerStats.getLevel().isDropperLevel())
                 player.teleport(playerStats.getLevel().getStartLocation());
+
+            // run reset logic
+            playerStats.resetLevel();
         }
 
         // toggle off elytra armor

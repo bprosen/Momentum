@@ -368,5 +368,20 @@ public class SettingsManager {
         infinite_soft_border_radius_z = settings.getInt("infinite.soft_border_radius_z");
         infinite_angle_outside_border_min = settings.getInt("infinite.generation.angle_outside_border_min");
         infinite_angle_outside_border_max = settings.getInt("infinite.generation.angle_outside_border_max");
+
+        // need linked so sorted
+        cooldown_modifiers = new LinkedHashMap<>();
+
+        Set<String> modifiers = settings.getConfigurationSection("cooldowns.modifiers").getKeys(false);
+        for (String modifier : modifiers)
+            cooldown_modifiers.put(Integer.parseInt(modifier), (float) settings.getDouble("cooldowns.modifiers." + modifier + ".modifier"));
+
+        String[] time = settings.getString("cooldowns.reset_time").split(":");
+
+        // set cooldown reset time
+        cooldown_calendar = Calendar.getInstance();
+        cooldown_calendar.set(Calendar.DAY_OF_YEAR, cooldown_calendar.get(Calendar.DAY_OF_YEAR) + 1); // next day
+        cooldown_calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
+        cooldown_calendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
     }
 }

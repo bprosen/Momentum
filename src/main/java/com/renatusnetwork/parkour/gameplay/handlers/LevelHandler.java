@@ -292,6 +292,9 @@ public class LevelHandler {
                         playerStats.resetFails(); // reset fails in grinding
                     }
 
+                    // add cooldown
+                    levelManager.addLevelCooldown(playerStats.getPlayerName(), level);
+
                     ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
                     Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
 

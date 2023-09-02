@@ -442,7 +442,7 @@ public class MenuItemFormatter {
                 if (cooldown != null && cooldown.getModifier() != 1.00f)
                 {
                     itemLore.add(Utils.translate("  &7On cooldown &6(-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%)"));
-                    itemLore.add(Utils.translate("    &7For " +
+                    itemLore.add(Utils.translate("    &7For &e" +
                             Time.elapsedShortened((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
                     );
                 }
@@ -487,6 +487,15 @@ public class MenuItemFormatter {
                     beatenMessage += "s";
 
                 itemLore.add(beatenMessage);
+
+                // add record if there is one
+                List<LevelCompletion> leaderboard = level.getLeaderboard();
+                if (!leaderboard.isEmpty())
+                {
+                    LevelCompletion record = leaderboard.get(0);
+
+                    itemLore.add(Utils.translate("&7  Record &6" + (record.getCompletionTimeElapsed() / 1000D) + "s &e" + record.getPlayerName()));
+                }
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
                 if (fastestCompletion != null) {
