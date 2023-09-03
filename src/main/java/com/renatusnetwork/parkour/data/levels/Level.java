@@ -379,7 +379,7 @@ public class Level {
                     }
                 }
             }
-            PlayerStats playerStats = Parkour.getStatsManager().get(levelCompletion.getPlayerName()); // get player that got record
+            PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName()); // get player that got record
             if (playerStats.hasModifier(ModifierTypes.RECORD_BONUS))
             {
                 Bonus bonus = (Bonus) playerStats.getModifier(ModifierTypes.RECORD_BONUS);

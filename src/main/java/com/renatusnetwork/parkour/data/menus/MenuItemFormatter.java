@@ -482,27 +482,33 @@ public class MenuItemFormatter {
 
                 itemLore.add("");
 
-                String beatenMessage = Utils.translate("&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
+                String beatenMessage = "&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7Time";
                 if (levelCompletionsCount > 1)
                     beatenMessage += "s";
 
-                itemLore.add(beatenMessage);
-
-                // add record if there is one
-                List<LevelCompletion> leaderboard = level.getLeaderboard();
-                if (!leaderboard.isEmpty())
-                {
-                    LevelCompletion record = leaderboard.get(0);
-
-                    itemLore.add(Utils.translate("&7  Record &6" + (record.getCompletionTimeElapsed() / 1000D) + "s &e" + record.getPlayerName()));
-                }
+                itemLore.add(Utils.translate(beatenMessage));
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
                 if (fastestCompletion != null) {
                     double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
                     long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
 
-                    itemLore.add(Utils.translate("&7  Best Time &6" + completionTime + "s"));
+                    String bestTime = "&7  Best Time &6" + completionTime + "s";
+
+                    // add record if there is one
+                    List<LevelCompletion> leaderboard = level.getLeaderboard();
+                    if (!leaderboard.isEmpty())
+                    {
+                        LevelCompletion record = leaderboard.get(0);
+
+                        // add number 1
+                        if (record.getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
+                            bestTime += " &e#1";
+                        else
+                            bestTime += " &e+" + (completionTime - (record.getCompletionTimeElapsed() / 1000D)) + "s";
+                    }
+
+                    itemLore.add(Utils.translate(bestTime));
 
                     // this makes it so it will not have " ago" if they just completed it
                     String timeSinceString;

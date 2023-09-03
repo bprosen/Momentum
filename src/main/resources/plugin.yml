@@ -22,6 +22,7 @@ commands:
     aliases: [perk]
   stats:
     description: "RN-Parkour stats display command"
+    aliases: [lb, leaderboard]
   spectate:
     description: "RN-Parkour spectate command"
   clan:
