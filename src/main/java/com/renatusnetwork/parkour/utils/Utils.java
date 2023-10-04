@@ -234,6 +234,9 @@ public class Utils {
                                 playerStats.resetLevel();
                                 playerStats.clearPotionEffects();
 
+                                if (playerStats.isAttemptingRankup())
+                                    Parkour.getRanksManager().leftRankup(playerStats);
+
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
                             }

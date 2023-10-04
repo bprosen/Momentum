@@ -48,20 +48,15 @@ public class LevelHandler {
                     if (level.getMaxCompletions() == -1 || playerLevelCompletions < level.getMaxCompletions()) {
                         // if it is a race completion, end it
                         if (!playerStats.inRace()) {
-                            // if player was not attempting a rankup level, continue
-                            if (!(level.isRankUpLevel() && playerStats.isAttemptingRankup())) {
-                                // if level is not an event level, it is guaranteed normal completion
-                                if (!level.isEventLevel())
-                                    dolevelCompletion(playerStats, player, level, levelName, false, false);
-                                // otherwise, if there is an event running, end!
-                                else if (eventManager.isEventRunning())
-                                    eventManager.endEvent(player, false, false);
-                                // otherwise, they are clicking the sign when the event is not running
-                                else
-                                    player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
-
-                            } else
-                                dolevelCompletion(playerStats, player, level, levelName, true, false);
+                            // if level is not an event level, it is guaranteed normal completion
+                            if (!level.isEventLevel())
+                                dolevelCompletion(playerStats, player, level, levelName, false);
+                            // otherwise, if there is an event running, end!
+                            else if (eventManager.isEventRunning())
+                                eventManager.endEvent(player, false, false);
+                            // otherwise, they are clicking the sign when the event is not running
+                            else
+                                player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
                         } else {
                             // if in race
                             Parkour.getRaceManager().endRace(player, false);
@@ -78,7 +73,7 @@ public class LevelHandler {
         }
     }
 
-    public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean rankUpLevel, boolean forcedCompletion) {
+    public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean forcedCompletion) {
 
         LevelCompletionEvent event = new LevelCompletionEvent(playerStats, level);
         Bukkit.getPluginManager().callEvent(event);
@@ -131,9 +126,6 @@ public class LevelHandler {
 
             // used for playing sound!
             int beforeClanLevel = -1;
-
-            if (rankUpLevel)
-                Parkour.getRanksManager().doRankUp(player);
 
             // only broadcast and give xp/coins if it is not a forced completion
             if (!forcedCompletion) {
@@ -283,11 +275,15 @@ public class LevelHandler {
                 Location locationTo = level.getRespawnLocation();
 
                 // If not rank up level or has a start location and is grinding, set to start loc
-                if (level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
+                if (!playerStats.isAttemptingRankup() && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
                 {
                     locationTo = level.getStartLocation();
                     playerStats.resetFails(); // reset fails in grinding
                 }
+
+                // rank them up!
+                if (level.isRankUpLevel() && playerStats.isAttemptingRankup())
+                    Parkour.getRanksManager().doRankUp(player);
 
                 // add cooldown
                 levelManager.addLevelCooldown(playerStats.getPlayerName(), level);
@@ -324,7 +320,7 @@ public class LevelHandler {
                         if (playerStats.getLevelCompletionsCount(requiredLevelName) < 1) {
                             Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
-                            dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, false, true);
+                            dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, true);
                         }
                     }
                 }

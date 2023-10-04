@@ -269,6 +269,9 @@ public class LevelListener implements Listener {
                     PracticeHandler.resetDataOnly(playerStats);
                     playerStats.resetLevel();
 
+                    if (playerStats.isAttemptingRankup())
+                        Parkour.getRanksManager().leftRankup(playerStats);
+
                     playerStats.clearPotionEffects();
 
                     player.teleport(lobby);

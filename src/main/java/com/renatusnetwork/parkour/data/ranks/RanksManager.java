@@ -215,9 +215,9 @@ public class RanksManager {
         Parkour.getDatabaseManager().add("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
     }
 
-    public boolean isPastRank(PlayerStats playerStats, Rank current)
+    public boolean isPastOrAtRank(PlayerStats playerStats, Rank current)
     {
-        return playerStats.getPrestiges() != 0 || current.getRankId() < playerStats.getRank().getRankId();
+        return playerStats.getPrestiges() != 0 || current.getRankId() <= playerStats.getRank().getRankId();
     }
 
     public Rank getMaxRank() {

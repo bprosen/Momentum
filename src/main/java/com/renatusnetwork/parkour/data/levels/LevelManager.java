@@ -517,6 +517,9 @@ public class LevelManager {
                     PracticeHandler.resetDataOnly(playerStats);
                     playerStats.resetCurrentCheckpoint();
 
+                    if (playerStats.isAttemptingRankup())
+                        Parkour.getRanksManager().leftRankup(playerStats);
+
                     // toggle off elytra armor
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
                 }
@@ -533,7 +536,7 @@ public class LevelManager {
         // since ascendance is a free-roam map...
         if (!level.isAscendanceLevel())
         {
-            if (!level.isRankUpLevel())
+            if (!(level.needsRank() && Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank())))
             {
                 if (!level.isEventLevel())
                 {
@@ -564,7 +567,7 @@ public class LevelManager {
             }
             else
             {
-                player.sendMessage(Utils.translate("&cYou cannot teleport to a Rankup level"));
+                player.sendMessage(Utils.translate("&cYou cannot teleport to a level you do not have the rank to"));
             }
         }
         else

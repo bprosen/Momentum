@@ -305,15 +305,9 @@ public class MenuItemFormatter {
             if (level.isNewLevel())
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
-            if (level.needsRank())
-            {
-                if (!Parkour.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))
-                {
-                    // show whats required
-                    Rank nextRank = Parkour.getRanksManager().getNextRank(level.getRequiredRank());
-                    itemLore.add(Utils.translate("&cRequires rank " + nextRank.getRankTitle()));
-                }
-            }
+            if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))
+                itemLore.add(Utils.translate("&cRequires rank " + level.getRequiredRank().getRankTitle()));
+
             BankManager bankManager = Parkour.getBankManager();
 
             // show they need to buy it and it is not the jackpot level if it is running

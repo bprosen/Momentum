@@ -405,6 +405,9 @@ public class PlotCMD implements CommandExecutor {
             playerStats.resetCurrentCheckpoint();
             playerStats.resetLevel();
             PracticeHandler.resetDataOnly(playerStats);
+
+            if (playerStats.isAttemptingRankup())
+                Parkour.getRanksManager().leftRankup(playerStats);
         }
     }
 

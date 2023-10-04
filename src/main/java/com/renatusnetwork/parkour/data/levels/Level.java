@@ -457,9 +457,18 @@ public class Level {
             ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
             price = LevelsYAML.getPrice(name);
             newLevel = LevelsYAML.getNewLevel(name);
-            requiredRank = LevelsYAML.getRankRequired(name);
             difficulty = LevelsYAML.getDifficulty(name);
             cooldown = LevelsYAML.hasCooldown(name);
+
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    // special case where it needs to be run 1 tick later since the rank manager isnt registered yet, it will be if we skip this tick.
+                    requiredRank = LevelsYAML.getRankRequired(name);
+                }
+            }.runTaskLater(Parkour.getPlugin(), 1);
         }
     }
 

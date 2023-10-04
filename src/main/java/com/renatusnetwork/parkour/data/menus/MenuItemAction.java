@@ -158,7 +158,7 @@ public class MenuItemAction {
             if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName())) ||
                 (!level.getRequiredLevels().isEmpty() && !level.hasRequiredLevels(playerStats)) ||
                 (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermissionNode())) ||
-                (level.needsRank() && !Parkour.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))) &&
+                (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))) &&
                 !level.isFeaturedLevel() && !level.isRankUpLevel())
                 addLevel = false;
 
@@ -545,9 +545,9 @@ public class MenuItemAction {
                                 if (level.needsRank()) {
                                     Rank rank = level.getRequiredRank();
 
-                                    if (!Parkour.getRanksManager().isPastRank(playerStats, rank)) {
-                                        Rank nextRank = Parkour.getRanksManager().getNextRank(rank);
-                                        player.sendMessage(Utils.translate("&cYou need to be rank " + nextRank.getRankTitle() + " &cto play this level"));
+                                    if (!Parkour.getRanksManager().isPastOrAtRank(playerStats, rank))
+                                    {
+                                        player.sendMessage(Utils.translate("&cYou need to be rank " + rank.getRankTitle() + " &cto play this level"));
                                         return;
                                     }
                                 }

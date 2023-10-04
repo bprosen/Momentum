@@ -430,12 +430,8 @@ public class LevelCMD implements CommandExecutor {
                     if (levelManager.exists(levelName)) {
 
                         Level level = levelManager.get(levelName);
-                        boolean isRankUpLevel = false;
 
-                        if (level.isRankUpLevel())
-                            isRankUpLevel = true;
-
-                        LevelHandler.dolevelCompletion(playerStats, target, level, levelName, isRankUpLevel, true);
+                        LevelHandler.dolevelCompletion(playerStats, target, level, levelName, true);
                         sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + " &7Completion for &a" + target.getName()));
                     } else {
                         sender.sendMessage(Utils.translate("&cLevel &4" + levelName + " &cdoes not exist"));

@@ -212,7 +212,7 @@ public class RankCMD implements CommandExecutor {
                 return Utils.translate("&c/ranks create <rankName> <rankUpPrice> <rankTitle>  &7Create a rank (can use spaces in <rankTitle>)");
             case "remove":
                 return Utils.translate("&c/ranks remove <rankName>  &7Removes a rank from config/database and rank players down in the rank");
-            case "set":
+            case "setrank":
                 return Utils.translate("&c/ranks setrank <player> <rankName>  &7Sets players rank");
             case "setprestiges":
                 return Utils.translate("&c/ranks setprestiges <player> <amount>  &7Sets players prestiges from database and cache");
