@@ -220,7 +220,7 @@ public class Scoreboard {
                     board.add(Utils.translate("&7"));
 
                     // change the entire scoreboard if it is a rankup level
-                    if (level.isRankUpLevel()) {
+                    if (level.isRankUpLevel() && playerStats.isAttemptingRankup()) {
                         Rank rank = playerStats.getRank();
 
                         // null check their rank to avoid NPE and same with next rank

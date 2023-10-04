@@ -188,6 +188,12 @@ public class StatsDB {
 
                 playerStats.setInfiniteType(InfiniteType.valueOf(playerResult.get("infinite_type").toUpperCase()));
 
+                int attemptingRankup = Integer.parseInt(playerResult.get("attempting_rankup"));
+                if (attemptingRankup == 0)
+                    playerStats.setAttemptingRankup(false);
+                else
+                    playerStats.setAttemptingRankup(true);
+
                 updateBoughtLevels(playerStats);
             }
         } else {

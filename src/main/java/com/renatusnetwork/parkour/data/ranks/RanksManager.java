@@ -130,10 +130,9 @@ public class RanksManager {
         }
     }
 
-    public void doRankUp(Player player) {
+    public void doRankUp(Player player)
+    {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-        Utils.teleportToSpawn(playerStats);
 
         int newId = playerStats.getRank().getRankId() + 1;
         Rank rank = get(newId);
@@ -202,6 +201,18 @@ public class RanksManager {
             rank = get(current.getRankId() + 1);
 
         return rank;
+    }
+
+    public void enteredRankup(PlayerStats playerStats)
+    {
+        playerStats.setAttemptingRankup(true);
+        Parkour.getDatabaseManager().add("UPDATE players SET attempting_rankup=1 WHERE uuid='" + playerStats.getUUID() + "'");
+    }
+
+    public void leftRankup(PlayerStats playerStats)
+    {
+        playerStats.setAttemptingRankup(false);
+        Parkour.getDatabaseManager().add("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
     }
 
     public boolean isPastRank(PlayerStats playerStats, Rank current)

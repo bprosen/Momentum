@@ -48,8 +48,8 @@ public class LevelHandler {
                     if (level.getMaxCompletions() == -1 || playerLevelCompletions < level.getMaxCompletions()) {
                         // if it is a race completion, end it
                         if (!playerStats.inRace()) {
-                            // if level is not a rankup level, continue
-                            if (!level.isRankUpLevel()) {
+                            // if player was not attempting a rankup level, continue
+                            if (!(level.isRankUpLevel() && playerStats.isAttemptingRankup())) {
                                 // if level is not an event level, it is guaranteed normal completion
                                 if (!level.isEventLevel())
                                     dolevelCompletion(playerStats, player, level, levelName, false, false);
@@ -134,204 +134,201 @@ public class LevelHandler {
 
             if (rankUpLevel)
                 Parkour.getRanksManager().doRankUp(player);
-            else
-                // only broadcast and give xp/coins if it is not a forced completion
-                if (!forcedCompletion) {
 
-                    BankManager bankManager = Parkour.getBankManager();
+            // only broadcast and give xp/coins if it is not a forced completion
+            if (!forcedCompletion) {
 
-                    // give higher reward if prestiged
-                    int prestiges = playerStats.getPrestiges();
-                    int reward = event.getReward();
+                BankManager bankManager = Parkour.getBankManager();
 
-                    // level booster
-                    if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                // give higher reward if prestiged
+                int prestiges = playerStats.getPrestiges();
+                int reward = event.getReward();
+
+                // level booster
+                if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                {
+                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                    reward *= booster.getMultiplier();
+                }
+
+                // if featured, set reward!
+                if (level.isFeaturedLevel())
+                    reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
+                // jackpot section
+                else if (bankManager.isJackpotRunning() &&
+                        bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                        !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
+                {
+                    Jackpot jackpot = bankManager.getJackpot();
+
+                    JackpotRewardEvent jackpotEvent = new JackpotRewardEvent(playerStats, jackpot.getLevel(), jackpot.getBonus());
+                    Bukkit.getPluginManager().callEvent(jackpotEvent);
+
+                    if (!jackpotEvent.isCancelled())
                     {
-                        Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
-                        reward *= booster.getMultiplier();
-                    }
+                        int bonus = jackpotEvent.getBonus();
 
-                    // if featured, set reward!
-                    if (level.isFeaturedLevel())
-                        reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
-                    // jackpot section
-                    else if (bankManager.isJackpotRunning() &&
-                            bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                            !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
-                    {
-                        Jackpot jackpot = bankManager.getJackpot();
-
-                        JackpotRewardEvent jackpotEvent = new JackpotRewardEvent(playerStats, jackpot.getLevel(), jackpot.getBonus());
-                        Bukkit.getPluginManager().callEvent(jackpotEvent);
-
-                        if (!jackpotEvent.isCancelled())
+                        // jackpot booster
+                        if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
                         {
-                            int bonus = jackpotEvent.getBonus();
-
-                            // jackpot booster
-                            if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
-                            {
-                                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
-                                bonus *= booster.getMultiplier();
-                            }
-
-                            // add coins and add to completed, as well as broadcast completion
-                            jackpot.addCompleted(player.getName());
-                            jackpot.broadcastCompletion(player);
-                            reward += bonus;
+                            Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                            bonus *= booster.getMultiplier();
                         }
+
+                        // add coins and add to completed, as well as broadcast completion
+                        jackpot.addCompleted(player.getName());
+                        jackpot.broadcastCompletion(player);
+                        reward += bonus;
                     }
-                    // prestige/cooldown section
-                    else
+                }
+                // prestige/cooldown section
+                else
+                {
+                    if (prestiges > 0 && level.getReward() > 0)
+                        reward *= playerStats.getPrestigeMultiplier();
+
+                    // set cooldown modifier last!
+                    if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
+                        reward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+                }
+
+                Parkour.getStatsManager().addCoins(playerStats, reward);
+
+                String completionMessage = Utils.translate(Parkour.getSettingsManager().levels_message_completion);
+
+                completionMessage = completionMessage.replace("%title%", level.getFormattedTitle());
+                completionMessage = completionMessage.replace("%reward%", Utils.translate(Utils.getCoinFormat(level.getReward(), reward)));
+                completionMessage = completionMessage.replace("%completions%",
+                        Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(levelName)));
+
+                if (playerStats.inFailMode())
+                    completionMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
+
+                if (elapsedTime > 0L && elapsedTime < 8388607L)
+                    completionMessage = completionMessage.replace("%time%", time);
+                else
+                    completionMessage = completionMessage.replace("%time%", "-");
+
+                player.sendMessage(completionMessage);
+                player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                        + ChatColor.stripColor(level.getFormattedTitle())));
+
+                // broadcast completed if it the featured level
+                if (level.isFeaturedLevel()) {
+                    Bukkit.broadcastMessage(Utils.translate(
+                            "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
+                    ));
+                } else if (level.getBroadcastCompletion()) {
+                    String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
+
+                    broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
+                    broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
+
+                    Bukkit.broadcastMessage(broadcastMessage);
+                }
+
+                if (playerStats.getClan() != null) {
+                    beforeClanLevel = playerStats.getClan().getLevel();
+
+                    // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
+                    if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
+                        Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), playerStats, reward);
+
+                    // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
+                    if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
                     {
-                        if (prestiges > 0 && level.getReward() > 0)
-                            reward *= playerStats.getPrestigeMultiplier();
+                        // async for database querying
+                        int finalReward = reward;
 
-                        // set cooldown modifier last!
-                        if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
-                            reward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
-                    }
-
-                    Parkour.getStatsManager().addCoins(playerStats, reward);
-
-                    String completionMessage = Utils.translate(Parkour.getSettingsManager().levels_message_completion);
-
-                    completionMessage = completionMessage.replace("%title%", level.getFormattedTitle());
-                    completionMessage = completionMessage.replace("%reward%", Utils.translate(Utils.getCoinFormat(level.getReward(), reward)));
-                    completionMessage = completionMessage.replace("%completions%",
-                            Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(levelName)));
-
-                    if (playerStats.inFailMode())
-                        completionMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
-
-                    if (elapsedTime > 0L && elapsedTime < 8388607L)
-                        completionMessage = completionMessage.replace("%time%", time);
-                    else
-                        completionMessage = completionMessage.replace("%time%", "-");
-
-                    player.sendMessage(completionMessage);
-                    player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
-                            + ChatColor.stripColor(level.getFormattedTitle())));
-
-                    // broadcast completed if it the featured level
-                    if (level.isFeaturedLevel()) {
-                        Bukkit.broadcastMessage(Utils.translate(
-                                "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
-                        ));
-                    } else if (level.getBroadcastCompletion()) {
-                        String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
-
-                        broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
-                        broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
-
-                        Bukkit.broadcastMessage(broadcastMessage);
-                    }
-
-                    if (playerStats.getClan() != null) {
-                        beforeClanLevel = playerStats.getClan().getLevel();
-
-                        // do clan xp algorithm if they are in clan and level has higher reward than configurable amount
-                        if (level.getReward() > Parkour.getSettingsManager().clan_calc_level_reward_needed)
-                            Parkour.getClansManager().doClanXPCalc(playerStats.getClan(), playerStats, reward);
-
-                        // do clan reward split algorithm if they are in clan and level has higher reward than configurable amount
-                        if (level.getReward() > Parkour.getSettingsManager().clan_split_reward_min_needed)
+                        new BukkitRunnable()
                         {
-                            // async for database querying
-                            int finalReward = reward;
-
-                            new BukkitRunnable()
+                            @Override
+                            public void run()
                             {
-                                @Override
-                                public void run()
-                                {
-                                    Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level, finalReward);
-                                }
-                            }.runTaskAsynchronously(Parkour.getPlugin());
-                        }
-                    }
-
-                    if (!playerStats.isGrinding())
-                        Parkour.getStatsManager().toggleOffElytra(playerStats);
-
-                    Parkour.getPluginLogger().info(playerStats.getPlayerName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
-
-                    // reset cp and saves before teleport
-                    Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
-                    Parkour.getSavesManager().removeSave(playerStats, level); // safety removal (likely will never actually execute)
-
-                    // clear potion effects
-                    playerStats.clearPotionEffects();
-
-                    // send title and sound if not rankup level
-                    if (!rankUpLevel) {
-                        String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
-                        if (elapsedTime > 0L && elapsedTime < 8388607L)
-                            titleMessage += Utils.translate("&7 in &2" + time);
-
-                        String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
-                                + ChatColor.stripColor(level.getFormattedTitle()));
-
-                        TitleAPI.sendTitle(
-                                player, 10, 60, 10,
-                                titleMessage,
-                                subTitleMessage
-                        );
-
-                        // play sound if they did not level up their clan
-                        if (!(beforeClanLevel > -1 && beforeClanLevel < playerStats.getClan().getLevel()))
-                            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 0f);
-                    }
-
-                    Location locationTo = level.getRespawnLocation();
-
-                    // If not rank up level or has a start location and is grinding, set to start loc
-                    if (!rankUpLevel && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
-                    {
-                        locationTo = level.getStartLocation();
-                        playerStats.resetFails(); // reset fails in grinding
-                    }
-
-                    // add cooldown
-                    levelManager.addLevelCooldown(playerStats.getPlayerName(), level);
-
-                    ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
-                    Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
-
-                    // if area they are teleporting to is empty
-                    // if not empty, make sure it is a level
-                    // if not a level (like spawn), reset level
-                    if (getToRegion == null)
-                        playerStats.resetLevel();
-                    else if (newLevel != null) {
-                        playerStats.setLevel(newLevel);
-
-                        // apply potion effects if any exist
-                        if (!newLevel.getPotionEffects().isEmpty())
-                            for (PotionEffect potionEffect : newLevel.getPotionEffects())
-                                player.addPotionEffect(potionEffect);
-                    } else
-                        playerStats.resetLevel();
-
-                    // teleport
-                    player.teleport(locationTo);
-                    playerStats.disableLevelStartTime();
-
-                } else {
-                    player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
-
-                    if (!level.hasRequiredLevels(playerStats) && !level.getRequiredLevels().isEmpty()) {
-
-                        for (String requiredLevelName : level.getRequiredLevels()) {
-
-                            if (playerStats.getLevelCompletionsCount(requiredLevelName) < 1) {
-                                Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
-
-                                dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, false, true);
+                                Parkour.getClansManager().doSplitClanReward(playerStats.getClan(), player, level, finalReward);
                             }
+                        }.runTaskAsynchronously(Parkour.getPlugin());
+                    }
+                }
+
+                if (!playerStats.isGrinding())
+                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+
+                Parkour.getPluginLogger().info(playerStats.getPlayerName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
+
+                // reset cp and saves before teleport
+                Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
+                Parkour.getSavesManager().removeSave(playerStats, level); // safety removal (likely will never actually execute)
+
+                // clear potion effects
+                playerStats.clearPotionEffects();
+
+                String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
+                if (elapsedTime > 0L && elapsedTime < 8388607L)
+                    titleMessage += Utils.translate("&7 in &2" + time);
+
+                String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
+                        + ChatColor.stripColor(level.getFormattedTitle()));
+
+                TitleAPI.sendTitle(
+                        player, 10, 60, 10,
+                        titleMessage,
+                        subTitleMessage
+                );
+
+                // play sound if they did not level up their clan
+                if (!(beforeClanLevel > -1 && beforeClanLevel < playerStats.getClan().getLevel()))
+                    player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 0f);
+
+                Location locationTo = level.getRespawnLocation();
+
+                // If not rank up level or has a start location and is grinding, set to start loc
+                if (level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
+                {
+                    locationTo = level.getStartLocation();
+                    playerStats.resetFails(); // reset fails in grinding
+                }
+
+                // add cooldown
+                levelManager.addLevelCooldown(playerStats.getPlayerName(), level);
+
+                ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
+                Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
+
+                // if area they are teleporting to is empty
+                // if not empty, make sure it is a level
+                // if not a level (like spawn), reset level
+                if (getToRegion == null)
+                    playerStats.resetLevel();
+                else if (newLevel != null) {
+                    playerStats.setLevel(newLevel);
+
+                    // apply potion effects if any exist
+                    if (!newLevel.getPotionEffects().isEmpty())
+                        for (PotionEffect potionEffect : newLevel.getPotionEffects())
+                            player.addPotionEffect(potionEffect);
+                } else
+                    playerStats.resetLevel();
+
+                // teleport
+                player.teleport(locationTo);
+                playerStats.disableLevelStartTime();
+
+            } else {
+                player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
+
+                if (!level.hasRequiredLevels(playerStats) && !level.getRequiredLevels().isEmpty()) {
+
+                    for (String requiredLevelName : level.getRequiredLevels()) {
+
+                        if (playerStats.getLevelCompletionsCount(requiredLevelName) < 1) {
+                            Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
+
+                            dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, false, true);
                         }
                     }
                 }
+            }
         }
     }
 

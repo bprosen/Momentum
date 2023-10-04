@@ -103,7 +103,7 @@ public class MenuItemAction {
             performInfiniteModeChange(playerStats, menuItem);
         else if (itemType.equals("type"))
         {
-            // certain conditions of types for rankup
+            // certain conditions
             String typeValue = menuItem.getTypeValue();
             if (typeValue.equals("submit-plot"))
                 performPlotSubmission(player);
@@ -158,7 +158,8 @@ public class MenuItemAction {
             if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName())) ||
                 (!level.getRequiredLevels().isEmpty() && !level.hasRequiredLevels(playerStats)) ||
                 (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermissionNode())) ||
-                (level.needsRank() && !Parkour.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))) && !level.isFeaturedLevel())
+                (level.needsRank() && !Parkour.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))) &&
+                !level.isFeaturedLevel() && !level.isRankUpLevel())
                 addLevel = false;
 
             // make sure we do not add the level they are already in
@@ -546,7 +547,7 @@ public class MenuItemAction {
 
                                     if (!Parkour.getRanksManager().isPastRank(playerStats, rank)) {
                                         Rank nextRank = Parkour.getRanksManager().getNextRank(rank);
-                                        player.sendMessage(Utils.translate("&cYou need to be " + nextRank.getRankTitle() + " &cto play this level"));
+                                        player.sendMessage(Utils.translate("&cYou need to be rank " + nextRank.getRankTitle() + " &cto play this level"));
                                         return;
                                     }
                                 }
@@ -560,6 +561,15 @@ public class MenuItemAction {
 
                                 // if in practice mode
                                 PracticeHandler.resetDataOnly(playerStats);
+
+                                // if currently attempting, reset
+                                if (playerStats.isAttemptingRankup())
+                                    Parkour.getRanksManager().leftRankup(playerStats);
+
+                                Level rankupLevel = playerStats.getRank().getRankupLevel();
+                                // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
+                                if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
+                                    Parkour.getRanksManager().enteredRankup(playerStats);
 
                                 Location save = playerStats.getSave(level.getName());
                                 Location spawn = playerStats.getCheckpoint(level.getName());

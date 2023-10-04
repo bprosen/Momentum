@@ -311,7 +311,7 @@ public class MenuItemFormatter {
                 {
                     // show whats required
                     Rank nextRank = Parkour.getRanksManager().getNextRank(level.getRequiredRank());
-                    itemLore.add(Utils.translate("&cRequires " + nextRank.getRankTitle()));
+                    itemLore.add(Utils.translate("&cRequires rank " + nextRank.getRankTitle()));
                 }
             }
             BankManager bankManager = Parkour.getBankManager();

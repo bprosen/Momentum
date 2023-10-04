@@ -59,6 +59,7 @@ public class PlayerStats {
     private boolean inBlackmarket = false;
     private boolean failsToggled;
     private int fails;
+    private boolean attemptingRankup;
 
     private FastBoard board;
 
@@ -362,6 +363,9 @@ public class PlayerStats {
 
     public void setPrestigeMultiplier(float prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
 
+    public void setAttemptingRankup(boolean attemptingRankup) { this.attemptingRankup = attemptingRankup; }
+
+    public boolean isAttemptingRankup() { return attemptingRankup; }
     //
     // Fails Section
     //

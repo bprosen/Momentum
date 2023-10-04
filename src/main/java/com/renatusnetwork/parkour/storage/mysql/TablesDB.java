@@ -99,6 +99,7 @@ public class TablesDB {
                 "infinite_block VARCHAR(30) DEFAULT '' NOT NULL, " +
                 "fail_mode BIT DEFAULT 1, " +
                 "infinite_type VARCHAR(10) DEFAULT 'classic' NOT NULL, " +
+                "attempting_rankup BIT DEFAULT 0, " +
                 "PRIMARY KEY (player_id)" +
                 ")";
 
