@@ -217,7 +217,8 @@ public class RanksManager {
 
     public boolean isPastOrAtRank(PlayerStats playerStats, Rank current)
     {
-        return playerStats.getPrestiges() != 0 || current.getRankId() <= playerStats.getRank().getRankId();
+        return current != null && playerStats != null && playerStats.getRank() != null &&
+               (playerStats.getPrestiges() != 0 || current.getRankId() <= playerStats.getRank().getRankId());
     }
 
     public Rank getMaxRank() {

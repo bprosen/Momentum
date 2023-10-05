@@ -77,7 +77,11 @@ public class MenuItemAction {
             if (menuItem.getTypeValue().equals("featured"))
                 performLevelTeleport(playerStats, player, Parkour.getLevelManager().getFeaturedLevel());
             else if (menuItem.getTypeValue().equals("rankup"))
-                performLevelTeleport(playerStats, player, playerStats.getRank().getRankupLevel());
+            {
+                // only allow this if they are not at the last rank!
+                if (!playerStats.isLastRank())
+                    performLevelTeleport(playerStats, player, playerStats.getRank().getRankupLevel());
+            }
             else if (menuItem.getTypeValue().equals("random"))
                 performRandomLevel(playerStats);
             else
@@ -88,15 +92,7 @@ public class MenuItemAction {
         else if (itemType.equals("bank"))
             performBankItem(playerStats, menuItem);
         else if (itemType.equals("open"))
-        {
-            if (menuItem.getTypeValue().equals("rankup") && playerStats.isLastRank())
-            {
-                player.sendMessage(Utils.translate("&cYou are at last rank! Use /prestige to reset!"));
-                player.closeInventory();
-            }
-            else
-                performOpenItem(player, menuItem);
-        }
+            performOpenItem(player, menuItem);
         else if (itemType.equals("rate"))
             performLevelRate(player, menuItem);
         else if (itemType.equals("infinite-mode"))

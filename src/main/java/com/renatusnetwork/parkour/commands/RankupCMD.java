@@ -21,14 +21,10 @@ public class RankupCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
         MenuManager menuManager = Parkour.getMenuManager();
 
-        if (a.length == 0) {
-            if (playerStats.isLastRank()) {
-                player.sendMessage(Utils.translate("&cYou are at last rank! Use /prestige to reset!"));
-                return true;
-            }
+        if (a.length == 0)
+        {
 
             String menuName = "rankup";
 

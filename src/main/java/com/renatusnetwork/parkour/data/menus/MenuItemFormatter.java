@@ -18,6 +18,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -275,13 +276,33 @@ public class MenuItemFormatter {
 
         if (playerStats.getRank() != null)
         {
-            String levelName = RanksYAML.getRankUpLevel(playerStats.getRank().getRankName());
-
-            if (levelName != null)
+            if (playerStats.isLastRank())
             {
-                Level level = Parkour.getLevelManager().get(levelName);
+                // override itemstack
+                item = new ItemStack(Material.EXP_BOTTLE);
 
-                return createLevelItem(playerStats, level, menuItem, item);
+                // make simple item to tell them they need to do /prestige!
+                ItemMeta itemMeta = item.getItemMeta();
+                itemMeta.setDisplayName(Utils.translate("&6&lPrestige"));
+                itemMeta.setLore(new ArrayList<String>() {{
+                    add(Utils.translate("&cYou are now at the max rank"));
+                    add(Utils.translate("&cPrestige by doing &4/prestige &cin chat"));
+                }});
+
+                item.setItemMeta(itemMeta);
+
+                return item;
+            }
+            else
+            {
+                String levelName = RanksYAML.getRankUpLevel(playerStats.getRank().getRankName());
+
+                if (levelName != null)
+                {
+                    Level level = Parkour.getLevelManager().get(levelName);
+
+                    return createLevelItem(playerStats, level, menuItem, item);
+                }
             }
         }
         return null;
