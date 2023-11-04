@@ -69,7 +69,7 @@ public class RageQuitCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&7You purchased &c/ragequit&7! Type it again to use it"));
                     } else {
                         player.sendMessage(Utils.translate("&7Are you sure you want to buy the &c/ragequit &7command?" +
-                                " Type &c/ragequit &7again to buy it for &6$" + Utils.formatNumber(price)));
+                                " Type &c/ragequit &7again to buy it for &6" + Utils.formatNumber(price) + " &eCoins"));
 
                         confirmMap.put(player.getName(), new BukkitRunnable() {
                             public void run() {
@@ -85,7 +85,7 @@ public class RageQuitCMD implements CommandExecutor {
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou do not have enough coins buy the &c/ragequit &7command" +
-                            " &6($" + Utils.formatNumber(price - balance) + " more)"));
+                            " &6(need " + Utils.formatNumber(price - balance) + " &eCoins)"));
                 }
             }
         }

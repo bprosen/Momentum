@@ -396,9 +396,9 @@ public class RaceManager {
 
         if (bet) {
             opponentString = Utils.translate(
-                    "&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &4$" + Utils.formatNumber(betAmount) + "&7! &a&nClick here to accept the race&r"
+                    "&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &6" + Utils.formatNumber(betAmount) + " &eCoins&7! &a&nClick here to accept the race&r"
             );
-            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &4$" + Utils.formatNumber(betAmount));
+            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &6" + Utils.formatNumber(betAmount) + " &eCoins");
         } else {
             opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request&7! &a&nClick here to accept the race&r");
             senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request");
@@ -500,14 +500,14 @@ public class RaceManager {
             double senderBalance = player2.getCoins();
             if (accepterBalance < betAmount) {
                 player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                        " Your Balance &4$" + Utils.formatNumber(senderBalance)));
+                        " Your Balance &6" + Utils.formatNumber(senderBalance) + " &eCoins"));
                 removeRequest(raceRequest);
                 return;
             }
 
             if (senderBalance < betAmount) {
                 player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayerName() + " &7does not have enough to do this bet" +
-                        " - &cTheir Balance &4$" + Utils.formatNumber(senderBalance)));
+                        " - &cTheir Balance &6" + Utils.formatNumber(senderBalance) + " &eCoins"));
                 removeRequest(raceRequest);
                 return;
             }

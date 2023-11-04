@@ -117,19 +117,19 @@ public class RaceCMD implements CommandExecutor {
 
         if (bet && senderBalance < betAmount) {
             player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                    " Your Balance &4$" + senderBalance));
+                    " Your Balance &6" + Utils.formatNumber(senderBalance) + " &eCoins"));
             return false;
         }
 
         if (bet && victimBalance < betAmount) {
             player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayer().getName() + " &7does not have enough to do this bet" +
-                    " - &cTheir Balance &4$" + victimBalance));
+                    " - &cTheir Balance &6" + Utils.formatNumber(victimBalance) + " &eCoins"));
             return false;
         }
 
         double minBetAmount = Parkour.getSettingsManager().min_race_bet_amount;
         if (bet && betAmount < minBetAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot bet less than &4$" + minBetAmount));
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot bet less than &6" + Utils.formatNumber(minBetAmount) + " &eCoins"));
             return false;
         }
 
