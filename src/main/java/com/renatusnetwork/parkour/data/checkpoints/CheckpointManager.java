@@ -16,7 +16,7 @@ public class CheckpointManager {
             playerStats.removeCheckpoint(level.getName());
             playerStats.resetCurrentCheckpoint();
 
-            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + level.getName() + "'" +
+            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + level.getName() + "'" +
                     " AND player_name='" + playerStats.getPlayerName() + "'");
         }
     }

@@ -98,8 +98,7 @@ public class PlotsDB {
             for (String playerString : trustedPlayers)
                 joinedString += ":" + playerString;
 
-            Parkour.getDatabaseManager().run("UPDATE plots SET trusted_players='" + joinedString
-                                             + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players='?' WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
         }
     }
 
@@ -120,13 +119,12 @@ public class PlotsDB {
                     joinedString += playerString + ":";
             }
 
-            Parkour.getDatabaseManager().run("UPDATE plots SET trusted_players='" + joinedString
-                    + "' WHERE uuid='" + player.getUniqueId().toString() + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players='?' WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
         }
     }
 
     public static void addPlot(Player player, Location loc) {
-        Parkour.getDatabaseManager().run("INSERT INTO plots " +
+        Parkour.getDatabaseManager().runQuery("INSERT INTO plots " +
                 "(uuid, player_name, trusted_players, center_x, center_z, submitted)" +
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
@@ -140,7 +138,7 @@ public class PlotsDB {
     }
 
     public static void removePlot(String UUID) {
-        Parkour.getDatabaseManager().add("DELETE FROM plots " +
+        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM plots " +
                 "WHERE uuid='" + UUID + "'");
     }
 
@@ -201,14 +199,14 @@ public class PlotsDB {
     public static void toggleSubmitted(String UUID) {
         if (hasPlot(UUID)) {
             boolean currentlySubmitted = isSubmitted(UUID);
-            Parkour.getDatabaseManager().add("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE UUID='" + UUID + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE UUID='" + UUID + "'");
         }
     }
 
     public static void toggleSubmittedFromName(String playerName) {
         if (hasPlotFromName(playerName)) {
             boolean currentlySubmitted = isSubmittedFromName(playerName);
-            Parkour.getDatabaseManager().add("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name='" + playerName + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name='?'", playerName);
         }
     }
 
@@ -218,6 +216,6 @@ public class PlotsDB {
                 "WHERE UUID='" + UUID + "'"
                 ;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 }

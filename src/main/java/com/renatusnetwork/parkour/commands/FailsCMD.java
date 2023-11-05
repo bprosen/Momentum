@@ -52,7 +52,7 @@ public class FailsCMD implements CommandExecutor
                     failBit = 1;
 
                 // update in db
-                Parkour.getDatabaseManager().add("UPDATE players SET fail_mode=" + failBit + " WHERE uuid='" + player.getUniqueId() + "'");
+                Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET fail_mode=" + failBit + " WHERE uuid='" + player.getUniqueId() + "'");
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
             {

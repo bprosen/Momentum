@@ -48,7 +48,7 @@ public class SavesDB
     public static void addSave(PlayerStats playerStats, String levelName, Location location)
     {
         // add to async queue
-        Parkour.getDatabaseManager().add("INSERT INTO saves " +
+        Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO saves " +
                 "(uuid, player_name, level_name, world, x, y, z, yaw, pitch)" +
                 " VALUES ('" +
                 playerStats.getUUID() + "','" +
@@ -66,6 +66,6 @@ public class SavesDB
 
     public static void removeSave(PlayerStats playerStats, String levelName)
     {
-        Parkour.getDatabaseManager().add("DELETE FROM saves WHERE uuid='" + playerStats.getUUID() + "' AND level_name='" + levelName + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM saves WHERE uuid='" + playerStats.getUUID() + "' AND level_name='" + levelName + "'");
     }
 }

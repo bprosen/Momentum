@@ -527,10 +527,10 @@ public class LevelManager {
             LocationsYAML.remove(levelName + "-spawn");
             LocationsYAML.remove(levelName + "-completion");
             // remove from levels, checkpoints, ratings and completions to clean up database
-            Parkour.getDatabaseManager().add("DELETE FROM levels WHERE level_name='" + levelName + "'");
-            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");
-            Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" + level.getID());
-            Parkour.getDatabaseManager().add("DELETE FROM ratings WHERE level_id=" + level.getID());
+            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM completions WHERE level_id=" + level.getID());
+            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM ratings WHERE level_id=" + level.getID());
 
             // loop through and reset if applicable
             for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())

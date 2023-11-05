@@ -202,7 +202,7 @@ public class EventManager {
 
                 // update wins
                 playerStats.addEventWin();
-                Parkour.getDatabaseManager().add("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
+                Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
             }
 
             if (forceEnded)

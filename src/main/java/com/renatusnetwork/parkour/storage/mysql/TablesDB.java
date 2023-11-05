@@ -86,7 +86,7 @@ public class TablesDB {
                 "PRIMARY KEY (player_id)" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createLevels(DatabaseManager database) {
@@ -98,7 +98,7 @@ public class TablesDB {
                 "PRIMARY KEY (level_id)" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createPerks(DatabaseManager database) {
@@ -108,7 +108,7 @@ public class TablesDB {
                 "PRIMARY KEY (perk_id)" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createClans(DatabaseManager database) {
@@ -122,7 +122,7 @@ public class TablesDB {
                 "PRIMARY KEY (clan_id)" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createLedger(DatabaseManager database) {
@@ -132,7 +132,7 @@ public class TablesDB {
                 "date TIMESTAMP NOT NULL" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createCompletions(DatabaseManager database) {
@@ -143,7 +143,7 @@ public class TablesDB {
                 "completion_date TIMESTAMP NOT NULL" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createPlots(DatabaseManager database) {
@@ -157,7 +157,7 @@ public class TablesDB {
                 "submitted VARCHAR(5) NOT NULL, " +
                 "PRIMARY KEY (plot_id)" +
                 ")";
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createCheckpoints(DatabaseManager database) {
@@ -171,7 +171,7 @@ public class TablesDB {
                 "z INT NOT NULL" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createRatings(DatabaseManager database) {
@@ -182,7 +182,7 @@ public class TablesDB {
                 "rating TINYINT NOT NULL" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createPurchasedLevels(DatabaseManager database)
@@ -192,7 +192,7 @@ public class TablesDB {
                 "player_name VARCHAR(16) NOT NULL, " +
                 "level_name VARCHAR(30) NOT NULL)";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createSaves(DatabaseManager database)
@@ -209,6 +209,6 @@ public class TablesDB {
                 "pitch FLOAT NOT NULL" +
                 ")";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 }

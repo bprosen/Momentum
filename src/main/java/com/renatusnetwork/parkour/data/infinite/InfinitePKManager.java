@@ -239,8 +239,9 @@ public class InfinitePKManager {
         if (isLBPosition(playerName))
             getLeaderboardPosition(playerName).setScore(score);
 
-        Parkour.getDatabaseManager().run(
-                "UPDATE players SET infinitepk_score=" + score + " WHERE player_name='" + playerName + "'"
+        Parkour.getDatabaseManager().runQuery(
+                "UPDATE players SET infinitepk_score=? WHERE player_name='?'",
+                score, playerName
         );
     }
 

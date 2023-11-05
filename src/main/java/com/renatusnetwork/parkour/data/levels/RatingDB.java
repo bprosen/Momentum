@@ -122,35 +122,6 @@ public class RatingDB {
         return hasRated;
     }
 
-    public static int getPlayerTotalRatings(String UUID, int levelID) {
-        int total = 0;
-
-        if (hasRatedLevel(UUID, levelID)) {
-            List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
-                    "ratings",
-                    "level_id",
-                    " WHERE uuid='" + UUID + "' AND level_id=" + levelID
-            );
-
-            total = ratingResults.size();
-        }
-        return total;
-    }
-
-    public static int getRating(String UUID, int levelID) {
-        if (hasRatedLevel(UUID, levelID)) {
-            List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
-                    "ratings",
-                    "rating",
-                    " WHERE uuid='" + UUID + "' AND level_id=" + levelID
-            );
-
-            for (Map<String, String> ratingResult : ratingResults)
-                return Integer.parseInt(ratingResult.get("rating"));
-        }
-        return 0;
-    }
-
     public static int getRatingFromName(String playerName, int levelID) {
         if (hasRatedLevelFromName(playerName, levelID)) {
             List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
@@ -165,17 +136,6 @@ public class RatingDB {
         return 0;
     }
 
-    public static void removeRating(String UUID, int levelID, float rating, boolean async) {
-        if (hasRatedLevel(UUID, levelID)) {
-            String query = "DELETE FROM ratings WHERE uuid='" + UUID + "' AND level_id=" + levelID + " AND rating=" + rating;
-
-            if (async)
-                Parkour.getDatabaseManager().add(query);
-            else
-                Parkour.getDatabaseManager().run(query);
-        }
-    }
-
     public static void addRating(Player player, Level level, int rating) {
 
         String query = "INSERT INTO ratings " +
@@ -187,6 +147,6 @@ public class RatingDB {
                        rating +
                        ")";
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 }

@@ -170,7 +170,7 @@ public class MenuItemAction {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
 
-                Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
+                Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
                 break;
         }
     }
