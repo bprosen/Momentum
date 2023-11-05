@@ -126,7 +126,7 @@ public class ClansDB {
     public static void resetClanMember(String playerName) {
         Parkour.getDatabaseManager().runAsyncQuery(
                 "UPDATE players SET " +
-                "clan_id=-1 WHERE player_name='?'", playerName);
+                "clan_id=-1 WHERE player_name=?", playerName);
     }
 
     public static void updatePlayerClanID(PlayerStats playerStats) {
@@ -149,7 +149,7 @@ public class ClansDB {
 
     public static void updateClanTag(Clan clan) {
         String query = "UPDATE clans SET " +
-                "clan_tag='?' WHERE clan_id=?";
+                "clan_tag=? WHERE clan_id=?";
 
         Parkour.getDatabaseManager().runAsyncQuery(query, clan.getTag(), clan.getID());
     }

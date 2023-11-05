@@ -36,7 +36,7 @@ public class PlotsDB {
     public static boolean hasPlotFromName(String playerName) {
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 "plots",
-                "*", " WHERE player_name='?'", playerName);
+                "*", " WHERE player_name=?", playerName);
 
         return !results.isEmpty();
     }
@@ -82,7 +82,7 @@ public class PlotsDB {
             for (String playerString : trustedPlayers)
                 joinedString += ":" + playerString;
 
-            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players='?' WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players=? WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
         }
     }
 
@@ -103,7 +103,7 @@ public class PlotsDB {
                     joinedString += playerString + ":";
             }
 
-            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players='?' WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players=? WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
         }
     }
 
@@ -172,7 +172,7 @@ public class PlotsDB {
         if (hasPlotFromName(playerName)) {
             List<Map<String, String>> results = DatabaseQueries.getResults(
                     "plots",
-                    "submitted", " WHERE player_name='?'", playerName);
+                    "submitted", " WHERE player_name=?", playerName);
 
             for (Map<String, String> result : results)
                 submitted = Boolean.parseBoolean(result.get("submitted"));
@@ -190,7 +190,7 @@ public class PlotsDB {
     public static void toggleSubmittedFromName(String playerName) {
         if (hasPlotFromName(playerName)) {
             boolean currentlySubmitted = isSubmittedFromName(playerName);
-            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name='?'", playerName);
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name=?", playerName);
         }
     }
 

@@ -35,11 +35,11 @@ public class RanksDB {
     // from UUID method
     public static void updatePrestiges(UUID uuid, int newAmount) {
 
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET rank_prestiges=? WHERE uuid='?'", newAmount, uuid);
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET rank_prestiges=? WHERE uuid=?", newAmount, uuid);
     }
 
     // from playerName method
     public static void updatePrestiges(String playerName, int newAmount) {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET rank_prestiges=? WHERE player_name='?'", newAmount, playerName);
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET rank_prestiges=? WHERE player_name=?", newAmount, playerName);
     }
 }

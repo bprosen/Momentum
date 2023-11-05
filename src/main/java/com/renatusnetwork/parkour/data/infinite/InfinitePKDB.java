@@ -9,7 +9,7 @@ public class InfinitePKDB {
 
     public static int getScoreFromName(String playerName) {
         List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "infinitepk_score",
-                " WHERE player_name='?'", playerName);
+                " WHERE player_name=?", playerName);
 
         for (Map<String, String> scoreResult : scoreResults)
             return Integer.parseInt(scoreResult.get("infinitepk_score"));
@@ -19,7 +19,7 @@ public class InfinitePKDB {
 
     public static boolean hasScore(String playerName) {
         List<Map<String, String>> scoreResults = DatabaseQueries.getResults("players", "infinitepk_score",
-                " WHERE player_name='?'", playerName);
+                " WHERE player_name=?", playerName);
 
         return !scoreResults.isEmpty();
     }

@@ -81,7 +81,7 @@ public class LevelsDB {
 
     public static void updateName(String levelName, String newLevelName) {
         String query = "UPDATE levels SET " +
-                "level_name='?' WHERE level_name='?'";
+                "level_name=? WHERE level_name=?";
 
         Parkour.getDatabaseManager().runAsyncQuery(query, newLevelName, levelName);
     }
@@ -97,7 +97,7 @@ public class LevelsDB {
     {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
                 "COUNT(*) AS total_completions",
-                " WHERE level_id=" + levelID + " AND completion_date >= '?' AND completion_date < '?'", start, end);
+                " WHERE level_id=" + levelID + " AND completion_date >= ? AND completion_date < ?", start, end);
 
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
