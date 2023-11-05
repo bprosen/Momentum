@@ -339,7 +339,7 @@ public class StatsDB {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
                 "records",
-                " WHERE player_name='" + playerName + "'"
+                " WHERE player_name='?'", playerName
         );
 
         for (Map<String, String> playerResult : playerResults)
@@ -355,7 +355,7 @@ public class StatsDB {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
                 "coins",
-                " WHERE player_name='" + playerName + "'"
+                " WHERE player_name='?'", playerName
         );
 
         for (Map<String, String> playerResult : playerResults)
@@ -385,7 +385,7 @@ public class StatsDB {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
                 "uuid",
-                " WHERE player_name='" + playerName + "'"
+                " WHERE player_name='?'", playerName
         );
 
         return !playerResults.isEmpty();
@@ -398,7 +398,7 @@ public class StatsDB {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "players",
                 "player_id",
-                " WHERE player_name='" + playerName + "'"
+                " WHERE player_name='?'", playerName
         );
 
         for (Map<String, String> playerResult : playerResults)
@@ -468,7 +468,7 @@ public class StatsDB {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 "bought_levels",
                 "uuid",
-                " WHERE player_name='" + playerName + "' AND level_name='" + boughtLevel + "'"
+                " WHERE player_name='?' AND level_name='?'", playerName, boughtLevel
         );
 
         return !playerResults.isEmpty();
@@ -523,7 +523,7 @@ public class StatsDB {
 
     public static int getTotalCompletions(String playerName) {
 
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults("players", "level_completions", " WHERE player_name='" + playerName + "'");
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults("players", "level_completions", " WHERE player_name='?'", playerName);
 
         for (Map<String, String> playerResult : playerResults)
             return Integer.parseInt(playerResult.get("level_completions"));

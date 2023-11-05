@@ -30,15 +30,20 @@ public class DatabaseQueries {
         return null;
     }
 
-    public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL) {
+    public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL, Object... parameters) {
         List<Map<String, String>> finalResults = new ArrayList<>();
 
         String query = "SELECT " + selection + " FROM " + tableName;
-        if (!trailingSQL.equals(""))
+        if (!trailingSQL.isEmpty())
             query = query + " " + trailingSQL;
 
         try {
             PreparedStatement statement = Parkour.getDatabaseManager().get().get().prepareStatement(query);
+
+            // secure
+            for (int i = 0; i < parameters.length; i++)
+                statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
+
             ResultSet results = statement.executeQuery();
 
             while (results.next())

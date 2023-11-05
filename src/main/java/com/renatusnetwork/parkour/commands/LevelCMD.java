@@ -499,7 +499,7 @@ public class LevelCMD implements CommandExecutor {
                             List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
                                     "ratings",
                                     "rating",
-                                    " WHERE player_name='" + playerName + "' AND level_id=" + level.getID()
+                                    " WHERE player_name='?' AND level_id=" + level.getID(), playerName
                             );
 
                             // loop through and remove, then remove all from database

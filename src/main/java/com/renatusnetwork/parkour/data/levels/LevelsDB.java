@@ -97,7 +97,7 @@ public class LevelsDB {
     {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults("completions",
                 "COUNT(*) AS total_completions",
-                " WHERE level_id=" + levelID + " AND completion_date >= '" + start + "' AND completion_date < '" + end + "'");
+                " WHERE level_id=" + levelID + " AND completion_date >= '?' AND completion_date < '?'", start, end);
 
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }

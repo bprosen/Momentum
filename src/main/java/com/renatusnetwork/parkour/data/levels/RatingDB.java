@@ -95,7 +95,7 @@ public class RatingDB {
         List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
                 "ratings",
                 "player_name",
-                " WHERE level_id=" + levelID + " AND rating=" + rating
+                " WHERE level_id=" + levelID + " AND rating=?", rating
         );
 
         for (Map<String, String> ratingResult : ratingResults)
@@ -108,7 +108,7 @@ public class RatingDB {
         List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
                 "ratings",
                 "level_id",
-                " WHERE player_name='" + raterName + "'"
+                " WHERE player_name='?'", raterName
         );
 
         boolean hasRated = false;
@@ -127,7 +127,7 @@ public class RatingDB {
             List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
                     "ratings",
                     "rating",
-                    " WHERE player_name='" + playerName + "' AND level_id=" + levelID
+                    " WHERE player_name='?' AND level_id=" + levelID, playerName
             );
 
             for (Map<String, String> ratingResult : ratingResults)
