@@ -458,9 +458,9 @@ public class StatsDB {
 
     public static void removeBoughtLevel(String playerName, String boughtLevel)
     {
-        String query = "DELETE FROM bought_levels WHERE player_name='" + playerName + "' AND level_name='" + boughtLevel + "'";
+        String query = "DELETE FROM bought_levels WHERE player_name=? AND level_name=?";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query, playerName, boughtLevel);
     }
 
     public static boolean hasBoughtLevel(String playerName, String boughtLevel)
