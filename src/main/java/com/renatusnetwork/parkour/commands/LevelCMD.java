@@ -338,7 +338,7 @@ public class LevelCMD implements CommandExecutor {
                                         StatsDB.removeRecordsName(levelCompletion.getPlayerName());
                                 }
 
-                                Parkour.getDatabaseManager().add("DELETE FROM completions WHERE level_id=" +
+                                Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM completions WHERE level_id=" +
                                         level.getID() + " AND time_taken=" + time + " AND player_id=" + playerID);
                                 completions.remove(levelCompletion);
                                 level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
@@ -501,7 +501,7 @@ public class LevelCMD implements CommandExecutor {
                             for (Map<String, String> ratingResult : ratingResults)
                                 level.removeRatingAndCalc(Integer.parseInt(ratingResult.get("rating")));
 
-                            Parkour.getDatabaseManager().add("DELETE FROM ratings WHERE level_id=" + level.getID()
+                            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM ratings WHERE level_id=" + level.getID()
                                     + " AND player_name='" + playerName + "'");
 
                             sender.sendMessage(Utils.translate("&cYou removed &4" + playerName + " &crating from &7" + level.getFormattedTitle()));
@@ -747,9 +747,9 @@ public class LevelCMD implements CommandExecutor {
 
                                 int newTotal = totalCompletions - levelCompletions;
 
-                                Parkour.getDatabaseManager().add(
+                                Parkour.getDatabaseManager().runAsyncQuery(
                                         "UPDATE players SET level_completions=" + newTotal +
-                                                " WHERE player_name='" + playerName + "'");
+                                                " WHERE player_name='?'", playerName);
 
                                 StatsDB.removeCompletions(playerID, level.getID());
 
@@ -808,7 +808,7 @@ public class LevelCMD implements CommandExecutor {
                             }
 
                         // delete from db
-                        Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");
+                        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='?'", levelName);
 
                         sender.sendMessage(Utils.translate("&cYou have deleted all checkpoints for level &4" + levelName));
                     } else {
@@ -835,8 +835,7 @@ public class LevelCMD implements CommandExecutor {
                                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in " + levelName));
                                 }
                             } else {
-                                Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + levelName + "'" +
-                                        " AND player_name='" + playerName + "'");
+                                Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='?' AND player_name='?'", levelName, playerName);
                                 sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a loaded checkpoint, but any database record was deleted"));
                             }
                         } else {
@@ -861,7 +860,7 @@ public class LevelCMD implements CommandExecutor {
                             // now remove from level cache and db
                             for (String levelName : levelsToRemove) {
                                 levelCache.remove(levelName);
-                                Parkour.getDatabaseManager().run("DELETE FROM levels WHERE level_name='" + levelName + "'");
+                                Parkour.getDatabaseManager().runQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
                             }
 
                             sender.sendMessage(Utils.translate("&2" + levelsToRemove.size() + " &7levels cleaned from the database (already removed levels, etc)"));
@@ -1105,7 +1104,7 @@ public class LevelCMD implements CommandExecutor {
                         }
                         else
                         {
-                            Parkour.getDatabaseManager().add("DELETE FROM saves WHERE player_name='" + playerName + "' AND level_name='" + levelName + "'");
+                            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM saves WHERE player_name='?' AND level_name='?'", playerName, levelName);
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online but any record has been deleted from the database"));
                         }
                     } else {

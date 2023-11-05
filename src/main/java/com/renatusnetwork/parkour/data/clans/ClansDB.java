@@ -92,7 +92,7 @@ public class ClansDB {
     }
 
     public static void insertClan(Clan clan) {
-        Parkour.getDatabaseManager().run(
+        Parkour.getDatabaseManager().runQuery(
                 "INSERT INTO clans " +
                         "(clan_tag, owner_player_id, clan_level, clan_xp, total_gained_xp)" +
                         " VALUES " +
@@ -107,34 +107,28 @@ public class ClansDB {
     }
 
     public static void setClanXP(int clanXP, int clanID) {
-        Parkour.getDatabaseManager().add("UPDATE clans SET " +
-                "clan_xp=" + clanXP +
-                " WHERE clan_id=" + clanID);
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE clans SET " +
+                "clan_xp=? WHERE clan_id=?", clanXP, clanID);
     }
 
     public static void setTotalGainedClanXP(long totalGainedClanXP, int clanID) {
-        Parkour.getDatabaseManager().add("UPDATE clans SET " +
-                "total_gained_xp=" + totalGainedClanXP +
-                " WHERE clan_id=" + clanID);
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE clans SET " +
+                "total_gained_xp=? WHERE clan_id=?", totalGainedClanXP, clanID);
     }
 
     public static void setClanLevel(int clanLevel, int clanID) {
-        Parkour.getDatabaseManager().add("UPDATE clans SET " +
-                "clan_level=" + clanLevel +
-                " WHERE clan_id=" + clanID);
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE clans SET " +
+                "clan_level=? WHERE clan_id=?", clanLevel, clanID);
     }
 
     public static void removeClan(int clanID) {
-        Parkour.getDatabaseManager().add(
-                "DELETE FROM clans " +
-                "WHERE clan_id=" + clanID);
+        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM clans WHERE clan_id=?", clanID);
     }
 
     public static void resetClanMember(String playerName) {
-        Parkour.getDatabaseManager().add(
+        Parkour.getDatabaseManager().runAsyncQuery(
                 "UPDATE players SET " +
-                "clan_id=" + -1 +
-                " WHERE player_name='" + playerName + "'");
+                "clan_id=-1 WHERE player_name='?'", playerName);
     }
 
     public static Clan getClan(String playerName) {
@@ -167,21 +161,20 @@ public class ClansDB {
                 "clan_id=" + clanID +
                 " WHERE player_id=" + playerStats.getPlayerID();
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updatePlayerClanID(String playerName, int clanID) {
-        Parkour.getDatabaseManager().add(
+        Parkour.getDatabaseManager().runAsyncQuery(
                 "UPDATE players SET clan_id=" + clanID + " WHERE player_name='" + playerName + "'"
         );
     }
 
     public static void updateClanTag(Clan clan) {
         String query = "UPDATE clans SET " +
-                "clan_tag='" + clan.getTag() + "' " +
-                "WHERE clan_id=" + clan.getID();
+                "clan_tag='?' WHERE clan_id=?";
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query, clan.getTag(), clan.getID());
     }
 
     public static void updateClanOwnerID(Clan clan) {
@@ -189,7 +182,7 @@ public class ClansDB {
                 "owner_player_id=" + clan.getOwnerID() +
                 " WHERE clan_id=" + clan.getID();
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runQuery(query);
     }
 
     public static void updateClanMaxLevel(Clan clan)

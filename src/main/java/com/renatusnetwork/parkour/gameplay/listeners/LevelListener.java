@@ -174,7 +174,7 @@ public class LevelListener implements Listener {
 
         // delete if they have a cp
         if (playerStats.hasCurrentCheckpoint())
-            Parkour.getDatabaseManager().add("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
+            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
                     " AND player_name='" + playerStats.getPlayerName() + "'");
 
         playerStats.setCurrentCheckpoint(location);
@@ -207,7 +207,7 @@ public class LevelListener implements Listener {
         player.sendMessage(Utils.translate(msgString));
 
         // add to async queue
-        Parkour.getDatabaseManager().add("INSERT INTO checkpoints " +
+        Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO checkpoints " +
                 "(uuid, player_name, level_name, world, x, y, z)" +
                 " VALUES ('" +
                 playerStats.getUUID() + "','" +

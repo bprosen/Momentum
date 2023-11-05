@@ -15,19 +15,17 @@ public class RanksDB {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     // from UUID method
     public static void updatePrestiges(UUID uuid, int newAmount) {
 
-        Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + newAmount +
-                " WHERE uuid='" + uuid.toString() + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET rank_prestiges=? WHERE uuid='?'", newAmount, uuid);
     }
 
     // from playerName method
     public static void updatePrestiges(String playerName, int newAmount) {
-        Parkour.getDatabaseManager().add("UPDATE players SET rank_prestiges=" + newAmount +
-                " WHERE player_name='" + playerName + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET rank_prestiges=? WHERE player_name='?'", newAmount, playerName);
     }
 }

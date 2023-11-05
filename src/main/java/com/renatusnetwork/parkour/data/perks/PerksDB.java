@@ -59,7 +59,7 @@ public class PerksDB {
             for (String sql : insertQueries)
                 finalQuery = finalQuery + sql + "; ";
 
-            Parkour.getDatabaseManager().run(finalQuery);
+            Parkour.getDatabaseManager().runQuery(finalQuery);
             return true;
         }
 
@@ -84,7 +84,7 @@ public class PerksDB {
     }
 
     public static void insertPerk(PlayerStats playerStats, Perk perk, Long date) {
-        Parkour.getDatabaseManager().add(
+        Parkour.getDatabaseManager().runAsyncQuery(
                 "INSERT INTO ledger (player_id, perk_id, date)"
                         + " VALUES "
                         + "(" + playerStats.getPlayerID()

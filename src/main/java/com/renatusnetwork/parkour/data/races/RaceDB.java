@@ -8,13 +8,13 @@ public class RaceDB {
         String query = "UPDATE players SET race_losses=" + newRaceLosses +
                        " WHERE uuid='" + playerUUID + "'";
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateRaceWins(String playerUUID, int newRaceWins) {
         String query = "UPDATE players SET race_wins=" + newRaceWins +
                 " WHERE uuid='" + playerUUID + "'";
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 }

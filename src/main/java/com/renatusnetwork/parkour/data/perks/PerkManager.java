@@ -121,7 +121,7 @@ public class PerkManager {
         {
             // update in both stats and db
             playerStats.setInfiniteBlock(perk.getInfiniteBlock());
-            Parkour.getDatabaseManager().add("UPDATE players SET infinite_block='" + perk.getInfiniteBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET infinite_block='" + perk.getInfiniteBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
         }
     }
 }

@@ -71,7 +71,7 @@ public class LevelsDB {
                 for (String sql : insertQueries)
                     finalQuery = finalQuery + sql + "; ";
 
-                Parkour.getDatabaseManager().run(finalQuery);
+                Parkour.getDatabaseManager().runQuery(finalQuery);
                 return true;
             }
             return false;
@@ -81,10 +81,9 @@ public class LevelsDB {
 
     public static void updateName(String levelName, String newLevelName) {
         String query = "UPDATE levels SET " +
-                "level_name='" + newLevelName + "' WHERE " +
-                "level_name='" + levelName + "'";
+                "level_name='?' WHERE level_name='?'";
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query, newLevelName, levelName);
     }
 
     public static long getGlobalCompletions() {
@@ -106,25 +105,25 @@ public class LevelsDB {
     public static void updateReward(Level level) {
         String query = "UPDATE levels SET " +
                 "reward=" + level.getReward() + " " +
-                "WHERE level_id=" + level.getID() + ""
+                "WHERE level_id=" + level.getID()
                 ;
 
         LevelData levelData = Parkour.getLevelManager().getLevelDataCache().get(level.getName());
         if (levelData != null)
             levelData.setReward(level.getReward());
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateScoreModifier(Level level) {
         String query = "UPDATE levels SET " +
                 "score_modifier=" + level.getScoreModifier() + " " +
-                "WHERE level_id=" + level.getID() + "";
+                "WHERE level_id=" + level.getID();
 
         LevelData levelData = Parkour.getLevelManager().getLevelDataCache().get(level.getName());
         if (levelData != null)
             levelData.setScoreModifier(level.getScoreModifier());
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 }

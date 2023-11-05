@@ -222,38 +222,38 @@ public class StatsDB {
                 "')"
                 ;
 
-        Parkour.getDatabaseManager().run(query);
+        Parkour.getDatabaseManager().runQuery(query);
     }
 
     // this will update the player name all across the database
     private static void updatePlayerName(PlayerStats playerStats, String oldName) {
         // update in stats
-        Parkour.getDatabaseManager().asyncRun("UPDATE players SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_id=" + playerStats.getPlayerID());
 
         // update in checkpoints
-        Parkour.getDatabaseManager().asyncRun("UPDATE checkpoints SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE checkpoints SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
 
         // update in ratings
-        Parkour.getDatabaseManager().asyncRun("UPDATE ratings SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE ratings SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
 
         // update in plots
-        Parkour.getDatabaseManager().asyncRun("UPDATE plots SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE plots SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
 
         // update in bought levels
-        Parkour.getDatabaseManager().asyncRun("UPDATE bought_levels SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE bought_levels SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
 
         // update in saves
-        Parkour.getDatabaseManager().asyncRun("UPDATE saves SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE saves SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
 
@@ -279,7 +279,7 @@ public class StatsDB {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updatePlayerNightVision(PlayerStats playerStats) {
@@ -293,7 +293,7 @@ public class StatsDB {
                 "WHERE player_id=" + playerStats.getPlayerID()
                 ;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updatePlayerGrinding(PlayerStats playerStats)
@@ -306,7 +306,7 @@ public class StatsDB {
         String query = "UPDATE players SET " +
                 "grinding=" + grinding + " WHERE player_id=" + playerStats.getPlayerID();
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateCoins(PlayerStats playerStats, double coins)
@@ -315,7 +315,7 @@ public class StatsDB {
             coins = 0;
 
         String query = "UPDATE players SET coins=" + coins + " WHERE player_id=" + playerStats.getPlayerID();
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateCoinsUUID(String UUID, double coins)
@@ -324,7 +324,7 @@ public class StatsDB {
             coins = 0;
 
         String query = "UPDATE players SET coins=" + coins + " WHERE uuid='" + UUID + "'";
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateCoinsName(String playerName, double coins)
@@ -333,7 +333,7 @@ public class StatsDB {
             coins = 0;
 
         String query = "UPDATE players SET coins=" + coins + " WHERE player_name='" + playerName + "'";
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateInfiniteType(PlayerStats playerStats, InfiniteType newType)
@@ -348,7 +348,7 @@ public class StatsDB {
             records = 0;
 
         String query = "UPDATE players SET records=" + records + " WHERE player_name='" + playerName + "'";
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void addRecordsName(String playerName)
@@ -468,7 +468,7 @@ public class StatsDB {
                 "')"
                 ;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void addBoughtLevel(PlayerStats playerStats, String boughtLevel)
@@ -483,14 +483,14 @@ public class StatsDB {
                 "')"
         ;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void removeBoughtLevel(String playerName, String boughtLevel)
     {
         String query = "DELETE FROM bought_levels WHERE player_name='" + playerName + "' AND level_name='" + boughtLevel + "'";
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static boolean hasBoughtLevel(String playerName, String boughtLevel)
@@ -536,7 +536,7 @@ public class StatsDB {
 
     public static void insertCompletion(PlayerStats playerStats, Level level, LevelCompletion levelCompletion) {
 
-        Parkour.getDatabaseManager().asyncRun(
+        Parkour.getDatabaseManager().runAsyncQuery(
                 "INSERT INTO completions " +
                     "(player_id, level_id, time_taken, completion_date)" +
                     " VALUES (" +
@@ -547,7 +547,7 @@ public class StatsDB {
                     ")"
         );
 
-        Parkour.getDatabaseManager().asyncRun("UPDATE players SET level_completions=" + playerStats.getTotalLevelCompletions() +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET level_completions=" + playerStats.getTotalLevelCompletions() +
                                                   " WHERE player_name='" + playerStats.getPlayerName() + "'");
     }
 
@@ -578,7 +578,7 @@ public class StatsDB {
 
         String query = "DELETE FROM completions WHERE player_id=" + playerID + " AND level_id=" + levelID;
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static boolean hasCompleted(int playerID, int levelID) {
@@ -717,7 +717,7 @@ public class StatsDB {
         if (!recordsMap.isEmpty())
         {
             // reset
-            Parkour.getDatabaseManager().run("UPDATE players SET records=0");
+            Parkour.getDatabaseManager().runQuery("UPDATE players SET records=0");
 
             for (Map.Entry<String, Integer> entry : recordsMap.entrySet())
             {
