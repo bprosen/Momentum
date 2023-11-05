@@ -322,8 +322,8 @@ public class MenuItemAction {
             // go through price buying if not featured, non null item, has price and has not bought level, or not the jackpot level
             if (menuItem != null && level.getPrice() > 0 &&
                 !level.isFeaturedLevel() &&
-                !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0))
+                !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
+                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                 performLevelBuying(playerStats, player, level, menuItem);
             else
                 performLevelTeleport(playerStats, player, level);
