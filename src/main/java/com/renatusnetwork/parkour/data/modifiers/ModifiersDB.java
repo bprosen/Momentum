@@ -49,6 +49,6 @@ public class ModifiersDB
 
     public static void removeModifierName(String playerName, Modifier modifier)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM modifiers WHERE player_name='?' AND modifier_name='" + modifier.getName() + "'", playerName);
+        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM modifiers WHERE player_name=? AND modifier_name='" + modifier.getName() + "'", playerName);
     }
 }

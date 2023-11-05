@@ -247,7 +247,7 @@ public class InfiniteManager {
             playerStats.setInfiniteScore(type, score);
 
         Parkour.getDatabaseManager().runAsyncQuery(
-                "UPDATE players SET infinite_" + type.toString().toLowerCase() + "_score=" + score + " WHERE player_name='?'", playerName
+                "UPDATE players SET infinite_" + type.toString().toLowerCase() + "_score=" + score + " WHERE player_name=?", playerName
         );
     }
 
