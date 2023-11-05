@@ -52,7 +52,7 @@ public class DatabaseManager {
             for (int i = 0; i < parameters.length; i++)
                 statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
 
-            statement.executeQuery();
+            statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
             Parkour.getPluginLogger().severe("ERROR: SQL Failed to run query: " + sql);
