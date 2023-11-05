@@ -191,7 +191,7 @@ public class ClansDB {
                 "max_level=" + clan.getMaxLevel() +
                 " WHERE clan_id=" + clan.getID();
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateClanMaxMembers(Clan clan)
@@ -200,6 +200,6 @@ public class ClansDB {
                 "max_members=" + clan.getMaxMembers() +
                 " WHERE clan_id=" + clan.getID();
 
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 }

@@ -72,7 +72,7 @@ public class TablesDB {
                 "player_name VARCHAR(16) NOT NULL," +
                 "modifier_name VARCHAR(20) NOT NULL)";
 
-        database.run(sqlQuery);
+        database.runQuery(sqlQuery);
     }
 
     private static void createPlayers(DatabaseManager database) {

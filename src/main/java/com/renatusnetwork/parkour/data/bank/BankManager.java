@@ -216,7 +216,7 @@ public class BankManager
                             Parkour.getModifiersManager().removeModifier(Parkour.getStatsManager().get(player), modifier);
                         else
                             // remove from db only
-                            Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
+                            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
 
                         Parkour.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
                         bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder

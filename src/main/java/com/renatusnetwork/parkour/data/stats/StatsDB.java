@@ -258,12 +258,12 @@ public class StatsDB {
                 "WHERE player_name='" + oldName + "'");
 
         // update in bank
-        Parkour.getDatabaseManager().asyncRun("UPDATE bank SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE bank SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
 
         // update in modifiers
-        Parkour.getDatabaseManager().asyncRun("UPDATE modifiers SET " +
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE modifiers SET " +
                 "player_name='" + playerStats.getPlayerName() + "' " +
                 "WHERE player_name='" + oldName + "'");
     }
@@ -339,7 +339,7 @@ public class StatsDB {
     public static void updateInfiniteType(PlayerStats playerStats, InfiniteType newType)
     {
         String query = "UPDATE players SET infinite_type='" + newType.toString().toLowerCase() + "' WHERE player_id=" + playerStats.getPlayerID();
-        Parkour.getDatabaseManager().add(query);
+        Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
     public static void updateRecordsName(String playerName, int records)

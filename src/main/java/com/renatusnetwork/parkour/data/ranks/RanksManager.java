@@ -206,13 +206,13 @@ public class RanksManager {
     public void enteredRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(true);
-        Parkour.getDatabaseManager().add("UPDATE players SET attempting_rankup=1 WHERE uuid='" + playerStats.getUUID() + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET attempting_rankup=1 WHERE uuid='" + playerStats.getUUID() + "'");
     }
 
     public void leftRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(false);
-        Parkour.getDatabaseManager().add("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
     }
 
     public boolean isPastOrAtRank(PlayerStats playerStats, Rank current)

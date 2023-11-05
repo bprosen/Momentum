@@ -35,7 +35,7 @@ public class ModifiersDB
 
     public static void addModifier(PlayerStats playerStats, Modifier modifier)
     {
-        Parkour.getDatabaseManager().add("INSERT INTO modifiers (uuid, player_name, modifier_name) VALUES('" +
+        Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO modifiers (uuid, player_name, modifier_name) VALUES('" +
                 playerStats.getUUID() + "','" +
                 playerStats.getPlayerName() + "','" +
                 modifier.getName() + "')"
@@ -44,11 +44,11 @@ public class ModifiersDB
 
     public static void removeModifier(PlayerStats playerStats, Modifier modifier)
     {
-        Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE uuid='" + playerStats.getUUID() + "' AND modifier_name='" + modifier.getName() + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM modifiers WHERE uuid='" + playerStats.getUUID() + "' AND modifier_name='" + modifier.getName() + "'");
     }
 
     public static void removeModifierName(String playerName, Modifier modifier)
     {
-        Parkour.getDatabaseManager().add("DELETE FROM modifiers WHERE player_name='" + playerName + "' AND modifier_name='" + modifier.getName() + "'");
+        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM modifiers WHERE player_name='?' AND modifier_name='" + modifier.getName() + "'", playerName);
     }
 }
