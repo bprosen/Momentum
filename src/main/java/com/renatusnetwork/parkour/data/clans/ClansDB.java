@@ -131,27 +131,6 @@ public class ClansDB {
                 "clan_id=-1 WHERE player_name='?'", playerName);
     }
 
-    public static Clan getClan(String playerName) {
-        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
-                "players",
-                "clan_id",
-                "WHERE player_name='" + playerName + "'"
-        );
-
-        for (Map<String, String> completionResult : completionsResults) {
-
-            int clanId = Integer.parseInt(completionResult.get("clan_id"));
-
-            if (clanId > 0) {
-                Clan clan = Parkour.getClansManager().get(clanId);
-
-                if (clan != null)
-                    return clan;
-            }
-        }
-        return null;
-    }
-
     public static void updatePlayerClanID(PlayerStats playerStats) {
         int clanID = -1;
         if (playerStats.getClan() != null)
