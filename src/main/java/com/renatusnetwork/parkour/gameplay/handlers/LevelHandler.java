@@ -94,6 +94,13 @@ public class LevelHandler {
                     elapsedTime
             );
 
+            // get new PB
+            LevelCompletion bestCompletion = playerStats.getQuickestCompletion(levelName);
+            boolean newPB = false;
+
+            if (bestCompletion != null)
+                newPB = bestCompletion.getCompletionTimeElapsed() > elapsedTime; // if this completion will be a PB!
+
             // disable when complete
             if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
                 playerStats.setTutorial(false);
@@ -204,6 +211,14 @@ public class LevelHandler {
                 player.sendMessage(completionMessage);
                 player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + " &7with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle())));
+
+                // if new pb, send message to player
+                if (newPB)
+                {
+                    String oldTimeString = (((double) bestCompletion.getCompletionTimeElapsed()) / 1000) + "s"; // need to format the long
+
+                    player.sendMessage(Utils.translate("You have broken your personal best &c(" + oldTimeString + ") with &a" + time));
+                }
 
                 // broadcast completed if it the featured level
                 if (level.isFeaturedLevel()) {
