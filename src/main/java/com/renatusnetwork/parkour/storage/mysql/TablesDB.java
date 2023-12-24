@@ -121,6 +121,8 @@ public class TablesDB
                             "FOREIGN KEY(required_rank) REFERENCES ranks(name)" +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
+                            // indexes
+                            "INDEX type_index(type), " +
                             // constraints
                             "CONSTRAINT non_negative CHECK (" +
                                     "reward >= 0 AND " +
