@@ -38,7 +38,7 @@ public class DatabaseQueries {
             query = query + " " + trailingSQL;
 
         try {
-            PreparedStatement statement = Parkour.getDatabaseManager().get().get().prepareStatement(query);
+            PreparedStatement statement = Parkour.getDatabaseManager().getConnection().get().prepareStatement(query);
 
             // secure
             for (int i = 0; i < parameters.length; i++)
@@ -62,7 +62,7 @@ public class DatabaseQueries {
     public static ResultSet getRawResults(String query)
     {
         try {
-            PreparedStatement statement = Parkour.getDatabaseManager().get().get().prepareStatement(query);
+            PreparedStatement statement = Parkour.getDatabaseManager().getConnection().get().prepareStatement(query);
             return statement.executeQuery();
 
         } catch (SQLException exception) {
