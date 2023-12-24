@@ -21,11 +21,13 @@ import java.util.*;
 public class LevelManager {
 
     private HashMap<String, Level> levels = new HashMap<>();
-    private HashMap<String, LevelData> levelDataCache;
+
     private HashMap<Menu, Set<Level>> menuLevels = new HashMap<>();
+
     private Level featuredLevel;
     private Level tutorialLevel;
     private long totalLevelCompletions;
+
     private HashMap<Integer, Level> globalLevelCompletionsLB = new HashMap<>
             (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
     private HashMap<Integer, Level> topRatedLevelsLB = new HashMap<>
@@ -35,9 +37,8 @@ public class LevelManager {
 
     private HashMap<String, LevelCooldown> cooldowns = new HashMap<>();
 
-    public LevelManager(Plugin plugin) {
-        this.levelDataCache = LevelsDB.getDataCache();
-
+    public LevelManager(Plugin plugin)
+    {
         load(); // Loads levels from configuration
         loadRatings();
         loadLevelsInMenus();
@@ -48,56 +49,15 @@ public class LevelManager {
     }
 
     public void load() {
-        levels = new HashMap<>();
-
-        for (String levelName : LevelsYAML.getNames())
-            load(levelName);
-
+        levels = LevelsDB.getLevels();
         tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
+
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
 
     public void loadGlobalLevelCompletions()
     {
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
-    }
-
-    public void load(String levelName) {
-        boolean exists = exists(levelName);
-
-        Level level = null;
-
-        if (!LevelsYAML.exists(levelName) && exists)
-            levels.remove(levelName);
-        else {
-            level = new Level(levelName);
-            LevelsDB.syncDataCache(level, levelDataCache);
-
-            if (exists)
-                levels.remove(levelName);
-
-            levels.put(levelName, level);
-        }
-
-        // refresh featured here
-        if (featuredLevel != null && level != null && level.getName().equalsIgnoreCase(featuredLevel.getName()))
-            featuredLevel = level;
-
-        // need to add final copy for outside inner class access
-        Level finalLevel = level;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // loop through to update stats
-                for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                    if (playerStats.getLevel() != null && playerStats.getLevel().getName().equalsIgnoreCase(levelName))
-                        if (finalLevel != null)
-                            playerStats.setLevel(finalLevel);
-                        else
-                            // if level was just removed from only config, then reset their level
-                            playerStats.resetLevel();
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     private void loadRatings()
@@ -109,32 +69,40 @@ public class LevelManager {
             {
                 for (Level level : levels.values())
                 {
-                    level.setRating(RatingDB.getAverageRating(level.getID()));
+                    level.setRating(RatingDB.getAverageRating(level.getName()));
                     level.setRatingsCount(RatingDB.getTotalRatings(level.getID()));
                 }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
-    private void startScheduler(Plugin plugin) {
+    private void startScheduler(Plugin plugin)
+    {
 
         // update player count in levels every 60 seconds
-        new BukkitRunnable() {
+        new BukkitRunnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
+                HashMap<Level, Integer> amountInLevel = new HashMap<>();
 
-            // loop through levels then all players online to determine how many are in each level
-            for (Level level : getLevelsInAllMenus()) {
-                if (level != null) {
-                    int amountInLevel = 0;
-                    for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values()) {
+                // loop through levels then all players online to determine how many are in each level
+                for (PlayerStats playerStats : Parkour.getStatsManager().getOnlinePlayers())
+                {
+                    Level level = playerStats.getLevel();
 
-                        if (playerStats != null && playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
-                            amountInLevel++;
-                        }
-                        level.setPlayersInLevel(amountInLevel);
-                    }
+                    // if in a level, add to map
+                    if (level != null)
+                        if (amountInLevel.containsKey(level))
+                            amountInLevel.replace(level, amountInLevel.get(level) + 1);
+                        else
+                            amountInLevel.put(level, 1);
                 }
+
+                // set in level amount
+                for (Map.Entry<Level, Integer> entry : amountInLevel.entrySet())
+                    entry.getKey().setPlayersInLevel(entry.getValue());
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
 
@@ -148,7 +116,8 @@ public class LevelManager {
         }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 15, 20 * 180);
     }
 
-    public void pickFeatured() {
+    public void pickFeatured()
+    {
 
         List<Level> temporaryList = new ArrayList<>();
 
@@ -156,15 +125,25 @@ public class LevelManager {
            sort through all levels that are in menus
            to make sure it does not have required levels and has more than 0 coin reward
          */
-        for (Level level : getLevelsInAllMenus()) {
-            if (level.getRequiredLevels().isEmpty() && !level.hasPermissionNode() && !level.isAscendanceLevel() && !level.isRankUpLevel() && !level.isDropperLevel() && level.getReward() > 0 && level.getReward() < 50000)
+        for (Level level : getLevelsInAllMenus())
+        {
+            if (
+                level.getRequiredLevels().isEmpty() &&
+                !level.hasPermissionNode() &&
+                !level.isAscendanceLevel() &&
+                !level.isRankUpLevel() &&
+                !level.isDropperLevel() &&
+                level.getReward() > 0 &&
+                level.getReward() < 50000
+            )
                 temporaryList.add(level);
         }
 
         Random ran = new Random();
         Level level = temporaryList.get(ran.nextInt(temporaryList.size()));
 
-        if (level != null) {
+        if (level != null)
+        {
             featuredLevel = level;
             Parkour.getPluginLogger().info("Featured Level: " + level.getName());
         }
@@ -369,24 +348,8 @@ public class LevelManager {
         return temporaryRaceLevelList;
     }
 
-    public void setLevelDataCache(HashMap<String, LevelData> levelDataCache) {
-        this.levelDataCache = levelDataCache;
-    }
-
-    public HashMap<String, LevelData> getLevelDataCache() {
-        return levelDataCache;
-    }
-
     public Level get(String levelName) {
         return levels.get(levelName);
-    }
-
-    public Level get(int levelID) {
-        for (Level level : levels.values())
-            if (level.getID() == levelID)
-                return level;
-
-        return null;
     }
 
     public Level getFromTitle(String levelTitle) {

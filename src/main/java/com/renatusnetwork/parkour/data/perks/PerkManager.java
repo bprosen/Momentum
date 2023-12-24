@@ -12,39 +12,18 @@ import java.util.*;
 public class PerkManager {
 
     private HashMap<String, Perk> perks = new HashMap<>();
-    private HashMap<String, Integer> IDCache;
 
-    public PerkManager(Plugin plugin) {
-        this.IDCache = PerksDB.getIDCache();
+    public PerkManager(Plugin plugin)
+    {
         load();
-        startScheduler(plugin);
     }
 
-    public void load() {
+    public void load()
+    {
         for (String perkName : PerksYAML.getNames())
             load(perkName);
 
         Parkour.getPluginLogger().info("Perks loaded: " + perks.size());
-    }
-
-    private void startScheduler(Plugin plugin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (PerksDB.syncPerkIDs()) {
-                    Parkour.getPerkManager().setIDCache(PerksDB.getIDCache());
-                    PerksDB.syncIDCache();
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 0L, 10L);
-    }
-
-    public void setIDCache(HashMap<String, Integer> IDCache) {
-        this.IDCache = IDCache;
-    }
-
-    public Map<String, Integer> getIDCache() {
-        return IDCache;
     }
 
     public Perk get(String perkName) {
@@ -75,9 +54,9 @@ public class PerkManager {
 
         if (!PerksYAML.exists(perkName) && exists)
             remove(perkName);
-        else {
+        else
+        {
             Perk perk = new Perk(perkName);
-            PerksDB.syncIDCache(perk, IDCache);
 
             if (exists)
                 remove(perkName);
@@ -86,13 +65,12 @@ public class PerkManager {
         }
     }
 
-    public void bought(PlayerStats playerStats, Perk perk) {
-        if (perk.getID() > 0) {
-            Long date = System.currentTimeMillis();
+    public void bought(PlayerStats playerStats, Perk perk)
+    {
+        Long date = System.currentTimeMillis();
 
-            playerStats.addPerk(perk.getName(), date);
-            PerksDB.insertPerk(playerStats, perk, date);
-        }
+        playerStats.addPerk(perk.getName(), date);
+        PerksDB.addOwnedPerk(playerStats, perk, date);
     }
 
     public void setPerk(Perk perk, PlayerStats playerStats)
@@ -103,16 +81,16 @@ public class PerkManager {
         {
             for (Map.Entry<String, ItemStack> entry : items.entrySet())
                 switch (entry.getKey()) {
-                    case "head":
+                    case "helmet":
                         player.getInventory().setHelmet(entry.getValue());
                         break;
-                    case "chest":
+                    case "chestplate":
                         player.getInventory().setChestplate(entry.getValue());
                         break;
-                    case "leg":
+                    case "leggings":
                         player.getInventory().setLeggings(entry.getValue());
                         break;
-                    case "feet":
+                    case "boots":
                         player.getInventory().setBoots(entry.getValue());
                         break;
                 }
@@ -121,7 +99,7 @@ public class PerkManager {
         {
             // update in both stats and db
             playerStats.setInfiniteBlock(perk.getInfiniteBlock());
-            Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET infinite_block='" + perk.getInfiniteBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
+            PerksDB.updateInfiniteBlock(playerStats, perk);
         }
     }
 }

@@ -48,17 +48,17 @@ public class PerksYAML {
         HashMap<String, ItemStack> items = new HashMap<>();
 
         if (perksConfig.isConfigurationSection(perkName + ".items")) {
-            if (perksConfig.isConfigurationSection(perkName + ".items.head"))
-                items.put("head", createItem(perkName, "head"));
+            if (perksConfig.isConfigurationSection(perkName + ".items.helmet"))
+                items.put("helmet", createItem(perkName, "helmet"));
 
-            if (perksConfig.isConfigurationSection(perkName + ".items.chest"))
-                items.put("chest", createItem(perkName, "chest"));
+            if (perksConfig.isConfigurationSection(perkName + ".items.chestplate"))
+                items.put("chestplate", createItem(perkName, "chestplate"));
 
-            if (perksConfig.isConfigurationSection(perkName + ".items.leg"))
-                items.put("leg", createItem(perkName, "leg"));
+            if (perksConfig.isConfigurationSection(perkName + ".items.leggings"))
+                items.put("leggings", createItem(perkName, "leggings"));
 
-            if (perksConfig.isConfigurationSection(perkName + ".items.feet"))
-                items.put("feet", createItem(perkName, "feet"));
+            if (perksConfig.isConfigurationSection(perkName + ".items.boots"))
+                items.put("boots", createItem(perkName, "boots"));
         }
         return items;
     }

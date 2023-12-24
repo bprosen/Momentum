@@ -186,6 +186,8 @@ player_submitted:
   plot_default_y: 64
   plot_buffer_width: 10
   minimum_rank_for_plot_creation: "novice-i"
+ranks:
+  default_rank: "I"
 event:
   reminder_delay: 300
   max_run_time: 1800
@@ -198,6 +200,8 @@ event:
     half_heart: 15
     rising_water: 100
 infinite:
+  default_block: "QUARTZ_BLOCK"
+  default_type: "CLASSIC"
   max_leaderboard_size: 10
   soft_border_radius_x: 100
   soft_border_radius_z: 100

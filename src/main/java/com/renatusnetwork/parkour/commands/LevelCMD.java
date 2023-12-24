@@ -742,15 +742,6 @@ public class LevelCMD implements CommandExecutor {
                                         StatsDB.removeRecordsName(playerName);
                                 }
 
-                                int totalCompletions = StatsDB.getTotalCompletions(playerName);
-                                int levelCompletions = StatsDB.getCompletionsFromLevel(playerName, level.getID());
-
-                                int newTotal = totalCompletions - levelCompletions;
-
-                                Parkour.getDatabaseManager().runAsyncQuery(
-                                        "UPDATE players SET level_completions=" + newTotal +
-                                                " WHERE player_name=?", playerName);
-
                                 StatsDB.removeCompletions(playerID, level.getID());
 
                                 PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);

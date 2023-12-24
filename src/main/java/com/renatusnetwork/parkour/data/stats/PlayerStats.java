@@ -26,7 +26,6 @@ public class PlayerStats {
     private String playerName;
     private double coins;
     private Level level = null;
-    private int playerID = -1;
     private long levelStartTime = 0;
     private boolean spectatable;
     private PlayerStats playerToSpectate;
@@ -63,7 +62,7 @@ public class PlayerStats {
 
     private FastBoard board;
 
-    private HashMap<String, Set<LevelCompletion>> levelCompletionsMap;
+    private HashMap<String, Set<LevelCompletion>> levelCompletions;
     private HashMap<String, Long> perks;
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
@@ -79,7 +78,7 @@ public class PlayerStats {
         this.board = new FastBoard(player); // load board
 
         // load maps
-        this.levelCompletionsMap = new HashMap<>();
+        this.levelCompletions = new HashMap<>();
         this.perks = new HashMap<>();
         this.checkpoints = new HashMap<>();
         this.boughtLevels = new HashSet<>();
@@ -94,9 +93,6 @@ public class PlayerStats {
     //
     // Player Info Section
     //
-    public boolean isLoaded() {
-        return playerID > 0;
-    }
 
     public Player getPlayer() {
         return player;
@@ -110,15 +106,7 @@ public class PlayerStats {
         return UUID;
     }
 
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
-    }
-
     public FastBoard getBoard() { return board; }
-
-    public int getPlayerID() {
-        return playerID;
-    }
 
     public boolean hasNVStatus() {return nightVision; }
 
@@ -255,6 +243,10 @@ public class PlayerStats {
     public int getRecords() { return records; }
 
     public void setRecords(int records) { this.records = records; }
+
+    public void removeRecord() { this.records--; }
+
+    public void addRecord() { this.records++; }
 
     public boolean hasBoughtLevel(String levelName)
     {
@@ -412,6 +404,9 @@ public class PlayerStats {
 
     public void resetClan() { clan = null; }
 
+    public boolean inClan() { return clan != null; }
+
+
     //
     // Checkpoint Section
     //
@@ -482,7 +477,7 @@ public class PlayerStats {
         int mostCompletions = -1;
         String mostCompletedLevel = null;
 
-        for (Map.Entry<String, Set<LevelCompletion>> entry : levelCompletionsMap.entrySet())
+        for (Map.Entry<String, Set<LevelCompletion>> entry : levelCompletions.entrySet())
             if (entry.getValue().size() > mostCompletions) {
                 mostCompletions = entry.getValue().size();
                 mostCompletedLevel = entry.getKey();
@@ -496,11 +491,11 @@ public class PlayerStats {
 
     public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
         if (levelName != null && levelCompletion != null) {
-            if (!levelCompletionsMap.containsKey(levelName))
-                levelCompletionsMap.put(levelName, new HashSet<>());
+            if (!levelCompletions.containsKey(levelName))
+                levelCompletions.put(levelName, new HashSet<>());
 
-            if (levelCompletionsMap.get(levelName) != null)
-                levelCompletionsMap.get(levelName).add(levelCompletion);
+            if (levelCompletions.get(levelName) != null)
+                levelCompletions.get(levelName).add(levelCompletion);
         }
     }
 
@@ -509,12 +504,17 @@ public class PlayerStats {
     }
 
     public HashMap<String, Set<LevelCompletion>> getLevelCompletionsMap() {
-        return levelCompletionsMap;
+        return levelCompletions;
+    }
+
+    public boolean hasCompleted(String levelName)
+    {
+        return levelCompletions.containsKey(levelName);
     }
 
     public int getLevelCompletionsCount(String levelName) {
-        if (levelCompletionsMap.containsKey(levelName))
-            return levelCompletionsMap.get(levelName).size();
+        if (levelCompletions.containsKey(levelName))
+            return levelCompletions.get(levelName).size();
 
         return 0;
     }
@@ -523,9 +523,9 @@ public class PlayerStats {
     public LevelCompletion getQuickestCompletion(String levelName) {
         LevelCompletion fastestCompletion = null;
 
-        if (levelCompletionsMap.containsKey(levelName)) {
+        if (levelCompletions.containsKey(levelName)) {
             // loop through to find fastest completion
-            for (LevelCompletion levelCompletion : levelCompletionsMap.get(levelName))
+            for (LevelCompletion levelCompletion : levelCompletions.get(levelName))
                 // if not null and not including not timed levels, continue
                 if (levelCompletion != null && levelCompletion.getCompletionTimeElapsed() > 0)
                     // if null or faster than already fastest completion, set to new completion
@@ -671,5 +671,10 @@ public class PlayerStats {
     public boolean equals(PlayerStats playerStats)
     {
         return playerStats.getPlayerName().equals(playerName);
+    }
+
+    public void sendMessage(String message)
+    {
+        player.sendMessage(message);
     }
 }

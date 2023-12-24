@@ -6,14 +6,12 @@ import com.renatusnetwork.parkour.data.levels.Level;
 public class Rank {
 
     private String rankName;
-    private int rankId;
     private String rankTitle;
     private Level rankupLevel;
 
-    public Rank(String rankName, String rankTitle, int rankId) {
+    public Rank(String rankName, String rankTitle) {
         this.rankName = rankName;
         this.rankTitle = rankTitle;
-        this.rankId = rankId;
         this.rankupLevel = Parkour.getLevelManager().get(RanksYAML.getRankUpLevel(rankName));
     }
 
@@ -21,10 +19,6 @@ public class Rank {
 
     public String getRankName() {
         return rankName;
-    }
-
-    public int getRankId() {
-        return rankId;
     }
 
     public String getRankTitle() { return rankTitle; }

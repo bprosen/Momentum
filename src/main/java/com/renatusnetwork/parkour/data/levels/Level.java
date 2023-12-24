@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -32,13 +33,11 @@ public class Level {
     private Location startLocation;
     private Location respawnLocation;
     private int maxCompletions;
-    private int playersInLevel = 0;
+    private int playersInLevel;
     private boolean broadcastCompletion;
     private String requiredPermissionNode = null;
     private List<String> requiredLevels;
     private int respawnY;
-    private int ID = -1;
-    private int scoreModifier = 1;
     private boolean isRankUpLevel = false;
     private boolean liquidResetPlayer = true;
     private boolean elytraLevel = false;
@@ -319,15 +318,16 @@ public class Level {
 
     public void doRecordModification(LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)
     {
-        String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
-
-        // if first completion, make it record set
-        if (firstCompletion)
-            brokenRecord = "&e✦ &d&lRECORD SET &e✦";
 
         // broadcast when record is beaten
         if (leaderboardCache.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
         {
+            String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
+
+            // if first completion, make it record set
+            if (firstCompletion)
+                brokenRecord = "&e✦ &d&lRECORD SET &e✦";
+
             double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
 
             Bukkit.broadcastMessage("");
@@ -338,24 +338,13 @@ public class Level {
             Bukkit.broadcastMessage("");
 
             Utils.spawnFirework(respawnLocation, Color.PURPLE, Color.FUCHSIA, true);
+
             if (!alreadyFirstPlace)
             {
                 // update new #1 records
                 PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName());
 
-                if (playerStats != null)
-                    Parkour.getStatsManager().addRecord(playerStats, playerStats.getRecords());
-                else
-                {
-                    new BukkitRunnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            StatsDB.addRecordsName(levelCompletion.getPlayerName());
-                        }
-                    }.runTaskAsynchronously(Parkour.getPlugin());
-                }
+                playerStats.addRecord();
 
                 // if more than 1, remove
                 if (leaderboardCache.size() > 1)
@@ -365,21 +354,16 @@ public class Level {
                     PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getPlayerName());
 
                     if (previousStats != null)
-                        Parkour.getStatsManager().removeRecord(previousStats, previousStats.getRecords());
-                    else
-                    {
-                        new BukkitRunnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                StatsDB.removeRecordsName(previousRecord.getPlayerName());
-                            }
-                        }.runTaskAsynchronously(Parkour.getPlugin());
-                    }
+                        previousStats.removeRecord();
+
+                    // update data
+                    LevelsDB.updateLevelRecord(this.name, playerStats.getUUID());
                 }
+                else
+                    LevelsDB.insertLevelRecord(this.name, playerStats.getUUID());
             }
             PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName()); // get player that got record
+
             if (playerStats.hasModifier(ModifierTypes.RECORD_BONUS))
             {
                 Bonus bonus = (Bonus) playerStats.getModifier(ModifierTypes.RECORD_BONUS);
@@ -393,16 +377,9 @@ public class Level {
         }
     }
 
-    public void setScoreModifier(int scoreModifier) {
-        this.scoreModifier = scoreModifier;
-    }
-
-    public int getScoreModifier() {
-        return scoreModifier;
-    }
-
     private void load() {
-        if (LevelsYAML.exists(name)) {
+        if (LevelsYAML.exists(name))
+        {
 
             if (LevelsYAML.isSet(name, "title"))
                 title = LevelsYAML.getTitle(name);
@@ -548,5 +525,10 @@ public class Level {
                 return false;
 
         return true;
+    }
+
+    public boolean equals(Level level)
+    {
+        return this.name.equalsIgnoreCase(level.getName());
     }
 }

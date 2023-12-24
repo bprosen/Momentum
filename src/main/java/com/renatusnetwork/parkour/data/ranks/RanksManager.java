@@ -165,10 +165,10 @@ public class RanksManager {
         playerStats.setPrestigeMultiplier(prestigeMultiplier);
 
         // dont need to update stage as they will never hit stage 2 in max rank
-        RanksDB.updateRank(player.getUniqueId(), 1);
+        RanksDB.updateRank(player.getUniqueId().toString(), 1);
 
         // now add prestige db
-        RanksDB.updatePrestiges(player.getUniqueId(), playerStats.getPrestiges());
+        RanksDB.updatePrestiges(player.getUniqueId().toString(), playerStats.getPrestiges());
 
         // add an s if its not one because im OCD with this
         String endingString = "time";

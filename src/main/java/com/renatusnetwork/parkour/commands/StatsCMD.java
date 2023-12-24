@@ -137,7 +137,7 @@ public class StatsCMD implements CommandExecutor {
                         if (clan != null && clan.getOwner() != null && clan.getOwner().getPlayerName() != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &6" +
-                                    Utils.shortStyleNumber(clan.getTotalGainedXP()) + " &e" +
+                                    Utils.shortStyleNumber(clan.getTotalXP()) + " &e" +
                                     clan.getTag() + " &6(" + clan.getOwner().getPlayerName() + ")"));
                             lbPositionNum++;
                         }

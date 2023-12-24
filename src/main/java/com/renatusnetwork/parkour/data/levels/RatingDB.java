@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.entity.Player;
 
@@ -12,19 +13,20 @@ import java.util.Map;
 
 public class RatingDB {
 
-    public static float getAverageRating(int levelID) {
+    public static float getAverageRating(String levelName) {
 
         List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
-                "ratings",
+                DatabaseManager.RANKS_TABLE,
                 "rating",
-                " WHERE level_id=" + levelID
+                " WHERE level_name='" + levelName + "'"
         );
 
         if (!ratingResults.isEmpty()) {
-            float totalRating = 0.0f;
+            double totalRating = 0.0f;
             int totalRatings = 0;
 
-            for (Map<String, String> ratingResult : ratingResults) {
+            for (Map<String, String> ratingResult : ratingResults)
+            {
                 totalRatings++;
                 totalRating += Double.parseDouble(ratingResult.get("rating"));
             }
@@ -37,7 +39,8 @@ public class RatingDB {
         return 0.00f;
     }
 
-    public static int getTotalRatings(int levelID) {
+    public static int getTotalRatings(int levelID)
+    {
         List<Map<String, String>> ratingResults = DatabaseQueries.getResults(
                 "ratings",
                 "*",

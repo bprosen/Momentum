@@ -1,8 +1,12 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,73 +14,9 @@ import java.util.Map;
 
 public class LevelsDB {
 
-    public static HashMap<String, LevelData> getDataCache() {
-        HashMap<String, LevelData> levelData = new HashMap<>();
+    public static HashMap<String, Level> getLevels()
+    {
 
-        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "levels",
-                "level_id, level_name, reward, score_modifier",
-                ""
-        );
-
-        for (Map<String, String> levelResult : levelsResults)
-            levelData.put(
-                    levelResult.get("level_name"),
-                    new LevelData(
-                            Integer.parseInt(levelResult.get("level_id")),
-                            Integer.parseInt(levelResult.get("reward")),
-                            Integer.parseInt(levelResult.get("score_modifier"))
-                    )
-            );
-
-        Parkour.getPluginLogger().info("Levels in data cache: " + levelData.size());
-        return levelData;
-    }
-
-    public static void syncDataCache() {
-        for (Map.Entry<String, Level> entry : Parkour.getLevelManager().getLevels().entrySet())
-            syncDataCache(entry.getValue(), Parkour.getLevelManager().getLevelDataCache());
-    }
-
-    public static void syncDataCache(Level level, Map<String, LevelData> levelDataCache) {
-        LevelData levelData = levelDataCache.get(level.getName());
-
-        if (levelData != null) {
-            level.setID(levelData.getID());
-            level.setReward(levelData.getReward());
-            level.setScoreModifier(levelData.getScoreModifier());
-        }
-    }
-
-    public static boolean syncLevelData() {
-
-        HashMap<String, LevelData> levelCache = Parkour.getLevelManager().getLevelDataCache();
-        HashMap<String, Level> levels = Parkour.getLevelManager().getLevels();
-
-        // if not equal size, then sort through
-        if (levelCache.size() != levels.size()) {
-
-            List<String> insertQueries = new ArrayList<>();
-            for (Level level : levels.values())
-                if (!levelCache.containsKey(level.getName()))
-                    insertQueries.add(
-                            "INSERT INTO levels " +
-                                    "(level_name)" +
-                                    " VALUES " +
-                                    "('" + level.getName() + "')"
-                    );
-
-            if (insertQueries.size() > 0) {
-                String finalQuery = "";
-                for (String sql : insertQueries)
-                    finalQuery = finalQuery + sql + "; ";
-
-                Parkour.getDatabaseManager().runQuery(finalQuery);
-                return true;
-            }
-            return false;
-        }
-        return false;
     }
 
     public static void updateName(String levelName, String newLevelName) {
@@ -125,5 +65,19 @@ public class LevelsDB {
             levelData.setScoreModifier(level.getScoreModifier());
 
         Parkour.getDatabaseManager().runAsyncQuery(query);
+    }
+
+    public static void insertLevelRecord(String levelName, String uuid)
+    {
+        Parkour.getDatabaseManager().runAsyncQuery(
+        "INSERT INTO " + DatabaseManager.LEVEL_RECORDS_TABLE + " (level_name, uuid) VALUES ('" + levelName + "', '" + uuid + "')"
+        );
+    }
+
+    public static void updateLevelRecord(String levelName, String uuid)
+    {
+        Parkour.getDatabaseManager().runAsyncQuery(
+        "UPDATE " + DatabaseManager.LEVEL_RECORDS_TABLE + " SET uuid='" + uuid + "' WHERE level_name='" + levelName + "'"
+        );
     }
 }

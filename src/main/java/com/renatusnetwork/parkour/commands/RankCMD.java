@@ -42,10 +42,11 @@ public class RankCMD implements CommandExecutor {
                     return true;
                 }
 
-                if (ranksManager.exists(rankName)) {
+                if (ranksManager.exists(rankName))
+                {
                     Rank rank = ranksManager.get(rankName);
                     Parkour.getStatsManager().get(victim).setRank(rank);
-                    RanksDB.updateRank(victim.getUniqueId(), rank.getRankId());
+                    RanksDB.updateRank(victim.getUniqueId().toString(), rank.getRankName());
                     player.sendMessage(Utils.translate("&7You set &c" + victim.getName() + "&7's rank to &c" + rank.getRankTitle()));
                 } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
@@ -139,7 +140,7 @@ public class RankCMD implements CommandExecutor {
                                 }
                             }
                             // update in db
-                            RanksDB.updatePrestiges(a[1], newPrestige);
+                            RanksDB.updatePrestigesFromName(a[1], newPrestige);
                             player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's Prestiges to &6" + newPrestige));
 
                         } else {

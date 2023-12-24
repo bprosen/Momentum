@@ -102,14 +102,6 @@ public class StatsManager {
         return null;
     }
 
-    public PlayerStats get(int playerID) {
-        for (PlayerStats playerStats : getPlayerStats().values())
-            if (playerStats.getPlayerID() == playerID)
-                return playerStats;
-
-        return null;
-    }
-
     public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
 
     public void toggleLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
@@ -121,6 +113,8 @@ public class StatsManager {
     public HashMap<String, PlayerStats> getPlayerStats() {
         return playerStatsList;
     }
+
+    public Collection<PlayerStats> getOnlinePlayers() { return playerStatsList.values(); }
 
     public void enteredAscendance(PlayerStats playerStats)
     {
@@ -267,32 +261,30 @@ public class StatsManager {
 
     public void updateCoins(PlayerStats playerStats, double coins)
     {
-        StatsDB.updateCoins(playerStats, coins);
+        StatsDB.updateCoins(playerStats.getUUID(), coins);
         playerStats.setCoins(coins);
     }
 
     public void removeCoins(PlayerStats playerStats, double coins)
     {
-        StatsDB.updateCoins(playerStats, playerStats.getCoins() - coins);
+        StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() - coins);
         playerStats.removeCoins(coins);
     }
 
     public void addCoins(PlayerStats playerStats, double coins)
     {
-        StatsDB.updateCoins(playerStats, playerStats.getCoins() + coins);
+        StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() + coins);
         playerStats.addCoins(coins);
     }
 
     public void addRecord(PlayerStats playerStats, int currentRecords)
     {
-        StatsDB.updateRecordsName(playerStats.getPlayerName(), currentRecords + 1);
         playerStats.setRecords(currentRecords + 1);
     }
 
-    public void removeRecord(PlayerStats playerStats, int currentRecords)
+    public void removeRecord(PlayerStats playerStats)
     {
-        StatsDB.updateRecordsName(playerStats.getPlayerName(), currentRecords - 1);
-        playerStats.setRecords(currentRecords - 1);
+        playerStats.setRecords(playerStats.getRecords() - 1);
     }
 
     public long getTotalCoins() { return totalCoins; }
@@ -569,7 +561,7 @@ public class StatsManager {
                                     // replace clan items
                                     loreString = loreString.replace("%clan_name%", clan.getTag())
                                             .replace("%clan_level%", clan.getLevel() + "")
-                                            .replace("%clan_total_xp%", Utils.shortStyleNumber(clan.getTotalGainedXP()))
+                                            .replace("%clan_total_xp%", Utils.shortStyleNumber(clan.getTotalXP()))
                                             .replace("%clan_level_xp%", Utils.shortStyleNumber(clan.getXP()))
                                             .replace("%clan_owner%", clan.getOwner().getPlayerName())
                                             .replace("%clan_member_count%", clan.getMembers().size() + "");

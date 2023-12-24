@@ -128,7 +128,7 @@ public class RecordsCMD implements CommandExecutor
             if (offline)
             {
                 if (StatsDB.isPlayerInDatabase(targetName))
-                    records = StatsDB.getRecordsFromName(targetName);
+                    records = StatsDB.getNumRecordsFromName(targetName);
                 else
                     exists = false;
             }

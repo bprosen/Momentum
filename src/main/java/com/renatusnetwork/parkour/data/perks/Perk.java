@@ -21,7 +21,6 @@ public class Perk {
     private List<String> requiredPermissions;
 
     private int price;
-    private int ID = -1;
 
     public Perk(String perkName) {
         name = perkName;
@@ -39,10 +38,6 @@ public class Perk {
             setRequirementsLore = PerksYAML.getSetRequirementsLore(name);
             infiniteBlock = PerksYAML.getInfinitePKBlock(name);
         }
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
     }
 
     public String getName() {
@@ -94,10 +89,6 @@ public class Perk {
     public boolean hasSetRequirementsLore() { return setRequirementsLore != null; }
     public int getPrice() {
         return price;
-    }
-
-    public int getID() {
-        return ID;
     }
 
     public boolean hasRequirements(PlayerStats playerStats, Player player)

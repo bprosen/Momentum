@@ -37,9 +37,13 @@ public class DatabaseManager {
     public static final String LEVEL_COMPLETIONS_COMMANDS_TABLE = "level_completions_commands";
     public static final String LEVEL_POTION_EFFECTS_TABLE = "level_potion_effects";
     public static final String LEVEL_REQUIRED_LEVELS_TABLE = "level_required_levels";
-    public static final String MASTERY_BADGES_LEVEL_REQUIREMENTS_TABLE = "mastery_badges_level_requirements";
+    public static final String BADGES_TABLE = "badges";
+    public static final String BADGES_OWNED_TABLE = "badges_owned";
+    public static final String BADGES_COMMANDS_TABLE = "badges_commands";
+    public static final String MASTERY_BADGE_LEVELS_TABLE = "mastery_badge_levels";
 
-    public DatabaseManager(Plugin plugin) {
+    public DatabaseManager(Plugin plugin)
+    {
         connection = new DatabaseConnection();
         TablesDB.initTables(this);
         startScheduler(plugin);

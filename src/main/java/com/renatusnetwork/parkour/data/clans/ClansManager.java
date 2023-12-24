@@ -29,34 +29,21 @@ public class ClansManager {
 
     public ClansManager(Plugin plugin) {
         load();
-
         startScheduler(plugin);
     }
 
-    private void load() {
-        clans = ClansDB.getClans();
-
-        HashMap<Integer, List<ClanMember>> members = ClansDB.getMembers();
-
-        syncMembers(members);
-    }
-
-    private void syncMembers(Map<Integer, List<ClanMember>> members) {
-        for (Map.Entry<Integer, List<ClanMember>> entry : members.entrySet()) {
-            Clan clan = get(entry.getKey());
-
-            if (clan != null)
-                for (ClanMember member : entry.getValue())
-                    clan.addMember(member);
-        }
+    private void load()
+    {
+        clans = ClansDB.loadClans();
     }
 
     public void add(Clan clan) {
         clans.put(clan.getTag(), clan);
     }
 
-    public void addMember(int clanID, ClanMember clanMember) {
-        Clan clan = get(clanID);
+    public void addMember(String tag, ClanMember clanMember)
+    {
+        Clan clan = get(tag);
 
         if (clan != null)
             clan.addMember(clanMember);
@@ -64,19 +51,11 @@ public class ClansManager {
 
     public void remove(String clanTag) { clans.remove(clanTag); }
 
-    public Clan get(int clanID) {
+    public Clan getFromMember(String memberName)
+    {
         for (Clan clan : clans.values())
-            if (clan.getID() == clanID)
+            if (clan.isMember(memberName))
                 return clan;
-
-        return null;
-    }
-
-    public Clan getFromMember(String clanMember) {
-        for (Clan clan : clans.values())
-            for (ClanMember member : clan.getMembers())
-                if (member.getPlayerName().equalsIgnoreCase(clanMember))
-                    return clan;
 
         return null;
     }
@@ -114,7 +93,7 @@ public class ClansManager {
                 // loop through and make sure they are not already added, and higher than previous
                 for (Clan clan : clans.values())
                     if (!alreadyAddedClans.contains(clan) &&
-                        (highestXPClan == null || clan.getTotalGainedXP() > highestXPClan.getTotalGainedXP()))
+                        (highestXPClan == null || clan.getTotalXP() > highestXPClan.getTotalXP()))
                         highestXPClan = clan;
 
                 if (highestXPClan != null) {
@@ -187,7 +166,7 @@ public class ClansManager {
             if (clan.isMaxLevel())
             {
                 clan.addXP(clanXP);
-                ClansDB.setClanXP(totalXP, clan.getID());
+                ClansDB.setClanXP(totalXP, clan.getTag());
 
             // level them up
             }
@@ -198,52 +177,51 @@ public class ClansManager {
             {
                 // otherwise add xp to cache and database
                 clan.addXP(clanXP);
-                ClansDB.setClanXP(totalXP, clan.getID());
+                ClansDB.setClanXP(totalXP, clan.getTag());
             }
+            long newTotal = clan.getTotalXP() + clanXP;
+
             // update total gained xp
-            ClansDB.setTotalGainedClanXP(clan.getTotalGainedXP() + clanXP, clan.getID());
-            clan.setTotalGainedXP(clan.getTotalGainedXP() + clanXP);
+            ClansDB.setTotalXP(newTotal, clan.getTag());
+            clan.setTotalXP(newTotal);
         }
     }
 
-    public void deleteClan(int clanID, boolean messageMembers) {
-        Clan clan = get(clanID);
+    public void deleteClan(String tag, boolean messageMembers) {
+        Clan clan = get(tag);
 
-        if (clan != null) {
+        if (clan != null)
+        {
             // iterate through existing clan members to reset/remove their data
-            for (ClanMember clanMember : clan.getMembers()) {
+            for (ClanMember clanMember : clan.getMembers())
+            {
+                // we do not need to delete from db for each player as the foreign key will set null on cascading
 
-                // reset clan member in database
-                ClansDB.resetClanMember(clanMember.getPlayerName());
-
-                Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
-                if (clanPlayer != null) {
-
-                    if (messageMembers) {
+                Player clanPlayer = Bukkit.getPlayer(clanMember.getPlayerName());
+                if (clanPlayer != null)
+                {
+                    if (messageMembers)
                         clanPlayer.sendMessage(Utils.translate("&6" + clan.getOwner().getPlayerName() +
                                 " &ehas disbanded your &6&lClan &6" + clan.getTag()));
-                    }
 
                     // reset data on the players
                     Parkour.getStatsManager().get(clanPlayer).resetClan();
                 }
             }
             // remove from database and list
-            ClansDB.removeClan(clanID);
+            ClansDB.removeClan(tag);
             clans.remove(clan.getTag());
         }
     }
 
     public void sendMessageToMembers(Clan clan, String msg, String dontSendTo) {
-        for (ClanMember clanMember : clan.getMembers()) {
+        for (ClanMember clanMember : clan.getMembers())
+        {
             // make sure they are online
-            Player clanPlayer = Bukkit.getPlayer(UUID.fromString(clanMember.getUUID()));
+            Player clanPlayer = Bukkit.getPlayer(clanMember.getPlayerName());
 
-            if (clanPlayer != null)
-                if (dontSendTo != null && clanPlayer.getName().equalsIgnoreCase(dontSendTo))
-                    continue;
-                else
-                    clanPlayer.sendMessage(Utils.translate(msg));
+            if (clanPlayer != null && (dontSendTo == null || !clanPlayer.getName().equalsIgnoreCase(dontSendTo)))
+                clanPlayer.sendMessage(Utils.translate(msg));
         }
     }
 
@@ -276,7 +254,7 @@ public class ClansManager {
             {
                 // means they went down in max level but were past the new max (force their level down)
                 clan.setLevel(clan.getMaxLevel());
-                ClansDB.setClanLevel(clan.getMaxLevel(), clan.getID());
+                ClansDB.setClanLevel(clan.getMaxLevel(), clan.getTag());
             }
         }
     }
@@ -318,8 +296,8 @@ public class ClansManager {
         }
 
         // add rest of xp after leveling up
-        ClansDB.setClanLevel(newLevel, clan.getID());
-        ClansDB.setClanXP(clanXPOverflow, clan.getID());
+        ClansDB.setClanLevel(newLevel, clan.getTag());
+        ClansDB.setClanXP(clanXPOverflow, clan.getTag());
         clan.setXP(clanXPOverflow);
     }
 
@@ -369,8 +347,6 @@ public class ClansManager {
     }
 
     public HashMap<String, Clan> getClans() { return clans; }
-
-    public HashMap<String, Clan> getClanChatMap() { return clanChat; }
 
     public Set<String> getChatSpyMap() { return chatSpy; }
 }

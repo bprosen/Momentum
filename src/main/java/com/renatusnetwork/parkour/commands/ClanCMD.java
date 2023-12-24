@@ -339,7 +339,7 @@ public class ClanCMD implements CommandExecutor {
 
                                 if (clanTagRequirements(clanTag, sender)) {
                                     Parkour.getStatsManager().removeCoins(playerStats, Parkour.getSettingsManager().clans_price_create);
-                                    Clan newClan = new Clan(-1, clanTag, playerStats.getPlayerID(), 1, 0, 0, 5, 5);
+                                    Clan newClan = new Clan(clanTag, playerStats.getUUID(), 1, 0, 0, 5, 5);
                                     Parkour.getClansManager().add(newClan);
                                     ClansDB.newClan(newClan);
                                 }
@@ -408,7 +408,7 @@ public class ClanCMD implements CommandExecutor {
                             if (targetClan.getID() == clan.getID()) {
                                 if (clan.getOwner().getPlayerName().equalsIgnoreCase(player.getName())) {
                                     // update data
-                                    clan.promoteOwnerFromName(a[1]);
+                                    clan.promoteOwner(a[1]);
                                     ClansDB.updateClanOwnerID(clan);
                                     sendClanMessage(clan, "&6" + a[1] + " &ehas been promoted to" +
                                             " &6&lClan Owner &eby &6" + player.getName(), true, player);
@@ -452,11 +452,11 @@ public class ClanCMD implements CommandExecutor {
                                         player.sendMessage(Utils.translate("&eYou sent a &6&lClan Invite &eto &6" + victim.getName()
                                                 + " &ethey have 30 seconds to accept"));
 
-                                        clan.addInvite(victim.getUniqueId().toString());
+                                        clan.addInvite(victim.getName());
                                         new BukkitRunnable() {
                                             public void run() {
                                                 // ran out of time
-                                                if (clan.isInvited(victim.getUniqueId().toString())) {
+                                                if (clan.isInvited(victim.getName())) {
 
                                                     player.sendMessage(Utils.translate("&6" + victim.getName() +
                                                             " &edid not accept your &6&lClan Invite &ein time"));
@@ -464,7 +464,7 @@ public class ClanCMD implements CommandExecutor {
                                                             player.getName() + "&e's &6&lClan Invite &ein time"));
 
                                                     // remove old invite
-                                                    clan.removeInvite(victim.getUniqueId().toString());
+                                                    clan.removeInvite(victim.getName());
                                                 }
                                             }
                                             // 20 seconds to accept invite
@@ -505,7 +505,7 @@ public class ClanCMD implements CommandExecutor {
 
                                 if (targetClan.getMembers().size() < targetClan.getMaxMembers()) {
                                     // add to clan and remove invite
-                                    targetClan.addMember(new ClanMember(playerStats.getPlayerID(), playerStats.getUUID(), player.getName()));
+                                    targetClan.addMember(new ClanMember(playerStats.getUUID(), player.getName()));
                                     playerStats.setClan(targetClan);
                                     ClansDB.updatePlayerClanID(playerStats);
                                     targetClan.removeInvite(player.getUniqueId().toString());

@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data;
 
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -50,6 +51,7 @@ public class SettingsManager {
     public int player_submitted_plot_default_y;
     public int player_submitted_plot_buffer_width;
     public String minimum_rank_for_plot_creation;
+    public String default_rank;
 
     public int event_reminder_delay;
     public int max_event_run_time;
@@ -72,6 +74,8 @@ public class SettingsManager {
     public int infinite_soft_border_radius_z;
     public String infinite_respawn_loc;
     public String infinite_middle_loc;
+    public Material infinite_default_block;
+    public InfiniteType infinite_default_type;
 
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
@@ -197,6 +201,7 @@ public class SettingsManager {
         falling_anvil_event_task_delay = settings.getInt("event.task_delay.falling_anvil");
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");
+        default_rank = settings.getString("ranks.default_rank");
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         sword_title = Utils.translate(settings.getString("setup-sword.title"));
@@ -228,6 +233,8 @@ public class SettingsManager {
         max_infinite_y = settings.getInt("infinite.max_y");
         min_infinite_y = settings.getInt("infinite.min_y");
         infinite_starting_y = settings.getInt("infinite.starting_y");
+        infinite_default_block = Material.matchMaterial(settings.getString("infinite.default_block"));
+        infinite_default_type = InfiniteType.valueOf(settings.getString("infinite.default_type"));
         max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
         max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
         max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");

@@ -28,7 +28,10 @@ public class TablesDB
         createLevelCompletionCommands(database);
         createLevelPotionEffects(database);
         createLevelRequiredLevels(database);
-        createMasteryBadgesLevelsRequirements(database);
+        createBadges(database);
+        createBadgesOwned(database);
+        createBadgesCommands(database);
+        createMasteryBadgeLevels(database);
     }
 
     private static void createPlayers(DatabaseManager databaseManager)
@@ -46,10 +49,8 @@ public class TablesDB
                            "infinite_timed_score INT DEFAULT 0, " +
                            "infinite_block VARCHAR(30) DEFAULT NULL, " + // default set from settings
                            "infinite_type VARCHAR(10) DEFAULT NULL, " + // default set from settings
-                           "level_completions INT DEFAULT 0, " +
                            "race_wins SMALLINT DEFAULT 0, " +
                            "race_losses SMALLINT DEFAULT 0, " +
-                           "records SMALLINT DEFAULT 0, " +
                            "event_wins MEDIUMINT DEFAULT 0, " +
                            // mode switches
                            "attempting_mastery BIT DEFAULT 0, " +
@@ -60,10 +61,10 @@ public class TablesDB
                            "fail_mode BIT DEFAULT 1, " +
                            // keys
                            "PRIMARY KEY(uuid), " +
-                           "FOREIGN KEY(clan) REFERENCES clans(tag) " +
+                           "FOREIGN KEY(clan) REFERENCES " + DatabaseManager.CLANS_TABLE + "(tag) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
-                           "FOREIGN KEY(rank) REFERENCES rank(name) " +
+                           "FOREIGN KEY(rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
                            // indexes
@@ -78,8 +79,7 @@ public class TablesDB
                                "infinite_timed_score >= 0 AND " +
                                "level_completions >= 0 AND " +
                                "race_wins >= 0 AND " +
-                               "race_losses >= 0 AND" +
-                               "records >= 0 AND" +
+                               "race_losses >= 0 AND " +
                                "event_wins >= 0 AND" +
                            ")" +
                        ")";
@@ -94,7 +94,7 @@ public class TablesDB
                             "name VARCHAR(20) NOT NULL, " +
                             "reward INT DEFAULT 0, " +
                             "price INT DEFAULT 0, " +
-                            "title VARCHAR(30) NOT NULL, " + // this needs to be long to allow for storage of colors
+                            "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
                             "required_rank VARCHAR(10) DEFAULT NULL, " +
@@ -107,18 +107,19 @@ public class TablesDB
                             "broadcast BIT DEFAULT 0, " +
                             "liquid_reset BIT DEFAULT 0, " +
                             "new BIT DEFAULT 0, " +
+                            "has_mastery BIT DEFAULT 0, " +
                             // specific locations
                             "start_location VARCHAR(30) DEFAULT NULL, " +
                             "completion_location VARCHAR(30) DEFAULT NULL, " +
                             // keys
                             "PRIMARY KEY(name), " +
-                            "FOREIGN KEY(start_location) REFERENCES locations(name) " +
+                            "FOREIGN KEY(start_location) REFERENCES " + DatabaseManager.LOCATIONS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
-                            "FOREIGN KEY(completion_locations) REFERENCES locations(name) " +
+                            "FOREIGN KEY(completion_locations) REFERENCES " + DatabaseManager.LOCATIONS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
-                            "FOREIGN KEY(required_rank) REFERENCES ranks(name)" +
+                            "FOREIGN KEY(required_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)" +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
                             // indexes
@@ -137,7 +138,7 @@ public class TablesDB
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
-                            "title VARCHAR(30) NOT NULL, " + // this needs to be long to allow for storage of colors
+                            "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
                             "price INT DEFAULT 0, " +
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
@@ -162,7 +163,7 @@ public class TablesDB
                             "submitted BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(plot_id), " +
-                            "FOREIGN KEY(owner_uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(owner_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON DELETE CASCADE" + // we want to delete their plot if the player is deleted from the db
                         ")";
 
@@ -193,10 +194,10 @@ public class TablesDB
                             "rating TINYINT DEFAULT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -221,10 +222,10 @@ public class TablesDB
                             "z DOUBLE NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -237,14 +238,14 @@ public class TablesDB
     private static void createLevelRecords(DatabaseManager databaseManager)
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_RECORDS_TABLE + "(" +
-                            "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
+                            "uuid CHAR(36) NOT NULL, " +
                             // keys
-                            "PRIMARY KEY(uuid, level_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "PRIMARY KEY(level_name), " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -267,10 +268,10 @@ public class TablesDB
                             "pitch DOUBLE NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -287,10 +288,10 @@ public class TablesDB
                             "level_name VARCHAR(20) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -326,7 +327,7 @@ public class TablesDB
                             "max_members SMALLINT NOT NULL DEFAULT 5, " +
                             // keys
                             "PRIMARY KEY(tag), " +
-                            "FOREIGN KEY(owner_uuid) REFERENCES players(uuid)" +
+                            "FOREIGN KEY(owner_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid)" +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // constraints
@@ -346,13 +347,15 @@ public class TablesDB
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.RANKS_TABLE + "(" +
                             "name VARCHAR(10) NOT NULL, " +
-                            "title VARCHAR(20) NOT NULL, " + // allow space for color codes
+                            "title VARCHAR(20) DEFAULT NULL, " + // allow space for color codes
                             "rankup_level VARCHAR(20) DEFAULT NULL, " +
+                            "next_rank VARCHAR(10) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(name), " +
-                            "FOREIGN KEY(rankup_level) REFERENCES levels(name) " +
+                            "FOREIGN KEY(rankup_level) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
+                            "FOREIGN KEY(next_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)" +
                         ")";
 
         databaseManager.runQuery(query);
@@ -367,7 +370,7 @@ public class TablesDB
                             "completion_date TIMESTAMP NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -385,8 +388,8 @@ public class TablesDB
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MODIFIERS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
-                            "type VARCHAR(20) NOT NULL, " +
-                            "title VARCHAR(30) NOT NULL, " + // add room for color codes
+                            "type VARCHAR(20) DEFAULT NULL, " +
+                            "title VARCHAR(30) DEFAULT NULL, " + // add room for color codes
                             "multiplier FLOAT DEFAULT NULL, " +
                             "discount FLOAT DEFAULT NULL, " +
                             "bonus INT DEFAULT NULL, " +
@@ -410,10 +413,10 @@ public class TablesDB
                             "trusted_uuid CHAR(36) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(plot_id, trusted_uuid), " +
-                            "FOREIGN KEY(plot_id) REFERENCES plots(id) " +
+                            "FOREIGN KEY(plot_id) REFERENCES " + DatabaseManager.PLOTS_TABLE + "(id) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(trusted_uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(trusted_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -430,10 +433,10 @@ public class TablesDB
                             "modifier_name VARCHAR(20) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, modifier_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(modifier_name) REFERENCES modifiers(name) " +
+                            "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.MODIFIERS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -451,10 +454,10 @@ public class TablesDB
                             "date_received TIMESTAMP NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, perk_name), " +
-                            "FOREIGN KEY(uuid) REFERENCES players(uuid) " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(perk_name) REFERENCES perks(name) " +
+                            "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -471,10 +474,10 @@ public class TablesDB
                             "level_name VARCHAR(20) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(perk_name, level_name), " +
-                            "FOREIGN KEY(perk_name) REFERENCES perks(name) " +
+                            "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -491,11 +494,11 @@ public class TablesDB
                             "armor_piece VARCHAR(10) NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS... so max = 10
                             "material VARCHAR(30) NOT NULL, " +
                             "type TINYINT DEFAULT 0, " +
-                            "title VARCHAR(30) NOT NULL, " + // allow for extra length due to color codes
+                            "title VARCHAR(30) DEFAULT NULL, " + // allow for extra length due to color codes
                             "glow BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(perk_name, armor_piece), " +
-                            "FOREIGN KEY(perk_name) REFERENCES perks(name) " +
+                            "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -512,7 +515,7 @@ public class TablesDB
                             "command VARCHAR(100) NOT NULL, " + // commands can get quite long
                             // keys
                             "PRIMARY KEY(level_name, command), " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -530,7 +533,7 @@ public class TablesDB
                             "amplifier TINYINT UNSIGNED DEFAULT 0, " + // potion effects dont go past 255, so TINYINT UNSIGNED is perfect
                             "duration MEDIUMINT DEFAULT 0, " +
                             "PRIMARY KEY(level_name, type), " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -552,10 +555,10 @@ public class TablesDB
                             "required_level_name VARCHAR(20) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(level_name, required_level_name), " +
-                            "FOREIGN KEY(level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(required_level_name) REFERENCES levels(name) " +
+                            "FOREIGN KEY(required_level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
@@ -565,9 +568,70 @@ public class TablesDB
         databaseManager.runQuery(query);
     }
 
-    private static void  createMasteryBadgesLevelsRequirements(DatabaseManager databaseManager)
+    private static void createBadges(DatabaseManager databaseManager)
     {
-        // TODO: make this last part of the db schema
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_TABLE + "(" +
+                            "name VARCHAR(20) NOT NULL, " +
+                            "title VARCHAR(30) DEFAULT NULL, " + // allow for extra space for color codes
+                            "required_permission VARCHAR(20) DEFAULT NULL, " +
+                            "PRIMARY KEY(name)" +
+                        ")";
+
+        databaseManager.runQuery(query);
+    }
+
+    private static void createBadgesOwned(DatabaseManager databaseManager)
+    {
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_OWNED_TABLE + "(" +
+                            "uuid CHAR(36) NOT NULL, " +
+                            "badge_name VARCHAR(20) NOT NULL, " +
+                            // keys
+                            "PRIMARY KEY(uuid, badge_name), " +
+                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            // indexes
+                            "INDEX uuid_index(uuid)" +
+                        ")";
+
+        databaseManager.runQuery(query);
+    }
+
+    private static void createBadgesCommands(DatabaseManager databaseManager)
+    {
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_COMMANDS_TABLE + "(" +
+                            "badge_name VARCHAR(20) NOT NULL, " +
+                            "command VARCHAR(100) NOT NULL, " + // commands can get quite long
+                            // keys
+                            "PRIMARY KEY(badge_name, command), " +
+                            "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            // indexes
+                            "INDEX badge_name_index(badge_name)" +
+                        ")";
+
+        databaseManager.runQuery(query);
+    }
+
+    private static void createMasteryBadgeLevels(DatabaseManager databaseManager)
+    {
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "(" +
+                            "badge_name VARCHAR(20) NOT NULL, " +
+                            "level_name VARCHAR(20) NOT NULL, " +
+                            // keys
+                            "PRIMARY KEY(badge_name, level_name), " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            // indexes
+                            "INDEX badge_name_index(badge_name)" +
+                        ")";
+
+        databaseManager.runQuery(query);
     }
 
     /*
