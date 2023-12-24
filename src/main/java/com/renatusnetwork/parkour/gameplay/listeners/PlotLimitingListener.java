@@ -65,8 +65,7 @@ public class PlotLimitingListener implements Listener {
                     doCancel = true;
 
                     // check if they are not trusted and not owner, then cancel
-                else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) &&
-                        !plot.getTrustedPlayers().contains(player.getName()))
+                else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) && !plot.isTrusted(player.getUniqueId().toString()))
                     doCancel = true;
                 // this will only continue if the block they edited is in the x and y of the bedrock spawn
                 // no nearest plot

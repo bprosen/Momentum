@@ -33,7 +33,7 @@ public class PrestigeCMD implements CommandExecutor {
 
         if (a.length == 0) {
             // this means they are max rank
-            if (rankManager.isMaxRank(playerStats.getRank()))
+            if (playerStats.getRank().isMaxRank())
             {
                 int prestiges = playerStats.getPrestiges();
                 double cost = Parkour.getSettingsManager().base_prestige_cost + (prestiges * Parkour.getSettingsManager().additional_cost_per_prestige);
@@ -69,7 +69,7 @@ public class PrestigeCMD implements CommandExecutor {
                 }
             } else
                 player.sendMessage(Utils.translate("&cYou cannot do this yet!" +
-                                                        " You need to be Rank &4" + rankManager.getMaxRank().getRankTitle()));
+                                                        " You need to be Rank &4" + rankManager.getMaxRank().getTitle()));
         }
         return false;
     }

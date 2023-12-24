@@ -133,7 +133,7 @@ public class ClansManager {
                 else
                 {
                     double coins = StatsDB.getCoinsFromUUID(clanMember.getUUID());
-                    StatsDB.updateCoinsUUID(clanMember.getUUID(), splitAmountPerMember + coins);
+                    StatsDB.updateCoins(clanMember.getUUID(), splitAmountPerMember + coins);
                 }
             }
         }

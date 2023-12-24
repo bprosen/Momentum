@@ -48,7 +48,8 @@ public class LevelManager {
         startScheduler(plugin);
     }
 
-    public void load() {
+    public void load()
+    {
         levels = LevelsDB.getLevels();
         tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
 
@@ -450,46 +451,26 @@ public class LevelManager {
         return get(levelName) != null;
     }
 
-    public void remove(String levelName) {
-        boolean foundLevel = false;
+    public void remove(String levelName)
+    {
+        LevelsDB.removeLevel(levelName);
 
-        for (String name : levels.keySet()) {
-            if (name.equals(levelName)) {
-                foundLevel = true;
-                break;
+        // loop through and reset if applicable
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+            if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
+            {
+                playerStats.resetLevel();
+                PracticeHandler.resetDataOnly(playerStats);
+                playerStats.resetCurrentCheckpoint();
+
+                if (playerStats.isAttemptingRankup())
+                    Parkour.getRanksManager().leftRankup(playerStats);
+
+                // toggle off elytra armor
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
             }
-        }
-        // once level found, remove from config, db and cache
-        if (foundLevel) {
-            Level level = get(levelName);
 
-            LevelsYAML.remove(levelName);
-            LocationsYAML.remove(levelName + "-spawn");
-            LocationsYAML.remove(levelName + "-completion");
-            // remove from levels, checkpoints, ratings and completions to clean up database
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + levelName + "'");
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM completions WHERE level_id=" + level.getID());
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM ratings WHERE level_id=" + level.getID());
-
-            // loop through and reset if applicable
-            for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-                if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(levelName))
-                {
-                    playerStats.resetLevel();
-                    PracticeHandler.resetDataOnly(playerStats);
-                    playerStats.resetCurrentCheckpoint();
-
-                    if (playerStats.isAttemptingRankup())
-                        Parkour.getRanksManager().leftRankup(playerStats);
-
-                    // toggle off elytra armor
-                    Parkour.getStatsManager().toggleOffElytra(playerStats);
-                }
-
-            levelDataCache.remove(levelName);
-            levels.remove(levelName);
-        }
+        levels.remove(levelName);
     }
 
     public void teleportToLevel(PlayerStats playerStats, Level level)
@@ -562,10 +543,6 @@ public class LevelManager {
                     playerStats.setCurrentCheckpoint(checkpoint);
             }
         }
-    }
-
-    public void create(String levelName) {
-        LevelsYAML.create(levelName);
     }
 
     public Set<String> getNames() {

@@ -238,13 +238,21 @@ public class PlotCMD implements CommandExecutor {
     private void createPlot(Player player) {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
-        if (checkConditions(playerStats)) {
-            Rank minimumRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().minimum_rank_for_plot_creation);
 
-            if (playerStats.getRank().getRankId() >= minimumRank.getRankId() || playerStats.getPrestiges() >= 1) {
-                Parkour.getPlotsManager().createPlot(player);
-            } else {
-                player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getRankTitle() + " &7to create a &aPlot"));
+        if (checkConditions(playerStats))
+        {
+            if (!Parkour.getPlotsManager().exists(player.getName()))
+            {
+                Rank minimumRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().minimum_rank_for_plot_creation);
+
+                if (Parkour.getRanksManager().isPastOrAtRank(playerStats, minimumRank))
+                    Parkour.getPlotsManager().createPlot(player);
+                else
+                    player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getRankTitle() + " &7to create a &aPlot"));
+            }
+            else
+            {
+                player.sendMessage(Utils.translate("&cYou already have a plot"));
             }
         }
     }
@@ -289,53 +297,72 @@ public class PlotCMD implements CommandExecutor {
 
     }
 
-    private void untrustPlayer(Player player, String[] a) {
-        Plot plot = Parkour.getPlotsManager().get(player.getName());
+    private void untrustPlayer(Player player, String[] a)
+    {
         Player target = Bukkit.getPlayer(a[1]);
 
-        if (target == null) {
-            player.sendMessage(Utils.translate("&4" + target.getName() + " &cis not online!"));
-            return;
-        }
+        if (target == null)
+        {
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
 
-        // if they have plot
-        if (plot != null) {
-            // if they are not a trusted player
-            if (plot.getTrustedPlayers().contains(target.getName())) {
-                PlotsDB.removeTrustedPlayer(player, target);
-                plot.removeTrustedPlayer(target);
+            // if you have plot
+            if (plot != null)
+            {
+                // if they are not a trusted player
+                if (plot.isTrusted(target.getUniqueId().toString()))
+                {
+                    PlotsDB.removeTrustedPlayer(plot.getPlotID(), target);
+                    plot.removeTrusted(target);
 
-                player.sendMessage(Utils.translate("&7You removed &3" + target.getName() + " &7from your plot!"));
-            } else {
-                player.sendMessage(Utils.translate("&4" + player.getName() + " &cis not trusted in your plot"));
+                    player.sendMessage(Utils.translate("&7You removed &3" + target.getName() + " &7from your plot!"));
+                }
+                else
+                {
+                    player.sendMessage(Utils.translate("&4" + player.getName() + " &cis not trusted in your plot"));
+                }
             }
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            else
+            {
+                player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            }
         }
+        else
+        {
+            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
+        }
+
     }
 
-    private void trustPlayer(Player player, String[] a) {
-        Plot plot = Parkour.getPlotsManager().get(player.getName());
+    private void trustPlayer(Player player, String[] a)
+    {
         Player target = Bukkit.getPlayer(a[1]);
 
-        if (target == null) {
-            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
-            return;
-        }
+        if (target != null)
+        {
+            Plot plot = Parkour.getPlotsManager().get(player.getName());
 
-        // if they have plot
-        if (plot != null) {
-            // if they are not a trusted player
-            if (!plot.getTrustedPlayers().contains(target.getName())) {
-                PlotsDB.addTrustedPlayer(player, target);
-                plot.addTrustedPlayer(target);
+            // if you have plot
+            if (plot != null)
+            {
+                // if they are not a trusted player
+                if (!plot.isTrusted(target.getUniqueId().toString()))
+                {
+                    PlotsDB.addTrustedPlayer(plot.getPlotID(), target);
+                    plot.addTrusted(target);
 
-                player.sendMessage(Utils.translate("&7You trusted &3" + target.getName() + " &7to your plot!"));
-            } else {
-                player.sendMessage(Utils.translate("&4" + player.getName() + " &cis already trusted in your plot"));
+                    player.sendMessage(Utils.translate("&7You trusted &3" + target.getName() + " &7to your plot!"));
+                }
+                else
+                    player.sendMessage(Utils.translate("&4" + player.getName() + " &cis already trusted in your plot"));
             }
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            else
+            {
+                player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            }
+        }
+        else
+        {
+            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
         }
     }
 

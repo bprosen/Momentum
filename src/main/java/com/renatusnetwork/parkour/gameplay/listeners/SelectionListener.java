@@ -146,8 +146,8 @@ public class SelectionListener {
                of one of their pos and another pos in their own plot, therefore the selection goes over the road
                and across multiple plots
          */
-        boolean cantInMin = minPlot == null || !minPlot.canBuild(player.getName());
-        boolean cantInMax = maxPlot == null || !maxPlot.canBuild(player.getName());
+        boolean cantInMin = minPlot == null || !minPlot.canBuild(player);
+        boolean cantInMax = maxPlot == null || !maxPlot.canBuild(player);
         boolean notSameOwner = ((minPlot != null && maxPlot != null) &&
                 !minPlot.getOwnerName().equalsIgnoreCase(maxPlot.getOwnerName()));
 

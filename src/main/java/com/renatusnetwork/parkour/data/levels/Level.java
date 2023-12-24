@@ -35,28 +35,28 @@ public class Level {
     private int maxCompletions;
     private int playersInLevel;
     private boolean broadcastCompletion;
-    private String requiredPermissionNode = null;
+    private String requiredPermissionNode;
     private List<String> requiredLevels;
     private int respawnY;
-    private boolean isRankUpLevel = false;
-    private boolean liquidResetPlayer = true;
-    private boolean elytraLevel = false;
-    private boolean dropperLevel = false;
-    private boolean newLevel = false;
-    private boolean tcLevel = false;
+    private boolean isRankUpLevel;
+    private boolean liquidResetPlayer = true; // default is true
+    private boolean elytraLevel;
+    private boolean dropperLevel;
+    private boolean newLevel;
+    private boolean tcLevel;
 
     private List<PotionEffect> potionEffects = new ArrayList<>();
 
-    private boolean raceLevel = false;
+    private boolean raceLevel;
 
-    private boolean eventLevel = false;
+    private boolean eventLevel;
     private EventType eventType;
 
-    private Location raceLocation1 = null;
-    private Location raceLocation2 = null;
+    private Location raceLocation1;
+    private Location raceLocation2;
     private Material raceLevelItemType;
 
-    private int totalCompletionsCount = 0;
+    private int totalCompletionsCount;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
     private List<String> commands = new ArrayList<>();
 
@@ -65,7 +65,6 @@ public class Level {
     private boolean ascendanceLevel = false;
 
     private int difficulty;
-
     private boolean cooldown;
 
     public Level(String levelName) {
@@ -125,14 +124,6 @@ public class Level {
 
     public boolean getBroadcastCompletion() {
         return broadcastCompletion;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    public int getID() {
-        return ID;
     }
 
     public void setRating(float rating) {
@@ -531,4 +522,7 @@ public class Level {
     {
         return this.name.equalsIgnoreCase(level.getName());
     }
+
+    public boolean equals(String levelName) { return this.name.equalsIgnoreCase(levelName); }
+
 }

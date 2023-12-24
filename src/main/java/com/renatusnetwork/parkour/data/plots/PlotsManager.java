@@ -27,43 +27,21 @@ public class PlotsManager {
         load();
     }
 
-    public void load() {
-        // loop through and add to cache
-        for (String uuidString : PlotsDB.getPlotOwnerUUIDs()) {
+    public void load()
+    {
+        plotList = PlotsDB.loadPlots();
 
-            String playerName = PlotsDB.getPlotOwnerName(uuidString);
-            String locString = PlotsDB.getPlotCenter(uuidString);
-            String[] locSplit = locString.split(":");
-
-            // get offline player object and update in db if their name changed
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuidString));
-            if (!offlinePlayer.getName().equalsIgnoreCase(playerName)) {
-                PlotsDB.updatePlayerName(offlinePlayer.getName(), uuidString);
-                playerName = offlinePlayer.getName();
-            }
-
-            // loc from database, 0.5 for center of block
-            Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                    Double.parseDouble(locSplit[0]) + 0.5, Parkour.getSettingsManager().player_submitted_plot_default_y,
-                    Double.parseDouble(locSplit[1]) + 0.5);
-
-            add(playerName, uuidString, loc);
-        }
         Parkour.getPluginLogger().info("Plots Loaded: " + plotList.size());
     }
+
     // player param version
-    public void add(Player player) {
-        Plot plot = new Plot(player, player.getLocation());
-        plotList.put(player.getName(), plot);
+    public void add(Player player)
+    {
+        plotList.put(player.getName(), new Plot(player, player.getLocation()));
     }
 
-    // string ver
-    public void add(String playerName, String playerUUID, Location spawnLoc) {
-        Plot plot = new Plot(playerName, playerUUID, spawnLoc);
-        plotList.put(playerName, plot);
-    }
-    public Plot get(String playerName) {
-        return plotList.get(playerName);
+    public Plot get(String name) {
+        return plotList.get(name);
     }
 
     public boolean exists(String playerName) {
@@ -74,16 +52,18 @@ public class PlotsManager {
         return plotList;
     }
 
-    public void remove(String playerName) {
-        if (exists(playerName))
-            plotList.remove(playerName);
+    public void remove(String playerName)
+    {
+        plotList.remove(playerName);
     }
 
     // this needs to be a list due to #get(int)
-    public List<Plot> getSubmittedPlots() {
+    public List<Plot> getSubmittedPlots()
+    {
         List<Plot> tempList = new ArrayList<>();
 
-        for (Plot plot : plotList.values()) {
+        for (Plot plot : plotList.values())
+        {
             if (plot.isSubmitted())
                 tempList.add(plot);
         }
@@ -91,12 +71,13 @@ public class PlotsManager {
     }
 
     // creation algorithm
-    public void createPlot(Player player) {
+    public void createPlot(Player player)
+    {
 
         // run algorithm in async
         Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Parkour.getPlugin(), () -> {
 
-        String result = findNextFreePlot(player.getUniqueId().toString());
+        String result = findNextFreePlot();
 
         // run teleport and creation in sync
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Parkour.getPlugin(), () -> {
@@ -129,11 +110,13 @@ public class PlotsManager {
         });
     }
 
-    public void deletePlot(Plot plot) {
+    public void deletePlot(Plot plot)
+    {
 
         Player owner = Bukkit.getPlayer(plot.getOwnerName());
+
         // if they are in plot world, teleport them
-        if (owner != null && owner.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+        if (owner.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
             owner.teleport(Parkour.getLocationManager().getLobbyLocation());
 
         // clear plot!
@@ -144,8 +127,8 @@ public class PlotsManager {
         PlotsDB.removePlot(plot.getOwnerUUID());
     }
 
-    public void clearPlot(Plot plot, boolean deletePlot) {
-
+    public void clearPlot(Plot plot, boolean deletePlot)
+    {
         WorldEdit api = WorldEdit.getInstance();
 
         if (api != null) {
@@ -173,7 +156,8 @@ public class PlotsManager {
                 editSession.flushQueue();
 
                 // if plot isnt being deleted then regen the bedrock
-                if (!deletePlot) {
+                if (!deletePlot)
+                {
                     editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
                     editSession.flushQueue();
                 }
@@ -192,102 +176,73 @@ public class PlotsManager {
       is going so it can check if there is a plot to the right of it based on direction. If there is no
       plot to the right, it turns right otherwise if there is a plot to the right, it moves forward.
      */
-    private String findNextFreePlot(String playerUUID) {
-
-        int max = Integer.MAX_VALUE;
+    private String findNextFreePlot()
+    {
         // add buffer so plots will not touch eachother
-        int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width
-                        + Parkour.getSettingsManager().player_submitted_plot_buffer_width;
-
-
+        int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width + Parkour.getSettingsManager().player_submitted_plot_buffer_width;
         List<String> plots = PlotsDB.getPlotCenters();
-        if (!plots.isEmpty()) {
 
-            List<String> checkedLocs = new ArrayList<>();
-            // so plots do not hug eachother
-            int x = (plotWidth / 2);
-            int z = (plotWidth / 2);
-            int direction = 1; // direction, 1 = north, 2 = east, 3 = south, 4 = west
+        // so plots do not hug eachother
+        int x = (plotWidth / 2);
+        int z = (plotWidth / 2);
+        int direction = 1; // direction, 1 = north, 2 = east, 3 = south, 4 = west
 
-            for (int i = 0; i < max; i++) {
+        int index = 0;
 
-                // check if current x and z are a plot center
-                List<Map<String, String>> results = DatabaseQueries.getResults(
-                        "plots",
-                        "uuid, center_x, center_z",
-                        " WHERE uuid='" + playerUUID + "'");
+        while (index < Integer.MAX_VALUE)
+        {
+            String currentCenter = plots.get(index);
 
-                if (results.isEmpty()) {
-                    boolean isPlot = false;
+            String[] split = currentCenter.split(":");
+            int plotX = Integer.parseInt(split[0]);
+            int plotZ = Integer.parseInt(split[1]);
 
-                    for (String plotString : plots) {
-                        String[] split = plotString.split(":");
-                        int plotX = Integer.parseInt(split[0]);
-                        int plotZ = Integer.parseInt(split[1]);
-
-                        // check if the x and z coords exist in database
-                        if (plotX == x && plotZ == z) {
-                            isPlot = true;
-                            break;
-                        }
-                    }
-                    // if is a plot, keep going in algorithm
-                    if (isPlot) {
-                        switch (direction) {
-                            // north
-                            case 1:
-                                if (checkedLocs.contains((x + plotWidth) + ":" + z))
-                                    z -= plotWidth;
-                                else
-                                    x += plotWidth;
-                            // east
-                            case 2:
-                                if (checkedLocs.contains(x + ":" + (z + plotWidth)))
-                                    x += plotWidth;
-                                else
-                                    z += plotWidth;
-                            // south
-                            case 3:
-                                if (checkedLocs.contains((x - plotWidth) + ":" + z))
-                                    z += plotWidth;
-                                else
-                                    x -= plotWidth;
-                            // west
-                            case 4:
-                                if (checkedLocs.contains(x + ":" + (z - plotWidth)))
-                                    x -= plotWidth;
-                                else
-                                    z -= plotWidth;
-                        }
-                        if (direction % 4 > 0)
-                            direction++;
+            if (plotX == x && plotZ == z)
+            {
+                // if is a plot, keep going in algorithm
+                switch (direction)
+                {
+                    // north
+                    case 1:
+                        if (plots.contains((x + plotWidth) + ":" + z))
+                            z -= plotWidth;
                         else
-                            direction = 1;
-
-                        // add to checked locs
-                        checkedLocs.add(x + ":" + z);
-                    // create plot
-                    } else {
-                        return x + ":" + z;
-                    }
-                // already has plot
-                } else {
-                    return "hasPlot";
+                            x += plotWidth;
+                    // east
+                    case 2:
+                        if (plots.contains(x + ":" + (z + plotWidth)))
+                            x += plotWidth;
+                        else
+                            z += plotWidth;
+                    // south
+                    case 3:
+                        if (plots.contains((x - plotWidth) + ":" + z))
+                            z += plotWidth;
+                        else
+                            x -= plotWidth;
+                    // west
+                    case 4:
+                        if (plots.contains(x + ":" + (z - plotWidth)))
+                            x -= plotWidth;
+                        else
+                            z -= plotWidth;
                 }
+                // keep going through 1, 2, 3, 4, if we hit 0, max of 1
+                direction = Math.max((direction + 1) % 4, 1);
             }
-        // first plot
-        } else {
-            return (plotWidth / 2) + ":" + (plotWidth / 2);
+            index++;
         }
         return null;
     }
 
     // get nearest plot from location
-    public Plot getPlotInLocation(Location loc) {
-
+    public Plot getPlotInLocation(Location loc)
+    {
         Plot nearestPlot = null;
-        for (Plot plot : plotList.values()) {
-            if (blockInPlot(loc, plot)) {
+        for (Plot plot : plotList.values())
+        {
+            if (blockInPlot(loc, plot))
+            {
                 nearestPlot = plot;
                 break;
             }
@@ -295,10 +250,12 @@ public class PlotsManager {
         return nearestPlot;
     }
 
-    public void updatePlayerNameInPlot(String oldName, String newName) {
+    public void updatePlayerNameInPlot(String oldName, String newName)
+    {
         Plot plot = get(oldName);
 
-        if (plot != null) {
+        if (plot != null)
+        {
             // remove
             plotList.remove(oldName);
 
@@ -308,15 +265,13 @@ public class PlotsManager {
         }
     }
 
-    public boolean blockInPlot(Location loc, Plot plot) {
-
+    public boolean blockInPlot(Location loc, Plot plot)
+    {
         int maxX = plot.getSpawnLoc().getBlockX() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);
         int maxZ = plot.getSpawnLoc().getBlockZ() + (Parkour.getSettingsManager().player_submitted_plot_width / 2);
         int minX = plot.getSpawnLoc().getBlockX() - (Parkour.getSettingsManager().player_submitted_plot_width / 2);
         int minZ = plot.getSpawnLoc().getBlockZ() - (Parkour.getSettingsManager().player_submitted_plot_width / 2);
 
-        if (loc.getBlockX() <= maxX && loc.getBlockX() >= minX && loc.getBlockZ() <= maxZ && loc.getBlockZ() >= minZ)
-            return true;
-        return false;
+        return (loc.getBlockX() <= maxX && loc.getBlockX() >= minX && loc.getBlockZ() <= maxZ && loc.getBlockZ() >= minZ);
     }
 }

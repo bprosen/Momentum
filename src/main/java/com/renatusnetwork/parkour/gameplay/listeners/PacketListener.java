@@ -47,13 +47,15 @@ public class PacketListener implements Listener {
                 PacketContainer packet = event.getPacket();
 
                 // use block change for right click, left click, etc
-                if (packet.getType() == PacketType.Play.Client.BLOCK_DIG || packet.getType() == PacketType.Play.Client.USE_ITEM) {
+                if (packet.getType() == PacketType.Play.Client.BLOCK_DIG || packet.getType() == PacketType.Play.Client.USE_ITEM)
+                {
 
                     Player player = event.getPlayer();
 
                     // make sure they are not temporary and in the right world
                     if (!event.isPlayerTemporary() &&
-                        player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+                        player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                    {
 
                         // if they are opped, and if they are bypassing plots, then ignore
                         if (player.isOp() && Parkour.getStatsManager().get(player).isBypassingPlots())
@@ -67,7 +69,8 @@ public class PacketListener implements Listener {
                                 Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world));
 
                         // if it is a block place, adjust location to the block being placed, not what it is placed on
-                        if (packet.getType() == PacketType.Play.Client.USE_ITEM) {
+                        if (packet.getType() == PacketType.Play.Client.USE_ITEM)
+                        {
                             String direction = packet.getDirections().read(0).toString();
 
                             // adjust location
@@ -105,26 +108,32 @@ public class PacketListener implements Listener {
 
                         // check if they have a plot,
                         // only way this does not get cancelled is if they are trusted or own it
-                        if (plot != null) {
+                        if (plot != null)
+                        {
                             // check if their plot is submitted
-                            if (plot.isSubmitted()) {
+                            if (plot.isSubmitted())
+                            {
                                 doCancel = true;
                                 reason = "&cYou cannot edit your plot when it has been submitted";
                             // check if they are not trusted and not owner, then cancel
-                            } else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) &&
-                                       !plot.getTrustedPlayers().contains(player.getName())) {
+                            }
+                            else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) && !plot.isTrusted(player.getUniqueId().toString()))
+                            {
 
                                 doCancel = true;
                                 reason = "&cYou cannot do this here";
                             // this will only continue if the block they edited is in the x and y of the bedrock spawn
                             }
                         // no nearest plot
-                        } else {
+                        }
+                        else
+                        {
                             doCancel = true;
                             reason = "&cYou cannot do this here";
                         }
 
-                        if (doCancel) {
+                        if (doCancel)
+                        {
                             // if they are opped, tell them on being able to bypass
                             if (player.isOp())
                                 reason += " &7You can bypass this with &c/plot bypass";
@@ -150,10 +159,12 @@ public class PacketListener implements Listener {
 
         // listen to move event asynchronously
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(
-                plugin, ListenerPriority.HIGHEST, PacketType.Play.Client.POSITION) {
+                plugin, ListenerPriority.HIGHEST, PacketType.Play.Client.POSITION)
+        {
 
             @Override
-            public void onPacketReceiving(PacketEvent event) {
+            public void onPacketReceiving(PacketEvent event)
+            {
                 PacketContainer packet = event.getPacket();
                 Player player = event.getPlayer();
 
@@ -164,7 +175,8 @@ public class PacketListener implements Listener {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 // null check jic
-                if (playerStats != null) {
+                if (playerStats != null)
+                {
 
                     InfiniteManager infiniteManager = Parkour.getInfiniteManager();
                     LocationManager locationManager = Parkour.getLocationManager();
@@ -231,7 +243,8 @@ public class PacketListener implements Listener {
                         else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.ASCENDANCE))
                         {
                             Level level = Parkour.getLevelManager().get(Parkour.getSettingsManager().ascendance_hub_level);
-                            if (level != null) {
+
+                            if (level != null)
                                 // force sync
                                 new BukkitRunnable() {
                                     @Override
@@ -239,10 +252,8 @@ public class PacketListener implements Listener {
                                         MenuItemAction.performLevelTeleport(playerStats, player, level); // Tp to ascendance hub
                                     }
                                 }.runTask(Parkour.getPlugin());
-                            }
                         }
                         else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.BLACK_MARKET))
-                        {
                             new BukkitRunnable()
                             {
                                 @Override
@@ -255,7 +266,6 @@ public class PacketListener implements Listener {
                                         Parkour.getBlackMarketManager().playerJoined(playerStats);
                                 }
                             }.runTask(Parkour.getPlugin());
-                        }
                     }
                     else
                     {

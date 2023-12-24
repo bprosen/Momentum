@@ -108,9 +108,6 @@ public class TablesDB
                             "liquid_reset BIT DEFAULT 0, " +
                             "new BIT DEFAULT 0, " +
                             "has_mastery BIT DEFAULT 0, " +
-                            // specific locations
-                            "start_location VARCHAR(30) DEFAULT NULL, " +
-                            "completion_location VARCHAR(30) DEFAULT NULL, " +
                             // keys
                             "PRIMARY KEY(name), " +
                             "FOREIGN KEY(start_location) REFERENCES " + DatabaseManager.LOCATIONS_TABLE + "(name) " +
@@ -349,7 +346,7 @@ public class TablesDB
                             "name VARCHAR(10) NOT NULL, " +
                             "title VARCHAR(20) DEFAULT NULL, " + // allow space for color codes
                             "rankup_level VARCHAR(20) DEFAULT NULL, " +
-                            "next_rank VARCHAR(10) NOT NULL, " +
+                            "next_rank VARCHAR(10) DEFAULT NULL, " +
                             // keys
                             "PRIMARY KEY(name), " +
                             "FOREIGN KEY(rankup_level) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +

@@ -300,6 +300,11 @@ public class StatsDB {
         Parkour.getDatabaseManager().runAsyncQuery(query);
     }
 
+    public static void updateRank(String uuid, String rank)
+    {
+        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank=? WHERE uuid=?", rank, uuid);
+    }
+
     public static double getCoinsFromName(String playerName)
     {
         double coins = 0;

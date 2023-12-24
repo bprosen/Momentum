@@ -11,8 +11,6 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
-import com.renatusnetwork.parkour.data.ranks.Rank;
-import com.renatusnetwork.parkour.data.ranks.RanksYAML;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
@@ -295,14 +293,8 @@ public class MenuItemFormatter {
             }
             else
             {
-                String levelName = RanksYAML.getRankUpLevel(playerStats.getRank().getRankName());
-
-                if (levelName != null)
-                {
-                    Level level = Parkour.getLevelManager().get(levelName);
-
-                    return createLevelItem(playerStats, level, menuItem, item);
-                }
+                Level level = playerStats.getRank().getRankupLevel();
+                return createLevelItem(playerStats, level, menuItem, item);
             }
         }
         return null;
@@ -327,7 +319,7 @@ public class MenuItemFormatter {
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
             if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))
-                itemLore.add(Utils.translate("&cRequires rank " + level.getRequiredRank().getRankTitle()));
+                itemLore.add(Utils.translate("&cRequires rank " + level.getRequiredRank().getTitle()));
 
             BankManager bankManager = Parkour.getBankManager();
 
