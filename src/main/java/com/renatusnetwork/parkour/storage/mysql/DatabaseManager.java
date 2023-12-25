@@ -45,7 +45,7 @@ public class DatabaseManager {
     public DatabaseManager(Plugin plugin)
     {
         connection = new DatabaseConnection();
-        TablesDB.initTables(this);
+        TablesDB.initTables();
         startScheduler(plugin);
     }
 
