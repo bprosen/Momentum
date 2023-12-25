@@ -55,7 +55,7 @@ public class StatsDB {
                     "')"
                     ;
 
-            Parkour.getDatabaseManager().runQuery(query);
+            DatabaseQueries.runQuery(query);
 
             // reload results
             playerResults = DatabaseQueries.getResults(
@@ -240,7 +240,7 @@ public class StatsDB {
     // this will update the player name all across the database
     private static void updatePlayerName(PlayerStats playerStats) {
         // update in stats
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET " +
+        DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET " +
                 "name='" + playerStats.getPlayerName() + "' WHERE uuid=" + playerStats.getUUID());
     }
 
@@ -252,7 +252,7 @@ public class StatsDB {
                 "spectatable=" + spectatable + " " +
                 "WHERE uuid='" + playerStats.getUUID() + "'";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updatePlayerNightVision(PlayerStats playerStats)
@@ -263,7 +263,7 @@ public class StatsDB {
                 "night_vision=" + vision + " " +
                 "WHERE uuid='" + playerStats.getUUID() + "'";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updatePlayerGrinding(PlayerStats playerStats)
@@ -273,7 +273,7 @@ public class StatsDB {
         String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
                 "grinding=" + grinding + " WHERE uuid='" + playerStats.getUUID() + "'";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updateCoins(String uuid, double coins)
@@ -282,7 +282,7 @@ public class StatsDB {
             coins = 0;
 
         String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=" + coins + " WHERE uuid='" + uuid + "'";
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updateCoinsName(String playerName, double coins)
@@ -291,18 +291,18 @@ public class StatsDB {
             coins = 0;
 
         String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=" + coins + " WHERE name='" + playerName + "'";
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updateInfiniteType(PlayerStats playerStats, InfiniteType newType)
     {
         String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_type='" + newType.toString().toLowerCase() + "' WHERE uuid='" + playerStats.getUUID() + "'";
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updateRank(String uuid, String rank)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank=? WHERE uuid=?", rank, uuid);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank=? WHERE uuid=?", rank, uuid);
     }
 
     public static double getCoinsFromName(String playerName)
@@ -373,14 +373,14 @@ public class StatsDB {
                 " VALUES " +
                 "('" + playerStats.getUUID() + "', '" + boughtLevel + "')";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void removeBoughtLevel(String uuid, String boughtLevel)
     {
         String query = "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=? AND level_name=?";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query, uuid, boughtLevel);
+        DatabaseQueries.runAsyncQuery(query, uuid, boughtLevel);
     }
 
     public static boolean hasBoughtLevel(String uuid, String boughtLevel)
@@ -422,7 +422,7 @@ public class StatsDB {
 
     public static void insertCompletion(PlayerStats playerStats, Level level, LevelCompletion levelCompletion) {
 
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
                     " (uuid, level_name, time_taken, completion_date)" +
                     " VALUES ('" +
@@ -438,7 +438,7 @@ public class StatsDB {
 
         String query = "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " WHERE uuid=? AND level_name=?";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query, uuid, levelName);
+        DatabaseQueries.runAsyncQuery(query, uuid, levelName);
     }
 
     public static boolean hasCompleted(String uuid, String levelName) {
@@ -514,26 +514,25 @@ public class StatsDB {
         Parkour.getStatsManager().toggleLoadingLeaderboards(true);
 
         ResultSet results = DatabaseQueries.getRawResults(
-                "SELECT c.level_id, l.level_name, p.player_name, c.time_taken, c.completion_date " +
+                "SELECT l.name AS level_name, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
                 "FROM (" +
-                "  SELECT *, ROW_NUMBER() OVER (PARTITION BY level_id ORDER BY time_taken) AS row_num" +
+                "  SELECT *, ROW_NUMBER() OVER (PARTITION BY l.name ORDER BY time_taken) AS row_num" +
                 "  FROM (" +
-                "    SELECT level_id, player_id, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
-                "    FROM completions" +
+                "    SELECT l.name, p.uuid, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
+                "    FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
                 "    WHERE time_taken > 0" +
-                "    GROUP BY level_id, player_id" +
+                "    GROUP BY l.name, p.uuid" +
                 "  ) AS grouped_completions" +
                 ") AS c " +
-                "JOIN players p ON c.player_id = p.player_id " +
-                "JOIN levels l ON c.level_id = l.level_id " +
+                "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON c.uuid=p.uuid " +
+                "JOIN " + DatabaseManager.LEVELS_TABLE + " l ON c.level_name=l.level_name " +
                 "WHERE c.row_num <= 10 " +
-                "ORDER BY c.level_id, c.time_taken;"
+                "ORDER BY c.level_name, c.time_taken;"
         );
 
         if (results != null)
         {
             // default values
-            int currentID = -1;
             Level currentLevel = null;
             List<LevelCompletion> currentLB = new ArrayList<>();
 
@@ -541,20 +540,17 @@ public class StatsDB {
             {
                 while (results.next())
                 {
-                    int levelID = results.getInt("level_id");
+                    String levelName = results.getString("level_name");
 
-                    if (currentID != levelID)
+                    if (currentLevel == null || !currentLevel.getName().equalsIgnoreCase(levelName))
                     {
                         // if not at the start (level is null), set LB
                         if (currentLevel != null)
                             currentLevel.setLeaderboardCache(currentLB);
 
-                        // initialize
+                        // initialize and adjust
                         currentLB = new ArrayList<>();
-                        currentLevel = Parkour.getLevelManager().get(results.getString("level_name"));
-
-                        // adjust
-                        currentID = levelID;
+                        currentLevel = Parkour.getLevelManager().get(levelName);
                     }
 
                     // create completion
@@ -579,16 +575,16 @@ public class StatsDB {
     public static void loadLeaderboard(Level level) {
         // Artificial limit of 500
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "completions",
-                "player.player_name, " +
+                DatabaseManager.LEVEL_COMPLETIONS_TABLE + " c",
+                "p.player_name AS player_name, " +
                         "time_taken, " +
                         "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
-                "JOIN players player" +
-                        " ON completions.player_id=player.player_id" +
-                        " WHERE level_id=" + level.getID() +
-                        " AND time_taken > 0" +
-                        " ORDER BY time_taken" +
-                        " ASC LIMIT 500"
+                "JOIN " + DatabaseManager.PLAYERS_TABLE + " p " +
+                        "ON c.player_id=p.player_id " +
+                        "WHERE c.level_name=" + level.getName() + " " +
+                        "AND time_taken > 0 " +
+                        "ORDER BY time_taken " +
+                        "ASC LIMIT 500"
         );
 
         List<LevelCompletion> levelCompletions = new ArrayList<>();

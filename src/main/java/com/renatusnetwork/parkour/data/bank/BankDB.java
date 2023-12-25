@@ -35,13 +35,13 @@ public class BankDB
                 // run in async!
                 if (hasBid(playerStats, type))
                 {
-                    Parkour.getDatabaseManager().runAsyncQuery(
+                    DatabaseQueries.runAsyncQuery(
                             "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND player_name='" + playerStats.getPlayerName() + "'"
                     );
                 }
                 else
                 {
-                    Parkour.getDatabaseManager().runAsyncQuery(
+                    DatabaseQueries.runAsyncQuery(
                             "INSERT INTO bank (uuid, player_name, type, total_bid) VALUES ('" +
                             playerStats.getUUID() + "','" +
                             playerStats.getPlayerName() + "','" +

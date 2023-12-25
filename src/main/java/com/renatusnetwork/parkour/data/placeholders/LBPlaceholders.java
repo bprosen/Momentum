@@ -2,14 +2,16 @@ package com.renatusnetwork.parkour.data.placeholders;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
-import com.renatusnetwork.parkour.data.events.EventLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.EventLBPosition;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
-import com.renatusnetwork.parkour.data.infinite.leaderboard.InfiniteLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.InfiniteLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.races.RaceLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.RaceLBPosition;
 import com.renatusnetwork.parkour.data.stats.*;
+import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.entity.Player;
 
 public class LBPlaceholders
 {
@@ -71,7 +73,7 @@ public class LBPlaceholders
                             {
                                 // return name or value
                                 if (value.equals("xp"))
-                                    return Utils.shortStyleNumber(clan.getTotalGainedXP());
+                                    return Utils.shortStyleNumber(clan.getTotalXP());
                                 else if (value.equals("name"))
                                     return clan.getTag();
                                 else if (value.equals("owner"))

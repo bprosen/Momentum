@@ -34,37 +34,37 @@ public class RanksDB {
     // from UUID method
     public static void updatePrestiges(String uuid, int newAmount)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET prestiges=? WHERE uuid=?", newAmount, uuid);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET prestiges=? WHERE uuid=?", newAmount, uuid);
     }
 
     // from playerName method
     public static void updatePrestigesFromName(String playerName, int newAmount)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET prestiges=? WHERE name=?", newAmount, playerName);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET prestiges=? WHERE name=?", newAmount, playerName);
     }
 
     public static void addRank(String name)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO " + DatabaseManager.RANKS_TABLE + " (name) VALUES('" + name + "')");
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.RANKS_TABLE + " (name) VALUES('" + name + "')");
     }
 
     public static void removeRank(String rankName)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM " + DatabaseManager.RANKS_TABLE + " WHERE name='" + rankName + "'");
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.RANKS_TABLE + " WHERE name='" + rankName + "'");
     }
 
     public static void updateTitle(String rankName, String title)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET title=? WHERE name=?", title, rankName);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET title=? WHERE name=?", title, rankName);
     }
 
     public static void updateRankupLevel(String rankName, String rankupLevel)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET rankup_level=? WHERE name=?", rankupLevel, rankName);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET rankup_level=? WHERE name=?", rankupLevel, rankName);
     }
 
     public static void updateNextRank(String rankName, String nextRank)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET next_rank=? WHERE name=?", nextRank, rankName);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET next_rank=? WHERE name=?", nextRank, rankName);
     }
 }

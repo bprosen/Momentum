@@ -19,6 +19,7 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -208,7 +209,7 @@ public class MenuItemAction {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
 
-                Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
+                DatabaseQueries.runAsyncQuery("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
                 break;
         }
     }
@@ -543,7 +544,7 @@ public class MenuItemAction {
 
                                     if (!Parkour.getRanksManager().isPastOrAtRank(playerStats, rank))
                                     {
-                                        player.sendMessage(Utils.translate("&cYou need to be rank " + rank.getRankTitle() + " &cto play this level"));
+                                        player.sendMessage(Utils.translate("&cYou need to be rank " + rank.getTitle() + " &cto play this level"));
                                         return;
                                     }
                                 }

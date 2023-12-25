@@ -60,7 +60,7 @@ public class DatabaseManager {
             public void run() {
                 try {
                     PreparedStatement statement = connection.get().prepareStatement(
-                            "SELECT * FROM checkpoints WHERE UUID='s'");
+                            "SELECT * FROM " + DatabaseManager.PLAYERS_TABLE + " WHERE UUID='s'");
                     statement.execute();
                     statement.close();
                 } catch (SQLException e) {
@@ -72,29 +72,5 @@ public class DatabaseManager {
 
     public DatabaseConnection getConnection() {
         return connection;
-    }
-
-    public void runQuery(String sql, Object... parameters) {
-        try {
-            PreparedStatement statement = connection.get().prepareStatement(sql);
-
-            // secure
-            for (int i = 0; i < parameters.length; i++)
-                statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
-
-            statement.executeUpdate();
-            statement.close();
-        } catch (SQLException e) {
-            Parkour.getPluginLogger().severe("ERROR: SQL Failed to run query: " + sql);
-            e.printStackTrace();
-        }
-    }
-
-    public void runAsyncQuery(String sql, Object... parameters) {
-        new BukkitRunnable() {
-            public void run() {
-                runQuery(sql, parameters);
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 }

@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.events;
+package com.renatusnetwork.parkour.data.leaderboards;
 
 public class EventLBPosition
 {

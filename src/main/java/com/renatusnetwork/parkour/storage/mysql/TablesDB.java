@@ -2,39 +2,39 @@ package com.renatusnetwork.parkour.storage.mysql;
 
 public class TablesDB
 {
-    public static void initTables(DatabaseManager database)
+    public static void initTables()
     {
         // initialize all tables...
-        createPlayers(database);
-        createLevels(database);
-        createPerks(database);
-        createPlots(database);
-        createLocations(database);
-        createLevelRatings(database);
-        createLevelCheckpoints(database);
-        createLevelRecords(database);
-        createLevelSaves(database);
-        createLevelPurchases(database);
-        createLevelSpawns(database);
-        createLevelCompletions(database);
-        createClans(database);
-        createRanks(database);
-        createPlotTrustedPlayers(database);
-        createModifiers(database);
-        createPlayerModifiers(database);
-        createPerksOwned(database);
-        createPerksLevelRequirements(database);
-        createPerksArmor(database);
-        createLevelCompletionCommands(database);
-        createLevelPotionEffects(database);
-        createLevelRequiredLevels(database);
-        createBadges(database);
-        createBadgesOwned(database);
-        createBadgesCommands(database);
-        createMasteryBadgeLevels(database);
+        createPlayers();
+        createLevels();
+        createPerks();
+        createPlots();
+        createLocations();
+        createLevelRatings();
+        createLevelCheckpoints();
+        createLevelRecords();
+        createLevelSaves();
+        createLevelPurchases();
+        createLevelSpawns();
+        createLevelCompletions();
+        createClans();
+        createRanks();
+        createPlotTrustedPlayers();
+        createModifiers();
+        createPlayerModifiers();
+        createPerksOwned();
+        createPerksLevelRequirements();
+        createPerksArmor();
+        createLevelCompletionCommands();
+        createLevelPotionEffects();
+        createLevelRequiredLevels();
+        createBadges();
+        createBadgesOwned();
+        createBadgesCommands();
+        createMasteryBadgeLevels();
     }
 
-    private static void createPlayers(DatabaseManager databaseManager)
+    private static void createPlayers()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLAYERS_TABLE + "(" +
                            "uuid CHAR(36) NOT NULL, " +
@@ -84,10 +84,10 @@ public class TablesDB
                            ")" +
                        ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevels(DatabaseManager databaseManager)
+    private static void createLevels()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVELS_TABLE + "(" +
                             // basic info
@@ -110,12 +110,6 @@ public class TablesDB
                             "has_mastery BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(name), " +
-                            "FOREIGN KEY(start_location) REFERENCES " + DatabaseManager.LOCATIONS_TABLE + "(name) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE SET NULL, " +
-                            "FOREIGN KEY(completion_locations) REFERENCES " + DatabaseManager.LOCATIONS_TABLE + "(name) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE SET NULL, " +
                             "FOREIGN KEY(required_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)" +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE SET NULL, " +
@@ -128,10 +122,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPerks(DatabaseManager databaseManager)
+    private static void createPerks()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
@@ -147,10 +141,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPlots(DatabaseManager databaseManager)
+    private static void createPlots()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLOTS_TABLE + "(" +
                             "id INT NOT NULL AUTO_INCREMENT, " +
@@ -164,10 +158,10 @@ public class TablesDB
                                 "ON DELETE CASCADE" + // we want to delete their plot if the player is deleted from the db
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLocations(DatabaseManager databaseManager)
+    private static void createLocations()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LOCATIONS_TABLE + "(" +
                             "name VARCHAR(30) NOT NULL, " +
@@ -175,15 +169,15 @@ public class TablesDB
                             "x DOUBLE NOT NULL, " +
                             "y DOUBLE NOT NULL, " +
                             "z DOUBLE NOT NULL, " +
-                            "yaw DOUBLE NOT NULL, " +
-                            "pitch DOUBLE NOT NULL, " +
+                            "yaw FLOAT NOT NULL, " +
+                            "pitch FLOAT NOT NULL, " +
                             "PRIMARY KEY(name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelRatings(DatabaseManager databaseManager)
+    private static void createLevelRatings()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_RATINGS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -205,10 +199,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelCheckpoints(DatabaseManager databaseManager)
+    private static void createLevelCheckpoints()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -229,10 +223,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelRecords(DatabaseManager databaseManager)
+    private static void createLevelRecords()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_RECORDS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
@@ -249,10 +243,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelSaves(DatabaseManager databaseManager)
+    private static void createLevelSaves()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_SAVES_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -275,10 +269,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelPurchases(DatabaseManager databaseManager)
+    private static void createLevelPurchases()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_PURCHASES_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -295,10 +289,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelSpawns(DatabaseManager databaseManager)
+    private static void createLevelSpawns()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_SPAWNS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
@@ -309,10 +303,10 @@ public class TablesDB
                             "INDEX level_index(level_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createClans(DatabaseManager databaseManager)
+    private static void createClans()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.CLANS_TABLE + "(" +
                             "tag VARCHAR(10) NOT NULL, " +
@@ -337,10 +331,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createRanks(DatabaseManager databaseManager)
+    private static void createRanks()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.RANKS_TABLE + "(" +
                             "name VARCHAR(10) NOT NULL, " +
@@ -355,10 +349,10 @@ public class TablesDB
                             "FOREIGN KEY(next_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelCompletions(DatabaseManager databaseManager)
+    private static void createLevelCompletions()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -378,10 +372,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createModifiers(DatabaseManager databaseManager)
+    private static void createModifiers()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MODIFIERS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
@@ -400,10 +394,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPlotTrustedPlayers(DatabaseManager databaseManager)
+    private static void createPlotTrustedPlayers()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "(" +
                             "plot_id INT NOT NULL, " +
@@ -420,10 +414,10 @@ public class TablesDB
                             "INDEX id_index(plot_id)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPlayerModifiers(DatabaseManager databaseManager)
+    private static void createPlayerModifiers()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -440,10 +434,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPerksOwned(DatabaseManager databaseManager)
+    private static void createPerksOwned()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_OWNED_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -461,10 +455,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPerksLevelRequirements(DatabaseManager databaseManager)
+    private static void createPerksLevelRequirements()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "(" +
                             "perk_name VARCHAR(20) NOT NULL, " +
@@ -481,10 +475,10 @@ public class TablesDB
                             "INDEX perk_name_index(perk_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createPerksArmor(DatabaseManager databaseManager)
+    private static void createPerksArmor()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
                             "perk_name VARCHAR(20) NOT NULL, " +
@@ -502,10 +496,10 @@ public class TablesDB
                             "INDEX perk_name_index(perk_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelCompletionCommands(DatabaseManager databaseManager)
+    private static void createLevelCompletionCommands()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
@@ -519,10 +513,10 @@ public class TablesDB
                             "INDEX level_name_index(level_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelPotionEffects(DatabaseManager databaseManager)
+    private static void createLevelPotionEffects()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
@@ -542,10 +536,10 @@ public class TablesDB
                             ")" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelRequiredLevels(DatabaseManager databaseManager)
+    private static void createLevelRequiredLevels()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
@@ -562,10 +556,10 @@ public class TablesDB
                             "INDEX level_name_index(level_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createBadges(DatabaseManager databaseManager)
+    private static void createBadges()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
@@ -574,10 +568,10 @@ public class TablesDB
                             "PRIMARY KEY(name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createBadgesOwned(DatabaseManager databaseManager)
+    private static void createBadgesOwned()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_OWNED_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
@@ -594,10 +588,10 @@ public class TablesDB
                             "INDEX uuid_index(uuid)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createBadgesCommands(DatabaseManager databaseManager)
+    private static void createBadgesCommands()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_COMMANDS_TABLE + "(" +
                             "badge_name VARCHAR(20) NOT NULL, " +
@@ -611,10 +605,10 @@ public class TablesDB
                             "INDEX badge_name_index(badge_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
-    private static void createMasteryBadgeLevels(DatabaseManager databaseManager)
+    private static void createMasteryBadgeLevels()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "(" +
                             "badge_name VARCHAR(20) NOT NULL, " +
@@ -628,7 +622,7 @@ public class TablesDB
                             "INDEX badge_name_index(badge_name)" +
                         ")";
 
-        databaseManager.runQuery(query);
+        DatabaseQueries.runQuery(query);
     }
 
     /*

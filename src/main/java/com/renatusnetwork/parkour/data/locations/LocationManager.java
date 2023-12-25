@@ -4,10 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class LocationManager {
 
@@ -17,48 +14,49 @@ public class LocationManager {
         load();
     }
 
-    public void load() {
-        locations = new HashMap<>();
-
-        for (String locationName : LocationsYAML.getNames())
-            load(locationName);
+    public void load()
+    {
+        locations = LocationsDB.loadLocations();
 
         Parkour.getPluginLogger().info("Locations loaded: " + locations.size());
     }
 
-    public void load(String locationName) {
-        Location location = LocationsYAML.get(locationName);
+    public void load(String locationName)
+    {
+        locations.put(locationName, LocationsDB.loadLocation(locationName));
+    }
 
-        if (location == null && exists(locationName))
-            locations.remove(locationName);
+    public void add(String locationName, Location location)
+    {
+        // update if it exists, insert if not
+        if (exists(locationName))
+            LocationsDB.updateLocation(locationName, location);
         else
-            locations.put(locationName, location);
+            LocationsDB.insertLocation(locationName, location);
+
+        locations.put(locationName, location);
     }
 
     public Location get(String locationName) {
         return locations.get(locationName);
     }
 
-    public List<String> getNames() {
-        return new ArrayList<>(locations.keySet());
-    }
-
     public boolean exists(String locationName) {
         return locations.containsKey(locationName);
     }
 
-    public void teleport(Player player, String locationName) {
-        if (exists(locationName))
-            player.teleport(get(locationName));
+    public void teleport(Player player, String locationName)
+    {
+        Location location = get(locationName);
+
+        if (location != null)
+            player.teleport(location);
     }
 
-    public void save(String locationName, Location location) {
-        LocationsYAML.save(locationName, location);
-    }
-
-    public void remove(String locationName) {
-        if (exists(locationName))
-            LocationsYAML.remove(locationName);
+    public void remove(String locationName)
+    {
+        locations.remove(locationName);
+        LocationsDB.removeLocation(locationName);
     }
 
     public boolean hasCompletionLocation(String levelName) {
@@ -106,7 +104,7 @@ public class LocationManager {
         return inPortal;
     }
 
-    public HashMap<String, Location> getLocations() { return locations; }
+    public int numLocations() { return locations.size(); }
 
     public Location getLobbyLocation() {
         return get("spawn");

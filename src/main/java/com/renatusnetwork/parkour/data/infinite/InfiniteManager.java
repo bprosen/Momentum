@@ -4,15 +4,15 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.InfiniteEndEvent;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.*;
-import com.renatusnetwork.parkour.data.infinite.leaderboard.InfiniteLB;
+import com.renatusnetwork.parkour.data.leaderboards.InfiniteLB;
 import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteReward;
 import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewards;
-import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewardsYAML;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
@@ -246,7 +246,7 @@ public class InfiniteManager {
         if (playerStats != null)
             playerStats.setInfiniteScore(type, score);
 
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "UPDATE players SET infinite_" + type.toString().toLowerCase() + "_score=" + score + " WHERE player_name=?", playerName
         );
     }

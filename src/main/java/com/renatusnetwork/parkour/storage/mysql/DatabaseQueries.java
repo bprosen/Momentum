@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.storage.mysql;
 
 import com.renatusnetwork.parkour.Parkour;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -74,5 +75,29 @@ public class DatabaseQueries
         }
 
         return null;
+    }
+
+    public static void runQuery(String sql, Object... parameters) {
+        try {
+            PreparedStatement statement = Parkour.getDatabaseManager().getConnection().get().prepareStatement(sql);
+
+            // secure
+            for (int i = 0; i < parameters.length; i++)
+                statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
+
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            Parkour.getPluginLogger().severe("ERROR: SQL Failed to run query: " + sql);
+            e.printStackTrace();
+        }
+    }
+
+    public static void runAsyncQuery(String sql, Object... parameters) {
+        new BukkitRunnable() {
+            public void run() {
+                runQuery(sql, parameters);
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 }

@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.races;
+package com.renatusnetwork.parkour.data.leaderboards;
 
 public class RaceLBPosition {
 

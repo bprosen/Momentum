@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.infinite.leaderboard;
+package com.renatusnetwork.parkour.data.leaderboards;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;

@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.checkpoints;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 
@@ -16,7 +17,7 @@ public class CheckpointManager {
             playerStats.removeCheckpoint(level.getName());
             playerStats.resetCurrentCheckpoint();
 
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + level.getName() + "'" +
+            DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + level.getName() + "'" +
                     " AND player_name='" + playerStats.getPlayerName() + "'");
         }
     }

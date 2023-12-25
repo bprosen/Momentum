@@ -142,14 +142,13 @@ public class RatingDB {
     public static void addRating(Player player, Level level, int rating) {
 
         String query = "INSERT INTO ratings " +
-                       "(uuid, player_name, level_id, rating)" +
+                       "(uuid, level_name, rating)" +
                        " VALUES('" +
                        player.getUniqueId().toString() + "','" +
-                       player.getName() + "'," +
-                       level.getID() + "," +
+                       level.getName() + "'," +
                        rating +
                        ")";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 }

@@ -54,14 +54,14 @@ public class PlotsDB {
 
     public static void addTrustedPlayer(int plotID, Player trustedPlayer)
     {
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) " +
                     "VALUES (" + plotID + ",'" + trustedPlayer.getUniqueId().toString() + "')");
     }
 
     public static void removeTrustedPlayer(int plotID, Player trustedPlayer)
     {
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=" + plotID + " AND trusted_uuid='" + trustedPlayer.getUniqueId().toString() + "'");
     }
 
@@ -73,7 +73,7 @@ public class PlotsDB {
     }
 
     public static void addPlot(Player player, Location loc) {
-        Parkour.getDatabaseManager().runQuery("INSERT INTO " + DatabaseManager.PLOTS_TABLE +
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PLOTS_TABLE +
                 " (owner_uuid, center_x, center_z)" +
                 " VALUES ('" +
                 player.getUniqueId().toString() + "','" +
@@ -83,7 +83,7 @@ public class PlotsDB {
     }
 
     public static void removePlot(String UUID) {
-        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid='" + UUID + "'");
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid='" + UUID + "'");
     }
 
 
@@ -126,12 +126,12 @@ public class PlotsDB {
 
     public static void toggleSubmitted(String UUID)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.PLOTS_TABLE + " SET submitted=NOT submitted WHERE owner_uuid='" + UUID + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLOTS_TABLE + " SET submitted=NOT submitted WHERE owner_uuid='" + UUID + "'");
     }
 
     public static void toggleSubmittedFromName(String playerName)
     {
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.PLOTS_TABLE + " p " +
                     "JOIN " + DatabaseManager.PLAYERS_TABLE + " pl ON p.owner_uuid=pl.uuid " +
                     "SET submitted=NOT submitted " +

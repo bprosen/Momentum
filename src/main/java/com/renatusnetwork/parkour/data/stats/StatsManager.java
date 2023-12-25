@@ -10,6 +10,9 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
+import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -517,7 +520,7 @@ public class StatsManager {
                                 loreString = loreString.replace("%balance%", Utils.formatNumber(playerStats.getCoins()))
                                         .replace("%perks_gained%", playerStats.getGainedPerksCount() + "")
                                         .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
-                                        .replace("%rank_name%", Utils.translate(playerStats.getRank().getRankTitle()))
+                                        .replace("%rank_name%", Utils.translate(playerStats.getRank().getTitle()))
                                         .replace("%prestiges%", playerStats.getPrestiges() + "")
                                         .replace("%infinite_classic_score%", playerStats.getBestInfiniteScore(InfiniteType.CLASSIC) + "")
                                         .replace("%infinite_sprint_score%", playerStats.getBestInfiniteScore(InfiniteType.SPRINT) + "")
@@ -618,7 +621,7 @@ public class StatsManager {
         Rank rank = playerStats.getRank();
         String rankString = "&cNone";
         if (rank != null)
-            rankString = rank.getRankTitle();
+            rankString = rank.getTitle();
 
         int prestiges = playerStats.getPrestiges();
         int bestClassicInfinite = playerStats.getBestInfiniteScore(InfiniteType.CLASSIC);

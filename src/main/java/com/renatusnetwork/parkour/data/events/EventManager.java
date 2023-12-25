@@ -8,23 +8,14 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.leaderboards.EventLBPosition;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.Location;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -105,7 +96,7 @@ public class EventManager {
 
                 // update wins
                 playerStats.addEventWin();
-                Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
+                DatabaseQueries.runAsyncQuery("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
             }
 
             if (forceEnded)

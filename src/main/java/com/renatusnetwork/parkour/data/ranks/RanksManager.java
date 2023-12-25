@@ -72,7 +72,7 @@ public class RanksManager {
         // play sound
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2f, 0f);
 
-        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
+        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getTitle()));
         Parkour.getStatsManager().runGGTimer();
     }
 
@@ -96,7 +96,7 @@ public class RanksManager {
         playerStats.setPrestigeMultiplier(prestigeMultiplier);
 
         // dont need to update stage as they will never hit stage 2 in max rank
-        StatsDB.updateRank(player.getUniqueId().toString(), defaultRank.getRankName());
+        StatsDB.updateRank(player.getUniqueId().toString(), defaultRank.getName());
 
         // now add prestige db
         RanksDB.updatePrestiges(player.getUniqueId().toString(), playerStats.getPrestiges());
@@ -132,13 +132,13 @@ public class RanksManager {
     public void enteredRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(true);
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET attempting_rankup=1 WHERE uuid='" + playerStats.getUUID() + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE players SET attempting_rankup=1 WHERE uuid='" + playerStats.getUUID() + "'");
     }
 
     public void leftRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(false);
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
     }
 
     public boolean isPastOrAtRank(PlayerStats playerStats, Rank current)

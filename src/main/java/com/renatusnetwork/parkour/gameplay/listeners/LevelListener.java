@@ -11,6 +11,7 @@ import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -174,7 +175,7 @@ public class LevelListener implements Listener {
 
         // delete if they have a cp
         if (playerStats.hasCurrentCheckpoint())
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
+            DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
                     " AND player_name='" + playerStats.getPlayerName() + "'");
 
         playerStats.setCurrentCheckpoint(location);
@@ -207,7 +208,7 @@ public class LevelListener implements Listener {
         player.sendMessage(Utils.translate(msgString));
 
         // add to async queue
-        Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO checkpoints " +
+        DatabaseQueries.runAsyncQuery("INSERT INTO checkpoints " +
                 "(uuid, player_name, level_name, world, x, y, z)" +
                 " VALUES ('" +
                 playerStats.getUUID() + "','" +

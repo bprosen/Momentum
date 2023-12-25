@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import org.bukkit.Bukkit;
@@ -216,7 +217,7 @@ public class BankManager
                             Parkour.getModifiersManager().removeModifier(Parkour.getStatsManager().get(player), modifier);
                         else
                             // remove from db only
-                            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
+                            DatabaseQueries.runAsyncQuery("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
 
                         Parkour.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
                         bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder

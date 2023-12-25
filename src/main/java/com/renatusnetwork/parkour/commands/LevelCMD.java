@@ -3,7 +3,6 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
-import com.renatusnetwork.parkour.data.locations.LocationsYAML;
 import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -20,10 +19,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class LevelCMD implements CommandExecutor {
-
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
-
+public class LevelCMD implements CommandExecutor
+{
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
+    {
         if (sender.isOp() || !(sender instanceof Player)) {
 
             LevelManager levelManager = Parkour.getLevelManager();
@@ -46,9 +45,6 @@ public class LevelCMD implements CommandExecutor {
                             sender.sendMessage(Utils.translate("&cIncorrect parameters"));
                         }
                     }
-                } else if (a[0].equalsIgnoreCase("list")) { // subcommand: list
-                    sender.sendMessage(Utils.translate("&7Levels loaded in: &2" + String.join("&7, &2",
-                            levelManager.getNames())));
                 } else if (a[0].equalsIgnoreCase("create")) { // subcommand: create
                     if (a.length == 2) {
                         String levelName = a[1].toLowerCase();
@@ -338,7 +334,7 @@ public class LevelCMD implements CommandExecutor {
                                         StatsDB.removeRecordsName(levelCompletion.getPlayerName());
                                 }
 
-                                Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM completions WHERE level_id=" +
+                                DatabaseQueries.runAsyncQuery("DELETE FROM completions WHERE level_id=" +
                                         level.getID() + " AND time_taken=" + time + " AND player_id=" + playerID);
                                 completions.remove(levelCompletion);
                                 level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
@@ -501,7 +497,7 @@ public class LevelCMD implements CommandExecutor {
                             for (Map<String, String> ratingResult : ratingResults)
                                 level.removeRatingAndCalc(Integer.parseInt(ratingResult.get("rating")));
 
-                            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM ratings WHERE level_id=" + level.getID()
+                            DatabaseQueries.runAsyncQuery("DELETE FROM ratings WHERE level_id=" + level.getID()
                                     + " AND player_name='" + playerName + "'");
 
                             sender.sendMessage(Utils.translate("&cYou removed &4" + playerName + " &crating from &7" + level.getFormattedTitle()));
@@ -799,7 +795,7 @@ public class LevelCMD implements CommandExecutor {
                             }
 
                         // delete from db
-                        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name=?", levelName);
+                        DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name=?", levelName);
 
                         sender.sendMessage(Utils.translate("&cYou have deleted all checkpoints for level &4" + levelName));
                     } else {
@@ -826,7 +822,7 @@ public class LevelCMD implements CommandExecutor {
                                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in " + levelName));
                                 }
                             } else {
-                                Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name=? AND player_name=?", levelName, playerName);
+                                DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name=? AND player_name=?", levelName, playerName);
                                 sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a loaded checkpoint, but any database record was deleted"));
                             }
                         } else {
@@ -851,7 +847,7 @@ public class LevelCMD implements CommandExecutor {
                             // now remove from level cache and db
                             for (String levelName : levelsToRemove) {
                                 levelCache.remove(levelName);
-                                Parkour.getDatabaseManager().runQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
+                                DatabaseQueries.runQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
                             }
 
                             sender.sendMessage(Utils.translate("&2" + levelsToRemove.size() + " &7levels cleaned from the database (already removed levels, etc)"));
@@ -1095,7 +1091,7 @@ public class LevelCMD implements CommandExecutor {
                         }
                         else
                         {
-                            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM saves WHERE player_name=? AND level_name=?", playerName, levelName);
+                            DatabaseQueries.runAsyncQuery("DELETE FROM saves WHERE player_name=? AND level_name=?", playerName, levelName);
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online but any record has been deleted from the database"));
                         }
                     } else {
@@ -1118,7 +1114,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&aTo apply changes use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
         sender.sendMessage(Utils.translate("&a/level show  &7Show level information"));
-        sender.sendMessage(Utils.translate("&a/level list  &7List levels loaded in memory"));
         sender.sendMessage(Utils.translate("&a/level create <level>  &7Create a level"));
         sender.sendMessage(Utils.translate("&a/level load  &7Loads levels.yml then levels"));
         sender.sendMessage(Utils.translate("&a/level delete <level>  &7Delete a level"));

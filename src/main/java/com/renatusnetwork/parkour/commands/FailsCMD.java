@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -52,7 +53,7 @@ public class FailsCMD implements CommandExecutor
                     failBit = 1;
 
                 // update in db
-                Parkour.getDatabaseManager().runAsyncQuery("UPDATE players SET fail_mode=" + failBit + " WHERE uuid='" + player.getUniqueId() + "'");
+                DatabaseQueries.runAsyncQuery("UPDATE players SET fail_mode=" + failBit + " WHERE uuid='" + player.getUniqueId() + "'");
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
             {

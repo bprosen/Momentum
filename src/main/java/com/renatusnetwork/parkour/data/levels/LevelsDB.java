@@ -23,7 +23,7 @@ public class LevelsDB {
         String query = "UPDATE levels SET " +
                 "level_name=? WHERE level_name=?";
 
-        Parkour.getDatabaseManager().runAsyncQuery(query, newLevelName, levelName);
+        DatabaseQueries.runAsyncQuery(query, newLevelName, levelName);
     }
 
     public static long getGlobalCompletions() {
@@ -52,7 +52,7 @@ public class LevelsDB {
         if (levelData != null)
             levelData.setReward(level.getReward());
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void updateScoreModifier(Level level) {
@@ -64,29 +64,29 @@ public class LevelsDB {
         if (levelData != null)
             levelData.setScoreModifier(level.getScoreModifier());
 
-        Parkour.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(query);
     }
 
     public static void insertLevelRecord(String levelName, String uuid)
     {
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
         "INSERT INTO " + DatabaseManager.LEVEL_RECORDS_TABLE + " (level_name, uuid) VALUES ('" + levelName + "', '" + uuid + "')"
         );
     }
 
     public static void updateLevelRecord(String levelName, String uuid)
     {
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
         "UPDATE " + DatabaseManager.LEVEL_RECORDS_TABLE + " SET uuid='" + uuid + "' WHERE level_name='" + levelName + "'"
         );
     }
 
     public static void removeLevel(String levelName)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
+        DatabaseQueries.runAsyncQuery("DELETE FROM levels WHERE level_name='" + levelName + "'");
 
         // this is just for extra clean up since they are not foreign key relationships
-        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM locations WHERE name='" + levelName + "-spawn'");
-        Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM locations WHERE name='" + levelName + "-completion'");
+        DatabaseQueries.runAsyncQuery("DELETE FROM locations WHERE name='" + levelName + "-spawn'");
+        DatabaseQueries.runAsyncQuery("DELETE FROM locations WHERE name='" + levelName + "-completion'");
     }
 }

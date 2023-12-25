@@ -28,7 +28,7 @@ public class PerksDB
     }
 
     public static void addOwnedPerk(PlayerStats playerStats, Perk perk, Long date) {
-        Parkour.getDatabaseManager().runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.PERKS_OWNED_TABLE + " (uuid, perk_name, date_received) VALUES " +
                     "(" + playerStats.getUUID() + ", " + perk.getName() + ", FROM_UNIXTIME(" + (date / 1000) + "))"
         );
@@ -36,6 +36,6 @@ public class PerksDB
 
     public static void updateInfiniteBlock(PlayerStats playerStats, Perk perk)
     {
-        Parkour.getDatabaseManager().runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block='" + perk.getInfiniteBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block='" + perk.getInfiniteBlock().name() + "' WHERE uuid='" + playerStats.getUUID() + "'");
     }
 }

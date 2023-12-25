@@ -1,4 +1,4 @@
-package com.renatusnetwork.parkour.data.stats;
+package com.renatusnetwork.parkour.data.leaderboards;
 
 public class CoinsLBPosition
 {
