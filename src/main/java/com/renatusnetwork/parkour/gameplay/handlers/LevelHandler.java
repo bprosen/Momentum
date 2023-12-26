@@ -73,8 +73,8 @@ public class LevelHandler {
         }
     }
 
-    public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean forcedCompletion) {
-
+    public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean forcedCompletion)
+    {
         LevelCompletionEvent event = new LevelCompletionEvent(playerStats, level);
         Bukkit.getPluginManager().callEvent(event);
 
@@ -90,6 +90,8 @@ public class LevelHandler {
             Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
             String time = (((double) elapsedTime) / 1000) + "s";
             LevelCompletion levelCompletion = new LevelCompletion(
+                    playerStats.getUUID(),
+                    playerStats.getPlayerName(),
                     System.currentTimeMillis(),
                     elapsedTime
             );
@@ -105,7 +107,6 @@ public class LevelHandler {
             if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
                 playerStats.setTutorial(false);
 
-            levelCompletion.setPlayerName(player.getName());
             playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
 
             // small microoptimization running it in async

@@ -247,11 +247,12 @@ public class RaceManager {
                 elapsedTime = 0;
 
             LevelCompletion levelCompletion = new LevelCompletion(
+                    winner.getUniqueId().toString(),
+                    winner.getName(),
                     System.currentTimeMillis(),
                     elapsedTime
             );
 
-            levelCompletion.setPlayerName(winner.getName());
             winnerStats.setTotalLevelCompletions(winnerStats.getTotalLevelCompletions() + 1);
             StatsDB.insertCompletion(winnerStats, raceObject.getRaceLevel(), levelCompletion);
             levelManager.addTotalLevelCompletion();

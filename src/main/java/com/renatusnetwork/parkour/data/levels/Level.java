@@ -31,10 +31,10 @@ public class Level {
     private float rating;
     private int ratingsCount;
     private Location startLocation;
-    private Location respawnLocation;
+    private Location completionLocation;
     private int maxCompletions;
     private int playersInLevel;
-    private boolean broadcastCompletion;
+    private boolean broadcast;
     private String requiredPermissionNode;
     private List<String> requiredLevels;
     private int respawnY;
@@ -67,7 +67,8 @@ public class Level {
     private int difficulty;
     private boolean cooldown;
 
-    public Level(String levelName) {
+    public Level(String levelName)
+    {
         this.name = levelName;
         load();
     }
@@ -81,6 +82,8 @@ public class Level {
     public String getTitle() {
         return title;
     }
+
+    public void setTitle(String title) { this.title = title; }
 
     public String getFormattedTitle() {
         return Utils.translate(title);
@@ -102,9 +105,11 @@ public class Level {
         return startLocation;
     }
 
-    public Location getRespawnLocation() {
-        return respawnLocation;
-    }
+    public void setStartLocation(Location startLocation) { this.startLocation = startLocation;}
+
+    public Location getCompletionLocation() { return completionLocation; }
+
+    public void setCompletionLocation(Location completionLocation) { this.completionLocation = completionLocation; }
 
     public void toggleLiquidReset() { liquidResetPlayer = !liquidResetPlayer; }
 
@@ -122,9 +127,11 @@ public class Level {
         return maxCompletions;
     }
 
-    public boolean getBroadcastCompletion() {
-        return broadcastCompletion;
-    }
+    public void setMaxCompletions(int maxCompletions) { this.maxCompletions = maxCompletions; }
+
+    public boolean isBroadcasting() { return broadcast; }
+
+    public void toggleBroadcast() { this.broadcast = !this.broadcast; }
 
     public void setRating(float rating) {
         this.rating = rating;
@@ -474,9 +481,13 @@ public class Level {
         return leaderboardCache;
     }
 
-    public List<String> getRequiredLevels() {
-        return requiredLevels;
-    }
+    public boolean isRequiredLevel(String levelName) { return requiredLevels.contains(levelName); }
+
+    public boolean hasRequiredLevels() { return !requiredLevels.isEmpty(); }
+
+    public void addRequiredLevel(String levelName) { requiredLevels.add(levelName); }
+
+    public void removeRequiredLevel(String levelName) { requiredLevels.remove(levelName); }
 
     public List<PotionEffect> getPotionEffects() {
         return potionEffects;

@@ -406,6 +406,8 @@ public class StatsDB {
 
         for (Map<String, String> completionResult : completionsResults)
             playerStats.levelCompletion(
+                    playerStats.getUUID(),
+                    playerStats.getPlayerName(),
                     completionResult.get("level_name"),
                     Long.parseLong(completionResult.get("date")),
                     Long.parseLong(completionResult.get("time_taken"))
@@ -514,7 +516,7 @@ public class StatsDB {
         Parkour.getStatsManager().toggleLoadingLeaderboards(true);
 
         ResultSet results = DatabaseQueries.getRawResults(
-                "SELECT l.name AS level_name, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
+                "SELECT l.name AS level_name, p.uuid AS player_uuid, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
                 "FROM (" +
                 "  SELECT *, ROW_NUMBER() OVER (PARTITION BY l.name ORDER BY time_taken) AS row_num" +
                 "  FROM (" +
@@ -554,8 +556,12 @@ public class StatsDB {
                     }
 
                     // create completion
-                    LevelCompletion levelCompletion = new LevelCompletion(results.getLong("completion_date"), results.getLong("time_taken"));
-                    levelCompletion.setPlayerName(results.getString("player_name"));
+                    LevelCompletion levelCompletion = new LevelCompletion(
+                            results.getString("player_uuid"),
+                            results.getString("player_name"),
+                            results.getLong("completion_date"),
+                            results.getLong("time_taken")
+                    );
 
                     currentLB.add(levelCompletion);
                 }
@@ -576,7 +582,7 @@ public class StatsDB {
         // Artificial limit of 500
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE + " c",
-                "p.player_name AS player_name, " +
+                "p.uuid AS player_uuid, p.name AS player_name, " +
                         "time_taken, " +
                         "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
                 "JOIN " + DatabaseManager.PLAYERS_TABLE + " p " +
@@ -600,11 +606,11 @@ public class StatsDB {
             // if not added already, add to leaderboard
             if (!addedPlayers.contains(playerName)) {
                 LevelCompletion levelCompletion = new LevelCompletion(
+                        levelResult.get("player_uuid"),
+                        playerName,
                         Long.parseLong(levelResult.get("date")),
                         Long.parseLong(levelResult.get("time_taken"))
                 );
-
-                levelCompletion.setPlayerName(playerName);
                 levelCompletions.add(levelCompletion);
                 addedPlayers.add(playerName);
             }

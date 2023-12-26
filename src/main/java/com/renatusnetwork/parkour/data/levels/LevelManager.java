@@ -2,7 +2,7 @@ package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
-import com.renatusnetwork.parkour.data.locations.LocationsYAML;
+import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
@@ -10,9 +10,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -21,7 +19,6 @@ import java.util.*;
 public class LevelManager {
 
     private HashMap<String, Level> levels = new HashMap<>();
-
     private HashMap<Menu, Set<Level>> menuLevels = new HashMap<>();
 
     private Level featuredLevel;
@@ -54,6 +51,96 @@ public class LevelManager {
         tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
 
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
+    }
+
+    public void create(String levelName)
+    {
+        LevelsDB.insertLevel(levelName);
+        levels.put(levelName, new Level(levelName));
+    }
+
+    public void remove(String levelName)
+    {
+        LevelsDB.removeLevel(levelName);
+
+        // loop through and reset if applicable
+        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+            if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
+            {
+                playerStats.resetLevel();
+                PracticeHandler.resetDataOnly(playerStats);
+                playerStats.resetCurrentCheckpoint();
+
+                if (playerStats.isAttemptingRankup())
+                    Parkour.getRanksManager().leftRankup(playerStats);
+
+                // toggle off elytra armor
+                Parkour.getStatsManager().toggleOffElytra(playerStats);
+            }
+
+        levels.remove(levelName);
+    }
+
+    public Level get(String levelName) {
+        return levels.get(levelName);
+    }
+
+    public Level getFromTitle(String levelTitle) {
+        levelTitle = ChatColor.stripColor(levelTitle);
+
+        for (Level level : levels.values())
+            if (ChatColor.stripColor(level.getFormattedTitle()).equalsIgnoreCase(levelTitle))
+                return level;
+
+        return null;
+    }
+
+    public void setTitle(Level level, String title)
+    {
+        level.setTitle(title);
+        LevelsDB.updateTitle(level.getName(), title);
+    }
+
+    public void setReward(Level level, int reward)
+    {
+        level.setReward(reward);
+        LevelsDB.updateReward(level.getName(), reward);
+    }
+
+    public void setStartLocation(Level level, String locationName, Location location)
+    {
+        level.setStartLocation(location);
+        LocationsDB.insertLocation(locationName, location);
+    }
+
+    public void setCompletionLocation(Level level, String locationName, Location location)
+    {
+        level.setCompletionLocation(location);
+        LocationsDB.insertLocation(locationName, location);
+    }
+
+    public void setMaxCompletions(Level level, int maxCompletions)
+    {
+        level.setMaxCompletions(maxCompletions);
+        LevelsDB.updateMaxCompletions(level.getName(), maxCompletions);
+    }
+
+    public void toggleBroadcastCompletion(Level level)
+    {
+        level.toggleBroadcast();
+        LevelsDB.updateBroadcast(level.getName());
+    }
+
+    public void addRequiredLevel(Level level, String requiredLevelName)
+    {
+        level.addRequiredLevel(requiredLevelName);
+        LevelsDB.insertLevelRequired(level.getName(), requiredLevelName);
+    }
+
+    public void removeRequiredLevel(Level level, String requiredLevelName)
+    {
+        level.removeRequiredLevel(requiredLevelName);
+        LevelsDB.removeLevelRequired(level.getName(), requiredLevelName);
     }
 
     public void loadGlobalLevelCompletions()
@@ -129,7 +216,7 @@ public class LevelManager {
         for (Level level : getLevelsInAllMenus())
         {
             if (
-                level.getRequiredLevels().isEmpty() &&
+                !level.hasRequiredLevels() &&
                 !level.hasPermissionNode() &&
                 !level.isAscendanceLevel() &&
                 !level.isRankUpLevel() &&
@@ -349,20 +436,6 @@ public class LevelManager {
         return temporaryRaceLevelList;
     }
 
-    public Level get(String levelName) {
-        return levels.get(levelName);
-    }
-
-    public Level getFromTitle(String levelTitle) {
-        levelTitle = ChatColor.stripColor(levelTitle);
-
-        for (Level level : levels.values())
-            if (ChatColor.stripColor(level.getFormattedTitle()).equalsIgnoreCase(levelTitle))
-                return level;
-
-        return null;
-    }
-
     public long getTotalLevelCompletions() { return totalLevelCompletions; }
 
     public void addTotalLevelCompletion() { totalLevelCompletions++; }
@@ -451,28 +524,6 @@ public class LevelManager {
         return get(levelName) != null;
     }
 
-    public void remove(String levelName)
-    {
-        LevelsDB.removeLevel(levelName);
-
-        // loop through and reset if applicable
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-            if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
-            {
-                playerStats.resetLevel();
-                PracticeHandler.resetDataOnly(playerStats);
-                playerStats.resetCurrentCheckpoint();
-
-                if (playerStats.isAttemptingRankup())
-                    Parkour.getRanksManager().leftRankup(playerStats);
-
-                // toggle off elytra armor
-                Parkour.getStatsManager().toggleOffElytra(playerStats);
-            }
-
-        levels.remove(levelName);
-    }
-
     public void teleportToLevel(PlayerStats playerStats, Level level)
     {
         Player player = playerStats.getPlayer();
@@ -545,11 +596,14 @@ public class LevelManager {
         }
     }
 
+    public int numLevels() { return levels.size(); }
+
     public Set<String> getNames() {
         return levels.keySet();
     }
 
-    public void shutdown() {
+    public void shutdown()
+    {
         for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
             Parkour.getStatsManager().toggleOffElytra(playerStats);
     }

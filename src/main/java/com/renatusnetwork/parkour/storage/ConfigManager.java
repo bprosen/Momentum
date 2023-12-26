@@ -19,15 +19,9 @@ public class ConfigManager {
 
     public ConfigManager(Plugin plugin) {
         initialize("settings", plugin);
-        initialize("levels", plugin);
-        initialize("locations", plugin);
         initialize("menus", plugin);
-        initialize("perks", plugin);
-        initialize("ranks", plugin);
-        initialize("clans", plugin);
         initialize("rewards", plugin);
         initialize("bank", plugin);
-        initialize("modifiers", plugin);
         initialize("blackmarket", plugin);
     }
 
