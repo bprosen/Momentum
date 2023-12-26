@@ -362,6 +362,7 @@ public class TablesDB
                             "level_name VARCHAR(20) NOT NULL, " +
                             "time_taken MEDIUMINT DEFAULT 0, " +
                             "completion_date TIMESTAMP NOT NULL, " +
+                            "mastery BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
                             "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
