@@ -32,6 +32,8 @@ public class TablesDB
         createBadgesOwned();
         createBadgesCommands();
         createMasteryBadgeLevels();
+        createLevelLore();
+        createPerksLore();
     }
 
     private static void createPlayers()
@@ -133,6 +135,7 @@ public class TablesDB
                             // settings
                             "price INT DEFAULT 0, " +
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
+                            "set_lore VARCHAR(50) DEFAULT NULL, " + // lore can get quite long
                             // keys
                             "PRIMARY KEY(name), " +
                             // constraints
@@ -625,6 +628,49 @@ public class TablesDB
         DatabaseQueries.runQuery(query);
     }
 
+    private static void createLevelLore()
+    {
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_LORE + "(" +
+                            "level_name VARCHAR(20) NOT NULL, " +
+                            "lore_index TINYINT NOT NULL, " +
+                            "lore VARCHAR(50) NOT NULL, " + // a line of lore can get decently long with color codes
+                            // keys
+                            "PRIMARY KEY(level_name, lore_index), " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            //indexes
+                            "INDEX level_name_index(level_name), " +
+                            // constraints
+                            "CONSTRAINT non_negative CHECK (" +
+                                "lore_index >= 0" +
+                            ")" +
+                        ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createPerksLore()
+    {
+        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_LORE + "(" +
+                            "perk_name VARCHAR(20) NOT NULL, " +
+                            "lore_index TINYINT NOT NULL, " +
+                            "lore VARCHAR(50) NOT NULL, " + // a line of lore can get decently long with color codes
+                            // keys
+                            "PRIMARY KEY(perk_name, lore_index), " +
+                            "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            //indexes
+                            "INDEX level_name_index(level_name), " +
+                            // constraints
+                            "CONSTRAINT non_negative CHECK (" +
+                                "lore_index >= 0" +
+                            ")" +
+                        ")";
+
+        DatabaseQueries.runQuery(query);
+    }
     /*
     private static void createPlayers(DatabaseManager database) {
         String sqlQuery = "CREATE TABLE players(" +

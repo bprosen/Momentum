@@ -41,6 +41,8 @@ public class DatabaseManager {
     public static final String BADGES_OWNED_TABLE = "badges_owned";
     public static final String BADGES_COMMANDS_TABLE = "badges_commands";
     public static final String MASTERY_BADGE_LEVELS_TABLE = "mastery_badge_levels";
+    public static final String LEVEL_LORE = "level_lore";
+    public static final String PERKS_LORE = "perks_lore";
 
     public DatabaseManager(Plugin plugin)
     {
