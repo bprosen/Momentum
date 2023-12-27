@@ -501,7 +501,7 @@ public class PlayerStats {
     }
 
     public void levelCompletion(String levelName, String playerUUID, String playerName, long timeOfCompletion, long completionTimeElapsed) {
-        this.levelCompletion(levelName, new LevelCompletion(playerUUID, playerName, timeOfCompletion, completionTimeElapsed));
+        this.levelCompletion(levelName, new LevelCompletion(levelName, playerUUID, playerName, timeOfCompletion, completionTimeElapsed));
     }
 
     public HashMap<String, Set<LevelCompletion>> getLevelCompletionsMap() {

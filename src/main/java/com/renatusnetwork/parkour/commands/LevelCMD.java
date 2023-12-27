@@ -10,13 +10,11 @@ import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.*;
 
 public class LevelCMD implements CommandExecutor
@@ -257,69 +255,63 @@ public class LevelCMD implements CommandExecutor
                             int name = row - 1;
 
                             LevelCompletion levelCompletion = leaderboard.get(name);
+                            // update records
+                            PlayerStats playerStats = Parkour.getStatsManager().get(levelCompletion.getUUID());
 
-                            // if deleting record
-                            if (name == 0)
+                            if (playerStats != null)
+                                Parkour.getStatsManager().removeRecord(playerStats);
+
+                            // run it in async!
+                            new BukkitRunnable()
                             {
-                                // update records
-                                PlayerStats playerStats = Parkour.getStatsManager().get(levelCompletion.getUUID());
+                                @Override
+                                public void run()
+                                {
+                                    LevelsDB.removeCompletion(levelCompletion, false);
+                                    level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
 
-                                if (playerStats != null)
-                                    Parkour.getStatsManager().removeRecord(playerStats);
-
-                                // only one person on lb, delete record entirely
-                                if (leaderboard.size() == 1)
-                                    LevelsDB.removeLevelRecord(levelName);
-                                else
-                                    // or simply update
-                                    LevelsDB.updateLevelRecord(levelName, leaderboard.get(1).getUUID());
-                            }
-
-                            LevelsDB.removeCompletion(levelName, levelCompletion.getUUID(), levelCompletion.getCompletionTimeElapsed());
-
-                            level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
-
-                            sender.sendMessage(Utils.translate("&4" + levelCompletion.getPlayerName() + "'s" +
-                                               " &ctime has been removed succesfully from &4" + levelName));
-                            // run it async 0.25 seconds later so it does it when database has updated
-                            new BukkitRunnable() {
-                                public void run() {
                                     StatsDB.loadLeaderboard(level);
+
+                                    // if deleting record
+                                    if (name == 0)
+                                    {
+                                        List<LevelCompletion> newLeaderbaord = level.getLeaderboard();
+
+                                        if (!newLeaderbaord.isEmpty())
+                                        {
+                                            // if the new leaderboard is no longer empty, add record for new holder
+                                            LevelCompletion newHolder = leaderboard.get(0);
+
+                                            // we always want to insert, because we are removing the specific completion which would cascade into removing it from the records table
+                                            LevelsDB.insertLevelRecord(newHolder);
+
+                                            // update cache if they are online
+                                            PlayerStats newRecordStats = Parkour.getStatsManager().get(newHolder.getUUID());
+
+                                            if (newRecordStats != null)
+                                                newRecordStats.addRecord();
+                                        }
+                                    }
+
+                                    sender.sendMessage(Utils.translate(
+                                            "&4" + levelCompletion.getPlayerName() + "'s &ctime has been removed succesfully from &4" + levelName
+                                    ));
                                 }
-                            }.runTaskLaterAsynchronously(Parkour.getPlugin(), 5);
-                        } else {
+                            }.runTaskAsynchronously(Parkour.getPlugin());
+                        }
+                        else
+                        {
                             sender.sendMessage(Utils.translate("&cYou are entering an integer above 9"));
                         }
-                    } else {
+                    }
+                    else
+                    {
                             sender.sendMessage(Utils.translate("&7No level named '&c" + levelName + "&7' exists"));
                     }
-                } else {
-                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer!"));
                 }
-            } else if (a[0].equalsIgnoreCase("modifier")) { //subcommand: modifier
-                if (a.length > 1) {
-                    String levelName = a[1].toLowerCase();
-                    Level level = Parkour.getLevelManager().get(levelName);
-
-                    if (level != null) {
-                        if (a.length == 3) {
-                            if (Utils.isInteger(a[2])) {
-                                level.setScoreModifier(Integer.parseInt(a[2]));
-                                LevelsDB.updateScoreModifier(level);
-
-                                sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's " +
-                                                   "score modifier to &6" + a[2]));
-                            } else {
-                                sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
-                            }
-                        } else {
-                            sender.sendMessage(Utils.translate("&2" + levelName + "&7's current score modifier:" +
-                                               " &6" + level.getScoreModifier()));
-                        }
-                    } else
-                        sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
-                } else {
-                    sender.sendMessage(Utils.translate("&cIncorrect parameters"));
+                else
+                {
+                    sender.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer!"));
                 }
             } else if (a.length == 3 && a[0].equalsIgnoreCase("raceset")) {
 
@@ -437,93 +429,110 @@ public class LevelCMD implements CommandExecutor
                 } else {
                     sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                 }
-            } else if (a.length == 3 && a[0].equalsIgnoreCase("hasrated")) {
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("hasrated"))
+            {
                 String levelName = a[1].toLowerCase();
                 String playerName = a[2];
                 Level level = levelManager.get(levelName);
 
                 if (level != null) {
-                    if (RatingDB.hasRatedLevelFromName(playerName, level.getID()))
+                    int rating = RatingDB.getRatingFromName(playerName, levelName);
 
-                        sender.sendMessage(Utils.translate("&c" + playerName + " &7has rated &c" +
-                                level.getFormattedTitle() + " &7with a &6" +
-                                RatingDB.getRatingFromName(playerName, level.getID())));
-
+                    if (rating > -1)
+                        sender.sendMessage(Utils.translate(
+                                "&c" + playerName + " &7has rated &c" + level.getFormattedTitle() + " &7with a &6" + rating
+                        ));
                     else
-
-                        sender.sendMessage(Utils.translate("&c" + playerName + " &7has not rated &c" +
-                                level.getFormattedTitle()));
-                } else {
-                    sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+                        sender.sendMessage(Utils.translate(
+                                "&c" + playerName + " &7has not rated &c" + level.getFormattedTitle()
+                        ));
                 }
-            } else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings")) {
+                else
+                    sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
+            }
+            else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings"))
+            {
                 String levelName = a[1].toLowerCase();
                 Level level = levelManager.get(levelName);
 
-                if (level != null) {
-                    if (a.length == 2) {
-                        HashMap<Integer, List<String>> ratings = RatingDB.getAllLevelRaters(level.getID());
+                if (level != null)
+                {
+                    if (a.length == 2)
+                    {
+                        HashMap<String, Integer> ratings = RatingDB.getAllLevelRaters(level.getName());
 
-                        if (!ratings.isEmpty()) {
-
+                        if (!ratings.isEmpty())
+                        {
                             sender.sendMessage(Utils.translate("&2" + level.getFormattedTitle() + "&7's Ratings"));
-                            int totalRatings = 0;
 
                             // loop through list
-                            for (Map.Entry<Integer, List<String>> entry : ratings.entrySet()) {
-                                String msg = " &2" + entry.getKey() + " &7-";
-                                // loop through names
-                                for (String playerName : entry.getValue()) {
-                                    if (!entry.getValue().get(entry.getValue().size() - 1).equalsIgnoreCase(playerName))
-                                        msg += " &a" + playerName + "&7,";
-                                    else
-                                        // no comma if last one
-                                        msg += " &a" + playerName;
+                            for (int i = 5; i >= 0; i--)
+                            {
+                                String msg = " &2" + i + " &7-";
 
-                                    totalRatings++;
-                                }
+                                for (Map.Entry<String, Integer> entry : ratings.entrySet())
+                                    if (entry.getValue() == i)
+                                        msg += " &a" + entry.getKey();
+
                                 sender.sendMessage(Utils.translate(msg));
                             }
-                            sender.sendMessage(Utils.translate("&a" + totalRatings + " &7Ratings"));
-                        } else {
+                            sender.sendMessage(Utils.translate("&a" + ratings.size() + " &7ratings"));
+                        }
+                        else
+                        {
                             sender.sendMessage(Utils.translate("&cNobody has rated this level"));
                         }
                     // if they put the optional specification arg
-                    } else if (a.length == 3) {
-                        if (Utils.isInteger(a[2])) {
+                    }
+                    else if (a.length == 3)
+                    {
+                        if (Utils.isInteger(a[2]))
+                        {
                             int rating = Integer.parseInt(a[2]);
                             // make sure it is between 0 and 5
-                            if (rating >= 0 && rating <= 5) {
+                            if (rating >= 0 && rating <= 5)
+                            {
 
-                                List<String> ratings = RatingDB.getSpecificLevelRaters(level.getID(), rating);
-                                // if it is empty
-                                if (!ratings.isEmpty()) {
+                                List<String> ratings = RatingDB.getSpecificLevelRaters(level.getName(), rating);
 
-                                    sender.sendMessage(Utils.translate("&7Users who rated &2" +
-                                                            level.getFormattedTitle() + " &7a &a" + rating));
+                                // if it is not empty
+                                if (!ratings.isEmpty())
+                                {
+                                    sender.sendMessage(Utils.translate(
+                                            "&7Users who rated &2" + level.getFormattedTitle() + " &7a &a" + rating
+                                    ));
 
                                     String msg = " &2" + rating + " &7-";
 
-                                    for (String playerName : ratings) {
-                                        if (!ratings.get(ratings.size() - 1).equalsIgnoreCase(playerName))
-                                            msg += " &a" + playerName + "&7,";
-                                        else
-                                            // no comma if last one
-                                            msg += " &a" + playerName;
-                                    }
+                                    for (String playerName : ratings)
+                                        msg += " &a" + playerName;
+
                                     sender.sendMessage(Utils.translate(msg));
-                                    sender.sendMessage(Utils.translate("&a" + ratings.size() + " &7Ratings"));
-                                } else {
+                                    sender.sendMessage(Utils.translate("&a" + ratings.size() + " &7ratings"));
+                                }
+                                else
+                                {
                                     sender.sendMessage(Utils.translate("&cNobody has rated this level a " + rating));
                                 }
-                            } else {
+                            }
+                            else
+                            {
                                 sender.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
                             }
-                        } else {
+                        }
+                        else
+                        {
                             sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an Integer"));
                         }
                     }
-                } else {
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&cInvalid arguments"));
+                    }
+                }
+                else
+                {
                     sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a valid level name"));
                 }
             } else if (a.length == 2 && a[0].equalsIgnoreCase("togglewater")) {
@@ -1039,7 +1048,7 @@ public class LevelCMD implements CommandExecutor
     }
 
     private static void sendHelp(CommandSender sender) {
-        sender.sendMessage(Utils.translate("&aTo apply changes use &2/level load"));
+        sender.sendMessage(Utils.translate("&aTo reload levels from database, use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
         sender.sendMessage(Utils.translate("&a/level show  &7Show level information"));
         sender.sendMessage(Utils.translate("&a/level create <level>  &7Create a level"));

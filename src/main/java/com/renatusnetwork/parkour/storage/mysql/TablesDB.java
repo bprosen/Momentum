@@ -233,17 +233,15 @@ public class TablesDB
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_RECORDS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
-                            "uuid CHAR(36) NOT NULL, " +
+                            "completion_id INT NOT NULL, " +
                             // keys
                             "PRIMARY KEY(level_name), " +
                             "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                            "FOREIGN KEY(completion_id) REFERENCES " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(id) " +
                                 "ON UPDATE CASCADE " +
-                                "ON DELETE CASCADE, " +
-                            // indexes
-                            "INDEX uuid_index(uuid)" +
+                                "ON DELETE CASCADE" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -358,18 +356,24 @@ public class TablesDB
     private static void createLevelCompletions()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
+                            "id INT NOT NULL AUTO_INCREMENT, " +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
-                            "time_taken MEDIUMINT DEFAULT 0, " +
                             "completion_date TIMESTAMP NOT NULL, " +
+                            "time_taken MEDIUMINT DEFAULT 0, " +
                             "mastery BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(uuid, level_name), " +
+                            "PRIMARY KEY(id), " +
                             "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                                "ON UPDATE CASCADE " +
+                                "ON DELETE CASCADE, " +
+                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
                             "INDEX uuid_index(uuid), " +
+                            "INDEX level_index(level_name), " +
+                            "UNIQUE INDEX alternate_id(uuid, level_name, completion_date), " +
                             // constraints
                             "CONSTRAINT non_negative CHECK (" +
                                 "time_taken >= 0" +

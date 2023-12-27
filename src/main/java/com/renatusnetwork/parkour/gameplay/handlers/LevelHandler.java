@@ -90,6 +90,7 @@ public class LevelHandler {
             Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
             String time = (((double) elapsedTime) / 1000) + "s";
             LevelCompletion levelCompletion = new LevelCompletion(
+                    levelName,
                     playerStats.getUUID(),
                     playerStats.getPlayerName(),
                     System.currentTimeMillis(),

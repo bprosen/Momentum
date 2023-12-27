@@ -557,6 +557,7 @@ public class StatsDB {
 
                     // create completion
                     LevelCompletion levelCompletion = new LevelCompletion(
+                            levelName,
                             results.getString("player_uuid"),
                             results.getString("player_name"),
                             results.getLong("completion_date"),
@@ -606,6 +607,7 @@ public class StatsDB {
             // if not added already, add to leaderboard
             if (!addedPlayers.contains(playerName)) {
                 LevelCompletion levelCompletion = new LevelCompletion(
+                        level.getName(),
                         levelResult.get("player_uuid"),
                         playerName,
                         Long.parseLong(levelResult.get("date")),

@@ -37,7 +37,6 @@ public class LevelManager {
     public LevelManager(Plugin plugin)
     {
         load(); // Loads levels from configuration
-        loadRatings();
         loadLevelsInMenus();
         pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
@@ -157,8 +156,7 @@ public class LevelManager {
             {
                 for (Level level : levels.values())
                 {
-                    level.setRating(RatingDB.getAverageRating(level.getName()));
-                    level.setRatingsCount(RatingDB.getTotalRatings(level.getID()));
+                    Le
                 }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());

@@ -247,6 +247,7 @@ public class RaceManager {
                 elapsedTime = 0;
 
             LevelCompletion levelCompletion = new LevelCompletion(
+                    raceObject.getRaceLevel().getName(),
                     winner.getUniqueId().toString(),
                     winner.getName(),
                     System.currentTimeMillis(),

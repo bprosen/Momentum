@@ -358,7 +358,7 @@ public class Level {
                     LevelsDB.updateLevelRecord(this.name, playerStats.getUUID());
                 }
                 else
-                    LevelsDB.insertLevelRecord(this.name, playerStats.getUUID());
+                    LevelsDB.insertLevelRecord(levelCompletion);this.name, playerStats.getUUID());
             }
             PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName()); // get player that got record
 
