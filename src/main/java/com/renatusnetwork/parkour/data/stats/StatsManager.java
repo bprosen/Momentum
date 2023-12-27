@@ -5,7 +5,9 @@ import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -67,8 +69,8 @@ public class StatsManager {
         // Leader Boards
         new BukkitRunnable() {
             public void run() {
-                StatsDB.loadTotalCompletions();
-                StatsDB.loadLeaderboards();
+                CompletionsDB.loadTotalCompletions();
+                CompletionsDB.loadLeaderboards();
                 loadGlobalPersonalCompletionsLB();
                 loadCoinsLB();
                 loadRecordsLB();
@@ -278,16 +280,6 @@ public class StatsManager {
     {
         StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() + coins);
         playerStats.addCoins(coins);
-    }
-
-    public void addRecord(PlayerStats playerStats, int currentRecords)
-    {
-        playerStats.setRecords(currentRecords + 1);
-    }
-
-    public void removeRecord(PlayerStats playerStats)
-    {
-        playerStats.setRecords(playerStats.getRecords() - 1);
     }
 
     public long getTotalCoins() { return totalCoins; }

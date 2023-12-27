@@ -1,15 +1,11 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.ranks.Rank;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -20,7 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Level {
 
@@ -29,7 +27,7 @@ public class Level {
     private int reward;
     private int price;
     private float rating;
-    private int ratingsCount;
+    private HashMap<String, Integer> ratings;
     private Location startLocation;
     private Location completionLocation;
     private int maxCompletions;
@@ -145,34 +143,52 @@ public class Level {
 
     public void setPrice(int price) { this.price = price; }
 
-    public int getRatingsCount() { return ratingsCount; }
+    public int getRatingsCount() { return ratings.size(); }
 
-    public void setRatingsCount(int ratingsCount) { this.ratingsCount = ratingsCount; }
-
-    public void addRatingAndCalc(int rating) {
-
-        // run new average = old average + (new rating + old average) / new count formula
-        double newAverageRating = this.rating + (rating - this.rating) / (ratingsCount + 1);
-        double newAmount = Double.valueOf(new BigDecimal(newAverageRating).toPlainString());
-        // this makes it seperate digits by commands and .2 means round decimal by 2 places
-        this.rating = Float.parseFloat(String.format("%,.2f", newAmount));
-        ratingsCount += 1;
+    public boolean hasRated(String playerName)
+    {
+        return ratings.containsKey(playerName);
     }
 
-    public void removeRatingAndCalc(int rating) {
+    public int getRating(String playerName)
+    {
+        return ratings.getOrDefault(playerName, -1);
+    }
 
-        if (ratingsCount - 1 <= 0) {
-            this.rating = 0.00f;
-            this.ratingsCount = 0;
+    public void addRating(String playerName, int rating)
+    {
+        ratings.put(playerName, rating);
+        calcRating();
+    }
 
-        } else {
-            // run new average = old average + (new rating + old average) / new count formula
-            double newAverageRating = this.rating + (rating - this.rating) / (ratingsCount - 1);
-            double newAmount = Double.valueOf(new BigDecimal(newAverageRating).toPlainString());
-            // this makes it seperate digits by commands and .2 means round decimal by 2 places
-            this.rating = Float.parseFloat(String.format("%,.2f", newAmount));
-            ratingsCount -= 1;
-        }
+    public void removeRating(String playerName)
+    {
+        ratings.remove(playerName);
+        calcRating();
+    }
+
+    public List<String> getUsersWhoRated(int rating)
+    {
+        List<String> tempList = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : ratings.entrySet())
+            if (entry.getValue() == rating)
+                tempList.add(entry.getKey());
+
+        return tempList;
+    }
+
+    private void calcRating()
+    {
+        long sumRatings = 0;
+
+        for (Integer value : ratings.values())
+            sumRatings += value;
+
+        double newAverageRating = ((double) sumRatings) / ratings.size();
+
+        // this makes it seperate digits by commands and .2 means round decimal by 2 places
+        rating = Float.parseFloat(String.format("%,.2f", newAverageRating));
     }
 
     public List<String> getCommands() { return commands; }
@@ -464,6 +480,8 @@ public class Level {
     public int getRespawnY() {
         return respawnY;
     }
+
+    public void setRespawnY(int respawnY) { this.respawnY = respawnY; }
 
     public boolean isElytraLevel() { return elytraLevel; }
 

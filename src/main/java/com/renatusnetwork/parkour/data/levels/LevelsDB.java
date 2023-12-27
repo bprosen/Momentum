@@ -1,15 +1,11 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
-import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +44,11 @@ public class LevelsDB {
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
 
+    public static void updateLiquidReset(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET liquid_reset=NOT liquid_reset WHERE name=?", levelName);
+    }
+
     public static void updateReward(String levelName, int reward)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET reward=? WHERE name=?", reward, levelName);
@@ -58,6 +59,10 @@ public class LevelsDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET title=? WHERE name=?", title, levelName);
     }
 
+    public static void updateRespawnY(String levelName, int respawnY)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET respawn_y=? WHERE name=?", respawnY, levelName);
+    }
     public static void updateMaxCompletions(String levelName, int maxCompletions)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET max_completions=? WHERE name=?", maxCompletions, levelName);

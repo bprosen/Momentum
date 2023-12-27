@@ -2,7 +2,9 @@ package com.renatusnetwork.parkour.data.races;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.stats.*;
 import com.renatusnetwork.parkour.data.leaderboards.RaceLBPosition;
@@ -255,7 +257,7 @@ public class RaceManager {
             );
 
             winnerStats.setTotalLevelCompletions(winnerStats.getTotalLevelCompletions() + 1);
-            StatsDB.insertCompletion(winnerStats, raceObject.getRaceLevel(), levelCompletion);
+            CompletionsDB.insertCompletion(levelCompletion, false, false);
             levelManager.addTotalLevelCompletion();
             raceObject.getRaceLevel().addCompletion(winner.getName(), levelCompletion);
 

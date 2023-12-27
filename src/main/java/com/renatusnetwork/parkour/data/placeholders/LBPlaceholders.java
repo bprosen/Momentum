@@ -7,7 +7,7 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.leaderboards.InfiniteLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.leaderboards.RaceLBPosition;
-import com.renatusnetwork.parkour.data.stats.*;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;

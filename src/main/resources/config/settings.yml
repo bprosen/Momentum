@@ -43,6 +43,8 @@ levels:
   featured_level_reward_multiplier: 1.50
   max_rated_levels_leaderboard_size: 10
   tutorial_level: tutorial
+  max_rating: 5
+  min_rating: 0
 cooldowns:
   reset_time: "3:15"
   modifiers:

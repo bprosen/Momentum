@@ -2,21 +2,19 @@ package com.renatusnetwork.parkour.gameplay.handlers;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.api.JackpotRewardEvent;
 import com.renatusnetwork.parkour.api.LevelCompletionEvent;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.events.EventManager;
+import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -24,9 +22,6 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class LevelHandler {
 
@@ -111,10 +106,12 @@ public class LevelHandler {
             playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
 
             // small microoptimization running it in async
-            new BukkitRunnable() {
+            new BukkitRunnable()
+            {
                 @Override
-                public void run() {
-                    StatsDB.insertCompletion(playerStats, level, levelCompletion);
+                public void run()
+                {
+                    CompletionsDB.insertCompletion(levelCompletion);
                 }
             }.runTaskAsynchronously(Parkour.getPlugin());
 

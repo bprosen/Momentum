@@ -37,7 +37,7 @@ public class LocationCMD implements CommandExecutor
 
                 if (!locationManager.exists(locationName))
                 {
-                    locationManager.add(locationName, player.getLocation());
+                    locationManager.set(locationName, player.getLocation());
                     player.sendMessage(Utils.translate("&7Set location &2" + locationName));
                 }
                 else

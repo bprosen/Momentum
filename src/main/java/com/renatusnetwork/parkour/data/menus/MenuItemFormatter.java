@@ -11,7 +11,7 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;

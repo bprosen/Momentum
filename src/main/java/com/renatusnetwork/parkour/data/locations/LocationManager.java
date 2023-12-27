@@ -26,7 +26,7 @@ public class LocationManager {
         locations.put(locationName, LocationsDB.loadLocation(locationName));
     }
 
-    public void add(String locationName, Location location)
+    public void set(String locationName, Location location)
     {
         // update if it exists, insert if not
         if (exists(locationName))
@@ -59,17 +59,26 @@ public class LocationManager {
         LocationsDB.removeLocation(locationName);
     }
 
+    public void updateName(String oldLocationName, String newLocationName)
+    {
+        Location location = locations.get(oldLocationName);
+
+        if (location != null)
+        {
+            // remove and replace
+            locations.remove(oldLocationName);
+            locations.put(newLocationName, location);
+
+            LocationsDB.updateLocationName(oldLocationName, newLocationName);
+        }
+    }
+
     public boolean hasCompletionLocation(String levelName) {
-        return exists(levelName + "-completion");
+        return exists(SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName));
     }
 
     public boolean hasSpawnLocation(String levelName) {
-        return exists(levelName + "-spawn");
-    }
-
-    public boolean hasPortalLocation(String levelName)
-    {
-        return exists(levelName + "-portal");
+        return exists(SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName));
     }
 
     public boolean isNearPortal(double playerX, double playerY, double playerZ, double radius, PortalType portalType)

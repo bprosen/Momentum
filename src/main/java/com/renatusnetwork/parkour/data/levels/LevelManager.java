@@ -52,6 +52,11 @@ public class LevelManager {
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
 
+    public void add(Level level)
+    {
+        levels.put(level.getName(), level);
+    }
+
     public void create(String levelName)
     {
         LevelsDB.insertLevel(levelName);
@@ -94,10 +99,33 @@ public class LevelManager {
         return null;
     }
 
+    public void addRating(Player player, Level level, int rating)
+    {
+        level.addRating(player.getName(), rating);
+        RatingDB.addRating(player, level, rating);
+    }
+
+    public void removeRating(String playerName, Level level)
+    {
+        level.removeRating(playerName);
+        RatingDB.removeRating(playerName, level);
+    }
+
+    public void toggleLiquidReset(Level level)
+    {
+        level.toggleLiquidReset();
+        LevelsDB.updateLiquidReset(level.getName());
+    }
     public void setTitle(Level level, String title)
     {
         level.setTitle(title);
         LevelsDB.updateTitle(level.getName(), title);
+    }
+
+    public void setRespawnY(Level level, int respawnY)
+    {
+        level.setRespawnY(respawnY);
+        LevelsDB.updateRespawnY(level.getName(), respawnY);
     }
 
     public void setReward(Level level, int reward)
@@ -145,21 +173,6 @@ public class LevelManager {
     public void loadGlobalLevelCompletions()
     {
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
-    }
-
-    private void loadRatings()
-    {
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-                for (Level level : levels.values())
-                {
-                    Le
-                }
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     private void startScheduler(Plugin plugin)

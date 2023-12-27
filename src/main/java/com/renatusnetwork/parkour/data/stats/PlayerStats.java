@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
 import com.renatusnetwork.parkour.data.ranks.Rank;

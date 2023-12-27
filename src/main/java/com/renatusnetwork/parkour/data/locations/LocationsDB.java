@@ -84,6 +84,15 @@ public class LocationsDB
         );
     }
 
+    public static void updateLocationName(String oldName, String newName)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.LOCATIONS_TABLE + " " +
+                    "SET name=? WHERE name=?",
+                    newName, oldName
+        );
+    }
+
     public static void removeLocation(String locationName)
     {
         DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name=?", locationName);

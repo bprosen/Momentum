@@ -2,7 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.stats.LevelCompletion;
+import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;

@@ -22,6 +22,9 @@ public class SettingsManager {
     public static final String INFINITE_PORTAL_NAME = "infinite-portal";
     public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
     public static final String BLACK_MARKET_PORTAL_NAME = "black_market-portal";
+    public static final String RACE_LEVEL_SPAWN_FORMAT = "race-%level%-%spawn%";
+    public static final String LEVEL_SPAWN_FORMAT = "%level%-spawn";
+    public static final String LEVEL_COMPLETION_FORMAT = "%level%-completion";
 
     public World main_world;
     public String levels_message_completion;
@@ -163,6 +166,9 @@ public class SettingsManager {
 
     public int infinite_angle_outside_border_min;
     public int infinite_angle_outside_border_max;
+
+    public int min_rating;
+    public int max_rating;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -390,5 +396,8 @@ public class SettingsManager {
         cooldown_calendar.set(Calendar.DAY_OF_YEAR, cooldown_calendar.get(Calendar.DAY_OF_YEAR) + 1); // next day
         cooldown_calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
         cooldown_calendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
+
+        max_rating = settings.getInt("levels.max_rating");
+        min_rating = settings.getInt("levels.min_rating");
     }
 }
