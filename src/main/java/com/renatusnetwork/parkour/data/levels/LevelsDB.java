@@ -84,62 +84,6 @@ public class LevelsDB {
         );
     }
 
-    public static void insertLevelRecord(LevelCompletion levelCompletion)
-    {
-        DatabaseQueries.runAsyncQuery(
-                "INSERT INTO " + DatabaseManager.LEVEL_RECORDS_TABLE + " (level_name, completion_id) " +
-                    "VALUES (?," +
-                    "(" +
-                        "SELECT id FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc " +
-                        "WHERE lc.uuid=? AND lc.level_name=? AND lc.completion_date=FROM_UNIXTIME(?)" +
-                    "))",
-                levelCompletion.getLevelName(),
-                levelCompletion.getUUID(),
-                levelCompletion.getLevelName(),
-                levelCompletion.getCompletionTimeElapsedSeconds()
-        );
-    }
-
-    public static void updateLevelRecord(LevelCompletion levelCompletion)
-    {
-        DatabaseQueries.runAsyncQuery(
-        "UPDATE " + DatabaseManager.LEVEL_RECORDS_TABLE + " SET completion_id=(" +
-                "SELECT id FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc " +
-                "WHERE lc.uuid=? AND lc.level_name=? AND lc.completion_date=FROM_UNIXTIME(?)" +
-            ") WHERE level_name=?",
-            levelCompletion.getUUID(),
-            levelCompletion.getLevelName(),
-            levelCompletion.getCompletionTimeElapsedSeconds(),
-            levelCompletion.getLevelName()
-        );
-    }
-
-    public static void removeLevelRecord(String levelName)
-    {
-        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVEL_RECORDS_TABLE + " WHERE level_name=?" + levelName);
-    }
-
-    public static void removeCompletions(String levelName, String playerUUID)
-    {
-        DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " WHERE level_name=? AND uuid=?",
-                levelName, playerUUID
-        );
-    }
-
-    public static void removeCompletion(LevelCompletion levelCompletion, boolean async)
-    {
-        String query =
-                "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
-                "WHERE level_name=? AND uuid=? AND completion_date=FROM_UNIXTIME(?)";
-
-        // we want this specific method to have the ability to choose async or not since it is used in an ordering sense in other places
-        if (async)
-            DatabaseQueries.runAsyncQuery(query, levelCompletion.getLevelName(), levelCompletion.getCompletionTimeElapsedSeconds());
-        else
-            DatabaseQueries.runQuery(query, levelCompletion.getPlayerName(), levelCompletion.getCompletionTimeElapsedSeconds());
-    }
-
     public static void removeLevel(String levelName)
     {
         Connection connection = Parkour.getDatabaseManager().getConnection().get();

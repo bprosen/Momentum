@@ -12,7 +12,6 @@ public class TablesDB
         createLocations();
         createLevelRatings();
         createLevelCheckpoints();
-        createLevelRecords();
         createLevelSaves();
         createLevelPurchases();
         createLevelSpawns();
@@ -32,8 +31,6 @@ public class TablesDB
         createBadgesOwned();
         createBadgesCommands();
         createMasteryBadgeLevels();
-        createLevelLore();
-        createPerksLore();
     }
 
     private static void createPlayers()
@@ -135,7 +132,6 @@ public class TablesDB
                             // settings
                             "price INT DEFAULT 0, " +
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
-                            "set_lore VARCHAR(50) DEFAULT NULL, " + // lore can get quite long
                             // keys
                             "PRIMARY KEY(name), " +
                             // constraints
@@ -224,24 +220,6 @@ public class TablesDB
                                 "ON DELETE CASCADE, " +
                             // indexes
                             "INDEX uuid_index(uuid)" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createLevelRecords()
-    {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_RECORDS_TABLE + "(" +
-                            "level_name VARCHAR(20) NOT NULL, " +
-                            "completion_id INT NOT NULL, " +
-                            // keys
-                            "PRIMARY KEY(level_name), " +
-                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE CASCADE, " +
-                            "FOREIGN KEY(completion_id) REFERENCES " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(id) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE CASCADE" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -356,14 +334,14 @@ public class TablesDB
     private static void createLevelCompletions()
     {
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
-                            "id INT NOT NULL AUTO_INCREMENT, " +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "completion_date TIMESTAMP NOT NULL, " +
                             "time_taken MEDIUMINT DEFAULT 0, " +
                             "mastery BIT DEFAULT 0, " +
+                            "record BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(id), " +
+                            "PRIMARY KEY(uuid, level_name, completion_date), " +
                             "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
@@ -371,9 +349,9 @@ public class TablesDB
                                 "ON UPDATE CASCADE " +
                                 "ON DELETE CASCADE, " +
                             // indexes
-                            "INDEX uuid_index(uuid), " +
-                            "INDEX level_index(level_name), " +
-                            "UNIQUE INDEX alternate_id(uuid, level_name, completion_date), " +
+                            "INDEX uuid_index(uuid), " + // gets the completions for that user fast
+                            "INDEX level_index(level_name), " + // gets the completions for that level fast
+                            "UNIQUE INDEX record_index(uuid, record), " + // get a users records fast, where uuid=player uuid and record=1
                             // constraints
                             "CONSTRAINT non_negative CHECK (" +
                                 "time_taken >= 0" +
@@ -633,49 +611,6 @@ public class TablesDB
         DatabaseQueries.runQuery(query);
     }
 
-    private static void createLevelLore()
-    {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_LORE + "(" +
-                            "level_name VARCHAR(20) NOT NULL, " +
-                            "lore_index TINYINT NOT NULL, " +
-                            "lore VARCHAR(50) NOT NULL, " + // a line of lore can get decently long with color codes
-                            // keys
-                            "PRIMARY KEY(level_name, lore_index), " +
-                            "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE CASCADE, " +
-                            //indexes
-                            "INDEX level_name_index(level_name), " +
-                            // constraints
-                            "CONSTRAINT non_negative CHECK (" +
-                                "lore_index >= 0" +
-                            ")" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createPerksLore()
-    {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_LORE + "(" +
-                            "perk_name VARCHAR(20) NOT NULL, " +
-                            "lore_index TINYINT NOT NULL, " +
-                            "lore VARCHAR(50) NOT NULL, " + // a line of lore can get decently long with color codes
-                            // keys
-                            "PRIMARY KEY(perk_name, lore_index), " +
-                            "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE CASCADE, " +
-                            //indexes
-                            "INDEX level_name_index(level_name), " +
-                            // constraints
-                            "CONSTRAINT non_negative CHECK (" +
-                                "lore_index >= 0" +
-                            ")" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
     /*
     private static void createPlayers(DatabaseManager database) {
         String sqlQuery = "CREATE TABLE players(" +

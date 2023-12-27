@@ -426,12 +426,12 @@ public class StatsDB {
 
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
-                    " (uuid, level_name, time_taken, completion_date)" +
+                    " (uuid, level_name, completion_date, time_taken)" +
                     " VALUES ('" +
                     playerStats.getUUID() + "', '" +
                     level.getName() + "', " +
-                    levelCompletion.getCompletionTimeElapsed() + ", " +
-                    "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
+                    "FROM_UNIXTIME(" + levelCompletion.getTimeOfCompletionSeconds() + "), " +
+                    levelCompletion.getCompletionTimeElapsed() +
                     ")"
         );
     }

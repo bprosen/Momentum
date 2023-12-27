@@ -13,6 +13,7 @@ public class LevelCompletion
         this.levelName = levelName;
         this.uuid = uuid;
         this.playerName = playerName;
+        this.timeOfCompletion = timeOfCompletion;
 
         if (completionTimeElapsed < 72000000L)
             this.completionTimeElapsed = completionTimeElapsed;
@@ -22,15 +23,15 @@ public class LevelCompletion
 
     public String getLevelName() { return levelName; }
 
-    public long getTimeOfCompletion() {
+    public long getTimeOfCompletionMillis() {
         return timeOfCompletion;
     }
+
+    public long getTimeOfCompletionSeconds() { return timeOfCompletion / 1000; }
 
     public long getCompletionTimeElapsed() {
         return completionTimeElapsed;
     }
-
-    public long getCompletionTimeElapsedSeconds() { return (completionTimeElapsed / 1000); }
 
     public String getPlayerName() {
         return playerName;
