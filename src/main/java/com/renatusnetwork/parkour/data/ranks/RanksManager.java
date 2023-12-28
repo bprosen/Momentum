@@ -146,7 +146,7 @@ public class RanksManager {
         if (playerStats != null && playerStats.getRank() != null)
         {
             // if they have prestiged already
-            if (playerStats.getPrestiges() > 0)
+            if (playerStats.hasPrestiges())
                 return true;
 
             // keep recursively going through the ranks until we reach the end of the rank

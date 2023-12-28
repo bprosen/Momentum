@@ -2,17 +2,11 @@ package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
-import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
-import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +99,8 @@ public class Level
         return reward;
     }
 
+    public boolean hasReward() { return reward > 0; }
+
     public int getPlayersInLevel() { return playersInLevel; }
 
     public void setPlayersInLevel(int playersInLevel) { this.playersInLevel = playersInLevel; }
@@ -154,6 +150,8 @@ public class Level
     public float getRating() {
         return rating;
     }
+
+    public boolean hasRating() { return rating > 0.0; }
 
     public int getPrice() { return price; }
 
@@ -219,6 +217,8 @@ public class Level
         totalCompletionsCount = count;
     }
 
+    public void addTotalCompletionsCount() { this.totalCompletionsCount++; }
+
     public int getTotalCompletionsCount() {
         return totalCompletionsCount;
     }
@@ -249,162 +249,21 @@ public class Level
 
     public EventType getEventType()
     {
-        EventType event = null;
-
-        if (eventLevel)
-            event = eventType;
-
-        return event;
-    }
-
-    public void sortNewCompletion(LevelCompletion levelCompletion)
-    {
-        HashMap<Integer, LevelCompletion> newLeaderboard = new HashMap<>(leaderboard);
-
-        newLeaderboard.put(newLeaderboard.size() + 1, levelCompletion);
-
-        for (int i = newLeaderboard.size(); i > 1; i--)
+        // simple switch case
+        switch (type)
         {
-            LevelCompletion completion = newLeaderboard.get(i);
-            LevelCompletion nextCompletion = newLeaderboard.get(i - 1);
-
-            if (nextCompletion.getCompletionTimeElapsed() > completion.getCompletionTimeElapsed())
-            {
-                // swap
-                newLeaderboard.replace((i - 1), completion);
-                newLeaderboard.replace(i, nextCompletion);
-            }
+            case EVENT_ASCENT:
+                return EventType.ASCENT;
+            case EVENT_MAZE:
+                return EventType.MAZE;
+            case EVENT_PVP:
+                return EventType.PVP;
+            case EVENT_FALLING_ANVIL:
+                return EventType.FALLING_ANVIL;
+            case EVENT_RISING_WATER:
+                return EventType.RISING_WATER;
         }
-        // Trimming potential #11 datapoint
-        if (newLeaderboard.size() > 10)
-            newLeaderboard.remove(11);
-
-        leaderboard = newLeaderboard;
-    }
-
-    public void addCompletion(String playerName, LevelCompletion levelCompletion)
-    {
-        if (totalCompletionsCount < 0)
-            totalCompletionsCount = 0;
-
-        boolean alreadyFirstPlace = false;
-        boolean firstCompletion = false;
-        boolean validCompletion = false;
-
-        totalCompletionsCount += 1;
-
-        if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
-            return;
-
-        if (!Parkour.getStatsManager().isLoadingLeaderboards())
-        {
-            if (!leaderboard.isEmpty())
-            {
-                // Compare completion against scoreboard
-                if (leaderboard.size() < 10 ||
-                        leaderboard.get(leaderboard.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                {
-                    LevelCompletion firstPlace = leaderboard.get(0);
-
-                    // check for first place
-                    if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                    {
-                        leaderboardCache.remove(firstPlace);
-                        alreadyFirstPlace = true;
-                    }
-                    // otherwise, search for where it is
-                    else
-                    {
-                        LevelCompletion completionToRemove = null;
-                        boolean completionSlower = false;
-
-                        for (LevelCompletion completion : leaderboardCache)
-                        {
-                            if (completion.getPlayerName().equalsIgnoreCase(playerName))
-                                if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                                    completionToRemove = completion;
-                                else
-                                    completionSlower = true;
-                        }
-                        if (completionToRemove != null)
-                            leaderboardCache.remove(completionToRemove);
-                        else if (completionSlower)
-                            return;
-                    }
-                    sortNewCompletion(levelCompletion);
-                    validCompletion = true;
-                }
-            }
-            else
-            {
-                leaderboardCache.add(levelCompletion);
-                firstCompletion = true;
-            }
-            // only do record mod if it is a valid or first completion
-            if (validCompletion || firstCompletion)
-                doRecordModification(levelCompletion, alreadyFirstPlace, firstCompletion);
-        }
-    }
-
-    public void doRecordModification(LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)
-    {
-
-        // broadcast when record is beaten
-        if (leaderboardCache.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
-        {
-            String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
-
-            // if first completion, make it record set
-            if (firstCompletion)
-                brokenRecord = "&e✦ &d&lRECORD SET &e✦";
-
-            double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
-
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(Utils.translate(brokenRecord));
-            Bukkit.broadcastMessage(Utils.translate("&d" + levelCompletion.getPlayerName() +
-                    " &7has the new &8" + getFormattedTitle() +
-                    " &7record with &a" + completionTime + "s"));
-            Bukkit.broadcastMessage("");
-
-            Utils.spawnFirework(respawnLocation, Color.PURPLE, Color.FUCHSIA, true);
-
-            if (!alreadyFirstPlace)
-            {
-                // update new #1 records
-                PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName());
-
-                playerStats.addRecord();
-
-                // if more than 1, remove
-                if (leaderboardCache.size() > 1)
-                {
-                    LevelCompletion previousRecord = leaderboardCache.get(1);
-
-                    PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getPlayerName());
-
-                    if (previousStats != null)
-                        previousStats.removeRecord();
-
-                    // remove previous
-                    CompletionsDB.updateRecord(previousRecord);
-                }
-                // update new
-                CompletionsDB.updateRecord(levelCompletion);
-            }
-            PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName()); // get player that got record
-
-            if (playerStats.hasModifier(ModifierTypes.RECORD_BONUS))
-            {
-                Bonus bonus = (Bonus) playerStats.getModifier(ModifierTypes.RECORD_BONUS);
-
-                // add coins
-                Parkour.getStatsManager().addCoins(playerStats, bonus.getBonus());
-                playerStats.getPlayer().sendMessage(Utils.translate("&7You got &6" + Utils.formatNumber(bonus.getBonus()) + " &eCoins &7for getting the record!"));
-            }
-            // do gg run
-            Parkour.getStatsManager().runGGTimer();
-        }
+        return null;
     }
 
     public boolean hasCooldown() { return cooldown; }
@@ -488,17 +347,12 @@ public class Level
         return name.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName());
     }
 
-    public boolean hasValidRaceLocations() {
-        if (LevelsYAML.isSet(name, "race.player1-loc") && LevelsYAML.isSet(name, "race.player2-loc"))
-            return true;
-        return false;
-    }
-
-    public Material getRaceLevelMenuItemType() {
+    public Material getRaceLevelMenuItemType()
+    {
         return raceLevelItemType;
     }
 
-    public boolean hasRequiredLevels(PlayerStats playerStats)
+    public boolean playerHasRequiredLevels(PlayerStats playerStats)
     {
         for (String levelName : requiredLevels)
             if (playerStats.getLevelCompletionsCount(levelName) < 1)

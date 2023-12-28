@@ -11,23 +11,25 @@ public class ClansYAML {
         Parkour.getConfigManager().save("clans");
     }
 
-    public static boolean isSection(String rankName) {
-        if (clansConfig.isConfigurationSection(rankName))
-            return true;
-        return false;
+    public static boolean isSection(String rankName)
+    {
+        return clansConfig.isConfigurationSection(rankName);
     }
 
-    public static boolean isSet(String rankName, String valuePath) {
+    public static boolean isSet(String rankName, String valuePath)
+    {
         return clansConfig.isSet(rankName + "." + valuePath);
     }
 
-    public static int getLevelUpPrice(Clan clan) {
+    public static int getLevelUpPrice(Clan clan)
+    {
         if (isSection("clans." + clan.getLevel()))
             return clansConfig.getInt("clans." + clan.getLevel() + ".xp-needed");
         return 0;
     }
 
-    public static int getLevelUpPrice(int level) {
+    public static int getLevelUpPrice(int level)
+    {
         if (isSection("clans." + level))
             return clansConfig.getInt("clans." + level + ".xp-needed");
         return 0;

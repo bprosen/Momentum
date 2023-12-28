@@ -11,12 +11,12 @@ import java.util.*;
 
 public class CompletionsDB
 {
-    private static void loadCompletions(PlayerStats playerStats)
+    public static void loadCompletions(PlayerStats playerStats)
     {
         List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE,
                 "*",
-                "WHERE uuid='" + playerStats.getUUID() + "'");
+                "WHERE uuid=?", playerStats.getUUID());
 
         for (Map<String, String> completionResult : completionsResults)
             playerStats.levelCompletion(
@@ -36,21 +36,19 @@ public class CompletionsDB
         playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
     }
 
-    public static void insertCompletion(LevelCompletion levelCompletion, boolean isMastery, boolean isRecord)
+    public static void insertCompletion(LevelCompletion levelCompletion, boolean isMastery)
     {
         int masteryBit = isMastery ? 1 : 0;
-        int recordBit = isRecord ? 1 : 0;
 
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
                         " (uuid, level_name, completion_date, time_taken, mastery, record)" +
-                        " VALUES (?,?,FROM_UNIXTIME(?),?,?,?)",
+                        " VALUES (?,?,FROM_UNIXTIME(?),?,?)",
                 levelCompletion.getUUID(),
                 levelCompletion.getLevelName(),
                 levelCompletion.getTimeOfCompletionSeconds(),
-                levelCompletion.getCompletionTimeElapsed(),
-                masteryBit,
-                recordBit
+                levelCompletion.getCompletionTimeElapsedMillis(),
+                masteryBit
         );
     }
 
@@ -111,7 +109,7 @@ public class CompletionsDB
         List<Map<String, String>> recordResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lr",
                 "COUNT(level_name) AS num_records",
                 "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lr.uuid " +
-                        "WHERE p.name=?", name);
+                        "WHERE p.name=? AND record=(1)", name);
 
         for (Map<String, String> recordResult : recordResults)
             return Integer.parseInt(recordResult.get("num_records"));

@@ -265,26 +265,25 @@ public class StatsCMD implements CommandExecutor {
                                 level.getFormattedTitle() + " &7Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
                         ));
 
-                        List<LevelCompletion> completions = level.getLeaderboard();
+                        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
                         boolean onLB = false;
 
-                        if (completions.size() > 0)
-                            for (int i = 0; i <= completions.size() - 1; i++)
+                        if (!leaderboard.isEmpty())
+                            for (int i = 1; i <= leaderboard.size(); i++)
                             {
-                                LevelCompletion levelCompletion = completions.get(i);
-                                int rank = i + 1;
+                                LevelCompletion levelCompletion = leaderboard.get(i);
                                 String lbName = levelCompletion.getPlayerName();
+                                double time = levelCompletion.getCompletionTimeElapsedSeconds();
+                                String lbString = " &7" + i;
 
-                                String lbString = " &7" + rank;
-
-                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbName))
+                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(levelCompletion.getPlayerName()))
                                 {
                                     // we want to show it as blue if they are on it
                                     onLB = true;
-                                    lbString += " &3" + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &b" + levelCompletion.getPlayerName();
+                                    lbString += " &3" + time + "s &b" + lbName;
                                 }
                                 else
-                                    lbString += " &2" + (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s &a" + levelCompletion.getPlayerName();
+                                    lbString += " &2" + time + "s &a" + lbName;
 
                                 sender.sendMessage(Utils.translate(lbString));
                             }
@@ -302,8 +301,7 @@ public class StatsCMD implements CommandExecutor {
                                 LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level.getName());
                                 if (levelCompletion != null)
                                 {
-                                    sender.sendMessage(Utils.translate("&7Your best is &2" +
-                                            (((double) levelCompletion.getCompletionTimeElapsed()) / 1000) + "s"));
+                                    sender.sendMessage(Utils.translate("&7Your best is &2" + levelCompletion.getTimeOfCompletionSeconds() + "s"));
                                 }
                             }
                         }

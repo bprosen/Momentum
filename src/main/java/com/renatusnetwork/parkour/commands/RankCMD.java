@@ -202,7 +202,7 @@ public class RankCMD implements CommandExecutor {
                                 PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
                                 victimStats.setPrestiges(newPrestige);
 
-                                if (victimStats.getPrestiges() > 0) {
+                                if (victimStats.hasPrestiges()) {
                                     float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * victimStats.getPrestiges();
 
                                     if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
@@ -248,7 +248,7 @@ public class RankCMD implements CommandExecutor {
 
         PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
 
-        if (playerStats.getPrestiges() > 0) {
+        if (playerStats.hasPrestiges()) {
 
             // add an s if its not one because im OCD with this
             String endingString = "time";

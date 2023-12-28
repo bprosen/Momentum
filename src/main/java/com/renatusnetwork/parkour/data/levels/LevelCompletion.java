@@ -23,15 +23,19 @@ public class LevelCompletion
 
     public String getLevelName() { return levelName; }
 
+    public boolean wasTimed() { return completionTimeElapsed > 0; }
+
     public long getTimeOfCompletionMillis() {
         return timeOfCompletion;
     }
 
     public long getTimeOfCompletionSeconds() { return timeOfCompletion / 1000; }
 
-    public long getCompletionTimeElapsed() {
+    public long getCompletionTimeElapsedMillis() {
         return completionTimeElapsed;
     }
+
+    public double getCompletionTimeElapsedSeconds() { return completionTimeElapsed / 1000f; }
 
     public String getPlayerName() {
         return playerName;

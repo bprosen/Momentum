@@ -284,7 +284,7 @@ public class Scoreboard {
                             }
                             // modifier section
                             else {
-                                if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+                                if (playerStats.hasPrestiges() && level.hasReward())
                                     newReward *= playerStats.getPrestigeMultiplier();
 
                                 LevelManager levelManager = Parkour.getLevelManager();

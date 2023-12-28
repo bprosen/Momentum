@@ -166,7 +166,7 @@ public class LBPlaceholders
                                     if (value.equals("name"))
                                         return completion.getPlayerName();
                                     else if (value.equals("time"))
-                                        return String.valueOf(((double) completion.getCompletionTimeElapsed()) / 1000);
+                                        return String.valueOf(completion.getCompletionTimeElapsedSeconds());
                                 }
                             }
                             else

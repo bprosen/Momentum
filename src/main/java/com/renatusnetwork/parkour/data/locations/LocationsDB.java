@@ -29,18 +29,13 @@ public class LocationsDB
 
     public static Location loadLocation(String locationName)
     {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
+        Map<String, String> result = DatabaseQueries.getResult(
                          DatabaseManager.LOCATIONS_TABLE,
                 "*",
                "WHERE name=?",
                          locationName);
 
-        Location location = null;
-
-        for (Map<String, String> result : results)
-            location = parseLocationFromResult(result);
-
-        return location;
+        return parseLocationFromResult(result);
     }
 
     public static Location parseLocationFromResult(Map<String, String> result)

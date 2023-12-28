@@ -433,7 +433,7 @@ public class MenuItemFormatter {
             else
             {
 
-                if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
+                if (playerStats.hasPrestiges() && level.hasReward())
                     newReward *= playerStats.getPrestigeMultiplier();
 
                 // set cooldown modifier last!
@@ -502,7 +502,7 @@ public class MenuItemFormatter {
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
                 if (fastestCompletion != null) {
-                    double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
+                    double completionTime = fastestCompletion.getCompletionTimeElapsedSeconds();
                     long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletionMillis();
 
                     String bestTime = "&7  Best Time &6" + completionTime + "s";
@@ -516,7 +516,7 @@ public class MenuItemFormatter {
                         if (record.getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
                             bestTime += " &e#1";
                         else
-                            bestTime += " &e+" + (completionTime - (record.getCompletionTimeElapsed() / 1000D)) + "s";
+                            bestTime += " &e+" + (completionTime - (record.getCompletionTimeElapsedSeconds())) + "s";
                     }
 
                     itemLore.add(Utils.translate(bestTime));

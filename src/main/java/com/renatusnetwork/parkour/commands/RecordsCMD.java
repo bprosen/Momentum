@@ -156,9 +156,9 @@ public class RecordsCMD implements CommandExecutor
                             if (record != null && record.getPlayerName().equalsIgnoreCase(targetName))
                             {
                                 // print to player and increment
-                                long time = record.getCompletionTimeElapsed();
+                                double time = record.getCompletionTimeElapsedSeconds();
 
-                                messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + " &7" + (((double) time) / 1000) + "s");
+                                messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + " &7" + time + "s");
                                 currentFound++;
                             }
                         }

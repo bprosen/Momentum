@@ -26,40 +26,41 @@ public class PlayerStats {
     private String UUID;
     private String playerName;
     private double coins;
-    private Level level = null;
-    private long levelStartTime = 0;
+    private Level level;
+    private long levelStartTime;
     private boolean spectatable;
     private PlayerStats playerToSpectate;
     private Clan clan;
-    private Location currentCheckpoint = null;
-    private Location practiceSpawn = null;
-    private Location spectateSpawn = null;
-    private boolean inRace = false;
+    private Location currentCheckpoint;
+    private Location practiceSpawn;
+    private Location spectateSpawn;
+    private boolean inRace;
     private Rank rank;
-    private ItemStack chestplateSavedFromElytra = null;
-    private int prestiges = 0;
-    private int raceWins = 0;
-    private int raceLosses = 0;
+    private ItemStack chestplateSavedFromElytra;
+    private int prestiges;
+    private int raceWins;
+    private int raceLosses;
     private int ratedLevelsCount;
     private int records;
-    private int gainedPerksCount = 0;
-    private float raceWinRate = 0.00f;
-    private float prestigeMultiplier = 1.00f;
+    private int gainedPerksCount;
+    private float raceWinRate;
+    private float prestigeMultiplier;
     private int individualLevelsBeaten;
-    private boolean inInfinite = false;
+    private boolean inInfinite;
     private InfiniteType infiniteType;
-    private boolean eventParticipant = false;
-    private boolean bypassingPlots = false;
-    private int totalLevelCompletions = 0;
-    private boolean nightVision = false;
-    private boolean grinding = false;
+    private boolean eventParticipant;
+    private boolean bypassingPlots;
+    private int totalLevelCompletions;
+    private boolean nightVision;
+    private boolean grinding;
     private int eventWins;
     private Material infiniteBlock;
-    private boolean inTutorial = false;
-    private boolean inBlackmarket = false;
+    private boolean inTutorial;
+    private boolean inBlackmarket;
     private boolean failsToggled;
     private int fails;
     private boolean attemptingRankup;
+    private boolean attemptingMastery;
 
     private FastBoard board;
 
@@ -87,6 +88,10 @@ public class PlayerStats {
         this.modifiers = new HashMap<>();
         this.bestInfiniteScores = new HashMap<>();
 
+        // default for now, if they are not a new player the mysql db loading will adjust these
+        this.infiniteBlock = Parkour.getSettingsManager().infinite_default_block;
+        this.rank = Parkour.getRanksManager().get(Parkour.getSettingsManager().default_rank);
+
         for (InfiniteType type : InfiniteType.values())
             bestInfiniteScores.put(type, 0); // arbitrary to be replaced when stats load
     }
@@ -109,9 +114,9 @@ public class PlayerStats {
 
     public FastBoard getBoard() { return board; }
 
-    public boolean hasNVStatus() {return nightVision; }
+    public boolean hasNightVision() { return nightVision; }
 
-    public void setNVStatus(boolean nightVision) { this.nightVision = nightVision; }
+    public void setNightVision(boolean nightVision) { this.nightVision = nightVision; }
 
     public boolean isInTutorial() { return inTutorial; }
 
@@ -347,6 +352,8 @@ public class PlayerStats {
         return rank != null && rank.isMaxRank();
     }
 
+    public boolean hasPrestiges() { return prestiges > 0; }
+
     public int getPrestiges() { return prestiges; }
 
     public void addPrestige() { prestiges++; }
@@ -359,7 +366,12 @@ public class PlayerStats {
 
     public void setAttemptingRankup(boolean attemptingRankup) { this.attemptingRankup = attemptingRankup; }
 
+    public void setAttemptingMastery(boolean attemptingMastery) { this.attemptingMastery = attemptingMastery; }
+
     public boolean isAttemptingRankup() { return attemptingRankup; }
+
+    public boolean isAttemptingMastery() { return attemptingMastery; }
+
     //
     // Fails Section
     //
@@ -607,6 +619,8 @@ public class PlayerStats {
     public void toggleGrinding() {
         grinding = !grinding;
     }
+
+    public void setGrinding(boolean grinding) { this.grinding = grinding; }
 
     //
     // Modifier Section

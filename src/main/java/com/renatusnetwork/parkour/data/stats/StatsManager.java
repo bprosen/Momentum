@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.stats;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.GGRewardEvent;
+import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
@@ -9,12 +10,15 @@ import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
+import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
+import com.renatusnetwork.parkour.data.saves.SavesDB;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -101,6 +105,31 @@ public class StatsManager {
         }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20, 20);
     }
 
+    public void loadStats(PlayerStats playerStats)
+    {
+        // load all db and player stats needed
+        StatsDB.loadPlayerInformation(playerStats);
+        StatsDB.loadBoughtLevels(playerStats);
+        CompletionsDB.loadCompletions(playerStats);
+        loadIndividualLevelsBeaten(playerStats);
+        PerksDB.loadPerks(playerStats);
+        loadPerksGainedCount(playerStats);
+        ModifiersDB.loadModifiers(playerStats);
+        CheckpointDB.loadCheckpoints(playerStats);
+        SavesDB.loadSaves(playerStats);
+    }
+
+    public static void loadIndividualLevelsBeaten(PlayerStats playerStats)
+    {
+        // get individual levels beaten by looping through list
+        int individualLevelsBeaten = 0;
+        for (Level level : Parkour.getLevelManager().getLevels().values())
+            if (playerStats.hasCompleted(level.getName()))
+                individualLevelsBeaten++;
+
+        playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
+    }
+
     public PlayerStats get(String UUID) {
         for (PlayerStats playerStats : getPlayerStats().values())
             if (playerStats.getUUID().equals(UUID))
@@ -132,9 +161,9 @@ public class StatsManager {
         }
 
         // if is ascendance, toggle NV on
-        if (!playerStats.hasNVStatus())
+        if (!playerStats.hasNightVision())
         {
-            playerStats.setNVStatus(true);
+            playerStats.setNightVision(true);
             StatsDB.updatePlayerNightVision(playerStats);
         }
     }
@@ -147,9 +176,9 @@ public class StatsManager {
         }
 
         // if is ascendance, toggle NV on
-        if (playerStats.hasNVStatus())
+        if (playerStats.hasNightVision())
         {
-            playerStats.setNVStatus(false);
+            playerStats.setNightVision(false);
             playerStats.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             StatsDB.updatePlayerNightVision(playerStats);
         }
@@ -551,8 +580,8 @@ public class StatsManager {
                                             playerStats.getMostCompletedLevel());
 
                                     if (fastestCompletion != null)
-                                            loreString = loreString.replace("%fastest_completion%",
-                                  (((double) fastestCompletion.getCompletionTimeElapsed()) / 1000) + "s");
+                                            loreString = loreString.replace(
+                                                    "%fastest_completion%", fastestCompletion.getCompletionTimeElapsedSeconds() + "s");
                                 }
 
                                 if (loreString.contains("%favorite_level%") || loreString.contains("%fastest_completion%"))

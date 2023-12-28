@@ -27,14 +27,18 @@ public class EventManager {
     private Player winner = null;
     private BukkitTask maxRunTimer;
     private BukkitTask reminderTimer;
-    private HashMap<String, EventParticipant> participants = new HashMap<>();
-    private Set<String> eliminated = new HashSet<>();
+    private long startTime;
 
-    // start millis according to system
-    private long startTime = 0L;
-    private HashMap<Integer, EventLBPosition> eventLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_event_leaderboard_size);
+    private HashMap<String, EventParticipant> participants;
+    private Set<String> eliminated;
+    private HashMap<Integer, EventLBPosition> eventLeaderboard;
 
-    public EventManager() {
+    public EventManager()
+    {
+        this.participants = new HashMap<>();
+        this.eliminated = new HashSet<>();
+        this.eventLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_event_leaderboard_size);
+
         startScheduler();
     }
 
@@ -301,7 +305,7 @@ public class EventManager {
             );
 
         // set back if they came from elytra level
-        if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+        if (playerStats.inLevel() && playerStats.getLevel().isElytra())
             Parkour.getStatsManager().toggleOnElytra(playerStats);
 
         participants.remove(player.getName());

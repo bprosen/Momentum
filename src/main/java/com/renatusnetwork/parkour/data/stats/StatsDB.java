@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
@@ -26,26 +27,16 @@ public class StatsDB {
     /*
      * Player Stats Section
      */
-    public static void loadPlayerStats(PlayerStats playerStats) {
-        loadPlayerInformation(playerStats);
-        loadCompletions(playerStats);
-        loadIndividualLevelsBeaten(playerStats);
-        PerksDB.loadPerks(playerStats);
-        Parkour.getStatsManager().loadPerksGainedCount(playerStats);
-        ModifiersDB.loadModifiers(playerStats);
-
-    }
-
-    private static void loadPlayerInformation(PlayerStats playerStats)
+    public static void loadPlayerInformation(PlayerStats playerStats)
     {
 
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+        Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "*",
-                " WHERE uuid='" + playerStats.getUUID() + "'"
+                " WHERE uuid=?", playerStats.getUUID()
         );
 
-        if (playerResults.isEmpty())
+        if (playerResult.isEmpty())
         {
             String query = "INSERT INTO " + DatabaseManager.PLAYERS_TABLE +
                     " (uuid, name)" +
@@ -57,17 +48,8 @@ public class StatsDB {
                     ;
 
             DatabaseQueries.runQuery(query);
-
-            // reload results
-            playerResults = DatabaseQueries.getResults(
-                    DatabaseManager.PLAYERS_TABLE,
-                    "*",
-                    " WHERE uuid='" + playerStats.getUUID() + "'"
-            );
-
         }
-
-        for (Map<String, String> playerResult : playerResults)
+        else
         {
             ClansManager clansManager = Parkour.getClansManager();
 
@@ -88,12 +70,7 @@ public class StatsDB {
             }
 
             playerStats.setCoins(Double.parseDouble(playerResult.get("coins")));
-
-            int spectatable = Integer.parseInt(playerResult.get("spectatable"));
-            if (spectatable == 1)
-                playerStats.setSpectatable(true);
-            else
-                playerStats.setSpectatable(false);
+            playerStats.setSpectatable(Integer.parseInt(playerResult.get("spectatable")) == 1);
 
             if (clan != null)
             {
@@ -115,8 +92,6 @@ public class StatsDB {
             if (rank != null)
                 playerStats.setRank(rank);
 
-            playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
-
             for (InfiniteType type : InfiniteType.values())
             {
                 String typeString = "infinite_" + type.toString().toLowerCase() + "_score";
@@ -127,24 +102,10 @@ public class StatsDB {
                     playerStats.setInfiniteScore(type, Integer.parseInt(scoreString));
             }
 
-            // set total race wins
-            int raceWins = Integer.parseInt(playerResult.get("race_wins"));
-            playerStats.setRaceWins(raceWins);
+            playerStats.setNightVision(Integer.parseInt(playerResult.get("night_vision")) == 1);
 
-            // set total race losses
-            int raceLosses = Integer.parseInt(playerResult.get("race_losses"));
-            playerStats.setRaceLosses(raceLosses);
-
-            playerStats.setRecords(getNumRecords(playerStats));
-
-            // set night vision, 0 == false, 1 == true
-            int nightVision = Integer.parseInt(playerResult.get("night_vision"));
-            if (nightVision == 0)
-                playerStats.setNVStatus(false);
-            else
-            {
-                playerStats.setNVStatus(true);
-
+            // need to give them night vision
+            if (playerStats.hasNightVision())
                 // run sync potion add
                 new BukkitRunnable() {
                     @Override
@@ -152,41 +113,39 @@ public class StatsDB {
                         playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
                     }
                 }.runTask(Parkour.getPlugin());
-            }
 
             // get total count of how many levels they've rated
-            int ratedLevelsCount = Integer.parseInt(
-                    DatabaseQueries.getResults(DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*)",
-                            " WHERE player_name='" + playerStats.getPlayerName() + "'")
-                            .get(0).get("COUNT(*)"));
-
-            playerStats.setRatedLevelsCount(ratedLevelsCount);
-
-            // set race win rate
-            if (raceLosses > 0)
-                playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses)));
-            else
-                playerStats.setRaceWinRate(raceWins);
+            playerStats.setRatedLevelsCount(getRatedLevelsCount(playerStats));
 
             // set multiplier percentage
-            if (playerStats.getPrestiges() > 0)
+            if (playerStats.hasPrestiges())
             {
-                float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
+                float defaultMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige;
 
-                if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
-                    prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
+                float prestigeMultiplier = defaultMultiplier * playerStats.getPrestiges();
+
+                if (prestigeMultiplier >= defaultMultiplier)
+                    prestigeMultiplier = defaultMultiplier;
 
                 prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
 
                 playerStats.setPrestigeMultiplier(prestigeMultiplier);
             }
 
-            // Set to true if 1 (true)
-            if (Integer.parseInt(playerResult.get("grinding")) == 1)
-                playerStats.toggleGrinding();
+            // lots of settings here
+            playerStats.setGrinding(Integer.parseInt(playerResult.get("grinding")) == 1);
+            playerStats.setEventWins(Integer.parseInt(playerResult.get("event_wins")));
+            playerStats.setFailMode(Integer.parseInt(playerResult.get("fail_mode")) == 1);
+            playerStats.setAttemptingRankup(Integer.parseInt(playerResult.get("attempting_rankup")) == 1);
+            playerStats.setRaceWins(Integer.parseInt(playerResult.get("race_wins")));
+            playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
+            playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
+            playerStats.setRecords(CompletionsDB.getNumRecords(playerStats));
 
-            int eventWins = Integer.parseInt(playerResult.get("event_wins"));
-            playerStats.setEventWins(eventWins);
+            // we do a math.max since we can't divide by 0... so if they have never lost we divide by 1 not zero
+            playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal(
+                    (double) playerStats.getRaceWins() / Math.max(1, playerStats.getRaceLosses())
+            )));
 
             String infiniteBlock = playerResult.get("infinite_block");
 
@@ -202,33 +161,17 @@ public class StatsDB {
                 playerStats.setInfiniteType(InfiniteType.valueOf(infiniteType.toUpperCase()));
             else
                 playerStats.setInfiniteType(Parkour.getSettingsManager().infinite_default_type);
-
-            // set fail mode, 0 == false, 1 == true
-            int failsToggled = Integer.parseInt(playerResult.get("fail_mode"));
-            if (failsToggled == 0)
-                playerStats.setFailMode(false);
-            else
-                playerStats.setFailMode(true);
-
-            int attemptingRankup = Integer.parseInt(playerResult.get("attempting_rankup"));
-            if (attemptingRankup == 0)
-                playerStats.setAttemptingRankup(false);
-            else
-                playerStats.setAttemptingRankup(true);
-
-            loadBoughtLevels(playerStats);
         }
     }
 
-    private static void loadIndividualLevelsBeaten(PlayerStats playerStats)
+    public static int getRatedLevelsCount(PlayerStats playerStats)
     {
-        // get individual levels beaten by looping through list
-        int individualLevelsBeaten = 0;
-        for (Level level : Parkour.getLevelManager().getLevels().values())
-            if (playerStats.hasCompleted(level.getName()))
-                individualLevelsBeaten++;
 
-        playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
+        Map<String, String> result = DatabaseQueries.getResult(
+                        DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*) AS count",
+                        "WHERE player_name=?", playerStats.getPlayerName());
+
+        return Integer.parseInt(result.get("count"));
     }
 
     public static int getTotalPlayers()
@@ -249,32 +192,30 @@ public class StatsDB {
     {
         int spectatable = playerStats.isSpectatable() ? 1 : 0;
 
-        String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "spectatable=" + spectatable + " " +
-                "WHERE uuid='" + playerStats.getUUID() + "'";
-
-        DatabaseQueries.runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
+                "spectatable=? WHERE uuid=?", spectatable, playerStats.getUUID()
+        );
     }
 
     public static void updatePlayerNightVision(PlayerStats playerStats)
     {
-        int vision = playerStats.hasNVStatus() ? 1 : 0;
+        int vision = playerStats.hasNightVision() ? 1 : 0;
 
-        String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "night_vision=" + vision + " " +
-                "WHERE uuid='" + playerStats.getUUID() + "'";
-
-        DatabaseQueries.runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
+                "night_vision=? WHERE uuid=?", vision, playerStats.getUUID()
+        );
     }
 
     public static void updatePlayerGrinding(PlayerStats playerStats)
     {
         int grinding = playerStats.isGrinding() ? 1 : 0;
 
-        String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "grinding=" + grinding + " WHERE uuid='" + playerStats.getUUID() + "'";
-
-        DatabaseQueries.runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
+                    "grinding=? WHERE uuid=?", grinding, playerStats.getUUID()
+        );
     }
 
     public static void updateCoins(String uuid, double coins)
@@ -282,8 +223,10 @@ public class StatsDB {
         if (coins < 0)
             coins = 0;
 
-        String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=" + coins + " WHERE uuid='" + uuid + "'";
-        DatabaseQueries.runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE uuid=?",
+                coins, uuid
+        );
     }
 
     public static void updateCoinsName(String playerName, double coins)
@@ -291,14 +234,18 @@ public class StatsDB {
         if (coins < 0)
             coins = 0;
 
-        String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=" + coins + " WHERE name='" + playerName + "'";
-        DatabaseQueries.runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE name=?",
+                    coins, playerName
+        );
     }
 
     public static void updateInfiniteType(PlayerStats playerStats, InfiniteType newType)
     {
-        String query = "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_type='" + newType.toString().toLowerCase() + "' WHERE uuid='" + playerStats.getUUID() + "'";
-        DatabaseQueries.runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_type=? WHERE uuid=?",
+                    newType.toString().toLowerCase(), playerStats.getUUID()
+        );
     }
 
     public static void updateRank(String uuid, String rank)
@@ -308,45 +255,36 @@ public class StatsDB {
 
     public static double getCoinsFromName(String playerName)
     {
-        double coins = 0;
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+        Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "coins",
                 " WHERE name=?", playerName
         );
 
-        for (Map<String, String> playerResult : playerResults)
-            coins = Double.parseDouble(playerResult.get("coins"));
-
-        return coins;
+        return Double.parseDouble(playerResult.get("coins"));
     }
 
     public static double getCoinsFromUUID(String UUID)
     {
-        double coins = 0;
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+        Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "coins",
-                " WHERE uuid='" + UUID + "'"
+                " WHERE uuid=?", UUID
         );
 
-        for (Map<String, String> playerResult : playerResults)
-            coins = Double.parseDouble(playerResult.get("coins"));
-
-        return coins;
+        return Double.parseDouble(playerResult.get("coins"));
     }
 
-    public static boolean isPlayerInDatabase(String playerName) {
+    public static boolean isPlayerInDatabase(String playerName)
+    {
 
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+        Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "uuid",
                 " WHERE name=?", playerName
         );
 
-        return !playerResults.isEmpty();
+        return !playerResult.isEmpty();
     }
 
     public static void loadBoughtLevels(PlayerStats playerStats)
@@ -358,7 +296,7 @@ public class StatsDB {
             List<Map<String, String>> purchasesResults = DatabaseQueries.getResults(
                     DatabaseManager.LEVEL_PURCHASES_TABLE,
                     "level_name",
-                    "WHERE uuid='" + playerStats.getUUID() + "'"
+                    "WHERE uuid=?", playerStats.getUUID()
             );
 
             for (Map<String, String> boughtResult : purchasesResults)
@@ -395,12 +333,12 @@ public class StatsDB {
 
     public static boolean hasBoughtLevel(String uuid, String boughtLevel)
     {
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+        Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.LEVEL_PURCHASES_TABLE,
                 "uuid",
                 " WHERE uuid=? AND level_name=?", uuid, boughtLevel
         );
 
-        return !playerResults.isEmpty();
+        return !playerResult.isEmpty();
     }
 }

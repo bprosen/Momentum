@@ -4,6 +4,8 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
+import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.ranks.RanksManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
@@ -209,6 +211,162 @@ public class LevelManager {
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
     }
 
+    public void addCompletion(PlayerStats playerStats, Level level, LevelCompletion levelCompletion)
+    {
+        boolean alreadyFirstPlace = false;
+        boolean firstCompletion = false;
+        boolean validCompletion = false;
+
+        level.addTotalCompletionsCount();
+
+        if (levelCompletion.wasTimed())
+        {
+            if (!Parkour.getStatsManager().isLoadingLeaderboards())
+            {
+                HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+
+                if (!leaderboard.isEmpty())
+                {
+                    // Compare completion against scoreboard
+                    if (leaderboard.size() < 10 ||
+                        leaderboard.get(leaderboard.size() - 1).getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
+                    {
+                        LevelCompletion firstPlace = level.getRecordCompletion();
+                        String playerName = playerStats.getPlayerName();
+
+                        // check for first place
+                        if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) &&
+                            firstPlace.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
+                        {
+                            leaderboard.remove(firstPlace);
+                            alreadyFirstPlace = true;
+                        }
+                        // otherwise, search for where it is
+                        else
+                        {
+                            int lbPositionToRemove = -1;
+                            boolean completionSlower = false;
+
+                            for (int i = 1; i < leaderboard.size(); i++)
+                            {
+                                LevelCompletion completion = leaderboard.get(i);
+
+                                if (completion.getPlayerName().equalsIgnoreCase(playerName))
+                                {
+                                    if (completion.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
+                                        lbPositionToRemove = i;
+                                    else
+                                        completionSlower = true;
+
+                                    break;
+                                }
+                            }
+
+                            if (lbPositionToRemove > -1)
+                                leaderboard.remove(lbPositionToRemove);
+                            else if (completionSlower)
+                                return;
+                        }
+                        sortNewCompletion(level, levelCompletion);
+                        validCompletion = true;
+                    }
+                }
+                else
+                {
+                    leaderboard.put(1, levelCompletion);
+                    firstCompletion = true;
+                }
+                // only do record mod if it is a valid or first completion
+                if (validCompletion || firstCompletion)
+                    doRecordModification(playerStats, level, levelCompletion, alreadyFirstPlace, firstCompletion);
+            }
+        }
+    }
+
+    private void sortNewCompletion(Level level, LevelCompletion levelCompletion)
+    {
+        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+        HashMap<Integer, LevelCompletion> newLeaderboard = new HashMap<>(leaderboard);
+
+        newLeaderboard.put(newLeaderboard.size() + 1, levelCompletion);
+
+        for (int i = newLeaderboard.size(); i > 1; i--)
+        {
+            LevelCompletion completion = newLeaderboard.get(i);
+            LevelCompletion nextCompletion = newLeaderboard.get(i - 1);
+
+            if (nextCompletion.getCompletionTimeElapsedMillis() > completion.getCompletionTimeElapsedMillis())
+            {
+                // swap
+                newLeaderboard.replace((i - 1), completion);
+                newLeaderboard.replace(i, nextCompletion);
+            }
+        }
+        // Trimming potential #11 datapoint
+        if (newLeaderboard.size() > 10)
+            newLeaderboard.remove(11);
+
+        level.setLeaderboard(newLeaderboard);
+    }
+
+    private void doRecordModification(PlayerStats playerStats, Level level, LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)
+    {
+
+        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+        // broadcast when record is beaten
+        if (level.getRecordCompletion().getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
+        {
+            String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
+
+            // if first completion, make it record set
+            if (firstCompletion)
+                brokenRecord = "&e✦ &d&lRECORD SET &e✦";
+
+            double completionTime = levelCompletion.getCompletionTimeElapsedSeconds();
+
+            Bukkit.broadcastMessage("");
+            Bukkit.broadcastMessage(Utils.translate(brokenRecord));
+            Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getPlayerName() +
+                    " &7has the new &8" + level.getFormattedTitle() +
+                    " &7record with &a" + completionTime + "s"));
+            Bukkit.broadcastMessage("");
+
+            Utils.spawnFirework(level.getCompletionLocation(), Color.PURPLE, Color.FUCHSIA, true);
+
+            if (!alreadyFirstPlace)
+            {
+                // update new #1 records
+                playerStats.addRecord();
+
+                // if more than 1, remove
+                if (leaderboard.size() > 1)
+                {
+                    LevelCompletion previousRecord = leaderboard.get(1);
+
+                    PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getPlayerName());
+
+                    if (previousStats != null)
+                        previousStats.removeRecord();
+
+                    // remove previous
+                    CompletionsDB.updateRecord(previousRecord);
+                }
+                // update new
+                CompletionsDB.updateRecord(levelCompletion);
+            }
+            if (playerStats.hasModifier(ModifierTypes.RECORD_BONUS))
+            {
+                Bonus bonus = (Bonus) playerStats.getModifier(ModifierTypes.RECORD_BONUS);
+
+                // add coins
+                Parkour.getStatsManager().addCoins(playerStats, bonus.getBonus());
+                playerStats.getPlayer().sendMessage(Utils.translate("&7You got &6" + Utils.formatNumber(bonus.getBonus()) + " &eCoins &7for getting the record!"));
+            }
+            // do gg run
+            Parkour.getStatsManager().runGGTimer();
+        }
+    }
+
     private void startScheduler(Plugin plugin)
     {
 
@@ -266,7 +424,7 @@ public class LevelManager {
                 !level.isAscendance() &&
                 !level.isRankUpLevel() &&
                 !level.isDropper() &&
-                level.getReward() > 0 &&
+                level.hasReward() &&
                 level.getReward() < 50000
             )
                 temporaryList.add(level);
@@ -509,7 +667,7 @@ public class LevelManager {
                 if (highestLevel != null) {
                     addedLevels.add(highestLevel.getName());
                     // add to temp lb
-                    if (highestLevel.getRating() > 0.00)
+                    if (highestLevel.hasRating())
                     {
                         topRatedLevelsLB.put(leaderboardPos, highestLevel);
                         leaderboardPos++;

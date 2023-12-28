@@ -34,7 +34,7 @@ public class LevelHandler {
         // if playerstats and level exists
         if (playerStats != null && !playerStats.isSpectating() && level != null) {
             // if they do have the required level
-            if (level.hasRequiredLevels(playerStats)) {
+            if (level.playerHasRequiredLevels(playerStats)) {
                 // if does not have a practice location
                 if (!playerStats.inPracticeMode()) {
 
@@ -105,27 +105,25 @@ public class LevelHandler {
 
             playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
 
-            // small microoptimization running it in async
+            boolean completedMastery = !forcedCompletion && playerStats.isAttemptingMastery();
+
+            // small microoptimization running it in async. if it is a record, it will be updated when we do the modifications
             new BukkitRunnable()
             {
                 @Override
                 public void run()
                 {
-                    CompletionsDB.insertCompletion(levelCompletion,);
+                    CompletionsDB.insertCompletion(levelCompletion, completedMastery);
                 }
             }.runTaskAsynchronously(Parkour.getPlugin());
 
             levelManager.addTotalLevelCompletion();
 
-            level.addCompletion(player.getName(), levelCompletion); // Update totalLevelCompletionsCount
+            levelManager.addCompletion(playerStats, level, levelCompletion); // Update totalLevelCompletionsCount
 
             // run commands if there is any
-            if (level.hasCommands()) {
-                for (String commandString : level.getCommands()) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            commandString.replace("%player%", player.getName()));
-                }
-            }
+            for (String commandString : level.getCommands())
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandString.replace("%player%", player.getName()));
 
             // Update player information
             playerStats.levelCompletion(levelName, levelCompletion);
@@ -134,12 +132,11 @@ public class LevelHandler {
             int beforeClanLevel = -1;
 
             // only broadcast and give xp/coins if it is not a forced completion
-            if (!forcedCompletion) {
-
+            if (!forcedCompletion)
+            {
                 BankManager bankManager = Parkour.getBankManager();
 
                 // give higher reward if prestiged
-                int prestiges = playerStats.getPrestiges();
                 int reward = event.getReward();
 
                 // level booster
@@ -182,7 +179,7 @@ public class LevelHandler {
                 // prestige/cooldown section
                 else
                 {
-                    if (prestiges > 0 && level.getReward() > 0)
+                    if (playerStats.hasPrestiges() && level.hasReward())
                         reward *= playerStats.getPrestigeMultiplier();
 
                     // set cooldown modifier last!
@@ -214,7 +211,7 @@ public class LevelHandler {
                 // if new pb, send message to player
                 if (newPB)
                 {
-                    String oldTimeString = (((double) bestCompletion.getCompletionTimeElapsed()) / 1000) + "s"; // need to format the long
+                    String oldTimeString = bestCompletion.getCompletionTimeElapsedSeconds() + "s"; // need to format the long
 
                     player.sendMessage(Utils.translate("You have broken your personal best &c(" + oldTimeString + ") with &a" + time));
                 }
@@ -327,11 +324,12 @@ public class LevelHandler {
             } else {
                 player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
 
-                if (!level.hasRequiredLevels(playerStats) && !level.getRequiredLevels().isEmpty()) {
-
-                    for (String requiredLevelName : level.getRequiredLevels()) {
-
-                        if (playerStats.getLevelCompletionsCount(requiredLevelName) < 1) {
+                if (level.hasRequiredLevels() && !level.playerHasRequiredLevels(playerStats))
+                {
+                    for (String requiredLevelName : level.getRequiredLevels())
+                    {
+                        if (playerStats.getLevelCompletionsCount(requiredLevelName) < 1)
+                        {
                             Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
                             dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, true);

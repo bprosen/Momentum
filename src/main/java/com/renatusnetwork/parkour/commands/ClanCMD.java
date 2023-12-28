@@ -187,7 +187,7 @@ public class ClanCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&6" + targetClan.getTag() + "&e's Stats"));
                     sender.sendMessage(Utils.translate("  &cClan Level &4" + targetClan.getLevel()));
                     sender.sendMessage(Utils.translate("  &cMax Level &4" + targetClan.getMaxLevel()));
-                    sender.sendMessage(Utils.translate("  &cTotal Clan XP &4" + Utils.shortStyleNumber(targetClan.getTotalGainedXP())));
+                    sender.sendMessage(Utils.translate("  &cTotal Clan XP &4" + Utils.shortStyleNumber(targetClan.getTotalXP())));
 
                     // if max level, dont send needed to level up
                     if (!targetClan.isMaxLevel()) {
@@ -235,7 +235,7 @@ public class ClanCMD implements CommandExecutor {
                                 if (newXp > 0) {
                                     targetClan.setXP(newXp);
                                     // update in db
-                                    ClansDB.setClanXP(newXp, targetClan.getID());
+                                    ClansDB.setClanXP(newXp, targetClan.getTag());
                                     player.sendMessage(Utils.translate("&eYou set &6&l" + targetClan.getTag() + "&e's" +
                                             " XP to &6" + newXp));
                                 } else {
@@ -262,9 +262,9 @@ public class ClanCMD implements CommandExecutor {
                             if (targetClan != null) {
                                 // make sure it is not negative xp
                                 if (newXP > 0) {
-                                    targetClan.setTotalGainedXP(newXP);
+                                    targetClan.setTotalXP(newXP);
                                     // update in db
-                                    ClansDB.setTotalGainedClanXP(newXP, targetClan.getID());
+                                    ClansDB.setTotalXP(newXP, targetClan.getID());
                                     player.sendMessage(Utils.translate("&eYou set &6&l" + targetClan.getTag() + "&e's" +
                                             " Total XP to &6" + newXP));
                                 } else {

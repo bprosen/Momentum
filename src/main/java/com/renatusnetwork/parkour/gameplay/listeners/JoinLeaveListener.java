@@ -72,13 +72,7 @@ public class JoinLeaveListener implements Listener {
                 StatsManager statsManager = Parkour.getStatsManager();
                 statsManager.add(player);
                 PlayerStats playerStats = statsManager.get(player);
-
-                // now load stats in async
-                StatsDB.loadPlayerStats(playerStats);
-
-                // load checkpoints
-                CheckpointDB.loadCheckpoints(playerStats);
-                SavesDB.loadSaves(playerStats);
+                statsManager.loadStats(playerStats);
 
                 // run most of this in async (region lookup, stat editing, etc)
                 new BukkitRunnable() {
@@ -166,13 +160,13 @@ public class JoinLeaveListener implements Listener {
             infiniteManager.endPK(player);
 
         // if night vision is enabled, clear it
-        if (playerStats.hasNVStatus())
+        if (playerStats.hasNightVision())
             playerStats.clearPotionEffects();
 
         if (playerStats.inLevel())
         {
             // if in dropper, respawn them
-            if (playerStats.getLevel().isDropperLevel())
+            if (playerStats.getLevel().isDropper())
                 player.teleport(playerStats.getLevel().getStartLocation());
 
             // run reset logic

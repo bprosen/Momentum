@@ -56,6 +56,12 @@ public class DatabaseQueries
         return finalResults;
     }
 
+    public static Map<String, String> getResult(String tableName, String selection, String trailingSQL, Object... parameters)
+    {
+        // this is a use case where we are using a primary key to get a single result, just cleaner code
+        return getResults(tableName, selection, trailingSQL, parameters).get(0);
+    }
+
     public static ResultSet getRawResults(String query, Object... parameters)
     {
         try
