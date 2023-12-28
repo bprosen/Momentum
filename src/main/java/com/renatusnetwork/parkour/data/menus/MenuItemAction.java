@@ -154,7 +154,7 @@ public class MenuItemAction {
             // cover all conditions that can stop a player from entering a level
             if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level)) ||
                 (level.hasRequiredLevels() && !level.hasRequiredLevels(playerStats)) ||
-                (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermissionNode())) ||
+                (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermission())) ||
                 (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))) &&
                 !level.isFeaturedLevel() && !level.isRankUpLevel())
                 addLevel = false;
@@ -510,7 +510,8 @@ public class MenuItemAction {
         }
     }
 
-    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
+    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level)
+    {
         if (!playerStats.inRace())
         {
             if (!playerStats.isSpectating())
@@ -527,19 +528,22 @@ public class MenuItemAction {
                                 player.closeInventory();
 
                                 // if the level has perm node, and player does not have perm node
-                                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
+                                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission()))
+                                {
                                     player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
                                     return;
                                 }
 
                                 // if player is in level and their level is the level they clicked on, cancel
-                                if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
+                                if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
+                                {
                                     player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                                     return;
                                 }
 
-                                if (level.needsRank()) {
-                                    Rank rank = level.getRequiredRank();
+                                if (level.needsRank())
+                                {
+                                    Rank rank = Parkour.getRanksManager().get(level.getRequiredRank());
 
                                     if (!Parkour.getRanksManager().isPastOrAtRank(playerStats, rank))
                                     {

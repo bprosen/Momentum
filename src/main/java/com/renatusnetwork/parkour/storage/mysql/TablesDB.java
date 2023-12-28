@@ -14,7 +14,6 @@ public class TablesDB
         createLevelCheckpoints();
         createLevelSaves();
         createLevelPurchases();
-        createLevelSpawns();
         createLevelCompletions();
         createClans();
         createRanks();
@@ -266,20 +265,6 @@ public class TablesDB
                                 "ON DELETE CASCADE, " +
                             // indexes
                             "INDEX uuid_index(uuid)" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createLevelSpawns()
-    {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_SPAWNS_TABLE + "(" +
-                            "level_name VARCHAR(20) NOT NULL, " +
-                            "location_name VARCHAR(30) NOT NULL, " +
-                            // keys
-                            "PRIMARY KEY(level_name, location_name), " +
-                            // indexes
-                            "INDEX level_index(level_name)" +
                         ")";
 
         DatabaseQueries.runQuery(query);

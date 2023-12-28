@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.stats.*;
 import com.renatusnetwork.parkour.data.leaderboards.RaceLBPosition;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -20,21 +21,26 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
 public class RaceManager {
 
-    private Set<Race> runningRaceList = new HashSet<>();
-    private Set<RaceRequest> raceRequests = new HashSet<>();
-    private HashMap<String, BukkitTask> confirmMap = new HashMap<>();
-    private HashMap<Integer, RaceLBPosition> raceLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_race_leaderboard_size);
+    private Set<Race> runningRaceList;
+    private Set<RaceRequest> raceRequests;
+    private HashMap<Integer, RaceLBPosition> raceLeaderboard;
 
-    public RaceManager() {
-        new BukkitRunnable() {
+    public RaceManager()
+    {
+        this.runningRaceList = new HashSet<>();
+        this.raceRequests = new HashSet<>();
+        this.raceLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_race_leaderboard_size);
+
+        new BukkitRunnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 loadLeaderboard();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
@@ -195,7 +201,8 @@ public class RaceManager {
         // set level in cache and toggle back on elytra
         ProtectedRegion player1Region = WorldGuard.getRegion(endedRace.getPlayer1().getLocation());
         ProtectedRegion player2Region = WorldGuard.getRegion(endedRace.getPlayer2().getLocation());
-        if (player1Region != null) {
+        if (player1Region != null)
+        {
             Level level = Parkour.getLevelManager().get(player1Region.getId());
             PlayerStats playerStats = statsManager.get(player1);
             playerStats.endedRace();
@@ -203,11 +210,12 @@ public class RaceManager {
             playerStats.setLevel(level);
 
             // if elytra level, give elytra
-            if (level != null && level.isElytraLevel())
+            if (level != null && level.isElytra())
                 statsManager.toggleOnElytra(playerStats);
         }
 
-        if (player2Region != null) {
+        if (player2Region != null)
+        {
             Level level = Parkour.getLevelManager().get(player2Region.getId());
             PlayerStats playerStats = statsManager.get(endedRace.getPlayer2());
             playerStats.endedRace();
@@ -215,7 +223,7 @@ public class RaceManager {
             playerStats.setLevel(level);
 
             // if elytra level, give elytra
-            if (level != null && level.isElytraLevel())
+            if (level != null && level.isElytra())
                 statsManager.toggleOnElytra(playerStats);
         }
 
@@ -323,21 +331,23 @@ public class RaceManager {
 
             ProtectedRegion winnerRegion = WorldGuard.getRegion(winner.getLocation());
             ProtectedRegion loserRegion = WorldGuard.getRegion(loser.getLocation());
-            if (winnerRegion != null) {
+            if (winnerRegion != null)
+            {
                 Level winnerLevel = Parkour.getLevelManager().get(winnerRegion.getId());
                 winnerStats.setLevel(winnerLevel);
 
                 // if elytra level, give elytra
-                if (winnerLevel != null && winnerLevel.isElytraLevel())
+                if (winnerLevel != null && winnerLevel.isElytra())
                     Parkour.getStatsManager().toggleOnElytra(winnerStats);
             }
 
-            if (loserRegion != null) {
+            if (loserRegion != null)
+            {
                 Level loserLevel = Parkour.getLevelManager().get(loserRegion.getId());
                 loserStats.setLevel(loserLevel);
 
                 // if elytra level, give elytra
-                if (loserLevel != null && loserLevel.isElytraLevel())
+                if (loserLevel != null && loserLevel.isElytra())
                     Parkour.getStatsManager().toggleOnElytra(loserStats);
             }
 
@@ -493,7 +503,8 @@ public class RaceManager {
             }
 
             // if other player is in an elytra level and not on the ground, do not continue
-            if (player2.inLevel() && player2.getLevel().isElytraLevel() && !player2.getPlayer().isOnGround()) {
+            if (player2.inLevel() && player2.getLevel().isElytra() && !player2.getPlayer().isOnGround())
+            {
                 player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race someone when " + player2.getPlayerName() + " is not on the ground in an elytra level"));
                 removeRequest(raceRequest);
                 return;
@@ -517,11 +528,11 @@ public class RaceManager {
             }
 
             // if in elytra and not on the ground, dont send
-            if (player1.inLevel() && player1.getLevel().isElytraLevel())
+            if (player1.inLevel() && player1.getLevel().isElytra())
                 Parkour.getStatsManager().toggleOffElytra(player1);
 
             // if in elytra and not on the ground, dont send
-            if (player2.inLevel() && player2.getLevel().isElytraLevel())
+            if (player2.inLevel() && player2.getLevel().isElytra())
                 Parkour.getStatsManager().toggleOffElytra(player2);
 
             // otherwise do race and disable any current time on levels
@@ -557,8 +568,8 @@ public class RaceManager {
         raceRequests.remove(raceRequest);
     }
 
-    public List<String> getNotInUseRaceLevels() {
-
+    public List<String> getNotInUseRaceLevels()
+    {
         List<String> notInUseRaceLevels = Parkour.getLevelManager().getRaceLevels();
 
         // get in use race levels, to then remove from total race levels
@@ -572,8 +583,6 @@ public class RaceManager {
         return runningRaceList;
     }
 
-    public Set<RaceRequest> getRaceRequests() { return raceRequests; }
-
     public void shutdown() {
         for (Race race : runningRaceList)
             forceEndRace(race, true);
@@ -582,27 +591,23 @@ public class RaceManager {
     /*
         Leaderboard Section
      */
-    public void loadLeaderboard() {
-        try {
-
-            HashMap<Integer, RaceLBPosition> leaderboard = getLeaderboard();
-            leaderboard.clear();
+    public void loadLeaderboard()
+    {
+        try
+        {
+            raceLeaderboard.clear();
 
             List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
-                    "players",
-                    "player_name, race_wins, race_losses",
-                    " WHERE race_wins > 0" +
-                            " ORDER BY race_wins DESC" +
-                            " LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
+                    DatabaseManager.PLAYERS_TABLE,
+                    "name, race_wins, race_losses",
+                    "WHERE race_wins > 0 " +
+                            "ORDER BY race_wins DESC " +
+                            "LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
 
             int leaderboardPos = 1;
-            outer: for (Map<String, String> scoreResult : scoreResults) {
 
-                // quick loop to make sure there are no duplicates
-                for (RaceLBPosition entry : leaderboard.values())
-                    if (entry.getName().equalsIgnoreCase(scoreResult.get("player_name")))
-                        continue outer;
-
+            for (Map<String, String> scoreResult : scoreResults)
+            {
                 int wins = Integer.parseInt(scoreResult.get("race_wins"));
                 int losses = Integer.parseInt(scoreResult.get("race_losses"));
 
@@ -613,16 +618,19 @@ public class RaceManager {
                 else
                     winRate = wins;
 
-                leaderboard.put(leaderboardPos,
+                raceLeaderboard.put(leaderboardPos,
                         new RaceLBPosition(
-                                scoreResult.get("player_name"),
+                                scoreResult.get("name"),
                                 wins,
-                                winRate)
+                                winRate
+                        )
                 );
                 leaderboardPos++;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        catch (Exception exception)
+        {
+            exception.printStackTrace();
         }
     }
 

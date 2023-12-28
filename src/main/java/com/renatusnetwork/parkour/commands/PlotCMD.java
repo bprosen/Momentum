@@ -248,7 +248,7 @@ public class PlotCMD implements CommandExecutor {
                 if (Parkour.getRanksManager().isPastOrAtRank(playerStats, minimumRank))
                     Parkour.getPlotsManager().createPlot(player);
                 else
-                    player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getRankTitle() + " &7to create a &aPlot"));
+                    player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getTitle() + " &7to create a &aPlot"));
             }
             else
             {

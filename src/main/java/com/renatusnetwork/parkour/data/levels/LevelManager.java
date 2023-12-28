@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
+import com.renatusnetwork.parkour.data.ranks.RanksManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -18,25 +19,28 @@ import java.util.*;
 
 public class LevelManager {
 
-    private HashMap<String, Level> levels = new HashMap<>();
-    private HashMap<Menu, Set<Level>> menuLevels = new HashMap<>();
-
     private Level featuredLevel;
     private Level tutorialLevel;
     private long totalLevelCompletions;
 
-    private HashMap<Integer, Level> globalLevelCompletionsLB = new HashMap<>
-            (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
-    private HashMap<Integer, Level> topRatedLevelsLB = new HashMap<>
-            (Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
-
-    private HashMap<String, HashMap<Integer, Level>> buyingLevels = new HashMap<>();
-
-    private HashMap<String, LevelCooldown> cooldowns = new HashMap<>();
+    private HashMap<String, Level> levels;
+    private HashMap<Menu, Set<Level>> menuLevels;
+    private HashMap<Integer, Level> globalLevelCompletionsLB;
+    private HashMap<Integer, Level> topRatedLevelsLB;
+    private HashMap<String, HashMap<Integer, Level>> buyingLevels;
+    private HashMap<String, LevelCooldown> cooldowns;
 
     public LevelManager(Plugin plugin)
     {
+        this.levels = new HashMap<>();
+        this.menuLevels = new HashMap<>();
+        this.globalLevelCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
+        this.topRatedLevelsLB = new HashMap<>(Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
+        this.buyingLevels = new HashMap<>();
+        this.cooldowns = new HashMap<>();
+
         load(); // Loads levels from configuration
+        CompletionsDB.loadLeaderboards();
         loadLevelsInMenus();
         pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
@@ -570,9 +574,10 @@ public class LevelManager {
         Player player = playerStats.getPlayer();
 
         // since ascendance is a free-roam map...
-        if (!level.isAscendanceLevel())
+        if (!level.isAscendance())
         {
-            if (!(level.needsRank() && Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank())))
+            RanksManager ranksManager = Parkour.getRanksManager();
+            if (!(level.needsRank() && ranksManager.isPastOrAtRank(playerStats, level.getRequiredRank())))
             {
                 if (!level.isEventLevel())
                 {

@@ -13,7 +13,7 @@ public class PerkManager {
 
     private HashMap<String, Perk> perks = new HashMap<>();
 
-    public PerkManager(Plugin plugin)
+    public PerkManager()
     {
         load();
     }
@@ -44,7 +44,8 @@ public class PerkManager {
                 iterator.remove();
     }
 
-    public void create(String perkName) {
+    public void create(String perkName)
+    {
         if (!exists(perkName))
             PerksYAML.create(perkName);
     }

@@ -12,6 +12,7 @@ import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -24,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -318,8 +320,10 @@ public class MenuItemFormatter {
             if (level.isNew())
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
-            if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))
-                itemLore.add(Utils.translate("&cRequires rank " + level.getRequiredRank().getTitle()));
+            Rank requiredRank = Parkour.getRanksManager().get(level.getRequiredRank());
+
+            if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
+                itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
 
             BankManager bankManager = Parkour.getBankManager();
 
@@ -504,11 +508,10 @@ public class MenuItemFormatter {
                     String bestTime = "&7  Best Time &6" + completionTime + "s";
 
                     // add record if there is one
-                    List<LevelCompletion> leaderboard = level.getLeaderboard();
-                    if (!leaderboard.isEmpty())
-                    {
-                        LevelCompletion record = leaderboard.get(0);
+                    LevelCompletion record = level.getRecordCompletion();
 
+                    if (record != null)
+                    {
                         // add number 1
                         if (record.getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
                             bestTime += " &e#1";

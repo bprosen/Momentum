@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -25,24 +26,17 @@ public class RecordsCMD implements CommandExecutor
             Player player = (Player) sender;
 
             if (a.length == 1 && a[0].equalsIgnoreCase("top"))
-            {
                 StatsCMD.printRecordsLB(sender);
-            }
             else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
-            {
                 sendHelp(player);
-            }
             else if (a.length >= 0 && a.length <= 2)
             {
                 if (a.length == 0)
-                {
-                    sendStats(player, player.getName(), false, 1, false);
-                }
+                    sendStats(player, player.getName(), 1);
                 else
                 {
                     String arg = a[0];
                     String targetName = player.getName();
-                    boolean pageOnSelf = false;
 
                     // if length 2, by default arg = page number and a[0] = target
                     if (a.length == 2)
@@ -66,8 +60,6 @@ public class RecordsCMD implements CommandExecutor
                         {
                             if (page >= 100)
                                 targetName = a[0];
-                            else
-                                pageOnSelf = true;
                         }
                     }
                     // if not integer and length 1, target name is a[0]
@@ -80,7 +72,6 @@ public class RecordsCMD implements CommandExecutor
                     {
                         // if not online, we run the async offline records check, inner classes
                         int finalPage = page;
-                        boolean finalPageOnSelf = pageOnSelf;
                         String finalTargetName = targetName;
 
                         new BukkitRunnable()
@@ -88,22 +79,19 @@ public class RecordsCMD implements CommandExecutor
                             @Override
                             public void run()
                             {
-                                sendStats(player, finalTargetName, true, finalPage, finalPageOnSelf);
+                                sendStats(player, finalTargetName, finalPage);
                             }
                         }.runTaskAsynchronously(Parkour.getPlugin());
                     } else
-                        sendStats(player, target.getName(), false, page, pageOnSelf); // do normal getter for online
+                        sendStats(player, target.getName(), page); // do normal getter for online
                 }
             }
             else
-            {
                 sendHelp(player);
-            }
         }
         else
-        {
             sender.sendMessage("Console cannot do this");
-        }
+
         return false;
     }
 
@@ -116,33 +104,31 @@ public class RecordsCMD implements CommandExecutor
         player.sendMessage(Utils.translate("&3/records help  &7Prints this screen"));
     }
 
-    private void sendStats(Player sender, String targetName, boolean offline, int page, boolean pageOnSelf)
+    private void sendStats(Player sender, String targetName, int page)
     {
         // make sure we are not loading lbs
         if (!Parkour.getStatsManager().isLoadingLeaderboards())
         {
             int records = 0;
-            boolean exists = true;
+            boolean exist = true;
 
-            // if offline, we get from database (async)
-            if (offline)
-            {
-                if (StatsDB.isPlayerInDatabase(targetName))
-                    records = StatsDB.getNumRecordsFromName(targetName);
-                else
-                    exists = false;
-            }
-            // otherwise we run the normal records player stats
+            PlayerStats targetStats = Parkour.getStatsManager().getByName(targetName);
+
+            // online then offline lookup process
+            if (targetStats != null)
+                records = targetStats.getRecords();
             else
             {
-                PlayerStats targetStats = Parkour.getStatsManager().getByName(targetName);
+                int foundRecords = CompletionsDB.getNumRecordsFromName(targetName);
 
-                if (targetStats != null)
-                    records = targetStats.getRecords();
+                if (foundRecords > -1)
+                    records = foundRecords;
+                else
+                    exist = false;
             }
 
-            // make sure they exist first
-            if (exists || pageOnSelf)
+            // if we have no record of them
+            if (exist)
             {
                 // if they are equal, we print out "Your records"
                 if (sender.getName().equalsIgnoreCase(targetName))
@@ -164,13 +150,13 @@ public class RecordsCMD implements CommandExecutor
                         // stop when we have all the records we wanted
                         if (records > currentFound && max > currentFound)
                         {
-                            List<LevelCompletion> leaderboard = level.getLeaderboard();
+                            LevelCompletion record = level.getRecordCompletion();
 
-                            // if not empty, keep going
-                            if (!leaderboard.isEmpty() && leaderboard.get(0).getPlayerName().equalsIgnoreCase(targetName))
+                            // if has record
+                            if (record != null && record.getPlayerName().equalsIgnoreCase(targetName))
                             {
                                 // print to player and increment
-                                long time = leaderboard.get(0).getCompletionTimeElapsed();
+                                long time = record.getCompletionTimeElapsed();
 
                                 messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + " &7" + (((double) time) / 1000) + "s");
                                 currentFound++;
@@ -203,7 +189,7 @@ public class RecordsCMD implements CommandExecutor
             }
             else
             {
-                sender.sendMessage(Utils.translate("&c" + targetName + " &7has not joined the server"));
+                sender.sendMessage(Utils.translate("&4" + targetName + " &chas not joined the server"));
             }
         }
         else

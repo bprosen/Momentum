@@ -193,7 +193,7 @@ public class Parkour extends JavaPlugin {
         menus = new MenuManager();
         levels = new LevelManager(plugin);
         ranks = new RanksManager();
-        perks = new PerkManager(plugin);
+        perks = new PerkManager();
         clans = new ClansManager(plugin);
         races = new RaceManager();
         infinite = new InfiniteManager();

@@ -9,6 +9,8 @@ import java.util.HashMap;
 public class LocationManager {
 
     private HashMap<String, Location> locations;
+    private Location lobbyLocation;
+    private Location tutorialLocation;
 
     public LocationManager() {
         load();
@@ -16,7 +18,9 @@ public class LocationManager {
 
     public void load()
     {
-        locations = LocationsDB.loadLocations();
+        this.locations = LocationsDB.loadLocations();
+        this.lobbyLocation = get("spawn");
+        this.tutorialLocation = get("tutorial");
 
         Parkour.getPluginLogger().info("Locations loaded: " + locations.size());
     }
@@ -116,8 +120,8 @@ public class LocationManager {
     public int numLocations() { return locations.size(); }
 
     public Location getLobbyLocation() {
-        return get("spawn");
+        return lobbyLocation;
     }
 
-    public Location getTutorialLocation() { return get("tutorial"); }
+    public Location getTutorialLocation() { return tutorialLocation; }
 }

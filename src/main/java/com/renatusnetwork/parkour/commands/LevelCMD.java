@@ -231,20 +231,18 @@ public class LevelCMD implements CommandExecutor
 
                 if (Utils.isInteger(a[2]))
                 {
-                    int row = Integer.parseInt(a[2]);
+                    int place = Integer.parseInt(a[2]);
 
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
                     if (level != null)
                     {
-                        List<LevelCompletion> leaderboard = level.getLeaderboard();
+                        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
 
-                        if (row <= leaderboard.size() && row > 0)
+                        if (place <= leaderboard.size() && place > 0)
                         {
-                            int name = row - 1;
-
-                            LevelCompletion oldHolder = leaderboard.get(name);
+                            LevelCompletion oldHolder = leaderboard.get(place);
 
                             // run it in async!
                             new BukkitRunnable()
@@ -255,18 +253,17 @@ public class LevelCMD implements CommandExecutor
                                     CompletionsDB.removeCompletion(oldHolder, false);
 
                                     level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
-
-                                    CompletionsDB.loadLeaderboard(level);
+                                    level.setLeaderboard(CompletionsDB.getLeaderboard(levelName));
 
                                     // if deleting record
-                                    if (name == 0)
+                                    if (place == 1)
                                     {
-                                        List<LevelCompletion> newLeaderbaord = level.getLeaderboard();
+                                        HashMap<Integer, LevelCompletion> newLeaderbaord = level.getLeaderboard();
 
                                         if (!newLeaderbaord.isEmpty())
                                         {
                                             // if the new leaderboard is no longer empty, add record for new holder
-                                            LevelCompletion newHolder = leaderboard.get(0);
+                                            LevelCompletion newHolder = level.getRecordCompletion();
 
                                             // if it is a diff person, need to update their in game stats
                                             if (!oldHolder.getUUID().equalsIgnoreCase(newHolder.getUUID()))

@@ -23,7 +23,6 @@ public class DatabaseManager {
     public static final String LEVEL_CHECKPOINTS_TABLE = "level_checkpoints";
     public static final String LEVEL_SAVES_TABLE = "level_saves";
     public static final String LEVEL_PURCHASES_TABLE = "level_purchases";
-    public static final String LEVEL_SPAWNS_TABLE = "level_spawns";
     public static final String LEVEL_COMPLETIONS_TABLE = "level_completions";
     public static final String CLANS_TABLE = "clans";
     public static final String RANKS_TABLE = "ranks";

@@ -161,6 +161,11 @@ public class RanksManager {
         return false;
     }
 
+    public boolean isPastOrAtRank(PlayerStats playerStats, String currentString)
+    {
+        return isPastOrAtRank(playerStats, get(currentString));
+    }
+
     public Rank getMaxRank()
     {
         for (Rank rank : ranks.values())

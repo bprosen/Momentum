@@ -103,7 +103,7 @@ public class CompletionsDB
         for (Map<String, String> recordResult : recordResults)
             return Integer.parseInt(recordResult.get("num_records"));
 
-        return 0;
+        return -1;
     }
 
     public static int getNumRecordsFromName(String name)
@@ -116,7 +116,7 @@ public class CompletionsDB
         for (Map<String, String> recordResult : recordResults)
             return Integer.parseInt(recordResult.get("num_records"));
 
-        return 0;
+        return -1;
     }
 
     /*
@@ -140,18 +140,19 @@ public class CompletionsDB
     }
 
     // can run complete async, only when all levels are loaded
-    public static void loadTotalCompletions(Level level) {
+    public static int getTotalCompletions(String levelName)
+    {
+        int completions;
 
-        if (level != null) {
-            List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                    DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                    "COUNT(*) AS total_completions",
-                    "WHERE level_name='" + level.getName() + "'"
-            );
+        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
+                DatabaseManager.LEVEL_COMPLETIONS_TABLE,
+                "COUNT(*) AS total_completions",
+                "WHERE level_name=?", levelName
+        );
 
-            for (Map<String, String> levelResult : levelsResults)
-                level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
-        }
+        completions = Integer.parseInt(levelsResults.get(0).get("total_completions"));
+
+        return completions;
     }
 
     public static void loadLeaderboards()
@@ -179,7 +180,8 @@ public class CompletionsDB
         {
             // default values
             Level currentLevel = null;
-            List<LevelCompletion> currentLB = new ArrayList<>();
+            HashMap<Integer, LevelCompletion> currentLB = new HashMap<>();
+            int lbPlace = 1;
 
             try
             {
@@ -191,10 +193,11 @@ public class CompletionsDB
                     {
                         // if not at the start (level is null), set LB
                         if (currentLevel != null)
-                            currentLevel.setLeaderboardCache(currentLB);
+                            currentLevel.setLeaderboard(currentLB);
 
                         // initialize and adjust
-                        currentLB = new ArrayList<>();
+                        lbPlace = 1;
+                        currentLB.clear();
                         currentLevel = Parkour.getLevelManager().get(levelName);
                     }
 
@@ -207,12 +210,13 @@ public class CompletionsDB
                             results.getLong("time_taken")
                     );
 
-                    currentLB.add(levelCompletion);
+                    currentLB.put(lbPlace, levelCompletion);
+                    lbPlace++;
                 }
 
                 // this makes it so the last level in the results will still get the leaderboard set
                 if (currentLevel != null)
-                    currentLevel.setLeaderboardCache(currentLB);
+                    currentLevel.setLeaderboard(currentLB);
             }
             catch (SQLException exception)
             {
@@ -222,44 +226,50 @@ public class CompletionsDB
         Parkour.getStatsManager().toggleLoadingLeaderboards(false);
     }
 
-    public static void loadLeaderboard(Level level) {
-        // Artificial limit of 500
-        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                DatabaseManager.LEVEL_COMPLETIONS_TABLE + " c",
-                "p.uuid AS player_uuid, p.name AS player_name, " +
-                        "time_taken, " +
-                        "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
-                "JOIN " + DatabaseManager.PLAYERS_TABLE + " p " +
-                        "ON c.player_id=p.player_id " +
-                        "WHERE c.level_name=" + level.getName() + " " +
-                        "AND time_taken > 0 " +
-                        "ORDER BY time_taken " +
-                        "ASC LIMIT 500"
+    public static HashMap<Integer, LevelCompletion> getLeaderboard(String levelName)
+    {
+
+        ResultSet results = DatabaseQueries.getRawResults(
+                "WITH min_times AS (" +
+                      "     SELECT uuid, level_name, MIN(time_taken) AS fastest_completion FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
+                      "     WHERE time_taken > 0 AND level_name=? GROUP BY uuid" +
+                      ")" +
+                      "SELECT p.uuid AS player_uuid, p.name AS player_name, min_times.fastest_completion AS fastest, (UNIX_TIMESTAMP(completion_date) * 1000) AS date " +
+                      "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " c " +
+                      "ON c.uuid=min_times.uuid AND c.level_name=min_times.level_name AND c.time_taken=min_times.fastest_completion " +
+                      "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=min_times.uuid ORDER BY min_times.fastest_time ASC LIMIT 10",
+                      levelName
         );
 
-        List<LevelCompletion> levelCompletions = new ArrayList<>();
-        Set<String> addedPlayers = new HashSet<>(); // used to avoid duplicate positions
+        HashMap<Integer, LevelCompletion> leaderboard = new HashMap<>();
+        int lbPlace = 1;
 
-        for (Map<String, String> levelResult : levelsResults) {
+        if (results != null)
+        {
+            try
+            {
+                while (results.next())
+                {
+                    // if not added already, add to leaderboard
+                    LevelCompletion levelCompletion = new LevelCompletion(
+                            levelName,
+                            results.getString("player_uuid"),
+                            results.getString("player_name"),
+                            results.getLong("date"),
+                            results.getLong("time_taken")
+                    );
 
-            if (levelCompletions.size() >= 10)
-                break;
-
-            String playerName = levelResult.get("player_name");
-
-            // if not added already, add to leaderboard
-            if (!addedPlayers.contains(playerName)) {
-                LevelCompletion levelCompletion = new LevelCompletion(
-                        level.getName(),
-                        levelResult.get("player_uuid"),
-                        playerName,
-                        Long.parseLong(levelResult.get("date")),
-                        Long.parseLong(levelResult.get("time_taken"))
-                );
-                levelCompletions.add(levelCompletion);
-                addedPlayers.add(playerName);
+                    leaderboard.put(lbPlace, levelCompletion);
+                    lbPlace++;
+                }
+            }
+            catch (SQLException exception)
+            {
+                Parkour.getPluginLogger().info("Error on getLeaderboard()");
+                exception.printStackTrace();
             }
         }
-        level.setLeaderboardCache(levelCompletions);
+
+        return leaderboard;
     }
 }

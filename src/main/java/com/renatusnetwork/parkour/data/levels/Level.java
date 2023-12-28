@@ -13,46 +13,72 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Level {
-
+public class Level
+{
     private String name;
     private String title;
     private int reward;
     private int price;
     private float rating;
-    private HashMap<String, Integer> ratings;
     private Location startLocation;
     private Location completionLocation;
     private int maxCompletions;
     private int playersInLevel;
     private boolean broadcast;
-    private String requiredPermissionNode;
-    private List<String> requiredLevels;
+    private String requiredPermission;
     private int respawnY;
-    private boolean liquidResetPlayer = true; // default is true
-    private List<PotionEffect> potionEffects = new ArrayList<>();
+    private boolean liquidResetPlayer;
     private Location raceLocation1;
     private Location raceLocation2;
     private Material raceLevelItemType;
     private int totalCompletionsCount;
-    private List<LevelCompletion> leaderboardCache = new ArrayList<>();
-    private List<String> commands = new ArrayList<>();
-    private Rank requiredRank;
+    private String requiredRank;
     private int difficulty;
     private boolean cooldown;
     private LevelType type;
     private boolean newLevel;
+    private boolean hasMastery;
+
+    private HashMap<String, Integer> ratings;
+    private List<String> requiredLevels;
+    private List<PotionEffect> potionEffects;
+    private HashMap<Integer, LevelCompletion> leaderboard;
+    private List<String> commands;
 
     public Level(String levelName)
     {
         this.name = levelName;
-        load();
+        this.ratings = new HashMap<>();
+        this.requiredLevels = new ArrayList<>();
+        this.potionEffects = new ArrayList<>();
+        this.leaderboard = new HashMap<>();
+        this.commands = new ArrayList<>();
+        this.liquidResetPlayer = true; // default is true
+    }
+
+    public void setCommands(List<String> commands)
+    {
+        this.commands = commands;
+    }
+
+    public void setPotionEffects(List<PotionEffect> potionEffects)
+    {
+        this.potionEffects = potionEffects;
+    }
+
+    public void setRatings(HashMap<String, Integer> ratings)
+    {
+        this.ratings = ratings;
+    }
+
+    public void setRequiredLevels(List<String> requiredLevels)
+    {
+        this.requiredLevels = requiredLevels;
     }
 
     public void setName(String name) { this.name = name; }
@@ -97,13 +123,17 @@ public class Level {
 
     public boolean doesLiquidResetPlayer() { return liquidResetPlayer; }
 
+    public void setLiquidResetPlayer(boolean liquidResetPlayer) { this.liquidResetPlayer = liquidResetPlayer; }
+
     public boolean hasPermissionNode() {
-        return requiredPermissionNode != null;
+        return requiredPermission != null;
     }
 
-    public String getRequiredPermissionNode() {
-        return requiredPermissionNode;
+    public String getRequiredPermission() {
+        return requiredPermission;
     }
+
+    public void setRequiredPermission(String requiredPermission) { this.requiredPermission = requiredPermission; }
 
     public int getMaxCompletions() {
         return maxCompletions;
@@ -114,6 +144,8 @@ public class Level {
     public boolean isBroadcasting() { return broadcast; }
 
     public void toggleBroadcast() { this.broadcast = !this.broadcast; }
+
+    public void setBroadcast(boolean broadcast) { this.broadcast = broadcast; }
 
     public void setRating(float rating) {
         this.rating = rating;
@@ -164,7 +196,7 @@ public class Level {
         return tempList;
     }
 
-    private void calcRating()
+    public void calcRating()
     {
         long sumRatings = 0;
 
@@ -225,45 +257,29 @@ public class Level {
         return event;
     }
 
-    public void sortNewCompletion(LevelCompletion levelCompletion) {
-        List<LevelCompletion> newLeaderboard = new ArrayList<>(leaderboardCache);
+    public void sortNewCompletion(LevelCompletion levelCompletion)
+    {
+        HashMap<Integer, LevelCompletion> newLeaderboard = new HashMap<>(leaderboard);
 
-        if (newLeaderboard.size() > 0)
+        newLeaderboard.put(newLeaderboard.size() + 1, levelCompletion);
+
+        for (int i = newLeaderboard.size(); i > 1; i--)
         {
-            newLeaderboard.add(levelCompletion);
+            LevelCompletion completion = newLeaderboard.get(i);
+            LevelCompletion nextCompletion = newLeaderboard.get(i - 1);
 
-            boolean done = false;
-            int currentIndex = newLeaderboard.size() - 1;
-
-            // working from the tail iteration
-            while (!done)
+            if (nextCompletion.getCompletionTimeElapsed() > completion.getCompletionTimeElapsed())
             {
-                int nextIndex = currentIndex - 1;
-
-                // if next is negative and current is less than next (higher lb position), swap!
-                if (nextIndex >= 0 &&
-                    newLeaderboard.get(nextIndex).getCompletionTimeElapsed() > newLeaderboard.get(currentIndex).getCompletionTimeElapsed())
-                {
-                    // swap
-                    LevelCompletion temp = newLeaderboard.get(nextIndex);
-
-                    newLeaderboard.set(nextIndex, newLeaderboard.get(currentIndex));
-                    newLeaderboard.set(currentIndex, temp);
-                }
-                else
-                {
-                    done = true;
-                }
-                currentIndex--;
+                // swap
+                newLeaderboard.replace((i - 1), completion);
+                newLeaderboard.replace(i, nextCompletion);
             }
+        }
+        // Trimming potential #11 datapoint
+        if (newLeaderboard.size() > 10)
+            newLeaderboard.remove(11);
 
-            // Trimming potential #11 datapoint
-            if (newLeaderboard.size() > 10)
-                newLeaderboard.remove(10);
-        } else
-            newLeaderboard.add(0, levelCompletion);
-
-        leaderboardCache = newLeaderboard;
+        leaderboard = newLeaderboard;
     }
 
     public void addCompletion(String playerName, LevelCompletion levelCompletion)
@@ -282,13 +298,13 @@ public class Level {
 
         if (!Parkour.getStatsManager().isLoadingLeaderboards())
         {
-            if (!leaderboardCache.isEmpty())
+            if (!leaderboard.isEmpty())
             {
                 // Compare completion against scoreboard
-                if (leaderboardCache.size() < 10 ||
-                    leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                if (leaderboard.size() < 10 ||
+                        leaderboard.get(leaderboard.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
                 {
-                    LevelCompletion firstPlace = leaderboardCache.get(0);
+                    LevelCompletion firstPlace = leaderboard.get(0);
 
                     // check for first place
                     if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
@@ -391,89 +407,17 @@ public class Level {
         }
     }
 
-    private void load() {
-        if (LevelsYAML.exists(name))
-        {
-
-            if (LevelsYAML.isSet(name, "title"))
-                title = LevelsYAML.getTitle(name);
-            else
-                title = name;
-
-            String startLocationName = name + "-spawn";
-            if (Parkour.getLocationManager().exists(startLocationName))
-                startLocation = Parkour.getLocationManager().get(startLocationName);
-            else
-                startLocation = Parkour.getLocationManager().get("spawn");
-
-            String respawnLocationName = name + "-completion";
-            if (Parkour.getLocationManager().exists(respawnLocationName))
-                respawnLocation = Parkour.getLocationManager().get(respawnLocationName);
-            else
-                respawnLocation = Parkour.getLocationManager().get("spawn");
-
-            // this acts as a boolean for races
-            if (LevelsYAML.isSection(name, "race")) {
-                // this checks if player1 and player2 has locations
-                raceLevel = true;
-
-                if (LevelsYAML.isSet(name, "race.player1_loc") &&
-                    LevelsYAML.isSet(name, "race.player2_loc")) {
-
-                    raceLocation1 = LevelsYAML.getPlayerRaceLocation("player1", name);
-                    raceLocation2 = LevelsYAML.getPlayerRaceLocation("player2", name);
-                }
-
-                if (LevelsYAML.isSet(name, "race.menu_item"))
-                    raceLevelItemType = LevelsYAML.getRaceMenuItemType(name);
-            }
-
-            if (LevelsYAML.isSet(name, "event")) {
-                eventLevel = true;
-                eventType = LevelsYAML.getEventType(name);
-            }
-
-            isRankUpLevel = LevelsYAML.getRankUpLevelSwitch(name);
-            maxCompletions = LevelsYAML.getMaxCompletions(name);
-            broadcastCompletion = LevelsYAML.getBroadcastSetting(name);
-            requiredLevels = LevelsYAML.getRequiredLevels(name);
-            potionEffects = LevelsYAML.getPotionEffects(name);
-            commands = LevelsYAML.getCommands(name);
-            liquidResetPlayer = LevelsYAML.getLiquidResetSetting(name);
-            requiredPermissionNode = LevelsYAML.getRequiredPermissionNode(name);
-            respawnY = LevelsYAML.getRespawnY(name);
-            elytraLevel = LevelsYAML.isElytraLevel(name);
-            dropperLevel = LevelsYAML.isDropperLevel(name);
-            tcLevel = LevelsYAML.isTCLevel(name);
-            ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
-            price = LevelsYAML.getPrice(name);
-            newLevel = LevelsYAML.getNewLevel(name);
-            difficulty = LevelsYAML.getDifficulty(name);
-            cooldown = LevelsYAML.hasCooldown(name);
-
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
-                {
-                    // special case where it needs to be run 1 tick later since the rank manager isnt registered yet, it will be if we skip this tick.
-                    requiredRank = LevelsYAML.getRankRequired(name);
-                }
-            }.runTaskLater(Parkour.getPlugin(), 1);
-        }
-    }
-
     public boolean hasCooldown() { return cooldown; }
 
     public void toggleCooldown() { cooldown = !cooldown; }
 
+    public void setCooldown(boolean cooldown) { this.cooldown = cooldown; }
+
     public boolean needsRank() { return requiredRank != null; }
 
-    public Rank getRequiredRank() { return requiredRank; }
+    public String getRequiredRank() { return requiredRank; }
 
-    public void setLeaderboardCache(List<LevelCompletion> levelCompletions) {
-        leaderboardCache = levelCompletions;
-    }
+    public void setRequiredRank(String requiredRank) { this.requiredRank = requiredRank; }
 
     public boolean hasRespawnY() {
         return respawnY > -1;
@@ -495,11 +439,23 @@ public class Level {
 
     public void toggleNew() { newLevel = !newLevel; }
 
+    public void setNew(boolean isNew) { this.newLevel = isNew; }
+
+    public boolean hasMastery() { return hasMastery; }
+
+    public void toggleHasMastery() { hasMastery = !hasMastery; }
+
+    public void setHasMastery(boolean hasMastery) { this.hasMastery = hasMastery; }
+
     public boolean isAscendance() { return type == LevelType.ASCENDANCE; }
 
-    public List<LevelCompletion> getLeaderboard() {
-        return leaderboardCache;
+    public HashMap<Integer, LevelCompletion> getLeaderboard() {
+        return leaderboard;
     }
+
+    public void setLeaderboard(HashMap<Integer, LevelCompletion> leaderboard) { this.leaderboard = leaderboard; }
+
+    public LevelCompletion getRecordCompletion() { return leaderboard.get(1); }
 
     public boolean isRequiredLevel(String levelName) { return requiredLevels.contains(levelName); }
 
