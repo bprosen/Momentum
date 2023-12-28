@@ -74,10 +74,10 @@ public class LevelListener implements Listener {
                 // if they are not spectating anyone, continue
                 } else if (!playerStats.isSpectating()) {
                     Level level = playerStats.getLevel();
-                    if (level != null && !level.isDropperLevel() && level.doesLiquidResetPlayer()) {
+                    if (level != null && !level.isDropper() && level.doesLiquidResetPlayer()) {
 
                         // if is elytra level, set gliding to false
-                        if (level.isElytraLevel())
+                        if (level.isElytra())
                             player.setGliding(false);
 
                         if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
@@ -249,7 +249,7 @@ public class LevelListener implements Listener {
                         if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
                         {
                             // if they are glitching elytra -> !elytra, remove elytra!
-                            if (level.isElytraLevel() && !levelTo.isElytraLevel())
+                            if (level.isElytra() && !levelTo.isElytra())
                                 Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                             playerStats.setLevel(levelTo);

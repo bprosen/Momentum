@@ -315,7 +315,7 @@ public class MenuItemFormatter {
                 formattedTitle = Utils.translate("&cFeatured " + formattedTitle);
             else
             // add new if new level! but dont show new if featured (too messy)
-            if (level.isNewLevel())
+            if (level.isNew())
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
 
             if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))
@@ -468,11 +468,12 @@ public class MenuItemFormatter {
             }
 
             // Required Levels Section, but only show it if not featured
-            if (level.getRequiredLevels().size() > 0 && !level.isFeaturedLevel()) {
+            if (level.hasRequiredLevels() && !level.isFeaturedLevel()) {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Required Levels"));
 
-                for (String requiredLevelName : level.getRequiredLevels()) {
+                for (String requiredLevelName : level.getRequiredLevels())
+                {
                     Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
                     if (requiredLevel != null)
@@ -498,7 +499,7 @@ public class MenuItemFormatter {
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
                 if (fastestCompletion != null) {
                     double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
-                    long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
+                    long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletionMillis();
 
                     String bestTime = "&7  Best Time &6" + completionTime + "s";
 

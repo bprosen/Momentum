@@ -22,7 +22,7 @@ public class GlideListener implements Listener {
                 // if the level they are in is not an elytra level or their world is not the plot world, cancel it
                 if (event.isGliding() &&
                    (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) &&
-                   !(playerStats.inLevel() && playerStats.getLevel().isElytraLevel()))) {
+                   !(playerStats.inLevel() && playerStats.getLevel().isElytra()))) {
                     player.setGliding(false);
                     event.setCancelled(true);
                 }

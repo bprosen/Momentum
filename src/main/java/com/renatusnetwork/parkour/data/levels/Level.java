@@ -47,6 +47,7 @@ public class Level {
     private int difficulty;
     private boolean cooldown;
     private LevelType type;
+    private boolean newLevel;
 
     public Level(String levelName)
     {
@@ -265,7 +266,8 @@ public class Level {
         leaderboardCache = newLeaderboard;
     }
 
-    public void addCompletion(String playerName, LevelCompletion levelCompletion) {
+    public void addCompletion(String playerName, LevelCompletion levelCompletion)
+    {
         if (totalCompletionsCount < 0)
             totalCompletionsCount = 0;
 
@@ -284,7 +286,7 @@ public class Level {
             {
                 // Compare completion against scoreboard
                 if (leaderboardCache.size() < 10 ||
-                        leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
+                    leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
                 {
                     LevelCompletion firstPlace = leaderboardCache.get(0);
 
@@ -368,11 +370,11 @@ public class Level {
                     if (previousStats != null)
                         previousStats.removeRecord();
 
-                    // update data
-                    LevelsDB.updateLevelRecord(this.name, playerStats.getUUID());
+                    // remove previous
+                    CompletionsDB.updateRecord(previousRecord);
                 }
-                else
-                    LevelsDB.insertLevelRecord(levelCompletion);this.name, playerStats.getUUID());
+                // update new
+                CompletionsDB.updateRecord(levelCompletion);
             }
             PlayerStats playerStats = Parkour.getStatsManager().getByName(levelCompletion.getPlayerName()); // get player that got record
 
@@ -483,17 +485,17 @@ public class Level {
 
     public void setRespawnY(int respawnY) { this.respawnY = respawnY; }
 
-    public boolean isElytra() { return elytraLevel; }
+    public boolean isElytra() { return type == LevelType.ELYTRA; }
 
-    public boolean isDropper() { return dropperLevel; }
+    public boolean isDropper() { return type == LevelType.DROPPER; }
 
-    public boolean isTC() { return tcLevel; }
+    public boolean isTC() { return type == LevelType.TC; }
 
     public boolean isNew() { return newLevel; }
 
     public void toggleNew() { newLevel = !newLevel; }
 
-    public boolean isAscendance() { return ascendanceLevel; }
+    public boolean isAscendance() { return type == LevelType.ASCENDANCE; }
 
     public List<LevelCompletion> getLeaderboard() {
         return leaderboardCache;
@@ -502,6 +504,8 @@ public class Level {
     public boolean isRequiredLevel(String levelName) { return requiredLevels.contains(levelName); }
 
     public boolean hasRequiredLevels() { return !requiredLevels.isEmpty(); }
+
+    public List<String> getRequiredLevels() { return requiredLevels; }
 
     public void addRequiredLevel(String levelName) { requiredLevels.add(levelName); }
 
@@ -520,13 +524,12 @@ public class Level {
     }
 
     public boolean isRaceLevel() {
-        return raceLevel;
+        return type == LevelType.RACE;
     }
 
-    public boolean isFeaturedLevel() {
-        if (name.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName()))
-            return true;
-        return false;
+    public boolean isFeaturedLevel()
+    {
+        return name.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName());
     }
 
     public boolean hasValidRaceLocations() {
@@ -539,7 +542,8 @@ public class Level {
         return raceLevelItemType;
     }
 
-    public boolean hasRequiredLevels(PlayerStats playerStats) {
+    public boolean hasRequiredLevels(PlayerStats playerStats)
+    {
         for (String levelName : requiredLevels)
             if (playerStats.getLevelCompletionsCount(levelName) < 1)
                 return false;

@@ -119,7 +119,7 @@ public class Scoreboard {
 
                 // if they have a rank, show it
                 if (playerStats.getRank() != null) {
-                    String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getRankTitle());
+                    String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getTitle());
                     board.add(rankString);
                 }
 
@@ -131,7 +131,7 @@ public class Scoreboard {
 
                 int fails = playerStats.getFails();
                 if (!playerStats.isInInfinite() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
-                        !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendanceLevel() &&
+                        !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendance() &&
                         playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
                     board.add(Utils.translate("  &e&lFails &6" + fails));
 
@@ -229,12 +229,12 @@ public class Scoreboard {
 
                             if (nextRank != null) {
                                 board.add(Utils.translate("  &c&lRankup"));
-                                board.add(Utils.translate("  &a" + rank.getRankTitle() + " &7-> &a" + nextRank.getRankTitle()));
+                                board.add(Utils.translate("  &a" + rank.getTitle() + " &7-> &a" + nextRank.getTitle()));
                             }
                         }
                     } else {
 
-                        if (level.isAscendanceLevel()) {
+                        if (level.isAscendance()) {
 
                             // add scoreboard
                             board.add(formatSpacing(Utils.translate("&8&lAscendance")));

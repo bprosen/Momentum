@@ -111,7 +111,7 @@ public class LevelHandler {
                 @Override
                 public void run()
                 {
-                    CompletionsDB.insertCompletion(levelCompletion);
+                    CompletionsDB.insertCompletion(levelCompletion,);
                 }
             }.runTaskAsynchronously(Parkour.getPlugin());
 
@@ -224,7 +224,7 @@ public class LevelHandler {
                     Bukkit.broadcastMessage(Utils.translate(
                             "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
                     ));
-                } else if (level.getBroadcastCompletion()) {
+                } else if (level.isBroadcasting()) {
                     String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
 
                     broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
@@ -286,7 +286,7 @@ public class LevelHandler {
                 if (!(beforeClanLevel > -1 && beforeClanLevel < playerStats.getClan().getLevel()))
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 0f);
 
-                Location locationTo = level.getRespawnLocation();
+                Location locationTo = level.getCompletionLocation();
 
                 // If not rank up level or has a start location and is grinding, set to start loc
                 if (!playerStats.isAttemptingRankup() && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())

@@ -11,16 +11,17 @@ import java.util.Map;
 public class PracticeHandler {
 
     public static void shutdown() {
-        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
-
+        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet())
+        {
             PlayerStats playerStats = entry.getValue();
-            if (playerStats.isLoaded() && playerStats.getPlayer().isOnline() && playerStats.inPracticeMode())
+
+            if (playerStats != null && playerStats.inPracticeMode())
                 resetPlayer(playerStats, false);
         }
     }
 
-    public static void resetPlayer(PlayerStats playerStats, boolean message) {
-
+    public static void resetPlayer(PlayerStats playerStats, boolean message)
+    {
         Player player = playerStats.getPlayer();
 
         player.teleport(playerStats.getPracticeLocation());
