@@ -1,5 +1,7 @@
 package com.renatusnetwork.parkour.data.levels;
 
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+
 public enum LevelType
 {
     NORMAL,

@@ -3,15 +3,13 @@ package com.renatusnetwork.parkour.data.clans;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.ClanXPRewardEvent;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
-import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -20,33 +18,98 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ClansManager {
+public class ClansManager
+{
+    private HashMap<String, Clan> clans;
+    private HashMap<Integer, Clan> clansLeaderboard;
+    private HashMap<String, Clan> clanChat;
+    private Set<String> chatSpy;
 
-    private HashMap<String, Clan> clans = new HashMap<>();
-    private HashMap<Integer, Clan> clansLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
-    private HashMap<String, Clan> clanChat = new HashMap<>();
-    private Set<String> chatSpy = new HashSet<>();
+    public ClansManager(Plugin plugin)
+    {
+        this.clans = new HashMap<>();
+        this.clansLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
+        this.clanChat = new HashMap<>();
+        this.chatSpy = new HashSet<>();
 
-    public ClansManager(Plugin plugin) {
         load();
         startScheduler(plugin);
     }
 
     private void load()
     {
-        clans = ClansDB.loadClans();
+        clans = ClansDB.getClans();
+    }
+
+    public void create(String tag, PlayerStats owner)
+    {
+        Clan clan = new Clan(tag, owner.getUUID());
+
+        // add to cache and db
+        add(clan);
+        ClansDB.insert(clan);
+
+        // update owner stats
+        clan.addMember(new ClanMember(owner.getUUID(), owner.getName()));
+        owner.setClan(clan);
+        StatsDB.updatePlayerClan(owner, clan.getTag());
     }
 
     public void add(Clan clan) {
         clans.put(clan.getTag(), clan);
     }
 
-    public void addMember(String tag, ClanMember clanMember)
+    public void updateClanTag(Clan clan, String newTag)
     {
-        Clan clan = get(tag);
+        // update in data
+        clans.remove(clan.getTag());
+        clans.put(clan.getTag(), clan);
+        clan.setTag(newTag);
 
-        if (clan != null)
-            clan.addMember(clanMember);
+        ClansDB.updateTag(clan.getTag(), newTag);
+    }
+
+    public void updateTotalXP(Clan clan, long totalXP)
+    {
+        clan.setTotalXP(totalXP);
+        ClansDB.updateTotalXP(clan.getTag(), totalXP);
+    }
+
+    public void updateXP(Clan clan, int xp)
+    {
+        clan.setXP(xp);
+        ClansDB.updateXP(clan.getTag(), xp);
+    }
+
+    public void updateLevel(Clan clan, int level)
+    {
+        clan.setLevel(level);
+        ClansDB.updateLevel(clan.getTag(), level);
+    }
+
+    public void updateClanOwner(Clan clan, String uuid)
+    {
+        clan.setOwner(uuid);
+        ClansDB.updateOwner(clan.getTag(), uuid);
+    }
+
+    public void addMember(Clan clan, PlayerStats playerStats)
+    {
+        clan.addMember(new ClanMember(playerStats.getUUID(), playerStats.getName()));
+        playerStats.setClan(clan);
+        StatsDB.updatePlayerClan(playerStats, clan.getTag());
+        clan.removeInvite(playerStats.getName());
+    }
+
+    public void kickMember(Clan clan, String playerName)
+    {
+        clan.removeMember(playerName);
+        StatsDB.resetPlayerClan(playerName);
+
+        PlayerStats victimStats = Parkour.getStatsManager().getByName(playerName);
+
+        if (victimStats != null)
+            victimStats.resetClan();
     }
 
     public void remove(String clanTag) { clans.remove(clanTag); }
@@ -64,18 +127,11 @@ public class ClansManager {
         return clans.get(clanTag);
     }
 
-    public Clan getIgnoreCase(String clanTag) {
-        for (Clan clan : clans.values())
-            if (clan.getTag().equalsIgnoreCase(clanTag))
-                return clan;
-
-        return null;
-    }
-
-    public void updatePlayerNameInClan(Clan clan, String oldName, String newName) {
+    public void updatePlayerNameInClan(Clan clan, String oldName, String newName)
+    {
         for (ClanMember clanMember : clan.getMembers())
-            if (clanMember.getPlayerName().equalsIgnoreCase(oldName))
-                clanMember.setPlayerName(newName);
+            if (clanMember.getName().equalsIgnoreCase(oldName))
+                clanMember.setName(newName);
     }
 
     public HashMap<Integer, Clan> getLeaderboard() { return clansLeaderboard; }
@@ -116,7 +172,7 @@ public class ClansManager {
 
         for (ClanMember clanMember : clan.getMembers()) {
             // make sure it is not given to the completioner
-            if (!clanMember.getPlayerName().equalsIgnoreCase(player.getName())) {
+            if (!clanMember.getName().equalsIgnoreCase(player.getName())) {
                 // check if they are online
                 if (Bukkit.getPlayer(UUID.fromString(clanMember.getUUID())) != null) {
 
@@ -155,9 +211,9 @@ public class ClansManager {
         {
             clanXP = event.getXP(); // override from event
 
-            if (playerStats.hasModifier(ModifierTypes.CLAN_XP_BOOSTER))
+            if (playerStats.hasModifier(ModifierType.CLAN_XP_BOOSTER))
             {
-                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.CLAN_XP_BOOSTER);
+                Booster booster = (Booster) playerStats.getModifier(ModifierType.CLAN_XP_BOOSTER);
                 clanXP *= booster.getMultiplier();
             }
             int totalXP = clanXP + clan.getXP();
@@ -166,7 +222,7 @@ public class ClansManager {
             if (clan.isMaxLevel())
             {
                 clan.addXP(clanXP);
-                ClansDB.setClanXP(totalXP, clan.getTag());
+                ClansDB.updateXP(clan.getTag(), totalXP);
 
             // level them up
             }
@@ -177,48 +233,55 @@ public class ClansManager {
             {
                 // otherwise add xp to cache and database
                 clan.addXP(clanXP);
-                ClansDB.setClanXP(totalXP, clan.getTag());
+                ClansDB.updateXP(clan.getTag(), totalXP);
             }
             long newTotal = clan.getTotalXP() + clanXP;
 
             // update total gained xp
-            ClansDB.setTotalXP(newTotal, clan.getTag());
+            ClansDB.updateTotalXP(clan.getTag(), newTotal);
             clan.setTotalXP(newTotal);
         }
     }
 
-    public void deleteClan(String tag, boolean messageMembers) {
-        Clan clan = get(tag);
-
-        if (clan != null)
+    public void deleteClan(Clan clan, boolean messageMembers)
+    {
+        // iterate through existing clan members to reset/remove their data
+        for (ClanMember clanMember : clan.getMembers())
         {
-            // iterate through existing clan members to reset/remove their data
-            for (ClanMember clanMember : clan.getMembers())
+            // we do not need to delete from db for each player as the foreign key will set null on cascading
+            PlayerStats clanPlayer = Parkour.getStatsManager().get(clanMember.getUUID());
+            if (clanPlayer != null)
             {
-                // we do not need to delete from db for each player as the foreign key will set null on cascading
+                if (messageMembers)
+                    clanPlayer.sendMessage(Utils.translate(
+                            "&6" + clan.getOwner().getName() + " &ehas disbanded your &6&lClan &6" + clan.getTag()
+                    ));
 
-                Player clanPlayer = Bukkit.getPlayer(clanMember.getPlayerName());
-                if (clanPlayer != null)
-                {
-                    if (messageMembers)
-                        clanPlayer.sendMessage(Utils.translate("&6" + clan.getOwner().getPlayerName() +
-                                " &ehas disbanded your &6&lClan &6" + clan.getTag()));
-
-                    // reset data on the players
-                    Parkour.getStatsManager().get(clanPlayer).resetClan();
-                }
+                // reset data on the players
+                clanPlayer.resetClan();
             }
-            // remove from database and list
-            ClansDB.removeClan(tag);
-            clans.remove(clan.getTag());
         }
+
+        // remove from database and list
+        ClansDB.remove(clan.getTag());
+        clans.remove(clan.getTag());
     }
 
-    public void sendMessageToMembers(Clan clan, String msg, String dontSendTo) {
+    public void leaveClan(Clan clan, PlayerStats playerStats)
+    {
+        // reset cache
+        StatsDB.resetPlayerClan(playerStats.getName());
+        clan.removeMember(playerStats.getName());
+
+        playerStats.resetClan();
+    }
+
+    public void sendMessageToMembers(Clan clan, String msg, String dontSendTo)
+    {
         for (ClanMember clanMember : clan.getMembers())
         {
             // make sure they are online
-            Player clanPlayer = Bukkit.getPlayer(clanMember.getPlayerName());
+            Player clanPlayer = Bukkit.getPlayer(clanMember.getName());
 
             if (clanPlayer != null && (dontSendTo == null || !clanPlayer.getName().equalsIgnoreCase(dontSendTo)))
                 clanPlayer.sendMessage(Utils.translate(msg));
@@ -239,7 +302,7 @@ public class ClansManager {
         {
             // update in cache and config
             clan.setMaxLevel(newMaxLevel);
-            ClansDB.updateClanMaxLevel(clan);
+            ClansDB.updateMaxLevel(clan.getTag(), newMaxLevel);
 
             int currLevel = clan.getLevel();
 
@@ -254,7 +317,7 @@ public class ClansManager {
             {
                 // means they went down in max level but were past the new max (force their level down)
                 clan.setLevel(clan.getMaxLevel());
-                ClansDB.setClanLevel(clan.getMaxLevel(), clan.getTag());
+                ClansDB.updateLevel(clan.getTag(), clan.getLevel());
             }
         }
     }
@@ -289,15 +352,15 @@ public class ClansManager {
         // play level up sound to online clan members
         for (ClanMember clanMember : clan.getMembers())
         {
-            Player onlineMember = Bukkit.getPlayer(clanMember.getPlayerName());
+            Player onlineMember = Bukkit.getPlayer(clanMember.getName());
 
             if (onlineMember != null)
                 onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
         }
 
         // add rest of xp after leveling up
-        ClansDB.setClanLevel(newLevel, clan.getTag());
-        ClansDB.setClanXP(clanXPOverflow, clan.getTag());
+        ClansDB.updateLevel(clan.getTag(), newLevel);
+        ClansDB.updateXP(clan.getTag(), clanXPOverflow);
         clan.setXP(clanXPOverflow);
     }
 
@@ -311,7 +374,7 @@ public class ClansManager {
 
         // update in cache and config
         clan.setMaxMembers(newMaxMembers);
-        ClansDB.updateClanMaxMembers(clan);
+        ClansDB.updateMaxMembers(clan.getTag(), newMaxMembers);
     }
 
     private void startScheduler(Plugin plugin) {

@@ -47,7 +47,7 @@ public class EventCMD implements CommandExecutor {
                                         if (!eventManager.isEliminated(player)) {
                                             if (!playerStats.isInBlackMarket()) {
                                                 if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())) {
-                                                    if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                                                    if (playerStats.inLevel() && playerStats.getLevel().isElytra())
                                                         Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                                                     // remove sword item if they have it and the mode is pvp

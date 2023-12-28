@@ -1,19 +1,26 @@
 package com.renatusnetwork.parkour.data.modifiers;
 
-import com.renatusnetwork.parkour.utils.Utils;
-
 public abstract class Modifier
 {
     private String name;
-    private String displayName;
-    private ModifierTypes type;
+    private String title;
+    private ModifierType type;
 
-    public Modifier(ModifierTypes type, String name)
+    public Modifier(ModifierType type, String name, String title)
     {
         this.type = type;
         this.name = name;
+        this.title = title;
+    }
 
-        load();
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public void setType(ModifierType type)
+    {
+        this.type = type;
     }
 
     public String getName()
@@ -21,20 +28,15 @@ public abstract class Modifier
         return name;
     }
 
-    public String getDisplayName()
+    public String getTitle()
     {
-        return displayName;
+        return title;
     }
 
-    public ModifierTypes getType() { return type; }
+    public ModifierType getType() { return type; }
 
     public boolean equals(Modifier modifier)
     {
         return modifier.getName().equals(name);
-    }
-
-    private void load()
-    {
-        this.displayName = Utils.translate(ModifiersYAML.getDisplayName(name));
     }
 }

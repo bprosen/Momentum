@@ -1,54 +1,81 @@
 package com.renatusnetwork.parkour.data.modifiers;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.modifiers.bonuses.RecordBonus;
+import com.renatusnetwork.parkour.data.modifiers.boosters.*;
+import com.renatusnetwork.parkour.data.modifiers.discounts.LevelDiscount;
+import com.renatusnetwork.parkour.data.modifiers.discounts.ShopDiscount;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
+import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Particle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ModifiersDB
 {
-    public static void loadModifiers(PlayerStats playerStats)
+    public static HashMap<String, Modifier> getModifiers()
     {
-        ArrayList<Modifier> modifiers = new ArrayList<>();
+        List<Map<String, String>> modifierResults = DatabaseQueries.getResults(DatabaseManager.MODIFIERS_TABLE, "*", "");
+        HashMap<String, Modifier> modifiers = new HashMap<>();
 
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "modifiers",
-                "*",
-                " WHERE uuid='" + playerStats.getUUID() + "'"
-        );
-
-        if (playerResults.size() > 0)
+        for (Map<String, String> modifierResult : modifierResults)
         {
-            for (Map<String, String> playerResult : playerResults)
-            {
-                String modifierName = playerResult.get("modifier_name");
+            String name = modifierResult.get("name");
+            ModifierType type = ModifierType.valueOf(modifierResult.get("type").toUpperCase());
+            String title = Utils.translate(modifierResult.get("title"));
 
-                modifiers.add(Parkour.getModifiersManager().getModifier(modifierName));
-            }
+            float modifierValue;
+
+            String multiplier = modifierResult.get("multiplier");
+            String discount = modifierResult.get("discount");
+
+            if (multiplier != null)
+                modifierValue = Float.parseFloat(multiplier);
+            else if (discount != null)
+                modifierValue = Float.parseFloat(discount);
+            else
+                modifierValue = Integer.parseInt(modifierResult.get("bonus"));
+
+            modifiers.put(name, Parkour.getModifiersManager().createSubclass(name, type, title, modifierValue));
         }
 
-        playerStats.setModifiers(modifiers);
+        return modifiers;
     }
 
-    public static void addModifier(PlayerStats playerStats, Modifier modifier)
+    public static void insertBoosterModifier(String name, ModifierType type, String title, float multiplier)
     {
-        DatabaseQueries.runAsyncQuery("INSERT INTO modifiers (uuid, player_name, modifier_name) VALUES('" +
-                playerStats.getUUID() + "','" +
-                playerStats.getPlayerName() + "','" +
-                modifier.getName() + "')"
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.MODIFIERS_TABLE + " (name, type, title, multiplier) VALUES (?,?,?,?)",
+                name, type, title, multiplier
         );
     }
 
-    public static void removeModifier(PlayerStats playerStats, Modifier modifier)
+    public static void insertDiscountModifier(String name, ModifierType type, String title, float discount)
     {
-        DatabaseQueries.runAsyncQuery("DELETE FROM modifiers WHERE uuid='" + playerStats.getUUID() + "' AND modifier_name='" + modifier.getName() + "'");
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.MODIFIERS_TABLE + " (name, type, title, discount) VALUES (?,?,?,?)",
+                name, type, title, discount
+        );
     }
 
-    public static void removeModifierName(String playerName, Modifier modifier)
+    public static void insertBonusModifier(String name, ModifierType type, String title, int bonus)
     {
-        DatabaseQueries.runAsyncQuery("DELETE FROM modifiers WHERE player_name=? AND modifier_name='" + modifier.getName() + "'", playerName);
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.MODIFIERS_TABLE + " (name, type, title, bonus) VALUES (?,?,?,?)",
+                name, type, title, bonus
+        );
+    }
+
+    public static void updateTitle(String name, String title)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.MODIFIERS_TABLE + " SET title=? WHERE name=?", title, name
+        );
     }
 }

@@ -21,7 +21,7 @@ public class CompletionsDB
         for (Map<String, String> completionResult : completionsResults)
             playerStats.levelCompletion(
                     playerStats.getUUID(),
-                    playerStats.getPlayerName(),
+                    playerStats.getName(),
                     completionResult.get("level_name"),
                     Long.parseLong(completionResult.get("date")),
                     Long.parseLong(completionResult.get("time_taken"))

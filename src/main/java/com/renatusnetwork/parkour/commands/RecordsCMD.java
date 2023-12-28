@@ -153,7 +153,7 @@ public class RecordsCMD implements CommandExecutor
                             LevelCompletion record = level.getRecordCompletion();
 
                             // if has record
-                            if (record != null && record.getPlayerName().equalsIgnoreCase(targetName))
+                            if (record != null && record.getName().equalsIgnoreCase(targetName))
                             {
                                 // print to player and increment
                                 double time = record.getCompletionTimeElapsedSeconds();

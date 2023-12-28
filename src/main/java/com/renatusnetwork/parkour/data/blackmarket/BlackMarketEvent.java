@@ -147,7 +147,7 @@ public class BlackMarketEvent
             Player player = highestBidder.getPlayer();
 
             for (String command : blackMarketArtifact.getRewardCommands())
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", highestBidder.getPlayerName())); // send command
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", highestBidder.getName())); // send command
 
             for (String message : blackMarketArtifact.getWinnerMessages())
                 player.sendMessage(Utils.translate(message)); // send msgs

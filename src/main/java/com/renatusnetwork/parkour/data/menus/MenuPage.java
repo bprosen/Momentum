@@ -14,19 +14,23 @@ public class MenuPage {
     private int pageNumber;
     private int rowCount;
 
-    private Map<Integer, MenuItem> pageItemsMap = new HashMap<>();
+    private HashMap<Integer, MenuItem> pageItemsMap;
 
-    MenuPage(Menu menu, int pageNumber) {
+    public MenuPage(Menu menu, int pageNumber)
+    {
         this.pageNumber = pageNumber;
+        this.pageItemsMap = new HashMap<>();
 
         load(menu);
     }
 
-    private void load(Menu menu) {
+    private void load(Menu menu)
+    {
         rowCount = MenusYAML.getRowCount(menu.getName(), pageNumber);
         int slotCount = rowCount * 9;
 
-        for (int slot = 0; slot <= slotCount - 1; slot++) {
+        for (int slot = 0; slot <= slotCount - 1; slot++)
+        {
             if (MenusYAML.hasItem(menu.getName(), pageNumber, slot))
                 pageItemsMap.put(slot, new MenuItem(menu, this, slot));
         }
@@ -54,12 +58,14 @@ public class MenuPage {
         return pageItemsMap.get(slot);
     }
 
-    public MenuItem getMenuItemFromTitle(String itemTitle) {
+    public MenuItem getMenuItemFromTitle(String itemTitle)
+    {
         for (MenuItem menuItem : pageItemsMap.values()) {
             if (menuItem.getItem().getItemMeta().getDisplayName().equals(itemTitle))
                 return menuItem;
 
-            if (menuItem.getType().equals("level")) {
+            if (menuItem.getType().equals("level"))
+            {
                 Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
                 if (level != null
@@ -71,5 +77,5 @@ public class MenuPage {
         return null;
     }
 
-    public Map<Integer, MenuItem> getPageItemsMap() { return pageItemsMap; }
+    public HashMap<Integer, MenuItem> getPageItemsMap() { return pageItemsMap; }
 }

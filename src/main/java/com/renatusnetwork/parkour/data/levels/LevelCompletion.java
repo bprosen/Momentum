@@ -5,14 +5,14 @@ public class LevelCompletion
     private String levelName;
     private long timeOfCompletion;
     private long completionTimeElapsed; // time elapsed
-    private String playerName;
+    private String name;
     private String uuid;
 
-    public LevelCompletion(String levelName, String uuid, String playerName, long timeOfCompletion, long completionTimeElapsed)
+    public LevelCompletion(String levelName, String uuid, String name, long timeOfCompletion, long completionTimeElapsed)
     {
         this.levelName = levelName;
         this.uuid = uuid;
-        this.playerName = playerName;
+        this.name = name;
         this.timeOfCompletion = timeOfCompletion;
 
         if (completionTimeElapsed < 72000000L)
@@ -37,8 +37,8 @@ public class LevelCompletion
 
     public double getCompletionTimeElapsedSeconds() { return completionTimeElapsed / 1000f; }
 
-    public String getPlayerName() {
-        return playerName;
+    public String getName() {
+        return name;
     }
 
     public String getUUID() { return uuid; }

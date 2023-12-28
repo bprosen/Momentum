@@ -284,7 +284,7 @@ public class LevelCMD implements CommandExecutor
                                     }
 
                                     sender.sendMessage(Utils.translate(
-                                            "&4" + oldHolder.getPlayerName() + "'s &ctime has been removed succesfully from &4" + levelName
+                                            "&4" + oldHolder.getName() + "'s &ctime has been removed succesfully from &4" + levelName
                                     ));
                                 }
                             }.runTaskAsynchronously(Parkour.getPlugin());
@@ -341,7 +341,7 @@ public class LevelCMD implements CommandExecutor
                     if (level != null)
                     {
                         LevelHandler.dolevelCompletion(playerStats, playerStats.getPlayer(), level, levelName, true);
-                        sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + " &7Completion for &a" + playerStats.getPlayerName()));
+                        sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + " &7Completion for &a" + playerStats.getName()));
                     }
                 }
                 else

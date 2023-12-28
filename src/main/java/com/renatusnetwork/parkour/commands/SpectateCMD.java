@@ -60,8 +60,8 @@ public class SpectateCMD implements CommandExecutor {
                                                                              if they are already spectating and the person they
                                                                              are spectating are who they are trying to spectate again, cancel
                                                                              */
-                                                                                if (spectatorStats.getPlayerToSpectate().getPlayerName()
-                                                                                        .equalsIgnoreCase(playerStats.getPlayerName())) {
+                                                                                if (spectatorStats.getPlayerToSpectate().getName()
+                                                                                        .equalsIgnoreCase(playerStats.getName())) {
 
                                                                                     player.sendMessage(Utils.translate(
                                                                                             "&cYou cannot spectate the same person you are spectating"));
@@ -73,7 +73,7 @@ public class SpectateCMD implements CommandExecutor {
                                                                             SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, initialSpectate);
 
                                                                             playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                                                                    spectatorStats.getPlayerName() + " &7began to spectate you"));
+                                                                                    spectatorStats.getName() + " &7began to spectate you"));
                                                                         } else
                                                                             player.sendMessage(Utils.translate("&cYou cannot spectate while in a block"));
                                                                     } else {

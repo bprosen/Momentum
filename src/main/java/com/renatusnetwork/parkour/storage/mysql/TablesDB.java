@@ -1,5 +1,14 @@
 package com.renatusnetwork.parkour.storage.mysql;
 
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.levels.LevelType;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
+import com.renatusnetwork.parkour.data.perks.PerksArmorType;
+import org.bukkit.Material;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.Arrays;
+
 public class TablesDB
 {
     public static void initTables()
@@ -34,6 +43,12 @@ public class TablesDB
 
     private static void createPlayers()
     {
+        String infiniteEnumString = Arrays.toString(InfiniteType.values());
+        infiniteEnumString = infiniteEnumString.substring(1, infiniteEnumString.length() - 1); // remove square brackets
+
+        String infiniteBlockEnumString = Arrays.toString(Material.values());
+        infiniteBlockEnumString = infiniteBlockEnumString.substring(1, infiniteBlockEnumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLAYERS_TABLE + "(" +
                            "uuid CHAR(36) NOT NULL, " +
                            "name VARCHAR(16) NOT NULL, " +
@@ -45,8 +60,8 @@ public class TablesDB
                            "infinite_speedrun_score INT DEFAULT 0, " +
                            "infinite_sprint_score INT DEFAULT 0, " +
                            "infinite_timed_score INT DEFAULT 0, " +
-                           "infinite_block VARCHAR(30) DEFAULT NULL, " + // default set from settings
-                           "infinite_type VARCHAR(10) DEFAULT NULL, " + // default set from settings
+                           "infinite_block ENUM(" + infiniteBlockEnumString + ") DEFAULT NULL, " + // default set from settings
+                           "infinite_type ENUM(" + infiniteEnumString + ") DEFAULT NULL, " + // default set from settings
                            "race_wins SMALLINT DEFAULT 0, " +
                            "race_losses SMALLINT DEFAULT 0, " +
                            "event_wins MEDIUMINT DEFAULT 0, " +
@@ -87,6 +102,9 @@ public class TablesDB
 
     private static void createLevels()
     {
+        String enumString = Arrays.toString(LevelType.values());
+        enumString = enumString.substring(1, enumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVELS_TABLE + "(" +
                             // basic info
                             "name VARCHAR(20) NOT NULL, " +
@@ -98,7 +116,7 @@ public class TablesDB
                             "required_rank VARCHAR(10) DEFAULT NULL, " +
                             "respawn_y SMALLINT DEFAULT NULL, " +
                             "max_completions SMALLINT DEFAULT NULL, " +
-                            "type VARCHAR(30) DEFAULT NULL, " + // default set from settings
+                            "type ENUM(" + enumString + ") DEFAULT NULL, " + // default set from settings
                             "difficulty TINYINT DEFAULT NULL, " +
                             // switches
                             "cooldown BIT DEFAULT 0, " +
@@ -348,9 +366,12 @@ public class TablesDB
 
     private static void createModifiers()
     {
+        String enumString = Arrays.toString(ModifierType.values());
+        enumString = enumString.substring(1, enumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MODIFIERS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
-                            "type VARCHAR(20) DEFAULT NULL, " +
+                            "type ENUM(" + enumString + ") DEFAULT NULL, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // add room for color codes
                             "multiplier FLOAT DEFAULT NULL, " +
                             "discount FLOAT DEFAULT NULL, " +
@@ -451,9 +472,12 @@ public class TablesDB
 
     private static void createPerksArmor()
     {
+        String enumString = Arrays.toString(PerksArmorType.values());
+        enumString = enumString.substring(1, enumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
                             "perk_name VARCHAR(20) NOT NULL, " +
-                            "armor_piece VARCHAR(10) NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS... so max = 10
+                            "armor_piece ENUM(" + enumString + ") NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS
                             "material VARCHAR(30) NOT NULL, " +
                             "type TINYINT DEFAULT 0, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // allow for extra length due to color codes
@@ -489,9 +513,12 @@ public class TablesDB
 
     private static void createLevelPotionEffects()
     {
+        String enumString = Arrays.toString(PotionEffectType.values());
+        enumString = enumString.substring(1, enumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
-                            "type VARCHAR(20) NOT NULL, " + // longest potion effect is DAMAGE_RESISTANCE (17), so will just say 20 max
+                            "type ENUM(" + enumString + ") NOT NULL, " +
                             "amplifier TINYINT UNSIGNED DEFAULT 0, " + // potion effects dont go past 255, so TINYINT UNSIGNED is perfect
                             "duration MEDIUMINT DEFAULT 0, " +
                             "PRIMARY KEY(level_name, type), " +

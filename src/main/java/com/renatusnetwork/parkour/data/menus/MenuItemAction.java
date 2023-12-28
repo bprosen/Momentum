@@ -9,8 +9,7 @@ import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
-import com.renatusnetwork.parkour.data.levels.RatingDB;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.plots.Plot;
@@ -153,7 +152,7 @@ public class MenuItemAction {
 
             // cover all conditions that can stop a player from entering a level
             if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level)) ||
-                (level.hasRequiredLevels() && !level.hasRequiredLevels(playerStats)) ||
+                (level.hasRequiredLevels() && !level.playerHasRequiredLevels(playerStats)) ||
                 (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermission())) ||
                 (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))) &&
                 !level.isFeaturedLevel() && !level.isRankUpLevel())
@@ -271,7 +270,7 @@ public class MenuItemAction {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             // bypass if opped
-            if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
+            if (perk.hasAccessTo(playerStats))
             {
                 player.closeInventory();
                 Parkour.getPerkManager().setPerk(perk, playerStats);
@@ -291,9 +290,9 @@ public class MenuItemAction {
                     int playerBalance = (int) playerStats.getCoins();
                     int price = event.getPrice();
 
-                    if (playerStats.hasModifier(ModifierTypes.SHOP_DISCOUNT))
+                    if (playerStats.hasModifier(ModifierType.SHOP_DISCOUNT))
                     {
-                        Discount discount = (Discount) playerStats.getModifier(ModifierTypes.SHOP_DISCOUNT);
+                        Discount discount = (Discount) playerStats.getModifier(ModifierType.SHOP_DISCOUNT);
                         price *= (1.00f - discount.getDiscount());
                     }
 
@@ -345,9 +344,9 @@ public class MenuItemAction {
             int oldTotal = total;
             int oldPrice = price;
 
-            if (playerStats.hasModifier(ModifierTypes.LEVEL_DISCOUNT))
+            if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT))
             {
-                Discount discount = (Discount) playerStats.getModifier(ModifierTypes.LEVEL_DISCOUNT);
+                Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
                 total *= (1.00f - discount.getDiscount());
                 price *= (1.00f - discount.getDiscount());
             }
@@ -479,9 +478,9 @@ public class MenuItemAction {
                 totalCoins = event.getTotalPrice();
 
                 // modifier discount
-                if (playerStats.hasModifier(ModifierTypes.LEVEL_DISCOUNT))
+                if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT))
                 {
-                    Discount discount = (Discount) playerStats.getModifier(ModifierTypes.LEVEL_DISCOUNT);
+                    Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
                     totalCoins *= (1.00f - discount.getDiscount());
                 }
 
@@ -520,7 +519,7 @@ public class MenuItemAction {
                 {
                     if (!playerStats.isInInfinite())
                     {
-                        if (level.hasRequiredLevels(playerStats))
+                        if (level.playerHasRequiredLevels(playerStats))
                         {
                             if (!playerStats.isInBlackMarket())
                             {

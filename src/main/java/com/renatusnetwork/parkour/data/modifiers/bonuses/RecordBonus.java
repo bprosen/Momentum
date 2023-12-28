@@ -1,11 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.bonuses;
 
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 
 public class RecordBonus extends Bonus
 {
-    public RecordBonus(ModifierTypes type, String name)
+    public RecordBonus(ModifierType type, String name, String title, int bonus)
     {
-        super(type, name);
+        super(type, name, title, bonus);
     }
 }

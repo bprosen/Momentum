@@ -154,7 +154,7 @@ public abstract class Infinite
     }
 
     public String getName() {
-        return playerStats.getPlayerName();
+        return playerStats.getName();
     }
 
     public void addScore() {

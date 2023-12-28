@@ -1,19 +1,20 @@
 package com.renatusnetwork.parkour.data.modifiers.bonuses;
 
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
-import com.renatusnetwork.parkour.data.modifiers.ModifiersYAML;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 
 public class Bonus extends Modifier
 {
     private int bonus;
 
-    public Bonus(ModifierTypes type, String name)
+    public Bonus(ModifierType type, String name, String title, int bonus)
     {
-        super(type, name);
+        super(type, name, title);
 
-        this.bonus = ModifiersYAML.getBonus(name);
+        this.bonus = bonus;
     }
+
+    public void setBonus(int bonus) { this.bonus = bonus; }
 
     public int getBonus()
     {

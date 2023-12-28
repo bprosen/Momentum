@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -37,12 +38,12 @@ public class BankManager
         BankItem radiant = items.get(BankItemType.RADIANT);
         BankItem brilliant = items.get(BankItemType.BRILLIANT);
         BankItem legendary = items.get(BankItemType.LEGENDARY);
-        ModifiersManager modifiersManager = Parkour.getModifiersManager();
+        StatsManager statsManager = Parkour.getStatsManager();
 
         // remove modifiers
-        modifiersManager.removeModifierName(radiant.getCurrentHolder(), radiant.getModifier());
-        modifiersManager.removeModifierName(brilliant.getCurrentHolder(), brilliant.getModifier());
-        modifiersManager.removeModifierName(legendary.getCurrentHolder(), legendary.getModifier());
+        statsManager.removeModifierName(radiant.getCurrentHolder(), radiant.getModifier());
+        statsManager.removeModifierName(brilliant.getCurrentHolder(), brilliant.getModifier());
+        statsManager.removeModifierName(legendary.getCurrentHolder(), legendary.getModifier());
 
         // reset items
         String radiantItem = BankYAML.chooseBankItem(BankItemType.RADIANT);
@@ -189,7 +190,7 @@ public class BankManager
         BankItem bankItem = items.get(type);
 
         // make sure they do not bid on themselves
-        if (!bankItem.hasCurrentHolder() || !bankItem.getCurrentHolder().equalsIgnoreCase(playerStats.getPlayerName()))
+        if (!bankItem.hasCurrentHolder() || !bankItem.getCurrentHolder().equalsIgnoreCase(playerStats.getName()))
         {
             if (!bankItem.isLocked())
             {
@@ -202,7 +203,7 @@ public class BankManager
 
                     // check through all items, for the items not currently being picked and if the current holder is the player, deny them (cant have two at once)
                     for (BankItem item : items.values())
-                        if (item.getType() != type && item.getCurrentHolder().equalsIgnoreCase(playerStats.getPlayerName()))
+                        if (item.getType() != type && item.getCurrentHolder().equalsIgnoreCase(playerStats.getName()))
                             alreadyHasTier = true;
 
                     if (!alreadyHasTier)
@@ -211,25 +212,25 @@ public class BankManager
                         Player player = Bukkit.getPlayer(oldHolder);
 
                         Modifier modifier = bankItem.getModifier();
-
+                        StatsManager statsManager = Parkour.getStatsManager();
                         // remove from cache
                         if (player != null)
-                            Parkour.getModifiersManager().removeModifier(Parkour.getStatsManager().get(player), modifier);
+                            statsManager.removeModifier(statsManager.get(player), modifier);
                         else
                             // remove from db only
                             DatabaseQueries.runAsyncQuery("DELETE FROM modifiers WHERE player_name='" + oldHolder + "' AND modifier_name='" + modifier.getName() + "'");
 
                         Parkour.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
-                        bankItem.setCurrentHolder(playerStats.getPlayerName()); // update current holder
+                        bankItem.setCurrentHolder(playerStats.getName()); // update current holder
                         bankItem.addTotal(bidAmount); // update in cache
                         bankItem.calcNextBid(); // calc next bid
                         broadcastNewBid(playerStats, bankItem, bidAmount); // broadcast bid
-                        BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getPlayerName()); // update in config
+                        BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getName()); // update in config
                         playerStats.getPlayer().playSound(playerStats.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         Utils.spawnFirework(playerStats.getPlayer().getLocation(), Color.PURPLE, Color.WHITE, true);
 
                         // update player info
-                        Parkour.getModifiersManager().addModifier(playerStats, bankItem.getModifier());
+                        statsManager.addModifier(playerStats, bankItem.getModifier());
 
                         // lock chance (has to be minimum and 10% chance)
                         if (bankItem.getMinimumLock() < bankItem.getTotalBalance() && ThreadLocalRandom.current().nextDouble(0, 100) <= Parkour.getSettingsManager().lock_chance)

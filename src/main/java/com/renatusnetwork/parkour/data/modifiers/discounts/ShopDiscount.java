@@ -1,11 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.discounts;
 
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 
 public class ShopDiscount extends Discount
 {
-    public ShopDiscount(ModifierTypes type, String name)
+    public ShopDiscount(ModifierType type, String name, String title, float discount)
     {
-        super(type, name);
+        super(type, name, title, discount);
     }
 }

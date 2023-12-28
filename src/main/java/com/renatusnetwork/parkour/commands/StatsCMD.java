@@ -138,11 +138,11 @@ public class StatsCMD implements CommandExecutor {
                     int lbPositionNum = 1;
 
                     for (Clan clan : clansLB.values()) {
-                        if (clan != null && clan.getOwner() != null && clan.getOwner().getPlayerName() != null) {
+                        if (clan != null && clan.getOwner() != null && clan.getOwner().getName() != null) {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &6" +
                                     Utils.shortStyleNumber(clan.getTotalXP()) + " &e" +
-                                    clan.getTag() + " &6(" + clan.getOwner().getPlayerName() + ")"));
+                                    clan.getTag() + " &6(" + clan.getOwner().getName() + ")"));
                             lbPositionNum++;
                         }
                     }
@@ -272,11 +272,11 @@ public class StatsCMD implements CommandExecutor {
                             for (int i = 1; i <= leaderboard.size(); i++)
                             {
                                 LevelCompletion levelCompletion = leaderboard.get(i);
-                                String lbName = levelCompletion.getPlayerName();
+                                String lbName = levelCompletion.getName();
                                 double time = levelCompletion.getCompletionTimeElapsedSeconds();
                                 String lbString = " &7" + i;
 
-                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(levelCompletion.getPlayerName()))
+                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(levelCompletion.getName()))
                                 {
                                     // we want to show it as blue if they are on it
                                     onLB = true;

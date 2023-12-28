@@ -96,7 +96,7 @@ public class JoinLeaveListener implements Listener {
                                         playerStats.setTutorial(true);
 
                                     // if the level they are being added to is an ascendance level, add them to the list
-                                    if (level.isAscendanceLevel())
+                                    if (level.isAscendance())
                                         statsManager.enteredAscendance(playerStats);
 
                                     Location checkpoint = playerStats.getCheckpoint(level);
@@ -104,7 +104,7 @@ public class JoinLeaveListener implements Listener {
                                         playerStats.setCurrentCheckpoint(checkpoint);
 
                                     // is elytra level, then set elytra in sync (player inventory changes)
-                                    if (level.isElytraLevel())
+                                    if (level.isElytra())
                                         new BukkitRunnable() {
                                             @Override
                                             public void run() {

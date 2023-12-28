@@ -3,21 +3,21 @@ package com.renatusnetwork.parkour.data.clans;
 public class ClanMember
 {
     private String uuid;
-    private String playerName;
+    private String name;
 
-    public ClanMember(String uuid, String playerName)
+    public ClanMember(String uuid, String name)
     {
         this.uuid = uuid;
-        this.playerName = playerName;
+        this.name = name;
     }
 
     public String getUUID() {
         return uuid;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public String getName() {
+        return name;
     }
 
-    public void setPlayerName(String playerName) { this.playerName = playerName; }
+    public void setName(String name) { this.name = name; }
 }

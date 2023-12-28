@@ -77,21 +77,22 @@ public class PerkManager {
     public void setPerk(Perk perk, PlayerStats playerStats)
     {
         Player player = playerStats.getPlayer();
-        HashMap<String, ItemStack> items = perk.getItems();
+        HashMap<PerksArmorType, ItemStack> items = perk.getItems();
+
         if (!items.isEmpty())
         {
-            for (Map.Entry<String, ItemStack> entry : items.entrySet())
+            for (Map.Entry<PerksArmorType, ItemStack> entry : items.entrySet())
                 switch (entry.getKey()) {
-                    case "helmet":
+                    case HELMET:
                         player.getInventory().setHelmet(entry.getValue());
                         break;
-                    case "chestplate":
+                    case CHESTPLATE:
                         player.getInventory().setChestplate(entry.getValue());
                         break;
-                    case "leggings":
+                    case LEGGINGS:
                         player.getInventory().setLeggings(entry.getValue());
                         break;
-                    case "boots":
+                    case BOOTS:
                         player.getInventory().setBoots(entry.getValue());
                         break;
                 }

@@ -12,7 +12,7 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.Sprint;
 import com.renatusnetwork.parkour.data.infinite.gamemode.Timed;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -93,7 +93,7 @@ public class Scoreboard {
                     if (blackMarketEvent.hasHighestBidder())
                     {
                         board.add(Utils.translate("  &8&lBid &7" + Utils.formatNumber(blackMarketEvent.getHighestBid())));
-                        board.add(Utils.translate("  &8&lHolder &7" + blackMarketEvent.getHighestBidder().getPlayerName()));
+                        board.add(Utils.translate("  &8&lHolder &7" + blackMarketEvent.getHighestBidder().getName()));
                     }
                     board.add(Utils.translate("&7"));
 
@@ -139,7 +139,7 @@ public class Scoreboard {
                 if (playerStats.isSpectating()) {
 
                     board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getPlayerName())));
+                    board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getName())));
                     board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
 
                     // practice section of scoreboard
@@ -197,11 +197,11 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase()) + " &5Infinite")));
 
                     // add best if they have one
-                    String scoreString = "&7Score &d" + Parkour.getInfiniteManager().get(playerStats.getPlayerName()).getScore();
+                    String scoreString = "&7Score &d" + Parkour.getInfiniteManager().get(playerStats.getName()).getScore();
                     if (playerStats.getBestInfiniteScore() > 0)
                         scoreString += " &7(&dBest " + playerStats.getBestInfiniteScore() + "&7)";
 
-                    Infinite infinite = Parkour.getInfiniteManager().get(playerStats.getPlayerName());
+                    Infinite infinite = Parkour.getInfiniteManager().get(playerStats.getName());
 
                     board.add(formatSpacing(Utils.translate(scoreString)));
 
@@ -256,9 +256,9 @@ public class Scoreboard {
                             int newReward = level.getReward();
 
                             // always modify level booster
-                            if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER)) {
+                            if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER)) {
                                 // downcast and boost
-                                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                                Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
                                 newReward *= booster.getMultiplier();
                             }
 
@@ -268,13 +268,13 @@ public class Scoreboard {
                                 newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
                             } else if (bankManager.isJackpotRunning() &&
                                     bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                                    !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName())) {
+                                    !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
                                 Jackpot jackpot = bankManager.getJackpot();
                                 int bonus = jackpot.getBonus();
 
-                                if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER)) {
+                                if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER)) {
                                     // downcast and boost
-                                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                                    Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
                                     bonus *= booster.getMultiplier();
                                 }
                                 // add bonus multiplier
@@ -290,8 +290,8 @@ public class Scoreboard {
                                 LevelManager levelManager = Parkour.getLevelManager();
 
                                 // set cooldown modifier last!
-                                if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()) && levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier() != 1.00)
-                                    newReward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+                                if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getName()) && levelManager.getLevelCooldown(playerStats.getName()).getModifier() != 1.00)
+                                    newReward *= levelManager.getLevelCooldown(playerStats.getName()).getModifier();
                             }
 
                             if (newReward != level.getReward())

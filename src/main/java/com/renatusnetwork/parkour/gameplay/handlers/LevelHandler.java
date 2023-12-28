@@ -10,11 +10,10 @@ import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -87,7 +86,7 @@ public class LevelHandler {
             LevelCompletion levelCompletion = new LevelCompletion(
                     levelName,
                     playerStats.getUUID(),
-                    playerStats.getPlayerName(),
+                    playerStats.getName(),
                     System.currentTimeMillis(),
                     elapsedTime
             );
@@ -97,7 +96,7 @@ public class LevelHandler {
             boolean newPB = false;
 
             if (bestCompletion != null)
-                newPB = bestCompletion.getCompletionTimeElapsed() > elapsedTime; // if this completion will be a PB!
+                newPB = bestCompletion.getCompletionTimeElapsedMillis() > elapsedTime; // if this completion will be a PB!
 
             // disable when complete
             if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
@@ -140,9 +139,9 @@ public class LevelHandler {
                 int reward = event.getReward();
 
                 // level booster
-                if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+                if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER))
                 {
-                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                    Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
                     reward *= booster.getMultiplier();
                 }
 
@@ -152,7 +151,7 @@ public class LevelHandler {
                 // jackpot section
                 else if (bankManager.isJackpotRunning() &&
                         bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                        !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
+                        !bankManager.getJackpot().hasCompleted(playerStats.getName()))
                 {
                     Jackpot jackpot = bankManager.getJackpot();
 
@@ -164,9 +163,9 @@ public class LevelHandler {
                         int bonus = jackpotEvent.getBonus();
 
                         // jackpot booster
-                        if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
+                        if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER))
                         {
-                            Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                            Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
                             bonus *= booster.getMultiplier();
                         }
 
@@ -183,8 +182,8 @@ public class LevelHandler {
                         reward *= playerStats.getPrestigeMultiplier();
 
                     // set cooldown modifier last!
-                    if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getPlayerName()))
-                        reward *= levelManager.getLevelCooldown(playerStats.getPlayerName()).getModifier();
+                    if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getName()))
+                        reward *= levelManager.getLevelCooldown(playerStats.getName()).getModifier();
                 }
 
                 Parkour.getStatsManager().addCoins(playerStats, reward);
@@ -257,7 +256,7 @@ public class LevelHandler {
                 if (!playerStats.isGrinding())
                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                Parkour.getPluginLogger().info(playerStats.getPlayerName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
+                Parkour.getPluginLogger().info(playerStats.getName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
                 // reset cp and saves before teleport
                 Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
@@ -297,7 +296,7 @@ public class LevelHandler {
                     Parkour.getRanksManager().doRankUp(player);
 
                 // add cooldown
-                levelManager.addLevelCooldown(playerStats.getPlayerName(), level);
+                levelManager.addLevelCooldown(playerStats.getName(), level);
 
                 ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
                 Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());

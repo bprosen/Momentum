@@ -8,7 +8,7 @@ import com.renatusnetwork.parkour.data.leaderboards.InfiniteLB;
 import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteReward;
 import com.renatusnetwork.parkour.data.infinite.rewards.InfiniteRewards;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -161,9 +161,9 @@ public class InfiniteManager {
                 }
             }
 
-            if (playerStats.hasModifier(ModifierTypes.INFINITE_BOOSTER))
+            if (playerStats.hasModifier(ModifierType.INFINITE_BOOSTER))
             {
-                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.INFINITE_BOOSTER);
+                Booster booster = (Booster) playerStats.getModifier(ModifierType.INFINITE_BOOSTER);
                 coinReward *= booster.getMultiplier();
             }
 

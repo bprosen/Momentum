@@ -21,32 +21,36 @@ import java.util.*;
 
 public class MenuManager {
 
-    private HashMap<String, Menu> menuMap = new HashMap<>();
-    private HashMap<String, CancelTasks> cancelTasks = new HashMap<>();
+    private HashMap<String, Menu> menus;
+    private HashMap<String, CancelTasks> cancelTasks;
 
-    public MenuManager() {
+    public MenuManager()
+    {
+        this.menus = new HashMap<>();
+        this.cancelTasks = new HashMap<>();
         load();
     }
 
-    public void load() {
-        menuMap = new HashMap<>();
-
+    public void load()
+    {
         for (String menuName : MenusYAML.getNames())
             load(menuName);
 
-        Parkour.getPluginLogger().info("Menus loaded: " + menuMap.size());
+        Parkour.getPluginLogger().info("Menus loaded: " + menus.size());
     }
 
-    public void load(String menuName) {
+    public void load(String menuName)
+    {
         if (MenusYAML.exists(menuName))
-            menuMap.put(menuName, new Menu(menuName));
+            menus.put(menuName, new Menu(menuName));
     }
 
-    public List<Menu> getMenus() {
+    public List<Menu> getMenus()
+    {
         List<Menu> menuArray = new ArrayList<>();
 
         // add menus to list
-        for (Menu menu : menuMap.values())
+        for (Menu menu : menus.values())
             if (menu != null)
                 menuArray.add(menu);
 
@@ -54,7 +58,7 @@ public class MenuManager {
     }
 
     public boolean exists(String menuName) {
-        return menuMap.containsKey(menuName);
+        return menus.containsKey(menuName);
     }
 
     public CancelTasks getCancelTasks(String playerName)
@@ -101,11 +105,11 @@ public class MenuManager {
     }
 
     public Menu getMenu(String menuName) {
-        return menuMap.get(menuName);
+        return menus.get(menuName);
     }
 
     public Menu getMenuFromStartingChars(String input) {
-        for (Menu menu : menuMap.values())
+        for (Menu menu : menus.values())
             if (input.startsWith(menu.getName()))
                 return menu;
 
@@ -114,7 +118,7 @@ public class MenuManager {
 
     public Menu getMenuFromTitle(String menuTitle) {
         // need to make exception for rate level menu as the title gets changed to replace a placeholder
-        for (Menu menu : menuMap.values())
+        for (Menu menu : menus.values())
             if (menuTitle.startsWith(menu.getFormattedTitleBase()) ||
                (menu.getName().equalsIgnoreCase("rate_level") && ChatColor.stripColor(menuTitle).contains("Rate")))
                 return menu;
@@ -124,7 +128,7 @@ public class MenuManager {
 
     public Menu getMenuFromSelectItem(ItemStack item) {
         if (item != null)
-            for (Menu menu : menuMap.values())
+            for (Menu menu : menus.values())
                 if (menu.getSelectItem() != null && menu.getSelectItem().getType().equals(item.getType()))
                     return menu;
 
@@ -132,12 +136,12 @@ public class MenuManager {
     }
 
     public List<String> getMenuNames() {
-        return new ArrayList<>(menuMap.keySet());
+        return new ArrayList<>(menus.keySet());
     }
 
     public Inventory getInventory(String menuName, int pageNumber) {
         if (exists(menuName))
-            return menuMap.get(menuName).getInventory(pageNumber);
+            return menus.get(menuName).getInventory(pageNumber);
 
         return null;
     }
@@ -150,7 +154,7 @@ public class MenuManager {
     }
 
     public void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
-        Menu menu = menuMap.get(menuName);
+        Menu menu = menus.get(menuName);
         if (menu != null) {
             menu.updateInventory(player, inventory, pageNumber);
         }
@@ -164,7 +168,7 @@ public class MenuManager {
         MenuItem correctMenuItem = null;
 
         // outer loop for menus
-        outer: for (Menu menu : menuMap.values())
+        outer: for (Menu menu : menus.values())
             // outer loop for menu pages
             for (MenuPage menuPage : menu.getPageMap().values())
                 // inner loop for menu items in pages

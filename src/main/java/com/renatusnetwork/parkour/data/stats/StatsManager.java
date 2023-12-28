@@ -9,7 +9,8 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -43,34 +44,36 @@ import java.util.*;
 
 public class StatsManager {
 
-    private HashMap<String, PlayerStats> playerStatsUUID = new HashMap<>(); // index by uuid
-    private HashMap<String, PlayerStats> playerStatsName = new HashMap<>(); // index by name
+    private HashMap<String, PlayerStats> playerStatsUUID; // index by uuid
+    private HashMap<String, PlayerStats> playerStatsName; // index by name
+    private HashSet<PlayerStats> ascendancePlayerList;
+    private HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB;
+    private HashMap<Integer, CoinsLBPosition> coinsLB;
+    private HashMap<Integer, RecordsLBPosition> recordsLB;
+    private HashSet<String> saidGG;
 
-    private HashSet<PlayerStats> ascendancePlayerList = new HashSet<>();
-
-    private HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB = new LinkedHashMap<>
-            (Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
-
-    private HashMap<Integer, CoinsLBPosition> coinsLB = new LinkedHashMap<>(
-            Parkour.getSettingsManager().max_coins_leaderboard_size);
-
-    private HashMap<Integer, RecordsLBPosition> recordsLB = new LinkedHashMap<>(
-            Parkour.getSettingsManager().max_records_leaderboard_size);
-
-    private HashSet<String> saidGG = new HashSet<>();
     private BukkitTask task = null;
-
     private boolean loadingLeaderboards = false;
 
     private int totalPlayers;
     private long totalCoins;
 
-    public StatsManager(Plugin plugin) {
+    public StatsManager(Plugin plugin)
+    {
+        this.playerStatsUUID = new HashMap<>();
+        this.playerStatsName = new HashMap<>();
+        this.ascendancePlayerList = new HashSet<>();
+        this.globalPersonalCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
+        this.coinsLB = new HashMap<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
+        this.recordsLB = new HashMap<>(Parkour.getSettingsManager().max_records_leaderboard_size);
+        this.saidGG = new HashSet<>();
+
         startScheduler(plugin);
         totalPlayers = StatsDB.getTotalPlayers();
     }
 
-    private void startScheduler(Plugin plugin) {
+    private void startScheduler(Plugin plugin)
+    {
 
         // Leader Boards
         new BukkitRunnable() {
@@ -114,7 +117,7 @@ public class StatsManager {
         loadIndividualLevelsBeaten(playerStats);
         PerksDB.loadPerks(playerStats);
         loadPerksGainedCount(playerStats);
-        ModifiersDB.loadModifiers(playerStats);
+        StatsDB.loadModifiers(playerStats);
         CheckpointDB.loadCheckpoints(playerStats);
         SavesDB.loadSaves(playerStats);
     }
@@ -226,7 +229,7 @@ public class StatsManager {
         synchronized (playerStatsUUID)
         {
             playerStatsUUID.remove(playerStats.getUUID());
-            playerStatsName.remove(playerStats.getPlayerName());
+            playerStatsName.remove(playerStats.getName());
         }
 
         synchronized (ascendancePlayerList)
@@ -237,7 +240,7 @@ public class StatsManager {
 
     public void addGG(PlayerStats playerStats)
     {
-        if (task != null && !saidGG.contains(playerStats.getPlayerName()))
+        if (task != null && !saidGG.contains(playerStats.getName()))
         {
             int reward = Parkour.getSettingsManager().default_gg_coin_reward;
 
@@ -248,9 +251,9 @@ public class StatsManager {
             {
                 reward = event.getReward();
 
-                if (playerStats.hasModifier(ModifierTypes.GG_BOOSTER))
+                if (playerStats.hasModifier(ModifierType.GG_BOOSTER))
                 {
-                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.GG_BOOSTER);
+                    Booster booster = (Booster) playerStats.getModifier(ModifierType.GG_BOOSTER);
                     reward *= booster.getMultiplier();
                 }
 
@@ -261,7 +264,7 @@ public class StatsManager {
                 else
                     rewardString = "&6" + Utils.formatNumber(reward);
 
-                saidGG.add(playerStats.getPlayerName());
+                saidGG.add(playerStats.getName());
                 playerStats.getPlayer().sendMessage(Utils.translate(rewardString + " &eCoin &7reward for saying &3&lGG&b!"));
                 Parkour.getStatsManager().addCoins(playerStats, reward);
             }
@@ -323,6 +326,36 @@ public class StatsManager {
     {
         playerStats.removeBoughtLevel(level);
         StatsDB.removeBoughtLevel(playerStats.getUUID(), level.getName());
+    }
+
+    public void addModifier(PlayerStats playerStats, Modifier modifier)
+    {
+        // add to cache and db
+        playerStats.addModifier(modifier);
+        StatsDB.addModifier(playerStats.getUUID(), modifier.getName());
+    }
+
+    public void removeModifier(PlayerStats playerStats, Modifier modifier)
+    {
+        // remove from cache and db
+        playerStats.removeModifier(modifier);
+        StatsDB.removeModifier(playerStats.getUUID(), modifier.getName());
+    }
+
+    public void removeModifierName(String playerName, Modifier modifier)
+    {
+        PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
+
+        // remove from cache if not null
+        if (playerStats != null)
+            removeModifier(playerStats, modifier);
+        else
+            StatsDB.removeModifierName(playerName, modifier.getName());
+    }
+
+    public void changeUpdatedModifiers(Modifier oldModifier, Modifier newModifier)
+    {
+
     }
 
     public long getTotalCoins() { return totalCoins; }
@@ -537,7 +570,7 @@ public class StatsManager {
                         List<String> newLore = new ArrayList<>();
 
                         // special condition if they are viewing someone else's stats, replace the skull with correct values
-                        if (playerStats.getPlayerName() != opener.getName() && item.getType() == Material.GOLD_NUGGET)
+                        if (playerStats.getName() != opener.getName() && item.getType() == Material.GOLD_NUGGET)
                         {
                             ItemStack headItem = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
                             ItemMeta headMeta = headItem.getItemMeta();
@@ -602,7 +635,7 @@ public class StatsManager {
                                             .replace("%clan_level%", clan.getLevel() + "")
                                             .replace("%clan_total_xp%", Utils.shortStyleNumber(clan.getTotalXP()))
                                             .replace("%clan_level_xp%", Utils.shortStyleNumber(clan.getXP()))
-                                            .replace("%clan_owner%", clan.getOwner().getPlayerName())
+                                            .replace("%clan_owner%", clan.getOwner().getName())
                                             .replace("%clan_member_count%", clan.getMembers().size() + "");
 
                                     // null it for clan
@@ -625,10 +658,10 @@ public class StatsManager {
 
                                     // make string for online/offline
                                     String onlineStatus = "&cOffline";
-                                    if (Bukkit.getPlayer(clanMember.getPlayerName()) != null)
+                                    if (Bukkit.getPlayer(clanMember.getName()) != null)
                                         onlineStatus = "&aOnline";
 
-                                    newLore.add(Utils.translate("  &7" + clanMember.getPlayerName() + " " + onlineStatus));
+                                    newLore.add(Utils.translate("  &7" + clanMember.getName() + " " + onlineStatus));
                                 }
                             }
                             itemMeta.setLore(newLore);
@@ -645,7 +678,7 @@ public class StatsManager {
 
     public String createChatHover(PlayerStats playerStats)
     {
-        String playerName = playerStats.getPlayerName();
+        String playerName = playerStats.getName();
         double coins = playerStats.getCoins();
         int hours = playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000;
 

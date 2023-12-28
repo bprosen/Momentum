@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.perks.PerksDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
@@ -43,7 +44,7 @@ public class StatsDB {
                     " VALUES " +
                     "('" +
                     playerStats.getUUID() + "', '" +
-                    playerStats.getPlayerName() +
+                    playerStats.getName() +
                     "')"
                     ;
 
@@ -57,16 +58,16 @@ public class StatsDB {
             Clan clan = clansManager.get(playerResult.get("clan"));
 
             // update player names
-            if (!nameInDB.equals(playerStats.getPlayerName()))
+            if (!nameInDB.equals(playerStats.getName()))
             {
                 updatePlayerName(playerStats);
 
                 if (clan != null)
                     // update name in cache
-                    Parkour.getClansManager().updatePlayerNameInClan(clan, nameInDB, playerStats.getPlayerName());
+                    Parkour.getClansManager().updatePlayerNameInClan(clan, nameInDB, playerStats.getName());
 
                 // update in db
-                Parkour.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getPlayerName());
+                Parkour.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getName());
             }
 
             playerStats.setCoins(Double.parseDouble(playerResult.get("coins")));
@@ -78,13 +79,13 @@ public class StatsDB {
 
                 // notify members of joining
                 String memberRole = "Member";
-                if (playerStats.getClan().getOwner().getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
+                if (clan.isOwner(playerStats.getName()))
                     memberRole = "Owner";
 
                 // Bukkit#getPlayer() is async safe :)
                 clansManager.sendMessageToMembers(playerStats.getClan(),
-                        "&eClan " + memberRole + " &6" + playerStats.getPlayerName() + " &7joined",
-                        playerStats.getPlayerName());
+                        "&eClan " + memberRole + " &6" + playerStats.getName() + " &7joined",
+                        playerStats.getName());
             }
 
             String rankName = playerResult.get("rank");
@@ -169,7 +170,7 @@ public class StatsDB {
 
         Map<String, String> result = DatabaseQueries.getResult(
                         DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*) AS count",
-                        "WHERE player_name=?", playerStats.getPlayerName());
+                        "WHERE player_name=?", playerStats.getName());
 
         return Integer.parseInt(result.get("count"));
     }
@@ -185,7 +186,7 @@ public class StatsDB {
     private static void updatePlayerName(PlayerStats playerStats) {
         // update in stats
         DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "name='" + playerStats.getPlayerName() + "' WHERE uuid=" + playerStats.getUUID());
+                "name='" + playerStats.getName() + "' WHERE uuid=" + playerStats.getUUID());
     }
 
     public static void updatePlayerSpectatable(PlayerStats playerStats)
@@ -340,5 +341,65 @@ public class StatsDB {
         );
 
         return !playerResult.isEmpty();
+    }
+
+    public static void resetPlayerClan(String playerName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=NULL WHERE name=?", playerName);
+    }
+
+    public static void updatePlayerClan(PlayerStats playerStats, String tag)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, playerStats.getUUID()
+        );
+    }
+
+    public static void loadModifiers(PlayerStats playerStats)
+    {
+        ArrayList<Modifier> modifiers = new ArrayList<>();
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                DatabaseManager.PLAYER_MODIFIERS_TABLE,
+                "*",
+                " WHERE uuid=?", playerStats.getUUID()
+        );
+
+        if (!playerResults.isEmpty())
+        {
+            for (Map<String, String> playerResult : playerResults)
+            {
+                String modifierName = playerResult.get("modifier_name");
+
+                modifiers.add(Parkour.getModifiersManager().getModifier(modifierName));
+            }
+        }
+
+        playerStats.setModifiers(modifiers);
+    }
+
+    public static void addModifier(String uuid, String modifierName)
+    {
+        DatabaseQueries.runAsyncQuery(
+            "INSERT INTO " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " (uuid, modifier_name) VALUES(?,?)",
+                uuid, modifierName
+        );
+    }
+
+    public static void removeModifier(String uuid, String modifierName)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid=? AND modifier_name=?",
+                    uuid, modifierName
+        );
+    }
+
+    public static void removeModifierName(String playerName, String modifierName)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " pm JOIN " + DatabaseManager.PLAYERS_TABLE + " " +
+                    "p ON p.uuid=pm.uuid WHERE p.name=? AND modifier_name=?",
+                    playerName, modifierName
+        );
     }
 }

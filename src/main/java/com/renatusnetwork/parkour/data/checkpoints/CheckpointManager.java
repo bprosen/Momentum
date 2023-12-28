@@ -32,7 +32,7 @@ public class CheckpointManager {
     public void deleteCheckpoint(PlayerStats playerStats, Level level)
     {
         deleteCheckpointData(playerStats, level);
-        CheckpointDB.deleteCheckpointFromName(playerStats.getPlayerName(), level.getName());
+        CheckpointDB.deleteCheckpointFromName(playerStats.getName(), level.getName());
     }
 
     public void teleportToPracCP(PlayerStats playerStats) {

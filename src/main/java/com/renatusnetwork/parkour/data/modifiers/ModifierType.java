@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.data.modifiers;
 
-public enum ModifierTypes
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+
+public enum ModifierType
 {
     CLAN_XP_BOOSTER,
     EVENT_BOOSTER,

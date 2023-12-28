@@ -80,11 +80,11 @@ public class RaceCMD implements CommandExecutor {
 
         // if target is in race
         if (player2.inRace()) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while &4" + player2.getPlayerName() + " &cis in a race"));
+            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while &4" + player2.getName() + " &cis in a race"));
             return false;
         }
 
-        if (player1.getPlayerName().equalsIgnoreCase(player2.getPlayerName())) {
+        if (player1.getName().equalsIgnoreCase(player2.getName())) {
             player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race yourself..."));
             return false;
         }
@@ -107,7 +107,7 @@ public class RaceCMD implements CommandExecutor {
 
         if (player2.isInBlackMarket())
         {
-            player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getPlayerName() + " &cis busy right now..."));
+            player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getName() + " &cis busy right now..."));
             return false;
         }
 

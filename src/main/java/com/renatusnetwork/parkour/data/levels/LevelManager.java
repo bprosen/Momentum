@@ -4,7 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.ranks.RanksManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -232,10 +232,10 @@ public class LevelManager {
                         leaderboard.get(leaderboard.size() - 1).getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
                     {
                         LevelCompletion firstPlace = level.getRecordCompletion();
-                        String playerName = playerStats.getPlayerName();
+                        String playerName = playerStats.getName();
 
                         // check for first place
-                        if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) &&
+                        if (firstPlace.getName().equalsIgnoreCase(playerName) &&
                             firstPlace.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
                         {
                             leaderboard.remove(firstPlace);
@@ -251,7 +251,7 @@ public class LevelManager {
                             {
                                 LevelCompletion completion = leaderboard.get(i);
 
-                                if (completion.getPlayerName().equalsIgnoreCase(playerName))
+                                if (completion.getName().equalsIgnoreCase(playerName))
                                 {
                                     if (completion.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
                                         lbPositionToRemove = i;
@@ -314,7 +314,7 @@ public class LevelManager {
 
         HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
         // broadcast when record is beaten
-        if (level.getRecordCompletion().getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
+        if (level.getRecordCompletion().getName().equalsIgnoreCase(levelCompletion.getName()))
         {
             String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
 
@@ -326,7 +326,7 @@ public class LevelManager {
 
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage(Utils.translate(brokenRecord));
-            Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getPlayerName() +
+            Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getName() +
                     " &7has the new &8" + level.getFormattedTitle() +
                     " &7record with &a" + completionTime + "s"));
             Bukkit.broadcastMessage("");
@@ -343,7 +343,7 @@ public class LevelManager {
                 {
                     LevelCompletion previousRecord = leaderboard.get(1);
 
-                    PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getPlayerName());
+                    PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getName());
 
                     if (previousStats != null)
                         previousStats.removeRecord();
@@ -354,9 +354,9 @@ public class LevelManager {
                 // update new
                 CompletionsDB.updateRecord(levelCompletion);
             }
-            if (playerStats.hasModifier(ModifierTypes.RECORD_BONUS))
+            if (playerStats.hasModifier(ModifierType.RECORD_BONUS))
             {
-                Bonus bonus = (Bonus) playerStats.getModifier(ModifierTypes.RECORD_BONUS);
+                Bonus bonus = (Bonus) playerStats.getModifier(ModifierType.RECORD_BONUS);
 
                 // add coins
                 Parkour.getStatsManager().addCoins(playerStats, bonus.getBonus());

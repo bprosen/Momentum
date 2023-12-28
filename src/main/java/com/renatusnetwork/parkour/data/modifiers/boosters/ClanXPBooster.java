@@ -1,11 +1,11 @@
 package com.renatusnetwork.parkour.data.modifiers.boosters;
 
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 
 public class ClanXPBooster extends Booster
 {
-    public ClanXPBooster(ModifierTypes type, String name)
+    public ClanXPBooster(ModifierType type, String name, String title, float multiplier)
     {
-        super(type, name);
+        super(type, name, title, multiplier);
     }
 }

@@ -77,7 +77,7 @@ public class LBPlaceholders
                                 else if (value.equals("name"))
                                     return clan.getTag();
                                 else if (value.equals("owner"))
-                                    return clan.getOwner().getPlayerName();
+                                    return clan.getOwner().getName();
                             }
                             break;
                         }
@@ -164,7 +164,7 @@ public class LBPlaceholders
 
                                     // return name or value
                                     if (value.equals("name"))
-                                        return completion.getPlayerName();
+                                        return completion.getName();
                                     else if (value.equals("time"))
                                         return String.valueOf(completion.getCompletionTimeElapsedSeconds());
                                 }

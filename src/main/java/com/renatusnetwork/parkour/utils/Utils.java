@@ -23,11 +23,12 @@ import java.util.Map;
 
 public class Utils {
 
-    public static List<String> formatLore(List<String> loreList) {
+    public static List<String> formatLore(List<String> loreList)
+    {
         List<String> loreFormatted = new ArrayList<>();
 
         for (String lore : loreList)
-            loreFormatted.add(ChatColor.translateAlternateColorCodes('&', lore));
+            loreFormatted.add(translate(lore));
 
         return loreFormatted;
     }
@@ -49,6 +50,15 @@ public class Utils {
     public static boolean isDouble(String input) {
         try {
             Double.parseDouble(input);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isFloat(String input) {
+        try {
+            Float.parseFloat(input);
         } catch(Exception e) {
             return false;
         }

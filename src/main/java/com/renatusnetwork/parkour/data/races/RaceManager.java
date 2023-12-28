@@ -505,7 +505,7 @@ public class RaceManager {
             // if other player is in an elytra level and not on the ground, do not continue
             if (player2.inLevel() && player2.getLevel().isElytra() && !player2.getPlayer().isOnGround())
             {
-                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race someone when " + player2.getPlayerName() + " is not on the ground in an elytra level"));
+                player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race someone when " + player2.getName() + " is not on the ground in an elytra level"));
                 removeRequest(raceRequest);
                 return;
             }
@@ -521,7 +521,7 @@ public class RaceManager {
             }
 
             if (senderBalance < betAmount) {
-                player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayerName() + " &7does not have enough to do this bet" +
+                player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getName() + " &7does not have enough to do this bet" +
                         " - &cTheir Balance &6" + Utils.formatNumber(senderBalance) + " &eCoins"));
                 removeRequest(raceRequest);
                 return;
@@ -546,14 +546,14 @@ public class RaceManager {
             startRace(player1, player2, chosenLevel, doingBet, betAmount);
             removeRequest(raceRequest);
         } else {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou do not have a request from &4" + player2.getPlayerName()));
+            player1.getPlayer().sendMessage(Utils.translate("&cYou do not have a request from &4" + player2.getName()));
         }
     }
 
     public RaceRequest getRequest(Player player1, Player player2) {
         for (RaceRequest raceRequest : raceRequests) {
-            String requestPlayer1Name = raceRequest.getPlayer1().getPlayerName();
-            String requestPlayer2Name = raceRequest.getPlayer2().getPlayerName();
+            String requestPlayer1Name = raceRequest.getPlayer1().getName();
+            String requestPlayer2Name = raceRequest.getPlayer2().getName();
 
             if ((requestPlayer1Name.equalsIgnoreCase(player1.getName()) &&
                 requestPlayer2Name.equalsIgnoreCase(player2.getName())) ||

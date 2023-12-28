@@ -32,7 +32,7 @@ public class JoinCMD implements CommandExecutor
                     if (targetStats.inLevel())
                         Parkour.getLevelManager().teleportToLevel(playerStats, targetStats.getLevel());
                     else
-                        player.sendMessage(Utils.translate("&4" + targetStats.getPlayerName() + " &cis not in a level"));
+                        player.sendMessage(Utils.translate("&4" + targetStats.getName() + " &cis not in a level"));
                 }
                 else
                 {

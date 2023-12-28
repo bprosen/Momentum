@@ -7,7 +7,7 @@ import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -25,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class MenuItemFormatter {
         }
 
         if (menuItem.getType().equals("perk"))
-            return getPerk(player, playerStats, menuItem);
+            return getPerk(playerStats, menuItem);
         if (menuItem.getType().equals("bank"))
             return getBankItem(menuItem);
         if (menuItem.getType().equals("open"))
@@ -137,7 +136,8 @@ public class MenuItemFormatter {
     //
     // Perk Section
     //
-    private static ItemStack getPerk(Player player, PlayerStats playerStats, MenuItem menuItem) {
+    private static ItemStack getPerk(PlayerStats playerStats, MenuItem menuItem)
+    {
         ItemStack item = new ItemStack(menuItem.getItem());
         String perkName = menuItem.getTypeValue();
         Perk perk = Parkour.getPerkManager().get(perkName);
@@ -146,65 +146,55 @@ public class MenuItemFormatter {
             ItemMeta itemMeta = item.getItemMeta();
 
             // if glowing, add glow effect
-            if (menuItem.isGlowing()) {
+            if (menuItem.isGlowing())
+            {
                 itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
 
             // Existing Lore Section
-            List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
+            List<String> itemLore = new ArrayList<>();
             itemMeta.setDisplayName(perk.getFormattedTitle());
 
             int price = perk.getPrice();
 
-            if (playerStats.hasModifier(ModifierTypes.SHOP_DISCOUNT))
+            if (playerStats.hasModifier(ModifierType.SHOP_DISCOUNT))
             {
-                Discount discount = (Discount) playerStats.getModifier(ModifierTypes.SHOP_DISCOUNT);
+                Discount discount = (Discount) playerStats.getModifier(ModifierType.SHOP_DISCOUNT);
                 price *= (1.00f - discount.getDiscount());
             }
 
             // Ownership Status Section
             itemLore.add("");
-            if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
+            if (perk.hasAccessTo(playerStats))
                 itemLore.add(Utils.translate("&2You own this perk"));
-            else {
+            else
+            {
                 itemLore.add(Utils.translate("&cYou do not own this perk"));
 
-                // Click to Buy Section
-                if (perk.getPrice() > 0) {
-                    int playerBalance = (int) playerStats.getCoins();
-
-                    if (playerBalance > price)
-                        itemLore.add(Utils.translate("&7  Click to buy "));
-                    else
-                        itemLore.add(Utils.translate("&7  Requires " + Utils.getCoinFormat(perk.getPrice() - playerBalance, price - playerBalance) + " &7more &eCoins"));
-                }
-            }
-
-            // if it has shortened custom lore, add it, otherwise do normal lore
-            if (perk.hasSetRequirementsLore()) {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Requirements"));
 
-                // loop through if it has shortened lore and add it
-                for (String shortLore : perk.getSetRequirementsLore())
-                    itemLore.add(Utils.translate(shortLore));
-            } else {
-                // Level Requirements Section
-                List<String> requirements = perk.getRequirements();
-                if (requirements.size() > 0 || perk.getPrice() > 0) {
-                    itemLore.add("");
-                    itemLore.add(Utils.translate("&7Requirements"));
-
-                    for (String requirement : requirements) {
-                        Level level = Parkour.getLevelManager().get(requirement);
-
-                        if (level != null)
-                            itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
-                    }
+                // if it has shortened custom lore, add it, otherwise do normal lore
+                if (menuItem.hasSpecificLore())
+                    itemLore.addAll(menuItem.getFormattedLore());
+                else
+                {
+                    // Level Requirements Section
+                    for (Level requirement : perk.getRequiredLevels())
+                        itemLore.add(Utils.translate("&7 - " + requirement.getFormattedTitle()));
 
                     if (price > 0)
-                        itemLore.add(Utils.translate("&7 - Pay " + Utils.getCoinFormat(perk.getPrice(), price) + " &eCoins"));
+                    {
+                        int playerBalance = (int) playerStats.getCoins();
+
+                        if (playerBalance > price)
+                            itemLore.add(Utils.translate("&7  Click to buy "));
+                        else
+                            itemLore.add(Utils.translate(
+                                    "&7  Requires " + Utils.getCoinFormat(perk.getPrice() - playerBalance, price - playerBalance) + " &7more &eCoins"
+                            ));
+                    }
                 }
             }
 
@@ -335,9 +325,9 @@ public class MenuItemFormatter {
 
                 int price = level.getPrice();
 
-                if (playerStats.hasModifier(ModifierTypes.LEVEL_DISCOUNT))
+                if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT))
                 {
-                    Discount discount = (Discount) playerStats.getModifier(ModifierTypes.LEVEL_DISCOUNT);
+                    Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
                     price *= (1.00f - discount.getDiscount());
                 }
 
@@ -401,10 +391,10 @@ public class MenuItemFormatter {
             int newReward = oldReward;
             LevelCooldown cooldown = null;
 
-            if (playerStats.hasModifier(ModifierTypes.LEVEL_BOOSTER))
+            if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER))
             {
                 // downcast and boost
-                Booster booster = (Booster) playerStats.getModifier(ModifierTypes.LEVEL_BOOSTER);
+                Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
                 newReward *= booster.getMultiplier();
             }
 
@@ -415,16 +405,16 @@ public class MenuItemFormatter {
             // jackpot section
             else if (bankManager.isJackpotRunning() &&
                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                !bankManager.getJackpot().hasCompleted(playerStats.getPlayerName()))
+                !bankManager.getJackpot().hasCompleted(playerStats.getName()))
             {
                 Jackpot jackpot = bankManager.getJackpot();
 
                 int bonus = jackpot.getBonus();
 
-                if (playerStats.hasModifier(ModifierTypes.JACKPOT_BOOSTER))
+                if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER))
                 {
                     // downcast and boost
-                    Booster booster = (Booster) playerStats.getModifier(ModifierTypes.JACKPOT_BOOSTER);
+                    Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
                     bonus *= booster.getMultiplier();
                 }
                 newReward += bonus;
@@ -437,9 +427,9 @@ public class MenuItemFormatter {
                     newReward *= playerStats.getPrestigeMultiplier();
 
                 // set cooldown modifier last!
-                if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getPlayerName()))
+                if (level.hasCooldown() && Parkour.getLevelManager().inCooldownMap(playerStats.getName()))
                 {
-                    cooldown = Parkour.getLevelManager().getLevelCooldown(playerStats.getPlayerName());
+                    cooldown = Parkour.getLevelManager().getLevelCooldown(playerStats.getName());
                     newReward *= cooldown.getModifier();
                 }
             }
@@ -513,7 +503,7 @@ public class MenuItemFormatter {
                     if (record != null)
                     {
                         // add number 1
-                        if (record.getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
+                        if (record.getName().equalsIgnoreCase(playerStats.getName()))
                             bestTime += " &e#1";
                         else
                             bestTime += " &e+" + (completionTime - (record.getCompletionTimeElapsedSeconds())) + "s";

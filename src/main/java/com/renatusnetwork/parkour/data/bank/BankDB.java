@@ -36,7 +36,7 @@ public class BankDB
                 if (hasBid(playerStats, type))
                 {
                     DatabaseQueries.runAsyncQuery(
-                            "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND player_name='" + playerStats.getPlayerName() + "'"
+                            "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND player_name='" + playerStats.getName() + "'"
                     );
                 }
                 else
@@ -44,7 +44,7 @@ public class BankDB
                     DatabaseQueries.runAsyncQuery(
                             "INSERT INTO bank (uuid, player_name, type, total_bid) VALUES ('" +
                             playerStats.getUUID() + "','" +
-                            playerStats.getPlayerName() + "','" +
+                            playerStats.getName() + "','" +
                             type + "'," + bidAmount + ")");
                 }
             }

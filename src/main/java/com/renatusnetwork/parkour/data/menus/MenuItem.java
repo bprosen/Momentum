@@ -6,8 +6,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class MenuItem {
-
+public class MenuItem
+{
     private String name;
     private int pageNumber;
     private int slot;
@@ -15,12 +15,13 @@ public class MenuItem {
     private String title;
     private String type;
     private String typeValue;
-    private boolean glow = false;
+    private boolean glow;
     private List<String> lore;
     private List<String> commands;
     private List<String> consoleCommands;
 
-    public MenuItem(Menu menu, MenuPage menuPage, int slot) {
+    public MenuItem(Menu menu, MenuPage menuPage, int slot)
+    {
         this.name = menu.getName();
         this.pageNumber = menuPage.getPageNumber();
         this.slot = slot;
@@ -74,6 +75,8 @@ public class MenuItem {
         return Utils.formatLore(lore);
     }
 
+    public boolean hasSpecificLore() { return !lore.isEmpty(); }
+
     public List<String> getCommands() {
         return commands;
     }
@@ -83,7 +86,6 @@ public class MenuItem {
     }
 
     public boolean hasCommands() {
-        return (commands.size() > 0 || consoleCommands.size() > 0);
+        return !(commands.isEmpty() && consoleCommands.isEmpty());
     }
-
 }

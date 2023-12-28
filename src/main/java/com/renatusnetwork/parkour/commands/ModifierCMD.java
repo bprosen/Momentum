@@ -2,10 +2,13 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
+import com.renatusnetwork.parkour.data.modifiers.ModifiersManager;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -15,6 +18,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -26,57 +30,101 @@ public class ModifierCMD implements CommandExecutor
         if (sender.hasPermission("rn-parkour.admin"))
         {
             /*
+                /modifier create (modifierName) (type) (modifierValue) (title)
+                /modifier title (modifier) (title)
                 /modifier add (player) (modifierName)
                 /modifier remove (player) (modifierName)
                 /modifier list (player)
                 /modifier list
                 /modifier load
              */
-            if (a.length == 3 && (a[0].equalsIgnoreCase("add") || a[0].equalsIgnoreCase("remove")))
+            ModifiersManager modifiersManager = Parkour.getModifiersManager();
+
+            if (a.length >= 5 && a[0].equalsIgnoreCase("create"))
+            {
+                String modifierName = a[1];
+                String modifierType = a[2].toUpperCase();
+                String modifierValue = a[3];
+
+                String[] split = Arrays.copyOfRange(a, 4, a.length);
+                String title = String.join(" ", split);
+
+                if (!modifiersManager.exists(modifierName))
+                {
+                    ModifierType type = parseType(modifierType, sender);
+
+                    if (type != null)
+                    {
+                        float modifier = parseModifierValue(modifierValue, type, sender);
+
+                        if (modifier > 0.00f)
+                        {
+                            // create now
+                            modifiersManager.create(modifierName, type, title, modifier);
+                            sender.sendMessage(Utils.translate(
+                                    "&7You have created the modifier &6" + title + "&7 with type &6" + modifierType + "&7 and modifier of &6" + modifier
+                            ));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&cYou cannot set a modifier of 0"));
+                    }
+                }
+                else
+                    sender.sendMessage(Utils.translate("&4" + modifierName + " &calready exists"));
+            }
+            else if (a.length >= 3 && a[0].equalsIgnoreCase("title"))
+            {
+                Modifier modifier = modifiersManager.getModifier(a[1]);
+                String[] split = Arrays.copyOfRange(a, 2, a.length);
+                String title = String.join(" ", split);
+
+                if (modifier != null)
+                {
+                    modifiersManager.updateTitle(modifier, title);
+                    sender.sendMessage(Utils.translate("&7You have updated &6" + modifier.getName() + "&7's title to &6" + title));
+                }
+                else
+                    sender.sendMessage(Utils.translate("&4" + a[1] + " &cdoes not exist"));
+            }
+            else if (a.length == 3 && (a[0].equalsIgnoreCase("add") || a[0].equalsIgnoreCase("remove")))
             {
                 String playerName = a[1];
                 String modifierName = a[2];
-                Player target = Bukkit.getPlayer(playerName);
+                PlayerStats playerStats = Parkour.getStatsManager().get(playerName);
 
-                if (target != null)
+                if (playerStats != null)
                 {
                     Modifier modifier = Parkour.getModifiersManager().getModifier(modifierName);
 
                     if (modifier != null)
                     {
-                        PlayerStats playerStats = Parkour.getStatsManager().get(target);
-
                         if (a[0].equalsIgnoreCase("add"))
                         {
                             if (!playerStats.hasModifier(modifier.getType()))
                             {
-                                Parkour.getModifiersManager().addModifier(playerStats, modifier);
-                                sender.sendMessage(Utils.translate("&7You have added a &c" + modifier.getDisplayName() + " &cModifier &7to &c" + target.getName()));
+                                Parkour.getStatsManager().addModifier(playerStats, modifier);
+                                sender.sendMessage(Utils.translate("&7You have added a &c" + modifier.getTitle() + " &cModifier &7to &c" + playerStats.getName()));
                             }
                             else
-                                sender.sendMessage(Utils.translate("&4" + target.getName() + " &calready has a &4" + modifier.getType() + " &cactive!"));
+                                sender.sendMessage(Utils.translate("&4" + playerStats.getName() + " &calready has a &4" + modifier.getType() + " &cactive!"));
                         }
                         else
                         {
                             // if they have it, we can remove
                             if (playerStats.hasModifierByName(modifier))
                             {
-                                Parkour.getModifiersManager().removeModifier(playerStats, modifier);
-                                sender.sendMessage(Utils.translate("&7You have removed a &c" + modifier.getDisplayName() + " &cModifier &7from &c" + target.getName()));
+                                Parkour.getStatsManager().removeModifier(playerStats, modifier);
+                                sender.sendMessage(Utils.translate("&7You have removed a &c" + modifier.getTitle() + " &cModifier &7from &c" + playerStats.getName()));
                             }
                             else
-                                sender.sendMessage(Utils.translate("&4" + target.getName() + " &cdoes not have the modifier &4" + modifier.getName()));
+                                sender.sendMessage(Utils.translate("&4" + playerStats.getName() + " &cdoes not have the modifier &4" + modifier.getName()));
                         }
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&4" + modifierName + " &cis not a modifier"));
-                    }
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
-                }
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("list"))
             {
@@ -86,26 +134,23 @@ public class ModifierCMD implements CommandExecutor
             else if (a.length == 2 && a[0].equalsIgnoreCase("list"))
             {
                 String playerName = a[1];
-                Player target = Bukkit.getPlayer(playerName);
+                PlayerStats targetStats = Parkour.getStatsManager().get(playerName);
 
-                if (target != null)
+                if (targetStats != null)
                 {
                     // list modifiers that the player has
-                    sender.sendMessage(Utils.translate("&4List of &c" + target.getName() + "&4's Modifiers"));
-                    listModifiers(sender, Parkour.getStatsManager().get(target).getModifiers());
+                    sender.sendMessage(Utils.translate("&4List of &c" + targetStats.getName() + "&4's Modifiers"));
+                    listModifiers(sender, targetStats.getModifiers());
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
-                }
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
             {
-                Parkour.getConfigManager().load("modifiers");
                 Parkour.getModifiersManager().load();
-                sender.sendMessage(Utils.translate("&4modifiers.yml &chas been reloaded"));
+                sender.sendMessage(Utils.translate("&4Modifiers has been reloaded"));
 
-                HashMap<String, PlayerStats> players = Parkour.getStatsManager().getPlayerStats();
+                Collection<PlayerStats> players = Parkour.getStatsManager().getOnlinePlayers();
 
                 new BukkitRunnable()
                 {
@@ -116,21 +161,17 @@ public class ModifierCMD implements CommandExecutor
                         synchronized (players)
                         {
                             // load all players modifiers
-                            for (PlayerStats playerStats : players.values())
-                                ModifiersDB.loadModifiers(playerStats);
+                            for (PlayerStats playerStats : players)
+                                StatsDB.loadModifiers(playerStats);
                         }
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
             else
-            {
                 sendHelp(sender);
-            }
         }
         else
-        {
             sender.sendMessage(Utils.translate("&cYou cannot do this"));
-        }
         return false;
     }
 
@@ -157,9 +198,56 @@ public class ModifierCMD implements CommandExecutor
         }
     }
 
+    private ModifierType parseType(String argument, CommandSender sender)
+    {
+        try
+        {
+            return ModifierType.valueOf(argument);
+        }
+        catch (IllegalArgumentException exception)
+        {
+            sender.sendMessage(Utils.translate("&4" + argument + " &cis not a valid type, select from"));
+            sender.sendMessage(Utils.translate("&7" + Arrays.toString(ModifierType.values())));
+            return null;
+        }
+    }
+
+    private float parseModifierValue(String modifierValue, ModifierType type, CommandSender sender)
+    {
+        float modifier;
+        ModifiersManager modifiersManager = Parkour.getModifiersManager();
+
+        // if it is a bonus, we want to make sure they typed an integer
+        if (modifiersManager.isBonus(type))
+        {
+            if (Utils.isInteger(modifierValue))
+                modifier = Integer.parseInt(modifierValue);
+            else
+            {
+                // return if failed
+                sender.sendMessage(Utils.translate("&4" + modifierValue + " &cis not an integer"));
+                return -1.00f;
+            }
+        }
+        else
+        {
+            if (Utils.isFloat(modifierValue))
+                modifier = Float.parseFloat(modifierValue);
+            else
+            {
+                sender.sendMessage(Utils.translate("&4" + modifierValue + " &cis not a decimal number"));
+                return -1.00f;
+            }
+        }
+
+        return modifier;
+    }
+
     private void sendHelp(CommandSender sender)
     {
         sender.sendMessage(Utils.translate("&4&lModifiers Help"));
+        sender.sendMessage(Utils.translate(" &c/modifier create (modifierName) (type) (modifierValue) (title)  &7Creates a modifier - title can have spaces"));
+        sender.sendMessage(Utils.translate(" &c/modifier title (modifierName) (title)  &7Changes a modifier's table - can have spaces"));
         sender.sendMessage(Utils.translate(" &c/modifier add (playerName) (modifierName)  &7Add a modifier to a player"));
         sender.sendMessage(Utils.translate(" &c/modifier remove (playerName) (modifierName)  &7Remove a modifier to a player"));
         sender.sendMessage(Utils.translate(" &c/modifier list (player)  &7Lists the modifiers a player has"));

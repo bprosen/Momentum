@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.clans;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 
@@ -9,12 +10,12 @@ import java.util.*;
 
 public class ClansDB {
 
-    public static HashMap<String, Clan> loadClans()
+    public static HashMap<String, Clan> getClans()
     {
         HashMap<String, Clan> clans = new HashMap<>();
 
         List<Map<String, String>> results = DatabaseQueries.getResults(
-                "clans",
+                DatabaseManager.CLANS_TABLE,
                 "*",
                 ""
         );
@@ -43,7 +44,7 @@ public class ClansDB {
     private static void loadMembers(HashMap<String, Clan> clans)
     {
         List<Map<String, String>> memberResults = DatabaseQueries.getResults(
-                "players", "uuid, name, clan",
+                DatabaseManager.PLAYERS_TABLE, "uuid, name, clan",
                 "WHERE clan IS NOT NULL");
 
         for (Map<String, String> memberResult : memberResults)
@@ -56,82 +57,66 @@ public class ClansDB {
         }
     }
 
-    public static void newClan(Clan clan)
+    public static void insert(Clan clan)
     {
-        insertClan(clan);
-
-        PlayerStats owner = Parkour.getStatsManager().get(clan.getOwnerUUID());
-
-        if (owner != null)
-        {
-            clan.addMember(new ClanMember(owner.getUUID(), owner.getPlayerName()));
-            owner.setClan(clan);
-            updatePlayerClan(owner);
-
-            owner.sendMessage(Utils.translate("&7Successfully created your Clan &3" + clan.getTag()));
-        }
-    }
-
-    public static void insertClan(Clan clan) {
         DatabaseQueries.runAsyncQuery(
-                "INSERT INTO clans (tag, owner_uuid) VALUES " +
-                    "('" + clan.getTag() + "', " + clan.getOwnerUUID() + ")"
+                "INSERT INTO " + DatabaseManager.CLANS_TABLE + " (tag, owner_uuid) VALUES " +
+                    "(?,?)",
+                    clan.getTag(), clan.getOwnerUUID()
         );
     }
 
-    public static void setClanXP(int clanXP, String tag) {
-        DatabaseQueries.runAsyncQuery("UPDATE clans SET " +
-                "xp=? WHERE tag=?", clanXP, tag);
-    }
-
-    public static void setTotalXP(long totalXP, String tag) {
-        DatabaseQueries.runAsyncQuery("UPDATE clans SET " +
-                "total_xp=? WHERE tag=?", totalXP, tag);
-    }
-
-    public static void setClanLevel(int clanLevel, String tag) {
-        DatabaseQueries.runAsyncQuery("UPDATE clans SET " +
-                "level=? WHERE tag=?", clanLevel, tag);
-    }
-
-    public static void removeClan(String tag) {
-        DatabaseQueries.runAsyncQuery("DELETE FROM clans WHERE tag=?", tag);
-    }
-
-    public static void resetClanMember(String playerName)
+    public static void updateXP(String tag, int clanXP)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE players SET clan=NULL WHERE name=?", playerName);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.CLANS_TABLE + " SET " +
+                    "xp=? WHERE tag=?", clanXP, tag);
     }
 
-    public static void updatePlayerClan(PlayerStats playerStats)
+    public static void updateTotalXP(String tag, long totalXP)
     {
-
-        if (playerStats.inClan())
-        {
-            String clanTag = playerStats.getClan().getTag();
-            String query = "UPDATE players SET clan=" + clanTag + " WHERE uuid=" + playerStats.getUUID();
-
-            DatabaseQueries.runAsyncQuery(query);
-        }
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.CLANS_TABLE + " SET " +
+                    "total_xp=? WHERE tag=?", totalXP, tag);
     }
 
-    public static void updatePlayerClanID(String playerName, String tag)
+    public static void updateLevel(String tag, int clanLevel)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE players SET clan=? WHERE name=?", tag, playerName);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.CLANS_TABLE + " SET " +
+                    "level=? WHERE tag=?", clanLevel, tag);
     }
 
-    public static void updateClanTag(Clan clan, String oldClanTag)
+    public static void remove(String tag)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE clans SET tag=? WHERE tag=?", clan.getTag(), oldClanTag);
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.CLANS_TABLE + " WHERE tag=?", tag);
     }
 
-    public static void updateClanMaxLevel(Clan clan)
+    public static void updateTag(String oldTag, String newTag)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE clans SET max_level=" + clan.getMaxLevel() + " WHERE tag='" + clan.getTag() + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.CLANS_TABLE + " SET tag=? WHERE tag=?", newTag, oldTag);
     }
 
-    public static void updateClanMaxMembers(Clan clan)
+    public static void updateMaxLevel(String tag, int newMax)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE clans SET max_members=" + clan.getMaxMembers() + " WHERE tag='" + clan.getTag() + "'");
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.CLANS_TABLE + " SET max_level=? WHERE tag=?",
+                    newMax, tag
+        );
+    }
+
+    public static void updateMaxMembers(String tag, int newMax)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.CLANS_TABLE + " SET max_members=? WHERE tag=?",
+                newMax, tag
+        );
+    }
+
+    public static void updateOwner(String tag, String newOwnerUUID)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.CLANS_TABLE + " SET owner_uuid=? WHERE tag=?", newOwnerUUID, tag
+        );
     }
 }

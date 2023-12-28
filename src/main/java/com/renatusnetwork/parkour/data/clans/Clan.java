@@ -1,9 +1,6 @@
 package com.renatusnetwork.parkour.data.clans;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Clan {
 
@@ -14,12 +11,21 @@ public class Clan {
     private long totalXP;
     private int maxLevel;
     private int maxMembers;
-    private HashMap<String, ClanMember> members = new HashMap<>(); // Does not include the owner
-    private List<String> invitedPlayerNames = new ArrayList<>();
+    private HashMap<String, ClanMember> members;
+    private HashSet<String> invitedPlayerNames;
 
-    public Clan(String clanTag, String ownerUUID, int clanLevel, int clanXP, long totalXP, int maxLevel, int maxMembers) {
-        this.tag = clanTag;
+    public Clan(String tag, String ownerUUID)
+    {
+        this.tag = tag;
         this.ownerUUID = ownerUUID;
+        this.members = new HashMap<>();
+        this.invitedPlayerNames = new HashSet<>();
+    }
+
+    public Clan(String tag, String ownerUUID, int clanLevel, int clanXP, long totalXP, int maxLevel, int maxMembers)
+    {
+        this(tag, ownerUUID);
+
         this.clanLevel = clanLevel;
         this.clanXP = clanXP;
         this.totalXP = totalXP;
@@ -49,7 +55,7 @@ public class Clan {
 
     public long getTotalXP() { return totalXP; }
 
-    public void addXP(long clanXP) { this.clanXP += clanXP; }
+    public void addXP(int clanXP) { this.clanXP += clanXP; }
 
     public boolean isMaxLevel()
     {
@@ -99,32 +105,37 @@ public class Clan {
 
     public ClanMember getOwner()
     {
-        return getMember(this.ownerUUID);
+        return getMember(ownerUUID);
     }
 
-    public void promoteOwner(String name) {
-        ClanMember newOwner = getMember(name);
+    public boolean isOwner(String playerName) { return getMember(ownerUUID).getName().equalsIgnoreCase(playerName); }
 
-        if (newOwner != null)
-            this.ownerUUID = newOwner.getUUID();
+    public void setOwner(String ownerUUID)
+    {
+        this.ownerUUID = ownerUUID;
     }
 
     public void addMember(ClanMember clanMember)
     {
-        members.put(clanMember.getPlayerName(), clanMember);
+        members.put(clanMember.getName(), clanMember);
+    }
+
+    public void removeMember(String playerName)
+    {
+        members.remove(playerName);
     }
 
     public void addInvite(String playerName)
     {
-        if (!invitedPlayerNames.contains(playerName))
-            invitedPlayerNames.add(playerName);
+        invitedPlayerNames.add(playerName);
     }
 
     public void removeInvite(String playerName) {
         invitedPlayerNames.remove(playerName);
     }
 
-    public boolean isInvited(String playerName) {
+    public boolean isInvited(String playerName)
+    {
         return invitedPlayerNames.contains(playerName);
     }
 
@@ -133,8 +144,10 @@ public class Clan {
         return members.values();
     }
 
+    public int numMembers() { return members.size(); }
+
     public boolean equals(Clan clan)
     {
-        return this.getOwner().getPlayerName().equalsIgnoreCase(clan.getOwner().getPlayerName());
+        return this.getOwner().getName().equalsIgnoreCase(clan.getOwner().getName());
     }
 }

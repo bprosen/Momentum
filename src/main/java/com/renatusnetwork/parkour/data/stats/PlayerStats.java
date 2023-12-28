@@ -7,7 +7,7 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
-import com.renatusnetwork.parkour.data.modifiers.ModifierTypes;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
@@ -23,8 +23,8 @@ import java.util.*;
 public class PlayerStats {
 
     private Player player;
-    private String UUID;
-    private String playerName;
+    private String uuid;
+    private String name;
     private double coins;
     private Level level;
     private long levelStartTime;
@@ -69,14 +69,14 @@ public class PlayerStats {
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
     private HashMap<String, Location> saves;
-    private HashMap<ModifierTypes, Modifier> modifiers;
+    private HashMap<ModifierType, Modifier> modifiers;
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
 
     public PlayerStats(Player player)
     {
         this.player = player;
-        this.UUID = player.getUniqueId().toString();
-        this.playerName = player.getName();
+        this.uuid = player.getUniqueId().toString();
+        this.name = player.getName();
         this.board = new FastBoard(player); // load board
 
         // load maps
@@ -104,12 +104,12 @@ public class PlayerStats {
         return player;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public String getName() {
+        return name;
     }
 
     public String getUUID() {
-        return UUID;
+        return uuid;
     }
 
     public FastBoard getBoard() { return board; }
@@ -543,13 +543,14 @@ public class PlayerStats {
     public LevelCompletion getQuickestCompletion(String levelName) {
         LevelCompletion fastestCompletion = null;
 
-        if (levelCompletions.containsKey(levelName)) {
+        if (levelCompletions.containsKey(levelName))
+        {
             // loop through to find fastest completion
             for (LevelCompletion levelCompletion : levelCompletions.get(levelName))
                 // if not null and not including not timed levels, continue
-                if (levelCompletion != null && levelCompletion.getCompletionTimeElapsed() > 0)
+                if (levelCompletion != null && levelCompletion.wasTimed())
                     // if null or faster than already fastest completion, set to new completion
-                    if (fastestCompletion == null || (levelCompletion.getCompletionTimeElapsed() < fastestCompletion.getCompletionTimeElapsed()))
+                    if (fastestCompletion == null || (levelCompletion.getCompletionTimeElapsedMillis() < fastestCompletion.getCompletionTimeElapsedMillis()))
                         fastestCompletion = levelCompletion;
         }
         return fastestCompletion;
@@ -637,9 +638,9 @@ public class PlayerStats {
         modifiers.remove(modifier.getType());
     }
 
-    public boolean hasModifier(ModifierTypes modifierTypes)
+    public boolean hasModifier(ModifierType modifierType)
     {
-        return modifiers.containsKey(modifierTypes);
+        return modifiers.containsKey(modifierType);
     }
 
     public boolean hasModifierByName(Modifier targetModifier)
@@ -656,6 +657,7 @@ public class PlayerStats {
         }
         return result;
     }
+
     public Collection<Modifier> getModifiers()
     {
         return modifiers.values();
@@ -673,9 +675,9 @@ public class PlayerStats {
         }
     }
 
-    public Modifier getModifier(ModifierTypes modifierTypes)
+    public Modifier getModifier(ModifierType modifierType)
     {
-        return modifiers.get(modifierTypes);
+        return modifiers.get(modifierType);
     }
 
     //
@@ -692,7 +694,7 @@ public class PlayerStats {
 
     public boolean equals(PlayerStats playerStats)
     {
-        return playerStats.getPlayerName().equals(playerName);
+        return playerStats.getName().equals(name);
     }
 
     public void sendMessage(String message)
