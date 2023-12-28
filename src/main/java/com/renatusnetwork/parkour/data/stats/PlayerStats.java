@@ -249,17 +249,17 @@ public class PlayerStats {
 
     public void addRecord() { this.records++; }
 
-    public boolean hasBoughtLevel(String levelName)
+    public boolean hasBoughtLevel(Level level)
     {
-        return boughtLevels.contains(levelName);
+        return boughtLevels.contains(level.getName());
     }
 
-    public void buyLevel(String levelName)
+    public void buyLevel(Level level)
     {
-        boughtLevels.add(levelName);
+        boughtLevels.add(level.getName());
     }
 
-    public void removeBoughtLevel(String levelName) { boughtLevels.remove(levelName); }
+    public void removeBoughtLevel(Level level) { boughtLevels.remove(level.getName()); }
 
     public void setBoughtLevels(HashSet<String> levels) { boughtLevels = levels ; }
 
@@ -432,44 +432,50 @@ public class PlayerStats {
         currentCheckpoint = null;
     }
 
-    public void addCheckpoint(String levelName, Location location)
+    public void addCheckpoint(Level level, Location location)
     {
-        checkpoints.put(levelName, location);
+        checkpoints.put(level.getName(), location);
     }
 
-    public void removeCheckpoint(String levelName)
+    public void removeCheckpoint(Level level)
     {
-        checkpoints.remove(levelName);
+        checkpoints.remove(level.getName());
     }
 
-    public Location getCheckpoint(String levelName)
+    public Location getCheckpoint(Level level)
     {
-        return checkpoints.get(levelName);
+        return checkpoints.get(level.getName());
     }
+
+    public boolean hasCheckpoint(Level level)
+    {
+        return checkpoints.containsKey(level.getName());
+    }
+
 
     public HashMap<String, Location> getCheckpoints() { return checkpoints; }
 
     //
     // Saves Section
     //
-    public Location getSave(String levelName)
+    public Location getSave(Level level)
     {
-        return saves.get(levelName);
+        return saves.get(level.getName());
     }
 
-    public boolean hasSave(String levelName)
+    public boolean hasSave(Level level)
     {
-        return saves.containsKey(levelName);
+        return saves.containsKey(level.getName());
     }
 
-    public void removeSave(String levelName)
+    public void removeSave(Level level)
     {
-        saves.remove(levelName);
+        saves.remove(level.getName());
     }
 
-    public void addSave(String levelName, Location location)
+    public void addSave(Level level, Location location)
     {
-        saves.put(levelName, location);
+        saves.put(level.getName(), location);
     }
 
     //

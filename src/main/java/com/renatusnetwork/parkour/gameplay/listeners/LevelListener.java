@@ -179,7 +179,7 @@ public class LevelListener implements Listener {
                     " AND player_name='" + playerStats.getPlayerName() + "'");
 
         playerStats.setCurrentCheckpoint(location);
-        playerStats.removeCheckpoint(playerStats.getLevel().getName());
+        playerStats.removeCheckpoint(playerStats.getLevel());
 
         // update if in ascendance realm
         if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
@@ -196,7 +196,7 @@ public class LevelListener implements Listener {
             }
         }
 
-        playerStats.addCheckpoint(playerStats.getLevel().getName(), location);
+        playerStats.addCheckpoint(playerStats.getLevel(), location);
 
         String msgString = "&eYour checkpoint has been set";
         if (playerStats.getLevelStartTime() > 0)
@@ -317,7 +317,7 @@ public class LevelListener implements Listener {
                                 playerStats.resetCurrentCheckpoint();
 
                                 // set cp if finds one
-                                Location newCP = playerStats.getCheckpoint(levelTo.getName());
+                                Location newCP = playerStats.getCheckpoint(levelTo);
                                 playerStats.setCurrentCheckpoint(newCP);
                             }
                         }

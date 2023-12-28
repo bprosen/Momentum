@@ -326,7 +326,7 @@ public class MenuItemFormatter {
             // show they need to buy it and it is not the jackpot level if it is running
             if (!(bankManager.isJackpotRunning() &&
                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
-                level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                level.getPrice() > 0 && !playerStats.hasBoughtLevel(level) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
             {
 
                 int price = level.getPrice();

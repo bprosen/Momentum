@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.saves;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,57 +16,56 @@ public class SavesDB
     public static void loadSaves(PlayerStats playerStats)
     {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "saves",
+                 DatabaseManager.LEVEL_SAVES_TABLE,
                 "*",
-                "WHERE UUID='" + playerStats.getUUID() + "'"
+                "WHERE uuid=?", playerStats.getUUID()
         );
 
-        // if they have a checkpoint, load it
-        if (!levelsResults.isEmpty())
+        for (Map<String, String> levelResult : levelsResults)
         {
-            for (Map<String, String> levelResult : levelsResults)
-            {
-                // get player name, world name and level
-                String playerName = levelResult.get("player_name");
-                String worldName = levelResult.get("world");
-                Level level = Parkour.getLevelManager().get(levelResult.get("level_name"));
+            String worldName = levelResult.get("world");
+            Level level = Parkour.getLevelManager().get(levelResult.get("level_name"));
 
-                // x, y, z
-                float x = Float.parseFloat(levelResult.get("x"));
-                float y = Float.parseFloat(levelResult.get("y"));
-                float z = Float.parseFloat(levelResult.get("z"));
+            // x, y, z
+            float x = Float.parseFloat(levelResult.get("x"));
+            float y = Float.parseFloat(levelResult.get("y"));
+            float z = Float.parseFloat(levelResult.get("z"));
 
-                float yaw = Float.parseFloat(levelResult.get("yaw"));
-                float pitch = Float.parseFloat(levelResult.get("pitch"));
+            float yaw = Float.parseFloat(levelResult.get("yaw"));
+            float pitch = Float.parseFloat(levelResult.get("pitch"));
 
-                // add to hashmap
-                if (playerName != null && worldName != null && level != null)
-                    playerStats.addSave(level.getName(), new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch));
-            }
+            // add to hashmap
+            playerStats.addSave(level, new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch));
         }
     }
 
-    public static void addSave(PlayerStats playerStats, String levelName, Location location)
+    public static void addSave(String uuid, String levelName, Location location)
     {
         // add to async queue
-        DatabaseQueries.runAsyncQuery("INSERT INTO saves " +
-                "(uuid, player_name, level_name, world, x, y, z, yaw, pitch)" +
-                " VALUES ('" +
-                playerStats.getUUID() + "','" +
-                playerStats.getPlayerName() + "','" +
-                levelName + "','" +
-                location.getWorld().getName() + "','" +
-                location.getX() + "','" +
-                location.getY() + "','" +
-                location.getZ() + "','" +
-                location.getYaw() + "','" +
-                location.getPitch() +
-                "')"
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVEL_SAVES_TABLE + " " +
+                "(uuid, level_name, world, x, y, z, yaw, pitch)" +
+                " VALUES (?,?,?,?,?,?,?,?)",
+                uuid,
+                levelName,
+                location.getWorld().getName(),
+                location.getX(),
+                location.getY(),
+                location.getZ(),
+                location.getYaw(),
+                location.getPitch()
         );
     }
 
-    public static void removeSave(PlayerStats playerStats, String levelName)
+    public static void removeSave(String uuid, String levelName)
     {
-        DatabaseQueries.runAsyncQuery("DELETE FROM saves WHERE uuid='" + playerStats.getUUID() + "' AND level_name='" + levelName + "'");
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVEL_SAVES_TABLE + " WHERE uuid=? AND level_name=?", uuid, levelName);
+    }
+
+    public static void removeSaveFromName(String playerName, String levelName)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_SAVES_TABLE + " ls " +
+                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=ls.uuid WHERE p.name=? AND ls.level_name=?",
+                    playerName, levelName);
     }
 }

@@ -45,6 +45,8 @@ levels:
   tutorial_level: tutorial
   max_rating: 5
   min_rating: 0
+  max_difficulty: 10
+  min_difficulty: 1
 cooldowns:
   reset_time: "3:15"
   modifiers:

@@ -51,7 +51,7 @@ public class MenuItemAction {
                     break;
                 }
         // if so, check if they are in elytra level
-        if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytraLevel()) {
+        if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytra()) {
             player.sendMessage(Utils.translate("&cYou cannot change your armor in an Elytra level"));
         } else {
 
@@ -152,8 +152,8 @@ public class MenuItemAction {
             boolean addLevel = true;
 
             // cover all conditions that can stop a player from entering a level
-            if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName())) ||
-                (!level.getRequiredLevels().isEmpty() && !level.hasRequiredLevels(playerStats)) ||
+            if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level)) ||
+                (level.hasRequiredLevels() && !level.hasRequiredLevels(playerStats)) ||
                 (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermissionNode())) ||
                 (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))) &&
                 !level.isFeaturedLevel() && !level.isRankUpLevel())
@@ -226,10 +226,9 @@ public class MenuItemAction {
             if (level != null) {
                 int rating = Integer.parseInt(menuItem.getTypeValue());
 
-                if (rating >= 0 && rating <= 5) {
-
-                    level.addRatingAndCalc(rating);
-                    RatingDB.addRating(player, level, rating);
+                if (rating >= 0 && rating <= 5)
+                {
+                    Parkour.getLevelManager().addRating(player, level, rating);
                     player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + " &7a &6" + rating + "&7! Thank you for rating!"));
                 } else {
                     player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
@@ -324,7 +323,7 @@ public class MenuItemAction {
             if (menuItem != null && level.getPrice() > 0 &&
                 !level.isFeaturedLevel() &&
                 !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
-                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                !playerStats.hasBoughtLevel(level) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                 performLevelBuying(playerStats, player, level, menuItem);
             else
                 performLevelTeleport(playerStats, player, level);
@@ -489,8 +488,8 @@ public class MenuItemAction {
                 // add to db/cache
                 for (Level boughtLevels : levels)
                 {
-                    StatsDB.addBoughtLevel(playerStats, boughtLevels.getName());
-                    playerStats.buyLevel(boughtLevels.getName());
+                    StatsDB.addBoughtLevel(playerStats.getUUID(), boughtLevels.getName());
+                    playerStats.buyLevel(boughtLevels);
                 }
                 Parkour.getStatsManager().removeCoins(playerStats, totalCoins); // remove all coins
 
@@ -568,8 +567,8 @@ public class MenuItemAction {
                                 if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
                                     Parkour.getRanksManager().enteredRankup(playerStats);
 
-                                Location save = playerStats.getSave(level.getName());
-                                Location spawn = playerStats.getCheckpoint(level.getName());
+                                Location save = playerStats.getSave(level);
+                                Location spawn = playerStats.getCheckpoint(level);
                                 if (spawn != null) {
                                     playerStats.setCurrentCheckpoint(spawn);
 
@@ -601,7 +600,7 @@ public class MenuItemAction {
                                         player.addPotionEffect(potionEffect);
                                 }
 
-                                if (level.isElytraLevel())
+                                if (level.isElytra())
                                     Parkour.getStatsManager().toggleOnElytra(playerStats);
 
                                 TitleAPI.sendTitle(

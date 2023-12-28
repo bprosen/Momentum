@@ -54,6 +54,11 @@ public class LevelsDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET reward=? WHERE name=?", reward, levelName);
     }
 
+    public static void updatePrice(String levelName, int price)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET price=? WHERE name=?", price, levelName);
+    }
+
     public static void updateTitle(String levelName, String title)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET title=? WHERE name=?", title, levelName);
@@ -71,6 +76,26 @@ public class LevelsDB {
     public static void updateBroadcast(String levelName)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET broadcast=NOT broadcast WHERE name=?", levelName);
+    }
+
+    public static void updateNew(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET new=NOT new WHERE name=?", levelName);
+    }
+
+    public static void updateCooldown(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET cooldown=NOT cooldown WHERE name=?", levelName);
+    }
+
+    public static void updateDifficulty(String levelName, int difficulty)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET difficulty=? WHERE name=?", difficulty, levelName);
+    }
+
+    public static void setLevelType(String levelName, LevelType levelType)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET type=? WHERE name=?", levelType.name(), levelName);
     }
 
     public static void insertLevelRequired(String levelName, String requiredLevelName)

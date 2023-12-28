@@ -170,6 +170,9 @@ public class SettingsManager {
     public int min_rating;
     public int max_rating;
 
+    public int max_difficulty;
+    public int min_difficulty;
+
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
         cooldown_calendar.setTime(new Date());
@@ -399,5 +402,8 @@ public class SettingsManager {
 
         max_rating = settings.getInt("levels.max_rating");
         min_rating = settings.getInt("levels.min_rating");
+
+        max_difficulty = settings.getInt("levels.max_difficulty");
+        min_difficulty = settings.getInt("levels.min_difficulty");
     }
 }

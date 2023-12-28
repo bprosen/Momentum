@@ -39,7 +39,9 @@ import java.util.*;
 
 public class StatsManager {
 
-    private HashMap<String, PlayerStats> playerStatsList = new HashMap<>();
+    private HashMap<String, PlayerStats> playerStatsUUID = new HashMap<>(); // index by uuid
+    private HashMap<String, PlayerStats> playerStatsName = new HashMap<>(); // index by name
+
     private HashSet<PlayerStats> ascendancePlayerList = new HashSet<>();
 
     private HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB = new LinkedHashMap<>
@@ -115,11 +117,12 @@ public class StatsManager {
 
     public void addTotalPlayer() { totalPlayers++; }
 
-    public HashMap<String, PlayerStats> getPlayerStats() {
-        return playerStatsList;
+    public HashMap<String, PlayerStats> getPlayerStats()
+    {
+        return playerStatsUUID;
     }
 
-    public Collection<PlayerStats> getOnlinePlayers() { return playerStatsList.values(); }
+    public Collection<PlayerStats> getOnlinePlayers() { return playerStatsUUID.values(); }
 
     public void enteredAscendance(PlayerStats playerStats)
     {
@@ -154,16 +157,13 @@ public class StatsManager {
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
 
-    public PlayerStats getByName(String playerName) {
-        for (Map.Entry<String, PlayerStats> entry : getPlayerStats().entrySet())
-            if (entry.getKey().equalsIgnoreCase(playerName))
-                return entry.getValue();
-
-        return null;
+    public PlayerStats getByName(String playerName)
+    {
+        return playerStatsName.get(playerName);
     }
 
     public PlayerStats get(Player player) {
-        return playerStatsList.get(player.getName());
+        return playerStatsUUID.get(player.getUniqueId().toString());
     }
 
     public boolean exists(String playerName) {
@@ -173,12 +173,13 @@ public class StatsManager {
     public void add(Player player)
     {
         // ensure thread safety
-        synchronized (playerStatsList)
+        synchronized (playerStatsUUID)
         {
             if (!exists(player.getUniqueId().toString()))
             {
                 PlayerStats playerStats = new PlayerStats(player);
-                playerStatsList.put(player.getName(), playerStats);
+                playerStatsUUID.put(player.getUniqueId().toString(), playerStats);
+                playerStatsName.put(player.getName(), playerStats);
             }
         }
     }
@@ -193,9 +194,10 @@ public class StatsManager {
     public void remove(PlayerStats playerStats)
     {
         // ensure thread safety
-        synchronized (playerStatsList)
+        synchronized (playerStatsUUID)
         {
-            playerStatsList.remove(playerStats.getPlayerName());
+            playerStatsUUID.remove(playerStats.getUUID());
+            playerStatsName.remove(playerStats.getPlayerName());
         }
 
         synchronized (ascendancePlayerList)
@@ -280,6 +282,18 @@ public class StatsManager {
     {
         StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() + coins);
         playerStats.addCoins(coins);
+    }
+
+    public void addBoughtLevel(PlayerStats playerStats, Level level)
+    {
+        playerStats.buyLevel(level);
+        StatsDB.addBoughtLevel(playerStats.getUUID(), level.getName());
+    }
+
+    public void removeBoughtLevel(PlayerStats playerStats, Level level)
+    {
+        playerStats.removeBoughtLevel(level);
+        StatsDB.removeBoughtLevel(playerStats.getUUID(), level.getName());
     }
 
     public long getTotalCoins() { return totalCoins; }
@@ -395,7 +409,7 @@ public class StatsManager {
             playerStats.getPlayer().getInventory().setChestplate(playerStats.getChestplateSavedFromElytra());
             playerStats.setChestplateSavedFromElytra(null);
         // remove elytra if was in level
-        } else if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+        } else if (playerStats.inLevel() && playerStats.getLevel().isElytra())
             playerStats.getPlayer().getInventory().setChestplate(null);
     }
 
@@ -428,8 +442,9 @@ public class StatsManager {
     }
 
     // loads all online players and updates their perks gained count
-    public void loadOnlinePerksGainedCount() {
-        for (PlayerStats playerStats : playerStatsList.values())
+    public void loadOnlinePerksGainedCount()
+    {
+        for (PlayerStats playerStats : playerStatsUUID.values())
             loadPerksGainedCount(playerStats);
     }
 
@@ -449,13 +464,13 @@ public class StatsManager {
                     Level level = Parkour.getLevelManager().get(region.getId());
 
                     // if their level is not the same as what they moved to, then update it
-                    if (level != null && level.isAscendanceLevel() &&
+                    if (level != null && level.isAscendance() &&
                             playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
                     {
                         playerStats.resetCurrentCheckpoint();
 
                         // load checkpoint into cache
-                        Location checkpoint = playerStats.getCheckpoint(level.getName());
+                        Location checkpoint = playerStats.getCheckpoint(level);
 
                         if (checkpoint != null)
                             playerStats.setCurrentCheckpoint(checkpoint);

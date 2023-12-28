@@ -29,7 +29,7 @@ public class SaveCMD implements CommandExecutor
                     {
                         Level level = playerStats.getLevel();
 
-                        if (!level.isAscendanceLevel())
+                        if (!level.isAscendance())
                         {
                             if (!playerStats.isInTutorial())
                             {
@@ -48,7 +48,7 @@ public class SaveCMD implements CommandExecutor
                                                         // passed all checks then they can save!
 
                                                         // remove here
-                                                        if (playerStats.hasSave(level.getName()))
+                                                        if (playerStats.hasSave(level))
                                                             Parkour.getSavesManager().removeSave(playerStats, level);
 
                                                         // add here

@@ -9,8 +9,8 @@ public class SavesManager
     // add save
     public void addSave(PlayerStats playerStats, Location location, Level level)
     {
-        playerStats.addSave(level.getName(), location);
-        SavesDB.addSave(playerStats, level.getName(), location);
+        playerStats.addSave(level, location);
+        SavesDB.addSave(playerStats.getUUID(), level.getName(), location);
     }
 
     public void loadSave(PlayerStats playerStats, Location location, Level level)
@@ -22,7 +22,7 @@ public class SavesManager
 
     public void removeSave(PlayerStats playerStats, Level level)
     {
-        playerStats.removeSave(level.getName());
-        SavesDB.removeSave(playerStats, level.getName());
+        playerStats.removeSave(level);
+        SavesDB.removeSave(playerStats.getUUID(), level.getName());
     }
 }

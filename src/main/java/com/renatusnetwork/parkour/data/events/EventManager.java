@@ -260,7 +260,7 @@ public class EventManager {
 
         if (!disconnected && eventParticipant.getOriginalLevel() != null)
         {
-            Location location = playerStats.getCheckpoint(eventParticipant.getOriginalLevel().getName());
+            Location location = playerStats.getCheckpoint(eventParticipant.getOriginalLevel());
 
             // reset the cache and teleport player back
             if (location != null)

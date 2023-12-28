@@ -116,10 +116,40 @@ public class LevelManager {
         level.toggleLiquidReset();
         LevelsDB.updateLiquidReset(level.getName());
     }
+
+    public void toggleNew(Level level)
+    {
+        level.toggleNew();
+        LevelsDB.updateNew(level.getName());
+    }
+
+    public void toggleCooldown(Level level)
+    {
+        level.toggleCooldown();
+        LevelsDB.updateCooldown(level.getName());
+    }
+
+    public void setDifficulty(Level level, int difficulty)
+    {
+        level.setDifficulty(difficulty);
+        LevelsDB.updateDifficulty(level.getName(), difficulty);
+    }
+    public void setLevelType(Level level, LevelType type)
+    {
+        level.setLevelType(type);
+        LevelsDB.setLevelType(level.getName(), type);
+    }
+
     public void setTitle(Level level, String title)
     {
         level.setTitle(title);
         LevelsDB.updateTitle(level.getName(), title);
+    }
+
+    public void setPrice(Level level, int price)
+    {
+        level.setPrice(price);
+        LevelsDB.updatePrice(level.getName(), price);
     }
 
     public void setRespawnY(Level level, int respawnY)
@@ -229,9 +259,9 @@ public class LevelManager {
             if (
                 !level.hasRequiredLevels() &&
                 !level.hasPermissionNode() &&
-                !level.isAscendanceLevel() &&
+                !level.isAscendance() &&
                 !level.isRankUpLevel() &&
-                !level.isDropperLevel() &&
+                !level.isDropper() &&
                 level.getReward() > 0 &&
                 level.getReward() < 50000
             )
@@ -551,7 +581,7 @@ public class LevelManager {
                         boolean teleport = true;
 
                         // not all levels have a price, so do a boolean switch
-                        if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                        if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
                         {
                             teleport = false;
                             player.sendMessage(Utils.translate("&cYou first need to buy " + level.getFormattedTitle() + " &cbefore teleporting to it"));
@@ -596,11 +626,11 @@ public class LevelManager {
                 playerStats.setLevel(level);
 
                 // if elytra level, toggle on
-                if (playerStats.getLevel().isElytraLevel())
+                if (playerStats.getLevel().isElytra())
                     Parkour.getStatsManager().toggleOnElytra(playerStats);
 
                 // if they have a cp, load it
-                Location checkpoint = playerStats.getCheckpoint(level.getName());
+                Location checkpoint = playerStats.getCheckpoint(level);
                 if (checkpoint != null)
                     playerStats.setCurrentCheckpoint(checkpoint);
             }

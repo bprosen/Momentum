@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,34 +35,18 @@ public class Level {
     private String requiredPermissionNode;
     private List<String> requiredLevels;
     private int respawnY;
-    private boolean isRankUpLevel;
     private boolean liquidResetPlayer = true; // default is true
-    private boolean elytraLevel;
-    private boolean dropperLevel;
-    private boolean newLevel;
-    private boolean tcLevel;
-
     private List<PotionEffect> potionEffects = new ArrayList<>();
-
-    private boolean raceLevel;
-
-    private boolean eventLevel;
-    private EventType eventType;
-
     private Location raceLocation1;
     private Location raceLocation2;
     private Material raceLevelItemType;
-
     private int totalCompletionsCount;
     private List<LevelCompletion> leaderboardCache = new ArrayList<>();
     private List<String> commands = new ArrayList<>();
-
     private Rank requiredRank;
-
-    private boolean ascendanceLevel = false;
-
     private int difficulty;
     private boolean cooldown;
+    private LevelType type;
 
     public Level(String levelName)
     {
@@ -141,6 +124,8 @@ public class Level {
 
     public int getPrice() { return price; }
 
+    public boolean isBuyable() { return price > 0; }
+
     public void setPrice(int price) { this.price = price; }
 
     public int getRatingsCount() { return ratings.size(); }
@@ -205,25 +190,38 @@ public class Level {
         return totalCompletionsCount;
     }
 
-    public boolean isRankUpLevel() {
-        return isRankUpLevel;
+    public boolean isRankUpLevel()
+    {
+        return type == LevelType.RANKUP;
     }
 
-    public boolean isEventLevel() { return eventLevel; }
+    public boolean isEventLevel()
+    {
+        return type == LevelType.EVENT_ASCENT ||
+               type == LevelType.EVENT_MAZE ||
+               type == LevelType.EVENT_PVP ||
+               type == LevelType.EVENT_FALLING_ANVIL ||
+               type == LevelType.EVENT_RISING_WATER;
+    }
+
+    public void setLevelType(LevelType levelType)
+    {
+        this.type = levelType;
+    }
+
 
     public int getDifficulty() { return difficulty; }
 
-    public EventType getEventType() {
+    public void setDifficulty(int difficulty) { this.difficulty = difficulty; }
+
+    public EventType getEventType()
+    {
         EventType event = null;
 
         if (eventLevel)
             event = eventType;
 
         return event;
-    }
-
-    public void setRankUpLevel(boolean isRankupLevel) {
-        this.isRankUpLevel = isRankupLevel;
     }
 
     public void sortNewCompletion(LevelCompletion levelCompletion) {
@@ -465,6 +463,8 @@ public class Level {
 
     public boolean hasCooldown() { return cooldown; }
 
+    public void toggleCooldown() { cooldown = !cooldown; }
+
     public boolean needsRank() { return requiredRank != null; }
 
     public Rank getRequiredRank() { return requiredRank; }
@@ -483,17 +483,17 @@ public class Level {
 
     public void setRespawnY(int respawnY) { this.respawnY = respawnY; }
 
-    public boolean isElytraLevel() { return elytraLevel; }
+    public boolean isElytra() { return elytraLevel; }
 
-    public boolean isDropperLevel() { return dropperLevel; }
+    public boolean isDropper() { return dropperLevel; }
 
-    public boolean isTCLevel() { return tcLevel; }
+    public boolean isTC() { return tcLevel; }
 
-    public boolean isNewLevel() { return newLevel; }
+    public boolean isNew() { return newLevel; }
 
-    public void toggleNewLevel() { newLevel = !newLevel; }
+    public void toggleNew() { newLevel = !newLevel; }
 
-    public boolean isAscendanceLevel() { return ascendanceLevel; }
+    public boolean isAscendance() { return ascendanceLevel; }
 
     public List<LevelCompletion> getLeaderboard() {
         return leaderboardCache;

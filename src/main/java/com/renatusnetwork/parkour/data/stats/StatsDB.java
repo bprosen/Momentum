@@ -368,20 +368,29 @@ public class StatsDB {
         }
     }
 
-    public static void addBoughtLevel(PlayerStats playerStats, String boughtLevel)
+    public static void addBoughtLevel(String uuid, String boughtLevel)
     {
-        String query = "INSERT INTO " + DatabaseManager.LEVEL_PURCHASES_TABLE + " (uuid, level_name)" +
+        DatabaseQueries.runAsyncQuery(
+            "INSERT INTO " + DatabaseManager.LEVEL_PURCHASES_TABLE + " (uuid, level_name)" +
                 " VALUES " +
-                "('" + playerStats.getUUID() + "', '" + boughtLevel + "')";
-
-        DatabaseQueries.runAsyncQuery(query);
+                "(?,?)",
+                uuid, boughtLevel);
     }
 
     public static void removeBoughtLevel(String uuid, String boughtLevel)
     {
-        String query = "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=? AND level_name=?";
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=? AND level_name=?",
+                uuid, boughtLevel);
+    }
 
-        DatabaseQueries.runAsyncQuery(query, uuid, boughtLevel);
+    public static void removeBoughtLevelByName(String playerName, String boughtLevel)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE +
+                    " lp JOIN " + DatabaseManager.PLAYERS_TABLE +
+                    " p ON p.uuid=lp.uuid WHERE p.name=? AND lp.level_name=?",
+                    playerName, boughtLevel);
     }
 
     public static boolean hasBoughtLevel(String uuid, String boughtLevel)

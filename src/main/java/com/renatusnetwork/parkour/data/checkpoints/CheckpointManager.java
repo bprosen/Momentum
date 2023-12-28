@@ -9,17 +9,30 @@ import org.bukkit.Location;
 
 public class CheckpointManager {
 
-    public void deleteCheckpoint(PlayerStats playerStats, Level level)
+    public void deleteCheckpoint(String playerName, Level level)
     {
-        if (playerStats.hasCurrentCheckpoint())
-        {
-            // remove all checkpoint data
-            playerStats.removeCheckpoint(level.getName());
+        PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
+
+        if (playerStats != null)
+            deleteCheckpointData(playerStats, level);
+
+        CheckpointDB.deleteCheckpointFromName(playerName, level.getName());
+    }
+
+    public void deleteCheckpointData(PlayerStats playerStats, Level level)
+    {
+        // reset cache only
+        if (playerStats.hasCurrentCheckpoint() && playerStats.inLevel() && playerStats.getLevel().equals(level))
             playerStats.resetCurrentCheckpoint();
 
-            DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + level.getName() + "'" +
-                    " AND player_name='" + playerStats.getPlayerName() + "'");
-        }
+        playerStats.removeCheckpoint(level);
+
+    }
+
+    public void deleteCheckpoint(PlayerStats playerStats, Level level)
+    {
+        deleteCheckpointData(playerStats, level);
+        CheckpointDB.deleteCheckpointFromName(playerStats.getPlayerName(), level.getName());
     }
 
     public void teleportToPracCP(PlayerStats playerStats) {

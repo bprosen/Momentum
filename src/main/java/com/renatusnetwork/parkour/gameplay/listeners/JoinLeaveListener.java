@@ -105,7 +105,7 @@ public class JoinLeaveListener implements Listener {
                                     if (level.isAscendanceLevel())
                                         statsManager.enteredAscendance(playerStats);
 
-                                    Location checkpoint = playerStats.getCheckpoint(level.getName());
+                                    Location checkpoint = playerStats.getCheckpoint(level);
                                     if (checkpoint != null)
                                         playerStats.setCurrentCheckpoint(checkpoint);
 

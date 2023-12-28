@@ -1,6 +1,6 @@
 package com.renatusnetwork.parkour.data.levels;
 
-public enum LevelTypes
+public enum LevelType
 {
     NORMAL,
     RACE,
