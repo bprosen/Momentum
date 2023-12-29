@@ -2,9 +2,14 @@ package com.renatusnetwork.parkour.data.locations;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import net.royawesome.jlibnoise.module.modifier.Abs;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LocationManager {
 
@@ -77,7 +82,57 @@ public class LocationManager {
         }
     }
 
-    public boolean hasCompletionLocation(String levelName) {
+    public HashMap<Integer, Location> getAscentLevelLocations(String levelName)
+    {
+        int num = 1;
+        boolean exists = true;
+        HashMap<Integer, Location> tempMap = new HashMap<>();
+
+        // keep going until location doesnt exist
+        while (exists)
+        {
+            String locationName = SettingsManager.LEVEL_ASCENT_FORMAT.replace("%level%", levelName).replace("%num%", String.valueOf(num));
+
+            Location location = get(locationName);
+            exists = location != null;
+            tempMap.put(num, location);
+
+            num++;
+        }
+        return tempMap;
+    }
+
+    public List<Location> getMazeLocations(String levelName, boolean respawnLocations, boolean exitLocations)
+    {
+        int num = 1;
+        boolean exists = true;
+        List<Location> temp = new ArrayList<>();
+
+        // keep going until location doesnt exist
+        while (exists)
+        {
+            String locationName = null;
+
+            // get different types (they have the same formatting)
+            if (respawnLocations)
+                locationName = SettingsManager.LEVEL_MAZE_RESPAWN_FORMAT.replace("%level%", levelName).replace("%num%", String.valueOf(num));
+            else if (exitLocations)
+                locationName = SettingsManager.LEVEL_MAZE_EXIT_FORMAT.replace("%level%", levelName).replace("%num%", String.valueOf(num));
+
+            if (locationName != null)
+            {
+                Location location = get(locationName);
+                exists = location != null;
+                temp.add(location);
+
+                num++;
+            }
+        }
+        return temp;
+    }
+
+    public boolean hasCompletionLocation(String levelName)
+    {
         return exists(SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName));
     }
 
@@ -124,4 +179,12 @@ public class LocationManager {
     }
 
     public Location getTutorialLocation() { return tutorialLocation; }
+
+    public boolean equals(Location one, Location two)
+    {
+        return one.getWorld().getName().equalsIgnoreCase(two.getWorld().getName()) &&
+               one.getX() == two.getX() &&
+               one.getY() == two.getY() &&
+               one.getZ() == two.getZ();
+    }
 }

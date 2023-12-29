@@ -5,11 +5,8 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
-import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
-import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
-import com.renatusnetwork.parkour.data.perks.PerksDB;
+import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -18,9 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class StatsDB {
@@ -401,5 +395,32 @@ public class StatsDB {
                     "p ON p.uuid=pm.uuid WHERE p.name=? AND modifier_name=?",
                     playerName, modifierName
         );
+    }
+
+    public static void loadPerks(PlayerStats playerStats)
+    {
+        List<Map<String, String>> perksResults = DatabaseQueries.getResults(
+                DatabaseManager.PERKS_OWNED_TABLE,
+                "perk_name, " +
+                        "(UNIX_TIMESTAMP(date_received) * 1000) AS date",
+                "WHERE uuid='" + playerStats.getUUID() + "'");
+
+        for (Map<String, String> perkResult : perksResults)
+            playerStats.addPerk(
+                    perkResult.get("perk_name"),
+                    Long.parseLong(perkResult.get("date"))
+            );
+    }
+
+    public static void addOwnedPerk(PlayerStats playerStats, Perk perk, Long date) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.PERKS_OWNED_TABLE + " (uuid, perk_name, date_received) VALUES " +
+                        "(" + playerStats.getUUID() + ", " + perk.getName() + ", FROM_UNIXTIME(" + (date / 1000) + "))"
+        );
+    }
+
+    public static void updateInfiniteBlock(String uuid, String material)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block=? WHERE uuid=?", material, uuid);
     }
 }

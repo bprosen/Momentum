@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,10 +22,12 @@ public class Menu {
 
     private ItemStack selectItem;
 
-    private Map<Integer, MenuPage> pageMap = new HashMap<>();
+    private Map<Integer, MenuPage> pages;
 
-    public Menu(String menuName) {
-        name = menuName;
+    public Menu(String name)
+    {
+        this.name = name;
+        this.pages = new HashMap<>();
 
         load();
     }
@@ -44,16 +47,13 @@ public class Menu {
     private void loadPages() {
         for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
             if (MenusYAML.isSet(name, pageNumber + ""))
-                pageMap.put(pageNumber, new MenuPage(this, pageNumber));
+                pages.put(pageNumber, new MenuPage(this, pageNumber));
         }
     }
 
-    public MenuPage getPage(int pageNumber) {
-        MenuPage menuPage = pageMap.get(pageNumber);
-
-        if (menuPage != null)
-            return menuPage;
-        return null;
+    public MenuPage getPage(int pageNumber)
+    {
+        return pages.get(pageNumber);
     }
     public String getName() {
         return name;
@@ -88,9 +88,11 @@ public class Menu {
         return selectItem;
     }
 
-    public Inventory getInventory(int pageNumber) {
-        if (pageMap.containsKey(pageNumber)) {
-            MenuPage menuPage = pageMap.get(pageNumber);
+    public Inventory getInventory(int pageNumber)
+    {
+        if (pages.containsKey(pageNumber))
+        {
+            MenuPage menuPage = pages.get(pageNumber);
 
             return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle(pageNumber));
         }
@@ -98,24 +100,27 @@ public class Menu {
         return Bukkit.createInventory(null, 54, getFormattedTitle(pageNumber));
     }
 
-    public void updateInventory(Player player, InventoryView inventory, int pageNumber) {
-        if (pageMap.containsKey(pageNumber))
-            pageMap.get(pageNumber).formatInventory(player, inventory);
+    public void updateInventory(Player player, InventoryView inventory, int pageNumber)
+    {
+        if (pages.containsKey(pageNumber))
+            pages.get(pageNumber).formatInventory(player, inventory);
     }
 
-    public MenuItem getMenuItemFromTitle(int pageNumber, String itemTitle) {
-        if (pageMap.containsKey(pageNumber))
-            return pageMap.get(pageNumber).getMenuItemFromTitle(itemTitle);
+    public MenuItem getMenuItemFromTitle(int pageNumber, String itemTitle)
+    {
+        if (pages.containsKey(pageNumber))
+            return pages.get(pageNumber).getMenuItemFromTitle(itemTitle);
 
         return null;
     }
 
-    public MenuItem getMenuItem(int pageNumber, int slot) {
-        if (pageMap.containsKey(pageNumber))
-            return pageMap.get(pageNumber).getMenuItem(slot);
+    public MenuItem getMenuItem(int pageNumber, int slot)
+    {
+        if (pages.containsKey(pageNumber))
+            return pages.get(pageNumber).getMenuItem(slot);
 
         return null;
     }
 
-    public Map<Integer, MenuPage> getPageMap() { return pageMap; }
+    public Collection<MenuPage> getPages() { return pages.values(); }
 }

@@ -2,12 +2,9 @@ package com.renatusnetwork.parkour.data.events.types;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.LevelsYAML;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,14 +18,11 @@ public class MazeEvent extends Event
     {
         super(level, "Maze");
 
-        load();
-    }
-
-    private void load()
-    {
         // load cache
-        respawnLocs = LevelsYAML.getMazeRespawns(getLevel().getName());
-        exit = LevelsYAML.getRandomMazeEventExit(getLevel().getName());
+        this.respawnLocs = Parkour.getLocationManager().getMazeLocations(level.getName(), true, false);
+        List<Location> exitLocations = Parkour.getLocationManager().getMazeLocations(level.getName(), false, true);
+
+        this.exit = exitLocations.get(ThreadLocalRandom.current().nextInt(exitLocations.size()));
         exit.getBlock().setType(Material.IRON_PLATE);
     }
 

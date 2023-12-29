@@ -143,12 +143,16 @@ public class TablesDB
 
     private static void createPerks()
     {
+        String infiniteBlockEnumString = Arrays.toString(Material.values());
+        infiniteBlockEnumString = infiniteBlockEnumString.substring(1, infiniteBlockEnumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
-                            "price INT DEFAULT 0, " +
+                            "price INT DEFAULT NULL, " +
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
+                            "infinite_block ENUM(" + infiniteBlockEnumString + ") DEFAULT NULL, " +
                             // keys
                             "PRIMARY KEY(name), " +
                             // constraints
@@ -475,10 +479,13 @@ public class TablesDB
         String enumString = Arrays.toString(PerksArmorType.values());
         enumString = enumString.substring(1, enumString.length() - 1); // remove square brackets
 
+        String materialEnumString = Arrays.toString(Material.values());
+        materialEnumString = materialEnumString.substring(1, materialEnumString.length() - 1); // remove square brackets
+
         String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
                             "perk_name VARCHAR(20) NOT NULL, " +
                             "armor_piece ENUM(" + enumString + ") NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS
-                            "material VARCHAR(30) NOT NULL, " +
+                            "material ENUM(" + materialEnumString + ") NOT NULL, " +
                             "type TINYINT DEFAULT 0, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // allow for extra length due to color codes
                             "glow BIT DEFAULT 0, " +

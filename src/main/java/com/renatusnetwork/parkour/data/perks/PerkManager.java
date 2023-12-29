@@ -2,6 +2,8 @@ package com.renatusnetwork.parkour.data.perks;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsDB;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -9,9 +11,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class PerkManager {
-
-    private HashMap<String, Perk> perks = new HashMap<>();
+public class PerkManager
+{
+    private HashMap<String, Perk> perks;
 
     public PerkManager()
     {
@@ -20,8 +22,7 @@ public class PerkManager {
 
     public void load()
     {
-        for (String perkName : PerksYAML.getNames())
-            load(perkName);
+        this.perks = PerksDB.getPerks();
 
         Parkour.getPluginLogger().info("Perks loaded: " + perks.size());
     }
@@ -30,40 +31,45 @@ public class PerkManager {
         return perks.get(perkName);
     }
 
-    public HashMap<String, Perk> getPerks() {
-        return perks;
+    public boolean exists(String perkName)
+    {
+        return perks.containsKey(perkName);
     }
 
-    public boolean exists(String perkName) {
-        return get(perkName) != null;
-    }
-
-    public void remove(String perkName) {
-        for (Iterator<Perk> iterator = perks.values().iterator(); iterator.hasNext();)
-            if (iterator.next().getName().equals(perkName))
-                iterator.remove();
+    public void remove(Perk perk)
+    {
+        perks.remove(perk.getName());
+        PerksDB.remove(perk.getName());
     }
 
     public void create(String perkName)
     {
-        if (!exists(perkName))
-            PerksYAML.create(perkName);
+        perks.put(perkName, new Perk(perkName));
+        PerksDB.insert(perkName);
     }
 
-    public void load(String perkName) {
-        boolean exists = exists(perkName);
+    public void updateTitle(Perk perk, String title)
+    {
+        perk.setTitle(title);
+        PerksDB.updateTitle(perk.getName(), title);
+    }
 
-        if (!PerksYAML.exists(perkName) && exists)
-            remove(perkName);
-        else
-        {
-            Perk perk = new Perk(perkName);
+    public void updatePrice(Perk perk, int price)
+    {
+        perk.setPrice(price);
+        PerksDB.updatePrice(perk.getName(), price);
+    }
 
-            if (exists)
-                remove(perkName);
+    public void updateRequiredPermission(Perk perk, String requiredPermission)
+    {
+        perk.setRequiredPermission(requiredPermission);
+        PerksDB.updateRequiredPermission(perk.getName(), requiredPermission);
+    }
 
-            perks.put(perkName, perk);
-        }
+    public void updateInfiniteBlock(Perk perk, Material material)
+    {
+        perk.setInfiniteBlock(material);
+        PerksDB.updateInfiniteBlock(perk.getName(), material.name());
     }
 
     public void bought(PlayerStats playerStats, Perk perk)
@@ -71,7 +77,7 @@ public class PerkManager {
         Long date = System.currentTimeMillis();
 
         playerStats.addPerk(perk.getName(), date);
-        PerksDB.addOwnedPerk(playerStats, perk, date);
+        StatsDB.addOwnedPerk(playerStats, perk, date);
     }
 
     public void setPerk(Perk perk, PlayerStats playerStats)
@@ -82,7 +88,8 @@ public class PerkManager {
         if (!items.isEmpty())
         {
             for (Map.Entry<PerksArmorType, ItemStack> entry : items.entrySet())
-                switch (entry.getKey()) {
+                switch (entry.getKey())
+                {
                     case HELMET:
                         player.getInventory().setHelmet(entry.getValue());
                         break;
@@ -100,8 +107,17 @@ public class PerkManager {
         else if (perk.isInfiniteBlock())
         {
             // update in both stats and db
-            playerStats.setInfiniteBlock(perk.getInfiniteBlock());
-            PerksDB.updateInfiniteBlock(playerStats, perk);
+            Parkour.getStatsManager().updateInfiniteBlock(playerStats, perk.getInfiniteBlock());
         }
+    }
+
+    public int numPerks()
+    {
+        return perks.size();
+    }
+
+    public Collection<Perk> getPerks()
+    {
+        return perks.values();
     }
 }

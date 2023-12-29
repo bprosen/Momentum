@@ -36,7 +36,8 @@ public class MenuPage {
         }
     }
 
-    void formatInventory(Player player, InventoryView inventory) {
+    void formatInventory(Player player, InventoryView inventory)
+    {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         for (MenuItem menuItem : pageItemsMap.values())
@@ -60,7 +61,8 @@ public class MenuPage {
 
     public MenuItem getMenuItemFromTitle(String itemTitle)
     {
-        for (MenuItem menuItem : pageItemsMap.values()) {
+        for (MenuItem menuItem : pageItemsMap.values())
+        {
             if (menuItem.getItem().getItemMeta().getDisplayName().equals(itemTitle))
                 return menuItem;
 
@@ -68,8 +70,7 @@ public class MenuPage {
             {
                 Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
 
-                if (level != null
-                        && level.getFormattedTitle().equals(itemTitle))
+                if (level != null && level.getFormattedTitle().equals(itemTitle))
                     return menuItem;
             }
         }

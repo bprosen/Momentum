@@ -108,6 +108,8 @@ public class PlayerStats {
         return name;
     }
 
+    public String getDisplayName() { return player.getDisplayName(); }
+
     public String getUUID() {
         return uuid;
     }

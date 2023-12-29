@@ -25,6 +25,9 @@ public class SettingsManager {
     public static final String RACE_LEVEL_SPAWN_FORMAT = "race-%level%-%spawn%";
     public static final String LEVEL_SPAWN_FORMAT = "%level%-spawn";
     public static final String LEVEL_COMPLETION_FORMAT = "%level%-completion";
+    public static final String LEVEL_ASCENT_FORMAT = "%level%-level-%num%";
+    public static final String LEVEL_MAZE_RESPAWN_FORMAT = "%level%-respawn-%num%";
+    public static final String LEVEL_MAZE_EXIT_FORMAT = "%level%-exit-%num%";
 
     public World main_world;
     public String levels_message_completion;
@@ -62,6 +65,7 @@ public class SettingsManager {
     public int min_players_online;
     public double anvil_spawn_percentage;
     public int anvil_spawn_y_above_start_y;
+    public int rising_water_y_below_start_y;
     public int falling_anvil_event_task_delay;
     public int rising_water_event_task_delay;
 
@@ -207,6 +211,7 @@ public class SettingsManager {
         min_players_online = settings.getInt("event.min_players_online");
         anvil_spawn_percentage = settings.getDouble("event.anvil_spawn_percentage");
         anvil_spawn_y_above_start_y = settings.getInt("event.anvil_spawn_y_above_start_y");
+        rising_water_y_below_start_y = settings.getInt("event.rising_water_y_below_start_y");
         falling_anvil_event_task_delay = settings.getInt("event.task_delay.falling_anvil");
         rising_water_event_task_delay = settings.getInt("event.task_delay.rising_water");
         minimum_rank_for_plot_creation = settings.getString("player_submitted.minimum_rank_for_plot_creation");

@@ -3,7 +3,7 @@ package com.renatusnetwork.parkour.data.events.types;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.LevelsYAML;
+import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -28,7 +28,7 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
         super(level, "Rising Water");
 
         this.delay = Parkour.getSettingsManager().rising_water_event_task_delay;
-        this.currentY = level.getStartLocation().getBlockY() - LevelsYAML.getRisingWaterStartingMinusY(level.getName());
+        this.currentY = level.getStartLocation().getBlockY() - Parkour.getSettingsManager().rising_water_y_below_start_y;
 
         runScheduler();
     }
@@ -97,14 +97,13 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
             {
                 if (!eventManager.getParticipants().isEmpty())
                 {
-                    // if there is no start loc, then cancel
-                    if (getLevel().getStartLocation().getX() == Parkour.getLocationManager().get("spawn").getX() &&
-                        getLevel().getStartLocation().getZ() == Parkour.getLocationManager().get("spawn").getZ())
+                    LocationManager locationManager = Parkour.getLocationManager();
 
+                    // if there is no start loc, then cancel
+                    if (locationManager.equals(getLevel().getStartLocation(), locationManager.getLobbyLocation()))
                         cancel();
                     else
                     {
-
                         // add another layer of water
                         BlockVector maxPoint = getRegion().getMaximumPoint().toBlockPoint();
                         BlockVector minPoint = getRegion().getMinimumPoint().toBlockPoint();
@@ -144,14 +143,13 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
                                 e.printStackTrace();
                             }
                             currentY++;
-                        } else
+                        }
+                        else
                             Parkour.getPluginLogger().info("WorldEdit API found null in RisingWaterEvent runScheduler");
                     }
                 }
                 else if (isStartCoveredInWater())
-                {
                     eventManager.endEvent(null, false, true);
-                }
             }
         }.runTaskTimer(Parkour.getPlugin(), delay, delay);
     }

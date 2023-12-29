@@ -170,7 +170,7 @@ public class MenuManager {
         // outer loop for menus
         outer: for (Menu menu : menus.values())
             // outer loop for menu pages
-            for (MenuPage menuPage : menu.getPageMap().values())
+            for (MenuPage menuPage : menu.getPages())
                 // inner loop for menu items in pages
                 for (MenuItem menuItem : menuPage.getPageItemsMap().values())
                     // check if they are equal, if so, break outer loop

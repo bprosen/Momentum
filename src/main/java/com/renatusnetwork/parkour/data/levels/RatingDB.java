@@ -1,13 +1,8 @@
 package com.renatusnetwork.parkour.data.levels;
 
-import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class RatingDB
 {

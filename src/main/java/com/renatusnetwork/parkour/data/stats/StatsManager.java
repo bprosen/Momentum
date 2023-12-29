@@ -52,8 +52,8 @@ public class StatsManager {
     private HashMap<Integer, RecordsLBPosition> recordsLB;
     private HashSet<String> saidGG;
 
-    private BukkitTask task = null;
-    private boolean loadingLeaderboards = false;
+    private BukkitTask task;
+    private boolean loadingLeaderboards;
 
     private int totalPlayers;
     private long totalCoins;
@@ -115,7 +115,7 @@ public class StatsManager {
         StatsDB.loadBoughtLevels(playerStats);
         CompletionsDB.loadCompletions(playerStats);
         loadIndividualLevelsBeaten(playerStats);
-        PerksDB.loadPerks(playerStats);
+        StatsDB.loadPerks(playerStats);
         loadPerksGainedCount(playerStats);
         StatsDB.loadModifiers(playerStats);
         CheckpointDB.loadCheckpoints(playerStats);
@@ -296,6 +296,12 @@ public class StatsManager {
                 task = null;
             }
         }.runTaskLater(Parkour.getPlugin(), Parkour.getSettingsManager().default_gg_timer * 20);
+    }
+
+    public void updateInfiniteBlock(PlayerStats playerStats, Material material)
+    {
+        playerStats.setInfiniteBlock(material);
+        StatsDB.updateInfiniteBlock(playerStats.getUUID(), material.name());
     }
 
     public void updateCoins(PlayerStats playerStats, double coins)
@@ -496,8 +502,8 @@ public class StatsManager {
     public void loadPerksGainedCount(PlayerStats playerStats) {
         // set gained perks count
         int gainedPerksCount = 0;
-        for (Perk perk : Parkour.getPerkManager().getPerks().values())
-            if (perk.hasRequirements(playerStats, playerStats.getPlayer()))
+        for (Perk perk : Parkour.getPerkManager().getPerks())
+            if (perk.hasAccessTo(playerStats))
                 gainedPerksCount++;
 
         playerStats.setGainedPerksCount(gainedPerksCount);

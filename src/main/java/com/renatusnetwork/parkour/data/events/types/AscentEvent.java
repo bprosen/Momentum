@@ -1,10 +1,9 @@
 package com.renatusnetwork.parkour.data.events.types;
 
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.LevelsYAML;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
 import java.util.HashMap;
 
 public class AscentEvent extends Event
@@ -12,18 +11,20 @@ public class AscentEvent extends Event
     private HashMap<Player, Integer> levels;
     private HashMap<Integer, Location> locations;
 
+    private final int DEFAULT_LEVEL = 1;
+
     public AscentEvent(Level level)
     {
         super(level, "Ascent");
 
         this.levels = new HashMap<>();
-        this.locations = LevelsYAML.getAscentLevelLocations(level.getName());
+        this.locations = Parkour.getLocationManager().getAscentLevelLocations(level.getName());
     }
 
     public void add(Player player)
     {
-        levels.put(player, 1); // default
-        player.teleport(locations.get(1)); // tp
+        levels.put(player, DEFAULT_LEVEL); // default
+        player.teleport(locations.get(DEFAULT_LEVEL)); // tp
     }
 
     public void remove(Player player)
@@ -55,7 +56,7 @@ public class AscentEvent extends Event
     {
         int newLevel = levels.get(player);
 
-        if (levels.containsKey(player) && levels.get(player) > 1) // min of 1
+        if (levels.containsKey(player) && levels.get(player) > DEFAULT_LEVEL) // min of 1
         {
             newLevel--;
             levels.replace(player, newLevel);
