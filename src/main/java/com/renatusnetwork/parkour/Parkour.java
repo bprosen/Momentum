@@ -27,6 +27,7 @@ import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
 import com.renatusnetwork.parkour.gameplay.listeners.*;
 import com.renatusnetwork.parkour.storage.ConfigManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
+import com.renatusnetwork.parkour.storage.mysql.TablesDB;
 import com.renatusnetwork.parkour.utils.dependencies.ProtocolLib;
 import com.sk89q.worldedit.WorldEdit;
 import org.bukkit.Bukkit;
@@ -183,12 +184,14 @@ public class Parkour extends JavaPlugin {
         getCommand("bid").setExecutor(new BidCMD());
     }
 
-    private static void loadClasses() {
+    private static void loadClasses()
+    {
         configs = new ConfigManager(plugin);
         settings = new SettingsManager(configs.get("settings"));
+        database = new DatabaseManager(plugin);
+        TablesDB.initTables();
         locations = new LocationManager();
         checkpoint = new CheckpointManager();
-        database = new DatabaseManager(plugin);
         stats = new StatsManager(plugin);
         menus = new MenuManager();
         levels = new LevelManager(plugin);

@@ -20,6 +20,7 @@ import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.data.saves.SavesDB;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -378,8 +379,14 @@ public class StatsManager {
             globalPersonalCompletionsLB.clear();
 
             // find the highest top 10 completion stat
-            List<Map<String, String>> playerCompletions = DatabaseQueries.getResults("players", "player_name, level_completions",
-                    " ORDER BY level_completions DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
+            List<Map<String, String>> playerCompletions = DatabaseQueries.getResults(
+                    DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc",
+                    "p.name AS player_name, COUNT(lc.level_name) AS total_completions",
+                   "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lc.uuid " +
+                           "GROUP BY lc.uuid " +
+                           "ORDER BY level_completions " +
+                           "DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size
+            );
 
             int lbPos = 1;
 

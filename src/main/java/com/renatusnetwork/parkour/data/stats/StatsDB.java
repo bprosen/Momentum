@@ -82,7 +82,7 @@ public class StatsDB {
                         playerStats.getName());
             }
 
-            String rankName = playerResult.get("rank");
+            String rankName = playerResult.get("rank_name");
             Rank rank = Parkour.getRanksManager().get(rankName);
             if (rank != null)
                 playerStats.setRank(rank);
@@ -245,7 +245,7 @@ public class StatsDB {
 
     public static void updateRank(String uuid, String rank)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank=? WHERE uuid=?", rank, uuid);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank_name=? WHERE uuid=?", rank, uuid);
     }
 
     public static double getCoinsFromName(String playerName)

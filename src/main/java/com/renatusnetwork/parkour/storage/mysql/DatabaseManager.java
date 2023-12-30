@@ -43,7 +43,6 @@ public class DatabaseManager {
     public DatabaseManager(Plugin plugin)
     {
         connection = new DatabaseConnection();
-        TablesDB.initTables();
         startScheduler(plugin);
     }
 

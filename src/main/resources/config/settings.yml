@@ -164,26 +164,7 @@ clans:
     min-percent: 10
     max-percent: 25
   blocked_clan_names:
-    - "nigger"
-    - "nigga"
-    - "nigg"
-    - "ni99a"
-    - "ni99er"
-    - "n!99er"
-    - "n!99a"
-    - "retard"
-    - "retarded"
-    - "fag"
-    - "faggot"
-    - "fagg0t"
-    - "coon"
-    - "nibba"
-    - "beaner"
-    - "nazi"
-    - "hitler"
-    - "n1gger"
-    - "nigg"
-    - "chink"
+    - ""
 player_submitted:
   world: ""
   plot_width: 75
