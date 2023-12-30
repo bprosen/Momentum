@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.saves.SavesDB;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -22,19 +23,80 @@ import java.util.*;
 
 public class LevelCMD implements CommandExecutor
 {
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
     {
-        if (sender.isOp() || !(sender instanceof Player)) {
+        LevelManager levelManager = Parkour.getLevelManager();
+        StatsManager statsManager = Parkour.getStatsManager();
 
-            LevelManager levelManager = Parkour.getLevelManager();
+        if (a.length >= 2 && a[0].equalsIgnoreCase("buy"))
+        {
+            if (sender instanceof Player)
+            {
+                Player player = (Player) sender;
+                PlayerStats playerStats = statsManager.get(player);
 
+                String levelName = a[1];
+                Level level = levelManager.get(levelName);
+
+                // if failure by name lookup, lookup by title
+                if (level == null)
+                {
+                    String[] split = Arrays.copyOfRange(a, 1, a.length);
+                    levelName = String.join(" ", split);
+
+                    level = levelManager.getFromTitle(levelName);
+                }
+
+                // no level exists otherwise
+                if (level != null)
+                {
+                    if (level.requiresBuying())
+                    {
+                        if (!playerStats.hasCompleted(level))
+                        {
+                            if (!playerStats.hasBoughtLevel(level))
+                            {
+                                double balance = playerStats.getCoins();
+                                double price = level.getPrice();
+
+                                if (balance >= price)
+                                {
+                                    statsManager.removeCoins(playerStats, price);
+                                    statsManager.addBoughtLevel(playerStats, level);
+                                    player.sendMessage(Utils.translate("&7You have bought &c" + level.getFormattedTitle()));
+                                }
+                                else
+                                {
+                                    double amountLeft = price - balance;
+                                    player.sendMessage(Utils.translate(
+                                            "&cYou cannot buy &4" + level.getFormattedTitle() + "&c, you need an additional &6" +
+                                                    Utils.formatNumber(amountLeft) + " &eCoins"));
+
+                                }
+                            }
+                            else
+                                player.sendMessage(Utils.translate("&cYou have already bought &4" + level.getFormattedTitle()));
+                        }
+                        else
+                            player.sendMessage(Utils.translate("&cYou have already completed &4" + level.getFormattedTitle()));
+                    }
+                    else
+                        player.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&c does not require buying"));
+                }
+            }
+            else
+                sender.sendMessage(Utils.translate("&cConsole cannot do this"));
+        }
+        else if (sender.isOp())
+        {
             if (a.length == 1 && a[0].equalsIgnoreCase("show"))
             { // subcommand: show
                 if (sender instanceof Player)
                 {
 
                     Player player = (Player) sender;
-                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                    PlayerStats playerStats = statsManager.get(player);
 
                     if (playerStats.inLevel())
                         sender.sendMessage(Utils.translate("&7You are in &c" + playerStats.getLevel().getFormattedTitle()));
@@ -269,8 +331,8 @@ public class LevelCMD implements CommandExecutor
                                             // if it is a diff person, need to update their in game stats
                                             if (!oldHolder.getUUID().equalsIgnoreCase(newHolder.getUUID()))
                                             {
-                                                PlayerStats oldHolderStats = Parkour.getStatsManager().get(oldHolder.getUUID());
-                                                PlayerStats newHolderStats = Parkour.getStatsManager().get(newHolder.getUUID());
+                                                PlayerStats oldHolderStats = statsManager.get(oldHolder.getUUID());
+                                                PlayerStats newHolderStats = statsManager.get(newHolder.getUUID());
 
                                                 if (oldHolderStats != null)
                                                     oldHolderStats.removeRecord();
@@ -331,7 +393,7 @@ public class LevelCMD implements CommandExecutor
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("forcecompletion"))
             {
-                PlayerStats playerStats = Parkour.getStatsManager().getByName(a[1]);
+                PlayerStats playerStats = statsManager.getByName(a[1]);
 
                 if (playerStats != null)
                 {
@@ -342,7 +404,7 @@ public class LevelCMD implements CommandExecutor
                     if (level != null)
                     {
                         LevelHandler.dolevelCompletion(playerStats, playerStats.getPlayer(), level, levelName, true);
-                        sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + " &7Completion for &a" + playerStats.getName()));
+                        sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + "&7 completion for &a" + playerStats.getName()));
                     }
                 }
                 else
@@ -440,7 +502,7 @@ public class LevelCMD implements CommandExecutor
 
                     if (rating > -1)
                         sender.sendMessage(Utils.translate(
-                                "&c" + playerName + " &7has rated &c" + level.getFormattedTitle() + " &7 &6" + rating
+                                "&c" + playerName + " &7has rated &c" + level.getFormattedTitle() + "&7 a &6" + rating
                         ));
                     else
                         sender.sendMessage(Utils.translate(
@@ -494,7 +556,7 @@ public class LevelCMD implements CommandExecutor
                                 if (!names.isEmpty())
                                 {
                                     sender.sendMessage(Utils.translate(
-                                            "&7Players who rated &2" + level.getFormattedTitle() + " &7a &a" + rating
+                                            "&7Players who rated &2" + level.getFormattedTitle() + "&7 a &a" + rating
                                     ));
 
                                     String msg = " &2" + rating + " &7-";
@@ -616,7 +678,7 @@ public class LevelCMD implements CommandExecutor
 
                     Parkour.getCheckpointManager().deleteCheckpoint(playerName, level);
                     sender.sendMessage(Utils.translate(
-                            "&7Any checkpoints stored for &c" + playerName + "&7 on level &2" + level.getFormattedTitle() + " &7has been deleted"
+                            "&7Any checkpoints stored for &c" + playerName + "&7 on level &2" + level.getFormattedTitle() + "&7 has been deleted"
                     ));
                 }
             }
@@ -639,7 +701,7 @@ public class LevelCMD implements CommandExecutor
                             long totalCompletions = LevelsDB.getCompletionsBetweenDates(level.getName(), startDate, endDate);
 
                             sender.sendMessage(Utils.translate(
-                                    "&c" + level.getFormattedTitle() + " &7between &a" + startDate + " &7and &a" + endDate +
+                                    "&c" + level.getFormattedTitle() + "&7 between &a" + startDate + " &7and &a" + endDate +
                                          " &7has &a" + Utils.formatNumber(totalCompletions) + " &7Completions"
                             ));
                         }
@@ -658,7 +720,7 @@ public class LevelCMD implements CommandExecutor
                     {
                         levelManager.setPrice(level, price);
                         sender.sendMessage(Utils.translate(
-                                "&7You set the price of &c" + level.getFormattedTitle() + " &7to &6" + Utils.formatNumber(price) + " &e&lCoins"
+                                "&7You set the price of &c" + level.getFormattedTitle() + "&7 to &6" + Utils.formatNumber(price) + " &e&lCoins"
                         ));
                     }
                 }
@@ -671,18 +733,18 @@ public class LevelCMD implements CommandExecutor
 
                 if (level != null)
                 {
-                    if (level.isBuyable())
+                    if (level.requiresBuying())
                     {
                         String playerName = a[1];
-                        PlayerStats targetStats = Parkour.getStatsManager().getByName(a[1]);
+                        PlayerStats targetStats = statsManager.getByName(a[1]);
 
                         if (targetStats != null)
                         {
                             if (!targetStats.hasBoughtLevel(level))
                             {
-                                Parkour.getStatsManager().addBoughtLevel(targetStats, level);
+                                statsManager.addBoughtLevel(targetStats, level);
                                 sender.sendMessage(Utils.translate(
-                                        "&7You have added &c" + level.getFormattedTitle() + " &7to &4" + playerName + "&c's &7bought levels"
+                                        "&7You have added &c" + level.getFormattedTitle() + "&7 to &4" + playerName + "&c's &7bought levels"
                                 ));
                             }
                             else
@@ -711,13 +773,13 @@ public class LevelCMD implements CommandExecutor
                             // this also acts as a checker of if they have ever joined
                             if (StatsDB.hasBoughtLevel(playerName, level.getName()))
                             {
-                                PlayerStats targetStats = Parkour.getStatsManager().getByName(playerName);
+                                PlayerStats targetStats = statsManager.getByName(playerName);
 
                                 if (targetStats != null)
-                                    Parkour.getStatsManager().removeBoughtLevel(targetStats, level);
+                                    statsManager.removeBoughtLevel(targetStats, level);
 
                                 StatsDB.removeBoughtLevelByName(playerName, level.getName());
-                                sender.sendMessage(Utils.translate("&7You have removed &c" + level.getFormattedTitle() + " &7from &4" + playerName + "&c's &7bought levels"));
+                                sender.sendMessage(Utils.translate("&7You have removed &c" + level.getFormattedTitle() + "&7 from &4" + playerName + "&c's &7bought levels"));
                             }
                             else
                                 sender.sendMessage(Utils.translate(
@@ -735,7 +797,7 @@ public class LevelCMD implements CommandExecutor
                 {
                     levelManager.toggleNew(level);
                     sender.sendMessage(Utils.translate(
-                            "&7You have set the new level value of &c" + level.getFormattedTitle() + " &7to &c" + level.isNew()
+                            "&7You have set the new level value of &c" + level.getFormattedTitle() + "&7 to &c" + level.isNew()
                     ));
                 }
             }
@@ -759,7 +821,7 @@ public class LevelCMD implements CommandExecutor
 
                         levelManager.setDifficulty(level, difficulty);
                         sender.sendMessage(Utils.translate(
-                                "&7You have set the difficulty of &c" + level.getFormattedTitle() + " &7to &c" + difficulty
+                                "&7You have set the difficulty of &c" + level.getFormattedTitle() + "&7 to &c" + difficulty
                         ));
                     }
                     else
@@ -791,7 +853,7 @@ public class LevelCMD implements CommandExecutor
 
                 if (level != null)
                 {
-                    PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
+                    PlayerStats playerStats = statsManager.getByName(playerName);
 
                     if (playerStats != null)
                     {

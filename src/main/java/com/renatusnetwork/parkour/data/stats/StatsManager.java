@@ -127,7 +127,7 @@ public class StatsManager {
         // get individual levels beaten by looping through list
         int individualLevelsBeaten = 0;
         for (Level level : Parkour.getLevelManager().getLevels().values())
-            if (playerStats.hasCompleted(level.getName()))
+            if (playerStats.hasCompleted(level))
                 individualLevelsBeaten++;
 
         playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
@@ -354,11 +354,6 @@ public class StatsManager {
             removeModifier(playerStats, modifier);
         else
             StatsDB.removeModifierName(playerName, modifier.getName());
-    }
-
-    public void changeUpdatedModifiers(Modifier oldModifier, Modifier newModifier)
-    {
-
     }
 
     public long getTotalCoins() { return totalCoins; }
@@ -606,11 +601,12 @@ public class StatsManager {
                                         .replace("%jumps%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
 
                                 // level stats, only add if the most completed level is not null
-                                Level mostCompletedLevel = Parkour.getLevelManager().get(playerStats.getMostCompletedLevel());
-                                if (mostCompletedLevel != null) {
+                                Level mostCompletedLevel = playerStats.getMostCompletedLevel();
+                                if (mostCompletedLevel != null)
+                                {
 
                                     loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
-                                            .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel.getName()) + "");
+                                            .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel) + "");
 
                                     LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(
                                             playerStats.getMostCompletedLevel());
@@ -702,14 +698,12 @@ public class StatsManager {
         int bestSprintInfinite = playerStats.getBestInfiniteScore(InfiniteType.SPRINT);
 
         int records = playerStats.getRecords();
-        String favoriteLevel = playerStats.getMostCompletedLevel();
 
-        Level level = Parkour.getLevelManager().get(favoriteLevel);
+        Level level = playerStats.getMostCompletedLevel();
+        String favoriteLevel = "None";
 
         if (level != null)
             favoriteLevel = level.getFormattedTitle();
-        else
-            favoriteLevel = "None";
 
         int totalCompletions = playerStats.getTotalLevelCompletions();
         int levelsRated = playerStats.getRatedLevelsCount();

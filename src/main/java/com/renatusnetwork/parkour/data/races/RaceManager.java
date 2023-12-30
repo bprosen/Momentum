@@ -261,7 +261,7 @@ public class RaceManager {
             raceObject.getMaxTimer().cancel();
 
             // if they have not completed this individual level, then add
-            if (winnerStats.getLevelCompletionsCount(raceObject.getLevel().getName()) < 1)
+            if (!winnerStats.hasCompleted(raceObject.getLevel()))
                 winnerStats.setIndividualLevelsBeaten(winnerStats.getIndividualLevelsBeaten() + 1);
 
             long elapsedTime = (System.currentTimeMillis() - winnerStats.getLevelStartTime());
@@ -282,7 +282,7 @@ public class RaceManager {
             levelManager.addCompletion(winnerStats, raceObject.getLevel(), levelCompletion);
 
             // Update player information
-            winnerStats.levelCompletion(raceObject.getLevel().getName(), levelCompletion);
+            winnerStats.levelCompletion(levelCompletion);
 
             if (raceObject.hasBet())
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()

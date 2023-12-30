@@ -15,7 +15,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -753,10 +756,13 @@ public class LevelManager {
                         boolean teleport = true;
 
                         // not all levels have a price, so do a boolean switch
-                        if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                        if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
                         {
                             teleport = false;
-                            player.sendMessage(Utils.translate("&cYou first need to buy " + level.getFormattedTitle() + " &cbefore teleporting to it"));
+                            player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getFormattedTitle() + "&7 before teleporting to it"));
+                            player.sendMessage(Utils.translate(
+                                    "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + level.getFormattedTitle()
+                            ));
                         }
 
                         // if still allowed, tp them!
@@ -764,24 +770,16 @@ public class LevelManager {
                             MenuItemAction.performLevelTeleport(playerStats, player, level);
                     }
                     else
-                    {
                         player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
-                    }
                 }
                 else
-                {
                     player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
-                }
             }
             else
-            {
                 player.sendMessage(Utils.translate("&cYou cannot teleport to a level you do not have the rank to"));
-            }
         }
         else
-        {
             player.sendMessage(Utils.translate("&cYou cannot teleport to an Ascendance level"));
-        }
     }
 
     public void regionLevelCheck(PlayerStats playerStats, Location location)

@@ -20,8 +20,6 @@ public class CompletionsDB
 
         for (Map<String, String> completionResult : completionsResults)
             playerStats.levelCompletion(
-                    playerStats.getUUID(),
-                    playerStats.getName(),
                     completionResult.get("level_name"),
                     Long.parseLong(completionResult.get("date")),
                     Long.parseLong(completionResult.get("time_taken"))
@@ -30,7 +28,7 @@ public class CompletionsDB
         // get individual levels beaten by looping through list
         int individualLevelsBeaten = 0;
         for (Level level : Parkour.getLevelManager().getLevels().values())
-            if (playerStats.hasCompleted(level.getName()))
+            if (playerStats.hasCompleted(level))
                 individualLevelsBeaten++;
 
         playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);

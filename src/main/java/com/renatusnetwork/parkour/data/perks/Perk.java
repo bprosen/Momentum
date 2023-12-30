@@ -101,7 +101,7 @@ public class Perk
 
         // if it needs a level completion, check all the levels to see if they are missing one, otherwise keep checking
         for (Level level : requiredLevels)
-            if (playerStats.getLevelCompletionsCount(level.getName()) < 1)
+            if (!playerStats.hasCompleted(level))
                 return false;
 
         // if it can be purchased, immediately return false since we know they don't have access to this perk

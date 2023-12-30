@@ -158,7 +158,7 @@ public class RecordsCMD implements CommandExecutor
                                 // print to player and increment
                                 double time = record.getCompletionTimeElapsedSeconds();
 
-                                messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + " &7" + time + "s");
+                                messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + "&7 " + time + "s");
                                 currentFound++;
                             }
                         }

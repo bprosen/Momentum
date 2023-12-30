@@ -239,7 +239,7 @@ public class MenuItemFormatter {
             boolean enchant = true;
             for (Level level : levelsInMenu)
             {
-                if (playerStats.getLevelCompletionsCount(level.getName()) < 1)
+                if (!playerStats.hasCompleted(level.getName()))
                     enchant = false;
                 else
                     count++;
@@ -320,7 +320,7 @@ public class MenuItemFormatter {
             // show they need to buy it and it is not the jackpot level if it is running
             if (!(bankManager.isJackpotRunning() &&
                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
-                level.getPrice() > 0 && !playerStats.hasBoughtLevel(level) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
             {
 
                 int price = level.getPrice();
@@ -331,7 +331,7 @@ public class MenuItemFormatter {
                     price *= (1.00f - discount.getDiscount());
                 }
 
-                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
+                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
             }
             else
@@ -476,7 +476,7 @@ public class MenuItemFormatter {
             }
 
             // Personal Level Stats Section
-            int levelCompletionsCount = playerStats.getLevelCompletionsCount(level.getName());
+            int levelCompletionsCount = playerStats.getLevelCompletionsCount(level);
             if (levelCompletionsCount > 0) {
                 // add glow effect to all levels they have completed
                 itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
@@ -490,7 +490,7 @@ public class MenuItemFormatter {
 
                 itemLore.add(Utils.translate(beatenMessage));
 
-                LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
+                LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
                 if (fastestCompletion != null) {
                     double completionTime = fastestCompletion.getCompletionTimeElapsedSeconds();
                     long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletionMillis();

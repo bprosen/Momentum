@@ -156,7 +156,8 @@ public class InteractListener implements Listener {
                                             PracticeHandler.resetDataOnly(playerStats);
                                             playerStats.disableLevelStartTime();
 
-                                            if (!level.getPotionEffects().isEmpty()) {
+                                            if (level.hasPotionEffects())
+                                            {
 
                                                 playerStats.clearPotionEffects();
 
@@ -164,10 +165,9 @@ public class InteractListener implements Listener {
                                                 if (playerStats.hasNightVision())
                                                     player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 
-                                                for (PotionEffect potionEffect : level.getPotionEffects()) {
+                                                for (PotionEffect potionEffect : level.getPotionEffects())
                                                     if (playerStats.hasNightVision() || potionEffect.getType() != PotionEffectType.NIGHT_VISION)
                                                         player.addPotionEffect(potionEffect);
-                                                }
                                             }
                                             resetConfirmMap.remove(player.getName());
 

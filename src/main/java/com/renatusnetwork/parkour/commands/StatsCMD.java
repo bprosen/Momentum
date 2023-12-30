@@ -262,7 +262,7 @@ public class StatsCMD implements CommandExecutor {
                     if (!Parkour.getStatsManager().isLoadingLeaderboards())
                     {
                         sender.sendMessage(Utils.translate(
-                                level.getFormattedTitle() + " &7Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
+                                level.getFormattedTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
                         ));
 
                         HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
@@ -295,10 +295,10 @@ public class StatsCMD implements CommandExecutor {
                             Player player = (Player) sender;
                             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                            if (playerStats != null && playerStats.getLevelCompletionsCount(level.getName()) > 0)
+                            if (playerStats != null && playerStats.hasCompleted(level))
                             {
                                 // send your best if not on it and have beaten it
-                                LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level.getName());
+                                LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
                                 if (levelCompletion != null)
                                 {
                                     sender.sendMessage(Utils.translate("&7Your best is &2" + levelCompletion.getTimeOfCompletionSeconds() + "s"));

@@ -495,24 +495,32 @@ public class PlayerStats {
     //
     // Completions Section
     //
-    public String getMostCompletedLevel() {
+    public Level getMostCompletedLevel()
+    {
         int mostCompletions = -1;
         String mostCompletedLevel = null;
 
         for (Map.Entry<String, Set<LevelCompletion>> entry : levelCompletions.entrySet())
-            if (entry.getValue().size() > mostCompletions) {
+            if (entry.getValue().size() > mostCompletions)
+            {
                 mostCompletions = entry.getValue().size();
                 mostCompletedLevel = entry.getKey();
             }
 
         if (mostCompletions > 0)
-            return mostCompletedLevel;
+        {
+            return Parkour.getLevelManager().get(mostCompletedLevel);
+        }
 
         return null;
     }
 
-    public void levelCompletion(String levelName, LevelCompletion levelCompletion) {
-        if (levelName != null && levelCompletion != null) {
+    public void levelCompletion(LevelCompletion levelCompletion)
+    {
+        String levelName = levelCompletion.getLevelName();
+
+        if (levelName != null && levelCompletion != null)
+        {
             if (!levelCompletions.containsKey(levelName))
                 levelCompletions.put(levelName, new HashSet<>());
 
@@ -521,12 +529,14 @@ public class PlayerStats {
         }
     }
 
-    public void levelCompletion(String levelName, String playerUUID, String playerName, long timeOfCompletion, long completionTimeElapsed) {
-        this.levelCompletion(levelName, new LevelCompletion(levelName, playerUUID, playerName, timeOfCompletion, completionTimeElapsed));
+    public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed)
+    {
+        this.levelCompletion(new LevelCompletion(levelName, uuid, name, timeOfCompletion, completionTimeElapsed));
     }
 
-    public HashMap<String, Set<LevelCompletion>> getLevelCompletionsMap() {
-        return levelCompletions;
+    public boolean hasCompleted(Level level)
+    {
+        return levelCompletions.containsKey(level.getName());
     }
 
     public boolean hasCompleted(String levelName)
@@ -534,7 +544,10 @@ public class PlayerStats {
         return levelCompletions.containsKey(levelName);
     }
 
-    public int getLevelCompletionsCount(String levelName) {
+    public int getLevelCompletionsCount(Level level)
+    {
+        String levelName = level.getName();
+
         if (levelCompletions.containsKey(levelName))
             return levelCompletions.get(levelName).size();
 
@@ -542,7 +555,9 @@ public class PlayerStats {
     }
 
     // fastest completion
-    public LevelCompletion getQuickestCompletion(String levelName) {
+    public LevelCompletion getQuickestCompletion(Level level)
+    {
+        String levelName = level.getName();
         LevelCompletion fastestCompletion = null;
 
         if (levelCompletions.containsKey(levelName))

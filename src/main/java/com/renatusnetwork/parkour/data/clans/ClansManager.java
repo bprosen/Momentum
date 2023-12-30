@@ -183,7 +183,7 @@ public class ClansManager
                     Parkour.getStatsManager().addCoins(memberStats, splitAmountPerMember);
 
                     onlineMember.sendMessage(Utils.translate("&6" + player.getDisplayName() + " &7completed &6" +
-                            level.getFormattedTitle() + " &7and you received &6" + Utils.formatNumber(splitAmountPerMember)
+                            level.getFormattedTitle() + "&7 and you received &6" + Utils.formatNumber(splitAmountPerMember)
                             + " &eCoins &7from your clan"));
                 }
                 else

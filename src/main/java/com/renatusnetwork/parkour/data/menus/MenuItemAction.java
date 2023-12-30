@@ -228,7 +228,7 @@ public class MenuItemAction {
                 if (rating >= 0 && rating <= 5)
                 {
                     Parkour.getLevelManager().addRating(player, level, rating);
-                    player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + " &7a &6" + rating + "&7! Thank you for rating!"));
+                    player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + "&7 a &6" + rating + "&7! Thank you for rating!"));
                 } else {
                     player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
                 }
@@ -311,7 +311,8 @@ public class MenuItemAction {
         }
     }
 
-    private static void performLevelItem(Player player, MenuItem menuItem) {
+    private static void performLevelItem(Player player, MenuItem menuItem)
+    {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
         BankManager bankManager = Parkour.getBankManager();
@@ -322,7 +323,7 @@ public class MenuItemAction {
             if (menuItem != null && level.getPrice() > 0 &&
                 !level.isFeaturedLevel() &&
                 !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
-                !playerStats.hasBoughtLevel(level) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
+                !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
                 performLevelBuying(playerStats, player, level, menuItem);
             else
                 performLevelTeleport(playerStats, player, level);
@@ -359,7 +360,7 @@ public class MenuItemAction {
                 ItemMeta itemMeta = itemStack.getItemMeta();
 
                 itemMeta.setDisplayName(Utils.translate(
-                        "&cClick to confirm &a" + level.getFormattedTitle() + " &cfor " + Utils.getCoinFormat(oldPrice, price) + " &eCoins"
+                        "&cClick to confirm &a" + level.getFormattedTitle() + "&c for " + Utils.getCoinFormat(oldPrice, price) + " &eCoins"
                 ));
 
                 List<String> loreString = new ArrayList<>();
@@ -583,8 +584,9 @@ public class MenuItemAction {
                                     // tp to start if no save
                                 } else if (save == null) {
                                     player.teleport(level.getStartLocation());
-                                    player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
-                                            + level.getFormattedTitle()));
+                                    player.sendMessage(Utils.translate(
+                                            "&7You were teleported to the beginning of " + level.getFormattedTitle()
+                                    ));
                                 }
 
                                 // if they have a save
@@ -598,10 +600,8 @@ public class MenuItemAction {
                                 playerStats.disableLevelStartTime();
                                 playerStats.resetFails();
 
-                                if (!level.getPotionEffects().isEmpty()) {
-                                    for (PotionEffect potionEffect : level.getPotionEffects())
-                                        player.addPotionEffect(potionEffect);
-                                }
+                                for (PotionEffect potionEffect : level.getPotionEffects())
+                                    player.addPotionEffect(potionEffect);
 
                                 if (level.isElytra())
                                     Parkour.getStatsManager().toggleOnElytra(playerStats);

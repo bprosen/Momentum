@@ -151,7 +151,7 @@ public class Level
 
     public int getPrice() { return price; }
 
-    public boolean isBuyable() { return price > 0; }
+    public boolean requiresBuying() { return price > 0; }
 
     public void setPrice(int price) { this.price = price; }
 
@@ -322,6 +322,8 @@ public class Level
 
     public void removeRequiredLevel(String levelName) { requiredLevels.remove(levelName); }
 
+    public boolean hasPotionEffects() { return !potionEffects.isEmpty(); }
+
     public List<PotionEffect> getPotionEffects() {
         return potionEffects;
     }
@@ -338,7 +340,7 @@ public class Level
     public boolean playerHasRequiredLevels(PlayerStats playerStats)
     {
         for (String levelName : requiredLevels)
-            if (playerStats.getLevelCompletionsCount(levelName) < 1)
+            if (!playerStats.hasCompleted(levelName))
                 return false;
 
         return true;

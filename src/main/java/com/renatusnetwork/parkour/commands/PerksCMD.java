@@ -130,10 +130,10 @@ public class PerksCMD implements CommandExecutor
                         if (!perk.alreadyRequiresLevel(level))
                         {
                             perkManager.addRequiredLevel(perk, level);
-                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + " &7to &c" + perk.getFormattedTitle() + "&7's required levels"));
+                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + "&7 to &c" + perk.getFormattedTitle() + "&7's required levels"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + " &7is already a required level for &c" + perk.getFormattedTitle()));
+                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is already a required level for &c" + perk.getFormattedTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
@@ -156,10 +156,10 @@ public class PerksCMD implements CommandExecutor
                         if (perk.alreadyRequiresLevel(level))
                         {
                             perkManager.removeRequiredLevel(perk, level);
-                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getFormattedTitle() + " &7from &c" + perk.getFormattedTitle() + "&7's required levels"));
+                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getFormattedTitle() + "&7 from &c" + perk.getFormattedTitle() + "&7's required levels"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + " &7is not a required level for &c" + perk.getFormattedTitle()));
+                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is not a required level for &c" + perk.getFormattedTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));

@@ -48,7 +48,7 @@ public class RateCMD implements CommandExecutor {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 String levelTitle = level.getFormattedTitle();
 
-                if (playerStats.hasCompleted(level.getName()))
+                if (playerStats.hasCompleted(level))
                 {
                     if (!level.hasRated(playerStats.getName()))
                     {
@@ -80,7 +80,7 @@ public class RateCMD implements CommandExecutor {
                 }
                 else
                     player.sendMessage(Utils.translate(
-                            "&cYou have not completed &c" + level.getFormattedTitle() + " &c to be able to rate it"
+                            "&cYou have not completed &c" + level.getFormattedTitle() + "&c to be able to rate it"
                     ));
             }
             else

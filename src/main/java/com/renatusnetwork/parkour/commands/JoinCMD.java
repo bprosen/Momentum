@@ -35,9 +35,7 @@ public class JoinCMD implements CommandExecutor
                         player.sendMessage(Utils.translate("&4" + targetStats.getName() + " &cis not in a level"));
                 }
                 else
-                {
                     player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
-                }
             }
             else
             {
