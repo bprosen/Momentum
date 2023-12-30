@@ -28,29 +28,21 @@ public class PlotsDB {
         return tempList;
     }
 
-    public static boolean hasPlot(String UUID)
+    public static List<String> getTrustedUUIDs(int plotID)
     {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
-                DatabaseManager.PLOTS_TABLE,
-                "*", " WHERE owner_uuid='" + UUID + "'");
-
-        return !results.isEmpty();
-    }
-
-    public static List<String> getTrustedUUIDs(String UUID) {
         List<String> trustedUUIDs = new ArrayList<>();
 
-        if (hasPlot(UUID)) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " tp",
-                    "trusted_uuid",
-                    "JOIN " + DatabaseManager.PLOTS_TABLE + "p ON tp.plot_id=p.id WHERE owner_uuid='" + UUID + "'");
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE,
+                "trusted_uuid",
+                "WHERE plot_id=?", plotID);
 
-            for (Map<String, String> result : results)
-                trustedUUIDs.add(result.get("trusted_uuid"));
-        }
+        for (Map<String, String> result : results)
+            trustedUUIDs.add(result.get("trusted_uuid"));
+
         return trustedUUIDs;
     }
+
 
     public static void addTrustedPlayer(int plotID, Player trustedPlayer)
     {
@@ -82,8 +74,8 @@ public class PlotsDB {
         );
     }
 
-    public static void removePlot(String UUID) {
-        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid='" + UUID + "'");
+    public static void removePlot(String uuid) {
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
     }
 
 
@@ -116,7 +108,7 @@ public class PlotsDB {
                      Parkour.getSettingsManager().player_submitted_plot_default_y,
                     centerZ + 0.5);
 
-            List<String> trustedUUIDs = getTrustedUUIDs(ownerUUID);
+            List<String> trustedUUIDs = getTrustedUUIDs(plotID);
 
             tempMap.put(ownerName, new Plot(plotID, ownerName, ownerUUID, loc, trustedUUIDs, submitted));
         }
@@ -124,9 +116,9 @@ public class PlotsDB {
         return tempMap;
     }
 
-    public static void toggleSubmitted(String UUID)
+    public static void toggleSubmitted(String uuid)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLOTS_TABLE + " SET submitted=NOT submitted WHERE owner_uuid='" + UUID + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLOTS_TABLE + " SET submitted=NOT submitted WHERE owner_uuid=?", uuid);
     }
 
     public static void toggleSubmittedFromName(String playerName)

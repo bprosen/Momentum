@@ -591,11 +591,6 @@ public class LevelManager {
         return buyingLevels.get(playerName);
     }
 
-    public void clearBuyingLevels(String playerName)
-    {
-        buyingLevels.remove(playerName);
-    }
-
     public Set<Level> getLevelsInAllMenus() {
         Set<Level> levelsInMenus = new HashSet<>();
 
@@ -761,8 +756,8 @@ public class LevelManager {
                             teleport = false;
                             player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getFormattedTitle() + "&7 before teleporting to it"));
                             player.sendMessage(Utils.translate(
-                                    "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + level.getFormattedTitle()
-                            ));
+                                    "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
+                            )));
                         }
 
                         // if still allowed, tp them!

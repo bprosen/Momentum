@@ -28,6 +28,7 @@ public class TablesDB
         {
             createTables();
             createKeys();
+            Parkour.getPluginLogger().info("Tables have successfully been created");
         }
     }
 
@@ -82,12 +83,32 @@ public class TablesDB
 
     private static void createKeys()
     {
-        
+        createPlayersKeys();
+        createLevelsKeys();
+        createPlotsKeys();
+        createLevelRatingsKeys();
+        createLevelCheckpointsKeys();
+        createLevelSavesKeys();
+        createLevelPurchasesKeys();
+        createLevelCompletionsKeys();
+        createClansKeys();
+        createRanksKeys();
+        createPlotTrustedPlayersKeys();
+        createPlayerModifiersKeys();
+        createPerksOwnedKeys();
+        createPerksLevelRequirementsKeys();
+        createPerksArmorKeys();
+        createLevelCompletionCommandsKeys();
+        createLevelPotionEffectsKeys();
+        createLevelRequiredLevelsKeys();
+        createBadgesOwnedKeys();
+        createBadgesCommandsKeys();
+        createMasteryBadgeLevelsKeys();
     }
 
     private static void createPlayers()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLAYERS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PLAYERS_TABLE + "(" +
                            "uuid CHAR(36) NOT NULL, " +
                            "name VARCHAR(16) NOT NULL, " +
                            "clan VARCHAR(10) DEFAULT NULL, " + // default not in a clan
@@ -129,7 +150,10 @@ public class TablesDB
                        ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createPlayersKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLAYERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_fk " +
                                  "FOREIGN KEY(clan) REFERENCES " + DatabaseManager.CLANS_TABLE + "(tag) " +
                                  "ON UPDATE CASCADE " +
@@ -144,7 +168,7 @@ public class TablesDB
     private static void createLevels()
     {
 
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVELS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVELS_TABLE + "(" +
                             // basic info
                             "name VARCHAR(20) NOT NULL, " +
                             "reward INT DEFAULT 0, " +
@@ -175,7 +199,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVELS_TABLE + "_fk " +
                                  "FOREIGN KEY(required_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)" +
                                  "ON UPDATE CASCADE " +
@@ -186,7 +213,7 @@ public class TablesDB
 
     private static void createPerks()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
@@ -206,18 +233,22 @@ public class TablesDB
 
     private static void createPlots()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLOTS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PLOTS_TABLE + "(" +
                             "id INT NOT NULL AUTO_INCREMENT, " +
                             "owner_uuid CHAR(36) NOT NULL, " +
                             "center_x INT NOT NULL, " +
                             "center_z INT NOT NULL, " +
                             "submitted BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(plot_id)" +
+                            "PRIMARY KEY(id)" +
                         ")";
 
         DatabaseQueries.runQuery(query);
 
+    }
+
+    private static void createPlotsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLOTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLOTS_TABLE + "_fk " +
                                  "FOREIGN KEY(owner_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON DELETE CASCADE, " +
@@ -228,7 +259,7 @@ public class TablesDB
 
     private static void createLocations()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LOCATIONS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LOCATIONS_TABLE + "(" +
                             "name VARCHAR(30) NOT NULL, " +
                             "world VARCHAR(30) NOT NULL, " +
                             "x DOUBLE NOT NULL, " +
@@ -244,7 +275,7 @@ public class TablesDB
 
     private static void createLevelRatings()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_RATINGS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_RATINGS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "rating TINYINT DEFAULT NULL, " +
@@ -259,7 +290,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelRatingsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_RATINGS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_RATINGS_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -273,7 +307,7 @@ public class TablesDB
 
     private static void createLevelCheckpoints()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "world VARCHAR(30) NOT NULL, " +
@@ -287,7 +321,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelCheckpointsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -301,7 +338,7 @@ public class TablesDB
 
     private static void createLevelSaves()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_SAVES_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_SAVES_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "world VARCHAR(30) NOT NULL, " +
@@ -317,7 +354,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelSavesKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_SAVES_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_SAVES_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -331,7 +371,7 @@ public class TablesDB
 
     private static void createLevelPurchases()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_PURCHASES_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_PURCHASES_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             // keys
@@ -341,7 +381,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelPurchasesKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_PURCHASES_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_PURCHASES_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -355,7 +398,7 @@ public class TablesDB
 
     private static void createClans()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.CLANS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.CLANS_TABLE + "(" +
                             "tag VARCHAR(10) NOT NULL, " +
                             "owner_uuid CHAR(36) NOT NULL, " +
                             "level SMALLINT NOT NULL DEFAULT 1, " +
@@ -376,7 +419,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createClansKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.CLANS_TABLE + " ADD CONSTRAINT " + DatabaseManager.CLANS_TABLE + "_fk " +
                                  "FOREIGN KEY(owner_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid)" +
                                  "ON UPDATE CASCADE " +
@@ -387,7 +433,7 @@ public class TablesDB
 
     private static void createRanks()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.RANKS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.RANKS_TABLE + "(" +
                             "name VARCHAR(10) NOT NULL, " +
                             "title VARCHAR(20) DEFAULT NULL, " + // allow space for color codes
                             "rankup_level VARCHAR(20) DEFAULT NULL, " +
@@ -397,19 +443,24 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createRanksKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.RANKS_TABLE + " ADD CONSTRAINT " + DatabaseManager.RANKS_TABLE + "_fk " +
                                  "FOREIGN KEY(rankup_level) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL, " +
-                                 "FOREIGN KEY(next_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)";
+                                 "FOREIGN KEY(next_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name) " +
+                                 "ON UPDATE CASCADE, " +
+                                 "ON DELETE SET NULL";
 
         DatabaseQueries.runQuery(foreignKeyQuery);
     }
 
     private static void createLevelCompletions()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "completion_date TIMESTAMP NOT NULL, " +
@@ -429,7 +480,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelCompletionsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -443,7 +497,7 @@ public class TablesDB
 
     private static void createModifiers()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MODIFIERS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.MODIFIERS_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
                             "type ENUM(" + enumQuotations(ModifierType.values()) + ") DEFAULT NULL, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // add room for color codes
@@ -465,7 +519,7 @@ public class TablesDB
 
     private static void createPlotTrustedPlayers()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "(" +
                             "plot_id INT NOT NULL, " +
                             "trusted_uuid CHAR(36) NOT NULL, " +
                             // keys
@@ -475,7 +529,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createPlotTrustedPlayersKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "_fk " +
                                  "FOREIGN KEY(plot_id) REFERENCES " + DatabaseManager.PLOTS_TABLE + "(id) " +
                                  "ON UPDATE CASCADE " +
@@ -489,7 +546,7 @@ public class TablesDB
 
     private static void createPlayerModifiers()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "modifier_name VARCHAR(20) NOT NULL, " +
                             // keys
@@ -499,7 +556,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createPlayerModifiersKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -513,7 +573,7 @@ public class TablesDB
 
     private static void createPerksOwned()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_OWNED_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_OWNED_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "perk_name VARCHAR(20) NOT NULL, " +
                             "date_received TIMESTAMP NOT NULL, " +
@@ -524,7 +584,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createPerksOwnedKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_OWNED_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_OWNED_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -538,7 +601,7 @@ public class TablesDB
 
     private static void createPerksLevelRequirements()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "(" +
                             "perk_name VARCHAR(20) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             // keys
@@ -548,7 +611,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createPerksLevelRequirementsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
@@ -562,7 +628,7 @@ public class TablesDB
 
     private static void createPerksArmor()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
                             "perk_name VARCHAR(20) NOT NULL, " +
                             "armor_piece ENUM(" + enumQuotations(PerksArmorType.values()) + ") NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS
                             "material ENUM(" + enumQuotations(Material.values()) + ") NOT NULL, " +
@@ -576,7 +642,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createPerksArmorKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_ARMOR_TABLE + "_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
@@ -587,7 +656,7 @@ public class TablesDB
 
     private static void createLevelCompletionCommands()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "command VARCHAR(100) NOT NULL, " + // commands can get quite long
                             // keys
@@ -597,7 +666,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelCompletionCommandsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
@@ -618,7 +690,7 @@ public class TablesDB
 
         finalString = finalString.substring(0, finalString.length() - 1);
 
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "type ENUM(" + finalString + ") NOT NULL, " +
                             "amplifier TINYINT UNSIGNED DEFAULT 0, " + // potion effects dont go past 255, so TINYINT UNSIGNED is perfect
@@ -634,7 +706,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelPotionEffectsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
@@ -645,7 +720,7 @@ public class TablesDB
 
     private static void createLevelRequiredLevels()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "required_level_name VARCHAR(20) NOT NULL, " +
                             // keys
@@ -655,7 +730,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createLevelRequiredLevelsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
@@ -669,7 +747,7 @@ public class TablesDB
 
     private static void createBadges()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.BADGES_TABLE + "(" +
                             "name VARCHAR(20) NOT NULL, " +
                             "title VARCHAR(30) DEFAULT NULL, " + // allow for extra space for color codes
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
@@ -681,7 +759,7 @@ public class TablesDB
 
     private static void createBadgesOwned()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_OWNED_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.BADGES_OWNED_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "badge_name VARCHAR(20) NOT NULL, " +
                             // keys
@@ -691,7 +769,10 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createBadgesOwnedKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BADGES_OWNED_TABLE + " ADD CONSTRAINT " + DatabaseManager.BADGES_OWNED_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
@@ -705,20 +786,20 @@ public class TablesDB
 
     private static void createBadgesCommands()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.BADGES_COMMANDS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.BADGES_COMMANDS_TABLE + "(" +
                             "badge_name VARCHAR(20) NOT NULL, " +
                             "command VARCHAR(100) NOT NULL, " + // commands can get quite long
                             // keys
                             "PRIMARY KEY(badge_name, command), " +
-                            "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
-                                "ON UPDATE CASCADE " +
-                                "ON DELETE CASCADE, " +
                             // indexes
                             "INDEX badge_name_index(badge_name)" +
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createBadgesCommandsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BADGES_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.BADGES_COMMANDS_TABLE + "_fk " +
                                  "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
@@ -729,7 +810,7 @@ public class TablesDB
 
     private static void createMasteryBadgeLevels()
     {
-        String query = "CREATE TABLE IF NOT EXISTS " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "(" +
                             "badge_name VARCHAR(20) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             // keys
@@ -739,8 +820,14 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
 
+    private static void createMasteryBadgeLevelsKeys()
+    {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "_fk " +
+                                 "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
+                                 "ON UPDATE CASCADE " +
+                                 "ON DELETE CASCADE, " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";

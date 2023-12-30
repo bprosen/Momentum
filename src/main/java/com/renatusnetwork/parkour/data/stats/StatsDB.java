@@ -164,7 +164,7 @@ public class StatsDB {
 
         Map<String, String> result = DatabaseQueries.getResult(
                         DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*) AS count",
-                        "WHERE player_name=?", playerStats.getName());
+                        "WHERE uuid=?", playerStats.getUUID());
 
         return Integer.parseInt(result.get("count"));
     }
