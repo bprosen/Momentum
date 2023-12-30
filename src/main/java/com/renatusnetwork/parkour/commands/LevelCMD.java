@@ -254,6 +254,7 @@ public class LevelCMD implements CommandExecutor
 
                                     level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
                                     level.setLeaderboard(CompletionsDB.getLeaderboard(levelName));
+                                    levelManager.removeTotalLevelCompletion();
 
                                     // if deleting record
                                     if (place == 1)

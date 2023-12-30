@@ -63,7 +63,9 @@ public class InteractListener implements Listener {
 
                 player.getInventory().removeItem(item);
                 player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
-                if (PlayerHider.containsPlayer(player)) {
+
+                if (PlayerHider.containsPlayer(player))
+                {
                     PlayerHider.showPlayer(player);
 
                     ItemStack newItem = new ItemStack(Material.REDSTONE_TORCH_ON);
@@ -73,7 +75,9 @@ public class InteractListener implements Listener {
                     player.getInventory().setItemInMainHand(newItem);
 
                     player.sendMessage(Utils.translate("&aYou have turned on players"));
-                } else {
+                }
+                else
+                {
                     PlayerHider.hidePlayer(player);
 
                     ItemStack newItem = new ItemStack(Material.LEVER);

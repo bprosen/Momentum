@@ -22,15 +22,16 @@ public class SpectatorHandler {
             spectator.teleport(player.getLocation());
 
             // this is done AFTER teleport to override some world changes that can happen
-            if (initialSpectate) {
+            if (initialSpectate)
+            {
                 spectator.setAllowFlight(true);
                 spectator.setFlying(true);
             }
 
             TitleAPI.sendTitle(
                     spectator, 10, 40, 10,
-                    "", Utils.translate("&7Teleported to " + player.getDisplayName() +
-                            "&7, use &2/spectate &7 to stop"));
+                    Utils.translate("&7Teleported to " + player.getDisplayName()), Utils.translate("&2/spectate &7 to exit"
+                    ));
         }
     }
 
@@ -38,7 +39,8 @@ public class SpectatorHandler {
         Location loc = playerStats.getSpectateSpawn();
         Player player = playerStats.getPlayer();
 
-        if (loc != null) {
+        if (loc != null)
+        {
 
             player.teleport(loc);
             TitleAPI.sendTitle(
@@ -83,10 +85,10 @@ public class SpectatorHandler {
         respawnToLastLocation(spectatorStats);
     }
 
-    public static void shutdown() {
-        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet()) {
-            
-            PlayerStats playerStats = entry.getValue();
+    public static void shutdown()
+    {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getOnlinePlayers())
+        {
             if (playerStats != null && playerStats.isSpectating())
                 removeSpectatorMode(playerStats);
         }

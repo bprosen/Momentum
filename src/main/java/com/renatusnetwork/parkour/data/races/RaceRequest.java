@@ -1,16 +1,18 @@
 package com.renatusnetwork.parkour.data.races;
 
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 
 public class RaceRequest {
 
     private PlayerStats player1;
     private PlayerStats player2;
-    private Level selectedLevel = null;
-    private double bet = -1.0;
+    private RaceLevel selectedLevel;
+    private double bet;
 
-    public RaceRequest(PlayerStats player1, PlayerStats player2) {
+    public RaceRequest(PlayerStats player1, PlayerStats player2)
+    {
         this.player1 = player1;
         this.player2 = player2;
     }
@@ -19,7 +21,7 @@ public class RaceRequest {
 
     public PlayerStats getPlayer2() { return player2; }
 
-    public void setSelectedLevel(Level selectedLevel) { this.selectedLevel = selectedLevel; }
+    public void setSelectedLevel(RaceLevel selectedLevel) { this.selectedLevel = selectedLevel; }
 
     public void setBet(double bet) { this.bet = bet; }
 
@@ -27,7 +29,7 @@ public class RaceRequest {
 
     public double getBet() { return bet; }
 
-    public Level getSelectedLevel() { return selectedLevel; }
+    public RaceLevel getSelectedLevel() { return selectedLevel; }
 
     public boolean randomLevel() { return selectedLevel == null; }
 }

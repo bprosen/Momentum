@@ -301,7 +301,7 @@ public class EventManager {
 
         if (!disconnected && winner != null)
             TitleAPI.sendTitle(eventParticipant.getPlayer(), 10, 80, 10,
-                    Utils.translate("&c" + winner.getDisplayName() + " &7has won the &2&l" + runningEvent.getFormattedName() + " &7Event")
+                    Utils.translate("&c" + winner.getDisplayName() + " &7has won the &2&l" + runningEvent.getFormattedName() + " &7Event"), ""
             );
 
         // set back if they came from elytra level

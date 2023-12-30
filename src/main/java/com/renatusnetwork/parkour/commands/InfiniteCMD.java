@@ -114,7 +114,7 @@ public class InfiniteCMD implements CommandExecutor {
                         if (!playerStats.inRace()) {
                             if (!playerStats.inPracticeMode()) {
                                 // if in elytra level, then toggle off
-                                if (playerStats.inLevel() && playerStats.getLevel().isElytraLevel())
+                                if (playerStats.inLevel() && playerStats.getLevel().isElytra())
                                     Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                                 infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), false);
@@ -149,7 +149,7 @@ public class InfiniteCMD implements CommandExecutor {
                 if (!rewards.isEmpty())
                 {
                     PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                    if (playerStats != null && playerStats.isLoaded())
+                    if (playerStats != null)
                     {
 
                         for (InfiniteReward reward : rewards)

@@ -5,7 +5,6 @@ import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,9 +26,6 @@ public class Level
     private String requiredPermission;
     private int respawnY;
     private boolean liquidResetPlayer;
-    private Location raceLocation1;
-    private Location raceLocation2;
-    private Material raceLevelItemType;
     private int totalCompletionsCount;
     private String requiredRank;
     private int difficulty;
@@ -330,14 +326,6 @@ public class Level
         return potionEffects;
     }
 
-    public Location getRaceLocation1() {
-        return raceLocation1;
-    }
-
-    public Location getRaceLocation2() {
-        return raceLocation2;
-    }
-
     public boolean isRaceLevel() {
         return type == LevelType.RACE;
     }
@@ -345,11 +333,6 @@ public class Level
     public boolean isFeaturedLevel()
     {
         return name.equalsIgnoreCase(Parkour.getLevelManager().getFeaturedLevel().getName());
-    }
-
-    public Material getRaceLevelMenuItemType()
-    {
-        return raceLevelItemType;
     }
 
     public boolean playerHasRequiredLevels(PlayerStats playerStats)

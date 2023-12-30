@@ -26,7 +26,7 @@ public class PlayerPlaceholders
                 case "coins":
                     return Utils.formatNumber((int) playerStats.getCoins());
                 case "rank":
-                    return playerStats.getRank() == null ? "None" : Utils.translate(playerStats.getRank().getRankTitle());
+                    return playerStats.getRank() == null ? "None" : Utils.translate(playerStats.getRank().getTitle());
                 case "clan":
                     return playerStats.getClan() == null ? "None" : playerStats.getClan().getTag();
                 case "total_completions":

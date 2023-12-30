@@ -40,7 +40,7 @@ public class DamageListener implements Listener {
             } else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                if (playerStats.inLevel() && playerStats.getLevel().isDropperLevel()) {
+                if (playerStats.inLevel() && playerStats.getLevel().isDropper()) {
                     event.setCancelled(true);
 
                     // just in case we use checkpoints for droppers at some point

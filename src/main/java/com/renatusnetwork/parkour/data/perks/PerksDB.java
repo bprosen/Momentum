@@ -74,45 +74,45 @@ public class PerksDB
         );
     }
 
-    public static void insertArmor(String perkName, PerksArmorType type, String material)
+    public static void insertArmor(String perkName, String armorPiece, String material)
     {
         DatabaseQueries.runAsyncQuery(
-                "INSERT INTO " + DatabaseManager.PERKS_ARMOR_TABLE + " (perk_name, armor_piece, material) VALUES (?,?,?)", perkName, type.name(), material
+                "INSERT INTO " + DatabaseManager.PERKS_ARMOR_TABLE + " (perk_name, armor_piece, material) VALUES (?,?,?)", perkName, armorPiece, material
         );
     }
 
-    public static void updateArmorGlow(String perkName, PerksArmorType type)
+    public static void updateArmorGlow(String perkName, String armorPiece)
     {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=NOT glow WHERE perk_name=? AND armor_piece=?", perkName, type.name()
+                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=NOT glow WHERE perk_name=? AND armor_piece=?", perkName, armorPiece
         );
     }
 
-    public static void updateArmorTitle(String perkName, PerksArmorType type, String title)
+    public static void updateArmorTitle(String perkName, String armorPiece, String title)
     {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET title=? WHERE perk_name=? AND armor_piece=?", title, perkName, type.name()
+                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET title=? WHERE perk_name=? AND armor_piece=?", title, perkName, armorPiece
         );
     }
 
-    public static void updateArmorMaterial(String perkName, PerksArmorType type, String material)
+    public static void updateArmorMaterial(String perkName, String armorPiece, String material)
     {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET material=? WHERE perk_name=? AND armor_piece=?", material, perkName, type.name()
+                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET material=? WHERE perk_name=? AND armor_piece=?", material, perkName, armorPiece
         );
     }
 
-    public static void updateArmorMaterialType(String perkName, PerksArmorType type, int typeNum)
+    public static void updateArmorMaterialType(String perkName, String armorPiece, int typeNum)
     {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET type=? WHERE perk_name=? AND armor_piece=?", type, perkName, type.name()
+                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET type=? WHERE perk_name=? AND armor_piece=?", typeNum, perkName, armorPiece
         );
     }
 
-    public static void removeArmor(String perkName, PerksArmorType type)
+    public static void removeArmor(String perkName, String armorPiece)
     {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.PERKS_ARMOR_TABLE + " WHERE perk_name=? AND armor_piece=?", perkName, type.name()
+                "DELETE FROM " + DatabaseManager.PERKS_ARMOR_TABLE + " WHERE perk_name=? AND armor_piece=?", perkName, armorPiece
         );
     }
 

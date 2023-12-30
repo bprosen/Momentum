@@ -1,20 +1,37 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.perks.PerkManager;
+import com.renatusnetwork.parkour.data.perks.PerksArmorType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
 import java.util.Arrays;
 
 public class PerksCMD implements CommandExecutor
 {
 
+    /*
+        /perk load
+        /perk title (perkName) (title)
+        /perk price (perkName) (price)
+        /perk requiredpermission (perkName) (permission)
+        /perk infiniteblock (perkName) (material)
+        /perk addrequiredlevel (perkName) (levelName)
+        /perk removerequiredlevel (perkName) (levelName)
+        /perk addarmor (perkName) (armorType) (material)
+        /perk removearmor (perkName) (armorType)
+        /perk armortitle (perkName) (armorType) (title)
+        /perk armorglow (perkName) (armorType)
+        /perk armormaterial (perkName) (armorType) (material)
+        /perk armormaterialtype (perkName) (armorType) (materialType)
+        /perk help
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
     {
@@ -31,10 +48,12 @@ public class PerksCMD implements CommandExecutor
             else if (a.length >= 3 && a[0].equalsIgnoreCase("title"))
             {
                 String perkName = a[1];
+                // helper method
                 Perk perk = getPerk(perkName, sender);
 
                 if (perk != null)
                 {
+                    // title can be multiple words
                     String[] split = Arrays.copyOfRange(a, 2, a.length);
                     String title = String.join(" ", split);
 
@@ -45,10 +64,12 @@ public class PerksCMD implements CommandExecutor
             else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
             {
                 String perkName = a[1];
+                // helper method
                 Perk perk = getPerk(perkName, sender);
 
                 if (perk != null)
                 {
+                    // can only set the price if it is an int...
                     if (Utils.isInteger(a[2]))
                     {
                         int price = Integer.parseInt(a[2]);
@@ -63,11 +84,12 @@ public class PerksCMD implements CommandExecutor
             else if (a.length == 3 && a[0].equalsIgnoreCase("requiredpermission"))
             {
                 String perkName = a[1];
+                // helper method
                 Perk perk = getPerk(perkName, sender);
 
                 if (perk != null)
                 {
-                    String requiredPermission = a[2].toLowerCase();
+                    String requiredPermission = a[2].toLowerCase(); // force lowercase standard2
 
                     perkManager.updateRequiredPermission(perk, requiredPermission);
                     sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7required permission to &c" + requiredPermission));
@@ -76,21 +98,250 @@ public class PerksCMD implements CommandExecutor
             else if (a.length == 3 && a[0].equalsIgnoreCase("infiniteblock"))
             {
                 String perkName = a[1];
+                // helper method
                 Perk perk = getPerk(perkName, sender);
 
                 if (perk != null)
                 {
-                    String infiniteBlock = a[2].toUpperCase();
-                    try
-                    {
-                        Material infiniteBlockMaterial = Material.matchMaterial(infiniteBlock);
+                    // helper method
+                    Material infiniteBlock = getMaterialType(a[2].toUpperCase(), sender);
 
-                        perkManager.updateInfiniteBlock(perk, infiniteBlockMaterial);
+                    if (infiniteBlock != null)
+                    {
+                        perkManager.updateInfiniteBlock(perk, infiniteBlock);
                         sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7infinite block to &c" + infiniteBlock));
                     }
-                    catch (IllegalArgumentException exception)
+                }
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("addrequiredlevel"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    String requiredLevel = a[2].toLowerCase();
+                    Level level = Parkour.getLevelManager().get(requiredLevel);
+
+                    if (level != null)
                     {
-                        sender.sendMessage(Utils.translate("&4" + infiniteBlock + " &cis not a valid material"));
+                        // we can only add if it doesn't exist
+                        if (!perk.alreadyRequiresLevel(level))
+                        {
+                            perkManager.addRequiredLevel(perk, level);
+                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + " &7to &c" + perk.getFormattedTitle() + "&7's required levels"));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + " &7is already a required level for &c" + perk.getFormattedTitle()));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
+                }
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("removerequiredlevel"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    String requiredLevel = a[2].toLowerCase();
+                    Level level = Parkour.getLevelManager().get(requiredLevel);
+
+                    if (level != null)
+                    {
+                        // we can only remove if it exists
+                        if (perk.alreadyRequiresLevel(level))
+                        {
+                            perkManager.removeRequiredLevel(perk, level);
+                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getFormattedTitle() + " &7from &c" + perk.getFormattedTitle() + "&7's required levels"));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + " &7is not a required level for &c" + perk.getFormattedTitle()));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
+                }
+            }
+            else if (a.length == 4 && a[0].equalsIgnoreCase("addarmor"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType armorType = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (armorType != null)
+                    {
+                        // helper method
+                        Material materialType = getMaterialType(a[3].toUpperCase(), sender);
+
+                        if (materialType != null)
+                        {
+                            // can only add if it doesn't exists
+                            if (!perk.hasArmorItem(armorType))
+                            {
+                                perkManager.addArmorPiece(perk, armorType, materialType);
+                                sender.sendMessage(Utils.translate(
+                                        "&7You have added armor piece of type &6" + armorType.name() +
+                                             "&7 with material &6" + materialType.name() + " &7to &6" + perk.getFormattedTitle()
+                                ));
+                            }
+                            else
+                                sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &calready has an armor piece on &4" + armorType));
+                        }
+                    }
+                }
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("removearmor"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType type = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (type != null)
+                    {
+                        // can only update if it exists
+                        if (perk.hasArmorItem(type))
+                        {
+                            perkManager.removeArmorPiece(perk, type);
+                            sender.sendMessage(Utils.translate(
+                                    "&7You have remove armor piece of type &6" + type.name() + "&7to &6" + perk.getFormattedTitle()
+                            ));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &cdoes not have an armor piece on &4" + type.name()));
+                    }
+                }
+            }
+            else if (a.length >= 4 && a[0].equalsIgnoreCase("armortitle"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType type = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (type != null)
+                    {
+                        // titles can be multiple words
+                        String[] split = Arrays.copyOfRange(a, 3, a.length);
+                        String title = String.join(" ", split);
+
+                        // can only update if it exists
+                        if (perk.hasArmorItem(type))
+                        {
+                            perkManager.updateArmorTitle(perk, type, title);
+                            sender.sendMessage(Utils.translate(
+                                    "&7You have updated &c" + perkName + "&7's armor piece &c" + type.name() + "&7's title to &c" + title
+                            ));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&4" + perk.getFormattedTitle() + " &cdoes not have an armor item on piece &4" + type.name()));
+                    }
+                }
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("armorglow"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType type = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (type != null)
+                    {
+                        // we can only update it if it exists
+                        if (perk.hasArmorItem(type))
+                        {
+                            boolean glow = perkManager.updateArmorGlow(perk, type); // get the result of the glow toggle for printing
+                            sender.sendMessage(Utils.translate(
+                                    "&7You have updated &c" + perkName + "&7's armor piece &c" + type.name() + "&7's glow to &c" + glow
+                            ));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&4" + perk.getFormattedTitle() + " &cdoes not have an armor item on piece &4" + type.name()));
+                    }
+                }
+            }
+            else if (a.length == 4 && a[0].equalsIgnoreCase("armormaterial"))
+            {
+                String perkName = a[1];
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType armorType = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (armorType != null)
+                    {
+                        // helper method
+                        Material materialType = getMaterialType(a[3].toUpperCase(), sender);
+
+                        if (materialType != null)
+                        {
+                            // we can only update it if it exists
+                            if (perk.hasArmorItem(armorType))
+                            {
+                                perkManager.updateArmorMaterial(perk, armorType, materialType);
+                                sender.sendMessage(Utils.translate(
+                                        "&7You have updated armor piece of type &6" + armorType.name() +
+                                            "&7 with new material &6" + materialType.name() + " &7to &6" + perk.getFormattedTitle()
+                                ));
+                            }
+                            else
+                                sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &cdoes not have an armor piece on &4" + armorType));
+                        }
+                    }
+                }
+            }
+            else if (a.length == 4 && a[0].equalsIgnoreCase("armormaterialtype"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType armorType = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (armorType != null)
+                    {
+                        String materialType = a[3];
+                        // material types in 1.12 are shorts that can be casted from ints
+                        if (Utils.isInteger(materialType))
+                        {
+                            int material = Integer.parseInt(materialType);
+
+                            if (perk.hasArmorItem(armorType))
+                            {
+                                perkManager.updateArmorMaterialType(perk, armorType, material);
+                                sender.sendMessage(Utils.translate(
+                                        "&7You have updated armor piece of type &6" + armorType.name() +
+                                                "&7 with new type value &6" + material + " &7to &6" + perk.getFormattedTitle()
+                                ));
+                            }
+                            else
+                                sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &cdoes not have an armor piece on &4" + armorType));
+                        }
                     }
                 }
             }
@@ -105,6 +356,7 @@ public class PerksCMD implements CommandExecutor
 
                     if (perk != null)
                     {
+                        // cannot be set if they do not have access
                         if (!perk.hasAccessTo(playerStats))
                         {
                             perkManager.setPerk(perk, playerStats);
@@ -128,8 +380,42 @@ public class PerksCMD implements CommandExecutor
         return true;
     }
 
+    private PerksArmorType getArmorType(String armorType, CommandSender sender)
+    {
+        // helper function for getting the armor type and printing a universal message
+        try
+        {
+            return PerksArmorType.valueOf(armorType);
+        }
+        catch (IllegalArgumentException exception)
+        {
+            sender.sendMessage(Utils.translate(
+                    "&4" + armorType + " &cis not a valid armor type, options: &4" +
+                            Arrays.toString(PerksArmorType.values())
+            ));
+        }
+        return null;
+    }
+
+    private Material getMaterialType(String materialType, CommandSender sender)
+    {
+        // helper function for getting the material and printing a universal message
+        try
+        {
+            return Material.matchMaterial(materialType);
+        }
+        catch (IllegalArgumentException exception)
+        {
+            sender.sendMessage(Utils.translate(
+                    "&4" + materialType + " &cis not a valid material type"
+            ));
+        }
+        return null;
+    }
+
     private Perk getPerk(String perkName, CommandSender sender)
     {
+        // helper function for getting the perk and printing a universal message
         Perk perk = Parkour.getPerkManager().get(perkName);
 
         if (perk != null)
@@ -145,6 +431,14 @@ public class PerksCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&e/perks price (perkName) (price)  &7Sets perk price"));
         sender.sendMessage(Utils.translate("&e/perks requiredpermission (perkName) (permission)  &7Sets perk's required permission"));
         sender.sendMessage(Utils.translate("&e/perks infiniteblock (perkName) (material)  &7Sets infinite block"));
+        sender.sendMessage(Utils.translate("&e/perks addrequiredlevel (perkName) (levelName)  &7Adds a required level for that perk"));
+        sender.sendMessage(Utils.translate("&e/perks removerequiredlevel (perkName) (levelName)  &7Removes a required level for that perk"));
+        sender.sendMessage(Utils.translate("&e/perks addarmor (perkName) (armorPiece) (material)  &7Adds a armor piece for that type"));
+        sender.sendMessage(Utils.translate("&e/perks removearmor (perkName) (armorPiece)  &7Removed a armor piece for that type"));
+        sender.sendMessage(Utils.translate("&e/perks armortitle (perkName) (armorPiece) (title)  &7Updates title for an existing armor piece, can be multiple words"));
+        sender.sendMessage(Utils.translate("&e/perks armorglow (perkName) (armorPiece)  &7Toggles glow on the armor piece"));
+        sender.sendMessage(Utils.translate("&e/perks armormaterial (perkName) (armorPiece) (material)  &7Updates material on existing armor piece"));
+        sender.sendMessage(Utils.translate("&e/perks armormaterialtype (perkName) (armorPiece) (type)  &7Updates material type on existing armor piece"));
         sender.sendMessage(Utils.translate("&e/perks setperk (IGN) (perkName)  &7Sets perk armor, hat or infinite block to player if they have it"));
         sender.sendMessage(Utils.translate("&e/perks help  &7Displays this page"));
         sender.sendMessage(Utils.translate("&e/perks load  &7Loads from disk"));

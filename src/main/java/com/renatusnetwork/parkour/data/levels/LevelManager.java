@@ -73,21 +73,28 @@ public class LevelManager {
     {
         LevelsDB.removeLevel(levelName);
 
-        // loop through and reset if applicable
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-            if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
+        HashMap<String, PlayerStats> players = Parkour.getStatsManager().getPlayerStats();
+
+        // thread safety
+        synchronized (players)
+        {
+            for (PlayerStats playerStats : players.values())
             {
-                playerStats.resetLevel();
-                PracticeHandler.resetDataOnly(playerStats);
-                playerStats.resetCurrentCheckpoint();
+                // loop through and reset if applicable
+                if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
+                {
+                    playerStats.resetLevel();
+                    PracticeHandler.resetDataOnly(playerStats);
+                    playerStats.resetCurrentCheckpoint();
 
-                if (playerStats.isAttemptingRankup())
-                    Parkour.getRanksManager().leftRankup(playerStats);
+                    if (playerStats.isAttemptingRankup())
+                        Parkour.getRanksManager().leftRankup(playerStats);
 
-                // toggle off elytra armor
-                Parkour.getStatsManager().toggleOffElytra(playerStats);
+                    // toggle off elytra armor
+                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+                }
             }
-
+        }
         levels.remove(levelName);
     }
 
@@ -597,17 +604,17 @@ public class LevelManager {
         return levelsInMenus;
     }
 
-    public Set<Level> getLevelsFromMenu(Menu menu) {
-        if (menuLevels.containsKey(menu))
-            return menuLevels.get(menu);
-        return null;
+    public Set<Level> getLevelsFromMenu(Menu menu)
+    {
+        return menuLevels.get(menu);
     }
 
     public Level getFeaturedLevel() {
         return featuredLevel;
     }
 
-    public List<Level> getEventLevels() {
+    public List<Level> getEventLevels()
+    {
         List<Level> tempList = new ArrayList<>();
 
         for (Level level : levels.values())
@@ -628,13 +635,14 @@ public class LevelManager {
         return tempList;
     }
 
-    public List<String> getRaceLevels() {
+    public List<RaceLevel> getRaceLevels()
+    {
+        List<RaceLevel> temporaryRaceLevelList = new ArrayList<>();
 
-        List<String> temporaryRaceLevelList = new ArrayList<>();
-
-        for (Level level : levels.values()) {
+        for (Level level : levels.values())
+        {
             if (level.isRaceLevel())
-                temporaryRaceLevelList.add(level.getName());
+                temporaryRaceLevelList.add((RaceLevel) level);
         }
         return temporaryRaceLevelList;
     }
@@ -644,6 +652,7 @@ public class LevelManager {
     public void addTotalLevelCompletion() { totalLevelCompletions++; }
 
     public void removeTotalLevelCompletion() { totalLevelCompletions--; }
+
 
     // top rated levels lb
     public void loadTopRatedLevelsLB() {
@@ -808,7 +817,7 @@ public class LevelManager {
 
     public void shutdown()
     {
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
+        for (PlayerStats playerStats : Parkour.getStatsManager().getOnlinePlayers())
             Parkour.getStatsManager().toggleOffElytra(playerStats);
     }
 }

@@ -281,14 +281,16 @@ public class PacketListener implements Listener {
                                     // teleport
                                     if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
                                         Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                    else if (playerStats.inRace()) {
+                                    else if (playerStats.inRace())
+                                    {
                                         Race race = Parkour.getRaceManager().get(player);
-                                        if (race != null) {
+                                        if (race != null)
+                                        {
                                             if (race.isPlayer1(player))
-                                                race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
+                                                race.getPlayer1().teleport(race.getLevel().getSpawnLocation1());
                                                 // swap tp to loc 2 if player 2
                                             else
-                                                race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
+                                                race.getPlayer2().teleport(race.getLevel().getSpawnLocation2());
                                         }
                                     } else
                                         LevelHandler.respawnPlayer(playerStats, level);

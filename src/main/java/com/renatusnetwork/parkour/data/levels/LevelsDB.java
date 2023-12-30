@@ -24,13 +24,31 @@ public class LevelsDB {
     {
         List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*", "");
         HashMap<String, Level> levels = new HashMap<>();
+        LocationManager locationManager = Parkour.getLocationManager();
 
         for (Map<String, String> result : results)
         {
             String levelName = result.get("name");
 
+            LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
+
+            Level level;
+            if (type == LevelType.RACE)
+            {
+                // since we store the 2 locations in the level object, we want a subclass for storage
+                level = new RaceLevel(levelName);
+                RaceLevel raceLevel = (RaceLevel) level;
+
+                String format = SettingsManager.RACE_LEVEL_SPAWN_FORMAT.replace("%level%", levelName);
+
+                raceLevel.setSpawnLocation1(locationManager.get(format.replace("%spawn%", String.valueOf(1))));
+                raceLevel.setSpawnLocation2(locationManager.get(format.replace("%spawn%", String.valueOf(2))));
+            }
+            else
+                // otherwise normal level, we have the LEVEL_TYPE to define simple things that don't have any extra storage in the level object
+                level = new Level(levelName);
+
             // set core details
-            Level level = new Level(levelName);
             level.setReward(Integer.parseInt(result.get("reward")));
             level.setPrice(Integer.parseInt(result.get("price")));
             level.setTitle(Utils.translate(result.get("title")));
@@ -40,7 +58,7 @@ public class LevelsDB {
             level.setRequiredRank(result.get("required_rank"));
             level.setRespawnY(Integer.parseInt(result.get("respawn_y")));
             level.setMaxCompletions(Integer.getInteger("max_completions"));
-            level.setLevelType(LevelType.valueOf(result.get("type").toUpperCase()));
+            level.setLevelType(type);
 
             // switches
             level.setCooldown(Integer.parseInt(result.get("cooldown")) == 1);
@@ -50,8 +68,6 @@ public class LevelsDB {
             level.setHasMastery(Integer.parseInt(result.get("has_mastery")) == 1);
 
             // spawns
-            LocationManager locationManager = Parkour.getLocationManager();
-
             Location spawnLoc = locationManager.get(SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName));
             Location completionLoc = locationManager.get(SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName));
 
@@ -66,8 +82,6 @@ public class LevelsDB {
                 level.setCompletionLocation(completionLoc);
             else
                 level.setCompletionLocation(locationManager.getLobbyLocation());
-
-            // TODO: implement the rest of the spawns... like races/events
 
             // 4 seperate queries... not the greatest but it keeps our code clean and due to our indexes it does still happen quite fast
             level.setCommands(getCompletionCommands(levelName));

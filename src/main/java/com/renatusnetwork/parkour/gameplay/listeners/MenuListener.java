@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.gameplay.listeners;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
+import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import com.renatusnetwork.parkour.data.menus.CancelTasks;
 import com.renatusnetwork.parkour.data.menus.Menu;
 import com.renatusnetwork.parkour.data.menus.MenuItem;
@@ -82,42 +83,38 @@ public class MenuListener implements Listener {
                     /*
                         Race Levels GUI, optimize by not including stained glass pane
                      */
-                    } else if (menu.getFormattedTitleBase().equalsIgnoreCase(pickRaceLevelsTitle) && currentItem.getType() != Material.STAINED_GLASS_PANE) {
+                    }
+                    else if (menu.getFormattedTitleBase().equalsIgnoreCase(pickRaceLevelsTitle) && currentItem.getType() != Material.STAINED_GLASS_PANE)
+                    {
                         // conditions to determine if it is the right item, if it is a random level they selected, etc
                         boolean randomLevel = false;
-                        boolean correctItem = false;
-                        Level selectedLevel = null;
+                        RaceLevel selectedLevel = null;
 
-                        if (ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).equalsIgnoreCase("Random Level")) {
+                        if (ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).equalsIgnoreCase("Random Level"))
                             randomLevel = true;
-                            correctItem = true;
-                        } else {
-                            Level level = Parkour.getLevelManager().getFromTitle(event.getCurrentItem().getItemMeta().getDisplayName());
-
-                            // if they hit a selected level
-                            if (level != null) {
-                                selectedLevel = level;
-                                correctItem = true;
-                            }
-                        }
+                        else
+                            selectedLevel = (RaceLevel) Parkour.getLevelManager().getFromTitle(event.getCurrentItem().getItemMeta().getDisplayName());
 
                         // if it is an item that can be used for races, continue
-                        if (correctItem) {
+                        if (selectedLevel != null)
+                        {
                             List<String> itemLore = currentItem.getItemMeta().getLore();
 
                             String lastString = ChatColor.stripColor(itemLore.get(itemLore.size() - 1));
                             boolean bet = false;
-                            double betAmount = -1.0;
+                            double betAmount = 0.0;
                             String opponentName = null;
 
-                            if (lastString.toUpperCase().contains("bet amount".toUpperCase())) {
+                            if (lastString.toUpperCase().contains("bet amount".toUpperCase()))
+                            {
                                 bet = true;
                                 // get the right side of the ->
                                 betAmount = Double.parseDouble(lastString.split("-> ")[1]);
                                 // this means the against string is second last
                                 opponentName = ChatColor.stripColor(itemLore.get(itemLore.size() - 2)).split("-> ")[1];
 
-                            } else if (lastString.toUpperCase().contains("against".toUpperCase()))
+                            }
+                            else if (lastString.toUpperCase().contains("against".toUpperCase()))
                                 opponentName = lastString.split("-> ")[1];
 
                             PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -126,14 +123,16 @@ public class MenuListener implements Listener {
                             // close inventory
                             player.closeInventory();
 
-                            if (opponentStats != null) {
+                            if (opponentStats != null)
+                            {
                                 // then use the boolean if to run the appropriate conditions
                                 if (randomLevel)
                                     Parkour.getRaceManager().sendRequest(playerStats, opponentStats, true, null, bet, betAmount);
                                 else
                                     Parkour.getRaceManager().sendRequest(playerStats, opponentStats, false, selectedLevel, bet, betAmount);
-                            } else
-                                player.sendMessage(Utils.translate("&4" + opponentName + " &cis not online anymore"));
+                            }
+                            else
+                                player.sendMessage(Utils.translate("&4" + opponentName + " &cis not online"));
                         }
                     }
                 }

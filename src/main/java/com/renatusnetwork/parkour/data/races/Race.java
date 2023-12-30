@@ -2,34 +2,37 @@ package com.renatusnetwork.parkour.data.races;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class Race {
-
+public class Race
+{
     private Player player1;
     private Player player2;
-    private boolean bet = false;
-    private Level level;
+    private boolean bet;
+    private RaceLevel level;
     private double betAmount;
     private Location originalPlayer1Loc;
     private Location originalPlayer2Loc;
     private BukkitTask maxTimer;
-    private Race race = this;
 
-    public Race(Player player1, Player player2, Level level, boolean doingBet, double betAmount) {
+    public Race(Player player1, Player player2, RaceLevel level, boolean doingBet, double betAmount) {
         this.player1 = player1;
         this.player2 = player2;
         this.level = level;
         this.originalPlayer1Loc = player1.getLocation();
         this.originalPlayer2Loc = player2.getLocation();
 
-        if (doingBet) {
-            bet = true;
+        if (doingBet)
+        {
+            this.bet = true;
             this.betAmount = betAmount;
         }
+
+        Race race = this;
 
         maxTimer = new BukkitRunnable() {
             @Override
@@ -57,29 +60,27 @@ public class Race {
         return originalPlayer2Loc;
     }
 
-    public boolean isPlayer1(Player player) {
-        if (player.getName().equalsIgnoreCase(player1.getName()))
-            return true;
-        return false;
+    public boolean isPlayer1(Player player)
+    {
+        return player.getName().equalsIgnoreCase(player1.getName());
     }
 
     public boolean hasBet() {
         return bet;
     }
 
-    public Level getRaceLevel() {
-        if (level != null)
-            return level;
-        return null;
+    public RaceLevel getLevel()
+    {
+        return level;
     }
 
-    public double getBet() {
-        if (bet)
-            return betAmount;
-        return 0.0;
+    public double getBet()
+    {
+        return betAmount;
     }
 
-    public Player getOpponent(Player player) {
+    public Player getOpponent(Player player)
+    {
         // if player is player 1, then opponent is player2, and vice versa
         if (player1.getName().equalsIgnoreCase(player.getName()))
             return player2;

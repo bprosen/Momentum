@@ -27,6 +27,7 @@ public class Perk
         this.requiredLevels = new ArrayList<>();
         this.armorItems = new HashMap<>();
         this.name = name;
+        this.title = name;
     }
 
     public String getName() {
@@ -49,13 +50,25 @@ public class Perk
         return Utils.translate(title);
     }
 
-    public HashMap<PerksArmorType, ItemStack> getItems() { return armorItems; }
-
     public boolean alreadyRequiresLevel(Level level) { return requiredLevels.contains(level); }
+
+    public void addRequiredLevel(Level level) { requiredLevels.add(level); }
+
+    public void removeRequiredLevel(Level level) { requiredLevels.remove(level); }
 
     public void setRequiredLevels(List<Level> requiredLevels) { this.requiredLevels = requiredLevels; }
 
+    public void addArmorItem(PerksArmorType type, ItemStack itemStack) { armorItems.put(type, itemStack); }
+    public boolean hasArmorItem(PerksArmorType type) { return armorItems.containsKey(type); }
     public void setArmorItems(HashMap<PerksArmorType, ItemStack> armorItems) { this.armorItems = armorItems; }
+
+    public ItemStack getArmorPiece(PerksArmorType type) { return armorItems.get(type); }
+
+    public void removeArmorItem(PerksArmorType type) { armorItems.remove(type); }
+
+    public void setArmorItem(PerksArmorType type, ItemStack item) { armorItems.replace(type, item); }
+
+    public HashMap<PerksArmorType, ItemStack> getArmorItems() { return armorItems; }
 
     public List<Level> getRequiredLevels() {
         return requiredLevels;

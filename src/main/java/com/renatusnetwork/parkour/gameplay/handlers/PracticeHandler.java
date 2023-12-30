@@ -6,18 +6,13 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-
 public class PracticeHandler {
 
-    public static void shutdown() {
-        for (Map.Entry<String, PlayerStats> entry : Parkour.getStatsManager().getPlayerStats().entrySet())
-        {
-            PlayerStats playerStats = entry.getValue();
-
+    public static void shutdown()
+    {
+        for (PlayerStats playerStats : Parkour.getStatsManager().getOnlinePlayers())
             if (playerStats != null && playerStats.inPracticeMode())
                 resetPlayer(playerStats, false);
-        }
     }
 
     public static void resetPlayer(PlayerStats playerStats, boolean message)

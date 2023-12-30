@@ -35,7 +35,7 @@ public class RaceCMD implements CommandExecutor {
             if (target != null) {
                 // open menu if they meet requirements
                 if (meetsRaceConditions(Parkour.getStatsManager().get(player), Parkour.getStatsManager().get(target), false, -1.0))
-                    menuManager.openRaceLevelsGUI(player, target, -1.0);
+                    menuManager.openRaceLevelsGUI(player, target, 0.0);
             } else {
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
             }

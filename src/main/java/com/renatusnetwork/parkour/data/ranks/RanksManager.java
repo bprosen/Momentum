@@ -53,12 +53,16 @@ public class RanksManager {
     public void resetPlayersInRank(Rank rank)
     {
         Rank defaultRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().default_rank);
+        HashMap<String, PlayerStats> players = Parkour.getStatsManager().getPlayerStats();
 
-        for (PlayerStats playerStats : Parkour.getStatsManager().getPlayerStats().values())
-
-            // if in rank, reset them to default rank
-            if (playerStats != null && playerStats.getRank().equals(rank))
-                playerStats.setRank(defaultRank);
+        // thread safety
+        synchronized (players)
+        {
+            for (PlayerStats playerStats : players.values())
+                // if in rank, reset them to default rank
+                if (playerStats != null && playerStats.getRank().equals(rank))
+                    playerStats.setRank(defaultRank);
+        }
     }
 
     public void doRankUp(Player player)

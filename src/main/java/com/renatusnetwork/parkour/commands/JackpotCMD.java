@@ -106,7 +106,7 @@ public class JackpotCMD implements CommandExecutor
                     {
                         if (Utils.isInteger(bonus))
                         {
-                            if (!level.isFeaturedLevel() && !level.isAscendanceLevel() && !level.isRankUpLevel())
+                            if (!level.isFeaturedLevel() && !level.isAscendance() && !level.isRankUpLevel())
                             {
                                 int bonusAmount = Integer.parseInt(bonus);
 

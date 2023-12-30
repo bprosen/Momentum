@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.menus;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -241,29 +242,23 @@ public class MenuManager {
     }
 
     // in ONE of TWO cases where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
-    public void openRaceLevelsGUI(Player player, Player target, double betAmount) {
+    public void openRaceLevelsGUI(Player player, Player target, double betAmount)
+    {
         Inventory inventory = getInventory("pick-race-levels", 0);
 
-        if (inventory != null) {
+        if (inventory != null)
+        {
             RaceManager raceManager = Parkour.getRaceManager();
-            List<String> notInUseRaceLevels = raceManager.getNotInUseRaceLevels();
+            List<RaceLevel> notInUseRaceLevels = raceManager.getNotInUseRaceLevels();
 
             for (int i = 0; i < notInUseRaceLevels.size() && i < inventory.getSize() - 9; i++) {
 
-                String levelName = notInUseRaceLevels.get(i);
-                Level level = Parkour.getLevelManager().get(levelName);
-                if (level != null) {
+                RaceLevel level = notInUseRaceLevels.get(i);
 
-                    // if they have a menu item type configured, use it
-                    Material raceMenuItem = level.getRaceLevelMenuItemType();
-                    ItemStack item;
-                    if (raceMenuItem != null)
-                        item = new ItemStack(raceMenuItem);
-                    else
-                        item = new ItemStack(Material.QUARTZ_BLOCK);
-
+                if (level != null)
+                {
+                    ItemStack item = new ItemStack(Material.QUARTZ_BLOCK);
                     ItemMeta itemMeta = item.getItemMeta();
-
                     itemMeta.setDisplayName(level.getFormattedTitle());
                     List<String> itemLore = new ArrayList<String>() {{
                         add(Utils.translate("&7Click to select &c" + level.getFormattedTitle()));
@@ -274,7 +269,7 @@ public class MenuManager {
                     }};
 
                     // this means they put a bet!
-                    if (betAmount > -1.0)
+                    if (betAmount > 0.0)
                         itemLore.add(Utils.translate("&7Bet Amount &e-> &6" + betAmount));
 
                     itemMeta.setLore(itemLore);
@@ -282,13 +277,15 @@ public class MenuManager {
                     inventory.setItem(i, item);
                 }
             }
-            // make black glass at the bottom row
-            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
 
+            // make black glass at the bottom row
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++)
+            {
                 int middleSlot = inventory.getSize() - 5;
                 ItemStack item;
 
-                if (i == middleSlot) {
+                if (i == middleSlot)
+                {
                     item = new ItemStack(Material.DIAMOND_BLOCK);
                     ItemMeta itemMeta = item.getItemMeta();
                     itemMeta.setDisplayName(Utils.translate("&c&lRandom Level"));
@@ -299,7 +296,7 @@ public class MenuManager {
                         add(Utils.translate("&7Racing Against &e-> &6" + target.getName()));
                     }};
 
-                    if (betAmount > -1.0)
+                    if (betAmount > 0.0)
                         itemLore.add(Utils.translate("&7Bet Amount &e-> &6" + betAmount));
 
                     itemMeta.setLore(itemLore);

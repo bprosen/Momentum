@@ -133,12 +133,18 @@ public class StatsManager {
         playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
     }
 
-    public PlayerStats get(String UUID) {
-        for (PlayerStats playerStats : getPlayerStats().values())
-            if (playerStats.getUUID().equals(UUID))
-                return playerStats;
+    public PlayerStats getByName(String playerName)
+    {
+        return playerStatsName.get(playerName);
+    }
 
-        return null;
+    public PlayerStats get(Player player) {
+        return playerStatsUUID.get(player.getUniqueId().toString());
+    }
+
+    public PlayerStats get(String uuid)
+    {
+        return playerStatsUUID.get(uuid);
     }
 
     public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
@@ -189,17 +195,8 @@ public class StatsManager {
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
 
-    public PlayerStats getByName(String playerName)
-    {
-        return playerStatsName.get(playerName);
-    }
-
-    public PlayerStats get(Player player) {
-        return playerStatsUUID.get(player.getUniqueId().toString());
-    }
-
     public boolean exists(String playerName) {
-        return getByName(playerName) != null;
+        return playerStatsName.containsKey(playerName);
     }
 
     public void add(Player player)
