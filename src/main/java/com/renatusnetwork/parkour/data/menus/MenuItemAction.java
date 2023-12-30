@@ -151,7 +151,7 @@ public class MenuItemAction {
             boolean addLevel = true;
 
             // cover all conditions that can stop a player from entering a level
-            if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level)) ||
+            if (((level.requiresBuying() && !playerStats.hasBoughtLevel(level)) ||
                 (level.hasRequiredLevels() && !level.playerHasRequiredLevels(playerStats)) ||
                 (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermission())) ||
                 (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))) &&
@@ -280,7 +280,7 @@ public class MenuItemAction {
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
 
             }
-            else if (!playerStats.hasPerk(perk.getName()) && perk.getPrice() > 0)
+            else if (!playerStats.hasPerk(perk.getName()) && perk.requiresBuying())
             {
                 ShopBuyEvent event = new ShopBuyEvent(playerStats, perk);
                 Bukkit.getPluginManager().callEvent(event);
@@ -320,7 +320,7 @@ public class MenuItemAction {
         if (level != null)
         {
             // go through price buying if not featured, non null item, has price and has not bought level, or not the jackpot level
-            if (menuItem != null && level.getPrice() > 0 &&
+            if (level.requiresBuying() &&
                 !level.isFeaturedLevel() &&
                 !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))

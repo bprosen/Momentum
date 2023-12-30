@@ -239,7 +239,7 @@ public class MenuItemFormatter {
             boolean enchant = true;
             for (Level level : levelsInMenu)
             {
-                if (!playerStats.hasCompleted(level.getName()))
+                if (!playerStats.hasCompleted(level))
                     enchant = false;
                 else
                     count++;

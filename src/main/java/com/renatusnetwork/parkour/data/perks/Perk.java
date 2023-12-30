@@ -59,7 +59,9 @@ public class Perk
     public void setRequiredLevels(List<Level> requiredLevels) { this.requiredLevels = requiredLevels; }
 
     public void addArmorItem(PerksArmorType type, ItemStack itemStack) { armorItems.put(type, itemStack); }
+
     public boolean hasArmorItem(PerksArmorType type) { return armorItems.containsKey(type); }
+
     public void setArmorItems(HashMap<PerksArmorType, ItemStack> armorItems) { this.armorItems = armorItems; }
 
     public ItemStack getArmorPiece(PerksArmorType type) { return armorItems.get(type); }
@@ -90,6 +92,8 @@ public class Perk
     public int getPrice() {
         return price;
     }
+
+    public boolean requiresBuying() { return price > 0; }
 
     public boolean hasAccessTo(PlayerStats playerStats)
     {
