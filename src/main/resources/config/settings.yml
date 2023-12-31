@@ -37,9 +37,6 @@ gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10
 levels:
-  message:
-    completion: "&7Rewarded &6%reward% Coins &7for %title% &7in &a%time% &2(&a%completions%&2)"
-    broadcast: "&a%player% &7has beaten %title%"
   featured_level_reward_multiplier: 1.50
   max_rated_levels_leaderboard_size: 10
   tutorial_level: tutorial

@@ -620,6 +620,8 @@ public class StatsManager {
                                 loreString = loreString.replace("%records%", Utils.formatNumber(playerStats.getNumRecords()))
                                         .replace("%total_completions%", Utils.formatNumber(playerStats.getTotalLevelCompletions()))
                                         .replace("%levels_completed%", Utils.formatNumber(playerStats.getIndividualLevelsBeaten()))
+                                        .replace("%mastery_level_completions%", Utils.formatNumber(playerStats.getNumMasteryCompletions()))
+                                        .replace("%total_mastery_levels%", Utils.formatNumber(Parkour.getLevelManager().getNumMasteryLevels()))
                                         .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
                                         .replace("%rated_levels_count%", playerStats.getRatedLevelsCount() + "");
 

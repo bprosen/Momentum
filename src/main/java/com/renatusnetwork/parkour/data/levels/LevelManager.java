@@ -28,6 +28,7 @@ public class LevelManager {
     private Level tutorialLevel;
     private long totalLevelCompletions;
 
+    private int masteryLevels;
     private HashMap<String, Level> levels;
     private HashMap<Menu, Set<Level>> menuLevels;
     private HashMap<Integer, Level> globalLevelCompletionsLB;
@@ -57,6 +58,11 @@ public class LevelManager {
     {
         levels = LevelsDB.getLevels();
         tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
+
+        // pre-computation optimization
+        for (Level level : levels.values())
+            if (level.hasMastery())
+                masteryLevels++;
 
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
@@ -208,7 +214,17 @@ public class LevelManager {
     {
         level.toggleHasMastery();
         LevelsDB.updateHasMastery(level.getName());
+
+        // means we toggled it on (+1)
+        if (level.hasMastery())
+            masteryLevels++;
+        // means we toggled it off (-1)
+        else
+            masteryLevels--;
     }
+
+    public int getNumMasteryLevels() { return masteryLevels; }
+
     public void addRequiredLevel(Level level, String requiredLevelName)
     {
         level.addRequiredLevel(requiredLevelName);

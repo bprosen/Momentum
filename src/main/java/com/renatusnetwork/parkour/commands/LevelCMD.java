@@ -403,7 +403,7 @@ public class LevelCMD implements CommandExecutor
 
                     if (level != null)
                     {
-                        LevelHandler.dolevelCompletion(playerStats, playerStats.getPlayer(), level, levelName, true);
+                        LevelHandler.dolevelCompletion(playerStats, level, true);
                         sender.sendMessage(Utils.translate("&7You forced a &c" + level.getFormattedTitle() + "&7 completion for &a" + playerStats.getName()));
                     }
                 }

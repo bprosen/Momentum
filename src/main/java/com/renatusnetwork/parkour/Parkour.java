@@ -3,7 +3,6 @@ package com.renatusnetwork.parkour;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
-import com.renatusnetwork.parkour.data.badges.BadgeManager;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;

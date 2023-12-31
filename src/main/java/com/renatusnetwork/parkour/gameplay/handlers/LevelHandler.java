@@ -49,7 +49,7 @@ public class LevelHandler {
                         {
                             // if level is not an event level, it is guaranteed normal completion
                             if (!level.isEventLevel())
-                                dolevelCompletion(playerStats, player, level, levelName, false);
+                                dolevelCompletion(playerStats, level, false);
                             // otherwise, if there is an event running, end!
                             else if (eventManager.isEventRunning())
                                 eventManager.endEvent(player, false, false);
@@ -72,10 +72,12 @@ public class LevelHandler {
         }
     }
 
-    public static void dolevelCompletion(PlayerStats playerStats, Player player, Level level, String levelName, boolean forcedCompletion)
+    public static void dolevelCompletion(PlayerStats playerStats, Level level, boolean forcedCompletion)
     {
         LevelCompletionEvent event = new LevelCompletionEvent(playerStats, level);
         Bukkit.getPluginManager().callEvent(event);
+        Player player = playerStats.getPlayer();
+        String levelName = level.getName();
 
         // continue if not cancelled
         if (!event.isCancelled())
@@ -193,22 +195,20 @@ public class LevelHandler {
 
                 Parkour.getStatsManager().addCoins(playerStats, reward);
 
-                String completionMessage = Utils.translate(Parkour.getSettingsManager().levels_message_completion);
+                String completionMessage = "&7 in ";
 
-                completionMessage = completionMessage.replace("%title%", level.getFormattedTitle());
-                completionMessage = completionMessage.replace("%reward%", Utils.translate(Utils.getCoinFormat(level.getReward(), reward)));
-                completionMessage = completionMessage.replace("%completions%",
-                        Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(level)));
+                if (elapsedTime > 0 && elapsedTime < 8388607)
+                    completionMessage = " &a" + elapsedTime;
+
+                String completion = "&7Rewarded &6" + Utils.getCoinFormat(level.getReward(), reward) +
+                        " Coins &7for " + level.getFormattedTitle() + completionMessage +
+                        " &a(" + Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(level)) +
+                        ")";
 
                 if (playerStats.inFailMode())
-                    completionMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
+                    completion += " &7in &6" + playerStats.getFails() + " fails";
 
-                if (elapsedTime > 0L && elapsedTime < 8388607L)
-                    completionMessage = completionMessage.replace("%time%", time);
-                else
-                    completionMessage = completionMessage.replace("%time%", "-");
-
-                player.sendMessage(completionMessage);
+                player.sendMessage(Utils.translate(completion));
                 player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + "&7 with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle())));
 
@@ -222,20 +222,15 @@ public class LevelHandler {
 
                 // broadcast completed if it the featured level
                 if (level.isFeaturedLevel())
-                {
                     Bukkit.broadcastMessage(Utils.translate(
                             "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
                     ));
-                }
+                else if (completedMastery)
+                    Bukkit.broadcastMessage(Utils.translate(
+                            "&c" + playerStats.getDisplayName() + "&7 has completed the &2" + level.getFormattedTitle() + "&5&l Mastery"
+                    ));
                 else if (level.isBroadcasting())
-                {
-                    String broadcastMessage = Utils.translate(Parkour.getSettingsManager().levels_message_broadcast);
-
-                    broadcastMessage = broadcastMessage.replace("%player%", player.getDisplayName());
-                    broadcastMessage = broadcastMessage.replace("%title%", level.getFormattedTitle());
-
-                    Bukkit.broadcastMessage(broadcastMessage);
-                }
+                    Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getFormattedTitle()));
 
                 if (playerStats.getClan() != null)
                 {
@@ -345,7 +340,7 @@ public class LevelHandler {
                         Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
                         if (!playerStats.hasCompleted(requiredLevel))
-                            dolevelCompletion(playerStats, player, requiredLevel, requiredLevelName, true);
+                            dolevelCompletion(playerStats, requiredLevel, true);
                     }
                 }
             }

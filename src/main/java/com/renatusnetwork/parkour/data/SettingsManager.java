@@ -30,8 +30,6 @@ public class SettingsManager {
     public static final String LEVEL_MAZE_EXIT_FORMAT = "%level%-exit-%num%";
 
     public World main_world;
-    public String levels_message_completion;
-    public String levels_message_broadcast;
     public double featured_level_reward_multiplier;
     public int max_rated_levels_leaderboard_size;
 
@@ -185,8 +183,6 @@ public class SettingsManager {
 
     public void load(FileConfiguration settings) {
         main_world = Bukkit.getWorld(settings.getString("main_world"));
-        levels_message_completion = settings.getString("levels.message.completion");
-        levels_message_broadcast = settings.getString("levels.message.broadcast");
         signs_first_line = settings.getString("signs.first_line");
         signs_second_line_completion = settings.getString("signs.second_line.completion");
         signs_second_line_spawn = settings.getString("signs.second_line.spawn");

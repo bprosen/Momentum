@@ -384,6 +384,8 @@ public class PlayerStats {
 
     public boolean hasMasteryCompletion(Level level) { return masteryCompletions.contains(level); }
 
+    public int getNumMasteryCompletions() { return masteryCompletions.size(); }
+
     public boolean isAttemptingMastery() { return attemptingMastery; }
 
     //
