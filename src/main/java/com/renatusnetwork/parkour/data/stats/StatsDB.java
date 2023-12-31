@@ -135,7 +135,6 @@ public class StatsDB {
             playerStats.setRaceWins(Integer.parseInt(playerResult.get("race_wins")));
             playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
             playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
-            playerStats.setRecords(CompletionsDB.getNumRecords(playerStats));
 
             // we do a math.max since we can't divide by 0... so if they have never lost we divide by 1 not zero
             playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal(

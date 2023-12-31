@@ -204,6 +204,11 @@ public class LevelManager {
         LevelsDB.updateBroadcast(level.getName());
     }
 
+    public void toggleHasMastery(Level level)
+    {
+        level.toggleHasMastery();
+        LevelsDB.updateHasMastery(level.getName());
+    }
     public void addRequiredLevel(Level level, String requiredLevelName)
     {
         level.addRequiredLevel(requiredLevelName);
@@ -346,7 +351,7 @@ public class LevelManager {
             if (!alreadyFirstPlace)
             {
                 // update new #1 records
-                playerStats.addRecord();
+                playerStats.addRecord(levelCompletion);
 
                 // if more than 1, remove
                 if (leaderboard.size() > 1)
@@ -356,7 +361,7 @@ public class LevelManager {
                     PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getName());
 
                     if (previousStats != null)
-                        previousStats.removeRecord();
+                        previousStats.removeRecord(previousRecord);
 
                     // remove previous
                     CompletionsDB.updateRecord(previousRecord);

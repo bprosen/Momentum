@@ -115,6 +115,7 @@ public class StatsManager {
         StatsDB.loadPlayerInformation(playerStats);
         StatsDB.loadBoughtLevels(playerStats);
         CompletionsDB.loadCompletions(playerStats);
+        CompletionsDB.loadRecords(playerStats);
         loadIndividualLevelsBeaten(playerStats);
         StatsDB.loadPerks(playerStats);
         loadPerksGainedCount(playerStats);
@@ -627,7 +628,7 @@ public class StatsManager {
                                     continue;
 
                                 // now add the last part of the level stats
-                                loreString = loreString.replace("%records%", Utils.formatNumber(playerStats.getRecords()))
+                                loreString = loreString.replace("%records%", Utils.formatNumber(playerStats.getNumRecords()))
                                         .replace("%total_completions%", Utils.formatNumber(playerStats.getTotalLevelCompletions()))
                                         .replace("%levels_completed%", Utils.formatNumber(playerStats.getIndividualLevelsBeaten()))
                                         .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
@@ -704,7 +705,7 @@ public class StatsManager {
         int bestTimedInfinite = playerStats.getBestInfiniteScore(InfiniteType.TIMED);
         int bestSprintInfinite = playerStats.getBestInfiniteScore(InfiniteType.SPRINT);
 
-        int records = playerStats.getRecords();
+        int records = playerStats.getNumRecords();
 
         Level level = playerStats.getMostCompletedLevel();
         String favoriteLevel = "None";

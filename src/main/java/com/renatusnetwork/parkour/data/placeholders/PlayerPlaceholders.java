@@ -22,7 +22,7 @@ public class PlayerPlaceholders
             switch (placeholder.toLowerCase())
             {
                 case "records":
-                    return Utils.formatNumber(playerStats.getRecords());
+                    return Utils.formatNumber(playerStats.getNumRecords());
                 case "coins":
                     return Utils.formatNumber((int) playerStats.getCoins());
                 case "rank":

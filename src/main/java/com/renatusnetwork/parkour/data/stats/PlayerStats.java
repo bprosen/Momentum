@@ -41,7 +41,6 @@ public class PlayerStats {
     private int raceWins;
     private int raceLosses;
     private int ratedLevelsCount;
-    private int records;
     private int gainedPerksCount;
     private float raceWinRate;
     private float prestigeMultiplier;
@@ -65,6 +64,8 @@ public class PlayerStats {
     private FastBoard board;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
+    private HashSet<Level> masteryCompletions;
+    private HashSet<LevelCompletion> records;
     private HashMap<String, Long> perks;
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
@@ -248,13 +249,15 @@ public class PlayerStats {
 
     public void setChestplateSavedFromElytra(ItemStack chestplate) { chestplateSavedFromElytra = chestplate; }
 
-    public int getRecords() { return records; }
+    public int getNumRecords() { return records.size(); }
 
-    public void setRecords(int records) { this.records = records; }
+    public HashSet<LevelCompletion> getRecords() { return records; }
 
-    public void removeRecord() { this.records--; }
+    public void setRecords(HashSet<LevelCompletion> records) { this.records = records; }
 
-    public void addRecord() { this.records++; }
+    public void removeRecord(LevelCompletion recordCompletion) { records.remove(recordCompletion); }
+
+    public void addRecord(LevelCompletion recordCompletion) { records.add(recordCompletion); }
 
     public boolean hasBoughtLevel(Level level)
     {
@@ -369,6 +372,12 @@ public class PlayerStats {
     public void setAttemptingRankup(boolean attemptingRankup) { this.attemptingRankup = attemptingRankup; }
 
     public void setAttemptingMastery(boolean attemptingMastery) { this.attemptingMastery = attemptingMastery; }
+
+    public void addMasteryCompletion(Level level) { masteryCompletions.add(level); }
+
+    public void removeMasteryCompletion(Level level) { masteryCompletions.remove(level); }
+
+    public boolean hasMasteryCompletion(Level level) { return masteryCompletions.contains(level); }
 
     public boolean isAttemptingRankup() { return attemptingRankup; }
 

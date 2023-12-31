@@ -14,7 +14,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class RecordsCMD implements CommandExecutor
 {
@@ -109,27 +112,28 @@ public class RecordsCMD implements CommandExecutor
         // make sure we are not loading lbs
         if (!Parkour.getStatsManager().isLoadingLeaderboards())
         {
-            int records = 0;
-            boolean exist = true;
-
-            PlayerStats targetStats = Parkour.getStatsManager().getByName(targetName);
-
-            // online then offline lookup process
-            if (targetStats != null)
-                records = targetStats.getRecords();
-            else
+            if (StatsDB.isPlayerInDatabase(targetName))
             {
-                int foundRecords = CompletionsDB.getNumRecordsFromName(targetName);
+                PlayerStats targetStats = Parkour.getStatsManager().getByName(targetName);
 
-                if (foundRecords > -1)
-                    records = foundRecords;
+                HashMap<Level, Double> records = new HashMap<>();
+
+                // online then offline lookup process
+                if (targetStats != null)
+                {
+                    HashSet<LevelCompletion> completions = targetStats.getRecords();
+
+                    for (LevelCompletion completion : completions)
+                        records.put(Parkour.getLevelManager().get(completion.getLevelName()), completion.getCompletionTimeElapsedSeconds());
+                }
                 else
-                    exist = false;
-            }
+                {
+                    HashMap<Level, Long> offlineCompletions = CompletionsDB.getRecordsFromName(targetName);
 
-            // if we have no record of them
-            if (exist)
-            {
+                    for (Map.Entry<Level, Long> offlineCompletion : offlineCompletions.entrySet())
+                        records.put(offlineCompletion.getKey(), (offlineCompletion.getValue() / 1000d));
+                }
+
                 // if they are equal, we print out "Your records"
                 if (sender.getName().equalsIgnoreCase(targetName))
                     sender.sendMessage(Utils.translate("&9&lYour Records"));
@@ -137,64 +141,41 @@ public class RecordsCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate("&9&l" + targetName + "'s Records"));
 
                 // only continue if they have records!
-                if (records > 0)
+                if (!records.isEmpty())
                 {
-                    int currentFound = 0;
+                    int currentNum = 0;
+                    int numRecords = records.size();
                     int max = page * 10;
 
-                    String[] messageStr = new String[max];
-
-                    // iterate through all levels
-                    for (Level level : Parkour.getLevelManager().getLevels().values())
-                    {
-                        // stop when we have all the records we wanted
-                        if (records > currentFound && max > currentFound)
-                        {
-                            LevelCompletion record = level.getRecordCompletion();
-
-                            // if has record
-                            if (record != null && record.getName().equalsIgnoreCase(targetName))
-                            {
-                                // print to player and increment
-                                double time = record.getCompletionTimeElapsedSeconds();
-
-                                messageStr[currentFound] = Utils.translate("&7" + (currentFound + 1) + " &a" + level.getFormattedTitle() + "&7 " + time + "s");
-                                currentFound++;
-                            }
-                        }
-                        else
-                            break;
-                    }
-
-                    int i = max - 10;
-
-                    if (messageStr[i] == null)
+                    if ((max - 10) >= records.size())
                         sender.sendMessage(Utils.translate("&7No page exists"));
                     else
-                    // send page
-                    for (; i < max; i++)
-                        if (messageStr[i] != null)
-                            sender.sendMessage(messageStr[i]);
+                        // iterate through all records
+                        for (Map.Entry<Level, Double> record : records.entrySet())
+                        {
+                            if (numRecords > currentNum && max > currentNum)
+                            {
+                                sender.sendMessage(Utils.translate(
+                                        "&7" + (currentNum + 1) + " &a" + record.getKey().getFormattedTitle() + "&7 " + record.getValue() + "s"
+                                ));
+                                currentNum++;
+                            }
+                            else break;
+                        }
 
                     // send next page option
-                    if (records > max)
+                    if (records.size() > max)
                         sender.sendMessage(Utils.translate("&9/records " + targetName + " " + (page + 1)));
 
                     sender.sendMessage(Utils.translate("&e✦ " + records + " &7Records"));
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&7None"));
-                }
             }
             else
-            {
                 sender.sendMessage(Utils.translate("&4" + targetName + " &chas not joined the server"));
-            }
         }
         else
-        {
             sender.sendMessage(Utils.translate("&cStill loading records..."));
-        }
     }
 }

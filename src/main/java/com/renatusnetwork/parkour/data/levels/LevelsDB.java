@@ -231,6 +231,11 @@ public class LevelsDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET new=NOT new WHERE name=?", levelName);
     }
 
+    public static void updateHasMastery(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET has_mastery=NOT has_mastery WHERE name=?", levelName);
+    }
+
     public static void updateCooldown(String levelName)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET cooldown=NOT cooldown WHERE name=?", levelName);

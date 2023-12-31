@@ -89,30 +89,38 @@ public class CompletionsDB
         return !playerResults.isEmpty();
     }
 
-    public static int getNumRecords(PlayerStats playerStats)
+    public static void loadRecords(PlayerStats playerStats)
     {
+        HashSet<LevelCompletion> levels = new HashSet<>();
+
         List<Map<String, String>> recordResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "COUNT(level_name) AS num_records",
+                "level_name",
                 "WHERE uuid=? AND record=(1)",
              playerStats.getUUID());
 
         for (Map<String, String> recordResult : recordResults)
-            return Integer.parseInt(recordResult.get("num_records"));
-
-        return -1;
+        {
+            LevelCompletion fastest = playerStats.getQuickestCompletion(Parkour.getLevelManager().get(recordResult.get("level_name")));
+            levels.add(fastest);
+        }
+        playerStats.setRecords(levels);
     }
 
-    public static int getNumRecordsFromName(String name)
+    public static HashMap<Level, Long> getRecordsFromName(String name)
     {
+        // for offline records
+
         List<Map<String, String>> recordResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lr",
-                "COUNT(level_name) AS num_records",
+                "level_name, time_taken",
                 "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lr.uuid " +
                         "WHERE p.name=? AND record=(1)", name);
 
-        for (Map<String, String> recordResult : recordResults)
-            return Integer.parseInt(recordResult.get("num_records"));
+        HashMap<Level, Long> levels = new HashMap<>();
 
-        return -1;
+        for (Map<String, String> recordResult : recordResults)
+            levels.put(Parkour.getLevelManager().get(recordResult.get("level_name")), Long.parseLong(recordResult.get("time_taken")));
+
+        return levels;
     }
 
     /*

@@ -335,10 +335,10 @@ public class LevelCMD implements CommandExecutor
                                                 PlayerStats newHolderStats = statsManager.get(newHolder.getUUID());
 
                                                 if (oldHolderStats != null)
-                                                    oldHolderStats.removeRecord();
+                                                    oldHolderStats.removeRecord(oldHolder);
 
                                                 if (newHolderStats != null)
-                                                    newHolderStats.addRecord();
+                                                    newHolderStats.addRecord(newHolder);
                                             }
                                             // update both in db
                                             CompletionsDB.updateRecord(oldHolder);
@@ -873,6 +873,17 @@ public class LevelCMD implements CommandExecutor
                     }
                 }
             }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("mastery"))
+            {
+                String levelName = a[1].toLowerCase();
+                Level level = getLevel(sender, levelName);
+
+                if (level != null)
+                {
+                    levelManager.toggleHasMastery(level);
+                    sender.sendMessage(Utils.translate("&7You have set &c" + level.getFormattedTitle() + "&7 having a mastery to &a" + level.hasMastery()));
+                }
+            }
             else
             {
                 sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
@@ -928,5 +939,6 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level cooldown <level>  &7Toggles if the level has a cooldown"));
         sender.sendMessage(Utils.translate("&a/level pickfeatured  &7Picks a new featured level"));
         sender.sendMessage(Utils.translate("&a/level resetsave <player> <level>  &7Resets a player's save for a specific level"));
+        sender.sendMessage(Utils.translate("&a/level mastery <level>  &7Toggles if a level has a mastery mode"));
     }
 }

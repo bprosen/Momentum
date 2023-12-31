@@ -381,10 +381,11 @@ public class StatsCMD implements CommandExecutor {
             }
 
             // if player, send personal total
-            if (sender instanceof Player) {
+            if (sender instanceof Player)
+            {
                 Player player = (Player) sender;
                 sender.sendMessage(Utils.translate("&7You have &e✦ " + Utils.formatNumber(
-                        Parkour.getStatsManager().get(player).getRecords()) + " &7Records"));
+                        Parkour.getStatsManager().get(player).getNumRecords()) + " &7Records"));
             }
         } else {
             sender.sendMessage(Utils.translate("&cRecords lb not loaded or no lb positions"));
