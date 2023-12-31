@@ -21,6 +21,7 @@ public class Perk
 
     private HashMap<PerksArmorType, ItemStack> armorItems;
     private List<Level> requiredLevels;
+    private boolean requiresMasteryLevels;
 
     public Perk(String name)
     {
@@ -82,6 +83,13 @@ public class Perk
 
     public void setRequiredPermission(String requiredPermission) { this.requiredPermission = requiredPermission; }
 
+
+    public void setRequiresMasteryLevels(boolean result) { this.requiresMasteryLevels = result; }
+
+    public void toggleRequiresMasteryLevels() { requiresMasteryLevels = !requiresMasteryLevels; }
+
+    public boolean requiresMasteryLevels() { return requiresMasteryLevels; }
+
     public boolean hasRequiredPermission(PlayerStats playerStats)
     {
         return requiredPermission == null || playerStats.getPlayer().hasPermission(requiredPermission);
@@ -95,17 +103,19 @@ public class Perk
 
     public boolean requiresBuying() { return price > 0; }
 
-    public boolean hasAccessTo(PlayerStats playerStats)
+    public boolean hasAccess(PlayerStats playerStats)
     {
         Player player = playerStats.getPlayer();
 
         // if they are opped or have the perk, no need to check other requirements
-        if (player.isOp() || playerStats.hasPerk(name))
+        if (player.isOp() || playerStats.hasPerk(this))
             return true;
 
         // if it needs a level completion, check all the levels to see if they are missing one, otherwise keep checking
         for (Level level : requiredLevels)
-            if (!playerStats.hasCompleted(level))
+            // if it is a mastery cosmetic and they do not have the mastery needed, then it is false, but if it is not a mastery and they do not have it completed, return false too
+            if ((requiresMasteryLevels && !playerStats.hasMasteryCompletion(level)) ||
+                (!requiresMasteryLevels && !playerStats.hasCompleted(level)))
                 return false;
 
         // if it can be purchased, immediately return false since we know they don't have access to this perk

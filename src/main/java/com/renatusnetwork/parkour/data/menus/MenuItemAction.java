@@ -269,8 +269,8 @@ public class MenuItemAction {
         if (perk != null) {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            // bypass if opped
-            if (perk.hasAccessTo(playerStats))
+            // bypass if have access (opped too)
+            if (perk.hasAccess(playerStats))
             {
                 player.closeInventory();
                 Parkour.getPerkManager().setPerk(perk, playerStats);
@@ -280,7 +280,7 @@ public class MenuItemAction {
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
 
             }
-            else if (!playerStats.hasPerk(perk.getName()) && perk.requiresBuying())
+            else if (perk.requiresBuying())
             {
                 ShopBuyEvent event = new ShopBuyEvent(playerStats, perk);
                 Bukkit.getPluginManager().callEvent(event);

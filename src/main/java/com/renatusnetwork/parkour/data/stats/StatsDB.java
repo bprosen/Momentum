@@ -4,8 +4,8 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
-import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
+import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
@@ -350,22 +350,20 @@ public class StatsDB {
 
     public static void loadModifiers(PlayerStats playerStats)
     {
-        ArrayList<Modifier> modifiers = new ArrayList<>();
+        HashMap<ModifierType, Modifier> modifiers = new HashMap<>();
 
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                DatabaseManager.PLAYER_MODIFIERS_TABLE,
-                "*",
-                " WHERE uuid=?", playerStats.getUUID()
+                DatabaseManager.PLAYER_MODIFIERS_TABLE + " pm",
+                "m.type AS type, pm.modifier_name AS modifier_name",
+                "JOIN " + DatabaseManager.MODIFIERS_TABLE + " m ON m.modifier_name=pm.modifier_name WHERE uuid=?",
+                playerStats.getUUID()
         );
 
-        if (!playerResults.isEmpty())
+        for (Map<String, String> playerResult : playerResults)
         {
-            for (Map<String, String> playerResult : playerResults)
-            {
-                String modifierName = playerResult.get("modifier_name");
+            String modifierName = playerResult.get("modifier_name");
 
-                modifiers.add(Parkour.getModifiersManager().getModifier(modifierName));
-            }
+            modifiers.put(ModifierType.valueOf(playerResult.get("type").toUpperCase()), Parkour.getModifiersManager().getModifier(modifierName));
         }
 
         playerStats.setModifiers(modifiers);
@@ -396,25 +394,23 @@ public class StatsDB {
         );
     }
 
-    public static void loadPerks(PlayerStats playerStats)
+    public static void loadBoughtPerks(PlayerStats playerStats)
     {
         List<Map<String, String>> perksResults = DatabaseQueries.getResults(
-                DatabaseManager.PERKS_OWNED_TABLE,
-                "perk_name, " +
-                        "(UNIX_TIMESTAMP(date_received) * 1000) AS date",
-                "WHERE uuid='" + playerStats.getUUID() + "'");
+                DatabaseManager.PERKS_BOUGHT_TABLE,
+                "perk_name",
+                "WHERE uuid=?", playerStats.getUUID());
 
         for (Map<String, String> perkResult : perksResults)
             playerStats.addPerk(
-                    perkResult.get("perk_name"),
-                    Long.parseLong(perkResult.get("date"))
+                    Parkour.getPerkManager().get(perkResult.get("perk_name"))
             );
     }
 
-    public static void addOwnedPerk(PlayerStats playerStats, Perk perk, Long date) {
+    public static void addBoughtPerk(String playerUUID, String perkName)
+    {
         DatabaseQueries.runAsyncQuery(
-                "INSERT INTO " + DatabaseManager.PERKS_OWNED_TABLE + " (uuid, perk_name, date_received) VALUES " +
-                        "(" + playerStats.getUUID() + ", " + perk.getName() + ", FROM_UNIXTIME(" + (date / 1000) + "))"
+                "INSERT INTO " + DatabaseManager.PERKS_BOUGHT_TABLE + " (uuid, perk_name) VALUES (?,?)", playerUUID, perkName
         );
     }
 

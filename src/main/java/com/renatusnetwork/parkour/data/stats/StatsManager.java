@@ -93,7 +93,6 @@ public class StatsManager {
             @Override
             public void run() {
                 loadGlobalPersonalCompletionsLB();
-                loadOnlinePerksGainedCount();
                 loadCoinsLB();
                 loadRecordsLB();
                 loadTotalCoins();
@@ -117,14 +116,21 @@ public class StatsManager {
         CompletionsDB.loadCompletions(playerStats);
         CompletionsDB.loadRecords(playerStats);
         loadIndividualLevelsBeaten(playerStats);
-        StatsDB.loadPerks(playerStats);
-        loadPerksGainedCount(playerStats);
+        StatsDB.loadBoughtPerks(playerStats);
+        loadRestOfPerks(playerStats);
         StatsDB.loadModifiers(playerStats);
         CheckpointDB.loadCheckpoints(playerStats);
         SavesDB.loadSaves(playerStats);
     }
 
-    public static void loadIndividualLevelsBeaten(PlayerStats playerStats)
+    private void loadRestOfPerks(PlayerStats playerStats)
+    {
+        for (Perk perk : Parkour.getPerkManager().getPerks())
+            if (perk.hasAccess(playerStats))
+                playerStats.addPerk(perk);
+    }
+
+    private void loadIndividualLevelsBeaten(PlayerStats playerStats)
     {
         // get individual levels beaten by looping through list
         int individualLevelsBeaten = 0;
@@ -497,23 +503,6 @@ public class StatsManager {
         elytraItem.setItemMeta(itemMeta);
 
         playerStats.getPlayer().getInventory().setChestplate(elytraItem);
-    }
-
-    public void loadPerksGainedCount(PlayerStats playerStats) {
-        // set gained perks count
-        int gainedPerksCount = 0;
-        for (Perk perk : Parkour.getPerkManager().getPerks())
-            if (perk.hasAccessTo(playerStats))
-                gainedPerksCount++;
-
-        playerStats.setGainedPerksCount(gainedPerksCount);
-    }
-
-    // loads all online players and updates their perks gained count
-    public void loadOnlinePerksGainedCount()
-    {
-        for (PlayerStats playerStats : playerStatsUUID.values())
-            loadPerksGainedCount(playerStats);
     }
 
     /*

@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
+import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
@@ -41,7 +42,6 @@ public class PlayerStats {
     private int raceWins;
     private int raceLosses;
     private int ratedLevelsCount;
-    private int gainedPerksCount;
     private float raceWinRate;
     private float prestigeMultiplier;
     private int individualLevelsBeaten;
@@ -66,7 +66,7 @@ public class PlayerStats {
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
     private HashSet<Level> masteryCompletions;
     private HashSet<LevelCompletion> records;
-    private HashMap<String, Long> perks;
+    private HashSet<Perk> perks;
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
     private HashMap<String, Location> saves;
@@ -82,7 +82,7 @@ public class PlayerStats {
 
         // load maps
         this.levelCompletions = new HashMap<>();
-        this.perks = new HashMap<>();
+        this.perks = new HashSet<>();
         this.checkpoints = new HashMap<>();
         this.boughtLevels = new HashSet<>();
         this.saves = new HashMap<>();
@@ -371,6 +371,11 @@ public class PlayerStats {
 
     public void setAttemptingRankup(boolean attemptingRankup) { this.attemptingRankup = attemptingRankup; }
 
+    public boolean isAttemptingRankup() { return attemptingRankup; }
+
+    //
+    // Mastery Section
+    //
     public void setAttemptingMastery(boolean attemptingMastery) { this.attemptingMastery = attemptingMastery; }
 
     public void addMasteryCompletion(Level level) { masteryCompletions.add(level); }
@@ -379,10 +384,9 @@ public class PlayerStats {
 
     public boolean hasMasteryCompletion(Level level) { return masteryCompletions.contains(level); }
 
-    public boolean isAttemptingRankup() { return attemptingRankup; }
-
     public boolean isAttemptingMastery() { return attemptingMastery; }
 
+    //
     //
     // Fails Section
     //
@@ -585,19 +589,18 @@ public class PlayerStats {
     //
     // Perks Section
     //
-    public void addPerk(String perkName, Long time) {
-        perks.put(perkName, time);
+    public void addPerk(Perk perk) {
+        perks.add(perk);
     }
 
-    public boolean hasPerk(String perkName) {
-        return perks.containsKey(perkName);
+    public boolean hasPerk(Perk perk)
+    {
+        return perks.contains(perk);
     }
 
-    public int getGainedPerksCount() { return gainedPerksCount; }
+    public int getGainedPerksCount() { return perks.size(); }
 
-    public void setGainedPerksCount(int gainedPerksCount) { this.gainedPerksCount = gainedPerksCount; }
-
-    public HashMap<String, Long> getPerks() { return perks; }
+    public HashSet<Perk> getPerks() { return perks; }
 
     //
     // Event Section
@@ -689,16 +692,9 @@ public class PlayerStats {
         return modifiers.values();
     }
 
-    public void setModifiers(Collection<Modifier> modifiersCollection)
+    public void setModifiers(HashMap<ModifierType, Modifier> modifiers)
     {
-        modifiers.clear();
-
-        // add to player
-        for (Modifier modifier : modifiersCollection)
-        {
-            if (modifier != null)
-                modifiers.put(modifier.getType(), modifier);
-        }
+        this.modifiers = modifiers;
     }
 
     public Modifier getModifier(ModifierType modifierType)

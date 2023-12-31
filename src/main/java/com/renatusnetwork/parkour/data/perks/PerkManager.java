@@ -155,6 +155,12 @@ public class PerkManager
         PerksDB.updateArmorMaterialType(perk.getName(), type.name(), typeNum);
     }
 
+    public void updateRequiresMasteryLevels(Perk perk)
+    {
+        perk.toggleRequiresMasteryLevels();
+        PerksDB.updateRequiresMasteryLevels(perk.getName());
+    }
+
     public void removeArmorPiece(Perk perk, PerksArmorType type)
     {
         perk.removeArmorItem(type);
@@ -163,10 +169,8 @@ public class PerkManager
 
     public void bought(PlayerStats playerStats, Perk perk)
     {
-        Long date = System.currentTimeMillis();
-
-        playerStats.addPerk(perk.getName(), date);
-        StatsDB.addOwnedPerk(playerStats, perk, date);
+        playerStats.addPerk(perk);
+        StatsDB.addBoughtPerk(playerStats.getUUID(), perk.getName());
     }
 
     public void setPerk(Perk perk, PlayerStats playerStats)

@@ -30,6 +30,7 @@ public class PerksCMD implements CommandExecutor
         /perk armorglow (perkName) (armorType)
         /perk armormaterial (perkName) (armorType) (material)
         /perk armormaterialtype (perkName) (armorType) (materialType)
+        /perk masterylevels (perkName)
         /perk help
      */
     @Override
@@ -345,6 +346,17 @@ public class PerksCMD implements CommandExecutor
                     }
                 }
             }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("masterylevels"))
+            {
+                String perkName = a[2];
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    perkManager.updateRequiresMasteryLevels(perk);
+                    sender.sendMessage(Utils.translate("&7You have toggled &c" + perk.getFormattedTitle() + "&7 requiring mastery level completions to &a" + perk.requiresMasteryLevels()));
+                }
+            }
             else if (a.length == 3 && a[0].equalsIgnoreCase("setperk"))
             {
                 PlayerStats playerStats = Parkour.getStatsManager().getByName(a[1]);
@@ -357,7 +369,7 @@ public class PerksCMD implements CommandExecutor
                     if (perk != null)
                     {
                         // cannot be set if they do not have access
-                        if (!perk.hasAccessTo(playerStats))
+                        if (perk.hasAccess(playerStats))
                         {
                             perkManager.setPerk(perk, playerStats);
                             sender.sendMessage(Utils.translate(
@@ -440,6 +452,7 @@ public class PerksCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&e/perks armormaterial (perkName) (armorPiece) (material)  &7Updates material on existing armor piece"));
         sender.sendMessage(Utils.translate("&e/perks armormaterialtype (perkName) (armorPiece) (type)  &7Updates material type on existing armor piece"));
         sender.sendMessage(Utils.translate("&e/perks setperk (IGN) (perkName)  &7Sets perk armor, hat or infinite block to player if they have it"));
+        sender.sendMessage(Utils.translate("&e/perks masterylevels (perkName)  &7Toggles if the perk requires mastery completions instead of normal level completions"));
         sender.sendMessage(Utils.translate("&e/perks help  &7Displays this page"));
         sender.sendMessage(Utils.translate("&e/perks load  &7Loads from disk"));
     }

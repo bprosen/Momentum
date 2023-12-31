@@ -1,10 +1,14 @@
 package com.renatusnetwork.parkour.data.modifiers;
 
+import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
+import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
+import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
+
 public abstract class Modifier
 {
+    private ModifierType type;
     private String name;
     private String title;
-    private ModifierType type;
 
     public Modifier(ModifierType type, String name, String title)
     {
@@ -13,15 +17,18 @@ public abstract class Modifier
         this.title = title;
     }
 
+    public ModifierType getType() { return type; }
+
     public void setTitle(String title)
     {
         this.title = title;
     }
 
-    public void setType(ModifierType type)
-    {
-        this.type = type;
-    }
+    public boolean isBonus() { return this instanceof Bonus; }
+
+    public boolean isBooster() { return this instanceof Booster; }
+
+    public boolean isDiscount() { return this instanceof Discount; }
 
     public String getName()
     {
@@ -32,8 +39,6 @@ public abstract class Modifier
     {
         return title;
     }
-
-    public ModifierType getType() { return type; }
 
     public boolean equals(Modifier modifier)
     {

@@ -34,11 +34,11 @@ public class ModifiersManager
         Modifier modifier = createSubclass(name, type, title, modifierValue);
         modifiers.put(name, modifier);
 
-        if (isBooster(modifier.getType()))
+        if (modifier.isBooster())
             ModifiersDB.insertBoosterModifier(name, type, title, modifierValue);
-        else if (isDiscount(modifier.getType()))
+        else if (modifier.isDiscount())
             ModifiersDB.insertDiscountModifier(name, type, title, modifierValue);
-        else if (isBonus(modifier.getType()))
+        else if (modifier.isBonus())
             ModifiersDB.insertBonusModifier(name, type, title, (int) modifierValue);
     }
 
@@ -46,26 +46,6 @@ public class ModifiersManager
     {
         modifier.setTitle(title);
         ModifiersDB.updateTitle(modifier.getName(), title);
-    }
-
-    public boolean isBooster(ModifierType type)
-    {
-        return type == ModifierType.CLAN_XP_BOOSTER ||
-               type == ModifierType.EVENT_BOOSTER ||
-               type == ModifierType.GG_BOOSTER ||
-               type == ModifierType.JACKPOT_BOOSTER ||
-               type == ModifierType.LEVEL_BOOSTER ||
-               type == ModifierType.INFINITE_BOOSTER;
-    }
-
-    public boolean isDiscount(ModifierType type)
-    {
-        return type == ModifierType.LEVEL_DISCOUNT || type == ModifierType.SHOP_DISCOUNT;
-    }
-
-    public boolean isBonus(ModifierType type)
-    {
-        return type == ModifierType.RECORD_BONUS;
     }
 
     public Modifier createSubclass(String name, ModifierType type, String title, float modifierValue)

@@ -160,11 +160,18 @@ public class PerksDB
         if (infiniteString != null)
             perk.setInfiniteBlock(Material.matchMaterial(infiniteString));
 
+        perk.setRequiresMasteryLevels(Integer.parseInt(result.get("requires_mastery_levels")) == 1);
+
         // set data using 2 extra queries, is fine since it's only done on startup, allows for clean code
         perk.setRequiredLevels(getRequiredLevels(perkName));
         perk.setArmorItems(getArmorItems(perkName));
 
         return perk;
+    }
+
+    public static void updateRequiresMasteryLevels(String perkName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PERKS_TABLE + " SET requires_mastery_levels=NOT requires_mastery_levels WHERE name=?", perkName);
     }
 
     public static List<Level> getRequiredLevels(String perkName)

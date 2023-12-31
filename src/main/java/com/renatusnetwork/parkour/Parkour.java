@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.parkour.commands.*;
+import com.renatusnetwork.parkour.data.badges.BadgeManager;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
@@ -61,7 +62,6 @@ public class Parkour extends JavaPlugin {
     private static BlackMarketManager blackmarket;
     private static SavesManager saves;
     private static ModifiersManager modifiers;
-
     private Placeholders placeholders;
 
     @Override
@@ -140,7 +140,8 @@ public class Parkour extends JavaPlugin {
 
     }
 
-    private void registerCommands() {
+    private void registerCommands()
+    {
         getCommand("practicego").setExecutor(new PracticeGoCMD());
         getCommand("level").setExecutor(new LevelCMD());
         getCommand("race").setExecutor(new RaceCMD());

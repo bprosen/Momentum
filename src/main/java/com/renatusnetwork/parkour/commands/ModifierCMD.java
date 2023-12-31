@@ -215,10 +215,9 @@ public class ModifierCMD implements CommandExecutor
     private float parseModifierValue(String modifierValue, ModifierType type, CommandSender sender)
     {
         float modifier;
-        ModifiersManager modifiersManager = Parkour.getModifiersManager();
 
         // if it is a bonus, we want to make sure they typed an integer
-        if (modifiersManager.isBonus(type))
+        if (type == ModifierType.RECORD_BONUS)
         {
             if (Utils.isInteger(modifierValue))
                 modifier = Integer.parseInt(modifierValue);

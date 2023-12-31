@@ -7,15 +7,10 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.PerksArmorType;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
-
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 public class TablesDB
 {
@@ -69,16 +64,12 @@ public class TablesDB
         createPlotTrustedPlayers();
         createModifiers();
         createPlayerModifiers();
-        createPerksOwned();
+        createPerksBought();
         createPerksLevelRequirements();
         createPerksArmor();
         createLevelCompletionCommands();
         createLevelPotionEffects();
         createLevelRequiredLevels();
-        createBadges();
-        createBadgesOwned();
-        createBadgesCommands();
-        createMasteryBadgeLevels();
     }
 
     private static void createKeys()
@@ -95,15 +86,12 @@ public class TablesDB
         createRanksKeys();
         createPlotTrustedPlayersKeys();
         createPlayerModifiersKeys();
-        createPerksOwnedKeys();
+        createPerksBoughtKeys();
         createPerksLevelRequirementsKeys();
         createPerksArmorKeys();
         createLevelCompletionCommandsKeys();
         createLevelPotionEffectsKeys();
         createLevelRequiredLevelsKeys();
-        createBadgesOwnedKeys();
-        createBadgesCommandsKeys();
-        createMasteryBadgeLevelsKeys();
     }
 
     private static void createPlayers()
@@ -220,6 +208,7 @@ public class TablesDB
                             "price INT DEFAULT NULL, " +
                             "required_permission VARCHAR(20) DEFAULT NULL, " +
                             "infinite_block ENUM(" + enumQuotations(Material.values()) + ") DEFAULT NULL, " +
+                            "requires_mastery_levels BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(name), " +
                             // constraints
@@ -571,12 +560,11 @@ public class TablesDB
         DatabaseQueries.runQuery(foreignKeyQuery);
     }
 
-    private static void createPerksOwned()
+    private static void createPerksBought()
     {
-        String query = "CREATE TABLE " + DatabaseManager.PERKS_OWNED_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_BOUGHT_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
                             "perk_name VARCHAR(20) NOT NULL, " +
-                            "date_received TIMESTAMP NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, perk_name), " +
                             // indexes
@@ -586,9 +574,9 @@ public class TablesDB
         DatabaseQueries.runQuery(query);
     }
 
-    private static void createPerksOwnedKeys()
+    private static void createPerksBoughtKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_OWNED_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_OWNED_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_BOUGHT_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_BOUGHT_TABLE + "_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
@@ -739,96 +727,6 @@ public class TablesDB
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
                                  "FOREIGN KEY(required_level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-    private static void createBadges()
-    {
-        String query = "CREATE TABLE " + DatabaseManager.BADGES_TABLE + "(" +
-                            "name VARCHAR(20) NOT NULL, " +
-                            "title VARCHAR(30) DEFAULT NULL, " + // allow for extra space for color codes
-                            "required_permission VARCHAR(20) DEFAULT NULL, " +
-                            "PRIMARY KEY(name)" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createBadgesOwned()
-    {
-        String query = "CREATE TABLE " + DatabaseManager.BADGES_OWNED_TABLE + "(" +
-                            "uuid CHAR(36) NOT NULL, " +
-                            "badge_name VARCHAR(20) NOT NULL, " +
-                            // keys
-                            "PRIMARY KEY(uuid, badge_name), " +
-                            // indexes
-                            "INDEX uuid_index(uuid)" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createBadgesOwnedKeys()
-    {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BADGES_OWNED_TABLE + " ADD CONSTRAINT " + DatabaseManager.BADGES_OWNED_TABLE + "_fk " +
-                                 "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE, " +
-                                 "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-    private static void createBadgesCommands()
-    {
-        String query = "CREATE TABLE " + DatabaseManager.BADGES_COMMANDS_TABLE + "(" +
-                            "badge_name VARCHAR(20) NOT NULL, " +
-                            "command VARCHAR(100) NOT NULL, " + // commands can get quite long
-                            // keys
-                            "PRIMARY KEY(badge_name, command), " +
-                            // indexes
-                            "INDEX badge_name_index(badge_name)" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createBadgesCommandsKeys()
-    {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BADGES_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.BADGES_COMMANDS_TABLE + "_fk " +
-                                 "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-    private static void createMasteryBadgeLevels()
-    {
-        String query = "CREATE TABLE " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "(" +
-                            "badge_name VARCHAR(20) NOT NULL, " +
-                            "level_name VARCHAR(20) NOT NULL, " +
-                            // keys
-                            "PRIMARY KEY(badge_name, level_name), " +
-                            // indexes
-                            "INDEX badge_name_index(badge_name)" +
-                        ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createMasteryBadgeLevelsKeys()
-    {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.MASTERY_BADGE_LEVELS_TABLE + "_fk " +
-                                 "FOREIGN KEY(badge_name) REFERENCES " + DatabaseManager.BADGES_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE, " +
-                                 "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
 
