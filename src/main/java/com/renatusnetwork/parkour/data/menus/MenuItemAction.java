@@ -566,6 +566,7 @@ public class MenuItemAction {
                                 if (playerStats.isAttemptingRankup())
                                     Parkour.getRanksManager().leftRankup(playerStats);
 
+
                                 Level rankupLevel = playerStats.getRank().getRankupLevel();
                                 // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
                                 if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))

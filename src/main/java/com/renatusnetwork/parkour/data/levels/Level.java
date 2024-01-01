@@ -34,6 +34,7 @@ public class Level
     private boolean newLevel;
     private boolean hasMastery;
     private float masteryMultiplier;
+    private boolean tc;
 
     private HashMap<String, Integer> ratings;
     private List<String> requiredLevels;
@@ -239,6 +240,7 @@ public class Level
         this.type = levelType;
     }
 
+    public boolean hasDifficulty() { return difficulty > 0; }
 
     public int getDifficulty() { return difficulty; }
 
@@ -289,7 +291,9 @@ public class Level
 
     public boolean isDropper() { return type == LevelType.DROPPER; }
 
-    public boolean isTC() { return type == LevelType.TC; }
+    public boolean isTCEnabled() { return tc; }
+
+    public void setTC(boolean tc) { this.tc = tc; }
 
     public boolean isNew() { return newLevel; }
 

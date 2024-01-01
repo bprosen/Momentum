@@ -21,7 +21,7 @@ public class TestChamberListener implements Listener {
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        if (playerStats != null && playerStats.inLevel() && playerStats.getLevel().isTC())
+        if (playerStats != null && playerStats.inLevel() && playerStats.getLevel().isTCEnabled())
         {
             Location location = player.getLocation();
 

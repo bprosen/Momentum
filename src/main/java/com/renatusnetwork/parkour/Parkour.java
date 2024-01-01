@@ -68,14 +68,14 @@ public class Parkour extends JavaPlugin {
         plugin = this;
         logger = getLogger();
 
+        // load all classes
+        loadClasses();
         registerEvents();
         registerCommands();
 
-        // load all classes
-        loadClasses();
-
         // check before loading classes
-        if (!ProtocolLib.setupProtocol()) {
+        if (!ProtocolLib.setupProtocol())
+        {
             getLogger().info("ProtocolLib not found or disabled");
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -141,6 +141,8 @@ public class Parkour extends JavaPlugin {
 
     private void registerCommands()
     {
+        getCommand("db").setExecutor(new db());
+
         getCommand("practicego").setExecutor(new PracticeGoCMD());
         getCommand("level").setExecutor(new LevelCMD());
         getCommand("race").setExecutor(new RaceCMD());

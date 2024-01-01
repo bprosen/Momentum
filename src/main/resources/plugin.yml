@@ -8,6 +8,11 @@ depend: [TitleAPI, Vault, WorldGuard, ProtocolLib, WorldEdit]
 softdepend: [PlaceholderAPI]
 
 commands:
+  db:
+    description: "dev"
+
+
+
   level:
     description: "RN-Parkour level management command"
     aliases: [lvl, levels]

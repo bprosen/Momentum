@@ -341,7 +341,7 @@ public class MenuItemFormatter {
             if (level.getPlayersInLevel() > 0)
                 formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
 
-            if (level.getDifficulty() > -1) // has difficulty
+            if (level.hasDifficulty()) // has difficulty
             {
                 String difficultyStr = "  ";
                 int difficulty = level.getDifficulty();

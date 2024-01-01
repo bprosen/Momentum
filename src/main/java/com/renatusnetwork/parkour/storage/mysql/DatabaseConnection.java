@@ -16,7 +16,8 @@ public class DatabaseConnection {
         open();
     }
 
-    private void open() {
+    private void open()
+    {
         FileConfiguration settings = Parkour.getConfigManager().get("settings");
         String dbPath = "database";
 
@@ -27,7 +28,7 @@ public class DatabaseConnection {
         String database = settings.getString(dbPath + ".database");
         String port = settings.getString(dbPath + ".port");
 
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true"  + "&allowMultiQueries=true" + "&useSSL=false";
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&allowMultiQueries=true&useSSL=false";
 
         try {
             Class.forName("com.mysql.jdbc.Driver");

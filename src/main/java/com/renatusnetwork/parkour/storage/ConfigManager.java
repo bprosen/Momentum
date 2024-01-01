@@ -29,12 +29,16 @@ public class ConfigManager {
         File file = new File(plugin.getDataFolder(), fileName + ".yml");
         FileConfiguration fileConfig = new YamlConfiguration();
 
-        try {
-            if (!file.exists()) {
+        try
+        {
+            if (!file.exists())
+            {
                 file.getParentFile().mkdirs();
                 copy(plugin.getResource("config/" + fileName + ".yml"), file);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
 
@@ -59,25 +63,31 @@ public class ConfigManager {
         }
     }
 
-    public FileConfiguration get(String fileName) {
-        FileConfiguration fileConfig = configs.get(fileName);
-        if (fileConfig != null)
-            return fileConfig;
-        return null;
+    public FileConfiguration get(String fileName)
+    {
+        return configs.get(fileName);
     }
 
-    public void load(String fileName) {
-        try {
+    public void load(String fileName)
+    {
+        try
+        {
             configs.get(fileName).load(files.get(fileName));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
 
-    public void save(String fileName) {
-        try {
+    public void save(String fileName)
+    {
+        try
+        {
             configs.get(fileName).save(files.get(fileName));
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }

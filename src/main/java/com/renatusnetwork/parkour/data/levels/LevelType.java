@@ -1,6 +1,5 @@
 package com.renatusnetwork.parkour.data.levels;
 
-import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 
 public enum LevelType
 {
@@ -9,7 +8,6 @@ public enum LevelType
     DROPPER,
     ELYTRA,
     ASCENDANCE,
-    TC,
     EVENT_ASCENT,
     EVENT_MAZE,
     EVENT_FALLING_ANVIL,

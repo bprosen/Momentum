@@ -122,7 +122,7 @@ public class TablesDB
                            // keys
                            "PRIMARY KEY(uuid), " +
                            // indexes
-                           "UNIQUE INDEX name_index(name), " +
+                           "INDEX name_index(name), " +
                            // constraints
                            "CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_non_negative CHECK (" +
                                "prestiges >= 0 AND " +
@@ -160,23 +160,24 @@ public class TablesDB
         String query = "CREATE TABLE " + DatabaseManager.LEVELS_TABLE + "(" +
                             // basic info
                             "name VARCHAR(20) NOT NULL, " +
-                            "reward INT DEFAULT 0, " +
-                            "price INT DEFAULT 0, " +
-                            "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
+                            "reward INT DEFAULT NULL, " +
+                            "price INT DEFAULT NULL, " +
+                            "title VARCHAR(50) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
-                            "required_permission VARCHAR(20) DEFAULT NULL, " +
+                            "required_permission VARCHAR(50) DEFAULT NULL, " +
                             "required_rank VARCHAR(10) DEFAULT NULL, " +
                             "respawn_y SMALLINT DEFAULT NULL, " +
                             "max_completions SMALLINT DEFAULT NULL, " +
-                            "type ENUM(" + enumQuotations(LevelType.values()) + ") DEFAULT NULL, " + // default set from settings
+                            "type ENUM(" + enumQuotations(LevelType.values()) + ") DEFAULT '" + LevelType.NORMAL.name() + "', " +
                             "difficulty TINYINT DEFAULT NULL, " +
+                            "mastery_multiplier FLOAT DEFAULT NULL, " + // default set from settings
                             // switches
                             "cooldown BIT DEFAULT 0, " +
                             "broadcast BIT DEFAULT 0, " +
                             "liquid_reset BIT DEFAULT 0, " +
                             "new BIT DEFAULT 0, " +
                             "has_mastery BIT DEFAULT 0, " +
-                            "mastery_multiplier FLOAT DEFAULT 1.00, " +
+                            "tc BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(name), " +
                             // indexes
@@ -184,7 +185,8 @@ public class TablesDB
                             // constraints
                             "CONSTRAINT " + DatabaseManager.LEVELS_TABLE + "_non_negative CHECK (" +
                                     "reward >= 0 AND " +
-                                    "price >= 0" +
+                                    "price >= 0 AND " +
+                                    "max_completions >= 0" +
                             ")" +
                         ")";
 
@@ -208,7 +210,7 @@ public class TablesDB
                             "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
                             "price INT DEFAULT NULL, " +
-                            "required_permission VARCHAR(20) DEFAULT NULL, " +
+                            "required_permission VARCHAR(50) DEFAULT NULL, " +
                             "infinite_block ENUM(" + enumQuotations(Material.values()) + ") DEFAULT NULL, " +
                             "requires_mastery_levels BIT DEFAULT 0, " +
                             // keys

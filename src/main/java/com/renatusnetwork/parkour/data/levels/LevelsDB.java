@@ -29,7 +29,6 @@ public class LevelsDB {
         for (Map<String, String> result : results)
         {
             String levelName = result.get("name");
-
             LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
 
             Level level;
@@ -49,15 +48,41 @@ public class LevelsDB {
                 level = new Level(levelName);
 
             // set core details
-            level.setReward(Integer.parseInt(result.get("reward")));
-            level.setPrice(Integer.parseInt(result.get("price")));
-            level.setTitle(Utils.translate(result.get("title")));
+            String reward = result.get("reward");
+            if (reward != null)
+                level.setReward(Integer.parseInt(reward));
+
+            String price = result.get("price");
+            if (price != null)
+                level.setPrice(Integer.parseInt(price));
+
+            String title = result.get("title");
+            if (title != null)
+                level.setTitle(Utils.translate(title));
 
             // settings
-            level.setRequiredPermission(result.get("required_permission"));
-            level.setRequiredRank(result.get("required_rank"));
-            level.setRespawnY(Integer.parseInt(result.get("respawn_y")));
-            level.setMaxCompletions(Integer.getInteger("max_completions"));
+            String permission = result.get("required_permission");
+            if (permission != null)
+                level.setRequiredPermission(permission);
+
+            String requiredRank = result.get("required_rank");
+            if (requiredRank != null)
+                level.setRequiredRank(result.get("required_rank"));
+
+            String respawnY = result.get("respawn_y");
+            if (respawnY != null)
+                level.setRespawnY(Integer.parseInt(respawnY));
+
+            String maxCompletions = result.get("max_completions");
+            if (maxCompletions != null)
+                level.setMaxCompletions(Integer.parseInt(maxCompletions));
+
+            String masteryMultiplier = result.get("mastery_multiplier");
+            if (masteryMultiplier != null)
+                level.setMasteryMultiplier(Float.parseFloat(masteryMultiplier));
+            else
+                level.setMasteryMultiplier(Parkour.getSettingsManager().min_mastery_multiplier);
+
             level.setLevelType(type);
 
             // switches
@@ -66,7 +91,7 @@ public class LevelsDB {
             level.setLiquidResetPlayer(Integer.parseInt(result.get("liquid_reset")) == 1);
             level.setNew(Integer.parseInt(result.get("new")) == 1);
             level.setHasMastery(Integer.parseInt(result.get("has_mastery")) == 1);
-            level.setMasteryMultiplier(Float.parseFloat(result.get("mastery_multiplier")));
+            level.setTC(Integer.parseInt(result.get("tc")) == 1);
 
             // spawns
             Location spawnLoc = locationManager.get(SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName));
