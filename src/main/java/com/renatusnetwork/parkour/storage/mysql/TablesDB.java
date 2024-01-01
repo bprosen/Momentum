@@ -175,6 +175,7 @@ public class TablesDB
                             "liquid_reset BIT DEFAULT 0, " +
                             "new BIT DEFAULT 0, " +
                             "has_mastery BIT DEFAULT 0, " +
+                            "mastery_multiplier FLOAT DEFAULT 1.00, " +
                             // keys
                             "PRIMARY KEY(name), " +
                             // indexes

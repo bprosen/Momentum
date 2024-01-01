@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.clans;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.ClanXPRewardEvent;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
@@ -197,8 +198,9 @@ public class ClansManager
 
     public void doClanXPCalc(Clan clan, PlayerStats playerStats, int reward)
     {
-        int min = Parkour.getSettingsManager().clan_calc_percent_min;
-        int max = Parkour.getSettingsManager().clan_calc_percent_max;
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+        int min = settingsManager.clan_calc_percent_min;
+        int max = settingsManager.clan_calc_percent_max;
 
         // get random percent
         double percent = ThreadLocalRandom.current().nextInt(min, max) / 100.0;
@@ -226,7 +228,7 @@ public class ClansManager
 
             // level them up
             }
-            else if (totalXP > ClansYAML.getLevelUpPrice(clan))
+            else if (totalXP > settingsManager.clan_level_xp_required.get(clan.getLevel()))
                 processClanLevelUp(clan, totalXP);
             // add xp to clan
             else
@@ -292,8 +294,10 @@ public class ClansManager
     {
         int oldMaxLevel = clan.getMaxLevel();
 
-        if (newMaxLevel > Parkour.getSettingsManager().clans_max_level)
-            newMaxLevel = Parkour.getSettingsManager().clans_max_level;
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        if (newMaxLevel > settingsManager.clans_max_level)
+            newMaxLevel = settingsManager.clans_max_level;
 
         if (newMaxLevel < 5) // default max level
             newMaxLevel = 5;
@@ -310,7 +314,7 @@ public class ClansManager
             if (currLevel == oldMaxLevel && currLevel < newMaxLevel) // means they were max but not anymore!
             {
                 // means they can level up
-                if (ClansYAML.getLevelUpPrice(clan) <= clan.getXP())
+                if (settingsManager.clan_level_xp_required.get(clan.getLevel()) <= clan.getXP())
                     processClanLevelUp(clan, clan.getXP());
             }
             else if (newMaxLevel < currLevel)
@@ -324,18 +328,20 @@ public class ClansManager
 
     private void processClanLevelUp(Clan clan, int totalXP)
     {
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
         // left over after level up
-        int clanXPOverflow = totalXP - ClansYAML.getLevelUpPrice(clan);
+        int clanXPOverflow = totalXP - settingsManager.clan_level_xp_required.get(clan.getLevel());
         int newLevel = clan.getLevel() + 1;
 
         // this is the section that will determine if they will skip any levels
         for (int i = clan.getLevel(); i < clan.getMaxLevel(); i++)
         {
             // this means they are still above the next level amount
-            if (clanXPOverflow >= ClansYAML.getLevelUpPrice(newLevel))
+            if (clanXPOverflow >= settingsManager.clan_level_xp_required.get(newLevel))
             {
                 // remove from overflow and add +1 level
-                clanXPOverflow -= ClansYAML.getLevelUpPrice(newLevel);
+                clanXPOverflow -= settingsManager.clan_level_xp_required.get(newLevel);
                 newLevel++;
             }
             else

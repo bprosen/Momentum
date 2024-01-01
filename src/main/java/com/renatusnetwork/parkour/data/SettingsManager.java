@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data;
 
+import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
@@ -175,7 +176,12 @@ public class SettingsManager {
     public int max_difficulty;
     public int min_difficulty;
 
-    public SettingsManager(FileConfiguration settings) {
+    public float min_mastery_multiplier;
+    public float max_mastery_multiplier;
+    public HashMap<Integer, Integer> clan_level_xp_required;
+
+    public SettingsManager(FileConfiguration settings)
+    {
         cooldown_calendar = Calendar.getInstance();
         cooldown_calendar.setTime(new Date());
         load(settings);
@@ -406,5 +412,20 @@ public class SettingsManager {
 
         max_difficulty = settings.getInt("levels.max_difficulty");
         min_difficulty = settings.getInt("levels.min_difficulty");
+
+        min_mastery_multiplier = (float) settings.getDouble("levels.min_mastery_multiplier");
+        max_mastery_multiplier = (float) settings.getDouble("levels.max_mastery_multiplier");
+
+        clan_level_xp_required = new HashMap<>();
+
+        for (int i = 1;; i++)
+        {
+            int xpNeeded = settings.getInt("clans.levels." + i + ".xp-needed", -1);
+
+            // more than default, means it exists
+            if (xpNeeded > -1)
+                clan_level_xp_required.put(i, xpNeeded);
+            else break;
+        }
     }
 }

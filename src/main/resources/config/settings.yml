@@ -44,6 +44,8 @@ levels:
   min_rating: 0
   max_difficulty: 10
   min_difficulty: 1
+  min_mastery_multiplier: 1.00
+  max_mastery_multiplier: 4.00
 cooldowns:
   reset_time: "3:15"
   modifiers:
@@ -162,6 +164,28 @@ clans:
     max-percent: 25
   blocked_clan_names:
     - ""
+  levels:
+    # XP Needed to level up
+    '1':
+      xp-needed: 1000
+    '2':
+      xp-needed: 10000
+    '3':
+      xp-needed: 100000
+    '4':
+      xp-needed: 1000000
+    '5':
+      xp-needed: 10000000
+    '6':
+      xp-needed: 20000000
+    '7':
+      xp-needed: 30000000
+    '8':
+      xp-needed: 40000000
+    '9':
+      xp-needed: 50000000
+    '10':
+      xp-needed: 100000000
 player_submitted:
   world: ""
   plot_width: 75

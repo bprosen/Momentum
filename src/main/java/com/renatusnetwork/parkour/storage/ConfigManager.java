@@ -23,7 +23,6 @@ public class ConfigManager {
         initialize("rewards", plugin);
         initialize("bank", plugin);
         initialize("blackmarket", plugin);
-        initialize("clans", plugin);
     }
 
     private void initialize(String fileName, Plugin plugin) {

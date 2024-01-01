@@ -283,7 +283,8 @@ public class Scoreboard {
                                 board.add(formatSpacing(Utils.translate("&a&lJACKPOT LEVEL")));
                             }
                             // modifier section
-                            else {
+                            else
+                            {
                                 if (playerStats.hasPrestiges() && level.hasReward())
                                     newReward *= playerStats.getPrestigeMultiplier();
 

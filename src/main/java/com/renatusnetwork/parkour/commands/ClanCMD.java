@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.clans.*;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -12,6 +13,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Set;
 import java.util.UUID;
 
 public class ClanCMD implements CommandExecutor
@@ -206,7 +209,9 @@ public class ClanCMD implements CommandExecutor
                     // if max level, dont send needed to level up
                     if (!targetClan.isMaxLevel())
                     {
-                        long clanXPNeeded = ClansYAML.getLevelUpPrice(targetClan) - targetClan.getXP();
+                        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+                        long clanXPNeeded = settingsManager.clan_level_xp_required.get(targetClan.getLevel()) - targetClan.getXP();
 
                         sender.sendMessage(Utils.translate("  &cClan XP for Level &4" + Utils.formatNumber(targetClan.getXP())));
                         sender.sendMessage(Utils.translate("  &cXP to Level Up"));
@@ -314,8 +319,8 @@ public class ClanCMD implements CommandExecutor
                             Clan targetClan = Parkour.getClansManager().get(clanName);
                             if (targetClan != null)
                             {
-                                // make sure it is actually a level
-                                if (ClansYAML.isSection("clans." + newLevel))
+                                // make sure it is actually a level, we cannot set beyond whats upgradable
+                                if (Parkour.getSettingsManager().clan_level_xp_required.containsKey(newLevel))
                                 {
                                     if (targetClan.getMaxLevel() >= newLevel)
                                     {
