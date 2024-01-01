@@ -66,6 +66,7 @@ public class LevelsDB {
             level.setLiquidResetPlayer(Integer.parseInt(result.get("liquid_reset")) == 1);
             level.setNew(Integer.parseInt(result.get("new")) == 1);
             level.setHasMastery(Integer.parseInt(result.get("has_mastery")) == 1);
+            level.setMasteryMultiplier(Float.parseFloat(result.get("mastery_multiplier")));
 
             // spawns
             Location spawnLoc = locationManager.get(SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName));

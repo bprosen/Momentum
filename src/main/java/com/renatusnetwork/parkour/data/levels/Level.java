@@ -33,6 +33,7 @@ public class Level
     private LevelType type;
     private boolean newLevel;
     private boolean hasMastery;
+    private float masteryMultiplier;
 
     private HashMap<String, Integer> ratings;
     private List<String> requiredLevels;
@@ -301,6 +302,10 @@ public class Level
     public void toggleHasMastery() { hasMastery = !hasMastery; }
 
     public void setHasMastery(boolean hasMastery) { this.hasMastery = hasMastery; }
+
+    public float getMasteryMultiplier() { return masteryMultiplier; }
+
+    public void setMasteryMultiplier(float masteryMultiplier) { this.masteryMultiplier = masteryMultiplier; }
 
     public boolean isAscendance() { return type == LevelType.ASCENDANCE; }
 
