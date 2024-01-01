@@ -174,7 +174,7 @@ public class TablesDB
                             // switches
                             "cooldown BIT DEFAULT 0, " +
                             "broadcast BIT DEFAULT 0, " +
-                            "liquid_reset BIT DEFAULT 0, " +
+                            "liquid_reset BIT DEFAULT 1, " +
                             "new BIT DEFAULT 0, " +
                             "has_mastery BIT DEFAULT 0, " +
                             "tc BIT DEFAULT 0, " +
