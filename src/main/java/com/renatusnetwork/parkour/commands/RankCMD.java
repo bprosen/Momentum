@@ -20,7 +20,8 @@ import java.util.Arrays;
 public class RankCMD implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
+    {
 
         if (!(sender instanceof Player)) {
             return true;
@@ -29,29 +30,32 @@ public class RankCMD implements CommandExecutor {
         Player player = (Player) sender;
         RanksManager ranksManager = Parkour.getRanksManager();
 
-        if (player.hasPermission("rn-parkour.admin")) {
-            if (a.length == 0) {
+        if (player.hasPermission("rn-parkour.admin"))
+        {
+            if (a.length == 0)
                 sendRank(player);
-            } else if (a.length == 3 && a[0].equalsIgnoreCase("setrank")) {
-
-                Player victim = Bukkit.getPlayer(a[1]);
+            else if (a.length == 3 && a[0].equalsIgnoreCase("setrank"))
+            {
+                PlayerStats victim = Parkour.getStatsManager().getByName(a[1]);
                 String rankName = a[2];
 
-                if (victim == null) {
-                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
-                    return true;
-                }
-
-                if (ranksManager.exists(rankName))
+                if (victim != null)
                 {
-                    Rank rank = ranksManager.get(rankName);
-                    Parkour.getStatsManager().get(victim).setRank(rank);
-                    StatsDB.updateRank(victim.getUniqueId().toString(), rank.getName());
-                    player.sendMessage(Utils.translate("&7You set &c" + victim.getName() + "&7's rank to &c" + rank.getTitle()));
-                } else {
-                    player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
+                    if (ranksManager.exists(rankName))
+                    {
+                        Rank rank = ranksManager.get(rankName);
+                        victim.setRank(rank);
+                        StatsDB.updateRank(victim.getUUID(), rank.getName());
+                        player.sendMessage(Utils.translate("&7You set &c" + victim.getName() + "&7's rank to &c" + rank.getTitle()));
+                    }
+                    else
+                        player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
+                else
+                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("list"))
+            {
 
                 player.sendMessage(Utils.translate("&7Ranks Loaded: &c" + String.join("&7, &c",
                         Parkour.getRanksManager().getNames())));
@@ -81,7 +85,7 @@ public class RankCMD implements CommandExecutor {
 
                 if (rank != null)
                 {
-                    String[] split = Arrays.copyOfRange(a, 1, a.length);
+                    String[] split = Arrays.copyOfRange(a, 2, a.length);
                     String title = String.join(" ", split);
 
                     // update in db
@@ -150,8 +154,9 @@ public class RankCMD implements CommandExecutor {
                 {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
-            } else if (a.length == 2 && a[0].equalsIgnoreCase("remove")) {
-
+            }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("remove"))
+            {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
 
@@ -167,96 +172,95 @@ public class RankCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&7Removed rank &c" + rankName));
                     }
                     else
-                    {
                         player.sendMessage(Utils.translate("&cYou cannot delete the default rank"));
-                    }
                 }
                 else
-                {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
-                }
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
+            {
                 new BukkitRunnable() {
                     @Override
                     public void run()
                     {
-                        Parkour.getConfigManager().load("ranks");
-                        sender.sendMessage(Utils.translate("&7Loaded &cranks.yml &7from disk"));
                         Parkour.getRanksManager().load();
-                        sender.sendMessage(Utils.translate("&7Loaded ranks from &cranks.yml&7, &c" +
-                                Parkour.getRanksManager().getNames().size() + " &7total"));
+                        sender.sendMessage(Utils.translate("&7Loaded &c" + Parkour.getRanksManager().getNames().size() + " ranks"));
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
-            } else if (a.length == 3 && a[0].equalsIgnoreCase("setprestiges")) {
-                // check if they have joined parkour
-                if (StatsDB.isPlayerInDatabase(a[1])) {
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("setprestiges"))
+            {
+                PlayerStats victim = Parkour.getStatsManager().getByName(a[1]);
 
-                    Player victim = Bukkit.getPlayer(a[1]);
-                    if (Utils.isInteger(a[2])) {
-
+                if (victim != null)
+                {
+                    if (Utils.isInteger(a[2]))
+                    {
                         int newPrestige = Integer.parseInt(a[2]);
 
-                        if (newPrestige >= 0) {
-                            // update ingame cache if theyre online
-                            if (victim != null) {
-                                PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
-                                victimStats.setPrestiges(newPrestige);
+                        if (newPrestige >= 0)
+                        {
+                            ranksManager.updatePrestiges(victim, newPrestige);
 
-                                if (victimStats.hasPrestiges()) {
-                                    float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * victimStats.getPrestiges();
+                            if (victim.hasPrestiges())
+                            {
+                                float prestigeMultiplier = Parkour.getSettingsManager().prestige_multiplier_per_prestige * victim.getPrestiges();
 
-                                    if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
-                                        prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
+                                if (prestigeMultiplier >= Parkour.getSettingsManager().max_prestige_multiplier)
+                                    prestigeMultiplier = Parkour.getSettingsManager().max_prestige_multiplier;
 
-                                    prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
+                                prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
 
-                                    victimStats.setPrestigeMultiplier(prestigeMultiplier);
-                                }
+                                victim.setPrestigeMultiplier(prestigeMultiplier);
                             }
-                            // update in db
-                            RanksDB.updatePrestigesFromName(a[1], newPrestige);
-                            player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's Prestiges to &6" + newPrestige));
+                            player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's prestiges to &6" + newPrestige));
 
-                        } else {
-                            player.sendMessage(Utils.translate("&cDon't try to set someone into the negatives please :)"));
                         }
-                    } else {
-                        player.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
+                        else
+                            player.sendMessage(Utils.translate("&cDon't try to set someone into the negatives please :)"));
                     }
-                } else {
-                    player.sendMessage(Utils.translate("&4" + a[1] + " &cdoes not exist in database!"));
+                    else
+                        player.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
                 }
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
-                sendAdminHelp(player);
-            } else {
-                sendAdminHelp(player);
+                else
+                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
             }
-        } else if (a.length == 0) {
-            sendRank(player);
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
-            sendPlayerHelp(player);
-        } else {
-            sendPlayerHelp(player);
+            else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
+                sendAdminHelp(player);
+            else
+                sendAdminHelp(player);
         }
+        else if (a.length == 0)
+            sendRank(player);
+        else
+            sendPlayerHelp(player);
 
         return false;
     }
 
     private void sendRank(Player player)
     {
-        player.sendMessage(Utils.translate("&cYou are &6" + Parkour.getStatsManager().get(player).getRank().getTitle()));
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        PlayerStats playerStats = Parkour.getStatsManager().get(player.getUniqueId().toString());
+        if (playerStats.hasRank())
+        {
+            player.sendMessage(Utils.translate("&cYou are &6" + playerStats.getRank().getTitle()));
 
-        if (playerStats.hasPrestiges()) {
+            if (playerStats.hasPrestiges())
+            {
 
-            // add an s if its not one because im OCD with this
-            String endingString = "time";
-            if (playerStats.getPrestiges() > 1)
-                endingString += "s";
+                // add an s if its not one because im OCD with this
+                String endingString = "prestige";
+                if (playerStats.getPrestiges() > 1)
+                    endingString += "s";
 
-            player.sendMessage(Utils.translate("&cYou have prestiged &6" + playerStats.getPrestiges() + " " + endingString));
+                player.sendMessage(Utils.translate("&cYou have &6" + playerStats.getPrestiges() + " " + endingString));
+            }
         }
+        else if (player.hasPermission("rn-parkour.admin"))
+            sendAdminHelp(player);
+        else
+            sendPlayerHelp(player);
     }
 
     private void sendAdminHelp(Player player) {

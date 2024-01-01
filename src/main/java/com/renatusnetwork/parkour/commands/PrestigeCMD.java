@@ -42,7 +42,7 @@ public class PrestigeCMD implements CommandExecutor {
                 {
                     // otherwise, put them in and ask them to confirm within 5 seconds
                     player.sendMessage("");
-                    player.sendMessage(Utils.translate("&cAre you sure you want to prestige? This will reset you to rank &f" + Parkour.getSettingsManager().default_rank));
+                    player.sendMessage(Utils.translate("&cAre you sure you want to prestige? This will reset you to rank &f" + rankManager.get(Parkour.getSettingsManager().default_rank).getTitle()));
                     player.sendMessage(Utils.translate("&cIt will cost you &6" + Utils.formatNumber(cost) + " &eCoins"));
                     player.sendMessage(Utils.translate("&cType &4/prestige &cagain to confirm"));
                     player.sendMessage("");

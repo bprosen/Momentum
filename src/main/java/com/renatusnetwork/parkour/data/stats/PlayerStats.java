@@ -351,6 +351,8 @@ public class PlayerStats {
         return rank;
     }
 
+    public boolean hasRank() { return rank != null; }
+
     public boolean isLastRank()
     {
         // get if they are at last rank

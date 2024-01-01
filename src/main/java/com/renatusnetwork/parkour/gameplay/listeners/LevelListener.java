@@ -177,8 +177,7 @@ public class LevelListener implements Listener {
 
         // delete if they have a cp
         if (playerStats.hasCurrentCheckpoint())
-            DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
-                    " AND player_name='" + playerStats.getName() + "'");
+            DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name=? AND name=?", playerStats.getLevel().getName(), playerStats.getName());
 
         playerStats.setCurrentCheckpoint(location);
         playerStats.removeCheckpoint(playerStats.getLevel());

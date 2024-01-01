@@ -84,6 +84,8 @@ public class LevelCMD implements CommandExecutor
                     else
                         player.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&c does not require buying"));
                 }
+                else
+                    sender.sendMessage(Utils.translate("&4'&c" + levelName + "&4' &cdoes not exist"));
             }
             else
                 sender.sendMessage(Utils.translate("&cConsole cannot do this"));
@@ -885,10 +887,7 @@ public class LevelCMD implements CommandExecutor
                 }
             }
             else
-            {
-                sender.sendMessage(Utils.translate("&c'&4" + a[0] + "&c' is not a valid parameter"));
                 sendHelp(sender);
-            }
         }
         return true;
     }
@@ -906,6 +905,7 @@ public class LevelCMD implements CommandExecutor
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&aTo reload levels from database, use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
+        sender.sendMessage(Utils.translate("&a/level buy  &7Buys a level if it has a price"));
         sender.sendMessage(Utils.translate("&a/level show  &7Show level information"));
         sender.sendMessage(Utils.translate("&a/level create <level>  &7Create a level"));
         sender.sendMessage(Utils.translate("&a/level load  &7Loads levels.yml then levels"));

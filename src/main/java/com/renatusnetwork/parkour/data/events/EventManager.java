@@ -363,8 +363,8 @@ public class EventManager {
 
             List<Map<String, String>> winResults = DatabaseQueries.getResults(
                     "players",
-                    "uuid, player_name, event_wins",
-                    " WHERE event_wins > 0" +
+                    "uuid, name, event_wins",
+                    "WHERE event_wins > 0" +
                             " ORDER BY event_wins DESC" +
                             " LIMIT " + Parkour.getSettingsManager().max_event_leaderboard_size);
 
@@ -373,7 +373,7 @@ public class EventManager {
             for (Map<String, String> winResult : winResults) {
                 leaderboard.put(leaderboardPos,
                         new EventLBPosition(
-                                winResult.get("uuid"), winResult.get("player_name"), Integer.parseInt(winResult.get("event_wins"))
+                                winResult.get("uuid"), winResult.get("name"), Integer.parseInt(winResult.get("event_wins"))
                         ));
 
                 leaderboardPos++;

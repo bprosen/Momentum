@@ -124,7 +124,7 @@ public class TablesDB
                            // indexes
                            "UNIQUE INDEX name_index(name), " +
                            // constraints
-                           "CONSTRAINT non_negative CHECK (" +
+                           "CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_non_negative CHECK (" +
                                "prestiges >= 0 AND " +
                                "coins >= 0.0 AND " +
                                "infinite_classic_score >= 0 AND " +
@@ -142,10 +142,11 @@ public class TablesDB
 
     private static void createPlayersKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLAYERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLAYERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_clan_fk " +
                                  "FOREIGN KEY(clan) REFERENCES " + DatabaseManager.CLANS_TABLE + "(tag) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_rank_name_fk " +
                                  "FOREIGN KEY(rank_name) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL";
@@ -181,7 +182,7 @@ public class TablesDB
                             // indexes
                             "INDEX type_index(type), " +
                             // constraints
-                            "CONSTRAINT non_negative CHECK (" +
+                            "CONSTRAINT " + DatabaseManager.LEVELS_TABLE + "_non_negative CHECK (" +
                                     "reward >= 0 AND " +
                                     "price >= 0" +
                             ")" +
@@ -192,7 +193,7 @@ public class TablesDB
 
     private static void createLevelsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVELS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVELS_TABLE + "_required_rank_fk " +
                                  "FOREIGN KEY(required_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name)" +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL";
@@ -213,7 +214,7 @@ public class TablesDB
                             // keys
                             "PRIMARY KEY(name), " +
                             // constraints
-                            "CONSTRAINT non_negative CHECK (" +
+                            "CONSTRAINT " + DatabaseManager.PERKS_TABLE + "_non_negative CHECK (" +
                                 "price >= 0" +
                             ")" +
                         ")";
@@ -239,9 +240,9 @@ public class TablesDB
 
     private static void createPlotsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLOTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLOTS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLOTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLOTS_TABLE + "_owner_uuid_fk " +
                                  "FOREIGN KEY(owner_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
-                                 "ON DELETE CASCADE, " +
+                                 "ON DELETE CASCADE " +
                                  "ON UPDATE CASCADE"; // we want to delete their plot if the player is deleted from the db
 
         DatabaseQueries.runQuery(foreignKeyQuery);
@@ -275,7 +276,7 @@ public class TablesDB
                             "INDEX uuid_index(uuid), " +
                             // constraints
                             "CONSTRAINT rating_in_bounds CHECK (" +
-                                "ratings >= 0 AND rating <= 5" +
+                                "rating >= 0 AND rating <= 5" +
                             ")" +
                         ")";
 
@@ -288,6 +289,7 @@ public class TablesDB
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.LEVEL_RATINGS_TABLE + "_rank_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -315,10 +317,11 @@ public class TablesDB
 
     private static void createLevelCheckpointsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "_uuid_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + "_owner_uuid_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -348,10 +351,11 @@ public class TablesDB
 
     private static void createLevelSavesKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_SAVES_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_SAVES_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_SAVES_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_SAVES_TABLE + "_uuid_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.LEVEL_SAVES_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -375,10 +379,11 @@ public class TablesDB
 
     private static void createLevelPurchasesKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_PURCHASES_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_PURCHASES_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_PURCHASES_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_PURCHASES_TABLE + "_uuid_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.LEVEL_PURCHASES_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -399,7 +404,7 @@ public class TablesDB
                             // keys
                             "PRIMARY KEY(tag), " +
                             // constraints
-                            "CONSTRAINT non_negative CHECK (" +
+                            "CONSTRAINT " + DatabaseManager.CLANS_TABLE + "_non_negative CHECK (" +
                                 "level >= 1 AND " +
                                 "xp >= 0 AND " +
                                 "total_xp >= 0 AND " +
@@ -437,12 +442,13 @@ public class TablesDB
 
     private static void createRanksKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.RANKS_TABLE + " ADD CONSTRAINT " + DatabaseManager.RANKS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.RANKS_TABLE + " ADD CONSTRAINT " + DatabaseManager.RANKS_TABLE + "_rankup_level_fk " +
                                  "FOREIGN KEY(rankup_level) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.RANKS_TABLE + "_next_rank_fk " +
                                  "FOREIGN KEY(next_rank) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE, " +
+                                 "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL";
 
         DatabaseQueries.runQuery(foreignKeyQuery);
@@ -464,7 +470,7 @@ public class TablesDB
                             "INDEX level_index(level_name), " + // gets the completions for that level fast
                             "UNIQUE INDEX record_index(uuid, record), " + // get a users records fast, where uuid=player uuid and record=1
                             // constraints
-                            "CONSTRAINT non_negative CHECK (" +
+                            "CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_non_negative CHECK (" +
                                 "time_taken >= 0" +
                             ")" +
                         ")";
@@ -474,10 +480,11 @@ public class TablesDB
 
     private static void createLevelCompletionsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_uuid_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -497,7 +504,7 @@ public class TablesDB
                             // keys
                             "PRIMARY KEY(name), " +
                             // constraints
-                            "CONSTRAINT non_negative CHECK (" +
+                            "CONSTRAINT " + DatabaseManager.MODIFIERS_TABLE + "_non_negative CHECK (" +
                                 "multiplier >= 0.0 AND " +
                                 "discount >= 0.0 AND " +
                                 "bonus >= 0" +
@@ -523,10 +530,11 @@ public class TablesDB
 
     private static void createPlotTrustedPlayersKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "_plot_id_fk " +
                                  "FOREIGN KEY(plot_id) REFERENCES " + DatabaseManager.PLOTS_TABLE + "(id) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "_trusted_uuid_fk " +
                                  "FOREIGN KEY(trusted_uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -550,10 +558,11 @@ public class TablesDB
 
     private static void createPlayerModifiersKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "_uuid_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PLAYER_MODIFIERS_TABLE + "_modifier_name_fk " +
                                  "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.MODIFIERS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -577,10 +586,11 @@ public class TablesDB
 
     private static void createPerksBoughtKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_BOUGHT_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_BOUGHT_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_BOUGHT_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_BOUGHT_TABLE + "_uuid_fk " +
                                  "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PERKS_BOUGHT_TABLE + "_perk_name_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -604,10 +614,11 @@ public class TablesDB
 
     private static void createPerksLevelRequirementsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "_perk_name_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -635,7 +646,7 @@ public class TablesDB
 
     private static void createPerksArmorKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_ARMOR_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_ARMOR_TABLE + "_perk_name_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -659,7 +670,7 @@ public class TablesDB
 
     private static void createLevelCompletionCommandsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -675,7 +686,10 @@ public class TablesDB
         String finalString = "";
 
         for (PotionEffectType type : PotionEffectType.values())
-            finalString += "'" + type.getName().toUpperCase() + "',";
+        {
+            if (type != null)
+                finalString += "'" + type.getName().toUpperCase() + "',";
+        }
 
         finalString = finalString.substring(0, finalString.length() - 1);
 
@@ -688,7 +702,7 @@ public class TablesDB
                             // indexes
                             "INDEX level_name_index(level_name), " +
                             // constraints
-                            "CONSTRAINT non_negative CHECK (" +
+                            "CONSTRAINT " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "_non_negative CHECK (" +
                                 "amplifier >= 0 AND " +
                                 "duration >= 0" +
                             ")" +
@@ -699,7 +713,7 @@ public class TablesDB
 
     private static void createLevelPotionEffectsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -723,10 +737,11 @@ public class TablesDB
 
     private static void createLevelRequiredLevelsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "_required_level_name_fk " +
                                  "FOREIGN KEY(required_level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";

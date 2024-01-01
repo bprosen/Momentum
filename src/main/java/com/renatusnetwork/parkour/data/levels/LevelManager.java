@@ -461,13 +461,16 @@ public class LevelManager {
                 temporaryList.add(level);
         }
 
-        Random ran = new Random();
-        Level level = temporaryList.get(ran.nextInt(temporaryList.size()));
-
-        if (level != null)
+        if (!temporaryList.isEmpty())
         {
-            featuredLevel = level;
-            Parkour.getPluginLogger().info("Featured Level: " + level.getName());
+            Random ran = new Random();
+            Level level = temporaryList.get(ran.nextInt(temporaryList.size()));
+
+            if (level != null)
+            {
+                featuredLevel = level;
+                Parkour.getPluginLogger().info("Featured Level: " + level.getName());
+            }
         }
     }
 

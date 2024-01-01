@@ -391,7 +391,7 @@ public class StatsManager {
                     "p.name AS player_name, COUNT(lc.level_name) AS total_completions",
                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lc.uuid " +
                            "GROUP BY lc.uuid " +
-                           "ORDER BY level_completions " +
+                           "ORDER BY total_completions " +
                            "DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size
             );
 
@@ -418,12 +418,13 @@ public class StatsManager {
         try {
 
             // find the highest top 10 completion stat
-            List<Map<String, String>> coinsResults = DatabaseQueries.getResults("players", "player_name, coins",
-                    " ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
+            List<Map<String, String>> coinsResults = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "name, coins",
+                    "ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
 
             int lbPos = 1;
-            for (Map<String, String> coinsResult : coinsResults) {
-                String playerName = coinsResult.get("player_name");
+            for (Map<String, String> coinsResult : coinsResults)
+            {
+                String playerName = coinsResult.get("name");
                 double coins = Double.parseDouble(coinsResult.get("coins"));
 
                 // if they have more than 0 completions, add (reset stats case)
@@ -444,12 +445,20 @@ public class StatsManager {
         try {
 
             // find the highest top 10 completion stat
-            List<Map<String, String>> recordsResult = DatabaseQueries.getResults("players", "player_name, records",
-                    " ORDER BY records DESC LIMIT " + Parkour.getSettingsManager().max_records_leaderboard_size);
+            List<Map<String, String>> recordsResult = DatabaseQueries.getResults(
+                    DatabaseManager.PLAYERS_TABLE + " p",
+                    "name, COUNT(level_name) AS numRecords",
+                    "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc " +
+                            "ON lc.uuid=p.uuid " +
+                            "WHERE lc.record=(1) " +
+                            "GROUP BY p.name " +
+                            "ORDER BY numRecords " +
+                            "DESC LIMIT " + Parkour.getSettingsManager().max_records_leaderboard_size);
 
             int lbPos = 1;
-            for (Map<String, String> recordResult : recordsResult) {
-                String playerName = recordResult.get("player_name");
+            for (Map<String, String> recordResult : recordsResult)
+            {
+                String playerName = recordResult.get("name");
                 int records = Integer.parseInt(recordResult.get("records"));
 
                 // if they have more than 0 completions, add (reset stats case)

@@ -166,16 +166,16 @@ public class CompletionsDB
         ResultSet results = DatabaseQueries.getRawResults(
                 "SELECT l.name AS level_name, p.uuid AS player_uuid, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
                         "FROM (" +
-                        "  SELECT *, ROW_NUMBER() OVER (PARTITION BY l.name ORDER BY time_taken) AS row_num" +
+                        "  SELECT *, ROW_NUMBER() OVER (PARTITION BY level_name ORDER BY time_taken) AS row_num" +
                         "  FROM (" +
-                        "    SELECT l.name, p.uuid, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
+                        "    SELECT level_name, uuid, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
                         "    FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
                         "    WHERE time_taken > 0" +
-                        "    GROUP BY l.name, p.uuid" +
+                        "    GROUP BY level_name, uuid" +
                         "  ) AS grouped_completions" +
                         ") AS c " +
                         "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON c.uuid=p.uuid " +
-                        "JOIN " + DatabaseManager.LEVELS_TABLE + " l ON c.level_name=l.level_name " +
+                        "JOIN " + DatabaseManager.LEVELS_TABLE + " l ON c.level_name=l.name " +
                         "WHERE c.row_num <= 10 " +
                         "ORDER BY c.level_name, c.time_taken;"
         );

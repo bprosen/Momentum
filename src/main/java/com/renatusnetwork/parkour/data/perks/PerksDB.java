@@ -140,7 +140,10 @@ public class PerksDB
                 DatabaseManager.PERKS_TABLE, "*", "WHERE name=?", perkName
         );
 
-        return parsePerkFromResult(perkName, perkResult);
+        if (!perkResult.isEmpty())
+            return parsePerkFromResult(perkName, perkResult);
+        else
+            return null;
     }
     private static Perk parsePerkFromResult(String perkName, Map<String, String> result)
     {

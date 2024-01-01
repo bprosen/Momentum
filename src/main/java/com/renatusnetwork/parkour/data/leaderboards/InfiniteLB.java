@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.leaderboards;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -56,9 +57,9 @@ public class InfiniteLB
                     String typeDBName = "infinite_" + type.toString().toLowerCase() + "_score";
 
                     List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
-                            "players",
-                            "uuid, player_name, " + typeDBName,
-                            " WHERE " + typeDBName + " > 0" +
+                            DatabaseManager.PLAYERS_TABLE,
+                            "uuid, name, " + typeDBName,
+                            "WHERE " + typeDBName + " > 0" +
                                     " ORDER BY " + typeDBName + " DESC" +
                                     " LIMIT " + Parkour.getSettingsManager().max_infinite_leaderboard_size);
 
@@ -68,7 +69,7 @@ public class InfiniteLB
                         leaderboard.put(lbPos,
                                 new InfiniteLBPosition(
                                         scoreResult.get("uuid"),
-                                        scoreResult.get("player_name"),
+                                        scoreResult.get("name"),
                                         Integer.parseInt(scoreResult.get(typeDBName)))
                         );
                         lbPos++;

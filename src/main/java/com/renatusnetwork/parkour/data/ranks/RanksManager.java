@@ -50,6 +50,12 @@ public class RanksManager {
         ranks.remove(rankName);
     }
 
+    public void updatePrestiges(PlayerStats playerStats, int prestiges)
+    {
+        RanksDB.updatePrestiges(playerStats.getUUID(), prestiges);
+        playerStats.setPrestiges(prestiges);
+    }
+
     public void resetPlayersInRank(Rank rank)
     {
         Rank defaultRank = Parkour.getRanksManager().get(Parkour.getSettingsManager().default_rank);

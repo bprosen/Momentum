@@ -20,7 +20,7 @@ public class BankDB
         List<Map<String, String>> results = DatabaseQueries.getResults("bank", "*", " WHERE type='" + type.toString() + "'");
 
         for (Map<String, String> result : results)
-            bids.put(result.get("player_name"), Long.parseLong(result.get("total_bid")));
+            bids.put(result.get("name"), Long.parseLong(result.get("total_bid")));
 
         return bids;
     }
@@ -36,13 +36,13 @@ public class BankDB
                 if (hasBid(playerStats, type))
                 {
                     DatabaseQueries.runAsyncQuery(
-                            "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND player_name='" + playerStats.getName() + "'"
+                            "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND name='" + playerStats.getName() + "'"
                     );
                 }
                 else
                 {
                     DatabaseQueries.runAsyncQuery(
-                            "INSERT INTO bank (uuid, player_name, type, total_bid) VALUES ('" +
+                            "INSERT INTO bank (uuid, name, type, total_bid) VALUES ('" +
                             playerStats.getUUID() + "','" +
                             playerStats.getName() + "','" +
                             type + "'," + bidAmount + ")");

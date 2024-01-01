@@ -28,21 +28,14 @@ public class StatsDB {
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "*",
-                " WHERE uuid=?", playerStats.getUUID()
+                "WHERE uuid=?", playerStats.getUUID()
         );
 
         if (playerResult.isEmpty())
         {
-            String query = "INSERT INTO " + DatabaseManager.PLAYERS_TABLE +
-                    " (uuid, name)" +
-                    " VALUES " +
-                    "('" +
-                    playerStats.getUUID() + "', '" +
-                    playerStats.getName() +
-                    "')"
-                    ;
-
-            DatabaseQueries.runQuery(query);
+            DatabaseQueries.runQuery(
+                    "INSERT INTO " + DatabaseManager.PLAYERS_TABLE + " (uuid, name) VALUES (?,?)",
+                    playerStats.getUUID(), playerStats.getName());
         }
         else
         {
@@ -86,6 +79,8 @@ public class StatsDB {
             Rank rank = Parkour.getRanksManager().get(rankName);
             if (rank != null)
                 playerStats.setRank(rank);
+            else
+                playerStats.setRank(Parkour.getRanksManager().get(Parkour.getSettingsManager().default_rank));
 
             for (InfiniteType type : InfiniteType.values())
             {
@@ -165,7 +160,10 @@ public class StatsDB {
                         DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*) AS count",
                         "WHERE uuid=?", playerStats.getUUID());
 
-        return Integer.parseInt(result.get("count"));
+        if (!result.isEmpty())
+            return Integer.parseInt(result.get("count"));
+        else
+            return 0;
     }
 
     public static int getTotalPlayers()
@@ -255,7 +253,10 @@ public class StatsDB {
                 " WHERE name=?", playerName
         );
 
-        return Double.parseDouble(playerResult.get("coins"));
+        if (!playerResult.isEmpty())
+            return Double.parseDouble(playerResult.get("coins"));
+        else
+            return 0.0;
     }
 
     public static double getCoinsFromUUID(String UUID)
@@ -266,7 +267,10 @@ public class StatsDB {
                 " WHERE uuid=?", UUID
         );
 
-        return Double.parseDouble(playerResult.get("coins"));
+        if (!playerResult.isEmpty())
+            return Double.parseDouble(playerResult.get("coins"));
+        else
+            return 0.0;
     }
 
     public static boolean isPlayerInDatabase(String playerName)
@@ -355,7 +359,7 @@ public class StatsDB {
         List<Map<String, String>> playerResults = DatabaseQueries.getResults(
                 DatabaseManager.PLAYER_MODIFIERS_TABLE + " pm",
                 "m.type AS type, pm.modifier_name AS modifier_name",
-                "JOIN " + DatabaseManager.MODIFIERS_TABLE + " m ON m.modifier_name=pm.modifier_name WHERE uuid=?",
+                "JOIN " + DatabaseManager.MODIFIERS_TABLE + " m ON m.name=pm.modifier_name WHERE uuid=?",
                 playerStats.getUUID()
         );
 

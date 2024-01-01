@@ -37,7 +37,10 @@ public class LocationsDB
                "WHERE name=?",
                          locationName);
 
-        return parseLocationFromResult(result);
+        if (!result.isEmpty())
+            return parseLocationFromResult(result);
+        else
+            return null;
     }
 
     public static Location parseLocationFromResult(Map<String, String> result)
