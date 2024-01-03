@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class PerksCMD implements CommandExecutor
 {
@@ -59,7 +60,7 @@ public class PerksCMD implements CommandExecutor
                     String title = String.join(" ", split);
 
                     perkManager.updateTitle(perk, title);
-                    sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7title to &c" + perk.getFormattedTitle()));
+                    sender.sendMessage(Utils.translate("&7You have updated &c" + perk.getTitle() + " &7title to &c" + perk.getFormattedTitle()));
                 }
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
@@ -76,7 +77,7 @@ public class PerksCMD implements CommandExecutor
                         int price = Integer.parseInt(a[2]);
 
                         perkManager.updatePrice(perk, price);
-                        sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7price to &c" + price));
+                        sender.sendMessage(Utils.translate("&7You have updated &c" + perk.getTitle() + " &7price to &c" + price));
                     }
                     else
                         sender.sendMessage(Utils.translate("&4" + a[2] + "&c is not a valid integer"));
@@ -93,7 +94,7 @@ public class PerksCMD implements CommandExecutor
                     String requiredPermission = a[2].toLowerCase(); // force lowercase standard2
 
                     perkManager.updateRequiredPermission(perk, requiredPermission);
-                    sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7required permission to &c" + requiredPermission));
+                    sender.sendMessage(Utils.translate("&7You have updated &c" + perk.getTitle() + " &7required permission to &c" + requiredPermission));
                 }
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("infiniteblock"))
@@ -110,7 +111,7 @@ public class PerksCMD implements CommandExecutor
                     if (infiniteBlock != null)
                     {
                         perkManager.updateInfiniteBlock(perk, infiniteBlock);
-                        sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7infinite block to &c" + infiniteBlock));
+                        sender.sendMessage(Utils.translate("&7You have updated &c" + perk.getTitle() + " &7infinite block to &c" + infiniteBlock));
                     }
                 }
             }
@@ -131,10 +132,10 @@ public class PerksCMD implements CommandExecutor
                         if (!perk.alreadyRequiresLevel(level))
                         {
                             perkManager.addRequiredLevel(perk, level);
-                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + "&7 to &c" + perk.getFormattedTitle() + "&7's required levels"));
+                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + "&7 to &c" + perk.getTitle() + "&7's required levels"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is already a required level for &c" + perk.getFormattedTitle()));
+                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is already a required level for &c" + perk.getTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
@@ -157,10 +158,10 @@ public class PerksCMD implements CommandExecutor
                         if (perk.alreadyRequiresLevel(level))
                         {
                             perkManager.removeRequiredLevel(perk, level);
-                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getFormattedTitle() + "&7 from &c" + perk.getFormattedTitle() + "&7's required levels"));
+                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getFormattedTitle() + "&7 from &c" + perk.getTitle() + "&7's required levels"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is not a required level for &c" + perk.getFormattedTitle()));
+                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is not a required level for &c" + perk.getTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
@@ -190,11 +191,11 @@ public class PerksCMD implements CommandExecutor
                                 perkManager.addArmorPiece(perk, armorType, materialType);
                                 sender.sendMessage(Utils.translate(
                                         "&7You have added armor piece of type &6" + armorType.name() +
-                                             "&7 with material &6" + materialType.name() + " &7to &6" + perk.getFormattedTitle()
+                                             "&7 with material &6" + materialType.name() + " &7to &6" + perk.getTitle()
                                 ));
                             }
                             else
-                                sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &calready has an armor piece on &4" + armorType));
+                                sender.sendMessage(Utils.translate("&c" + perk.getTitle() + " &calready has an armor piece on &4" + armorType));
                         }
                     }
                 }
@@ -221,7 +222,7 @@ public class PerksCMD implements CommandExecutor
                             ));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &cdoes not have an armor piece on &4" + type.name()));
+                            sender.sendMessage(Utils.translate("&c" + perk.getTitle() + " &cdoes not have an armor piece on &4" + type.name()));
                     }
                 }
             }
@@ -251,7 +252,7 @@ public class PerksCMD implements CommandExecutor
                             ));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&4" + perk.getFormattedTitle() + " &cdoes not have an armor item on piece &4" + type.name()));
+                            sender.sendMessage(Utils.translate("&4" + perk.getTitle() + " &cdoes not have an armor item on piece &4" + type.name()));
                     }
                 }
             }
@@ -277,7 +278,7 @@ public class PerksCMD implements CommandExecutor
                             ));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&4" + perk.getFormattedTitle() + " &cdoes not have an armor item on piece &4" + type.name()));
+                            sender.sendMessage(Utils.translate("&4" + perk.getTitle() + " &cdoes not have an armor item on piece &4" + type.name()));
                     }
                 }
             }
@@ -304,11 +305,11 @@ public class PerksCMD implements CommandExecutor
                                 perkManager.updateArmorMaterial(perk, armorType, materialType);
                                 sender.sendMessage(Utils.translate(
                                         "&7You have updated armor piece of type &6" + armorType.name() +
-                                            "&7 with new material &6" + materialType.name() + " &7to &6" + perk.getFormattedTitle()
+                                            "&7 with new material &6" + materialType.name() + " &7to &6" + perk.getTitle()
                                 ));
                             }
                             else
-                                sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &cdoes not have an armor piece on &4" + armorType));
+                                sender.sendMessage(Utils.translate("&c" + perk.getTitle() + " &cdoes not have an armor piece on &4" + armorType));
                         }
                     }
                 }
@@ -337,24 +338,84 @@ public class PerksCMD implements CommandExecutor
                                 perkManager.updateArmorMaterialType(perk, armorType, material);
                                 sender.sendMessage(Utils.translate(
                                         "&7You have updated armor piece of type &6" + armorType.name() +
-                                                "&7 with new type value &6" + material + " &7to &6" + perk.getFormattedTitle()
+                                                "&7 with new type value &6" + material + " &7to &6" + perk.getTitle()
                                 ));
                             }
                             else
-                                sender.sendMessage(Utils.translate("&c" + perk.getFormattedTitle() + " &cdoes not have an armor piece on &4" + armorType));
+                                sender.sendMessage(Utils.translate("&c" + perk.getTitle() + " &cdoes not have an armor piece on &4" + armorType));
                         }
                     }
                 }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("masterylevels"))
             {
-                String perkName = a[2];
+                String perkName = a[1];
                 Perk perk = getPerk(perkName, sender);
 
                 if (perk != null)
                 {
                     perkManager.updateRequiresMasteryLevels(perk);
-                    sender.sendMessage(Utils.translate("&7You have toggled &c" + perk.getFormattedTitle() + "&7 requiring mastery level completions to &a" + perk.requiresMasteryLevels()));
+                    sender.sendMessage(Utils.translate("&7You have toggled &c" + perk.getTitle() + "&7 requiring mastery level completions to &a" + perk.requiresMasteryLevels()));
+                }
+            }
+            else if (a.length >= 3 && a[0].equalsIgnoreCase("addcommand"))
+            {
+                String perkName = a[1];
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // title can be multiple words
+                    String[] split = Arrays.copyOfRange(a, 2, a.length);
+                    String command = String.join(" ", split);
+
+                    if (!perk.hasCommand(command))
+                    {
+                        perkManager.addCommand(perk, command);
+                        sender.sendMessage(Utils.translate("&2You have added the command to perk &a" + perk.getTitle()));
+                        sender.sendMessage(Utils.translate("&7" + command));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&4" + perk.getTitle()) + " &calready has the command &7" + command);
+                }
+            }
+            else if (a.length >= 3 && a[0].equalsIgnoreCase("removecommand"))
+            {
+                String perkName = a[1];
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // title can be multiple words
+                    String[] split = Arrays.copyOfRange(a, 2, a.length);
+                    String command = String.join(" ", split);
+
+                    if (perk.hasCommand(command))
+                    {
+                        perkManager.removeCommand(perk, command);
+                        sender.sendMessage(Utils.translate("&2You have remove the command to perk &a" + perk.getTitle()));
+                        sender.sendMessage(Utils.translate("&7" + command));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&4" + perk.getTitle()) + " &cdoes not have the command &7" + command);
+                }
+            }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("commands"))
+            {
+                String perkName = a[1];
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    HashSet<String> commands = perk.getCommands();
+
+                    sender.sendMessage(Utils.translate("&6" + perk.getTitle() + "&e's Commands"));
+
+                    if (commands.isEmpty())
+                        sender.sendMessage(Utils.translate("&7None"));
+                    else
+                        for (String command : commands)
+                            sender.sendMessage(Utils.translate("&7" + command));
                 }
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("setperk"))
@@ -453,6 +514,9 @@ public class PerksCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&e/perks armormaterialtype (perkName) (armorPiece) (type)  &7Updates material type on existing armor piece"));
         sender.sendMessage(Utils.translate("&e/perks setperk (IGN) (perkName)  &7Sets perk armor, hat or infinite block to player if they have it"));
         sender.sendMessage(Utils.translate("&e/perks masterylevels (perkName)  &7Toggles if the perk requires mastery completions instead of normal level completions"));
+        sender.sendMessage(Utils.translate("&e/perks addcommand (perkName) (command)  &7Adds a command to a perk to give out on setting (command can be multiple words)"));
+        sender.sendMessage(Utils.translate("&e/perks removecommand (perkName) (command)  &7Removes a command to a perk to give out on setting (command can be multiple words)"));
+        sender.sendMessage(Utils.translate("&e/perks commands (perkName)  &7Lists the commands for a perka"));
         sender.sendMessage(Utils.translate("&e/perks help  &7Displays this page"));
         sender.sendMessage(Utils.translate("&e/perks load  &7Loads from disk"));
     }

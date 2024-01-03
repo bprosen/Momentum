@@ -32,6 +32,7 @@ public class DatabaseManager {
     public static final String PERKS_BOUGHT_TABLE = "perks_bought";
     public static final String PERKS_LEVEL_REQUIREMENTS_TABLE = "perks_level_requirements";
     public static final String PERKS_ARMOR_TABLE = "perks_armor";
+    public static final String PERKS_COMMANDS = "perks_commands";
     public static final String LEVEL_COMPLETIONS_COMMANDS_TABLE = "level_completions_commands";
     public static final String LEVEL_POTION_EFFECTS_TABLE = "level_potion_effects";
     public static final String LEVEL_REQUIRED_LEVELS_TABLE = "level_required_levels";

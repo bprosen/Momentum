@@ -266,7 +266,8 @@ public class MenuItemAction {
     private static void performPerkItem(Player player, MenuItem menuItem) {
         Perk perk = Parkour.getPerkManager().get(menuItem.getTypeValue());
 
-        if (perk != null) {
+        if (perk != null)
+        {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             // bypass if have access (opped too)
@@ -274,10 +275,7 @@ public class MenuItemAction {
             {
                 player.closeInventory();
                 Parkour.getPerkManager().setPerk(perk, playerStats);
-
-                // if has commands, run them
-                if (menuItem.hasCommands())
-                    runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                runPerkCommands(perk, playerStats);
 
             }
             else if (perk.requiresBuying())
@@ -301,14 +299,19 @@ public class MenuItemAction {
                         Parkour.getStatsManager().removeCoins(playerStats, price);
                         Parkour.getPerkManager().bought(playerStats, perk);
                         Parkour.getMenuManager().updateInventory(player, player.getOpenInventory());
-
-                        // if has commands, run them
-                        if (menuItem.hasCommands())
-                            runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                        runPerkCommands(perk, playerStats);
                     }
                 }
             }
         }
+    }
+
+    private static void runPerkCommands(Perk perk, PlayerStats playerStats)
+    {
+        HashSet<String> commands = perk.getCommands();
+
+        for (String command : commands)
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", playerStats.getName()));
     }
 
     private static void performLevelItem(Player player, MenuItem menuItem)

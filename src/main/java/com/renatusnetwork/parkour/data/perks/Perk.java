@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class Perk
@@ -21,12 +22,14 @@ public class Perk
 
     private HashMap<PerksArmorType, ItemStack> armorItems;
     private List<Level> requiredLevels;
+    private HashSet<String> commands;
     private boolean requiresMasteryLevels;
 
     public Perk(String name)
     {
         this.requiredLevels = new ArrayList<>();
         this.armorItems = new HashMap<>();
+        this.commands = new HashSet<>();
         this.name = name;
         this.title = name;
     }
@@ -102,6 +105,25 @@ public class Perk
     }
 
     public boolean requiresBuying() { return price > 0; }
+
+    public HashSet<String> getCommands() { return commands; }
+
+    public void setCommands(HashSet<String> commands) { this.commands = commands; }
+
+    public void addCommand(String command)
+    {
+        commands.add(command);
+    }
+
+    public void removeCommand(String command)
+    {
+        commands.remove(command);
+    }
+
+    public boolean hasCommand(String command)
+    {
+        return commands.contains(command);
+    }
 
     public boolean hasAccess(PlayerStats playerStats)
     {

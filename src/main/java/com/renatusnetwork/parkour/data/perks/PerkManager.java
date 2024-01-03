@@ -88,6 +88,18 @@ public class PerkManager
         PerksDB.removeRequiredLevel(perk.getName(), level.getName());
     }
 
+    public void addCommand(Perk perk, String command)
+    {
+        perk.addCommand(command);
+        PerksDB.addCommand(perk.getName(), command);
+    }
+
+    public void removeCommand(Perk perk, String command)
+    {
+        perk.removeCommand(command);
+        PerksDB.removeCommand(perk.getName(), command);
+    }
+
     public void addArmorPiece(Perk perk, PerksArmorType type, Material material)
     {
         perk.addArmorItem(type, new ItemStack(material));

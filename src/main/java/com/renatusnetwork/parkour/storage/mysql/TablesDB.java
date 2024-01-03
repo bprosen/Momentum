@@ -67,6 +67,7 @@ public class TablesDB
         createPerksBought();
         createPerksLevelRequirements();
         createPerksArmor();
+        createPerksCommands();
         createLevelCompletionCommands();
         createLevelPotionEffects();
         createLevelRequiredLevels();
@@ -89,6 +90,7 @@ public class TablesDB
         createPerksBoughtKeys();
         createPerksLevelRequirementsKeys();
         createPerksArmorKeys();
+        createPerksCommandsKeys();
         createLevelCompletionCommandsKeys();
         createLevelPotionEffectsKeys();
         createLevelRequiredLevelsKeys();
@@ -649,6 +651,30 @@ public class TablesDB
     private static void createPerksArmorKeys()
     {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_ARMOR_TABLE + "_perk_name_fk " +
+                                 "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
+                                 "ON UPDATE CASCADE " +
+                                 "ON DELETE CASCADE";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createPerksCommands()
+    {
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_COMMANDS + " (" +
+                            "perk_name VARCHAR(20) NOT NULL, " +
+                            "command VARCHAR(100) NOT NULL, " + // commands can get quite long
+                            // keys
+                            "PRIMARY KEY(perk_name, command), " +
+                            // indexes
+                            "INDEX level_name_index(perk_name)" +
+                        ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createPerksCommandsKeys()
+    {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_COMMANDS + " ADD CONSTRAINT " + DatabaseManager.PERKS_COMMANDS + "_perk_name_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";

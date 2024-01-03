@@ -10,10 +10,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public class PerksDB
 {
@@ -168,6 +166,7 @@ public class PerksDB
         // set data using 2 extra queries, is fine since it's only done on startup, allows for clean code
         perk.setRequiredLevels(getRequiredLevels(perkName));
         perk.setArmorItems(getArmorItems(perkName));
+        perk.setCommands(getCommands(perkName));
 
         return perk;
     }
@@ -223,5 +222,28 @@ public class PerksDB
         }
 
         return armor;
+    }
+
+    public static HashSet<String> getCommands(String perkName)
+    {
+        List<Map<String, String>> perksResults = DatabaseQueries.getResults(
+                DatabaseManager.PERKS_COMMANDS, "*", "WHERE perk_name=?", perkName
+        );
+
+        HashSet<String> commands = new HashSet<>();
+        for (Map<String, String> result : perksResults)
+            commands.add(result.get("command"));
+
+        return commands;
+    }
+
+    public static void addCommand(String perkName, String command)
+    {
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PERKS_COMMANDS + " (perk_name, command) VALUES (?,?)", perkName, command);
+    }
+
+    public static void removeCommand(String perkName, String command)
+    {
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PERKS_COMMANDS + " WHERE perk_name=? AND command=?", perkName, command);
     }
 }
