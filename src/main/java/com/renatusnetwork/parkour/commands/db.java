@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,6 +63,9 @@ public class db implements CommandExecutor
                             Parkour.getPluginLogger().info("Temporarily disabling foreign key checks");
                             DatabaseQueries.runQuery("SET foreign_key_checks = 0");
 
+                            /*
+                                Migration handling players table
+                             */
                             Parkour.getPluginLogger().info("Attempting migration of players table");
 
                             String playersQuery = "SELECT * FROM players LEFT JOIN clans ON clans.clan_id=players.clan_id";
@@ -101,6 +105,9 @@ public class db implements CommandExecutor
 
                             sender.sendMessage(Utils.translate("&cMigrated " + playersCount + " players"));
 
+                            /*
+                                Tables handling level migration here
+                             */
                             Parkour.getPluginLogger().info("Attempting migration of levels.yml to levels table");
                             Set<String> levelNames = levelsConfig.getKeys(false);
                             int levelCount = 0;
@@ -219,12 +226,215 @@ public class db implements CommandExecutor
                                         DatabaseQueries.runQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET reward=? WHERE name=?", reward, levelName);
                                 }
 
+                                if (levelsConfig.isConfigurationSection(levelName + ".required_levels"))
+                                {
+                                    List<String> requiredLevels = levelsConfig.getStringList(levelName + ".required_levels");
+                                    for (String requiredLevel : requiredLevels)
+                                        DatabaseQueries.runQuery(
+                                                "INSERT INTO " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + "(level_name, required_level_name) VALUES (?,?)",
+                                                    levelName, requiredLevel
+                                        );
+                                }
+
+                                if (levelsConfig.isConfigurationSection(levelName + ".commands"))
+                                {
+                                    List<String> commands = levelsConfig.getStringList(levelName + ".commands");
+                                    for (String command : commands)
+                                        DatabaseQueries.runQuery(
+                                                "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "(level_name, command) VALUES (?,?)",
+                                                levelName, command
+                                        );
+                                }
+
+                                if (levelsConfig.isConfigurationSection(levelName + ".potion_effects"))
+                                {
+                                    for (int i = 1;; i++)
+                                    {
+                                        if (levelsConfig.isConfigurationSection(levelName + ".potion_effects." + i))
+                                        {
+                                            String potionType = levelsConfig.getString(levelName + ".potion_effects." + i + ".type").toUpperCase();
+                                            int amplifier = levelsConfig.getInt(levelName + ".potion_effects." + i + ".amplifier");
+                                            int duration = levelsConfig.getInt(levelName + ".potion_effects." + i + ".duration");
+
+                                            DatabaseQueries.runQuery(
+                                                    "INSERT INTO " + DatabaseManager.LEVEL_POTION_EFFECTS_TABLE + " (level_name, type, amplifier, duration) VALUES (?,?,?,?)",
+                                                    levelName, potionType, amplifier, duration
+                                            );
+                                        }
+                                        else break;
+                                    }
+                                }
                                 levelCount++;
-
-
                             }
 
+                            String ratingsQuery = "SELECT * FROM ratings r JOIN levels l ON l.level_id=r.level_id";
+
+                            PreparedStatement ratingsStatement = connection.prepareStatement(ratingsQuery);
+                            results = ratingsStatement.executeQuery();
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.LEVEL_RATINGS_TABLE + " (uuid, level_name, rating) VALUES (?,?,?)",
+                                        results.getString("uuid"),
+                                        results.getString("level_name"),
+                                        results.getInt("rating")
+                                );
+                            }
+
+                            String checkpointsQuery = "SELECT * FROM checkpoints";
+
+                            PreparedStatement checkpointStatement = connection.prepareStatement(checkpointsQuery);
+                            results = checkpointStatement.executeQuery();
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " (uuid, level_name, world, x, y, z) VALUES (?,?,?,?,?,?)",
+                                        results.getString("uuid"),
+                                        results.getString("level_name"),
+                                        results.getString("world"),
+                                        results.getInt("x"),
+                                        results.getInt("y"),
+                                        results.getInt("z")
+                                );
+                            }
+
+                            String purchasesTable = "SELECT * FROM bought_levels";
+
+                            PreparedStatement purchasesStatement = connection.prepareStatement(purchasesTable);
+                            results = purchasesStatement.executeQuery();
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.LEVEL_PURCHASES_TABLE + " (uuid, level_name) VALUES (?,?)",
+                                        results.getString("uuid"),
+                                        results.getString("level_name")
+                                );
+                            }
+
+                            String savesTable = "SELECT * FROM saves";
+
+                            PreparedStatement savesStatement = connection.prepareStatement(savesTable);
+                            results = savesStatement.executeQuery();
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.LEVEL_SAVES_TABLE + " (uuid, level_name, world, x, y, z, yaw, pitch) VALUES (?,?,?,?,?,?,?,?)",
+                                        results.getString("uuid"),
+                                        results.getString("level_name"),
+                                        results.getString("world"),
+                                        results.getDouble("x"),
+                                        results.getDouble("y"),
+                                        results.getDouble("z"),
+                                        results.getDouble("yaw"),
+                                        results.getDouble("pitch")
+                                );
+                            }
+
+
                             sender.sendMessage(Utils.translate("&cMigrated " + levelCount + " levels"));
+
+                            /*
+                                Migration handling level completions
+                             */
+                            Parkour.getPluginLogger().info("Attempting migration of completions table");
+                            String completionsQuery = "SELECT * FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id";
+
+                            int completionCounter = 0;
+
+                            PreparedStatement rewardStatement = connection.prepareStatement(completionsQuery);
+                            results = rewardStatement.executeQuery();
+
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " (uuid, level_name, completion_date, time_taken) VALUES (?,?,FROM_UNIXTIME(?),?)",
+                                        results.getString("uuid"),
+                                        results.getString("level_name"),
+                                        results.getString("completion_date"),
+                                        results.getInt("time_taken")
+                                );
+                                completionCounter++;
+                            }
+
+                            int recordCounter = 0;
+                            // now update levels
+                            for (String levelNameRecord : levelNames)
+                            {
+                                String recordQuery = "SELECT uuid, level_name, completion_date, MIN(time_taken) AS fastest FROM completions c JOIN players p ON p.player_id=c.player_id GROUP BY uuid,level_name,completion_date WHERE level_name='" + levelNameRecord + "'";
+                                PreparedStatement recordStatement = connection.prepareStatement(recordQuery);
+                                results = recordStatement.executeQuery();
+                                results.next();
+
+                                if (results.getInt("fastest") > 0)
+                                {
+                                    DatabaseQueries.runQuery(
+                                            "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " SET record=(1) WHERE uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)",
+                                            results.getString("uuid"), results.getString("level_name"), results.getString("completion_date")
+                                    );
+                                }
+                            }
+                            sender.sendMessage(Utils.translate("&cMigrated " + completionCounter + " completions and " + recordCounter + " records"));
+
+                            /*
+                                Clans migration system
+                             */
+                            Parkour.getPluginLogger().info("Attempting migration of clans table");
+
+                            String clansTable = "SELECT * FROM clans c JOIN players p ON p.player_id=c.owner_player_id";
+                            int clanCounter = 0;
+                            PreparedStatement clansStatement = connection.prepareStatement(clansTable);
+                            results = clansStatement.executeQuery();
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.CLANS_TABLE + " (tag, owner_uuid, xp, level, total_xp) VALUES (?,?,?,?,?)",
+                                        results.getString("clan_tag"),
+                                        results.getString("uuid"),
+                                        results.getInt("clan_xp"),
+                                        results.getInt("clan_level"),
+                                        results.getInt("total_gained_xp")
+                                );
+                                clanCounter++;
+                            }
+                            sender.sendMessage(Utils.translate("&cMigrated " + clanCounter + " clans"));
+
+                            Parkour.getPluginLogger().info("Attempting migration of plots table");
+                            String plotsTable = "SELECT * FROM plots";
+                            int plotsCounter = 0;
+                            PreparedStatement plotsStatement = connection.prepareStatement(plotsTable);
+                            results = plotsStatement.executeQuery();
+
+                            while (results.next())
+                            {
+                                int plotID = results.getInt("plot_id");
+
+                                DatabaseQueries.runQuery(
+                                        "INSERT INTO " + DatabaseManager.PLOTS_TABLE + " (id, owner_uuid, center_x, center_z, submitted) VALUES (?,?,?,?,?)",
+                                        plotID,
+                                        results.getString("uuid"),
+                                        results.getInt("center_x"),
+                                        results.getInt("center_z"),
+                                        Boolean.parseBoolean(results.getString("submitted")) ? 1 : 0
+                                );
+
+                                String[] trustedPlayers = results.getString("trusted_players").split(":");
+                                for (String trustedPlayerName : trustedPlayers)
+                                {
+                                    String playerUUID = "SELECT uuid FROM players WHERE player_name='" + trustedPlayerName + "'";
+
+                                    PreparedStatement playerNameStatement = connection.prepareStatement(playerUUID);
+                                    ResultSet trustedResults = playerNameStatement.executeQuery();
+                                    trustedResults.next();
+                                    DatabaseQueries.runQuery(
+                                            "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) VALUES (?,?)",
+                                            plotID, trustedResults.getString("uuid")
+                                    );
+
+                                }
+                                plotsCounter++;
+                            }
+                            sender.sendMessage(Utils.translate("&cMigrated " + plotsCounter + " plots"));
+
 
                             Parkour.getPluginLogger().info("Enabling foreign key checks");
                             DatabaseQueries.runQuery("SET foreign_key_checks = 1");

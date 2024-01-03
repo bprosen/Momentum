@@ -305,9 +305,9 @@ public class TablesDB
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "world VARCHAR(30) NOT NULL, " +
-                            "x DOUBLE NOT NULL, " +
-                            "y DOUBLE NOT NULL, " +
-                            "z DOUBLE NOT NULL, " +
+                            "x INT NOT NULL, " +
+                            "y INT NOT NULL, " +
+                            "z INT NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, level_name), " +
                             // indexes

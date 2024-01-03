@@ -40,7 +40,7 @@ public class CompletionsDB
 
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
-                        " (uuid, level_name, completion_date, time_taken, mastery, record)" +
+                        " (uuid, level_name, completion_date, time_taken, mastery)" +
                         " VALUES (?,?,FROM_UNIXTIME(?),?,?)",
                 levelCompletion.getUUID(),
                 levelCompletion.getLevelName(),
