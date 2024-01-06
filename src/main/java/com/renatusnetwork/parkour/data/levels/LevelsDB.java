@@ -140,7 +140,7 @@ public class LevelsDB {
     public static List<String> getCompletionCommands(String levelName)
     {
         List<Map<String, String>> results = DatabaseQueries.getResults(
-                DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE,
+                DatabaseManager.LEVEL_COMPLETION_COMMANDS_TABLE,
                 "*",
                 "WHERE level_name=?", levelName
         );

@@ -353,7 +353,7 @@ public class StatsCMD implements CommandExecutor {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 sender.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(
-                        Parkour.getStatsManager().get(player).getCoins()) + " &e&lCoins"));
+                        Parkour.getStatsManager().get(player).getCoins()) + " &eCoins"));
             }
         } else {
             sender.sendMessage(Utils.translate("&cCoins lb not loaded or no lb positions"));

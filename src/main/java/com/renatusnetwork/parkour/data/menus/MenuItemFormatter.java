@@ -464,7 +464,7 @@ public class MenuItemFormatter {
             // Required Levels Section, but only show it if not featured
             if (level.hasRequiredLevels() && !level.isFeaturedLevel()) {
                 itemLore.add("");
-                itemLore.add(Utils.translate("&7Required Levels"));
+                itemLore.add(Utils.translate("&7Required levels"));
 
                 for (String requiredLevelName : level.getRequiredLevels())
                 {

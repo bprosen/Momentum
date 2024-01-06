@@ -722,7 +722,7 @@ public class LevelCMD implements CommandExecutor
                     {
                         levelManager.setPrice(level, price);
                         sender.sendMessage(Utils.translate(
-                                "&7You set the price of &c" + level.getFormattedTitle() + "&7 to &6" + Utils.formatNumber(price) + " &e&lCoins"
+                                "&7You set the price of &c" + level.getFormattedTitle() + "&7 to &6" + Utils.formatNumber(price) + " &eCoins"
                         ));
                     }
                 }
@@ -916,7 +916,7 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level completionloc <level>  &7Sets the completion to your location"));
         sender.sendMessage(Utils.translate("&a/level maxcompletions <level> [completions]  &7View/Set max completions"));
         sender.sendMessage(Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion"));
-        sender.sendMessage(Utils.translate("&a/level requires <level> <levelTheyNeed>  &7Add/Remove required level"));
+        sender.sendMessage(Utils.translate("&a/level addrequired/removerequired <level> <levelTheyNeed>  &7Add/Remove required level"));
         sender.sendMessage(Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time from a level's leaderboard"));
         sender.sendMessage(Utils.translate("&a/level raceset <level> <1/2>  &7Sets the race location for player 1 or 2"));
         sender.sendMessage(Utils.translate("&a/level forcecompletion <player> <level>  &7Force completion for player"));

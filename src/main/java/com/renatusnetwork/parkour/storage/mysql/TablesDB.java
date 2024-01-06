@@ -684,7 +684,7 @@ public class TablesDB
 
     private static void createLevelCompletionCommands()
     {
-        String query = "CREATE TABLE " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "(" +
+        String query = "CREATE TABLE " + DatabaseManager.LEVEL_COMPLETION_COMMANDS_TABLE + "(" +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "command VARCHAR(100) NOT NULL, " + // commands can get quite long
                             // keys
@@ -698,7 +698,7 @@ public class TablesDB
 
     private static void createLevelCompletionCommandsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "_level_name_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.LEVEL_COMPLETION_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.LEVEL_COMPLETION_COMMANDS_TABLE + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";

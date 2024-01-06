@@ -295,7 +295,7 @@ public class StatsManager {
                     if (saidGG.size() > 1)
                         playerString += "s";
 
-                    Bukkit.broadcastMessage(Utils.translate("&3" + saidGG.size() + " &b" + playerString + " said &3&lGG&b!"));
+                    Bukkit.broadcastMessage(Utils.translate("&3" + saidGG.size() + " &7" + playerString + " said &3&lGG&b!"));
                 }
                 saidGG.clear();
                 task = null;

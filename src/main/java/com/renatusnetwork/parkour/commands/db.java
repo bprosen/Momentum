@@ -239,7 +239,7 @@ public class db implements CommandExecutor
                                         DatabaseQueries.runQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET reward=? WHERE name=?", reward, levelName);
                                 }
 
-                                if (levelsConfig.isConfigurationSection(levelName + ".required_levels"))
+                                if (levelsConfig.isSet(levelName + ".required_levels"))
                                 {
                                     List<String> requiredLevels = levelsConfig.getStringList(levelName + ".required_levels");
                                     for (String requiredLevel : requiredLevels)
@@ -249,12 +249,12 @@ public class db implements CommandExecutor
                                         );
                                 }
 
-                                if (levelsConfig.isConfigurationSection(levelName + ".commands"))
+                                if (levelsConfig.isSet(levelName + ".commands"))
                                 {
                                     List<String> commands = levelsConfig.getStringList(levelName + ".commands");
                                     for (String command : commands)
                                         DatabaseQueries.runQuery(
-                                                "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_COMMANDS_TABLE + "(level_name, command) VALUES (?,?)",
+                                                "INSERT INTO " + DatabaseManager.LEVEL_COMPLETION_COMMANDS_TABLE + "(level_name, command) VALUES (?,?)",
                                                 levelName, command
                                         );
                                 }
