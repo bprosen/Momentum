@@ -160,7 +160,7 @@ public class LBPlaceholders
                                     if (level.getLeaderboard().isEmpty())
                                         return "N/A";
 
-                                    LevelCompletion completion = level.getLeaderboard().get(posInt - 1); // adjust for index
+                                    LevelCompletion completion = level.getLeaderboard().get(posInt);
 
                                     // return name or value
                                     if (value.equals("name"))

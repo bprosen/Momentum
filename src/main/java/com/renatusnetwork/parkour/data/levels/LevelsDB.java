@@ -88,7 +88,7 @@ public class LevelsDB {
             // switches
             level.setCooldown(Integer.parseInt(result.get("cooldown")) == 1);
             level.setBroadcast(Integer.parseInt(result.get("broadcast")) == 1);
-            level.setLiquidResetPlayer(Integer.parseInt(result.get("liquid_reset")) == 1);
+            level.setLiquidResetPlayer(Integer.parseInt(result.get("liquid_reset")) == 0); // default is 0!
             level.setNew(Integer.parseInt(result.get("new")) == 1);
             level.setHasMastery(Integer.parseInt(result.get("has_mastery")) == 1);
             level.setTC(Integer.parseInt(result.get("tc")) == 1);

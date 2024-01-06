@@ -115,6 +115,16 @@ public class ClansManager
 
     public void remove(String clanTag) { clans.remove(clanTag); }
 
+    public boolean existsIgnoreCase(String clanTag)
+    {
+        for (String tag : clans.keySet())
+        {
+            if (tag.equalsIgnoreCase(clanTag))
+                return true;
+        }
+        return false;
+    }
+
     public Clan getFromMember(String memberName)
     {
         for (Clan clan : clans.values())

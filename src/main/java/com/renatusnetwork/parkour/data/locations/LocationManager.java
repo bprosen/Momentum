@@ -24,10 +24,15 @@ public class LocationManager {
     public void load()
     {
         this.locations = LocationsDB.loadLocations();
-        this.lobbyLocation = get("spawn");
-        this.tutorialLocation = get("tutorial");
+        reloadCachedLocations();
 
         Parkour.getPluginLogger().info("Locations loaded: " + locations.size());
+    }
+
+    public void reloadCachedLocations()
+    {
+        this.lobbyLocation = get("spawn");
+        this.tutorialLocation = get("tutorial");
     }
 
     public void load(String locationName)

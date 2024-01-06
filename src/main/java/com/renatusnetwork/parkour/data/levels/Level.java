@@ -133,6 +133,7 @@ public class Level
         return maxCompletions;
     }
 
+    public boolean hasMaxCompletions() { return maxCompletions > 0; }
     public void setMaxCompletions(int maxCompletions) { this.maxCompletions = maxCompletions; }
 
     public boolean isBroadcasting() { return broadcast; }

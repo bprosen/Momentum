@@ -29,13 +29,13 @@ public class LevelCompletion
         return timeOfCompletion;
     }
 
-    public long getTimeOfCompletionSeconds() { return timeOfCompletion / 1000; }
+    public double getTimeOfCompletionSeconds() { return timeOfCompletion / 1000d; }
 
     public long getCompletionTimeElapsedMillis() {
         return completionTimeElapsed;
     }
 
-    public double getCompletionTimeElapsedSeconds() { return completionTimeElapsed / 1000f; }
+    public double getCompletionTimeElapsedSeconds() { return completionTimeElapsed / 1000d; }
 
     public String getName() {
         return name;

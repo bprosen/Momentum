@@ -3,16 +3,19 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.levels.LevelType;
+import com.renatusnetwork.parkour.data.perks.PerksArmorType;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -41,6 +44,8 @@ public class db implements CommandExecutor
                     try
                     {
                         FileConfiguration levelsConfig = null;
+                        FileConfiguration perksConfig = null;
+                        FileConfiguration locationsConfig = null;
                         boolean cannotContinue = false;
 
                         try
@@ -48,6 +53,14 @@ public class db implements CommandExecutor
                             File oldLevels = new File(Parkour.getPlugin().getDataFolder(), "levels.yml");
                             levelsConfig = new YamlConfiguration();
                             levelsConfig.load(oldLevels);
+
+                            File oldPerks = new File(Parkour.getPlugin().getDataFolder(), "perks.yml");
+                            perksConfig = new YamlConfiguration();
+                            perksConfig.load(oldPerks);
+
+                            File locationPerks = new File(Parkour.getPlugin().getDataFolder(), "locations.yml");
+                            locationsConfig = new YamlConfiguration();
+                            locationsConfig.load(locationPerks);
                         }
                         catch (IOException | InvalidConfigurationException exception)
                         {
@@ -347,10 +360,10 @@ public class db implements CommandExecutor
                             while (results.next())
                             {
                                 DatabaseQueries.runQuery(
-                                        "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " (uuid, level_name, completion_date, time_taken) VALUES (?,?,FROM_UNIXTIME(?),?)",
+                                        "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " (uuid, level_name, completion_date, time_taken) VALUES (?,?,?,?)",
                                         results.getString("uuid"),
                                         results.getString("level_name"),
-                                        results.getString("completion_date"),
+                                        results.getTimestamp("completion_date"),
                                         results.getInt("time_taken")
                                 );
                                 completionCounter++;
@@ -358,21 +371,20 @@ public class db implements CommandExecutor
 
                             int recordCounter = 0;
                             // now update levels
-                            for (String levelNameRecord : levelNames)
-                            {
-                                String recordQuery = "SELECT uuid, level_name, completion_date, MIN(time_taken) AS fastest FROM completions c JOIN players p ON p.player_id=c.player_id GROUP BY uuid,level_name,completion_date WHERE level_name='" + levelNameRecord + "'";
-                                PreparedStatement recordStatement = connection.prepareStatement(recordQuery);
-                                results = recordStatement.executeQuery();
-                                results.next();
+                            String recordQuery = "SELECT level_name, MIN(time_taken) AS fastest FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id WHERE time_taken > 0 GROUP BY level_name";
+                            PreparedStatement recordStatement = connection.prepareStatement(recordQuery);
+                            results = recordStatement.executeQuery();
+                            results.next();
 
-                                if (results.getInt("fastest") > 0)
-                                {
-                                    DatabaseQueries.runQuery(
-                                            "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " SET record=(1) WHERE uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)",
-                                            results.getString("uuid"), results.getString("level_name"), results.getString("completion_date")
-                                    );
-                                }
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery(
+                                        "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " SET record=(1) WHERE level_name=? AND time_taken=?",
+                                        results.getString("level_name"), results.getInt("fastest")
+                                );
+                                recordCounter++;
                             }
+
                             sender.sendMessage(Utils.translate("&cMigrated " + completionCounter + " completions and " + recordCounter + " records"));
 
                             /*
@@ -398,6 +410,10 @@ public class db implements CommandExecutor
                             }
                             sender.sendMessage(Utils.translate("&cMigrated " + clanCounter + " clans"));
 
+                            /*
+                                Plots migration system
+                             */
+
                             Parkour.getPluginLogger().info("Attempting migration of plots table");
                             String plotsTable = "SELECT * FROM plots";
                             int plotsCounter = 0;
@@ -417,25 +433,154 @@ public class db implements CommandExecutor
                                         Boolean.parseBoolean(results.getString("submitted")) ? 1 : 0
                                 );
 
-                                String[] trustedPlayers = results.getString("trusted_players").split(":");
-                                for (String trustedPlayerName : trustedPlayers)
+                                String trusteds = results.getString("trusted_players");
+
+                                if (trusteds.contains(":"))
                                 {
-                                    String playerUUID = "SELECT uuid FROM players WHERE player_name='" + trustedPlayerName + "'";
+                                    String[] trustedPlayers = trusteds.split(":");
+                                    for (String trustedPlayerName : trustedPlayers)
+                                    {
+                                        String playerUUID = "SELECT uuid FROM players WHERE player_name='" + trustedPlayerName + "'";
 
-                                    PreparedStatement playerNameStatement = connection.prepareStatement(playerUUID);
-                                    ResultSet trustedResults = playerNameStatement.executeQuery();
-                                    trustedResults.next();
-                                    DatabaseQueries.runQuery(
-                                            "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) VALUES (?,?)",
-                                            plotID, trustedResults.getString("uuid")
-                                    );
+                                        PreparedStatement playerNameStatement = connection.prepareStatement(playerUUID);
+                                        ResultSet trustedResults = playerNameStatement.executeQuery();
 
+                                        if (trustedResults.next())
+                                            DatabaseQueries.runQuery(
+                                                    "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) VALUES (?,?)",
+                                                    plotID, trustedResults.getString("uuid")
+                                            );
+
+                                    }
                                 }
                                 plotsCounter++;
                             }
                             sender.sendMessage(Utils.translate("&cMigrated " + plotsCounter + " plots"));
 
+                            /*
+                                Perks migration system
+                             */
+                            Parkour.getPluginLogger().info("Attempting migration of perks table");
 
+                            Set<String> perks = perksConfig.getKeys(false);
+                            int perksCounter = 0;
+                            for (String perkName : perks)
+                            {
+
+                                DatabaseQueries.runQuery("INSERT INTO " + DatabaseManager.PERKS_TABLE + " (name) VALUES (?)", perkName);
+
+                                String title = perksConfig.getString(perkName + ".title");
+                                if (title != null)
+                                    DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_TABLE + " SET title=? WHERE name=?", title, perkName);
+
+                                int price = perksConfig.getInt(perkName + ".price", -1);
+                                if (price > -1)
+                                    DatabaseQueries.runQuery("UPDATE " +  DatabaseManager.PERKS_TABLE + " SET price=? WHERE name=?", price, perkName);
+
+                                String requiredPermission = perksConfig.getString(perkName + ".required_permissions");
+                                if (requiredPermission != null)
+                                    DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_TABLE + " SET required_permission=? WHERE name=?", requiredPermission, perkName);
+
+                                String infiniteBlockString = perksConfig.getString(perkName + ".infinite_block");
+                                if (infiniteBlockString != null)
+                                    DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_TABLE + " SET infinite_block=? WHERE name=?", infiniteBlockString.toUpperCase(), perkName);
+
+                                if (perksConfig.isConfigurationSection(perkName + ".requirements"))
+                                {
+                                    List<String> levelRequirements = perksConfig.getStringList(perkName + ".requirements");
+                                    for (String levelName : levelRequirements)
+                                    {
+                                        DatabaseQueries.runQuery(
+                                                "INSERT INTO " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " (perk_name, level_name) VALUES (?,?)",
+                                                perkName, levelName
+                                        );
+                                    }
+                                }
+
+
+                                if (perksConfig.isConfigurationSection(perkName + ".items"))
+                                {
+                                    String[] types = {"head", "chest", "leg", "feet"};
+
+                                    for (String type : types)
+                                    {
+                                        if (perksConfig.isConfigurationSection(perkName + ".items." + type))
+                                        {
+                                            PerksArmorType newType = null;
+                                            switch (type)
+                                            {
+                                                case "head":
+                                                    newType = PerksArmorType.HELMET;
+                                                    break;
+                                                case "chest":
+                                                    newType = PerksArmorType.CHESTPLATE;
+                                                    break;
+                                                case "leg":
+                                                    newType = PerksArmorType.LEGGINGS;
+                                                    break;
+                                                case "feet":
+                                                    newType = PerksArmorType.BOOTS;
+                                                    break;
+                                            }
+
+                                            Material itemMaterial = Material.matchMaterial(perksConfig.getString(perkName + ".items." + type + ".material"));
+                                            DatabaseQueries.runQuery("INSERT INTO " + DatabaseManager.PERKS_ARMOR_TABLE + "(perk_name,armor_piece,material) VALUES (?,?,?)",
+                                                    perkName, newType.name(), itemMaterial.name());
+
+                                            int itemType = perksConfig.getInt(perkName +".items." + type + ".type", 0);
+
+                                            if (itemType > 0)
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET type=? WHERE perk_name=?", itemType, perkName);
+
+                                            String itemTitle = perksConfig.getString(perkName + ".items." + type + ".title");
+
+                                            if (itemTitle != null)
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET title=? WHERE perk_name=?", title, perkName);
+
+                                            boolean glow = perksConfig.getBoolean(perkName + ".items." + type +".glow", false);
+
+                                            if (glow)
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=(1) WHERE perk_name=?", perkName);
+                                        }
+                                    }
+                                }
+                                perksCounter++;
+                            }
+                            sender.sendMessage(Utils.translate("&cMigrated " + perksCounter + " perks"));
+
+                            String perksTable = "SELECT uuid,p.perk_name AS perk_name FROM ledger l JOIN perks p ON p.perk_id=l.perk_id JOIN players pl ON pl.player_id=l.player_id";
+                            PreparedStatement perksStatement = connection.prepareStatement(perksTable);
+                            results = perksStatement.executeQuery();
+
+                            while (results.next())
+                            {
+                                DatabaseQueries.runQuery("INSERT INTO " + DatabaseManager.PERKS_BOUGHT_TABLE + " (uuid, perk_name) VALUES(?,?)",
+                                        results.getString("uuid"), results.getString("perk_name"));
+                            }
+
+                            /*
+                                Perks migration system
+                             */
+                            Parkour.getPluginLogger().info("Attempting migration of locations");
+                            Set<String> locationNames = locationsConfig.getKeys(false);
+                            int locationCounter = 0;
+
+                            for (String locationName : locationNames)
+                            {
+                                String world = locationsConfig.getString(locationName + ".world");
+                                double x = locationsConfig.getDouble(locationName + ".x");
+                                double y = locationsConfig.getDouble(locationName + ".y");
+                                double z = locationsConfig.getDouble(locationName + ".z");
+                                float yaw = (float) locationsConfig.getDouble(locationName + ".yaw");
+                                float pitch = (float) locationsConfig.getDouble(locationName + ".pitch");
+
+                                DatabaseQueries.runQuery("INSERT INTO " + DatabaseManager.LOCATIONS_TABLE + " (name,world,x,y,z,yaw,pitch) VALUES (?,?,?,?,?,?,?)",
+                                        locationName, world, x, y, z, yaw, pitch);
+                                locationCounter++;
+                            }
+                            sender.sendMessage(Utils.translate("&cMigrated " + locationCounter + " locations"));
+
+                            sender.sendMessage(Utils.translate("&cCompleted migration"));
                             Parkour.getPluginLogger().info("Enabling foreign key checks");
                             DatabaseQueries.runQuery("SET foreign_key_checks = 1");
                             close();
@@ -482,7 +627,9 @@ public class db implements CommandExecutor
         {
             if (!connection.isClosed())
                 connection.close();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
         }
     }

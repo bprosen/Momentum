@@ -117,12 +117,12 @@ public class Clan {
 
     public void addMember(ClanMember clanMember)
     {
-        members.put(clanMember.getName(), clanMember);
+        members.put(clanMember.getUUID(), clanMember);
     }
 
-    public void removeMember(String playerName)
+    public void removeMember(String playerUUID)
     {
-        members.remove(playerName);
+        members.remove(playerUUID);
     }
 
     public void addInvite(String playerName)

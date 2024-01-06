@@ -227,7 +227,7 @@ public class PerksDB
     public static HashSet<String> getCommands(String perkName)
     {
         List<Map<String, String>> perksResults = DatabaseQueries.getResults(
-                DatabaseManager.PERKS_COMMANDS, "*", "WHERE perk_name=?", perkName
+                DatabaseManager.PERKS_COMMANDS_TABLE, "*", "WHERE perk_name=?", perkName
         );
 
         HashSet<String> commands = new HashSet<>();
@@ -239,11 +239,11 @@ public class PerksDB
 
     public static void addCommand(String perkName, String command)
     {
-        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PERKS_COMMANDS + " (perk_name, command) VALUES (?,?)", perkName, command);
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PERKS_COMMANDS_TABLE + " (perk_name, command) VALUES (?,?)", perkName, command);
     }
 
     public static void removeCommand(String perkName, String command)
     {
-        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PERKS_COMMANDS + " WHERE perk_name=? AND command=?", perkName, command);
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PERKS_COMMANDS_TABLE + " WHERE perk_name=? AND command=?", perkName, command);
     }
 }

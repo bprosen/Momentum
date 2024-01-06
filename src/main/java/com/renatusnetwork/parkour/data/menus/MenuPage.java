@@ -42,7 +42,6 @@ public class MenuPage {
 
         for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(
-                    player,
                     playerStats,
                     menuItem));
     }

@@ -1,5 +1,8 @@
 package com.renatusnetwork.parkour.commands;
 
+import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.locations.LocationManager;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,7 +20,11 @@ public class SetSpawnCMD implements CommandExecutor {
 
         Player player = (Player) sender;
         if (player.hasPermission("rn-parkour.admin"))
-            Bukkit.dispatchCommand(player, "loc set spawn");
+        {
+            Parkour.getLocationManager().set("spawn", player.getLocation());
+            Parkour.getLocationManager().reloadCachedLocations();
+            player.sendMessage(Utils.translate("&7You have set spawn to your location"));
+        }
 
         return false;
     }

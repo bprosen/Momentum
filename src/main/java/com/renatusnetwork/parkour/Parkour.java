@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
+import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
@@ -33,6 +34,7 @@ import com.sk89q.worldedit.WorldEdit;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.logging.Logger;
 
@@ -69,7 +71,7 @@ public class Parkour extends JavaPlugin {
         logger = getLogger();
 
         // load all classes
-        loadClasses();
+        load();
         registerEvents();
         registerCommands();
 
@@ -110,7 +112,7 @@ public class Parkour extends JavaPlugin {
 
         // close database and unload classes
         database.close();
-        unloadClasses();
+        unload();
         unregisterPlaceholders();
 
         getLogger().info("RN-Parkour Disabled");
@@ -186,17 +188,27 @@ public class Parkour extends JavaPlugin {
         getCommand("bid").setExecutor(new BidCMD());
     }
 
-    private static void loadClasses()
+    private static void load()
     {
         configs = new ConfigManager(plugin);
         settings = new SettingsManager(configs.get("settings"));
         database = new DatabaseManager(plugin);
-        TablesDB.initTables();
+        TablesDB.initTables(); // needs to happen AFTER loading the manager
         locations = new LocationManager();
         checkpoint = new CheckpointManager();
         stats = new StatsManager(plugin);
         menus = new MenuManager();
         levels = new LevelManager(plugin);
+
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                CompletionsDB.loadLeaderboards(); // needs to happen AFTER loading the manager, in async to speedup start up
+            }
+        }.runTaskAsynchronously(Parkour.getPlugin());
+
         ranks = new RanksManager();
         perks = new PerkManager();
         clans = new ClansManager(plugin);
@@ -211,7 +223,7 @@ public class Parkour extends JavaPlugin {
         blackmarket = new BlackMarketManager();
     }
 
-    private static void unloadClasses() {
+    private static void unload() {
         menus = null;
         checkpoint = null;
         clans = null;

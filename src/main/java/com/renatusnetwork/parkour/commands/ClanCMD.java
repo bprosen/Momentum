@@ -709,7 +709,7 @@ public class ClanCMD implements CommandExecutor
             ));
             return false;
         }
-        else if (Parkour.getClansManager().get(clanTag) != null)
+        else if (Parkour.getClansManager().existsIgnoreCase(clanTag))
         {
             sender.sendMessage(Utils.translate("&cThe tag '&4" + clanTag + "&c' is already taken"));
             return false;

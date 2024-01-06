@@ -62,7 +62,7 @@ public class CoinsCMD implements CommandExecutor
                     }
 
                     // msg
-                    sender.sendMessage(Utils.translate("&7You have set &6" + targetName + " &e&lCoins &7to &6" + coins));
+                    sender.sendMessage(Utils.translate("&7You have set &6" + targetName + " &eCoins &7to &6" + coins));
                 }
                 else if (a[0].equalsIgnoreCase("add"))
                 {
@@ -85,7 +85,7 @@ public class CoinsCMD implements CommandExecutor
 
                     // msg
                     sender.sendMessage(Utils.translate(
-                            "&7You have added &6" + coins + " &e&lCoins &e(" + total + ") &7to &6" + targetName
+                            "&7You have added &6" + coins + " &eCoins &e(" + total + ") &7to &6" + targetName
                     ));
                 }
                 else if (a[0].equalsIgnoreCase("remove"))
@@ -112,7 +112,7 @@ public class CoinsCMD implements CommandExecutor
 
                     // msg
                     sender.sendMessage(Utils.translate(
-                            "&7You have removed &6" + coins + " &e&lCoins &e(" + total + ") &7to &6" + targetName
+                            "&7You have removed &6" + coins + " &eCoins &e(" + total + ") &7to &6" + targetName
                     ));
                 }
             }
@@ -129,7 +129,7 @@ public class CoinsCMD implements CommandExecutor
                 if (sender instanceof Player)
                 {
                     Player player = (Player) sender;
-                    player.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(statsManager.get(player).getCoins()) + " &e&lCoins"));
+                    player.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(statsManager.get(player).getCoins()) + " &eCoins"));
                 }
                 else
                 {
@@ -158,7 +158,7 @@ public class CoinsCMD implements CommandExecutor
                         coins = (int) statsManager.get(target).getCoins();
 
                     if (exists)
-                        sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &e&lCoins"));
+                        sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
                     else
                         sender.sendMessage(Utils.translate("&c" + playerName + " &7has not joined the server"));
                 }

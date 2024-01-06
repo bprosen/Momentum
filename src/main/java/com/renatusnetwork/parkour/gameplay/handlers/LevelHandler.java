@@ -32,8 +32,6 @@ public class LevelHandler {
         // if playerstats and level exists
         if (level != null && playerStats != null && !playerStats.isSpectating())
         {
-            String levelName = level.getName();
-
             // if they do have the required level
             if (level.playerHasRequiredLevels(playerStats))
             {
@@ -42,7 +40,7 @@ public class LevelHandler {
                 {
                     int playerLevelCompletions = playerStats.getLevelCompletionsCount(level);
 
-                    if (level.getMaxCompletions() == -1 || playerLevelCompletions < level.getMaxCompletions())
+                    if (!level.hasMaxCompletions() || playerLevelCompletions < level.getMaxCompletions())
                     {
                         // if it is a race completion, end it
                         if (!playerStats.inRace())
@@ -198,7 +196,7 @@ public class LevelHandler {
                 String completionMessage = "&7 in ";
 
                 if (elapsedTime > 0 && elapsedTime < 8388607)
-                    completionMessage = " &a" + elapsedTime;
+                    completionMessage = " &a" + (elapsedTime / 1000f);
 
                 String completion = "&7Rewarded &6" + Utils.getCoinFormat(level.getReward(), reward) +
                         " Coins &7for " + level.getFormattedTitle() + completionMessage +
@@ -217,7 +215,7 @@ public class LevelHandler {
                 {
                     String oldTimeString = bestCompletion.getCompletionTimeElapsedSeconds() + "s"; // need to format the long
 
-                    player.sendMessage(Utils.translate("You have broken your personal best &c(" + oldTimeString + ") with &a" + time));
+                    player.sendMessage(Utils.translate("&7You have broken your personal best &c(" + oldTimeString + ")&7 with &a" + time));
                 }
 
                 // broadcast completed if it the featured level

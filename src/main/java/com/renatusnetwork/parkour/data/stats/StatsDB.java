@@ -107,6 +107,8 @@ public class StatsDB {
             // get total count of how many levels they've rated
             playerStats.setRatedLevelsCount(getRatedLevelsCount(playerStats));
 
+            playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
+
             // set multiplier percentage
             if (playerStats.hasPrestiges())
             {
@@ -129,7 +131,6 @@ public class StatsDB {
             playerStats.setAttemptingRankup(Integer.parseInt(playerResult.get("attempting_rankup")) == 1);
             playerStats.setRaceWins(Integer.parseInt(playerResult.get("race_wins")));
             playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
-            playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
 
             // we do a math.max since we can't divide by 0... so if they have never lost we divide by 1 not zero
             playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal(

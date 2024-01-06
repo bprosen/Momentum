@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class MenuItemFormatter {
 
-    public static ItemStack format(Player player, PlayerStats playerStats, MenuItem menuItem) {
+    public static ItemStack format(PlayerStats playerStats, MenuItem menuItem) {
         if (menuItem.getType().equals("level"))
         {
             if (menuItem.getTypeValue().equals("featured"))
@@ -437,7 +437,7 @@ public class MenuItemFormatter {
             // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
             if (oldReward != newReward)
             {
-                itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(oldReward) + "&6 " + Utils.formatNumber(newReward) + " Coin &7Reward"));
+                itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(oldReward) + "&6 " + Utils.formatNumber(newReward) + "&e Coin &7Reward"));
 
                 // on cooldown!
                 if (cooldown != null && cooldown.getModifier() != 1.00f)
@@ -484,7 +484,7 @@ public class MenuItemFormatter {
 
                 itemLore.add("");
 
-                String beatenMessage = "&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7Time";
+                String beatenMessage = "&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7time";
                 if (levelCompletionsCount > 1)
                     beatenMessage += "s";
 
@@ -495,7 +495,7 @@ public class MenuItemFormatter {
                     double completionTime = fastestCompletion.getCompletionTimeElapsedSeconds();
                     long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletionMillis();
 
-                    String bestTime = "&7  Best Time &6" + completionTime + "s";
+                    String bestTime = "&7  Best time &6" + completionTime + "s";
 
                     // add record if there is one
                     LevelCompletion record = level.getRecordCompletion();
@@ -506,7 +506,7 @@ public class MenuItemFormatter {
                         if (record.getName().equalsIgnoreCase(playerStats.getName()))
                             bestTime += " &e#1";
                         else
-                            bestTime += " &e+" + (completionTime - (record.getCompletionTimeElapsedSeconds())) + "s";
+                            bestTime += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getCompletionTimeElapsedMillis()) / 1000d) + "s";
                     }
 
                     itemLore.add(Utils.translate(bestTime));

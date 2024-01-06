@@ -88,6 +88,8 @@ public class PlayerStats {
         this.saves = new HashMap<>();
         this.modifiers = new HashMap<>();
         this.bestInfiniteScores = new HashMap<>();
+        this.records = new HashSet<>();
+        this.masteryCompletions = new HashSet<>();
 
         // default for now, if they are not a new player the mysql db loading will adjust these
         this.infiniteBlock = Parkour.getSettingsManager().infinite_default_block;

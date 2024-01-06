@@ -398,7 +398,7 @@ public class StatsManager {
             int lbPos = 1;
 
             for (Map<String, String> playerCompletionStat : playerCompletions) {
-                int completions = Integer.parseInt(playerCompletionStat.get("level_completions"));
+                int completions = Integer.parseInt(playerCompletionStat.get("total_completions"));
                 // if they have more than 0 completions, add (reset stats case)
                 if (completions > 0)
                 {
@@ -459,7 +459,7 @@ public class StatsManager {
             for (Map<String, String> recordResult : recordsResult)
             {
                 String playerName = recordResult.get("name");
-                int records = Integer.parseInt(recordResult.get("records"));
+                int records = Integer.parseInt(recordResult.get("numRecords"));
 
                 // if they have more than 0 completions, add (reset stats case)
                 if (records > 0)

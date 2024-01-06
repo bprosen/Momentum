@@ -11,6 +11,7 @@ import com.renatusnetwork.parkour.data.races.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -209,17 +210,15 @@ public class LevelListener implements Listener {
         player.sendMessage(Utils.translate(msgString));
 
         // add to async queue
-        DatabaseQueries.runAsyncQuery("INSERT INTO checkpoints " +
-                "(uuid, player_name, level_name, world, x, y, z)" +
-                " VALUES ('" +
-                playerStats.getUUID() + "','" +
-                playerStats.getName() + "','" +
-                playerStats.getLevel().getName() + "','" +
-                location.getWorld().getName() + "','" +
-                location.getBlockX() + "','" +
-                location.getBlockY() + "','" +
-                location.getBlockZ() +
-                "')"
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " " +
+                "(uuid, level_name, world, x, y, z)" +
+                " VALUES (?,?,?,?,?,?)",
+                playerStats.getUUID(),
+                playerStats.getLevel().getName(),
+                location.getWorld().getName(),
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ()
         );
     }
 

@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.levels;
 
+import com.comphenix.protocol.PacketType;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.locations.LocationsDB;
@@ -46,7 +47,6 @@ public class LevelManager {
         this.cooldowns = new HashMap<>();
 
         load(); // Loads levels from configuration
-        CompletionsDB.loadLeaderboards();
         loadLevelsInMenus();
         pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
@@ -410,21 +410,26 @@ public class LevelManager {
                 HashMap<Level, Integer> amountInLevel = new HashMap<>();
 
                 // loop through levels then all players online to determine how many are in each level
-                for (PlayerStats playerStats : Parkour.getStatsManager().getOnlinePlayers())
+                HashMap<String, PlayerStats> stats = Parkour.getStatsManager().getPlayerStats();
+
+                synchronized (stats)
                 {
-                    Level level = playerStats.getLevel();
+                    for (PlayerStats playerStats : stats.values())
+                    {
+                        Level level = playerStats.getLevel();
 
-                    // if in a level, add to map
-                    if (level != null)
-                        if (amountInLevel.containsKey(level))
-                            amountInLevel.replace(level, amountInLevel.get(level) + 1);
-                        else
-                            amountInLevel.put(level, 1);
+                        // if in a level, add to map
+                        if (level != null)
+                            if (amountInLevel.containsKey(level))
+                                amountInLevel.replace(level, amountInLevel.get(level) + 1);
+                            else
+                                amountInLevel.put(level, 1);
+                    }
+
+                    // set in level amount
+                    for (Map.Entry<Level, Integer> entry : amountInLevel.entrySet())
+                        entry.getKey().setPlayersInLevel(entry.getValue());
                 }
-
-                // set in level amount
-                for (Map.Entry<Level, Integer> entry : amountInLevel.entrySet())
-                    entry.getKey().setPlayersInLevel(entry.getValue());
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
 

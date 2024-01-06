@@ -15,7 +15,7 @@ public class CompletionsDB
     {
         List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "*",
+                "level_name, (UNIX_TIMESTAMP(completion_date) * 1000) AS date, time_taken",
                 "WHERE uuid=?", playerStats.getUUID());
 
         for (Map<String, String> completionResult : completionsResults)
@@ -44,7 +44,7 @@ public class CompletionsDB
                         " VALUES (?,?,FROM_UNIXTIME(?),?,?)",
                 levelCompletion.getUUID(),
                 levelCompletion.getLevelName(),
-                levelCompletion.getTimeOfCompletionSeconds(),
+                levelCompletion.getTimeOfCompletionMillis() / 1000, // cannot use built in method, need to do int division
                 levelCompletion.getCompletionTimeElapsedMillis(),
                 masteryBit
         );
@@ -58,7 +58,7 @@ public class CompletionsDB
                         "uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)",
                 levelCompletion.getUUID(),
                 levelCompletion.getLevelName(),
-                levelCompletion.getTimeOfCompletionSeconds()
+                levelCompletion.getTimeOfCompletionMillis() / 1000
         );
     }
 
@@ -76,9 +76,9 @@ public class CompletionsDB
                        "WHERE uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)";
 
         if (async)
-            DatabaseQueries.runAsyncQuery(query, levelCompletion.getUUID(), levelCompletion.getLevelName(), levelCompletion.getTimeOfCompletionSeconds());
+            DatabaseQueries.runAsyncQuery(query, levelCompletion.getUUID(), levelCompletion.getLevelName(), levelCompletion.getTimeOfCompletionMillis() / 1000);
         else
-            DatabaseQueries.runQuery(query, levelCompletion.getUUID(), levelCompletion.getLevelName(), levelCompletion.getTimeOfCompletionSeconds());
+            DatabaseQueries.runQuery(query, levelCompletion.getUUID(), levelCompletion.getLevelName(), levelCompletion.getTimeOfCompletionMillis() / 1000);
     }
 
     public static boolean hasCompleted(String uuid, String levelName)
@@ -164,18 +164,17 @@ public class CompletionsDB
         Parkour.getStatsManager().toggleLoadingLeaderboards(true);
 
         ResultSet results = DatabaseQueries.getRawResults(
-                "SELECT l.name AS level_name, p.uuid AS player_uuid, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
+                "SELECT level_name, p.uuid AS player_uuid, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
                         "FROM (" +
                         "  SELECT *, ROW_NUMBER() OVER (PARTITION BY level_name ORDER BY time_taken) AS row_num" +
                         "  FROM (" +
-                        "    SELECT level_name, uuid, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
+                        "    SELECT level_name, uuid, MIN(time_taken) AS time_taken, MIN(UNIX_TIMESTAMP(completion_date) * 1000) AS completion_date" +
                         "    FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
                         "    WHERE time_taken > 0" +
                         "    GROUP BY level_name, uuid" +
                         "  ) AS grouped_completions" +
                         ") AS c " +
                         "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON c.uuid=p.uuid " +
-                        "JOIN " + DatabaseManager.LEVELS_TABLE + " l ON c.level_name=l.name " +
                         "WHERE c.row_num <= 10 " +
                         "ORDER BY c.level_name, c.time_taken;"
         );
@@ -201,7 +200,7 @@ public class CompletionsDB
 
                         // initialize and adjust
                         lbPlace = 1;
-                        currentLB.clear();
+                        currentLB = new HashMap<>();
                         currentLevel = Parkour.getLevelManager().get(levelName);
                     }
 

@@ -208,8 +208,8 @@ public class TablesDB
     private static void createPerks()
     {
         String query = "CREATE TABLE " + DatabaseManager.PERKS_TABLE + "(" +
-                            "name VARCHAR(20) NOT NULL, " +
-                            "title VARCHAR(30) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
+                            "name VARCHAR(30) NOT NULL, " +
+                            "title VARCHAR(100) DEFAULT NULL, " + // Some of these titles can get really long, especially tag based perks
                             // settings
                             "price INT DEFAULT NULL, " +
                             "required_permission VARCHAR(50) DEFAULT NULL, " +
@@ -472,7 +472,7 @@ public class TablesDB
                             // indexes
                             "INDEX uuid_index(uuid), " + // gets the completions for that user fast
                             "INDEX level_index(level_name), " + // gets the completions for that level fast
-                            "UNIQUE INDEX record_index(uuid, record), " + // get a users records fast, where uuid=player uuid and record=1
+                            "INDEX record_index(uuid, record), " + // get a users records fast, where uuid=player uuid and record=1
                             // constraints
                             "CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_non_negative CHECK (" +
                                 "time_taken >= 0" +
@@ -578,7 +578,7 @@ public class TablesDB
     {
         String query = "CREATE TABLE " + DatabaseManager.PERKS_BOUGHT_TABLE + "(" +
                             "uuid CHAR(36) NOT NULL, " +
-                            "perk_name VARCHAR(20) NOT NULL, " +
+                            "perk_name VARCHAR(30) NOT NULL, " +
                             // keys
                             "PRIMARY KEY(uuid, perk_name), " +
                             // indexes
@@ -605,10 +605,10 @@ public class TablesDB
     private static void createPerksLevelRequirements()
     {
         String query = "CREATE TABLE " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "(" +
-                            "perk_name VARCHAR(20) NOT NULL, " +
-                            "level_name VARCHAR(20) NOT NULL, " +
+                            "perk_name VARCHAR(30) NOT NULL, " +
+                            "required_level_name VARCHAR(20) NOT NULL, " +
                             // keys
-                            "PRIMARY KEY(perk_name, level_name), " +
+                            "PRIMARY KEY(perk_name, required_level_name), " +
                             // indexes
                             "INDEX perk_name_index(perk_name)" +
                         ")";
@@ -622,8 +622,8 @@ public class TablesDB
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
-                                 "ADD CONSTRAINT " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "_level_name_fk " +
-                                 "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + "_required_level_name_fk " +
+                                 "FOREIGN KEY(required_level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
 
@@ -633,11 +633,11 @@ public class TablesDB
     private static void createPerksArmor()
     {
         String query = "CREATE TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
-                            "perk_name VARCHAR(20) NOT NULL, " +
+                            "perk_name VARCHAR(30) NOT NULL, " +
                             "armor_piece ENUM(" + enumQuotations(PerksArmorType.values()) + ") NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS
                             "material ENUM(" + enumQuotations(Material.values()) + ") NOT NULL, " +
                             "type TINYINT DEFAULT 0, " +
-                            "title VARCHAR(30) DEFAULT NULL, " + // allow for extra length due to color codes
+                            "title VARCHAR(50) DEFAULT NULL, " + // allow for extra length due to color codes
                             "glow BIT DEFAULT 0, " +
                             // keys
                             "PRIMARY KEY(perk_name, armor_piece), " +
@@ -660,8 +660,8 @@ public class TablesDB
 
     private static void createPerksCommands()
     {
-        String query = "CREATE TABLE " + DatabaseManager.PERKS_COMMANDS + " (" +
-                            "perk_name VARCHAR(20) NOT NULL, " +
+        String query = "CREATE TABLE " + DatabaseManager.PERKS_COMMANDS_TABLE + " (" +
+                            "perk_name VARCHAR(30) NOT NULL, " +
                             "command VARCHAR(100) NOT NULL, " + // commands can get quite long
                             // keys
                             "PRIMARY KEY(perk_name, command), " +
@@ -674,7 +674,7 @@ public class TablesDB
 
     private static void createPerksCommandsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_COMMANDS + " ADD CONSTRAINT " + DatabaseManager.PERKS_COMMANDS + "_perk_name_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_COMMANDS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_COMMANDS_TABLE + "_perk_name_fk " +
                                  "FOREIGN KEY(perk_name) REFERENCES " + DatabaseManager.PERKS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
@@ -725,7 +725,7 @@ public class TablesDB
                             "level_name VARCHAR(20) NOT NULL, " +
                             "type ENUM(" + finalString + ") NOT NULL, " +
                             "amplifier TINYINT UNSIGNED DEFAULT 0, " + // potion effects dont go past 255, so TINYINT UNSIGNED is perfect
-                            "duration MEDIUMINT DEFAULT 0, " +
+                            "duration INT DEFAULT 0, " +
                             "PRIMARY KEY(level_name, type), " +
                             // indexes
                             "INDEX level_name_index(level_name), " +
