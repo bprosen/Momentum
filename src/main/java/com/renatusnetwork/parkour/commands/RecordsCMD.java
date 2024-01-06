@@ -167,7 +167,7 @@ public class RecordsCMD implements CommandExecutor
                     if (records.size() > max)
                         sender.sendMessage(Utils.translate("&9/records " + targetName + " " + (page + 1)));
 
-                    sender.sendMessage(Utils.translate("&e✦ " + records + " &7Records"));
+                    sender.sendMessage(Utils.translate("&e✦ " + records.size() + " &7Records"));
                 }
                 else
                     sender.sendMessage(Utils.translate("&7None"));
