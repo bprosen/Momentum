@@ -72,9 +72,10 @@ public class Scoreboard {
         }
     }
 
-    private static void displayScoreboard(PlayerStats playerStats) {
-        if (playerStats != null && playerStats.getPlayer() != null) {
-
+    private static void displayScoreboard(PlayerStats playerStats)
+    {
+        if (playerStats != null && playerStats.hasBoard())
+        {
             List<String> board = new ArrayList<>();
             BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
 
@@ -320,7 +321,7 @@ public class Scoreboard {
                 board.add(Utils.translate("&7"));
                 board.add(formatSpacing(Utils.translate("&6renatus.cc")));
             }
-            playerStats.getBoard().updateLines(board); // update board lines
+            playerStats.updateBoard(board); // update board lines
         }
     }
 }

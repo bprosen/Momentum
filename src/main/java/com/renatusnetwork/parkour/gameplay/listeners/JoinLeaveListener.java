@@ -27,13 +27,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
+
 import java.util.List;
 
-public class JoinLeaveListener implements Listener {
-
+public class JoinLeaveListener implements Listener
+{
+    // We use PlayerSpawnLocationEvent instead of PlayerJoinEvent since we rely on their spawn location to load their data
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-
+    public void onJoin(PlayerSpawnLocationEvent event)
+    {
         Player player = event.getPlayer();
 
         if (!player.hasPlayedBefore())
@@ -41,7 +44,7 @@ public class JoinLeaveListener implements Listener {
             Location spawn = Parkour.getLocationManager().getTutorialLocation();
             if (spawn != null)
             {
-                player.teleport(spawn);
+                event.setSpawnLocation(spawn);
 
                 StatsManager statsManager = Parkour.getStatsManager();
 
@@ -65,63 +68,64 @@ public class JoinLeaveListener implements Listener {
         // set inventory
         Utils.setHotbar(player);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
+        Location spawnLoc = event.getSpawnLocation();
 
-                StatsManager statsManager = Parkour.getStatsManager();
-                statsManager.add(player);
-                PlayerStats playerStats = statsManager.get(player);
+        StatsManager statsManager = Parkour.getStatsManager();
+        PlayerStats playerStats = statsManager.add(player);
+
+        // load level here in sync
+        ProtectedRegion region = WorldGuard.getRegion(spawnLoc);
+
+        if (region != null)
+        {
+            Level level = Parkour.getLevelManager().get(region.getId());
+
+            // make sure the area they are spawning in is a level
+            if (level != null)
+            {
+                playerStats.setLevel(level);
+
+                // toggle tutorial
+                if (level.equals(Parkour.getLevelManager().getTutorialLevel()))
+                    playerStats.setTutorial(true);
+            }
+        }
+
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
                 statsManager.loadStats(playerStats);
 
-                // run most of this in async (region lookup, stat editing, etc)
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
+                if (playerStats.inLevel())
+                {
+                    Level level = playerStats.getLevel();
 
-                        // if not spectating
-                        if (!playerStats.isSpectating()) {
-                            // load level, checkpoint info here
-                            ProtectedRegion region = WorldGuard.getRegion(player.getLocation());
-                            if (region != null) {
+                    // if the level they are being added to is an ascendance level, add them to the list
+                    if (level.isAscendance())
+                        statsManager.enteredAscendance(playerStats);
 
-                                Level level = Parkour.getLevelManager().get(region.getId());
+                    Location checkpoint = playerStats.getCheckpoint(level);
+                    if (checkpoint != null)
+                        playerStats.setCurrentCheckpoint(checkpoint);
 
-                                // make sure the area they are spawning in is a level
-                                if (level != null) {
-                                    playerStats.setLevel(level);
-
-                                    // toggle tutorial
-                                    if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
-                                        playerStats.setTutorial(true);
-
-                                    // if the level they are being added to is an ascendance level, add them to the list
-                                    if (level.isAscendance())
-                                        statsManager.enteredAscendance(playerStats);
-
-                                    Location checkpoint = playerStats.getCheckpoint(level);
-                                    if (checkpoint != null)
-                                        playerStats.setCurrentCheckpoint(checkpoint);
-
-                                    // is elytra level, then set elytra in sync (player inventory changes)
-                                    if (level.isElytra())
-                                        new BukkitRunnable() {
-                                            @Override
-                                            public void run() {
-                                                Parkour.getStatsManager().toggleOnElytra(playerStats);
-                                            }
-                                        }.runTask(Parkour.getPlugin());
-                                }
+                    // is elytra level, then set elytra in sync (player inventory changes)
+                    if (level.isElytra())
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                Parkour.getStatsManager().toggleOnElytra(playerStats);
                             }
-                        }
-                    }
-                }.runTaskLaterAsynchronously(Parkour.getPlugin(), 20 * 3);
+                        }.runTask(Parkour.getPlugin());
+                }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void onQuit(PlayerQuitEvent event)
+    {
 
         Player player = event.getPlayer();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);

@@ -111,6 +111,7 @@ public class StatsManager {
     public void loadStats(PlayerStats playerStats)
     {
         // load all db and player stats needed
+        playerStats.initBoard();
         StatsDB.loadPlayerInformation(playerStats);
         StatsDB.loadBoughtLevels(playerStats);
         CompletionsDB.loadCompletions(playerStats);
@@ -207,17 +208,16 @@ public class StatsManager {
         return playerStatsName.containsKey(playerName);
     }
 
-    public void add(Player player)
+    public PlayerStats add(Player player)
     {
         // ensure thread safety
         synchronized (playerStatsUUID)
         {
-            if (!exists(player.getUniqueId().toString()))
-            {
-                PlayerStats playerStats = new PlayerStats(player);
-                playerStatsUUID.put(player.getUniqueId().toString(), playerStats);
-                playerStatsName.put(player.getName(), playerStats);
-            }
+            PlayerStats playerStats = new PlayerStats(player);
+            playerStatsUUID.put(player.getUniqueId().toString(), playerStats);
+            playerStatsName.put(player.getName(), playerStats);
+
+            return playerStats;
         }
     }
 

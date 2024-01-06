@@ -78,7 +78,6 @@ public class PlayerStats {
         this.player = player;
         this.uuid = player.getUniqueId().toString();
         this.name = player.getName();
-        this.board = new FastBoard(player); // load board
 
         // load maps
         this.levelCompletions = new HashMap<>();
@@ -102,6 +101,21 @@ public class PlayerStats {
     //
     // Player Info Section
     //
+
+    public void initBoard()
+    {
+        this.board = new FastBoard(player);
+    }
+
+    public void updateBoard(List<String> lines)
+    {
+        board.updateLines(lines);
+    }
+
+    public boolean hasBoard()
+    {
+        return board != null;
+    }
 
     public Player getPlayer() {
         return player;
