@@ -19,6 +19,7 @@ public class Jackpot
     private long endMillis;
 
     private BukkitTask reminderTask;
+    private BukkitTask endTask;
 
     public Jackpot(Level level, int bonus)
     {
@@ -40,6 +41,9 @@ public class Jackpot
         if (reminderTask != null)
             reminderTask.cancel();
 
+        if (endTask != null)
+            endTask.cancel();
+
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
         Bukkit.broadcastMessage(Utils.translate("&6&lJACKPOT &e&lENDED"));
 
@@ -57,7 +61,7 @@ public class Jackpot
 
     private void runSchedulers()
     {
-        new BukkitRunnable()
+        endTask = new BukkitRunnable()
         {
             @Override
             public void run()
