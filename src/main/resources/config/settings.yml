@@ -28,8 +28,8 @@ blackmarket:
   start_time:
     day: sunday
     hour: 15
-  item_spawn_location: "blackmarket-item-spawn"
-  tp_location: "blackmarket-spawn"
+  item_spawn_location: "black_market-item-spawn"
+  tp_location: "black_market-spawn"
   seconds_before_ending_from_no_bids: 30 # time of which it will take of no bidding to end the black market
   min_player_count: 3
   message_prefix: "&8&lThe Merchant &7→"

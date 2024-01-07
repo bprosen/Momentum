@@ -15,12 +15,13 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class BlackMarketEvent
 {
-    private ArrayList<PlayerStats> players;
+    private HashSet<PlayerStats> players;
     private boolean canBid;
     private LinkedHashMap<PlayerStats, Integer> bids;
     private PlayerStats highestBidder;
@@ -34,8 +35,7 @@ public class BlackMarketEvent
     public BlackMarketEvent(BlackMarketArtifact blackMarketArtifact)
     {
         this.bids = new LinkedHashMap<>();
-        this.players = new ArrayList<>();
-        this.canBid = false;
+        this.players = new HashSet<>();
         this.blackMarketArtifact = blackMarketArtifact;
         this.nextMinimumBid = blackMarketArtifact.getStartingBid();
 
@@ -258,7 +258,7 @@ public class BlackMarketEvent
         return players.size();
     }
 
-    public ArrayList<PlayerStats> getPlayers() { return players; }
+    public HashSet<PlayerStats> getPlayers() { return players; }
 
     private void startTimer()
     {
