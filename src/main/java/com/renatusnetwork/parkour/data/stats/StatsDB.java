@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -106,7 +107,7 @@ public class StatsDB {
 
             // get total count of how many levels they've rated
             playerStats.setRatedLevelsCount(getRatedLevelsCount(playerStats));
-
+            playerStats.setTotalLevelCompletions(getTotalCompletions(playerStats));
             playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
 
             // set multiplier percentage
@@ -161,17 +162,25 @@ public class StatsDB {
                         DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*) AS count",
                         "WHERE uuid=?", playerStats.getUUID());
 
-        if (!result.isEmpty())
-            return Integer.parseInt(result.get("count"));
-        else
-            return 0;
+        return Integer.parseInt(result.get("count"));
     }
 
     public static int getTotalPlayers()
     {
-        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "COUNT(*) AS total", "");
+        Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLAYERS_TABLE, "COUNT(*) AS total", "");
 
-        return Integer.parseInt(results.get(0).get("total"));
+        return Integer.parseInt(result.get("total"));
+    }
+
+    public static int getTotalCompletions(PlayerStats playerStats)
+    {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.LEVEL_COMPLETIONS_TABLE,
+                "COUNT(*) AS total_completions",
+                "WHERE uuid=?", playerStats.getUUID()
+        );
+
+        return Integer.parseInt(playerResult.get("total_completions"));
     }
 
     // this will update the player name all across the database
