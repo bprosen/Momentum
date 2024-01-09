@@ -368,17 +368,9 @@ public class StatsManager {
 
     public void loadTotalCoins()
     {
-        try
-        {
-            ResultSet result = DatabaseQueries.getRawResults("SELECT SUM(coins) AS total_coins FROM players");
+        Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLAYERS_TABLE, "SUM(coins) AS total_coins", "");
 
-            if (result != null && result.next())
-                totalCoins = result.getLong("total_coins");
-        }
-        catch (SQLException exception)
-        {
-            exception.printStackTrace();
-        }
+        totalCoins = (long) Double.parseDouble(result.get("total_coins"));
     }
 
     public void loadGlobalPersonalCompletionsLB() {
@@ -388,9 +380,9 @@ public class StatsManager {
             // find the highest top 10 completion stat
             List<Map<String, String>> playerCompletions = DatabaseQueries.getResults(
                     DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc",
-                    "p.name AS player_name, COUNT(lc.level_name) AS total_completions",
+                    "p.name, COUNT(lc.level_name) AS total_completions",
                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lc.uuid " +
-                           "GROUP BY lc.uuid " +
+                           "GROUP BY p.name " +
                            "ORDER BY total_completions " +
                            "DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size
             );
@@ -399,11 +391,13 @@ public class StatsManager {
 
             for (Map<String, String> playerCompletionStat : playerCompletions) {
                 int completions = Integer.parseInt(playerCompletionStat.get("total_completions"));
+                String playerName = playerCompletionStat.get("name");
+
                 // if they have more than 0 completions, add (reset stats case)
                 if (completions > 0)
                 {
                     // add playername to completion in map
-                    globalPersonalCompletionsLB.put(lbPos, new GlobalPersonalLBPosition(playerCompletionStat.get("player_name"), completions));
+                    globalPersonalCompletionsLB.put(lbPos, new GlobalPersonalLBPosition(playerName, completions));
                     lbPos++;
                 }
             }

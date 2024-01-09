@@ -682,8 +682,10 @@ public class LevelManager {
 
 
     // top rated levels lb
-    public void loadTopRatedLevelsLB() {
-        try {
+    public void loadTopRatedLevelsLB()
+    {
+        try
+        {
 
             Level highestLevel = null;
             Set<String> addedLevels = new HashSet<>();
@@ -691,16 +693,18 @@ public class LevelManager {
             topRatedLevelsLB.clear();
             int leaderboardPos = 1;
 
-            while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize) {
+            while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize)
+            {
                 for (Level level : levels.values())
-                    if (level.getRatingsCount() >= 5 && (highestLevel == null || (!addedLevels.contains(level.getName()) &&
-                        level.getRating() >= highestLevel.getRating())))
+                    if (level.getRatingsCount() >= 5 &&
+                        (highestLevel == null || (!addedLevels.contains(level.getName()) && level.getRating() >= highestLevel.getRating())))
                         highestLevel = level;
 
                 // add 1 and add to added levels
                 lbSize++;
 
-                if (highestLevel != null) {
+                if (highestLevel != null)
+                {
                     addedLevels.add(highestLevel.getName());
                     // add to temp lb
                     if (highestLevel.hasRating())
@@ -712,7 +716,9 @@ public class LevelManager {
                     highestLevel = null;
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }

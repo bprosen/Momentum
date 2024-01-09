@@ -113,6 +113,7 @@ public class LevelsDB {
             level.setCommands(getCompletionCommands(levelName));
             level.setRequiredLevels(getRequiredLevels(levelName));
             level.setRatings(getLevelRatings(levelName));
+            level.calcRating();
             level.setPotionEffects(getPotionEffects(levelName));
 
             levels.put(levelName, level);
@@ -186,7 +187,7 @@ public class LevelsDB {
         HashMap<String, Integer> ratings = new HashMap<>();
 
         for (Map<String, String> result : results)
-            ratings.put(result.get("p.name"), Integer.parseInt(result.get("rating")));
+            ratings.put(result.get("name"), Integer.parseInt(result.get("rating")));
 
         return ratings;
     }
