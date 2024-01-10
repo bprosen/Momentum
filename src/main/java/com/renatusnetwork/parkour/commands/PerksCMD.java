@@ -42,7 +42,31 @@ public class PerksCMD implements CommandExecutor
 
         if (sender.isOp())
         {
-            if (a.length == 1 && a[0].equalsIgnoreCase("load"))
+            if (a.length == 2 && a[0].equalsIgnoreCase("create"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk == null)
+                {
+                    perkManager.create(perkName);
+                    sender.sendMessage(Utils.translate("&7You have created the perk &a" + perkName));
+                }
+            }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("remove"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    perkManager.remove(perk);
+                    sender.sendMessage(Utils.translate("&7You have removed the perk &a" + perkName));
+                }
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
             {
                 perkManager.load();
                 sender.sendMessage(Utils.translate("&eLoaded &6" + perkManager.numPerks() + " &eperks into memory"));
@@ -60,7 +84,7 @@ public class PerksCMD implements CommandExecutor
                     String title = String.join(" ", split);
 
                     perkManager.updateTitle(perk, title);
-                    sender.sendMessage(Utils.translate("&7You have updated &c" + perk.getTitle() + " &7title to &c" + perk.getFormattedTitle()));
+                    sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7title to &c" + perk.getFormattedTitle()));
                 }
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
@@ -491,7 +515,7 @@ public class PerksCMD implements CommandExecutor
         // helper function for getting the perk and printing a universal message
         Perk perk = Parkour.getPerkManager().get(perkName);
 
-        if (perk != null)
+        if (perk == null)
             sender.sendMessage(Utils.translate("&4" + perkName + " &cis not a perk"));
 
         return perk;
@@ -500,6 +524,8 @@ public class PerksCMD implements CommandExecutor
     private void sendHelp(CommandSender sender)
     {
         sender.sendMessage(Utils.translate("&6&lPerks Help"));
+        sender.sendMessage(Utils.translate("&e/perks create (perkName)  &7Creates a perk"));
+        sender.sendMessage(Utils.translate("&e/perks remove (perkName)  &7Removes a perk"));
         sender.sendMessage(Utils.translate("&e/perks title (perkName) (title)  &7Sets perk title (can be multiple words)"));
         sender.sendMessage(Utils.translate("&e/perks price (perkName) (price)  &7Sets perk price"));
         sender.sendMessage(Utils.translate("&e/perks requiredpermission (perkName) (permission)  &7Sets perk's required permission"));

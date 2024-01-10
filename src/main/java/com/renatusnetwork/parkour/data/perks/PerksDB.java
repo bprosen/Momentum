@@ -61,14 +61,14 @@ public class PerksDB
     public static void insertRequiredLevel(String perkName, String levelName)
     {
         DatabaseQueries.runAsyncQuery(
-                "INSERT INTO " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " (perk_name, level_name) VALUES (?,?)", perkName, levelName
+                "INSERT INTO " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " (perk_name, required_level_name) VALUES (?,?)", perkName, levelName
         );
     }
 
     public static void removeRequiredLevel(String perkName, String levelName)
     {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " WHERE perk_name=? AND level_name=?", perkName, levelName
+                "DELETE FROM " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " WHERE perk_name=? AND required_level_name=?", perkName, levelName
         );
     }
 
