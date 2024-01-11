@@ -93,7 +93,7 @@ public class LevelCMD implements CommandExecutor
         else if (sender.isOp())
         {
             if (a.length == 1 && a[0].equalsIgnoreCase("show"))
-            { // subcommand: show
+            {
                 if (sender instanceof Player)
                 {
 
@@ -106,9 +106,7 @@ public class LevelCMD implements CommandExecutor
                         sender.sendMessage(Utils.translate("&7You are not in a level"));
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&cConsole cannot run this"));
-                }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("create"))
             {
@@ -125,7 +123,7 @@ public class LevelCMD implements CommandExecutor
                 }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("delete"))
-            { // subcommand: delete
+            {
                 String levelName = a[1];
 
                 if (!levelManager.exists(levelName))
@@ -150,7 +148,6 @@ public class LevelCMD implements CommandExecutor
                         levelManager.loadGlobalLevelCompletions();
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
-
             }
             else if (a.length > 2 && a[0].equalsIgnoreCase("title"))
             {
@@ -182,9 +179,7 @@ public class LevelCMD implements CommandExecutor
                         sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's reward to &6" + reward));
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
-                    }
                 }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("startloc"))
@@ -292,7 +287,6 @@ public class LevelCMD implements CommandExecutor
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("removetime"))
             {
-
                 if (Utils.isInteger(a[2]))
                 {
                     int place = Integer.parseInt(a[2]);
@@ -309,11 +303,9 @@ public class LevelCMD implements CommandExecutor
                             LevelCompletion oldHolder = leaderboard.get(place);
 
                             // run it in async!
-                            new BukkitRunnable()
-                            {
+                            new BukkitRunnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     CompletionsDB.removeCompletion(oldHolder, false);
 
                                     level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
@@ -331,8 +323,7 @@ public class LevelCMD implements CommandExecutor
                                             LevelCompletion newHolder = level.getRecordCompletion();
 
                                             // if it is a diff person, need to update their in game stats
-                                            if (!oldHolder.getUUID().equalsIgnoreCase(newHolder.getUUID()))
-                                            {
+                                            if (!oldHolder.getUUID().equalsIgnoreCase(newHolder.getUUID())) {
                                                 PlayerStats oldHolderStats = statsManager.get(oldHolder.getUUID());
                                                 PlayerStats newHolderStats = statsManager.get(newHolder.getUUID());
 
@@ -461,9 +452,7 @@ public class LevelCMD implements CommandExecutor
                                     ));
                                 }
                                 else
-                                {
                                     sender.sendMessage(Utils.translate("&cRating has to be between &4" + minRating + "-" + maxRating));
-                                }
                             }
                             else
                                 sender.sendMessage(Utils.translate("&c" + a[2] + " is not an integer"));
@@ -512,8 +501,7 @@ public class LevelCMD implements CommandExecutor
                         ));
                 }
             }
-            else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings"))
-            {
+            else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
@@ -541,7 +529,6 @@ public class LevelCMD implements CommandExecutor
                         }
                         else
                             sender.sendMessage(Utils.translate("&cNobody has rated &4" + level.getFormattedTitle()));
-                    // if they put the optional specification arg
                     }
                     else if (a.length == 3)
                     {
@@ -687,11 +674,9 @@ public class LevelCMD implements CommandExecutor
             else if (a.length == 4 && a[0].equalsIgnoreCase("totalcompletions"))
             {
                 // asyncify since big db searching
-                new BukkitRunnable()
-                {
+                new BukkitRunnable() {
                     @Override
-                    public void run()
-                    {
+                    public void run() {
                         String levelName = a[1].toLowerCase();
                         String startDate = a[2];
                         String endDate = a[3];
@@ -704,13 +689,12 @@ public class LevelCMD implements CommandExecutor
 
                             sender.sendMessage(Utils.translate(
                                     "&c" + level.getFormattedTitle() + "&7 between &a" + startDate + " &7and &a" + endDate +
-                                         " &7has &a" + Utils.formatNumber(totalCompletions) + " &7Completions"
+                                            " &7has &a" + Utils.formatNumber(totalCompletions) + " &7Completions"
                             ));
                         }
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
             {
                 if (Utils.isInteger(a[2]))
                 {
@@ -765,11 +749,9 @@ public class LevelCMD implements CommandExecutor
 
                 if (level != null)
                 {
-                    new BukkitRunnable()
-                    {
+                    new BukkitRunnable() {
                         @Override
-                        public void run()
-                        {
+                        public void run() {
                             String playerName = a[1];
 
                             // this also acts as a checker of if they have ever joined
@@ -827,9 +809,7 @@ public class LevelCMD implements CommandExecutor
                         ));
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid integer"));
-                    }
                 }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("cooldown"))
@@ -842,10 +822,20 @@ public class LevelCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate("&7You have turned " + level.getFormattedTitle() + "&7's cooldown toggle to &2" + level.hasCooldown()));
                 }
             }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("tc"))
+            {
+                Level level = getLevel(sender, a[1].toLowerCase());
+
+                if (level != null)
+                {
+                    levelManager.toggleTC(level);
+                    sender.sendMessage(Utils.translate("&7You have turned " + level.getFormattedTitle() + "&7's cooldown toggle to &2" + level.hasCooldown()));
+                }
+            }
             else if (a.length == 1 && a[0].equalsIgnoreCase("pickfeatured"))
             {
-               levelManager.pickFeatured();
-               sender.sendMessage(Utils.translate("&7You have set the new featured to &c" + levelManager.getFeaturedLevel().getFormattedTitle()));
+                levelManager.pickFeatured();
+                sender.sendMessage(Utils.translate("&7You have set the new featured to &c" + levelManager.getFeaturedLevel().getFormattedTitle()));
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("resetsave"))
             {
@@ -864,8 +854,7 @@ public class LevelCMD implements CommandExecutor
                         {
                             Parkour.getSavesManager().removeSave(playerStats, level);
                             sender.sendMessage(Utils.translate("&7You have reset &c" + playerName + "'s &7save on &a" + level.getFormattedTitle()));
-                        }
-                        else
+                        } else
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a save for " + level.getFormattedTitle()));
                     }
                     else
@@ -886,6 +875,62 @@ public class LevelCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate("&7You have set &c" + level.getFormattedTitle() + "&7 having a mastery to &a" + level.hasMastery()));
                 }
             }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("masterymultiplier"))
+            {
+                String levelName = a[1].toLowerCase();
+                Level level = getLevel(sender, levelName);
+
+                if (level != null)
+                {
+                    String multiplier = a[2];
+
+                    if (Utils.isFloat(multiplier))
+                    {
+                        float multiplierValue = Float.parseFloat(multiplier);
+                        if (level.hasMastery())
+                        {
+                            float minValue = Parkour.getSettingsManager().min_mastery_multiplier;
+                            float maxValue = Parkour.getSettingsManager().max_mastery_multiplier;
+
+                            if (multiplierValue < minValue)
+                                multiplierValue = minValue;
+
+                            if (multiplierValue > maxValue)
+                                multiplierValue = maxValue;
+
+                            levelManager.setMasteryMultiplier(level, multiplierValue);
+                            sender.sendMessage(Utils.translate("&7You have set &a" + level.getFormattedTitle() + "&7's mastery multiplifer to &a" + multiplierValue));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&4" + levelName + " &cdoes not have a mastery version"));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&4" + multiplier + " &cis not a valid float"));
+                }
+            }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("permission"))
+            {
+                String levelName = a[1].toLowerCase();
+                Level level = getLevel(sender, levelName);
+
+                if (level != null)
+                {
+                    String permission = a[2].toLowerCase();
+                    levelManager.setRequiredPermission(level, permission);
+                    sender.sendMessage(Utils.translate("&7You have set &a" + level.getFormattedTitle() + "&7's required permission to enter to &a" + permission));
+                }
+            }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("removepermission"))
+            {
+                String levelName = a[1].toLowerCase();
+                Level level = getLevel(sender, levelName);
+
+                if (level != null)
+                {
+                    levelManager.removeRequiredPermission(level);
+                    sender.sendMessage(Utils.translate("&7You have removed &a" + level.getFormattedTitle() + "&7's required permission"));
+                }
+            }
             else
                 sendHelp(sender);
         }
@@ -902,7 +947,8 @@ public class LevelCMD implements CommandExecutor
         return level;
     }
 
-    private static void sendHelp(CommandSender sender) {
+    private static void sendHelp(CommandSender sender)
+    {
         sender.sendMessage(Utils.translate("&aTo reload levels from database, use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
         sender.sendMessage(Utils.translate("&a/level buy  &7Buys a level if it has a price"));
@@ -937,8 +983,12 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level new <level>  &7Toggles if the level is new (for menu and future updates)"));
         sender.sendMessage(Utils.translate("&a/level difficulty <level> <difficulty>  &7Sets the difficulty of the level"));
         sender.sendMessage(Utils.translate("&a/level cooldown <level>  &7Toggles if the level has a cooldown"));
+        sender.sendMessage(Utils.translate("&a/level tc <level>  &7Toggles if the level uses TC blocks"));
         sender.sendMessage(Utils.translate("&a/level pickfeatured  &7Picks a new featured level"));
         sender.sendMessage(Utils.translate("&a/level resetsave <player> <level>  &7Resets a player's save for a specific level"));
         sender.sendMessage(Utils.translate("&a/level mastery <level>  &7Toggles if a level has a mastery mode"));
+        sender.sendMessage(Utils.translate("&a/level masterymultiplier <level> <multiplier>  &7Multiplier the level gives for its mastery version"));
+        sender.sendMessage(Utils.translate("&a/level permission <level> <permission>  &7Sets the required permission to enter the level"));
+        sender.sendMessage(Utils.translate("&a/level removepermission <level>  &7Resets the required permission to enter (to null)"));
     }
 }

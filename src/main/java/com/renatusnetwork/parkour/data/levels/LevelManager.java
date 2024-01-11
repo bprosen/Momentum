@@ -37,8 +37,7 @@ public class LevelManager {
     private HashMap<String, HashMap<Integer, Level>> buyingLevels;
     private HashMap<String, LevelCooldown> cooldowns;
 
-    public LevelManager(Plugin plugin)
-    {
+    public LevelManager(Plugin plugin) {
         this.levels = new HashMap<>();
         this.menuLevels = new HashMap<>();
         this.globalLevelCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
@@ -54,8 +53,7 @@ public class LevelManager {
         startScheduler(plugin);
     }
 
-    public void load()
-    {
+    public void load() {
         levels = LevelsDB.getLevels();
         tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
 
@@ -67,31 +65,25 @@ public class LevelManager {
         Parkour.getPluginLogger().info("Levels loaded: " + levels.size());
     }
 
-    public void add(Level level)
-    {
+    public void add(Level level) {
         levels.put(level.getName(), level);
     }
 
-    public void create(String levelName)
-    {
+    public void create(String levelName) {
         LevelsDB.insertLevel(levelName);
         levels.put(levelName, new Level(levelName));
     }
 
-    public void remove(String levelName)
-    {
+    public void remove(String levelName) {
         LevelsDB.removeLevel(levelName);
 
         HashMap<String, PlayerStats> players = Parkour.getStatsManager().getPlayerStats();
 
         // thread safety
-        synchronized (players)
-        {
-            for (PlayerStats playerStats : players.values())
-            {
+        synchronized (players) {
+            for (PlayerStats playerStats : players.values()) {
                 // loop through and reset if applicable
-                if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
-                {
+                if (playerStats.inLevel() && playerStats.getLevel().equals(levelName)) {
                     playerStats.resetLevel();
                     PracticeHandler.resetDataOnly(playerStats);
                     playerStats.resetCurrentCheckpoint();
@@ -121,109 +113,117 @@ public class LevelManager {
         return null;
     }
 
-    public void addRating(Player player, Level level, int rating)
-    {
+    public void addRating(Player player, Level level, int rating) {
         level.addRating(player.getName(), rating);
         RatingDB.addRating(player, level, rating);
     }
 
-    public void removeRating(String playerName, Level level)
-    {
+    public void removeRating(String playerName, Level level) {
         level.removeRating(playerName);
         RatingDB.removeRating(playerName, level);
     }
 
-    public void toggleLiquidReset(Level level)
-    {
+    public void toggleLiquidReset(Level level) {
         level.toggleLiquidReset();
         LevelsDB.updateLiquidReset(level.getName());
     }
 
-    public void toggleNew(Level level)
-    {
+    public void toggleNew(Level level) {
         level.toggleNew();
         LevelsDB.updateNew(level.getName());
     }
 
-    public void toggleCooldown(Level level)
-    {
+    public void toggleTC(Level level) {
+        level.toggleTC();
+        LevelsDB.updateTC(level.getName());
+    }
+
+    public void toggleCooldown(Level level) {
         level.toggleCooldown();
         LevelsDB.updateCooldown(level.getName());
     }
 
-    public void setDifficulty(Level level, int difficulty)
-    {
+    public void setDifficulty(Level level, int difficulty) {
         level.setDifficulty(difficulty);
         LevelsDB.updateDifficulty(level.getName(), difficulty);
     }
-    public void setLevelType(Level level, LevelType type)
-    {
+
+    public void setLevelType(Level level, LevelType type) {
         level.setLevelType(type);
         LevelsDB.setLevelType(level.getName(), type);
     }
 
-    public void setTitle(Level level, String title)
-    {
+    public void setTitle(Level level, String title) {
         level.setTitle(title);
         LevelsDB.updateTitle(level.getName(), title);
     }
 
-    public void setPrice(Level level, int price)
-    {
+    public void setPrice(Level level, int price) {
         level.setPrice(price);
         LevelsDB.updatePrice(level.getName(), price);
     }
 
-    public void setRespawnY(Level level, int respawnY)
-    {
+    public void setRespawnY(Level level, int respawnY) {
         level.setRespawnY(respawnY);
         LevelsDB.updateRespawnY(level.getName(), respawnY);
     }
 
-    public void setReward(Level level, int reward)
-    {
+    public void setReward(Level level, int reward) {
         level.setReward(reward);
         LevelsDB.updateReward(level.getName(), reward);
     }
 
-    public void setStartLocation(Level level, String locationName, Location location)
-    {
+    public void setStartLocation(Level level, String locationName, Location location) {
         level.setStartLocation(location);
         LocationsDB.insertLocation(locationName, location);
     }
 
-    public void setCompletionLocation(Level level, String locationName, Location location)
-    {
+    public void setCompletionLocation(Level level, String locationName, Location location) {
         level.setCompletionLocation(location);
         LocationsDB.insertLocation(locationName, location);
     }
 
-    public void setMaxCompletions(Level level, int maxCompletions)
-    {
+    public void setMaxCompletions(Level level, int maxCompletions) {
         level.setMaxCompletions(maxCompletions);
         LevelsDB.updateMaxCompletions(level.getName(), maxCompletions);
     }
 
-    public void toggleBroadcastCompletion(Level level)
-    {
+    public void toggleBroadcastCompletion(Level level) {
         level.toggleBroadcast();
         LevelsDB.updateBroadcast(level.getName());
     }
 
-    public void toggleHasMastery(Level level)
-    {
+    public void toggleHasMastery(Level level) {
         level.toggleHasMastery();
         LevelsDB.updateHasMastery(level.getName());
 
         // means we toggled it on (+1)
         if (level.hasMastery())
             masteryLevels++;
-        // means we toggled it off (-1)
+            // means we toggled it off (-1)
         else
             masteryLevels--;
     }
 
+    public void setMasteryMultiplier(Level level, float amount)
+    {
+        level.setMasteryMultiplier(amount);
+        LevelsDB.updateMasteryMultiplier(level.getName(), amount);
+    }
+
     public int getNumMasteryLevels() { return masteryLevels; }
+
+    public void setRequiredPermission(Level level, String permission)
+    {
+        level.setRequiredPermission(permission);
+        LevelsDB.updateRequiredPermission(level.getName(), permission);
+    }
+
+    public void removeRequiredPermission(Level level)
+    {
+        level.setRequiredPermission(null);
+        LevelsDB.removeRequiredPermission(level.getName());
+    }
 
     public void addRequiredLevel(Level level, String requiredLevelName)
     {

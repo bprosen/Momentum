@@ -294,6 +294,8 @@ public class Level
 
     public boolean isTCEnabled() { return tc; }
 
+    public void toggleTC() { tc = !tc; }
+
     public void setTC(boolean tc) { this.tc = tc; }
 
     public boolean isNew() { return newLevel; }

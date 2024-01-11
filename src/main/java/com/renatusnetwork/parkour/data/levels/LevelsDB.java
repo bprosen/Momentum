@@ -20,20 +20,17 @@ import java.util.*;
 
 public class LevelsDB {
 
-    public static HashMap<String, Level> getLevels()
-    {
+    public static HashMap<String, Level> getLevels() {
         List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*", "");
         HashMap<String, Level> levels = new HashMap<>();
         LocationManager locationManager = Parkour.getLocationManager();
 
-        for (Map<String, String> result : results)
-        {
+        for (Map<String, String> result : results) {
             String levelName = result.get("name");
             LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
 
             Level level;
-            if (type == LevelType.RACE)
-            {
+            if (type == LevelType.RACE) {
                 // since we store the 2 locations in the level object, we want a subclass for storage
                 level = new RaceLevel(levelName);
                 RaceLevel raceLevel = (RaceLevel) level;
@@ -42,8 +39,7 @@ public class LevelsDB {
 
                 raceLevel.setSpawnLocation1(locationManager.get(format.replace("%spawn%", String.valueOf(1))));
                 raceLevel.setSpawnLocation2(locationManager.get(format.replace("%spawn%", String.valueOf(2))));
-            }
-            else
+            } else
                 // otherwise normal level, we have the LEVEL_TYPE to define simple things that don't have any extra storage in the level object
                 level = new Level(levelName);
 
@@ -122,12 +118,11 @@ public class LevelsDB {
         return levels;
     }
 
-    public static List<String> getRequiredLevels(String levelName)
-    {
+    public static List<String> getRequiredLevels(String levelName) {
         List<Map<String, String>> results = DatabaseQueries.getResults(
-            DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " lrl",
-             "*",
-            "WHERE level_name=?", levelName
+                DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " lrl",
+                "*",
+                "WHERE level_name=?", levelName
         );
 
         List<String> requiredLevels = new ArrayList<>();
@@ -138,8 +133,7 @@ public class LevelsDB {
         return requiredLevels;
     }
 
-    public static List<String> getCompletionCommands(String levelName)
-    {
+    public static List<String> getCompletionCommands(String levelName) {
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETION_COMMANDS_TABLE,
                 "*",
@@ -154,18 +148,16 @@ public class LevelsDB {
         return commands;
     }
 
-    public static List<PotionEffect> getPotionEffects(String levelName)
-    {
+    public static List<PotionEffect> getPotionEffects(String levelName) {
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_POTION_EFFECTS_TABLE,
                 "*",
-               "WHERE level_name=?", levelName
+                "WHERE level_name=?", levelName
         );
 
         List<PotionEffect> potionEffects = new ArrayList<>();
 
-        for (Map<String, String> result : results)
-        {
+        for (Map<String, String> result : results) {
             PotionEffectType type = PotionEffectType.getByName(result.get("type"));
             int duration = Integer.parseInt(result.get("duration"));
             int amplifier = Integer.parseInt(result.get("amplifier"));
@@ -176,8 +168,7 @@ public class LevelsDB {
         return potionEffects;
     }
 
-    public static HashMap<String, Integer> getLevelRatings(String levelName)
-    {
+    public static HashMap<String, Integer> getLevelRatings(String levelName) {
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_RATINGS_TABLE + " lr",
                 "*",
@@ -192,26 +183,22 @@ public class LevelsDB {
         return ratings;
     }
 
-    public static void insertLevel(String levelName)
-    {
+    public static void insertLevel(String levelName) {
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name) VALUES (?)", levelName);
     }
 
-    public static void updateName(String levelName, String newLevelName)
-    {
+    public static void updateName(String levelName, String newLevelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET name=? WHERE name=?", newLevelName, levelName);
     }
 
-    public static long getGlobalCompletions()
-    {
+    public static long getGlobalCompletions() {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE,
                 "COUNT(*) AS total_completions", "");
 
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
 
-    public static long getCompletionsBetweenDates(String levelName, String start, String end)
-    {
+    public static long getCompletionsBetweenDates(String levelName, String start, String end) {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE,
                 "COUNT(*) AS total_completions",
                 " WHERE name=? AND completion_date BETWEEN ? AND ?", levelName, start, end);
@@ -219,53 +206,64 @@ public class LevelsDB {
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
 
-    public static void updateLiquidReset(String levelName)
-    {
+    public static void updateLiquidReset(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET liquid_reset=NOT liquid_reset WHERE name=?", levelName);
     }
 
-    public static void updateReward(String levelName, int reward)
-    {
+    public static void updateReward(String levelName, int reward) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET reward=? WHERE name=?", reward, levelName);
     }
 
-    public static void updatePrice(String levelName, int price)
-    {
+    public static void updatePrice(String levelName, int price) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET price=? WHERE name=?", price, levelName);
     }
 
-    public static void updateTitle(String levelName, String title)
-    {
+    public static void updateTitle(String levelName, String title) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET title=? WHERE name=?", title, levelName);
     }
 
-    public static void updateRespawnY(String levelName, int respawnY)
-    {
+    public static void updateRespawnY(String levelName, int respawnY) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET respawn_y=? WHERE name=?", respawnY, levelName);
     }
-    public static void updateMaxCompletions(String levelName, int maxCompletions)
-    {
+
+    public static void updateMaxCompletions(String levelName, int maxCompletions) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET max_completions=? WHERE name=?", maxCompletions, levelName);
     }
 
-    public static void updateBroadcast(String levelName)
-    {
+    public static void updateBroadcast(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET broadcast=NOT broadcast WHERE name=?", levelName);
     }
 
-    public static void updateNew(String levelName)
-    {
+    public static void updateNew(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET new=NOT new WHERE name=?", levelName);
     }
 
-    public static void updateHasMastery(String levelName)
-    {
+    public static void updateHasMastery(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET has_mastery=NOT has_mastery WHERE name=?", levelName);
+    }
+
+    public static void updateMasteryMultiplier(String levelName, float amount) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET mastery_multiplier=? WHERE name=?", amount, levelName);
+    }
+
+    public static void updateRequiredPermission(String levelName, String permission)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_permission=? WHERE name=?", permission, levelName);
+    }
+
+    public static void removeRequiredPermission(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_permission=NULL WHERE name=?", levelName);
     }
 
     public static void updateCooldown(String levelName)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET cooldown=NOT cooldown WHERE name=?", levelName);
+    }
+
+    public static void updateTC(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET tc=NOT tc WHERE name=?", levelName);
     }
 
     public static void updateDifficulty(String levelName, int difficulty)
