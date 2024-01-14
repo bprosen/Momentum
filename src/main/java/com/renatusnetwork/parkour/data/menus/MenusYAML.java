@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class MenusYAML {
 
@@ -25,35 +26,32 @@ public class MenusYAML {
         return menusConfig.isSet(menuName);
     }
 
-    public static boolean isSet(String menuName, String valuePath) {
+    public static boolean isSet(String menuName, String valuePath)
+    {
         return menusConfig.isSet(menuName + "." + valuePath);
     }
 
-    public static String getTitle(String menuName) {
-        if (isSet(menuName, "settings.title"))
-            return menusConfig.getString(menuName + ".settings.title");
-
-        return menuName;
+    public static Set<String> getKeys(String path, boolean deep)
+    {
+        return menusConfig.getConfigurationSection(path).getKeys(deep);
     }
 
-    public static int getPageCount(String menuName) {
-        if (isSet(menuName, "settings.page_count"))
-            return menusConfig.getInt(menuName + ".settings.page_count");
-
-        return 1;
+    public static String getTitle(String menuName)
+    {
+        return menusConfig.getString(menuName + ".settings.title", menuName);
     }
 
-    public static boolean getUpdating(String menuName) {
-        if (isSet(menuName, "settings.updating"))
-            return menusConfig.getBoolean(menuName + ".settings.updating");
-
-        return false;
+    public static int getPageCount(String menuName)
+    {
+        return menusConfig.getInt(menuName + ".settings.page_count", 1);
     }
 
-    public static ItemStack getSelectItem(String menuName) {
+    public static ItemStack getSelectItem(String menuName)
+    {
         String selectItemPath = "settings.select_item";
 
-        if (isSet(menuName, selectItemPath + ".material")) {
+        if (isSet(menuName, selectItemPath + ".material"))
+        {
             String material = menusConfig.getString(menuName + "." + selectItemPath + ".material");
             int type = 0;
 
@@ -67,19 +65,19 @@ public class MenusYAML {
         return null;
     }
 
-    public static int getRowCount(String menuName, int pageNumber) {
-        if (isSet(menuName, pageNumber + ".row_count"))
-            return menusConfig.getInt(menuName + "." + pageNumber + ".row_count");
-
-        return 1;
+    public static int getRowCount(String menuName, int pageNumber)
+    {
+        return menusConfig.getInt(menuName + "." + pageNumber + ".row_count", 1);
     }
 
-    public static void setItemType(String menuName, int pageNumber, int itemSlot, String oldValue, String newValue) {
+    public static void setItemType(String menuName, int pageNumber, int itemSlot, String oldValue, String newValue)
+    {
         String itemPath = menuName + "." + pageNumber + "." + itemSlot;
 
         for (String string : menusConfig.getConfigurationSection(itemPath).getKeys(true))
             // found it
-            if (menusConfig.getString(itemPath + "." + string).equalsIgnoreCase(oldValue)) {
+            if (menusConfig.getString(itemPath + "." + string).equalsIgnoreCase(oldValue))
+            {
                 menusConfig.set(itemPath + "." + string, newValue);
                 break;
             }
@@ -87,7 +85,8 @@ public class MenusYAML {
         Parkour.getConfigManager().save("menus");
     }
 
-    public static String getItemType(String menuName, int pageNumber, int itemSlot) {
+    public static String getItemType(String menuName, int pageNumber, String itemSlot)
+    {
         String itemPath = pageNumber + "." + itemSlot;
 
         if (isSet(menuName, itemPath + ".level"))
@@ -110,80 +109,47 @@ public class MenusYAML {
         return "display";
     }
 
-    public static String getItemTypeValue(String menuName, int pageNumber, int itemSlot) {
-        String itemPath = pageNumber + "." + itemSlot;
-
-        if (isSet(menuName, itemPath + ".level"))
-            return menusConfig.getString(menuName + "." + itemPath + ".level");
-        if (isSet(menuName, itemPath + ".perk"))
-            return menusConfig.getString(menuName + "." + itemPath + ".perk");
-        if (isSet(menuName, itemPath + ".teleport"))
-            return menusConfig.getString(menuName + "." + itemPath + ".teleport");
-        if (isSet(menuName, itemPath + ".open"))
-            return menusConfig.getString(menuName + "." + itemPath + ".open");
-        if (isSet(menuName, itemPath + ".rate"))
-            return menusConfig.getString(menuName + "." + itemPath + ".rate");
-        if (isSet(menuName, itemPath + ".type"))
-            return menusConfig.getString(menuName + "." + itemPath + ".type");
-        if (isSet(menuName, itemPath + ".bank"))
-            return menusConfig.getString(menuName + "." + itemPath + ".bank");
-        if (isSet(menuName, itemPath + ".infinite-mode"))
-            return menusConfig.getString(menuName + "." + itemPath + ".infinite-mode");
-        return "";
+    public static String getItemTypeValue(String menuName, int pageNumber, String itemSlot, String type)
+    {
+        return menusConfig.getString(menuName + "." + pageNumber + "." + itemSlot + "." + type, "");
     }
 
-
-    public static boolean hasItem(String menuName, int pageNumber, int itemSlot) {
+    public static boolean hasItem(String menuName, int pageNumber, String itemSlot) {
         return isSet(menuName, pageNumber + "." + itemSlot);
     }
 
-    public static List<String> getCommands(String menuName, int pageNumber, int itemSlot) {
-        String itemPath = pageNumber + "." + itemSlot;
-
-        if (isSet(menuName, itemPath + ".commands"))
-            return menusConfig.getStringList(menuName + "." + itemPath + ".commands");
-
-        return new ArrayList<>();
+    public static boolean getSortedLevelTypes(String menuName)
+    {
+        return menusConfig.getBoolean(menuName + ".settings.sort_levels", false);
+    }
+    public static List<String> getCommands(String menuName, int pageNumber, String itemSlot)
+    {
+        return menusConfig.getStringList(menuName + "." + pageNumber + "." + itemSlot + ".commands");
     }
 
-    public static List<String> getConsoleCommands(String menuName, int pageNumber, int itemSlot) {
-        String itemPath = pageNumber + "." + itemSlot;
-
-        if (isSet(menuName, itemPath + ".console_commands"))
-            return menusConfig.getStringList(menuName + "." + itemPath + ".console_commands");
-
-        return new ArrayList<>();
+    public static List<String> getConsoleCommands(String menuName, int pageNumber, String itemSlot)
+    {
+        return menusConfig.getStringList(menuName + "." + pageNumber + "." + itemSlot + ".console_commands");
     }
 
-    public static List<String> getItemLore(String menuName, int pageNumber, int itemSlot) {
-        String itemPath = pageNumber + "." + itemSlot + ".item";
 
-        if (isSet(menuName, itemPath + ".lore"))
-            return menusConfig.getStringList(menuName + "." + itemPath + ".lore");
-
-        return new ArrayList<>();
+    public static List<String> getItemLore(String menuName, int pageNumber, String itemSlot)
+    {
+        return menusConfig.getStringList(menuName + "." + pageNumber + "." + itemSlot + ".item.lore");
     }
 
-    public static String getItemTitle(String menuName, int pageNumber, int itemSlot) {
-        String itemPath = pageNumber + "." + itemSlot + ".item";
-
-        if (isSet(menuName, itemPath + ".title"))
-            return menusConfig.getString(menuName + "." + itemPath + ".title");
-
-        return "";
-
+    public static String getItemTitle(String menuName, int pageNumber, String itemSlot)
+    {
+        return menusConfig.getString(menuName + "." + pageNumber + "." + itemSlot + ".item.title");
     }
 
-    public static boolean getGlow(String menuName, int pageNumber, int itemSlot) {
-        String itemPath = pageNumber + "." + itemSlot + ".item";
-
-        if (isSet(menuName, itemPath + ".glow"))
-            return menusConfig.getBoolean(menuName + "." + itemPath + ".glow");
-
-        return false;
+    public static boolean getGlow(String menuName, int pageNumber, String itemSlot)
+    {
+        return menusConfig.getBoolean(menuName + "." + pageNumber + "." + itemSlot + ".item.glow", false);
     }
 
-    public static ItemStack getItem(String menuName, int pageNumber, int itemSlot) {
+    public static ItemStack getItem(String menuName, int pageNumber, String itemSlot)
+    {
         String title = "";
         Material material = Material.STAINED_GLASS_PANE;
         int type = 7;
@@ -194,21 +160,16 @@ public class MenusYAML {
         if (hasItem(menuName, pageNumber, itemSlot)) {
             String itemPath = pageNumber + "." + itemSlot + ".item";
 
-            if (isSet(menuName, itemPath + ".title"))
-                title = menusConfig.getString(menuName + "." + itemPath + ".title");
+            title = menusConfig.getString(menuName + "." + itemPath + ".title", "");
 
             if (isSet(menuName, itemPath + ".material"))
                 material = Material.getMaterial(menusConfig.getString(menuName + "." + itemPath + ".material"));
+
             if (material == null)
                 material = Material.STAINED_GLASS_PANE;
 
-            if (isSet(menuName, itemPath + ".type"))
-                type = menusConfig.getInt(menuName + "." + itemPath + ".type");
-            else
-                type = 0;
-
-            if (isSet(menuName, itemPath + ".size"))
-                size = menusConfig.getInt(menuName + "." + itemPath + ".size");
+            type = menusConfig.getInt(menuName + "." + itemPath + ".type", 0);
+            size = menusConfig.getInt(menuName + "." + itemPath + ".size", 1);
 
             if (isSet(menuName, itemPath + ".armor_color"))
                 armorColor = Utils.getColorFromString(menusConfig.getString(menuName + "." + itemPath + ".armor_color"));
@@ -217,23 +178,21 @@ public class MenusYAML {
         }
 
         ItemStack item = new ItemStack(material, size, (byte) type);
-
         ItemMeta itemMeta = item.getItemMeta();
 
         itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', title));
 
-        if (lore.size() > 0)
+        if (!lore.isEmpty())
             itemMeta.setLore(lore);
 
         item.setItemMeta(itemMeta);
 
-        if (armorColor != null) {
+        if (armorColor != null)
+        {
             LeatherArmorMeta leatherItemMeta = (LeatherArmorMeta) item.getItemMeta();
             leatherItemMeta.setColor(armorColor);
             item.setItemMeta(leatherItemMeta);
         }
-
         return item;
     }
-
 }

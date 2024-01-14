@@ -29,9 +29,8 @@ public class ProfileCMD implements CommandExecutor {
             String menuName = "profile";
             int pageNumber = 1;
 
-            if (menuManager.exists(menuName)) {
-
-                Inventory inventory = menuManager.getInventory(menuName, pageNumber);
+            if (menuManager.exists(menuName))
+            {
                 PlayerStats playerStats;
 
                 // get properly through if-else
@@ -40,17 +39,21 @@ public class ProfileCMD implements CommandExecutor {
                 else
                     playerStats = Parkour.getStatsManager().get(player);
 
-                if (inventory != null) {
-                    if (playerStats != null) {
+                if (playerStats != null) {
+
+                    Inventory inventory = menuManager.getInventory(playerStats, menuName, pageNumber);
+
+                    if (inventory != null) {
                         player.openInventory(inventory);
-                        menuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
+                        menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
                         Parkour.getStatsManager().loadProfile(playerStats, player);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+
                     } else {
-                        sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online!"));
+                        sender.sendMessage(Utils.translate("&cError loading the inventory"));
                     }
                 } else {
-                    sender.sendMessage(Utils.translate("&cError loading the inventory"));
+                    sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online!"));
                 }
             }
         }

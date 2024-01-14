@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data;
 
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -179,6 +180,8 @@ public class SettingsManager {
     public float min_mastery_multiplier;
     public float max_mastery_multiplier;
     public HashMap<Integer, Integer> clan_level_xp_required;
+
+    public LevelSortingType default_level_sorting_type;
 
     public SettingsManager(FileConfiguration settings)
     {
@@ -427,5 +430,7 @@ public class SettingsManager {
                 clan_level_xp_required.put(i, xpNeeded);
             else break;
         }
+
+        default_level_sorting_type = LevelSortingType.valueOf(settings.getString("menu.default_level_sorting"));
     }
 }

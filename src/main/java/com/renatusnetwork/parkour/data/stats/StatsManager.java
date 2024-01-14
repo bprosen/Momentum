@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
@@ -362,6 +363,12 @@ public class StatsManager {
             removeModifier(playerStats, modifier);
         else
             StatsDB.removeModifierName(playerName, modifier.getName());
+    }
+
+    public void updateMenuSortLevelsType(PlayerStats playerStats, LevelSortingType newType)
+    {
+        playerStats.setLevelSortingType(newType);
+        StatsDB.updateMenuSortLevelsType(playerStats, newType);
     }
 
     public long getTotalCoins() { return totalCoins; }

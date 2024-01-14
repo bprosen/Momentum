@@ -28,9 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class MenuItemFormatter {
-
-    public static ItemStack format(PlayerStats playerStats, MenuItem menuItem) {
+public class MenuItemFormatter
+{
+    public static ItemStack format(PlayerStats playerStats, MenuItem menuItem)
+    {
         if (menuItem.getType().equals("level"))
         {
             if (menuItem.getTypeValue().equals("featured"))
@@ -50,12 +51,39 @@ public class MenuItemFormatter {
             return enchantMenuItem(playerStats, menuItem, Parkour.getMenuManager().getMenu(menuItem.getTypeValue()));
         if (menuItem.getType().equals("infinite-mode"))
             return getInfiniteMode(playerStats, menuItem);
+        if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("level-sorting"))
+            return getSortingType(playerStats, menuItem);
 
         // Add in some '%player%' and such formatters for lore
         return menuItem.getItem();
     }
 
-    private static ItemStack getInfiniteMode(PlayerStats playerStats, MenuItem menuItem) {
+    private static ItemStack getSortingType(PlayerStats playerStats, MenuItem menuItem)
+    {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        ItemMeta itemMeta = item.getItemMeta();
+
+        itemMeta.setDisplayName(Utils.translate("&b&lSort By"));
+        List<String> lore = new ArrayList<>();
+        lore.add("");
+
+        for (LevelSortingType type : LevelSortingType.values())
+            if (type == playerStats.getLevelSortingType())
+                lore.add(" &7→ &b" + LevelSortingType.toString(type));
+            else
+                lore.add(" &7→ &8" + LevelSortingType.toString(type));
+
+        lore.add("");
+        lore.add("&7Click to switch");
+        itemMeta.setLore(Utils.formatLore(lore));
+
+        item.setItemMeta(itemMeta);
+
+        return item;
+    }
+
+    private static ItemStack getInfiniteMode(PlayerStats playerStats, MenuItem menuItem)
+    {
         ItemStack item = new ItemStack(menuItem.getItem());
         ItemMeta itemMeta = item.getItemMeta();
 

@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.mozilla.javascript.ObjArray;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class PlotCMD implements CommandExecutor {
             if (a.length == 2 && a[0].equalsIgnoreCase("submit") && a[1].equalsIgnoreCase("list")) {
 
                 // open submitted plots list
-                Parkour.getMenuManager().openSubmittedPlotsGUI(player);
+                Parkour.getMenuManager().openSubmittedPlotsGUI(Parkour.getStatsManager().get(player));
             } else if (a.length == 1 && a[0].equalsIgnoreCase("bypass")) {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -170,7 +171,7 @@ public class PlotCMD implements CommandExecutor {
 
             // submit your plot
             } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
-                submitPlot(player);
+                submitPlot(Parkour.getStatsManager().get(player));
             // get info of current loc
             } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
                 plotInfo(player);
@@ -223,7 +224,7 @@ public class PlotCMD implements CommandExecutor {
             deletePlot(plot, false, player);
         // submit your plot
         } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
-            submitPlot(player);
+            submitPlot(Parkour.getStatsManager().get(player));
         // get info of current loc
         } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
             plotInfo(player);
@@ -399,7 +400,9 @@ public class PlotCMD implements CommandExecutor {
         }
     }
 
-    private void submitPlot(Player player) {
+    private void submitPlot(PlayerStats playerStats)
+    {
+        Player player = playerStats.getPlayer();
         Plot plot = Parkour.getPlotsManager().get(player.getName());
         // they have a plot
         if (plot != null) {
@@ -407,7 +410,7 @@ public class PlotCMD implements CommandExecutor {
             if (!plot.isSubmitted()) {
 
                 // submit map!
-                openMenu(player, "submit-plot");
+                openMenu(playerStats, "submit-plot");
             } else {
                 player.sendMessage(Utils.translate("&cYou have already submitted your plot!"));
             }
@@ -450,16 +453,18 @@ public class PlotCMD implements CommandExecutor {
         }.runTaskLater(Parkour.getPlugin(), 20 * 30));
     }
 
-    private void openMenu(Player player, String menuName) {
+    private void openMenu(PlayerStats playerStats, String menuName)
+    {
         MenuManager menuManager = Parkour.getMenuManager();
+        Player player = playerStats.getPlayer();
 
         if (menuManager.exists(menuName)) {
 
-            Inventory inventory = menuManager.getInventory(menuName, 1);
+            Inventory inventory = menuManager.getInventory(playerStats, menuName, 1);
 
             if (inventory != null) {
                 player.openInventory(inventory);
-                menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
+                menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, 1);
             } else {
                 player.sendMessage(Utils.translate("&cError loading the inventory"));
             }

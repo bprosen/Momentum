@@ -14,6 +14,7 @@ import java.util.Map;
 public class Level
 {
     private String name;
+    private long creationTime;
     private String title;
     private int reward;
     private int price;
@@ -42,7 +43,7 @@ public class Level
     private HashMap<Integer, LevelCompletion> leaderboard;
     private List<String> commands;
 
-    public Level(String levelName)
+    public Level(String levelName, long creationSeconds)
     {
         this.name = levelName;
         this.ratings = new HashMap<>();
@@ -51,7 +52,10 @@ public class Level
         this.leaderboard = new HashMap<>();
         this.commands = new ArrayList<>();
         this.liquidResetPlayer = true; // default is true
+        this.creationTime = creationSeconds;
     }
+
+    public long getCreationTime() { return creationTime; }
 
     public void setCommands(List<String> commands)
     {
@@ -150,7 +154,7 @@ public class Level
         return rating;
     }
 
-    public boolean hasRating() { return rating > 0.0; }
+    public boolean hasRating() { return rating > 0.0 && ratings.size() >= 5; }
 
     public int getPrice() { return price; }
 

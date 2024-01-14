@@ -44,7 +44,9 @@ public class MenuListener implements Listener {
                 && currentItem.hasItemMeta()
                 && currentItem.getItemMeta().hasDisplayName()) {
 
-                MenuItem menuItem = menu.getMenuItem(
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                MenuItem menuItem = menu.getMenuItem(playerStats,
                         Utils.getTrailingInt(event.getInventory().getTitle()),
                         event.getSlot()
                 );
@@ -117,7 +119,6 @@ public class MenuListener implements Listener {
                             else if (lastString.toUpperCase().contains("against".toUpperCase()))
                                 opponentName = lastString.split("-> ")[1];
 
-                            PlayerStats playerStats = Parkour.getStatsManager().get(player);
                             PlayerStats opponentStats = Parkour.getStatsManager().getByName(opponentName);
 
                             // close inventory
@@ -196,8 +197,8 @@ public class MenuListener implements Listener {
 
                 if (!playerStats.isInTutorial())
                 {
-                    player.openInventory(Parkour.getMenuManager().getInventory(menu.getName(), 1));
-                    Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), 1);
+                    player.openInventory(Parkour.getMenuManager().getInventory(playerStats, menu.getName(), 1));
+                    Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menu.getName(), 1);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                 }
                 else

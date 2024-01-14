@@ -3,11 +3,12 @@ package com.renatusnetwork.parkour.data.menus;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MenuPage {
 
@@ -16,34 +17,80 @@ public class MenuPage {
 
     private HashMap<Integer, MenuItem> pageItemsMap;
 
+    public MenuPage(int pageNumber, int rowCount, HashMap<Integer, MenuItem> items)
+    {
+        this.pageNumber = pageNumber;
+        this.rowCount = rowCount;
+        this.pageItemsMap = items;
+    }
+
     public MenuPage(Menu menu, int pageNumber)
     {
         this.pageNumber = pageNumber;
         this.pageItemsMap = new HashMap<>();
+        this.rowCount = MenusYAML.getRowCount(menu.getName(), pageNumber);
 
         load(menu);
     }
 
+    public MenuPage clone(int newPageNumber, HashMap<Integer, MenuItem> newItems)
+    {
+        HashMap<Integer, MenuItem> items = new HashMap<>();
+
+        // copy over rest of items
+        for (Map.Entry<Integer, MenuItem> oldItems : pageItemsMap.entrySet())
+            if (!newItems.containsKey(oldItems.getKey()))
+                // clones ones that are not levels
+                items.put(oldItems.getKey(), oldItems.getValue().clone(oldItems.getKey(), oldItems.getValue().getSlot()));
+
+        items.putAll(newItems);
+
+        return new MenuPage(newPageNumber, rowCount, items);
+    }
+
+
     private void load(Menu menu)
     {
-        rowCount = MenusYAML.getRowCount(menu.getName(), pageNumber);
-        int slotCount = rowCount * 9;
+        Set<String> pageKeys = MenusYAML.getKeys(menu.getName() + "." + pageNumber, false);
 
-        for (int slot = 0; slot <= slotCount - 1; slot++)
+        for (String key : pageKeys)
         {
-            if (MenusYAML.hasItem(menu.getName(), pageNumber, slot))
+            // if it is a simple int (slot)
+            if (Utils.isInteger(key))
+            {
+                int slot = Integer.parseInt(key);
                 pageItemsMap.put(slot, new MenuItem(menu, this, slot));
+            }
+            // support for being able to mass set an item (ex: 0-15)
+            else if (key.contains("-"))
+            {
+                String[] splitKey = key.split("-");
+
+                // make sure each side of the - is an int
+                if (Utils.isInteger(splitKey[0]) && Utils.isInteger(splitKey[1]))
+                {
+                    int from = Integer.parseInt(splitKey[0]);
+                    int to = Integer.parseInt(splitKey[1]);
+
+                    for (int i = from; i <= to; i++)
+                        pageItemsMap.put(i, new MenuItem(menu, this, i, from, to));
+                }
+            }
         }
     }
 
-    void formatInventory(Player player, InventoryView inventory)
+    public void formatInventory(PlayerStats playerStats, InventoryView inventory)
     {
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
         for (MenuItem menuItem : pageItemsMap.values())
             inventory.setItem(menuItem.getSlot(), MenuItemFormatter.format(
                     playerStats,
                     menuItem));
+    }
+
+    public void setItem(MenuItem menuItem)
+    {
+        pageItemsMap.replace(menuItem.getSlot(), menuItem);
+        menuItem.setPageNumber(pageNumber);
     }
 
     public int getPageNumber() {
@@ -58,24 +105,11 @@ public class MenuPage {
         return pageItemsMap.get(slot);
     }
 
-    public MenuItem getMenuItemFromTitle(String itemTitle)
+    public void setItems(Collection<MenuItem> items)
     {
-        for (MenuItem menuItem : pageItemsMap.values())
-        {
-            if (menuItem.getItem().getItemMeta().getDisplayName().equals(itemTitle))
-                return menuItem;
-
-            if (menuItem.getType().equals("level"))
-            {
-                Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
-
-                if (level != null && level.getFormattedTitle().equals(itemTitle))
-                    return menuItem;
-            }
-        }
-
-        return null;
+        for (MenuItem menuItem : items)
+            setItem(menuItem);
     }
 
-    public HashMap<Integer, MenuItem> getPageItemsMap() { return pageItemsMap; }
+    public Collection<MenuItem> getItems() { return pageItemsMap.values(); }
 }

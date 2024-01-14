@@ -197,8 +197,10 @@ public class Parkour extends JavaPlugin {
         locations = new LocationManager();
         checkpoint = new CheckpointManager();
         stats = new StatsManager(plugin);
-        menus = new MenuManager();
         levels = new LevelManager(plugin);
+        menus = new MenuManager();
+        levels.loadLevelsInMenus(); // load after loading menus
+        levels.pickFeatured();
 
         new BukkitRunnable()
         {

@@ -46,8 +46,6 @@ public class LevelManager {
         this.cooldowns = new HashMap<>();
 
         load(); // Loads levels from configuration
-        loadLevelsInMenus();
-        pickFeatured();
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
         tutorialLevel = get(Parkour.getSettingsManager().tutorial_level_name);
         startScheduler(plugin);
@@ -69,9 +67,11 @@ public class LevelManager {
         levels.put(level.getName(), level);
     }
 
-    public void create(String levelName) {
-        LevelsDB.insertLevel(levelName);
-        levels.put(levelName, new Level(levelName));
+    public void create(String levelName)
+    {
+        long systemMillis = System.currentTimeMillis();
+        LevelsDB.insertLevel(levelName, systemMillis / 1000);
+        levels.put(levelName, new Level(levelName, systemMillis));
     }
 
     public void remove(String levelName) {

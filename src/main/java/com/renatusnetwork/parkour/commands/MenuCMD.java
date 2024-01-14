@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,12 +32,12 @@ public class MenuCMD implements CommandExecutor {
                                 pageNumber = Integer.parseInt(a[2]);
 
                         if (menuManager.exists(menuName)) {
-
-                            Inventory inventory = menuManager.getInventory(menuName, pageNumber);
+                            PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                            Inventory inventory = menuManager.getInventory(playerStats, menuName, pageNumber);
 
                             if (inventory != null) {
                                 player.openInventory(inventory);
-                                menuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
+                                menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
                             } else {
                                 sender.sendMessage(Utils.translate("&cError loading the inventory"));
                             }

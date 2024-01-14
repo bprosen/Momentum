@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -60,6 +61,7 @@ public class PlayerStats {
     private int fails;
     private boolean attemptingRankup;
     private boolean attemptingMastery;
+    private LevelSortingType sortingType;
 
     private FastBoard board;
 
@@ -96,6 +98,8 @@ public class PlayerStats {
 
         for (InfiniteType type : InfiniteType.values())
             bestInfiniteScores.put(type, 0); // arbitrary to be replaced when stats load
+
+        this.sortingType = Parkour.getSettingsManager().default_level_sorting_type;
     }
 
     //
@@ -110,6 +114,21 @@ public class PlayerStats {
     public void updateBoard(List<String> lines)
     {
         board.updateLines(lines);
+    }
+
+    public void setLevelSortingType(LevelSortingType type)
+    {
+        this.sortingType = type;
+    }
+
+    public void getLevelSortingType(LevelSortingType type)
+    {
+        this.sortingType = type;
+    }
+
+    public LevelSortingType getLevelSortingType()
+    {
+        return sortingType;
     }
 
     public boolean hasBoard()

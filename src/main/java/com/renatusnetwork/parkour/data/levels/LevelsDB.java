@@ -21,27 +21,31 @@ import java.util.*;
 public class LevelsDB {
 
     public static HashMap<String, Level> getLevels() {
-        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*", "");
+        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*, (UNIX_TIMESTAMP(creation_date) * 1000) AS date", "");
         HashMap<String, Level> levels = new HashMap<>();
         LocationManager locationManager = Parkour.getLocationManager();
 
-        for (Map<String, String> result : results) {
+        for (Map<String, String> result : results)
+        {
             String levelName = result.get("name");
             LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
 
             Level level;
-            if (type == LevelType.RACE) {
+            long creationDate = Long.parseLong(result.get("date"));
+            if (type == LevelType.RACE)
+            {
                 // since we store the 2 locations in the level object, we want a subclass for storage
-                level = new RaceLevel(levelName);
+                level = new RaceLevel(levelName, creationDate);
                 RaceLevel raceLevel = (RaceLevel) level;
 
                 String format = SettingsManager.RACE_LEVEL_SPAWN_FORMAT.replace("%level%", levelName);
 
                 raceLevel.setSpawnLocation1(locationManager.get(format.replace("%spawn%", String.valueOf(1))));
                 raceLevel.setSpawnLocation2(locationManager.get(format.replace("%spawn%", String.valueOf(2))));
-            } else
+            }
+            else
                 // otherwise normal level, we have the LEVEL_TYPE to define simple things that don't have any extra storage in the level object
-                level = new Level(levelName);
+                level = new Level(levelName, creationDate);
 
             // set core details
             String reward = result.get("reward");
@@ -60,6 +64,10 @@ public class LevelsDB {
             String permission = result.get("required_permission");
             if (permission != null)
                 level.setRequiredPermission(permission);
+
+            String difficulty = result.get("difficulty");
+            if (difficulty != null)
+                level.setDifficulty(Integer.parseInt(difficulty));
 
             String requiredRank = result.get("required_rank");
             if (requiredRank != null)
@@ -183,8 +191,9 @@ public class LevelsDB {
         return ratings;
     }
 
-    public static void insertLevel(String levelName) {
-        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name) VALUES (?)", levelName);
+    public static void insertLevel(String levelName, long creationSeconds) {
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name, creation_date) VALUES (?, FROM_UNIXTIME(?))",
+                levelName, creationSeconds);
     }
 
     public static void updateName(String levelName, String newLevelName) {

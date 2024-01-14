@@ -191,9 +191,9 @@ public class db implements CommandExecutor
 
                                 DatabaseQueries.runQuery(
                                         "INSERT INTO " + DatabaseManager.LEVELS_TABLE + " " +
-                                                "(name, type, tc, broadcast, liquid_reset) VALUES " +
-                                                "(?,?,?,?,?)",
-                                                levelName, type.name(), tcEnabled, broadcast, liquid
+                                                "(name, creation_date, type, tc, broadcast, liquid_reset) VALUES " +
+                                                "(?,FROM_UNIXTIME(?), ?,?,?,?)",
+                                                levelName, System.currentTimeMillis() / 1000, type.name(), tcEnabled, broadcast, liquid
                                 );
 
                                 String title = levelsConfig.getString(levelName + ".title", null);

@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.Perk;
@@ -138,6 +139,15 @@ public class StatsDB {
                     (double) playerStats.getRaceWins() / Math.max(1, playerStats.getRaceLosses())
             )));
 
+            String sortLevelsType = playerResult.get("menu_sort_levels_type");
+
+            // only set it if its non null
+            if (sortLevelsType != null)
+                playerStats.setLevelSortingType(LevelSortingType.valueOf(sortLevelsType));
+            else
+                // default is config based otherwise
+                playerStats.setLevelSortingType(Parkour.getSettingsManager().default_level_sorting_type);
+
             String infiniteBlock = playerResult.get("infinite_block");
 
             // only set it if its non null
@@ -190,6 +200,10 @@ public class StatsDB {
                 "name='" + playerStats.getName() + "' WHERE uuid=" + playerStats.getUUID());
     }
 
+    public static void updateMenuSortLevelsType(PlayerStats playerStats, LevelSortingType type)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET menu_sort_levels_type=? WHERE uuid=?", type.name(), playerStats.getUUID());
+    }
     public static void updatePlayerSpectatable(PlayerStats playerStats)
     {
         int spectatable = playerStats.isSpectatable() ? 1 : 0;

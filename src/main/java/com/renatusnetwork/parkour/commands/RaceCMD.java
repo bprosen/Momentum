@@ -34,8 +34,8 @@ public class RaceCMD implements CommandExecutor {
 
             if (target != null) {
                 // open menu if they meet requirements
-                if (meetsRaceConditions(Parkour.getStatsManager().get(player), Parkour.getStatsManager().get(target), false, -1.0))
-                    menuManager.openRaceLevelsGUI(player, target, 0.0);
+                if (meetsRaceConditions(playerStats, Parkour.getStatsManager().get(target), false, -1.0))
+                    menuManager.openRaceLevelsGUI(playerStats, target, 0.0);
             } else {
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
             }
@@ -56,8 +56,8 @@ public class RaceCMD implements CommandExecutor {
 
                 if (target != null) {
                     // open menu if meets conditions
-                    if (meetsRaceConditions(Parkour.getStatsManager().get(player), Parkour.getStatsManager().get(target), true, betAmount))
-                        menuManager.openRaceLevelsGUI(player, target, betAmount);
+                    if (meetsRaceConditions(playerStats, Parkour.getStatsManager().get(target), true, betAmount))
+                        menuManager.openRaceLevelsGUI(playerStats, target, betAmount);
                 } else {
                     player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
                 }

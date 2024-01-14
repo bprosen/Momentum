@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.RaceManager;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -140,25 +141,26 @@ public class MenuManager {
         return new ArrayList<>(menus.keySet());
     }
 
-    public Inventory getInventory(String menuName, int pageNumber) {
+    public Inventory getInventory(PlayerStats playerStats, String menuName, int pageNumber)
+    {
         if (exists(menuName))
-            return menus.get(menuName).getInventory(pageNumber);
+            return menus.get(menuName).getInventory(playerStats, pageNumber);
 
         return null;
     }
 
-    public void updateInventory(Player player, InventoryView inventory) {
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory) {
         Menu menu = getMenuFromTitle(inventory.getTitle());
 
         if (menu != null)
-            menu.updateInventory(player, inventory, Utils.getTrailingInt(inventory.getTitle()));
+            menu.updateInventory(playerStats, inventory, Utils.getTrailingInt(inventory.getTitle()));
     }
 
-    public void updateInventory(Player player, InventoryView inventory, String menuName, int pageNumber) {
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName, int pageNumber) {
         Menu menu = menus.get(menuName);
-        if (menu != null) {
-            menu.updateInventory(player, inventory, pageNumber);
-        }
+
+        if (menu != null)
+            menu.updateInventory(playerStats, inventory, pageNumber);
     }
 
     public void renameLevel(String oldLevelName, String newLevelName) {
@@ -173,7 +175,7 @@ public class MenuManager {
             // outer loop for menu pages
             for (MenuPage menuPage : menu.getPages())
                 // inner loop for menu items in pages
-                for (MenuItem menuItem : menuPage.getPageItemsMap().values())
+                for (MenuItem menuItem : menuPage.getItems())
                     // check if they are equal, if so, break outer loop
                     if (menuItem.getTypeValue().equalsIgnoreCase(oldLevelName)) {
                         correctMenu = menu;
@@ -190,8 +192,10 @@ public class MenuManager {
     }
 
     // in ONE of TWO cases where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
-    public void openSubmittedPlotsGUI(Player player) {
-        Inventory inventory = getInventory("submitted-plots", 0);
+    public void openSubmittedPlotsGUI(PlayerStats playerStats)
+    {
+        Player player = playerStats.getPlayer();
+        Inventory inventory = getInventory(playerStats, "submitted-plots", 0);
 
         if (inventory != null)
         {
@@ -242,9 +246,10 @@ public class MenuManager {
     }
 
     // in ONE of TWO cases where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
-    public void openRaceLevelsGUI(Player player, Player target, double betAmount)
+    public void openRaceLevelsGUI(PlayerStats playerStats, Player target, double betAmount)
     {
-        Inventory inventory = getInventory("pick-race-levels", 0);
+        Player player = playerStats.getPlayer();
+        Inventory inventory = getInventory(playerStats, "pick-race-levels", 0);
 
         if (inventory != null)
         {

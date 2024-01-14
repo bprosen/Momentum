@@ -106,13 +106,13 @@ public class InteractListener implements Listener {
 
                 if (menuManager.exists(menuName))
                 {
-                    Inventory inventory = menuManager.getInventory(menuName, pageNumber);
                     PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                    Inventory inventory = menuManager.getInventory(playerStats, menuName, pageNumber);
 
                     if (inventory != null)
                     {
                         player.openInventory(inventory);
-                        menuManager.updateInventory(player, player.getOpenInventory(), menuName, pageNumber);
+                        menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
                         Parkour.getStatsManager().loadProfile(playerStats, player);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                     }

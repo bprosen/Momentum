@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,12 +26,13 @@ public class CosmeticsCMD implements CommandExecutor {
             MenuManager menuManager = Parkour.getMenuManager();
 
             if (menuManager.exists(menuName)) {
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                Inventory inventory = menuManager.getInventory(menuName, 1);
+                Inventory inventory = menuManager.getInventory(playerStats, menuName, 1);
 
                 if (inventory != null) {
                     player.openInventory(inventory);
-                    menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
+                    menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, 1);
                 } else {
                     sender.sendMessage(Utils.translate("&cError loading the inventory"));
                 }

@@ -58,7 +58,7 @@ public class RateCMD implements CommandExecutor {
 
                         if (menuManager.exists(menuName))
                         {
-                            Inventory inventory = menuManager.getInventory(menuName, 1);
+                            Inventory inventory = menuManager.getInventory(playerStats, menuName, 1);
                             if (inventory != null)
                             {
                                 // copy it into new inv with new title
@@ -67,7 +67,7 @@ public class RateCMD implements CommandExecutor {
                                 newInv.setContents(inventory.getContents());
 
                                 player.openInventory(newInv);
-                                menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
+                                menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, 1);
                             }
                             else
                                 player.sendMessage(Utils.translate("&cError loading the inventory"));

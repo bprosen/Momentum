@@ -7,9 +7,9 @@ public class RaceLevel extends Level
     private Location spawnLocation1;
     private Location spawnLocation2;
 
-    public RaceLevel(String levelName)
+    public RaceLevel(String levelName, long completionSeconds)
     {
-        super(levelName);
+        super(levelName, completionSeconds);
     }
 
     public Location getSpawnLocation1()

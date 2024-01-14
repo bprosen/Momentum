@@ -92,7 +92,7 @@ public class MenuItemAction {
         else if (itemType.equals("bank"))
             performBankItem(playerStats, menuItem);
         else if (itemType.equals("open"))
-            performOpenItem(player, menuItem);
+            performOpenItem(playerStats, menuItem);
         else if (itemType.equals("rate"))
             performLevelRate(player, menuItem);
         else if (itemType.equals("infinite-mode"))
@@ -106,10 +106,18 @@ public class MenuItemAction {
             else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
                      typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite"))
                 performCosmeticsClear(player, typeValue, menuItem);
+            else if (typeValue.equals("level-sorting") && !Parkour.getLevelManager().isBuyingLevelMenu(player.getName())) // do not allow switching sorting if buying
+                performLevelSort(playerStats);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performLevelSort(PlayerStats playerStats)
+    {
+        Parkour.getStatsManager().updateMenuSortLevelsType(playerStats, LevelSortingType.getNext(playerStats.getLevelSortingType()));
+        Parkour.getMenuManager().updateInventory(playerStats, playerStats.getPlayer().getOpenInventory());
     }
 
     private static void performInfiniteModeChange(PlayerStats playerStats, MenuItem menuItem)
@@ -298,7 +306,7 @@ public class MenuItemAction {
                     {
                         Parkour.getStatsManager().removeCoins(playerStats, price);
                         Parkour.getPerkManager().bought(playerStats, perk);
-                        Parkour.getMenuManager().updateInventory(player, player.getOpenInventory());
+                        Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory());
                         runPerkCommands(perk, playerStats);
                     }
                 }
@@ -500,9 +508,9 @@ public class MenuItemAction {
                 if (levels.size() > 1)
                 {
                     // update and open inventory
-                    Inventory inventory = Parkour.getMenuManager().getInventory(menuName, menuItem.getPageNumber());
+                    Inventory inventory = Parkour.getMenuManager().getInventory(playerStats, menuName, menuItem.getPageNumber());
                     player.openInventory(inventory);
-                    Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menuName, menuItem.getPageNumber());
+                    Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menuName, menuItem.getPageNumber());
                 }
                 else
                 {
@@ -659,18 +667,19 @@ public class MenuItemAction {
         }
     }
 
-    private static void performOpenItem(Player player, MenuItem menuItem) {
+    private static void performOpenItem(PlayerStats playerStats, MenuItem menuItem) {
         Menu menu = Parkour.getMenuManager().getMenuFromStartingChars(menuItem.getTypeValue());
 
         if (menu != null) {
             int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
 
-            Inventory inventory = Parkour.getMenuManager().getInventory(menu.getName(), pageNumber);
+            Player player = playerStats.getPlayer();
+            Inventory inventory = Parkour.getMenuManager().getInventory(playerStats, menu.getName(), pageNumber);
 
             if (inventory != null) {
                 player.closeInventory();
                 player.openInventory(inventory);
-                Parkour.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
+                Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menu.getName(), pageNumber);
             }
         }
     }

@@ -281,3 +281,5 @@ rage_quit:
     - "&6&l%player% &7failed their test and &c&lRage Quit"
     - "&6&l%player% &7missed their bedtime and &c&lRage Quit"
     - "&6&l%player% &7got the great idea to &c&lRage Quit"
+menu:
+  default_level_sorting: NEWEST

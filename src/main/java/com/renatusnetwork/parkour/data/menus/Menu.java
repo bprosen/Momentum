@@ -1,6 +1,8 @@
 package com.renatusnetwork.parkour.data.menus;
 
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -8,46 +10,177 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
-public class Menu {
-
+public class Menu
+{
     private String name;
     private String title;
     private int pageCount;
-    private boolean updating;
-
     private ItemStack selectItem;
+    private HashMap<Integer, MenuPage> pages;
+    private HashMap<LevelSortingType, HashMap<Integer, MenuPage>> sortedPages;
 
-    private Map<Integer, MenuPage> pages;
+    private boolean sortLevelTypes;
 
     public Menu(String name)
     {
         this.name = name;
         this.pages = new HashMap<>();
+        this.sortedPages = new HashMap<>();
 
         load();
     }
 
-    private void load() {
-        if (MenusYAML.exists(name)) {
-
+    private void load()
+    {
+        if (MenusYAML.exists(name))
+        {
+            sortLevelTypes = MenusYAML.getSortedLevelTypes(name);
             title = MenusYAML.getTitle(name);
             pageCount = MenusYAML.getPageCount(name);
-            updating = MenusYAML.getUpdating(name);
             selectItem = MenusYAML.getSelectItem(name);
 
             loadPages();
         }
     }
 
-    private void loadPages() {
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+    private void loadPages()
+    {
+        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+        {
             if (MenusYAML.isSet(name, pageNumber + ""))
                 pages.put(pageNumber, new MenuPage(this, pageNumber));
+        }
+
+        if (sortLevelTypes)
+        {
+            for (LevelSortingType type : LevelSortingType.values())
+                sortLevels(type);
+        }
+    }
+
+    public boolean levelsSorted() { return sortLevelTypes; }
+
+    public void sortLevels(LevelSortingType sortingType)
+    {
+        HashMap<Level, MenuItem> levelsInMenu = new HashMap<>();
+        HashMap<Integer, Integer> sizePerPage = new HashMap<>();
+        HashMap<Integer, ArrayList<Integer>> slots = new HashMap<>();
+
+        // parse into levels in menu
+        int levelsPerPage = 0;
+        ArrayList<Integer> pageSlots = new ArrayList<>();
+
+        for (MenuPage page : pages.values())
+        {
+            for (MenuItem item : page.getItems())
+            {
+                if (item.isLevel())
+                {
+                    Level level = Parkour.getLevelManager().get(item.getTypeValue());
+                    if (level != null)
+                    {
+                        levelsInMenu.put(level, item);
+                        pageSlots.add(item.getSlot());
+                        levelsPerPage++;
+                    }
+                }
+            }
+            sizePerPage.put(page.getPageNumber(), levelsPerPage);
+            // sort collection of slots
+            Collections.sort(pageSlots);
+            slots.put(page.getPageNumber(), pageSlots);
+
+            // reset data
+            pageSlots = new ArrayList<>();
+            levelsPerPage = 0;
+        }
+
+        if (!levelsInMenu.isEmpty())
+        {
+            HashMap<Integer, HashMap<Integer, MenuItem>> sortedLevels = new HashMap<>();
+            HashSet<Level> addedLevels = new HashSet<>();
+
+            int pageNumber = 1;
+            int currentSlotIndex = 0; // get first slot
+
+            HashMap<Integer, MenuItem> sortedPage = new HashMap<>();
+
+            // go until we have them all sorted
+            while (addedLevels.size() < levelsInMenu.size())
+            {
+                Level max = null;
+                int maxSize = sizePerPage.get(pageNumber);
+
+                for (Map.Entry<Level, MenuItem> entry : levelsInMenu.entrySet())
+                {
+                    Level currentLevel = entry.getKey();
+
+                    // only continue if we do not already have the level
+                    if (!addedLevels.contains(currentLevel))
+                    {
+                        // if null, just skip sorting
+                        if (max == null)
+                            max = currentLevel;
+                        else
+                        {
+                            if (sortingType == LevelSortingType.NEWEST && currentLevel.getCreationTime() > max.getCreationTime())
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.OLDEST && currentLevel.getCreationTime() < max.getCreationTime())
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.EASIEST &&
+                                    currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() <= max.getDifficulty()))
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.HARDEST &&
+                                    currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() > max.getDifficulty()))
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.HIGHEST_REWARD && currentLevel.getReward() > max.getReward())
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.LOWEST_REWARD && currentLevel.getReward() < max.getReward())
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.HIGHEST_RATING &&
+                                    currentLevel.hasRating() && (!max.hasRating() || currentLevel.getRating() > max.getRating()))
+                                max = currentLevel;
+                            else if (sortingType == LevelSortingType.LOWEST_RATING &&
+                                    currentLevel.hasRating() && (!max.hasRating() || currentLevel.getRating() <= max.getRating()))
+                                max = currentLevel;
+                        }
+                    }
+                }
+                // if not null by the end, then add
+                if (max != null)
+                {
+                    int newSlot = slots.get(pageNumber).get(currentSlotIndex);
+
+                    sortedPage.put(newSlot, levelsInMenu.get(max).clone(pageNumber, newSlot)); // need to clone it to the new page number and slot
+                    addedLevels.add(max);
+                    currentSlotIndex++;
+                }
+
+                // if it is time to add a new page
+                if (maxSize <= sortedPage.size())
+                {
+                    sortedLevels.put(pageNumber, sortedPage);
+
+                    pageNumber++;
+
+                    // reset data
+                    currentSlotIndex = 0;
+                    sortedPage = new HashMap<>();
+                }
+            }
+
+            HashMap<Integer, MenuPage> newSortedPages = new HashMap<>();
+
+            // update the menu
+            for (Map.Entry<Integer, HashMap<Integer, MenuItem>> entry : sortedLevels.entrySet())
+            {
+                MenuPage oldMenuPage = pages.get(entry.getKey());
+                HashMap<Integer, MenuItem> newItems = entry.getValue();
+                newSortedPages.put(entry.getKey(), oldMenuPage.clone(entry.getKey(), newItems));
+            }
+            sortedPages.put(sortingType, newSortedPages); // add to new sorted pages
         }
     }
 
@@ -80,16 +213,24 @@ public class Menu {
         return pageCount;
     }
 
-    public boolean isUpdating() {
-        return updating;
-    }
-
     public ItemStack getSelectItem() {
         return selectItem;
     }
 
-    public Inventory getInventory(int pageNumber)
+    public Inventory getInventory(PlayerStats playerStats, int pageNumber)
     {
+        if (sortLevelTypes)
+        {
+            HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
+
+            if (sortedMenu != null && sortedMenu.containsKey(pageNumber))
+            {
+                MenuPage menuPage = sortedMenu.get(pageNumber);
+
+                return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle(pageNumber));
+            }
+        }
+
         if (pages.containsKey(pageNumber))
         {
             MenuPage menuPage = pages.get(pageNumber);
@@ -100,22 +241,28 @@ public class Menu {
         return Bukkit.createInventory(null, 54, getFormattedTitle(pageNumber));
     }
 
-    public void updateInventory(Player player, InventoryView inventory, int pageNumber)
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber)
     {
-        if (pages.containsKey(pageNumber))
-            pages.get(pageNumber).formatInventory(player, inventory);
+        if (sortLevelTypes)
+        {
+            HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
+
+            if (sortedMenu.containsKey(pageNumber))
+                sortedMenu.get(pageNumber).formatInventory(playerStats, inventory);
+        }
+        else if (pages.containsKey(pageNumber))
+            pages.get(pageNumber).formatInventory(playerStats, inventory);
     }
 
-    public MenuItem getMenuItemFromTitle(int pageNumber, String itemTitle)
+    public MenuItem getMenuItem(PlayerStats playerStats, int pageNumber, int slot)
     {
-        if (pages.containsKey(pageNumber))
-            return pages.get(pageNumber).getMenuItemFromTitle(itemTitle);
+        if (sortLevelTypes)
+        {
+            HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
+            if (sortedMenu.containsKey(pageNumber))
+                return sortedMenu.get(pageNumber).getMenuItem(slot);
+        }
 
-        return null;
-    }
-
-    public MenuItem getMenuItem(int pageNumber, int slot)
-    {
         if (pages.containsKey(pageNumber))
             return pages.get(pageNumber).getMenuItem(slot);
 

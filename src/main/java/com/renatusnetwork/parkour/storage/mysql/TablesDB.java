@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.storage.mysql;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.LevelType;
+import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.PerksArmorType;
 import org.bukkit.Material;
@@ -111,6 +112,7 @@ public class TablesDB
                            "infinite_timed_score INT DEFAULT 0, " +
                            "infinite_block ENUM(" + enumQuotations(Material.values()) + ") DEFAULT NULL, " + // default set from settings
                            "infinite_type ENUM(" + enumQuotations(InfiniteType.values()) + ") DEFAULT NULL, " + // default set from settings
+                           "menu_sort_levels_type ENUM(" + enumQuotations(LevelSortingType.values()) + ") DEFAULT NULL, " + // default set from settings
                            "race_wins SMALLINT DEFAULT 0, " +
                            "race_losses SMALLINT DEFAULT 0, " +
                            "event_wins MEDIUMINT DEFAULT 0, " +
@@ -162,6 +164,7 @@ public class TablesDB
         String query = "CREATE TABLE " + DatabaseManager.LEVELS_TABLE + "(" +
                             // basic info
                             "name VARCHAR(20) NOT NULL, " +
+                            "creation_date TIMESTAMP NOT NULL, " +
                             "reward INT DEFAULT NULL, " +
                             "price INT DEFAULT NULL, " +
                             "title VARCHAR(50) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
