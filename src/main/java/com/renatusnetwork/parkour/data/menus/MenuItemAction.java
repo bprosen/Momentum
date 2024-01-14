@@ -84,6 +84,14 @@ public class MenuItemAction {
             }
             else if (menuItem.getTypeValue().equals("random"))
                 performRandomLevel(playerStats);
+            else if (menuItem.getTypeValue().startsWith("favorite-level"))
+            {
+                int index = Integer.parseInt(menuItem.getTypeValue().split("favorite-level-")[1]) - 1;
+                Level favoriteLevel = playerStats.getFavoriteLevel(index);
+
+                if (favoriteLevel != null)
+                    performLevelTeleport(playerStats, player, favoriteLevel);
+            }
             else
                 performLevelItem(player, menuItem);
         }

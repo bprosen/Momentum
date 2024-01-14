@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
+import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
@@ -17,6 +18,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -35,12 +37,23 @@ public class MenuItemFormatter
         if (menuItem.getType().equals("level"))
         {
             if (menuItem.getTypeValue().equals("featured"))
-                return getFeaturedLevel(playerStats, menuItem, menuItem.getItem());
+                return getFeaturedLevel(playerStats, menuItem);
 
             if (menuItem.getTypeValue().equals("rankup"))
                 return getRankUpLevel(playerStats, menuItem);
 
-            return getLevel(playerStats, menuItem);
+            if (menuItem.getTypeValue().startsWith("favorite-level"))
+            {
+                int index = Integer.parseInt(menuItem.getTypeValue().split("favorite-level-")[1]) - 1;
+                Level favoriteLevel = playerStats.getFavoriteLevel(index);
+
+                if (favoriteLevel != null)
+                {
+                    MenuItem foundItem = Parkour.getLevelManager().getMenuItemFromLevel(favoriteLevel);
+                    return getFavoriteLevel(playerStats, favoriteLevel, menuItem, foundItem.getItem());
+                }
+            }
+            return getLevel(playerStats, menuItem, menuItem.getItem());
         }
 
         if (menuItem.getType().equals("perk"))
@@ -56,6 +69,15 @@ public class MenuItemFormatter
 
         // Add in some '%player%' and such formatters for lore
         return menuItem.getItem();
+    }
+
+    private static ItemStack getFavoriteLevel(PlayerStats playerStats, Level favoriteLevel, MenuItem menuItem, ItemStack newItem)
+    {
+        // make it the featured in normal gui section too for consistency
+        if (Parkour.getLevelManager().getFeaturedLevel().equals(favoriteLevel))
+            return getFeaturedLevel(playerStats, menuItem);
+        else
+            return createLevelItem(playerStats, favoriteLevel, menuItem, newItem);
     }
 
     private static ItemStack getSortingType(PlayerStats playerStats, MenuItem menuItem)
@@ -234,24 +256,28 @@ public class MenuItemFormatter
         return item;
     }
 
-    private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem) {
-        ItemStack item = new ItemStack(menuItem.getItem());
+    private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem, ItemStack item)
+    {
         String levelName = menuItem.getTypeValue();
         Level level = Parkour.getLevelManager().get(levelName);
 
-        if (level != null) {
+        if (level != null)
+        {
             // make it the featured in normal gui section too for consistency
-            if (Parkour.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
-                return getFeaturedLevel(playerStats, menuItem, item);
+            if (Parkour.getLevelManager().getFeaturedLevel().equals(level))
+                return getFeaturedLevel(playerStats, menuItem);
             else
                 return createLevelItem(playerStats, level, menuItem, item);
         }
         return item;
     }
 
-    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem, ItemStack itemStack)
+    private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem)
     {
-        return createLevelItem(playerStats, Parkour.getLevelManager().getTutorialLevel(), menuItem, itemStack);
+        LevelManager levelManager = Parkour.getLevelManager();
+        MenuItem itemFromLevel = levelManager.getMenuItemFromLevel(levelManager.getFeaturedLevel());
+
+        return createLevelItem(playerStats, levelManager.getFeaturedLevel(), menuItem, itemFromLevel.getItem());
     }
 
     private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu) {
@@ -288,7 +314,8 @@ public class MenuItemFormatter
         return item;
     }
 
-    private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem) {
+    private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem)
+    {
 
         ItemStack item = new ItemStack(menuItem.getItem());
 
@@ -320,10 +347,12 @@ public class MenuItemFormatter
         return null;
     }
 
-    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item) {
+    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item)
+    {
 
         if (level != null) {
 
+            item = new ItemStack(item); // clone
             ItemMeta itemMeta = item.getItemMeta();
             String formattedTitle = level.getFormattedTitle();
 

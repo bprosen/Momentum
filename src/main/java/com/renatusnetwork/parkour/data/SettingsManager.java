@@ -183,6 +183,8 @@ public class SettingsManager {
 
     public LevelSortingType default_level_sorting_type;
 
+    public int max_favorite_levels;
+
     public SettingsManager(FileConfiguration settings)
     {
         cooldown_calendar = Calendar.getInstance();
@@ -432,5 +434,6 @@ public class SettingsManager {
         }
 
         default_level_sorting_type = LevelSortingType.valueOf(settings.getString("menu.default_level_sorting"));
+        max_favorite_levels = settings.getInt("levels.max_favorite");
     }
 }

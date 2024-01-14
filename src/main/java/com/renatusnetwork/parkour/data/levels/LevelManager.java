@@ -32,6 +32,7 @@ public class LevelManager {
     private int masteryLevels;
     private HashMap<String, Level> levels;
     private HashMap<Menu, Set<Level>> menuLevels;
+    private HashMap<Level, MenuItem> levelMenuItems;
     private HashMap<Integer, Level> globalLevelCompletionsLB;
     private HashMap<Integer, Level> topRatedLevelsLB;
     private HashMap<String, HashMap<Integer, Level>> buyingLevels;
@@ -40,6 +41,7 @@ public class LevelManager {
     public LevelManager(Plugin plugin) {
         this.levels = new HashMap<>();
         this.menuLevels = new HashMap<>();
+        this.levelMenuItems = new HashMap<>();
         this.globalLevelCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
         this.topRatedLevelsLB = new HashMap<>(Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
         this.buyingLevels = new HashMap<>();
@@ -486,6 +488,7 @@ public class LevelManager {
     public void loadLevelsInMenus() {
 
         menuLevels.clear();
+        levelMenuItems.clear();
         for (String menuName : MenusYAML.getNames()) {
             Menu menu = Parkour.getMenuManager().getMenu(menuName);
             // null check menu
@@ -512,7 +515,10 @@ public class LevelManager {
 
                                     // last step! null check level
                                     if (menuLevel != null)
+                                    {
                                         levelsInMenu.add(menuLevel);
+                                        levelMenuItems.put(menuLevel, menuItem);
+                                    }
                                 }
                             }
                         }
@@ -620,13 +626,13 @@ public class LevelManager {
         return buyingLevels.get(playerName);
     }
 
-    public Set<Level> getLevelsInAllMenus() {
+    public Set<Level> getLevelsInAllMenus()
+    {
         Set<Level> levelsInMenus = new HashSet<>();
 
         // loop through then add to new hashset
         for (Set<Level> levels : menuLevels.values())
-            for (Level level : levels)
-                levelsInMenus.add(level);
+            levelsInMenus.addAll(levels);
 
         return levelsInMenus;
     }
@@ -636,7 +642,18 @@ public class LevelManager {
         return menuLevels.get(menu);
     }
 
-    public Level getFeaturedLevel() {
+    public boolean isLevelInMenus(Level level)
+    {
+        return getLevelsInAllMenus().contains(level);
+    }
+
+    public MenuItem getMenuItemFromLevel(Level level)
+    {
+        return levelMenuItems.get(level);
+    }
+
+    public Level getFeaturedLevel()
+    {
         return featuredLevel;
     }
 

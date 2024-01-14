@@ -74,9 +74,9 @@ public class PlayerStats {
     private HashMap<String, Location> saves;
     private HashMap<ModifierType, Modifier> modifiers;
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
+    private ArrayList<Level> favoriteLevels;
 
-    public PlayerStats(Player player)
-    {
+    public PlayerStats(Player player) {
         this.player = player;
         this.uuid = player.getUniqueId().toString();
         this.name = player.getName();
@@ -91,6 +91,7 @@ public class PlayerStats {
         this.bestInfiniteScores = new HashMap<>();
         this.records = new HashSet<>();
         this.masteryCompletions = new HashSet<>();
+        this.favoriteLevels = new ArrayList<>();
 
         // default for now, if they are not a new player the mysql db loading will adjust these
         this.infiniteBlock = Parkour.getSettingsManager().infinite_default_block;
@@ -106,33 +107,27 @@ public class PlayerStats {
     // Player Info Section
     //
 
-    public void initBoard()
-    {
+    public void initBoard() {
         this.board = new FastBoard(player);
     }
 
-    public void updateBoard(List<String> lines)
-    {
+    public void updateBoard(List<String> lines) {
         board.updateLines(lines);
     }
 
-    public void setLevelSortingType(LevelSortingType type)
-    {
+    public void setLevelSortingType(LevelSortingType type) {
         this.sortingType = type;
     }
 
-    public void getLevelSortingType(LevelSortingType type)
-    {
+    public void getLevelSortingType(LevelSortingType type) {
         this.sortingType = type;
     }
 
-    public LevelSortingType getLevelSortingType()
-    {
+    public LevelSortingType getLevelSortingType() {
         return sortingType;
     }
 
-    public boolean hasBoard()
-    {
+    public boolean hasBoard() {
         return board != null;
     }
 
@@ -144,49 +139,61 @@ public class PlayerStats {
         return name;
     }
 
-    public String getDisplayName() { return player.getDisplayName(); }
+    public String getDisplayName() {
+        return player.getDisplayName();
+    }
 
     public String getUUID() {
         return uuid;
     }
 
-    public FastBoard getBoard() { return board; }
+    public FastBoard getBoard() {
+        return board;
+    }
 
-    public boolean hasNightVision() { return nightVision; }
+    public boolean hasNightVision() {
+        return nightVision;
+    }
 
-    public void setNightVision(boolean nightVision) { this.nightVision = nightVision; }
+    public void setNightVision(boolean nightVision) {
+        this.nightVision = nightVision;
+    }
 
-    public boolean isInTutorial() { return inTutorial; }
+    public boolean isInTutorial() {
+        return inTutorial;
+    }
 
-    public void setTutorial(boolean tutorial) { inTutorial = tutorial; }
+    public void setTutorial(boolean tutorial) {
+        inTutorial = tutorial;
+    }
 
-    public void setBlackMarket(boolean blackMarket) { inBlackmarket = blackMarket;}
+    public void setBlackMarket(boolean blackMarket) {
+        inBlackmarket = blackMarket;
+    }
 
-    public boolean isInBlackMarket() { return inBlackmarket; }
+    public boolean isInBlackMarket() {
+        return inBlackmarket;
+    }
 
     //
     // Coins Sections
     //
-    public double getCoins()
-    {
+    public double getCoins() {
         return coins;
     }
 
-    public void setCoins(double coins)
-    {
+    public void setCoins(double coins) {
         if (coins < 0)
             coins = 0;
 
         this.coins = coins;
     }
 
-    public void addCoins(double coins)
-    {
+    public void addCoins(double coins) {
         this.coins += coins;
     }
 
-    public void removeCoins(double coins)
-    {
+    public void removeCoins(double coins) {
         this.coins -= coins;
 
         // no allowing negative numbers, NO DEBT
@@ -209,30 +216,39 @@ public class PlayerStats {
         return inRace;
     }
 
-    public int getRaceWins() { return raceWins; }
+    public int getRaceWins() {
+        return raceWins;
+    }
 
-    public void setRaceWins(int raceWins) { this.raceWins = raceWins; }
+    public void setRaceWins(int raceWins) {
+        this.raceWins = raceWins;
+    }
 
-    public int getRaceLosses() { return raceLosses; }
+    public int getRaceLosses() {
+        return raceLosses;
+    }
 
-    public void setRaceLosses(int raceLosses) { this.raceLosses = raceLosses; }
+    public void setRaceLosses(int raceLosses) {
+        this.raceLosses = raceLosses;
+    }
 
-    public float getRaceWinRate() { return raceWinRate; }
+    public float getRaceWinRate() {
+        return raceWinRate;
+    }
 
-    public void setRaceWinRate(float raceWinRate) { this.raceWinRate = raceWinRate; }
+    public void setRaceWinRate(float raceWinRate) {
+        this.raceWinRate = raceWinRate;
+    }
 
     //
     // Level Section
     //
-    public void setLevel(Level level)
-    {
+    public void setLevel(Level level) {
         // only continue if non null
-        if (level != null)
-        {
+        if (level != null) {
             if (level.isRaceLevel())
                 resetLevel(); // force the item removal
-            else
-            {
+            else {
                 // set item
                 SettingsManager settingsManager = Parkour.getSettingsManager();
                 player.getInventory().setItem(settingsManager.leave_hotbar_slot, settingsManager.leave_item);
@@ -241,8 +257,7 @@ public class PlayerStats {
         this.level = level;
     }
 
-    public void resetLevel()
-    {
+    public void resetLevel() {
         level = null;
 
         ItemStack itemStack = Utils.getSpawnItemIfExists(player.getInventory());
@@ -258,6 +273,48 @@ public class PlayerStats {
 
     public boolean inLevel() {
         return level != null;
+    }
+
+    public Level getFavoriteLevel(int index)
+    {
+        if (index < favoriteLevels.size())
+            return favoriteLevels.get(index);
+        return null;
+    }
+
+    public int numFavoriteLevels()
+    {
+        return favoriteLevels.size();
+    }
+
+    public void addFavoriteLevel(Level level)
+    {
+        favoriteLevels.add(level);
+    }
+
+    public ArrayList<Level> getFavoriteLevels()
+    {
+        return favoriteLevels;
+    }
+
+    public boolean hasFavoriteLevels()
+    {
+        return !favoriteLevels.isEmpty();
+    }
+
+    public boolean hasFavorite(Level level)
+    {
+        return favoriteLevels.contains(level);
+    }
+
+    public void removeFavoriteLevel(Level level)
+    {
+        favoriteLevels.remove(level);
+    }
+
+    public void setFavoriteLevels(ArrayList<Level> favoriteLevels)
+    {
+        this.favoriteLevels = favoriteLevels;
     }
 
     public void startedLevel() {
@@ -547,26 +604,6 @@ public class PlayerStats {
     //
     // Completions Section
     //
-    public Level getMostCompletedLevel()
-    {
-        int mostCompletions = -1;
-        String mostCompletedLevel = null;
-
-        for (Map.Entry<String, Set<LevelCompletion>> entry : levelCompletions.entrySet())
-            if (entry.getValue().size() > mostCompletions)
-            {
-                mostCompletions = entry.getValue().size();
-                mostCompletedLevel = entry.getKey();
-            }
-
-        if (mostCompletions > 0)
-        {
-            return Parkour.getLevelManager().get(mostCompletedLevel);
-        }
-
-        return null;
-    }
-
     public void levelCompletion(LevelCompletion levelCompletion)
     {
         String levelName = levelCompletion.getLevelName();

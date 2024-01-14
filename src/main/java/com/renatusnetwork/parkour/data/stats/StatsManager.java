@@ -115,14 +115,15 @@ public class StatsManager {
         playerStats.initBoard();
         StatsDB.loadPlayerInformation(playerStats);
         StatsDB.loadBoughtLevels(playerStats);
+        CheckpointDB.loadCheckpoints(playerStats);
+        SavesDB.loadSaves(playerStats);
+        StatsDB.loadFavoriteLevels(playerStats);
         CompletionsDB.loadCompletions(playerStats);
         CompletionsDB.loadRecords(playerStats);
         loadIndividualLevelsBeaten(playerStats);
+        StatsDB.loadModifiers(playerStats);
         StatsDB.loadBoughtPerks(playerStats);
         loadRestOfPerks(playerStats);
-        StatsDB.loadModifiers(playerStats);
-        CheckpointDB.loadCheckpoints(playerStats);
-        SavesDB.loadSaves(playerStats);
     }
 
     private void loadRestOfPerks(PlayerStats playerStats)
@@ -340,6 +341,17 @@ public class StatsManager {
         StatsDB.removeBoughtLevel(playerStats.getUUID(), level.getName());
     }
 
+    public void addFavoriteLevel(PlayerStats playerStats, Level level)
+    {
+        playerStats.addFavoriteLevel(level);
+        StatsDB.addFavoriteLevel(playerStats.getUUID(), level.getName());
+    }
+
+    public void removeFavoriteLevel(PlayerStats playerStats, Level level)
+    {
+        playerStats.removeFavoriteLevel(level);
+        StatsDB.removeFavoriteLevel(playerStats.getUUID(), level.getName());
+    }
     public void addModifier(PlayerStats playerStats, Modifier modifier)
     {
         // add to cache and db
@@ -596,38 +608,17 @@ public class StatsManager {
                                         .replace("%perks_total%", Parkour.getPerkManager().getPerks().size() + "")
                                         .replace("%rank_name%", Utils.translate(playerStats.getRank().getTitle()))
                                         .replace("%prestiges%", playerStats.getPrestiges() + "")
-                                        .replace("%infinite_classic_score%", playerStats.getBestInfiniteScore(InfiniteType.CLASSIC) + "")
-                                        .replace("%infinite_sprint_score%", playerStats.getBestInfiniteScore(InfiniteType.SPRINT) + "")
-                                        .replace("%infinite_speedrun_score%", playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN) + "")
-                                        .replace("%infinite_timed_score%", playerStats.getBestInfiniteScore(InfiniteType.TIMED) + "")
+                                        .replace("%infinite_classic_score%", Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.CLASSIC)))
+                                        .replace("%infinite_sprint_score%", Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPRINT)))
+                                        .replace("%infinite_speedrun_score%", Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN)))
+                                        .replace("%infinite_timed_score%", Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.TIMED)))
                                         .replace("%race_wins%", playerStats.getRaceWins() + "")
                                         .replace("%race_losses%", playerStats.getRaceLosses() + "")
                                         .replace("%race_winrate%", playerStats.getRaceWinRate() + "")
                                         .replace("%event_wins%", playerStats.getEventWins() + "")
                                         .replace("%hours%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000))
-                                        .replace("%jumps%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
-
-                                // level stats, only add if the most completed level is not null
-                                Level mostCompletedLevel = playerStats.getMostCompletedLevel();
-                                if (mostCompletedLevel != null)
-                                {
-
-                                    loreString = loreString.replace("%favorite_level%", mostCompletedLevel.getFormattedTitle())
-                                            .replace("%favorite_level_completions%", playerStats.getLevelCompletionsCount(mostCompletedLevel) + "");
-
-                                    LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(
-                                            playerStats.getMostCompletedLevel());
-
-                                    if (fastestCompletion != null)
-                                            loreString = loreString.replace(
-                                                    "%fastest_completion%", fastestCompletion.getCompletionTimeElapsedSeconds() + "s");
-                                }
-
-                                if (loreString.contains("%favorite_level%") || loreString.contains("%fastest_completion%"))
-                                    continue;
-
-                                // now add the last part of the level stats
-                                loreString = loreString.replace("%records%", Utils.formatNumber(playerStats.getNumRecords()))
+                                        .replace("%jumps%", Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)))
+                                        .replace("%records%", Utils.formatNumber(playerStats.getNumRecords()))
                                         .replace("%total_completions%", Utils.formatNumber(playerStats.getTotalLevelCompletions()))
                                         .replace("%levels_completed%", Utils.formatNumber(playerStats.getIndividualLevelsBeaten()))
                                         .replace("%mastery_level_completions%", Utils.formatNumber(playerStats.getNumMasteryCompletions()))
@@ -635,8 +626,11 @@ public class StatsManager {
                                         .replace("%total_levels%", Parkour.getLevelManager().getLevels().size() + "")
                                         .replace("%rated_levels_count%", playerStats.getRatedLevelsCount() + "");
 
+                                boolean clanNull = false;
+
                                 // if they have a clan, check for clan item
-                                if (clan != null) {
+                                if (clan != null)
+                                {
 
                                     // replace clan items
                                     loreString = loreString.replace("%clan_name%", clan.getTag())
@@ -648,7 +642,10 @@ public class StatsManager {
 
                                     // null it for clan
                                     if (loreString.contains("%clan_members%"))
+                                    {
                                         loreString = null;
+                                        clanNull = true;
+                                    }
 
                                 // item loaded for clan is emerald
                                 } else if (item.getType() == Material.EMERALD) {
@@ -659,10 +656,36 @@ public class StatsManager {
                                     continue;
                                 }
 
+                                if (loreString != null && loreString.equalsIgnoreCase("%favorite_levels%"))
+                                {
+                                    loreString = loreString.replace("%favorite_levels%", Utils.translate("&7Favorite Levels"));
+                                    newLore.add(loreString);
+
+                                    loreString = null;
+
+                                    if (playerStats.hasFavoriteLevels())
+                                    {
+                                        ArrayList<Level> favoriteLevels = playerStats.getFavoriteLevels();
+                                        for (Level level : favoriteLevels)
+                                        {
+                                            newLore.add(Utils.translate(" " + level.getFormattedTitle()));
+                                            newLore.add(Utils.translate("  &7Completions &a" + Utils.formatNumber(playerStats.getLevelCompletionsCount(level))));
+
+                                            LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
+                                            if (levelCompletion != null)
+                                                newLore.add(Utils.translate("  &7Fastest &a" + levelCompletion.getCompletionTimeElapsedSeconds() + "s"));
+                                        }
+                                    }
+                                    else
+                                        newLore.add(Utils.translate(" &cNone"));
+                                }
+
                                 if (loreString != null)
                                     newLore.add(loreString);
                                     // this means clan members!
-                                else for (ClanMember clanMember : clan.getMembers()) {
+                                else if (clanNull)
+                                    for (ClanMember clanMember : clan.getMembers())
+                                    {
 
                                     // make string for online/offline
                                     String onlineStatus = "&cOffline";
@@ -701,19 +724,7 @@ public class StatsManager {
             rankString = rank.getTitle();
 
         int prestiges = playerStats.getPrestiges();
-        int bestClassicInfinite = playerStats.getBestInfiniteScore(InfiniteType.CLASSIC);
-        int bestSpeedrunInfinite = playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN);
-        int bestTimedInfinite = playerStats.getBestInfiniteScore(InfiniteType.TIMED);
-        int bestSprintInfinite = playerStats.getBestInfiniteScore(InfiniteType.SPRINT);
-
         int records = playerStats.getNumRecords();
-
-        Level level = playerStats.getMostCompletedLevel();
-        String favoriteLevel = "None";
-
-        if (level != null)
-            favoriteLevel = level.getFormattedTitle();
-
         int totalCompletions = playerStats.getTotalLevelCompletions();
         int levelsRated = playerStats.getRatedLevelsCount();
         int raceWins = playerStats.getRaceWins();
@@ -729,12 +740,7 @@ public class StatsManager {
                      "&7Clan » &e" + clanString + "\n" +
                      "&7Rank » &a" + rankString + "\n" +
                      "&7Prestige » &5" + prestiges + "\n" +
-                     "&7Classic Infinite » &d" + Utils.formatNumber(bestClassicInfinite) + "\n" +
-                     "&7Speedrun Infinite » &d" + Utils.formatNumber(bestSpeedrunInfinite) + "\n" +
-                     "&7Timed Infinite » &d" + Utils.formatNumber(bestTimedInfinite) + "\n" +
-                     "&7Sprint Infinite » &d" + Utils.formatNumber(bestSprintInfinite) + "\n" +
-                     "\n&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
-                     "&7Favorite Level » &2" + favoriteLevel + "\n" +
+                     "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
                      "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
                      "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
                      "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses + "\n" +

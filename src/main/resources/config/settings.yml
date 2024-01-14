@@ -37,6 +37,7 @@ gg:
   default_timer_in_seconds: 10
   default_coin_reward: 10
 levels:
+  max_favorite: 5
   featured_level_reward_multiplier: 1.50
   max_rated_levels_leaderboard_size: 10
   tutorial_level: tutorial

@@ -72,6 +72,7 @@ public class TablesDB
         createLevelCompletionCommands();
         createLevelPotionEffects();
         createLevelRequiredLevels();
+        createFavoriteLevels();
     }
 
     private static void createKeys()
@@ -95,6 +96,7 @@ public class TablesDB
         createLevelCompletionCommandsKeys();
         createLevelPotionEffectsKeys();
         createLevelRequiredLevelsKeys();
+        createFavoriteLevelsKeys();
     }
 
     private static void createPlayers()
@@ -776,6 +778,34 @@ public class TablesDB
                                  "FOREIGN KEY(required_level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createFavoriteLevels()
+    {
+        String query = "CREATE TABLE " + DatabaseManager.FAVORITE_LEVELS + "(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "level_name VARCHAR(20) NOT NULL, " +
+                // keys
+                "PRIMARY KEY(uuid, level_name), " +
+                // indexes
+                "INDEX uuid_index(uuid)" +
+                ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createFavoriteLevelsKeys()
+    {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.FAVORITE_LEVELS + " ADD CONSTRAINT " + DatabaseManager.FAVORITE_LEVELS + "_uuid_fk " +
+                "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE, " +
+                "ADD CONSTRAINT " + DatabaseManager.FAVORITE_LEVELS + "_level_name_fk " +
+                "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE";
 
         DatabaseQueries.runQuery(foreignKeyQuery);
     }

@@ -36,6 +36,7 @@ public class DatabaseManager {
     public static final String LEVEL_COMPLETION_COMMANDS_TABLE = "level_completion_commands";
     public static final String LEVEL_POTION_EFFECTS_TABLE = "level_potion_effects";
     public static final String LEVEL_REQUIRED_LEVELS_TABLE = "level_required_levels";
+    public static final String FAVORITE_LEVELS = "favorite_levels";
 
     public DatabaseManager(Plugin plugin)
     {

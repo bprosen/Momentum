@@ -122,3 +122,6 @@ commands:
     aliases: [market]
   bid:
     description: "RN-Parkour bid command"
+  favorite:
+    description: "RN-Parkour favorite command"
+    aliases: [fav]

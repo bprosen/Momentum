@@ -186,6 +186,7 @@ public class Parkour extends JavaPlugin {
         getCommand("bank").setExecutor(new BankCMD());
         getCommand("blackmarket").setExecutor(new BlackMarketCMD());
         getCommand("bid").setExecutor(new BidCMD());
+        getCommand("favorite").setExecutor(new FavoriteCMD());
     }
 
     private static void load()

@@ -328,6 +328,40 @@ public class StatsDB {
         }
     }
 
+    public static void loadFavoriteLevels(PlayerStats playerStats)
+    {
+        if (playerStats != null)
+        {
+            ArrayList<Level> favoriteLevels = new ArrayList<>();
+            List<Map<String, String>> purchasesResults = DatabaseQueries.getResults(
+                    DatabaseManager.FAVORITE_LEVELS,
+                    "level_name",
+                    "WHERE uuid=?", playerStats.getUUID()
+            );
+
+            for (Map<String, String> boughtResult : purchasesResults)
+                favoriteLevels.add(Parkour.getLevelManager().get(boughtResult.get("level_name")));
+
+            playerStats.setFavoriteLevels(favoriteLevels);
+        }
+    }
+
+    public static void addFavoriteLevel(String uuid, String boughtLevel)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.FAVORITE_LEVELS + " (uuid, level_name)" +
+                        " VALUES " +
+                        "(?,?)",
+                uuid, boughtLevel);
+    }
+
+    public static void removeFavoriteLevel(String uuid, String boughtLevel)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.FAVORITE_LEVELS + " WHERE uuid=? AND level_name=?",
+                uuid, boughtLevel);
+    }
+
     public static void addBoughtLevel(String uuid, String boughtLevel)
     {
         DatabaseQueries.runAsyncQuery(

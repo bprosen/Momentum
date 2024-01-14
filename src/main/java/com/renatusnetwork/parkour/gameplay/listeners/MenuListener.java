@@ -51,7 +51,12 @@ public class MenuListener implements Listener {
                         event.getSlot()
                 );
 
-                if (menuItem != null && (menuItem.getItem().getType() == currentItem.getType() || Parkour.getLevelManager().isBuyingLevelMenu(player.getName()))) {
+                if (menuItem != null &&
+                    ((menuItem.getItem().getType() == currentItem.getType() ||
+                      menuItem.getTypeValue().equalsIgnoreCase("featured") ||
+                      menuItem.getTypeValue().startsWith("favorite-level")
+                     ) || Parkour.getLevelManager().isBuyingLevelMenu(player.getName())))
+                {
                     MenuItemAction.perform(player, menuItem);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                 } else {
