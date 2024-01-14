@@ -65,11 +65,9 @@ public class Menu
     public void sortLevels(LevelSortingType sortingType)
     {
         HashMap<Level, MenuItem> levelsInMenu = new HashMap<>();
-        HashMap<Integer, Integer> sizePerPage = new HashMap<>();
         HashMap<Integer, ArrayList<Integer>> slots = new HashMap<>();
 
         // parse into levels in menu
-        int levelsPerPage = 0;
         ArrayList<Integer> pageSlots = new ArrayList<>();
 
         for (MenuPage page : pages.values())
@@ -83,18 +81,15 @@ public class Menu
                     {
                         levelsInMenu.put(level, item);
                         pageSlots.add(item.getSlot());
-                        levelsPerPage++;
                     }
                 }
             }
-            sizePerPage.put(page.getPageNumber(), levelsPerPage);
             // sort collection of slots
             Collections.sort(pageSlots);
             slots.put(page.getPageNumber(), pageSlots);
 
             // reset data
             pageSlots = new ArrayList<>();
-            levelsPerPage = 0;
         }
 
         if (!levelsInMenu.isEmpty())
@@ -111,7 +106,7 @@ public class Menu
             while (addedLevels.size() < levelsInMenu.size())
             {
                 Level max = null;
-                int maxSize = sizePerPage.get(pageNumber);
+                int maxSize = slots.get(pageNumber).size();
 
                 for (Map.Entry<Level, MenuItem> entry : levelsInMenu.entrySet())
                 {
