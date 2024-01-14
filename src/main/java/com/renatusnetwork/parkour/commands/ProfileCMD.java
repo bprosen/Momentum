@@ -46,7 +46,6 @@ public class ProfileCMD implements CommandExecutor {
                     if (inventory != null) {
                         player.openInventory(inventory);
                         menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
-                        Parkour.getStatsManager().loadProfile(playerStats, player);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
 
                     } else {

@@ -105,6 +105,8 @@ public class MenusYAML {
             return "bank";
         if (isSet(menuName, itemPath + ".infinite-mode"))
             return "infinite-mode";
+        if (isSet(menuName, itemPath + ".profile"))
+            return "profile";
 
         return "display";
     }

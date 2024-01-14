@@ -5,6 +5,9 @@ import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
+import com.renatusnetwork.parkour.data.clans.Clan;
+import com.renatusnetwork.parkour.data.clans.ClanMember;
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
@@ -20,6 +23,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -66,9 +70,103 @@ public class MenuItemFormatter
             return getInfiniteMode(playerStats, menuItem);
         if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("level-sorting"))
             return getSortingType(playerStats, menuItem);
+        if (menuItem.getType().equals("profile"))
+            return getProfileStats(playerStats, menuItem);
 
         // Add in some '%player%' and such formatters for lore
         return menuItem.getItem();
+    }
+
+    private static ItemStack getProfileStats(PlayerStats playerStats, MenuItem menuItem)
+    {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        ItemMeta itemMeta = item.getItemMeta();
+        List<String> newLore = new ArrayList<>();
+
+        switch (menuItem.getTypeValue())
+        {
+            case "clan":
+            {
+                Clan clan = playerStats.getClan();
+
+                // if they have a clan, check for clan item
+                if (clan != null)
+                {
+                    newLore.add("&7Clan &e" + clan.getTag());
+                    newLore.add("&7Level &e" + clan.getLevel());
+                    newLore.add("&7Total XP &e" + Utils.formatNumber(clan.getTotalXP()));
+                    newLore.add("&7Level XP &e" + Utils.formatNumber(clan.getXP()));
+                    newLore.add("");
+                    newLore.add("&7Members &e" + clan.numMembers());
+
+                    for (ClanMember clanMember : clan.getMembers())
+                    {
+                        // make string for online/offline
+                        String onlineStatus = "&cOffline";
+                        if (Bukkit.getPlayer(clanMember.getName()) != null)
+                            onlineStatus = "&aOnline";
+
+                        String ownerStatus = "";
+                        if (clan.getOwner().equals(clanMember))
+                            ownerStatus = "&e(Owner)";
+
+                        newLore.add("  &7" + clanMember.getName() + " " + onlineStatus + " " + ownerStatus);
+                    }
+                }
+                else
+                    newLore.add(Utils.translate("&7Not in a clan"));
+
+                break;
+            }
+            case "game":
+            {
+                newLore.add("&7Hours &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000));
+                newLore.add("&7Jumps &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
+                newLore.add("&7Coins &c" + Utils.formatNumber(playerStats.getCoins()));
+                newLore.add("&7Perks/Total &c" + playerStats.getGainedPerksCount() + "/" + Parkour.getPerkManager().numPerks());
+                newLore.add("&7Rank &c" + playerStats.getRank().getTitle());
+                newLore.add("&7Prestige &c" + Utils.formatNumber(playerStats.getPrestiges()));
+                newLore.add("&7Best Classic Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.CLASSIC)));
+                newLore.add("&7Best Sprint Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPRINT)));
+                newLore.add("&7Best Speedrun Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN)));
+                newLore.add("&7Best Timed Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.TIMED)));
+                newLore.add("&7Race Wins &c" + Utils.formatNumber(playerStats.getRaceWins()));
+                newLore.add("&7Race Losses &c" + Utils.formatNumber(playerStats.getRaceLosses()));
+                newLore.add("&7Race Win Rate &c" + playerStats.getRaceWinRate());
+                newLore.add("&7Event Wins &c" + Utils.formatNumber(playerStats.getEventWins()));
+                break;
+            }
+            case "level":
+            {
+                if (playerStats.hasFavoriteLevels())
+                {
+                    newLore.add("&7Favorite ");
+                    ArrayList<Level> favoriteLevels = playerStats.getFavoriteLevels();
+                    for (Level level : favoriteLevels)
+                    {
+                        newLore.add(" " + level.getFormattedTitle());
+                        newLore.add("  &7Completions &a" + Utils.formatNumber(playerStats.getLevelCompletionsCount(level)));
+
+                        LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
+                        if (levelCompletion != null)
+                            newLore.add("  &7Fastest &a" + levelCompletion.getCompletionTimeElapsedSeconds() + "s");
+                    }
+                }
+                else
+                    newLore.add("&7Favorite &cNone");
+
+                newLore.add("&7Records &e✦ &a" + Utils.formatNumber(playerStats.getNumRecords()));
+                newLore.add("&7Total Completions &a" + Utils.formatNumber(playerStats.getTotalLevelCompletions()));
+                newLore.add("&7Levels Completed/Total &a" + Utils.formatNumber(playerStats.getIndividualLevelsBeaten()) + "/" + Utils.formatNumber(Parkour.getLevelManager().numLevels()));
+                newLore.add("&7Mastery Levels Completed/Total &a" + Utils.formatNumber(playerStats.getNumMasteryCompletions()) + "/" + Utils.formatNumber(Parkour.getLevelManager().getNumMasteryLevels()));
+                newLore.add("&7Rated Levels &a" + Utils.formatNumber(playerStats.getRatedLevelsCount()));
+                break;
+            }
+        }
+        itemMeta.setLore(Utils.formatLore(newLore));
+        item.setItemMeta(itemMeta);
+
+        return item;
     }
 
     private static ItemStack getFavoriteLevel(PlayerStats playerStats, Level favoriteLevel, MenuItem menuItem, ItemStack newItem)

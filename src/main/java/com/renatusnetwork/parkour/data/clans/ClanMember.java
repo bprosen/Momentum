@@ -20,4 +20,7 @@ public class ClanMember
     }
 
     public void setName(String name) { this.name = name; }
+
+    public boolean equals(ClanMember other) { return this.uuid.equals(other.getUUID()); }
+
 }
