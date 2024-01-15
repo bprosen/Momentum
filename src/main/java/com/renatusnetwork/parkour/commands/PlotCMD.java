@@ -165,7 +165,7 @@ public class PlotCMD implements CommandExecutor {
                     deletePlot(plot, false, player);
                     // if 2 then its a target
                 } else if (a.length == 2) {
-                    Plot targetPlot = Parkour.getPlotsManager().get(a[1]);
+                    Plot targetPlot = Parkour.getPlotsManager().getIgnoreCase(a[1]);
                     deletePlot(targetPlot, true, player);
                 }
 
@@ -373,7 +373,7 @@ public class PlotCMD implements CommandExecutor {
         if (checkConditions(playerStats)) {
 
             String playerName = a[1];
-            Plot targetPlot = Parkour.getPlotsManager().get(playerName);
+            Plot targetPlot = Parkour.getPlotsManager().getIgnoreCase(playerName);
             if (targetPlot != null) {
                 targetPlot.teleportPlayerToEdge(player);
                 player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));

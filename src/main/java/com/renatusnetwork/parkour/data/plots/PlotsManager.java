@@ -44,8 +44,17 @@ public class PlotsManager {
         return plotList.get(name);
     }
 
+    public Plot getIgnoreCase(String name)
+    {
+        for (Map.Entry<String, Plot> entry : plotList.entrySet())
+            if (entry.getKey().equalsIgnoreCase(name))
+                return entry.getValue();
+
+        return null;
+    }
+
     public boolean exists(String playerName) {
-        return (get(playerName) != null);
+        return get(playerName) != null;
     }
 
     public HashMap<String, Plot> getPlots() {
