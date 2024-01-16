@@ -105,11 +105,12 @@ public class LevelManager {
         return levels.get(levelName);
     }
 
-    public Level getFromTitle(String levelTitle) {
+    public Level getFromTitle(String levelTitle)
+    {
         levelTitle = ChatColor.stripColor(levelTitle);
 
         for (Level level : levels.values())
-            if (ChatColor.stripColor(level.getFormattedTitle()).equalsIgnoreCase(levelTitle))
+            if (ChatColor.stripColor(level.getTitle()).equalsIgnoreCase(levelTitle))
                 return level;
 
         return null;
@@ -637,6 +638,15 @@ public class LevelManager {
         return levelsInMenus;
     }
 
+    public Level getNameThenTitle(String levelName)
+    {
+        Level level = levels.get(levelName.toLowerCase());
+
+        if (level == null)
+            level = getFromTitle(levelName);
+
+        return level;
+    }
     public Set<Level> getLevelsFromMenu(Menu menu)
     {
         return menuLevels.get(menu);

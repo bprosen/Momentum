@@ -36,17 +36,10 @@ public class LevelCMD implements CommandExecutor
                 Player player = (Player) sender;
                 PlayerStats playerStats = statsManager.get(player);
 
-                String levelName = a[1];
-                Level level = levelManager.get(levelName);
+                String[] split = Arrays.copyOfRange(a, 1, a.length);
+                String levelName = String.join(" ", split);
 
-                // if failure by name lookup, lookup by title
-                if (level == null)
-                {
-                    String[] split = Arrays.copyOfRange(a, 1, a.length);
-                    levelName = String.join(" ", split);
-
-                    level = levelManager.getFromTitle(levelName);
-                }
+                Level level = levelManager.getNameThenTitle(levelName);
 
                 // no level exists otherwise
                 if (level != null)
@@ -92,7 +85,19 @@ public class LevelCMD implements CommandExecutor
         }
         else if (sender.isOp())
         {
-            if (a.length == 1 && a[0].equalsIgnoreCase("show"))
+            if (a.length >= 2 && a[0].equalsIgnoreCase("reveal"))
+            {
+                String[] split = Arrays.copyOfRange(a, 1, a.length);
+                String levelName = String.join(" ", split);
+
+                Level level = levelManager.getNameThenTitle(levelName);
+
+                if (level != null)
+                    sender.sendMessage(Utils.translate("&a" + levelName + "&7 is level name &2" + level.getName()));
+                else
+                    sender.sendMessage(Utils.translate("&4'&c" + levelName + "&4' &cdoes not exist"));
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("show"))
             {
                 if (sender instanceof Player)
                 {
@@ -952,6 +957,7 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&aTo reload levels from database, use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
         sender.sendMessage(Utils.translate("&a/level buy  &7Buys a level if it has a price"));
+        sender.sendMessage(Utils.translate("&a/level reveal <title>  &7Reveals a level name, will pull from name then title and send name"));
         sender.sendMessage(Utils.translate("&a/level show  &7Show level information"));
         sender.sendMessage(Utils.translate("&a/level create <level>  &7Create a level"));
         sender.sendMessage(Utils.translate("&a/level load  &7Loads levels.yml then levels"));

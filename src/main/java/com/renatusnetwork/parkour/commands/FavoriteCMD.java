@@ -107,9 +107,7 @@ public class FavoriteCMD implements CommandExecutor
         }
 
         // if it does not get it from name, then attempt to get it from title
-        Level level = Parkour.getLevelManager().get(levelName);
-        if (level == null)
-            level = Parkour.getLevelManager().getFromTitle(levelName);
+        Level level = Parkour.getLevelManager().getNameThenTitle(levelName);
 
         if (level == null)
             sender.sendMessage(Utils.translate("&4" + levelName + " &cis not a level"));
