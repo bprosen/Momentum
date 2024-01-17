@@ -641,9 +641,20 @@ public class MenuItemFormatter
 
                 String beatenMessage = "&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7time";
                 if (levelCompletionsCount > 1)
-                    beatenMessage += "s";
+                {
+                    itemLore.add(Utils.translate(beatenMessage + "s"));
+                    if (level.hasMastery())
+                        if (playerStats.hasMasteryCompletion(level))
+                            itemLore.add(Utils.translate("&7  Mastery &a✓"));
+                        else
+                        {
+                            itemLore.add(Utils.translate("&7  Mastery &cx"));
+                            itemLore.add(Utils.translate("&7    &6Shift click to attempt"));
+                        }
+                }
+                else
+                    itemLore.add(Utils.translate(beatenMessage));
 
-                itemLore.add(Utils.translate(beatenMessage));
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
                 if (fastestCompletion != null) {

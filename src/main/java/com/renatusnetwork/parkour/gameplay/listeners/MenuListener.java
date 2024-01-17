@@ -57,7 +57,7 @@ public class MenuListener implements Listener {
                       menuItem.getTypeValue().startsWith("favorite-level")
                      ) || Parkour.getLevelManager().isBuyingLevelMenu(player.getName())))
                 {
-                    MenuItemAction.perform(player, menuItem);
+                    MenuItemAction.perform(player, menuItem, event.getClick().isShiftClick());
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
                 } else {
                     // submitted plots section
