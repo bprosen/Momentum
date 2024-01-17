@@ -31,6 +31,8 @@ public class PlayerPlaceholders
                     return playerStats.getClan() == null ? "None" : playerStats.getClan().getTag();
                 case "total_completions":
                     return Utils.formatNumber(playerStats.getTotalLevelCompletions());
+                case "mastery_completions":
+                    return Utils.formatNumber(playerStats.getNumMasteryCompletions());
                 case "race_wins":
                     return Utils.formatNumber(playerStats.getRaceWins());
                 case "race_losses":
