@@ -437,7 +437,10 @@ public class PlotCMD implements CommandExecutor {
             PracticeHandler.resetDataOnly(playerStats);
 
             if (playerStats.isAttemptingRankup())
-                Parkour.getRanksManager().leftRankup(playerStats);
+                Parkour.getStatsManager().leftRankup(playerStats);
+
+            if (playerStats.isAttemptingMastery())
+                Parkour.getStatsManager().leftMastery(playerStats);
         }
     }
 

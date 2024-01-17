@@ -139,18 +139,6 @@ public class RanksManager {
         return rank;
     }
 
-    public void enteredRankup(PlayerStats playerStats)
-    {
-        playerStats.setAttemptingRankup(true);
-        DatabaseQueries.runAsyncQuery("UPDATE players SET attempting_rankup=1 WHERE uuid='" + playerStats.getUUID() + "'");
-    }
-
-    public void leftRankup(PlayerStats playerStats)
-    {
-        playerStats.setAttemptingRankup(false);
-        DatabaseQueries.runAsyncQuery("UPDATE players SET attempting_rankup=0 WHERE uuid='" + playerStats.getUUID() + "'");
-    }
-
     public boolean isPastOrAtRank(PlayerStats playerStats, Rank current)
     {
         if (playerStats != null && playerStats.getRank() != null)

@@ -29,7 +29,6 @@ public class CheckpointDB {
             String worldName = levelResult.get("world");
             Level level = Parkour.getLevelManager().get(levelResult.get("level_name"));
 
-
             if (level != null)
             {
                 // x, y, z
@@ -50,6 +49,27 @@ public class CheckpointDB {
                     " lc JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON lc.uuid=p.uuid WHERE p.name=? AND lc.level_name=?",
                     playerName,
                     levelName
+        );
+    }
+
+    public static void deleteCheckpoint(String playerUUID, String levelName)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " WHERE uuid=? AND level_name=?", playerUUID, levelName
+        );
+    }
+    public static void insertCheckpoint(PlayerStats playerStats, Location location)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " " +
+                    "(uuid, level_name, world, x, y, z)" +
+                    " VALUES (?,?,?,?,?,?)",
+                playerStats.getUUID(),
+                playerStats.getLevel().getName(),
+                location.getWorld().getName(),
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ()
         );
     }
 }

@@ -76,12 +76,15 @@ public class MenuItemAction {
         else if (itemType.equals("level"))
         {
             if (menuItem.getTypeValue().equals("featured"))
-                performLevelTeleport(playerStats, Parkour.getLevelManager().getFeaturedLevel());
+            {
+                Level level = Parkour.getLevelManager().getFeaturedLevel();
+                performLevelTeleport(playerStats, level, shiftClicked);
+            }
             else if (menuItem.getTypeValue().equals("rankup"))
             {
                 // only allow this if they are not at the last rank!
                 if (!playerStats.isLastRank())
-                    performLevelTeleport(playerStats, playerStats.getRank().getRankupLevel());
+                    performLevelTeleport(playerStats, playerStats.getRank().getRankupLevel(), false);
             }
             else if (menuItem.getTypeValue().equals("random"))
                 performRandomLevel(playerStats);
@@ -91,19 +94,13 @@ public class MenuItemAction {
                 Level favoriteLevel = playerStats.getFavoriteLevel(index);
 
                 if (favoriteLevel != null)
-                {
-                    // if shift clicked, attempt to enter mastery
-                    if (shiftClicked)
-                        performEnterMastery(playerStats, favoriteLevel);
-
-                    performLevelTeleport(playerStats, favoriteLevel);
-                }
+                    performLevelTeleport(playerStats, favoriteLevel, shiftClicked);
             }
             else
                 performLevelItem(player, menuItem, shiftClicked);
         }
         else if (itemType.equals("teleport"))
-            performTeleportItem(playerStats, menuItem);
+            performTeleportItem(playerStats, menuItem, shiftClicked);
         else if (itemType.equals("bank"))
             performBankItem(playerStats, menuItem);
         else if (itemType.equals("open"))
@@ -127,13 +124,6 @@ public class MenuItemAction {
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
-    }
-
-    private static void performEnterMastery(PlayerStats playerStats, Level level)
-    {
-        // player cannot enter mastery if the level has one, the player has completed it or the player does not have mastery completion yet
-        if (level.hasMastery() && playerStats.hasCompleted(level) && !playerStats.hasMasteryCompletion(level))
-            playerStats.setAttemptingMastery(true);
     }
 
     private static void performLevelSort(PlayerStats playerStats)
@@ -195,7 +185,7 @@ public class MenuItemAction {
 
         // tp them to randomly chosen level
         Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
-        performLevelTeleport(playerStats, chosenLevel);
+        performLevelTeleport(playerStats, chosenLevel, false); // enforce no shift clicking
     }
 
     private static void performCosmeticsClear(Player player, String clearType, MenuItem menuItem) {
@@ -357,19 +347,13 @@ public class MenuItemAction {
                 !level.isFeaturedLevel() &&
                 !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
-                performLevelBuying(playerStats, player, level, menuItem);
+                performLevelBuying(playerStats, player, level, menuItem, shiftClicked);
             else
-            {
-                // if shift clicked, attempt to enter mastery
-                if (shiftClicked)
-                    performEnterMastery(playerStats, level);
-
-                performLevelTeleport(playerStats, level);
-            }
+                performLevelTeleport(playerStats, level, shiftClicked);
         }
     }
 
-    public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
+    public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem, boolean shiftClick)
     {
         MenuManager menuManager = Parkour.getMenuManager();
         String menuName = menuItem.getMenuName();
@@ -543,13 +527,13 @@ public class MenuItemAction {
                 else
                 {
                     // teleport if only one
-                    performLevelTeleport(playerStats, level);
+                    performLevelTeleport(playerStats, level, shiftClick);
                 }
             }
         }
     }
 
-    public static void performLevelTeleport(PlayerStats playerStats, Level level)
+    public static void performLevelTeleport(PlayerStats playerStats, Level level, boolean shiftClicked)
     {
         Player player = playerStats.getPlayer();
 
@@ -605,37 +589,63 @@ public class MenuItemAction {
 
                                 // if currently attempting, reset
                                 if (playerStats.isAttemptingRankup())
-                                    Parkour.getRanksManager().leftRankup(playerStats);
+                                    Parkour.getStatsManager().leftRankup(playerStats);
 
+                                if (playerStats.isAttemptingMastery())
+                                    Parkour.getStatsManager().leftMastery(playerStats);
 
                                 Level rankupLevel = playerStats.getRank().getRankupLevel();
                                 // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
                                 if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
-                                    Parkour.getRanksManager().enteredRankup(playerStats);
+                                    Parkour.getStatsManager().enteredRankup(playerStats);
 
-                                Location save = playerStats.getSave(level);
-                                Location spawn = playerStats.getCheckpoint(level);
-                                if (spawn != null) {
-                                    playerStats.setCurrentCheckpoint(spawn);
+                                if (shiftClicked && level.hasMastery() && playerStats.hasCompleted(level) && !playerStats.hasMasteryCompletion(level))
+                                    Parkour.getStatsManager().enteredMastery(playerStats);
 
-                                    // only tp if dont have a save
-                                    if (save == null) {
-                                        Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                        player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                                boolean tpToStart = false;
+
+                                if (!playerStats.isAttemptingMastery())
+                                {
+                                    Location save = playerStats.getSave(level);
+                                    Location spawn = playerStats.getCheckpoint(level);
+
+                                    if (spawn != null)
+                                    {
+                                        playerStats.setCurrentCheckpoint(spawn);
+
+                                        // only tp if dont have a save
+                                        if (save == null)
+                                        {
+                                            Parkour.getCheckpointManager().teleportToCP(playerStats);
+                                            player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                                        }
+                                        // tp to start if no save
                                     }
-                                    // tp to start if no save
-                                } else if (save == null) {
-                                    player.teleport(level.getStartLocation());
-                                    player.sendMessage(Utils.translate(
-                                            "&7You were teleported to the beginning of " + level.getFormattedTitle()
-                                    ));
-                                }
+                                    else if (save == null)
+                                        tpToStart = true;
 
-                                // if they have a save
-                                if (save != null) {
-                                    Parkour.getSavesManager().loadSave(playerStats, save, level);
-                                    player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
-                                    player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
+                                    // if they have a save and are not attempting mastery
+                                    if (save != null)
+                                    {
+                                        Parkour.getSavesManager().loadSave(playerStats, save, level);
+                                        player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
+                                        player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
+                                    }
+                                }
+                                else
+                                    tpToStart = true;
+
+                                if (tpToStart)
+                                {
+                                    player.teleport(level.getStartLocation());
+
+                                    player.sendMessage(Utils.translate("&7You were teleported to the start of " + level.getFormattedTitle()));
+
+                                    if (playerStats.isAttemptingMastery())
+                                    {
+                                        player.sendMessage(Utils.translate("&7This is a &5&lMastery &7attempt, you will get &e" + level.getMasteryMultiplier() + "x &7more &eCoins &7for completing"));
+                                        player.sendMessage(Utils.translate("&c&nCheckpoints and /practice is disabled!"));
+                                    }
                                 }
 
                                 playerStats.setLevel(level);
@@ -679,7 +689,7 @@ public class MenuItemAction {
         }
     }
 
-    private static void performTeleportItem(PlayerStats playerStats, MenuItem menuItem)
+    private static void performTeleportItem(PlayerStats playerStats, MenuItem menuItem, boolean shiftClick)
     {
         Location location = Parkour.getLocationManager().get(menuItem.getTypeValue());
 
@@ -693,7 +703,7 @@ public class MenuItemAction {
 
                 // make sure the area they are spawning in is a level
                 if (level != null)
-                    performLevelTeleport(playerStats, level);
+                    performLevelTeleport(playerStats, level, shiftClick);
             }
         }
     }

@@ -554,9 +554,7 @@ public class MenuItemFormatter
             }
 
             if (level.isFeaturedLevel())
-            {
                 newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
-            }
             // jackpot section
             else if (bankManager.isJackpotRunning() &&
                 bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
@@ -641,20 +639,18 @@ public class MenuItemFormatter
 
                 String beatenMessage = "&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7time";
                 if (levelCompletionsCount > 1)
-                {
                     itemLore.add(Utils.translate(beatenMessage + "s"));
-                    if (level.hasMastery())
-                        if (playerStats.hasMasteryCompletion(level))
-                            itemLore.add(Utils.translate("&7  Mastery &a✓"));
-                        else
-                        {
-                            itemLore.add(Utils.translate("&7  Mastery &cx"));
-                            itemLore.add(Utils.translate("&7    &6Shift click to attempt"));
-                        }
-                }
                 else
                     itemLore.add(Utils.translate(beatenMessage));
 
+                if (level.hasMastery())
+                    if (playerStats.hasMasteryCompletion(level))
+                        itemLore.add(Utils.translate("&7  Mastery &a✔"));
+                    else
+                    {
+                        itemLore.add(Utils.translate("&7  Mastery &c✖"));
+                        itemLore.add(Utils.translate("&7    Shift click &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins (" + level.getMasteryMultiplier() + "x)"));
+                    }
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
                 if (fastestCompletion != null) {

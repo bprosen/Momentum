@@ -249,7 +249,7 @@ public class PacketListener implements Listener {
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        MenuItemAction.performLevelTeleport(playerStats, level); // Tp to ascendance hub
+                                        MenuItemAction.performLevelTeleport(playerStats, level, false); // Tp to ascendance hub
                                     }
                                 }.runTask(Parkour.getPlugin());
                         }

@@ -107,7 +107,7 @@ public class JoinLeaveListener implements Listener
                         statsManager.enteredAscendance(playerStats);
 
                     Location checkpoint = playerStats.getCheckpoint(level);
-                    if (checkpoint != null)
+                    if (checkpoint != null && !playerStats.isAttemptingMastery()) // only load cp if they are not in a mastery attempt
                         playerStats.setCurrentCheckpoint(checkpoint);
 
                     // is elytra level, then set elytra in sync (player inventory changes)

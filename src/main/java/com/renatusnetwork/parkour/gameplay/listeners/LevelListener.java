@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.AscentEvent;
 import com.renatusnetwork.parkour.data.events.types.MazeEvent;
@@ -116,7 +117,7 @@ public class LevelListener implements Listener {
             } else if (block.getType() == Material.GOLD_PLATE) {
                 // gold plate = checkpoint
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats != null && playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating()) {
+                if (playerStats != null && playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isAttemptingMastery()) {
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
 
@@ -127,10 +128,10 @@ public class LevelListener implements Listener {
                         int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
 
                         if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
-                            setCheckpoint(player, playerStats, block.getLocation());
+                            setCheckpoint(playerStats, block.getLocation());
                     }
                     else
-                        setCheckpoint(player, playerStats, block.getLocation());
+                        setCheckpoint(playerStats, block.getLocation());
                 }
             }
             else if (block.getType() == Material.IRON_PLATE)
@@ -173,12 +174,15 @@ public class LevelListener implements Listener {
         }
     }
 
-    private void setCheckpoint(Player player, PlayerStats playerStats, Location location) {
+    private void setCheckpoint(PlayerStats playerStats, Location location)
+    {
+        Player player = playerStats.getPlayer();
+
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
 
         // delete if they have a cp
         if (playerStats.hasCurrentCheckpoint())
-            DatabaseQueries.runAsyncQuery("DELETE FROM checkpoints WHERE level_name=? AND name=?", playerStats.getLevel().getName(), playerStats.getName());
+            CheckpointDB.deleteCheckpoint(playerStats.getUUID(), playerStats.getLevel().getName());
 
         playerStats.setCurrentCheckpoint(location);
         playerStats.removeCheckpoint(playerStats.getLevel());
@@ -208,18 +212,7 @@ public class LevelListener implements Listener {
         }
 
         player.sendMessage(Utils.translate(msgString));
-
-        // add to async queue
-        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " " +
-                "(uuid, level_name, world, x, y, z)" +
-                " VALUES (?,?,?,?,?,?)",
-                playerStats.getUUID(),
-                playerStats.getLevel().getName(),
-                location.getWorld().getName(),
-                location.getBlockX(),
-                location.getBlockY(),
-                location.getBlockZ()
-        );
+        CheckpointDB.insertCheckpoint(playerStats, location);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -271,7 +264,10 @@ public class LevelListener implements Listener {
                     playerStats.resetLevel();
 
                     if (playerStats.isAttemptingRankup())
-                        Parkour.getRanksManager().leftRankup(playerStats);
+                        Parkour.getStatsManager().leftRankup(playerStats);
+
+                    if (playerStats.isAttemptingMastery())
+                        Parkour.getStatsManager().leftMastery(playerStats);
 
                     playerStats.clearPotionEffects();
 

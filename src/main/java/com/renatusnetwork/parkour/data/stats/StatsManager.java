@@ -352,6 +352,31 @@ public class StatsManager {
         playerStats.removeFavoriteLevel(level);
         StatsDB.removeFavoriteLevel(playerStats.getUUID(), level.getName());
     }
+
+    public void enteredRankup(PlayerStats playerStats)
+    {
+        playerStats.setAttemptingRankup(true);
+        StatsDB.updateAttemptingRankup(playerStats);
+    }
+
+    public void leftRankup(PlayerStats playerStats)
+    {
+        playerStats.setAttemptingRankup(false);
+        StatsDB.updateAttemptingRankup(playerStats);
+    }
+
+    public void enteredMastery(PlayerStats playerStats)
+    {
+        playerStats.setAttemptingMastery(true);
+        StatsDB.updateAttemptingMastery(playerStats);
+    }
+
+    public void leftMastery(PlayerStats playerStats)
+    {
+        playerStats.setAttemptingMastery(false);
+        StatsDB.updateAttemptingMastery(playerStats);
+    }
+
     public void addModifier(PlayerStats playerStats, Modifier modifier)
     {
         // add to cache and db

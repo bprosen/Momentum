@@ -66,7 +66,7 @@ public class PlayerStats {
     private FastBoard board;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
-    private HashSet<Level> masteryCompletions;
+    private HashSet<String> masteryCompletions;
     private HashSet<LevelCompletion> records;
     private HashSet<Perk> perks;
     private HashMap<String, Location> checkpoints;
@@ -333,6 +333,8 @@ public class PlayerStats {
 
     public void setTotalLevelCompletions(int totalLevelCompletions) { this.totalLevelCompletions = totalLevelCompletions; }
 
+    public void addTotalLevelCompletions() { totalLevelCompletions++; }
+
     public void setIndividualLevelsBeaten(int individualLevelsBeaten) { this.individualLevelsBeaten = individualLevelsBeaten; }
 
     public int getIndividualLevelsBeaten() { return individualLevelsBeaten; }
@@ -472,11 +474,13 @@ public class PlayerStats {
     //
     public void setAttemptingMastery(boolean attemptingMastery) { this.attemptingMastery = attemptingMastery; }
 
-    public void addMasteryCompletion(Level level) { masteryCompletions.add(level); }
+    public void addMasteryCompletion(String levelName) { masteryCompletions.add(levelName); }
 
-    public void removeMasteryCompletion(Level level) { masteryCompletions.remove(level); }
+    public void removeMasteryCompletion(String levelName) { masteryCompletions.remove(levelName); }
 
-    public boolean hasMasteryCompletion(Level level) { return masteryCompletions.contains(level); }
+    public boolean hasMasteryCompletion(Level level) { return masteryCompletions.contains(level.getName()); }
+
+    public boolean hasMasteryCompletion(String levelName) { return masteryCompletions.contains(levelName); }
 
     public int getNumMasteryCompletions() { return masteryCompletions.size(); }
 

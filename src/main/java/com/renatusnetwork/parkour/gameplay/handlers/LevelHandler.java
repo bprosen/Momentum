@@ -107,9 +107,9 @@ public class LevelHandler {
             if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
                 playerStats.setTutorial(false);
 
-            playerStats.setTotalLevelCompletions(playerStats.getTotalLevelCompletions() + 1);
+            playerStats.addTotalLevelCompletions();
 
-            boolean completedMastery = !forcedCompletion && playerStats.isAttemptingMastery();
+            boolean completedMastery = !forcedCompletion && level.hasMastery() && playerStats.isAttemptingMastery();
 
             // small microoptimization running it in async. if it is a record, it will be updated when we do the modifications
             new BukkitRunnable()
@@ -122,7 +122,6 @@ public class LevelHandler {
             }.runTaskAsynchronously(Parkour.getPlugin());
 
             levelManager.addTotalLevelCompletion();
-
             levelManager.addCompletion(playerStats, level, levelCompletion); // Update totalLevelCompletionsCount
 
             // run commands if there is any
@@ -131,6 +130,10 @@ public class LevelHandler {
 
             // Update player information
             playerStats.levelCompletion(levelCompletion);
+
+            // add mastery
+            if (completedMastery)
+                playerStats.addMasteryCompletion(level.getName());
 
             // used for playing sound!
             int beforeClanLevel = -1;
@@ -150,8 +153,11 @@ public class LevelHandler {
                     reward *= booster.getMultiplier();
                 }
 
+                // if mastery, boost it
+                if (completedMastery)
+                    reward *= level.getMasteryMultiplier();
                 // if featured, set reward!
-                if (level.isFeaturedLevel())
+                else if (level.isFeaturedLevel())
                     reward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
                 // jackpot section
                 else if (bankManager.isJackpotRunning() &&
@@ -193,14 +199,14 @@ public class LevelHandler {
 
                 Parkour.getStatsManager().addCoins(playerStats, reward);
 
-                String completionMessage = "&7 in ";
+                String completionMessage = "";
 
                 if (elapsedTime > 0 && elapsedTime < 8388607)
-                    completionMessage = " &a" + (elapsedTime / 1000f);
+                    completionMessage = "&7 in &a" + (elapsedTime / 1000f) + "s";
 
                 String completion = "&7Rewarded &6" + Utils.getCoinFormat(level.getReward(), reward) +
-                        " Coins &7for " + level.getFormattedTitle() + completionMessage +
-                        " &a(" + Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(level)) +
+                        " &eCoins &7for " + level.getFormattedTitle() + completionMessage +
+                        "&a (" + Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(level)) +
                         ")";
 
                 if (playerStats.inFailMode())
@@ -225,7 +231,7 @@ public class LevelHandler {
                     ));
                 else if (completedMastery)
                     Bukkit.broadcastMessage(Utils.translate(
-                            "&c" + playerStats.getDisplayName() + "&7 has completed the &2" + level.getFormattedTitle() + "&5&l Mastery"
+                            "&c" + playerStats.getDisplayName() + "&7 has completed the &2" + level.getFormattedTitle() + "&7 (&5&lMastery&7)"
                     ));
                 else if (level.isBroadcasting())
                     Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getFormattedTitle()));

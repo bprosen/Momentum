@@ -15,15 +15,22 @@ public class CompletionsDB
     {
         List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "level_name, (UNIX_TIMESTAMP(completion_date) * 1000) AS date, time_taken",
+                "level_name, (UNIX_TIMESTAMP(completion_date) * 1000) AS date, time_taken, mastery",
                 "WHERE uuid=?", playerStats.getUUID());
 
         for (Map<String, String> completionResult : completionsResults)
+        {
+            String levelName = completionResult.get("level_name");
+
+            if (Integer.parseInt(completionResult.get("mastery")) == 1)
+                playerStats.addMasteryCompletion(levelName);
+
             playerStats.levelCompletion(
-                    completionResult.get("level_name"),
+                    levelName,
                     Long.parseLong(completionResult.get("date")),
                     Long.parseLong(completionResult.get("time_taken"))
             );
+        }
 
         // get individual levels beaten by looping through list
         int individualLevelsBeaten = 0;

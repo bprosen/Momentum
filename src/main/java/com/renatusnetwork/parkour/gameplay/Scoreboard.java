@@ -263,8 +263,14 @@ public class Scoreboard {
                                 newReward *= booster.getMultiplier();
                             }
 
+                            // if level has mastery and player is in mastery
+                            if (level.hasMastery() && playerStats.isAttemptingMastery())
+                            {
+                                board.add(formatSpacing(Utils.translate("&5&lMastery")));
+                                newReward *= level.getMasteryMultiplier();
+                            }
                             // add title and adjust rewardstring if it is a featured level
-                            if (level.isFeaturedLevel()) {
+                            else if (level.isFeaturedLevel()) {
                                 board.add(formatSpacing(Utils.translate("&dFeatured Level")));
                                 newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
                             } else if (bankManager.isJackpotRunning() &&

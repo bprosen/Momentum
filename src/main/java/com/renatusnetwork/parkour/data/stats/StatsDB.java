@@ -131,6 +131,7 @@ public class StatsDB {
             playerStats.setEventWins(Integer.parseInt(playerResult.get("event_wins")));
             playerStats.setFailMode(Integer.parseInt(playerResult.get("fail_mode")) == 1);
             playerStats.setAttemptingRankup(Integer.parseInt(playerResult.get("attempting_rankup")) == 1);
+            playerStats.setAttemptingMastery(Integer.parseInt(playerResult.get("attempting_mastery")) == 1);
             playerStats.setRaceWins(Integer.parseInt(playerResult.get("race_wins")));
             playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
 
@@ -206,31 +207,36 @@ public class StatsDB {
     }
     public static void updatePlayerSpectatable(PlayerStats playerStats)
     {
-        int spectatable = playerStats.isSpectatable() ? 1 : 0;
-
         DatabaseQueries.runAsyncQuery(
-            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "spectatable=? WHERE uuid=?", spectatable, playerStats.getUUID()
+            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET spectatable=NOT spectatable WHERE uuid=?", playerStats.getUUID()
         );
     }
 
     public static void updatePlayerNightVision(PlayerStats playerStats)
     {
-        int vision = playerStats.hasNightVision() ? 1 : 0;
-
         DatabaseQueries.runAsyncQuery(
-            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "night_vision=? WHERE uuid=?", vision, playerStats.getUUID()
+            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET night_vision=NOT night_vision WHERE uuid=?", playerStats.getUUID()
         );
     }
 
     public static void updatePlayerGrinding(PlayerStats playerStats)
     {
-        int grinding = playerStats.isGrinding() ? 1 : 0;
-
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET " +
-                    "grinding=? WHERE uuid=?", grinding, playerStats.getUUID()
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET grinding=NOT grinding WHERE uuid=?", playerStats.getUUID()
+        );
+    }
+
+    public static void updateAttemptingRankup(PlayerStats playerStats)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_rankup=NOT attempting_rankup WHERE uuid=?", playerStats.getUUID()
+        );
+    }
+
+    public static void updateAttemptingMastery(PlayerStats playerStats)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_mastery=NOT attempting_mastery WHERE uuid=?", playerStats.getUUID()
         );
     }
 

@@ -245,7 +245,10 @@ public class Utils {
                                 playerStats.clearPotionEffects();
 
                                 if (playerStats.isAttemptingRankup())
-                                    Parkour.getRanksManager().leftRankup(playerStats);
+                                    Parkour.getStatsManager().leftRankup(playerStats);
+
+                                if (playerStats.isAttemptingMastery())
+                                    Parkour.getStatsManager().leftMastery(playerStats);
 
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
