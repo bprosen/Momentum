@@ -609,7 +609,7 @@ public class MenuItemFormatter
                 }
             }
             else
-                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(oldReward) + " Coin &7Reward"));
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(oldReward) + "&e Coin &7Reward"));
 
 
             if (level.getTotalCompletionsCount() > 0)

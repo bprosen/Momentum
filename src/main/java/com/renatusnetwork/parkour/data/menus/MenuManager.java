@@ -97,7 +97,6 @@ public class MenuManager {
 
         // init previous and add main menu so skipping isn't an option
         Set<String> previous = new HashSet<>();
-        previous.add(Parkour.getSettingsManager().main_menu_name); // prevent looping back around
         previous.add(inMenu.getName()); // add own menu to prevent infinite looping
 
         // added menus
@@ -120,7 +119,7 @@ public class MenuManager {
 
                 // if the connected menus are level menus, add to queue
                 for (Menu subMenu : currentMenu.getConnectedMenus())
-                    if (menuLevels.containsKey(subMenu))
+                    if (menuLevels.containsKey(subMenu) && !subMenu.getName().equalsIgnoreCase(Parkour.getSettingsManager().main_menu_name))
                         menus.add(subMenu);
             }
 
