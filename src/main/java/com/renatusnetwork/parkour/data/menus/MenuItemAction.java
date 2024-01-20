@@ -18,7 +18,9 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.gameplay.listeners.MenuListener;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
+import com.renatusnetwork.parkour.utils.MenuUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -66,7 +68,7 @@ public class MenuItemAction {
         player.closeInventory();
     }
 
-    public static void perform(Player player, MenuItem menuItem, boolean shiftClicked)
+    public static void perform(Player player, MenuItem menuItem)
     {
         String itemType = menuItem.getType();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
@@ -78,13 +80,13 @@ public class MenuItemAction {
             if (menuItem.getTypeValue().equals("featured"))
             {
                 Level level = Parkour.getLevelManager().getFeaturedLevel();
-                performLevelTeleport(playerStats, level, shiftClicked);
+                performLevelTeleport(playerStats, level);
             }
             else if (menuItem.getTypeValue().equals("rankup"))
             {
                 // only allow this if they are not at the last rank!
                 if (!playerStats.isLastRank())
-                    performLevelTeleport(playerStats, playerStats.getRank().getRankupLevel(), false);
+                    performLevelTeleport(playerStats, playerStats.getRank().getRankupLevel());
             }
             else if (menuItem.getTypeValue().equals("random"))
                 performRandomLevel(playerStats);
@@ -94,13 +96,13 @@ public class MenuItemAction {
                 Level favoriteLevel = playerStats.getFavoriteLevel(index);
 
                 if (favoriteLevel != null)
-                    performLevelTeleport(playerStats, favoriteLevel, shiftClicked);
+                    performLevelTeleport(playerStats, favoriteLevel);
             }
             else
-                performLevelItem(player, menuItem, shiftClicked);
+                performLevelItem(player, menuItem);
         }
         else if (itemType.equals("teleport"))
-            performTeleportItem(playerStats, menuItem, shiftClicked);
+            performTeleportItem(playerStats, menuItem);
         else if (itemType.equals("bank"))
             performBankItem(playerStats, menuItem);
         else if (itemType.equals("open"))
@@ -185,7 +187,7 @@ public class MenuItemAction {
 
         // tp them to randomly chosen level
         Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
-        performLevelTeleport(playerStats, chosenLevel, false); // enforce no shift clicking
+        performLevelTeleport(playerStats, chosenLevel); // enforce no shift clicking
     }
 
     private static void performCosmeticsClear(Player player, String clearType, MenuItem menuItem) {
@@ -334,7 +336,7 @@ public class MenuItemAction {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", playerStats.getName()));
     }
 
-    private static void performLevelItem(Player player, MenuItem menuItem, boolean shiftClicked)
+    private static void performLevelItem(Player player, MenuItem menuItem)
     {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         Level level = Parkour.getLevelManager().get(menuItem.getTypeValue());
@@ -347,13 +349,13 @@ public class MenuItemAction {
                 !level.isFeaturedLevel() &&
                 !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
-                performLevelBuying(playerStats, player, level, menuItem, shiftClicked);
+                performLevelBuying(playerStats, player, level, menuItem);
             else
-                performLevelTeleport(playerStats, level, shiftClicked);
+                performLevelTeleport(playerStats, level);
         }
     }
 
-    public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem, boolean shiftClick)
+    public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
     {
         MenuManager menuManager = Parkour.getMenuManager();
         String menuName = menuItem.getMenuName();
@@ -527,13 +529,13 @@ public class MenuItemAction {
                 else
                 {
                     // teleport if only one
-                    performLevelTeleport(playerStats, level, shiftClick);
+                    performLevelTeleport(playerStats, level);
                 }
             }
         }
     }
 
-    public static void performLevelTeleport(PlayerStats playerStats, Level level, boolean shiftClicked)
+    public static void performLevelTeleport(PlayerStats playerStats, Level level)
     {
         Player player = playerStats.getPlayer();
 
@@ -599,7 +601,9 @@ public class MenuItemAction {
                                 if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
                                     Parkour.getStatsManager().enteredRankup(playerStats);
 
-                                if (shiftClicked && level.hasMastery() && playerStats.hasCompleted(level) && !playerStats.hasMasteryCompletion(level))
+                                if (MenuUtils.containsShiftClicked(player.getName()) &&
+                                    level.hasMastery() && playerStats.hasCompleted(level) &&
+                                    !playerStats.hasMasteryCompletion(level))
                                     Parkour.getStatsManager().enteredMastery(playerStats);
 
                                 boolean tpToStart = false;
@@ -689,7 +693,7 @@ public class MenuItemAction {
         }
     }
 
-    private static void performTeleportItem(PlayerStats playerStats, MenuItem menuItem, boolean shiftClick)
+    private static void performTeleportItem(PlayerStats playerStats, MenuItem menuItem)
     {
         Location location = Parkour.getLocationManager().get(menuItem.getTypeValue());
 
@@ -703,7 +707,7 @@ public class MenuItemAction {
 
                 // make sure the area they are spawning in is a level
                 if (level != null)
-                    performLevelTeleport(playerStats, level, shiftClick);
+                    performLevelTeleport(playerStats, level);
             }
         }
     }

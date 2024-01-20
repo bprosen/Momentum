@@ -24,7 +24,7 @@ public class TutorialCMD implements CommandExecutor
                 if (!playerStats.isInTutorial())
                 {
                     // do menu tp
-                    MenuItemAction.performLevelTeleport(playerStats, Parkour.getLevelManager().getTutorialLevel(), false);
+                    MenuItemAction.performLevelTeleport(playerStats, Parkour.getLevelManager().getTutorialLevel());
 
                     // if they made it into tutorial, toggle it on
                     if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))

@@ -6,6 +6,7 @@ public enum LevelSortingType
 {
     NEWEST,
     OLDEST,
+    ALPHABETICAL,
     EASIEST,
     HARDEST,
     LOWEST_REWARD,
@@ -21,6 +22,8 @@ public enum LevelSortingType
             case NEWEST:
                 return OLDEST;
             case OLDEST:
+                return ALPHABETICAL;
+            case ALPHABETICAL:
                 return EASIEST;
             case EASIEST:
                 return HARDEST;

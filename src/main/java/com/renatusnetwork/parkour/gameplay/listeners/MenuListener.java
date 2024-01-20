@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.data.menus.MenuItem;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.utils.MenuUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -25,9 +26,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
-public class MenuListener implements Listener {
+public class MenuListener implements Listener
+{
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -57,8 +60,16 @@ public class MenuListener implements Listener {
                       menuItem.getTypeValue().startsWith("favorite-level")
                      ) || Parkour.getLevelManager().isBuyingLevelMenu(player.getName())))
                 {
-                    MenuItemAction.perform(player, menuItem, event.getClick().isShiftClick());
+                    boolean shiftClicked = event.isShiftClick();
+                    if (shiftClicked)
+                        MenuUtils.addShiftClicked(player.getName());
+
+                    MenuItemAction.perform(player, menuItem);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+
+                    if (shiftClicked)
+                        MenuUtils.removeShiftClicked(player.getName());
+
                 } else {
                     // submitted plots section
                     String submittedPlotsTitle = Parkour.getMenuManager().getMenu("submitted-plots").getFormattedTitleBase();

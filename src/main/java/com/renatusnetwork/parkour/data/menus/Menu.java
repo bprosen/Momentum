@@ -124,6 +124,9 @@ public class Menu
                                 max = currentLevel;
                             else if (sortingType == LevelSortingType.OLDEST && currentLevel.getCreationTime() < max.getCreationTime())
                                 max = currentLevel;
+                            else if (sortingType == LevelSortingType.ALPHABETICAL &&
+                                    ChatColor.stripColor(currentLevel.getFormattedTitle()).compareToIgnoreCase(ChatColor.stripColor(max.getFormattedTitle())) < 0.0)
+                                max = currentLevel;
                             else if (sortingType == LevelSortingType.EASIEST &&
                                     currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() <= max.getDifficulty()))
                                 max = currentLevel;

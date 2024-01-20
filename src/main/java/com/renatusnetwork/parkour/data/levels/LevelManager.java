@@ -827,7 +827,7 @@ public class LevelManager {
 
                         // if still allowed, tp them!
                         if (teleport)
-                            MenuItemAction.performLevelTeleport(playerStats, level, false);
+                            MenuItemAction.performLevelTeleport(playerStats, level);
                     }
                     else
                         player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
