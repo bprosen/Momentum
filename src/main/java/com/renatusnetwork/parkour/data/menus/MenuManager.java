@@ -33,6 +33,13 @@ public class MenuManager {
         load();
     }
 
+    public void reload()
+    {
+        load();
+        Parkour.getLevelManager().loadLevelsInMenus();
+        loadConnectedMenus();
+    }
+
     public void load()
     {
         for (String menuName : MenusYAML.getNames())
@@ -45,6 +52,12 @@ public class MenuManager {
     {
         if (MenusYAML.exists(menuName))
             menus.put(menuName, new Menu(menuName));
+    }
+
+    public void loadConnectedMenus()
+    {
+        for (Menu menu : menus.values())
+            menu.loadConnectedMenus();
     }
 
     public List<Menu> getMenus()
@@ -76,6 +89,52 @@ public class MenuManager {
     public void removeCancelTasks(String playerName)
     {
         cancelTasks.remove(playerName);
+    }
+
+    public Set<Level> getLevelsFromMenuDeep(Menu inMenu, Menu clickedMenu)
+    {
+        Set<Level> levels = new HashSet<>();
+
+        // init previous and add main menu so skipping isn't an option
+        Set<String> previous = new HashSet<>();
+        previous.add(Parkour.getSettingsManager().main_menu_name); // prevent looping back around
+        previous.add(inMenu.getName()); // add own menu to prevent infinite looping
+
+        // added menus
+        ArrayList<Menu> menus = new ArrayList<>();
+        HashMap<Menu, Set<Level>> menuLevels = Parkour.getLevelManager().getMenuLevels();
+
+        Menu currentMenu = clickedMenu;
+
+        while (currentMenu != null)
+        {
+            // prevent infinite looping
+            if (!previous.contains(currentMenu.getName()))
+            {
+                previous.add(currentMenu.getName());
+                Set<Level> levelsInMenu = menuLevels.get(currentMenu);
+
+                // add levels from that menu
+                if (levelsInMenu != null && !levelsInMenu.isEmpty())
+                    levels.addAll(levelsInMenu);
+
+                // if the connected menus are level menus, add to queue
+                for (Menu subMenu : currentMenu.getConnectedMenus())
+                    if (menuLevels.containsKey(subMenu))
+                        menus.add(subMenu);
+            }
+
+            if (!menus.isEmpty())
+            {
+                // pop first element
+                currentMenu = menus.get(0);
+                menus.remove(currentMenu);
+            }
+            else
+                currentMenu = null;
+        }
+
+        return levels;
     }
 
     public boolean hasCancelledItem(String playerName, int slot)

@@ -1,17 +1,12 @@
 package com.renatusnetwork.parkour.data.menus;
 
-import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
-
 import java.util.*;
 
-public class MenuPage {
-
+public class MenuPage
+{
     private int pageNumber;
     private int rowCount;
 
@@ -47,7 +42,6 @@ public class MenuPage {
 
         return new MenuPage(newPageNumber, rowCount, items);
     }
-
 
     private void load(Menu menu)
     {

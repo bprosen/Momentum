@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.swing.*;
 import java.util.*;
 
 public class LevelManager {
@@ -650,10 +651,13 @@ public class LevelManager {
 
         return level;
     }
+
     public Set<Level> getLevelsFromMenu(Menu menu)
     {
         return menuLevels.get(menu);
     }
+
+    public HashMap<Menu, Set<Level>> getMenuLevels() { return menuLevels; }
 
     public boolean isLevelInMenus(Level level)
     {

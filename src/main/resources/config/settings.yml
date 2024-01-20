@@ -284,3 +284,4 @@ rage_quit:
     - "&6&l%player% &7got the great idea to &c&lRage Quit"
 menu:
   default_level_sorting: NEWEST
+  main_menu_name: "parkour_levels"

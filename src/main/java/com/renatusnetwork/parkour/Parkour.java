@@ -63,7 +63,7 @@ public class Parkour extends JavaPlugin {
     private static BlackMarketManager blackmarket;
     private static SavesManager saves;
     private static ModifiersManager modifiers;
-    private Placeholders placeholders;
+    private static Placeholders placeholders;
 
     @Override
     public void onEnable() {
@@ -202,6 +202,7 @@ public class Parkour extends JavaPlugin {
         menus = new MenuManager();
         levels.loadLevelsInMenus(); // load after loading menus
         levels.pickFeatured();
+        menus.loadConnectedMenus();
 
         new BukkitRunnable()
         {

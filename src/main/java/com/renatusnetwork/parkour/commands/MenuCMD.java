@@ -50,8 +50,7 @@ public class MenuCMD implements CommandExecutor {
                 Parkour.getConfigManager().load("menus");
 
                 sender.sendMessage(Utils.translate("&7Loaded &2menus.yml &7from disk"));
-                menuManager.load();
-                Parkour.getLevelManager().loadLevelsInMenus();
+                menuManager.reload();
                 sender.sendMessage(Utils.translate("&7Loaded menus from the config"));
             }
             else

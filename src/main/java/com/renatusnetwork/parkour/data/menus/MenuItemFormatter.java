@@ -31,6 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +66,10 @@ public class MenuItemFormatter
         if (menuItem.getType().equals("bank"))
             return getBankItem(menuItem);
         if (menuItem.getType().equals("open"))
-            return enchantMenuItem(playerStats, menuItem, Parkour.getMenuManager().getMenu(menuItem.getTypeValue()));
+            return enchantMenuItem(
+                    playerStats, menuItem,
+                    Parkour.getMenuManager().getMenu(menuItem.getTypeValue())
+            );
         if (menuItem.getType().equals("infinite-mode"))
             return getInfiniteMode(playerStats, menuItem);
         if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("level-sorting"))
@@ -378,10 +382,13 @@ public class MenuItemFormatter
         return createLevelItem(playerStats, levelManager.getFeaturedLevel(), menuItem, itemFromLevel.getItem());
     }
 
-    private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu) {
+    private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu)
+    {
         // get item and levels, clone so it can change properly
-        ItemStack item = menuItem.getItem().clone();
-        Set<Level> levelsInMenu = Parkour.getLevelManager().getLevelsFromMenu(menu);
+        ItemStack item = new ItemStack(menuItem.getItem());
+        Set<Level> levelsInMenu = Parkour.getMenuManager().getLevelsFromMenuDeep(
+                Parkour.getMenuManager().getMenu(menuItem.getMenuName()), menu
+        );
 
         if (levelsInMenu != null && !levelsInMenu.isEmpty())
         {
@@ -399,7 +406,7 @@ public class MenuItemFormatter
 
             ItemMeta itemMeta = item.getItemMeta();
             itemMeta.setDisplayName(Utils.translate(
-                    itemMeta.getDisplayName() + " &7(&a" + (int) (((double) count / levelsInMenu.size()) * 100) + "%&7)"));
+                    itemMeta.getDisplayName() + "&a " + (int) (((double) count / levelsInMenu.size()) * 100) + "%"));
 
             // if enchanting, add durability and hide it for glow effect
             if (enchant)

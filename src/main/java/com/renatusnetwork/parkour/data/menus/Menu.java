@@ -20,6 +20,7 @@ public class Menu
     private ItemStack selectItem;
     private HashMap<Integer, MenuPage> pages;
     private HashMap<LevelSortingType, HashMap<Integer, MenuPage>> sortedPages;
+    private HashSet<Menu> connectedMenus;
 
     private boolean sortLevelTypes;
 
@@ -28,6 +29,7 @@ public class Menu
         this.name = name;
         this.pages = new HashMap<>();
         this.sortedPages = new HashMap<>();
+        this.connectedMenus = new HashSet<>();
 
         load();
     }
@@ -60,7 +62,7 @@ public class Menu
         }
     }
 
-    public boolean levelsSorted() { return sortLevelTypes; }
+    public boolean haveSortedLevels() { return sortLevelTypes; }
 
     public void sortLevels(LevelSortingType sortingType)
     {
@@ -182,6 +184,24 @@ public class Menu
         }
     }
 
+    public void loadConnectedMenus()
+    {
+        for (MenuPage menuPage : pages.values())
+            for (MenuItem menuItem : menuPage.getItems())
+                if (menuItem.getType().equalsIgnoreCase("open"))
+                {
+                    Menu value = Parkour.getMenuManager().getMenu(menuItem.getTypeValue());
+
+                    if (value != null && !value.equals(this))
+                        connectedMenus.add(value);
+                }
+    }
+
+    public Set<Menu> getConnectedMenus()
+    {
+        return connectedMenus;
+    }
+
     public MenuPage getPage(int pageNumber)
     {
         return pages.get(pageNumber);
@@ -268,4 +288,7 @@ public class Menu
     }
 
     public Collection<MenuPage> getPages() { return pages.values(); }
+
+    public boolean equals(Menu menu) { return menu.getName().equalsIgnoreCase(name); }
+
 }
