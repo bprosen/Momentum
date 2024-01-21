@@ -156,7 +156,7 @@ public class RecordsCMD implements CommandExecutor
                             if (numRecords > currentNum && max > currentNum)
                             {
                                 sender.sendMessage(Utils.translate(
-                                        "&7" + (currentNum + 1) + " &a" + record.getKey().getFormattedTitle() + "&7 " + record.getValue() + "s"
+                                        "&7" + (currentNum + 1) + " &a" + record.getKey().getTitle() + "&7 " + record.getValue() + "s"
                                 ));
                                 currentNum++;
                             }

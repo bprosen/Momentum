@@ -61,6 +61,10 @@ public class LevelsDB {
                 level.setTitle(Utils.translate(title));
 
             // settings
+            String stuckURL = result.get("stuck_url");
+            if (stuckURL != null)
+                level.setStuckURL(stuckURL);
+
             String permission = result.get("required_permission");
             if (permission != null)
                 level.setRequiredPermission(permission);
@@ -237,6 +241,16 @@ public class LevelsDB {
 
     public static void updateMaxCompletions(String levelName, int maxCompletions) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET max_completions=? WHERE name=?", maxCompletions, levelName);
+    }
+
+    public static void updateStuckURL(String levelName, String stuckURL)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET stuck_url=? WHERE name=?", stuckURL, levelName);
+    }
+
+    public static void resetStuckURL(String levelName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET stuck_url=NULL WHERE name=?", levelName);
     }
 
     public static void updateBroadcast(String levelName) {

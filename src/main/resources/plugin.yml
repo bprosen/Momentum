@@ -10,9 +10,8 @@ softdepend: [PlaceholderAPI]
 commands:
   db:
     description: "dev"
-
-
-
+  stuck:
+    description: "RN-Parkour stuck command"
   level:
     description: "RN-Parkour level management command"
     aliases: [lvl, levels]

@@ -90,7 +90,7 @@ public class StatsCMD implements CommandExecutor {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &4" +
                                     Utils.formatNumber(lbPosition.getTotalCompletionsCount()) + " &c" +
-                                    lbPosition.getFormattedTitle()));
+                                    lbPosition.getTitle()));
                             lbPositionNum++;
                         }
                     }
@@ -165,7 +165,7 @@ public class StatsCMD implements CommandExecutor {
                             sender.sendMessage(Utils.translate(" &7" +
                                     lbPositionNum + " &9" +
                                     level.getRating() + " &1" +
-                                    level.getFormattedTitle()));
+                                    level.getTitle()));
                             lbPositionNum++;
                         }
                     }
@@ -261,7 +261,7 @@ public class StatsCMD implements CommandExecutor {
                     if (!Parkour.getStatsManager().isLoadingLeaderboards())
                     {
                         sender.sendMessage(Utils.translate(
-                                level.getFormattedTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
+                                level.getTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
                         ));
 
                         HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();

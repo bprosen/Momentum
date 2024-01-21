@@ -56,8 +56,8 @@ public class SaveCMD implements CommandExecutor
 
                                                         Utils.teleportToSpawn(playerStats); // tp to spawn
 
-                                                        player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getFormattedTitle()));
-                                                        player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getFormattedTitle() + "&a, you will teleport at your save"));
+                                                        player.sendMessage(Utils.translate("&7You have saved your location on &c" + level.getTitle()));
+                                                        player.sendMessage(Utils.translate("&aWhen you come back to &c" + level.getTitle() + "&a, you will teleport at your save"));
                                                     }
                                                     else
                                                     {

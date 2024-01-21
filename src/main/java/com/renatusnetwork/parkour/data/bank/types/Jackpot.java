@@ -54,7 +54,7 @@ public class Jackpot
         if (playerCount > 1)
             playersString += "s";
 
-        Bukkit.broadcastMessage(Utils.translate("&a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed the " + level.getFormattedTitle() + "&7 level"));
+        Bukkit.broadcastMessage(Utils.translate("&a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed the " + level.getTitle() + "&7 level"));
         Bukkit.broadcastMessage(Utils.translate("&6" + Utils.formatNumber(completed.size() * (level.getReward() + bonus)) + " &eCoins &7were rewarded"));
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
     }
@@ -78,7 +78,7 @@ public class Jackpot
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
                 Bukkit.broadcastMessage(Utils.translate("&e&lBANK &6&lJACKPOT &e&lALERT"));
                 Bukkit.broadcastMessage("");
-                Bukkit.broadcastMessage(Utils.translate("&7Complete &2" + level.getFormattedTitle() + "&7 for &6" + Utils.formatNumber(bonus) + " &d&lBONUS &e&lCOINS"));
+                Bukkit.broadcastMessage(Utils.translate("&7Complete &2" + level.getTitle() + "&7 for &6" + Utils.formatNumber(bonus) + " &d&lBONUS &e&lCOINS"));
                 broadcastJoinComponent();
                 Bukkit.broadcastMessage(Utils.translate("&7There are &a" + (Math.round(millisLeft() / 1000f / 60f) + " minutes &7left to get the reward")));
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));

@@ -250,7 +250,7 @@ public class MenuItemAction {
                 if (rating >= 0 && rating <= 5)
                 {
                     Parkour.getLevelManager().addRating(player, level, rating);
-                    player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + "&7 a &6" + rating + "&7! Thank you for rating!"));
+                    player.sendMessage(Utils.translate("&7You rated &c" + level.getTitle() + "&7 a &6" + rating + "&7! Thank you for rating!"));
                 } else {
                     player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
                 }
@@ -385,7 +385,7 @@ public class MenuItemAction {
                 ItemMeta itemMeta = itemStack.getItemMeta();
 
                 itemMeta.setDisplayName(Utils.translate(
-                        "&cClick to confirm &a" + level.getFormattedTitle() + "&c for " + Utils.getCoinFormat(oldPrice, price) + " &eCoins"
+                        "&cClick to confirm &a" + level.getTitle() + "&c for " + Utils.getCoinFormat(oldPrice, price) + " &eCoins"
                 ));
 
                 List<String> loreString = new ArrayList<>();
@@ -433,7 +433,7 @@ public class MenuItemAction {
                     // this is where it creates a item telling them they cannot buy this!
                     ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 14);
                     ItemMeta itemMeta = itemStack.getItemMeta();
-                    itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getFormattedTitle()));
+                    itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getTitle()));
 
                     int remaining = (int) ((total + price) - coins);
 
@@ -632,7 +632,7 @@ public class MenuItemAction {
                                     if (save != null)
                                     {
                                         Parkour.getSavesManager().loadSave(playerStats, save, level);
-                                        player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
+                                        player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getTitle()));
                                         player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
                                     }
                                 }
@@ -643,7 +643,7 @@ public class MenuItemAction {
                                 {
                                     player.teleport(level.getStartLocation());
 
-                                    player.sendMessage(Utils.translate("&7You were teleported to the start of " + level.getFormattedTitle()));
+                                    player.sendMessage(Utils.translate("&7You were teleported to the start of " + level.getTitle()));
 
                                     if (playerStats.isAttemptingMastery())
                                     {

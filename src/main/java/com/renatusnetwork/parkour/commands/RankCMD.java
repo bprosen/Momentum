@@ -115,7 +115,7 @@ public class RankCMD implements CommandExecutor {
                         RanksDB.updateRankupLevel(rankName, levelName);
                         // update object
                         rank.setRankupLevel(level);
-                        player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's rank up level to &c" + level.getFormattedTitle()));
+                        player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's rank up level to &c" + level.getTitle()));
                     }
                     else
                     {

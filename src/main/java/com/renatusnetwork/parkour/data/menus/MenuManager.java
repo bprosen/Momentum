@@ -324,7 +324,7 @@ public class MenuManager {
                     ItemMeta itemMeta = item.getItemMeta();
                     itemMeta.setDisplayName(level.getFormattedTitle());
                     List<String> itemLore = new ArrayList<String>() {{
-                        add(Utils.translate("&7Click to select &c" + level.getFormattedTitle()));
+                        add(Utils.translate("&7Click to select &c" + level.getTitle()));
                         add(Utils.translate("&7for your race!"));
                         add(Utils.translate(""));
                         add(Utils.translate("&7Wins this Race Level Has &6" + level.getTotalCompletionsCount()));

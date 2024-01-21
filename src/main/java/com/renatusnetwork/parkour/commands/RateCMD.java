@@ -40,7 +40,6 @@ public class RateCMD implements CommandExecutor {
             if (level != null)
             {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                String levelTitle = level.getFormattedTitle();
 
                 if (playerStats.hasCompleted(level))
                 {
@@ -57,7 +56,7 @@ public class RateCMD implements CommandExecutor {
                             {
                                 // copy it into new inv with new title
                                 Inventory newInv = Bukkit.createInventory(null, inventory.getSize(), Utils.translate(
-                                        inventory.getTitle().replace("%level_name%", levelTitle)));
+                                        inventory.getTitle().replace("%level_name%", level.getTitle())));
                                 newInv.setContents(inventory.getContents());
 
                                 player.openInventory(newInv);
@@ -70,11 +69,11 @@ public class RateCMD implements CommandExecutor {
                             player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
                     }
                     else
-                        sender.sendMessage(Utils.translate("&cYou have already rated &4" + level.getFormattedTitle()));
+                        sender.sendMessage(Utils.translate("&cYou have already rated &4" + level.getTitle()));
                 }
                 else
                     player.sendMessage(Utils.translate(
-                            "&cYou have not completed &c" + level.getFormattedTitle() + "&c to be able to rate it"
+                            "&cYou have not completed &c" + level.getTitle() + "&c to be able to rate it"
                     ));
             }
             else

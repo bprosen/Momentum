@@ -36,6 +36,7 @@ public class Level
     private boolean hasMastery;
     private float masteryMultiplier;
     private boolean tc;
+    private String stuckURL;
 
     private HashMap<String, Integer> ratings;
     private List<String> requiredLevels;
@@ -145,6 +146,12 @@ public class Level
     public void toggleBroadcast() { this.broadcast = !this.broadcast; }
 
     public void setBroadcast(boolean broadcast) { this.broadcast = broadcast; }
+
+    public String getStuckURL() { return stuckURL; }
+
+    public void setStuckURL(String stuckURL) { this.stuckURL = stuckURL; }
+
+    public boolean hasStuckURL() { return stuckURL != null; }
 
     public void setRating(float rating) {
         this.rating = rating;

@@ -30,6 +30,7 @@ public class SettingsManager {
     public static final String LEVEL_ASCENT_FORMAT = "%level%-level-%num%";
     public static final String LEVEL_MAZE_RESPAWN_FORMAT = "%level%-respawn-%num%";
     public static final String LEVEL_MAZE_EXIT_FORMAT = "%level%-exit-%num%";
+    public static final int STUCK_URL_LENGTH = 50;
 
     public World main_world;
     public double featured_level_reward_multiplier;

@@ -286,10 +286,10 @@ public class RaceManager {
 
             if (raceObject.hasBet())
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()
-                                        + " &7in a race for &6" + Utils.formatNumber(raceObject.getBet()) + " &eCoins &7on " + raceObject.getLevel().getFormattedTitle()));
+                                        + " &7in a race for &6" + Utils.formatNumber(raceObject.getBet()) + " &eCoins &7on " + raceObject.getLevel().getTitle()));
             else
                 Bukkit.broadcastMessage(Utils.translate("&4" + winner.getDisplayName() + " &7has beaten &4" + loser.getDisplayName()
-                                        + " &7in a race on " + raceObject.getLevel().getFormattedTitle()));
+                                        + " &7in a race on " + raceObject.getLevel().getTitle()));
 
             // give winner money and take from loser if betted on race
             if (raceObject.hasBet())
@@ -436,8 +436,8 @@ public class RaceManager {
         }
 
         if (!randomLevel) {
-            senderString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
-            opponentString += Utils.translate(" &7on &c" + selectedLevel.getFormattedTitle());
+            senderString += Utils.translate(" &7on &c" + selectedLevel.getTitle());
+            opponentString += Utils.translate(" &7on &c" + selectedLevel.getTitle());
         }
 
         TextComponent opponentComponent = new TextComponent(TextComponent.fromLegacyText(opponentString));

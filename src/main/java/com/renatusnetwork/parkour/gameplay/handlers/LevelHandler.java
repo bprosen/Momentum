@@ -205,7 +205,7 @@ public class LevelHandler {
                     completionMessage = "&7 in &a" + (elapsedTime / 1000f) + "s";
 
                 String completion = "&7Rewarded &6" + Utils.getCoinFormat(level.getReward(), reward) +
-                        " &eCoins &7for " + level.getFormattedTitle() + completionMessage +
+                        " &eCoins &7for " + level.getTitle() + completionMessage +
                         "&a (" + Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(level)) +
                         ")";
 
@@ -213,7 +213,7 @@ public class LevelHandler {
                     completion += " &7in &6" + playerStats.getFails() + " fails";
 
                 player.sendMessage(Utils.translate(completion));
-                player.sendMessage(Utils.translate("&7Rate &e" + level.getFormattedTitle() + "&7 with &6/rate "
+                player.sendMessage(Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle())));
 
                 // if new pb, send message to player
@@ -227,14 +227,14 @@ public class LevelHandler {
                 // broadcast completed if it the featured level
                 if (level.isFeaturedLevel())
                     Bukkit.broadcastMessage(Utils.translate(
-                            "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getFormattedTitle()
+                            "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getTitle()
                     ));
                 else if (completedMastery)
                     Bukkit.broadcastMessage(Utils.translate(
-                            "&c" + playerStats.getDisplayName() + "&7 has completed the &2" + level.getFormattedTitle() + "&7 (&5&lMastery&7)"
+                            "&c" + playerStats.getDisplayName() + "&7 has completed the &2" + level.getTitle() + "&7 (&5&lMastery&7)"
                     ));
                 else if (level.isBroadcasting())
-                    Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getFormattedTitle()));
+                    Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getTitle()));
 
                 if (playerStats.getClan() != null)
                 {
@@ -273,11 +273,11 @@ public class LevelHandler {
                 // clear potion effects
                 playerStats.clearPotionEffects();
 
-                String titleMessage = Utils.translate("&7You beat " + level.getFormattedTitle());
+                String titleMessage = Utils.translate("&7You beat " + level.getTitle());
                 if (elapsedTime > 0L && elapsedTime < 8388607L)
                     titleMessage += Utils.translate("&7 in &2" + time);
 
-                String subTitleMessage = Utils.translate("&7Rate &e" + level.getFormattedTitle() + "&7 with &6/rate "
+                String subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle()));
 
                 TitleAPI.sendTitle(
@@ -335,7 +335,7 @@ public class LevelHandler {
             }
             else
             {
-                player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getFormattedTitle()));
+                player.sendMessage(Utils.translate("&7You have been given a completion for &c" + level.getTitle()));
 
                 if (level.hasRequiredLevels() && !level.playerHasRequiredLevels(playerStats))
                 {

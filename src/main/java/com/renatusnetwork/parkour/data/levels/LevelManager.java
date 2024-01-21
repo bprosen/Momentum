@@ -365,7 +365,7 @@ public class LevelManager {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage(Utils.translate(brokenRecord));
             Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getName() +
-                    " &7has the new &8" + level.getFormattedTitle() +
+                    " &7has the new &8" + level.getTitle() +
                     " &7record with &a" + completionTime + "s"));
             Bukkit.broadcastMessage("");
 
@@ -588,6 +588,18 @@ public class LevelManager {
     public boolean isBuyingLevelMenu(String playerName)
     {
         return buyingLevels.containsKey(playerName);
+    }
+
+    public void updateStuckURL(Level level, String url)
+    {
+        level.setStuckURL(url);
+        LevelsDB.updateStuckURL(level.getName(), url);
+    }
+
+    public void resetStuckURL(Level level)
+    {
+        level.setStuckURL(null);
+        LevelsDB.resetStuckURL(level.getName());
     }
 
     public boolean inCooldownMap(String playerName)
@@ -823,7 +835,7 @@ public class LevelManager {
                         if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
                         {
                             teleport = false;
-                            player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getFormattedTitle() + "&7 before teleporting to it"));
+                            player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
                             player.sendMessage(Utils.translate(
                                     "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
                             )));

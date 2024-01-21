@@ -28,7 +28,7 @@ public class FailsCMD implements CommandExecutor
                     if (playerStats.inFailMode())
                         player.sendMessage(Utils.translate(
                                 "&7You have &c" + Utils.formatNumber(playerStats.getFails()) +
-                                     " &cFails &7on &a" + playerStats.getLevel().getFormattedTitle())
+                                     " &cFails &7on &a" + playerStats.getLevel().getTitle())
                         );
                     else
                         player.sendMessage(Utils.translate("&7You have &4Fails &cOff&7. Type &c/fails toggle &7to see your fails on a level"));
@@ -73,7 +73,7 @@ public class FailsCMD implements CommandExecutor
                         if (targetStats.inFailMode())
                             player.sendMessage(Utils.translate(
                                     "&c" + targetName + " &7has &c" + Utils.formatNumber(targetStats.getFails()) +
-                                            " &cFails &7on &a" + targetStats.getLevel().getFormattedTitle())
+                                            " &cFails &7on &a" + targetStats.getLevel().getTitle())
                             );
                         else
                             player.sendMessage(Utils.translate("&c" + targetName + " has &4Fails &cOff&7"));

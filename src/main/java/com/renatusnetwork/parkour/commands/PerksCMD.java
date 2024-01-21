@@ -84,7 +84,7 @@ public class PerksCMD implements CommandExecutor
                     String title = String.join(" ", split);
 
                     perkManager.updateTitle(perk, title);
-                    sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7title to &c" + perk.getFormattedTitle()));
+                    sender.sendMessage(Utils.translate("&7You have updated &c" + perkName + " &7title to &c" + perk.getTitle()));
                 }
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
@@ -156,10 +156,10 @@ public class PerksCMD implements CommandExecutor
                         if (!perk.alreadyRequiresLevel(level))
                         {
                             perkManager.addRequiredLevel(perk, level);
-                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getFormattedTitle() + "&7 to &c" + perk.getTitle() + "&7's required levels"));
+                            sender.sendMessage(Utils.translate("&7You have added &c" + level.getTitle() + "&7 to &c" + perk.getTitle() + "&7's required levels"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is already a required level for &c" + perk.getTitle()));
+                            sender.sendMessage(Utils.translate("&c" + level.getTitle() + "&7 is already a required level for &c" + perk.getTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
@@ -182,10 +182,10 @@ public class PerksCMD implements CommandExecutor
                         if (perk.alreadyRequiresLevel(level))
                         {
                             perkManager.removeRequiredLevel(perk, level);
-                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getFormattedTitle() + "&7 from &c" + perk.getTitle() + "&7's required levels"));
+                            sender.sendMessage(Utils.translate("&7You have remove &c" + level.getTitle() + "&7 from &c" + perk.getTitle() + "&7's required levels"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&c" + level.getFormattedTitle() + "&7 is not a required level for &c" + perk.getTitle()));
+                            sender.sendMessage(Utils.translate("&c" + level.getTitle() + "&7 is not a required level for &c" + perk.getTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&c" + requiredLevel + " is not a valid level"));
@@ -242,7 +242,7 @@ public class PerksCMD implements CommandExecutor
                         {
                             perkManager.removeArmorPiece(perk, type);
                             sender.sendMessage(Utils.translate(
-                                    "&7You have remove armor piece of type &6" + type.name() + "&7to &6" + perk.getFormattedTitle()
+                                    "&7You have remove armor piece of type &6" + type.name() + "&7to &6" + perk.getTitle()
                             ));
                         }
                         else
@@ -458,7 +458,7 @@ public class PerksCMD implements CommandExecutor
                         {
                             perkManager.setPerk(perk, playerStats);
                             sender.sendMessage(Utils.translate(
-                                    "&7You have given the perk &c" + perk.getFormattedTitle() + " &7to &c" + playerStats.getName()
+                                    "&7You have given the perk &c" + perk.getTitle() + " &7to &c" + playerStats.getName()
                             ));
                         }
                         else

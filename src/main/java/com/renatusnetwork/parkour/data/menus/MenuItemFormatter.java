@@ -148,7 +148,7 @@ public class MenuItemFormatter
                     ArrayList<Level> favoriteLevels = playerStats.getFavoriteLevels();
                     for (Level level : favoriteLevels)
                     {
-                        newLore.add(" " + level.getFormattedTitle());
+                        newLore.add(" " + level.getTitle());
                         newLore.add("  &7Completions &a" + Utils.formatNumber(playerStats.getLevelCompletionsCount(level)));
 
                         LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
@@ -334,7 +334,7 @@ public class MenuItemFormatter
                 {
                     // Level Requirements Section
                     for (Level requirement : perk.getRequiredLevels())
-                        itemLore.add(Utils.translate("&7 - " + requirement.getFormattedTitle()));
+                        itemLore.add(Utils.translate("&7 - " + requirement.getTitle()));
 
                     if (price > 0)
                     {
@@ -493,11 +493,11 @@ public class MenuItemFormatter
                     price *= (1.00f - discount.getDiscount());
                 }
 
-                itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
+                itemLore.add(Utils.translate("&7Click to buy " + level.getTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
             }
             else
-                itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()));
+                itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
 
             // Item Title Section
             if (level.getPlayersInLevel() > 0)
@@ -631,7 +631,7 @@ public class MenuItemFormatter
                     Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
 
                     if (requiredLevel != null)
-                        itemLore.add(Utils.translate("&7 - " + requiredLevel.getFormattedTitle()));
+                        itemLore.add(Utils.translate("&7 - " + requiredLevel.getTitle()));
                 }
             }
 

@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.storage.mysql;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.LevelType;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
@@ -171,6 +172,7 @@ public class TablesDB
                             "price INT DEFAULT NULL, " +
                             "title VARCHAR(50) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
                             // settings
+                            "stuck_url VARCHAR(" + SettingsManager.STUCK_URL_LENGTH + ") DEFAULT NULL, " +
                             "required_permission VARCHAR(50) DEFAULT NULL, " +
                             "required_rank VARCHAR(10) DEFAULT NULL, " +
                             "respawn_y SMALLINT DEFAULT NULL, " +
