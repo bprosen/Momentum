@@ -54,7 +54,7 @@ public class Jackpot
         if (playerCount > 1)
             playersString += "s";
 
-        Bukkit.broadcastMessage(Utils.translate("&a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed the " + level.getTitle() + "&7 level"));
+        Bukkit.broadcastMessage(Utils.translate("&a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed " + level.getTitle()));
         Bukkit.broadcastMessage(Utils.translate("&6" + Utils.formatNumber(completed.size() * (level.getReward() + bonus)) + " &eCoins &7were rewarded"));
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
     }
