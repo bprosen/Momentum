@@ -13,6 +13,7 @@ import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -106,6 +107,10 @@ public class PlayerStats {
     //
     // Player Info Section
     //
+    public void setPlayer(Player player)
+    {
+        this.player = player;
+    }
 
     public void initBoard() {
         this.board = new FastBoard(player);
@@ -116,10 +121,6 @@ public class PlayerStats {
     }
 
     public void setLevelSortingType(LevelSortingType type) {
-        this.sortingType = type;
-    }
-
-    public void getLevelSortingType(LevelSortingType type) {
         this.sortingType = type;
     }
 
@@ -139,6 +140,8 @@ public class PlayerStats {
         return name;
     }
 
+    public void setName(String name) { this.name = name; }
+
     public String getDisplayName() {
         return player.getDisplayName();
     }
@@ -149,6 +152,12 @@ public class PlayerStats {
 
     public FastBoard getBoard() {
         return board;
+    }
+
+    public void deleteBoard()
+    {
+        board.delete();
+        board = null;
     }
 
     public boolean hasNightVision() {

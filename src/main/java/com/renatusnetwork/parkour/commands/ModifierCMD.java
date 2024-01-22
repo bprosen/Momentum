@@ -90,7 +90,7 @@ public class ModifierCMD implements CommandExecutor
             {
                 String playerName = a[1];
                 String modifierName = a[2];
-                PlayerStats playerStats = Parkour.getStatsManager().get(playerName);
+                PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
 
                 if (playerStats != null)
                 {
@@ -134,7 +134,7 @@ public class ModifierCMD implements CommandExecutor
             else if (a.length == 2 && a[0].equalsIgnoreCase("list"))
             {
                 String playerName = a[1];
-                PlayerStats targetStats = Parkour.getStatsManager().get(playerName);
+                PlayerStats targetStats = Parkour.getStatsManager().getByName(playerName);
 
                 if (targetStats != null)
                 {

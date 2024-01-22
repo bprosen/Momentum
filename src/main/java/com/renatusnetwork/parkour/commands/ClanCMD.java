@@ -37,7 +37,7 @@ public class ClanCMD implements CommandExecutor
                     {
                         int newMaxLevel = Integer.parseInt(a[2]);
 
-                        Clan targetClan = Parkour.getClansManager().get(clanName);
+                        Clan targetClan = Parkour.getClansManager().getIgnoreCase(clanName);
                         if (targetClan != null)
                         {
                             // make sure it is not negative level
@@ -69,7 +69,7 @@ public class ClanCMD implements CommandExecutor
                     {
                         int newMaxMembers = Integer.parseInt(a[2]);
 
-                        Clan targetClan = Parkour.getClansManager().get(clanName);
+                        Clan targetClan = Parkour.getClansManager().getIgnoreCase(clanName);
                         if (targetClan != null)
                         {
                             int memberCount = targetClan.getMembers().size();
@@ -194,7 +194,7 @@ public class ClanCMD implements CommandExecutor
                 }
                 else
                 {
-                    targetClan = Parkour.getClansManager().get(a[1]);
+                    targetClan = Parkour.getClansManager().getIgnoreCase(a[1]);
                 }
 
                 if (targetClan != null)
@@ -254,7 +254,7 @@ public class ClanCMD implements CommandExecutor
                         {
                             int newXP = Integer.parseInt(a[2]);
 
-                            Clan targetClan = Parkour.getClansManager().get(clanName);
+                            Clan targetClan = Parkour.getClansManager().getIgnoreCase(clanName);
                             if (targetClan != null)
                             {
                                 // make sure it is not negative xp
@@ -286,7 +286,7 @@ public class ClanCMD implements CommandExecutor
                         {
                             long newXP = Long.parseLong(a[2]);
 
-                            Clan targetClan = Parkour.getClansManager().get(clanName);
+                            Clan targetClan = Parkour.getClansManager().getIgnoreCase(clanName);
                             if (targetClan != null)
                             {
                                 // make sure it is not negative xp
@@ -316,7 +316,7 @@ public class ClanCMD implements CommandExecutor
                         {
                             int newLevel = Integer.parseInt(a[2]);
 
-                            Clan targetClan = Parkour.getClansManager().get(clanName);
+                            Clan targetClan = Parkour.getClansManager().getIgnoreCase(clanName);
                             if (targetClan != null)
                             {
                                 // make sure it is actually a level, we cannot set beyond whats upgradable
@@ -672,7 +672,7 @@ public class ClanCMD implements CommandExecutor
                 {
                     if (player.hasPermission("rn-parkour.admin"))
                     {
-                        Clan targetClan = clansManager.get(a[1]);
+                        Clan targetClan = clansManager.getIgnoreCase(a[1]);
 
                         if (targetClan != null)
                         {

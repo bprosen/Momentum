@@ -13,6 +13,7 @@ import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -26,7 +27,6 @@ public class StatsDB {
      */
     public static void loadPlayerInformation(PlayerStats playerStats)
     {
-
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "*",
@@ -195,10 +195,9 @@ public class StatsDB {
     }
 
     // this will update the player name all across the database
-    private static void updatePlayerName(PlayerStats playerStats) {
+    public static void updatePlayerName(PlayerStats playerStats) {
         // update in stats
-        DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET " +
-                "name='" + playerStats.getName() + "' WHERE uuid=" + playerStats.getUUID());
+        DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET name=? WHERE uuid=?", playerStats.getName(), playerStats.getUUID());
     }
 
     public static void updateMenuSortLevelsType(PlayerStats playerStats, LevelSortingType type)

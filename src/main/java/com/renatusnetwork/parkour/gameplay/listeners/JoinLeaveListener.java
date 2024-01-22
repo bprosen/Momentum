@@ -19,6 +19,7 @@ import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sun.tools.sjavac.CopyFile;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -57,7 +58,8 @@ public class JoinLeaveListener implements Listener
         PlayerHider.hideHiddenPlayersFromJoined(player);
 
         // send message to op people that there are undecided plots
-        if (player.isOp()) {
+        if (player.isOp())
+        {
             List<Plot> submittedPlotList = Parkour.getPlotsManager().getSubmittedPlots();
 
             if (!submittedPlotList.isEmpty())
@@ -71,7 +73,14 @@ public class JoinLeaveListener implements Listener
         Location spawnLoc = event.getSpawnLocation();
 
         StatsManager statsManager = Parkour.getStatsManager();
-        PlayerStats playerStats = statsManager.add(player);
+
+        PlayerStats playerStats = statsManager.getOffline(player.getUniqueId().toString());
+        boolean fromOffline = playerStats != null;
+
+        if (!fromOffline)
+            playerStats = statsManager.add(player);
+        else
+            statsManager.addFromOffline(playerStats, player); // add from offline
 
         // load level here in sync
         ProtectedRegion region = WorldGuard.getRegion(spawnLoc);
@@ -91,31 +100,36 @@ public class JoinLeaveListener implements Listener
             }
         }
 
+        PlayerStats finalPlayerStats = playerStats;
         new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                statsManager.loadStats(playerStats);
+                finalPlayerStats.initBoard(); // init board always on join
 
-                if (playerStats.inLevel())
+                // dont need to load if not offline
+                if (!fromOffline)
+                    statsManager.loadStats(finalPlayerStats);
+
+                if (finalPlayerStats.inLevel())
                 {
-                    Level level = playerStats.getLevel();
+                    Level level = finalPlayerStats.getLevel();
 
                     // if the level they are being added to is an ascendance level, add them to the list
                     if (level.isAscendance())
-                        statsManager.enteredAscendance(playerStats);
+                        statsManager.enteredAscendance(finalPlayerStats);
 
-                    Location checkpoint = playerStats.getCheckpoint(level);
-                    if (checkpoint != null && !playerStats.isAttemptingMastery()) // only load cp if they are not in a mastery attempt
-                        playerStats.setCurrentCheckpoint(checkpoint);
+                    Location checkpoint = finalPlayerStats.getCheckpoint(level);
+                    if (checkpoint != null && !finalPlayerStats.isAttemptingMastery()) // only load cp if they are not in a mastery attempt
+                        finalPlayerStats.setCurrentCheckpoint(checkpoint);
 
                     // is elytra level, then set elytra in sync (player inventory changes)
                     if (level.isElytra())
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                Parkour.getStatsManager().toggleOnElytra(playerStats);
+                                Parkour.getStatsManager().toggleOnElytra(finalPlayerStats);
                             }
                         }.runTask(Parkour.getPlugin());
                 }
@@ -126,9 +140,10 @@ public class JoinLeaveListener implements Listener
     @EventHandler
     public void onQuit(PlayerQuitEvent event)
     {
-
         Player player = event.getPlayer();
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+        StatsManager statsManager = Parkour.getStatsManager();
+        PlayerStats playerStats = statsManager.get(player);
         RaceManager raceManager = Parkour.getRaceManager();
         EventManager eventManager = Parkour.getEventManager();
         InfiniteManager infiniteManager = Parkour.getInfiniteManager();
@@ -178,15 +193,17 @@ public class JoinLeaveListener implements Listener
         }
 
         // toggle off elytra armor
-        Parkour.getStatsManager().toggleOffElytra(playerStats);
+        statsManager.toggleOffElytra(playerStats);
 
         // do not need to check, as method already checks
         clansManager.toggleClanChat(player.getName(), null);
         clansManager.toggleChatSpy(player.getName(), true);
 
-        playerStats.getBoard().delete();
+        playerStats.deleteBoard();
 
         // finally, remove them from the stats list
-        Parkour.getStatsManager().remove(playerStats);
+        statsManager.remove(playerStats);
+
+        statsManager.addOffline(playerStats); // add to offline cache
     }
 }

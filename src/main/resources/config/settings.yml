@@ -8,6 +8,7 @@ database:
   password: ""
 
 main_world: "parkour"
+max_offline_cache_size: 10
 bank:
   radiant:
     min_starting_bid: 100

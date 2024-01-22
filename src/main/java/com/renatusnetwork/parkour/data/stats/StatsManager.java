@@ -54,16 +54,19 @@ public class StatsManager {
     private HashMap<Integer, RecordsLBPosition> recordsLB;
     private HashSet<String> saidGG;
 
-    private BukkitTask task;
+    private BukkitTask ggTask;
     private boolean loadingLeaderboards;
 
     private int totalPlayers;
     private long totalCoins;
 
+    private LinkedHashMap<String, PlayerStats> offlineCache;
+
     public StatsManager(Plugin plugin)
     {
         this.playerStatsUUID = new HashMap<>();
         this.playerStatsName = new HashMap<>();
+        this.offlineCache = new LinkedHashMap<>();
         this.ascendancePlayerList = new HashSet<>();
         this.globalPersonalCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
         this.coinsLB = new HashMap<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
@@ -112,7 +115,6 @@ public class StatsManager {
     public void loadStats(PlayerStats playerStats)
     {
         // load all db and player stats needed
-        playerStats.initBoard();
         StatsDB.loadPlayerInformation(playerStats);
         StatsDB.loadBoughtLevels(playerStats);
         CheckpointDB.loadCheckpoints(playerStats);
@@ -143,6 +145,21 @@ public class StatsManager {
 
         playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
     }
+
+    public void addOffline(PlayerStats playerStats)
+    {
+        offlineCache.put(playerStats.getUUID(), playerStats);
+
+        // trim the last element if its over the max
+        if (offlineCache.size() > Parkour.getSettingsManager().max_offline_cache_size)
+        {
+            Iterator<Map.Entry<String, PlayerStats>> iterator = offlineCache.entrySet().iterator();
+            // tail insertion means first one is the last
+            offlineCache.remove(iterator.next().getKey());
+        }
+    }
+
+    public PlayerStats getOffline(String uuid) { return offlineCache.get(uuid); }
 
     public PlayerStats getByName(String playerName)
     {
@@ -206,8 +223,26 @@ public class StatsManager {
 
     public boolean isInAscendance(PlayerStats playerStats) { return ascendancePlayerList.contains(playerStats); }
 
-    public boolean exists(String playerName) {
-        return playerStatsName.containsKey(playerName);
+    public void addFromOffline(PlayerStats playerStats, Player player)
+    {
+        offlineCache.remove(playerStats.getUUID()); // clean cache
+
+        playerStats.setPlayer(player); // update player object
+
+        String playerName = player.getName();
+
+        // update player name logic
+        if (!playerStats.getName().equals(playerName))
+        {
+            playerStats.setName(playerName);
+            StatsDB.updatePlayerName(playerStats);
+        }
+
+        synchronized (playerStatsUUID)
+        {
+            playerStatsUUID.put(playerStats.getUUID(), playerStats);
+            playerStatsName.put(playerStats.getName(), playerStats);
+        }
     }
 
     public PlayerStats add(Player player)
@@ -221,13 +256,6 @@ public class StatsManager {
 
             return playerStats;
         }
-    }
-
-    public void addUnloadedPlayers()
-    {
-        for (Player player : Bukkit.getOnlinePlayers())
-            if (!exists(player.getUniqueId().toString()))
-                add(player);
     }
 
     public void remove(PlayerStats playerStats)
@@ -247,7 +275,7 @@ public class StatsManager {
 
     public void addGG(PlayerStats playerStats)
     {
-        if (task != null && !saidGG.contains(playerStats.getName()))
+        if (ggTask != null && !saidGG.contains(playerStats.getName()))
         {
             int reward = Parkour.getSettingsManager().default_gg_coin_reward;
 
@@ -280,11 +308,11 @@ public class StatsManager {
 
     public void runGGTimer()
     {
-        if (task != null)
+        if (ggTask != null)
             // cancel and rerun timer
-            task.cancel();
+            ggTask.cancel();
 
-            task = new BukkitRunnable()
+            ggTask = new BukkitRunnable()
         {
             @Override
             public void run()
@@ -300,7 +328,7 @@ public class StatsManager {
                     Bukkit.broadcastMessage(Utils.translate("&3" + saidGG.size() + " &7" + playerString + " said &3&lGG&b!"));
                 }
                 saidGG.clear();
-                task = null;
+                ggTask = null;
             }
         }.runTaskLater(Parkour.getPlugin(), Parkour.getSettingsManager().default_gg_timer * 20);
     }

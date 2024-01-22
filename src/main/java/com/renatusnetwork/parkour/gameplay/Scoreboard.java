@@ -19,6 +19,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Time;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -108,7 +109,7 @@ public class Scoreboard {
             }
             else
             {
-                playerStats.getBoard().updateTitle(Utils.translate("&c&lRenatus Network"));
+                playerStats.getBoard().updateTitle(Utils.translate("&c&lParkour"));
 
                 Level level = playerStats.getLevel();
                 EventManager eventManager = Parkour.getEventManager();

@@ -94,7 +94,6 @@ public class Parkour extends JavaPlugin {
 
         // start schedulers and any settings
         Scoreboard.startScheduler(plugin);
-        stats.addUnloadedPlayers();
 
         getLogger().info("RN-Parkour Enabled");
     }
@@ -102,22 +101,8 @@ public class Parkour extends JavaPlugin {
     @Override
     public void onDisable() {
         // save and do all shutdown methods
-        PracticeHandler.shutdown();
-        SpectatorHandler.shutdown();
-        infinite.shutdown();
-        events.shutdown();
-        races.shutdown();
-        levels.shutdown();
-        blackmarket.shutdown();
-
-        // close database and unload classes
-        database.close();
         unload();
-        unregisterPlaceholders();
-
         getLogger().info("RN-Parkour Disabled");
-
-        plugin = null;
     }
 
     private void registerEvents() {
@@ -228,37 +213,28 @@ public class Parkour extends JavaPlugin {
         blackmarket = new BlackMarketManager();
     }
 
-    private static void unload() {
-        menus = null;
-        checkpoint = null;
-        clans = null;
-        stats = null;
-        perks = null;
-        levels = null;
-        ranks = null;
-        races = null;
-        infinite = null;
-        locations = null;
-        settings = null;
-        configs = null;
-        database = null;
-        plots = null;
-        protocol = null;
-        bank = null;
-        events = null;
-        saves = null;
-        blackmarket = null;
-        modifiers = null;
+    private static void unload()
+    {
+        PracticeHandler.shutdown();
+        SpectatorHandler.shutdown();
+        infinite.shutdown();
+        events.shutdown();
+        races.shutdown();
+        levels.shutdown();
+        blackmarket.shutdown();
+
+        // close database and unload classes
+        database.close();
+
+        // unregister if not null
+        if (placeholders != null)
+            placeholders.unregister();
     }
 
-    private void registerPlaceholders()
+    private static void registerPlaceholders()
     {
         placeholders = new Placeholders();
         placeholders.register();
-    }
-    private void unregisterPlaceholders()
-    {
-        placeholders.unregister();
     }
 
     public static Plugin getPlugin() { return plugin; }

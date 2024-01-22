@@ -323,11 +323,18 @@ public class LevelsDB {
         {
             connection.setAutoCommit(false);
 
-            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVELS_TABLE + " WHERE name='" + levelName + "'");
+            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVELS_TABLE + " WHERE name=?", levelName);
 
             // this is just for extra clean up since they are not foreign key relationships
-            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name='" + levelName + "-spawn'");
-            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name='" + levelName + "-completion'");
+            DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name=?",
+                    SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName
+                    ));
+
+            DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name=?",
+                    SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName
+                    ));
 
             // commit
             connection.commit();

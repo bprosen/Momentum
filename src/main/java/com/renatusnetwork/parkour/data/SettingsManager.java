@@ -188,6 +188,8 @@ public class SettingsManager {
 
     public String main_menu_name;
 
+    public int max_offline_cache_size;
+
     public SettingsManager(FileConfiguration settings)
     {
         cooldown_calendar = Calendar.getInstance();
@@ -197,6 +199,7 @@ public class SettingsManager {
 
     public void load(FileConfiguration settings) {
         main_world = Bukkit.getWorld(settings.getString("main_world"));
+        max_offline_cache_size = settings.getInt("max_offline_cache_size");
         signs_first_line = settings.getString("signs.first_line");
         signs_second_line_completion = settings.getString("signs.second_line.completion");
         signs_second_line_spawn = settings.getString("signs.second_line.spawn");
