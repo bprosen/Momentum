@@ -16,46 +16,22 @@ public class ProfileCMD implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player))
             return true;
-        }
 
         Player player = (Player) sender;
+        PlayerStats playerStats;
 
-        if (a.length >= 0) {
+        // get properly through if-else
+        if (a.length >= 1)
+            playerStats = Parkour.getStatsManager().getByName(a[0]);
+        else
+            playerStats = Parkour.getStatsManager().get(player);
 
-            MenuManager menuManager = Parkour.getMenuManager();
-
-            String menuName = "profile";
-            int pageNumber = 1;
-
-            if (menuManager.exists(menuName))
-            {
-                PlayerStats playerStats;
-
-                // get properly through if-else
-                if (a.length >= 1)
-                    playerStats = Parkour.getStatsManager().getByName(a[0]);
-                else
-                    playerStats = Parkour.getStatsManager().get(player);
-
-                if (playerStats != null) {
-
-                    Inventory inventory = menuManager.getInventory(playerStats, menuName, pageNumber);
-
-                    if (inventory != null) {
-                        player.openInventory(inventory);
-                        menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
-                        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
-
-                    } else {
-                        sender.sendMessage(Utils.translate("&cError loading the inventory"));
-                    }
-                } else {
-                    sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online!"));
-                }
-            }
-        }
+        if (playerStats != null)
+            Parkour.getMenuManager().openInventory(playerStats, "profile", true);
+        else
+            sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online!"));
         return false;
     }
 }

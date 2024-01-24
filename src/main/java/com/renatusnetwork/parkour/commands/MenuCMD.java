@@ -23,27 +23,11 @@ public class MenuCMD implements CommandExecutor {
             {
                 Player player = (Player) sender;
 
-                String menuName = a[1];
                 int pageNumber = 1;
-
                 if (a.length == 3 && Utils.isInteger(a[2]))
                     pageNumber = Integer.parseInt(a[2]);
 
-                if (menuManager.exists(menuName))
-                {
-                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                    Inventory inventory = menuManager.getInventory(playerStats, menuName, pageNumber);
-
-                    if (inventory != null)
-                    {
-                        player.openInventory(inventory);
-                        menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
-                    }
-                    else
-                        sender.sendMessage(Utils.translate("&cError loading the inventory"));
-                }
-                else
-                    sender.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
+                menuManager.openInventory(Parkour.getStatsManager().get(player), a[1], pageNumber, true);
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
             {

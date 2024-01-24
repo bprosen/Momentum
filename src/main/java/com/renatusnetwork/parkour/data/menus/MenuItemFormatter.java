@@ -65,11 +65,10 @@ public class MenuItemFormatter
             return getPerk(playerStats, menuItem);
         if (menuItem.getType().equals("bank"))
             return getBankItem(menuItem);
-        if (menuItem.getType().equals("open"))
+        if (menuItem.hasOpenMenu() && !menuItem.getOpenMenu().getMenu().getName().equalsIgnoreCase(Parkour.getSettingsManager().main_menu_name))
             return enchantMenuItem(
                     playerStats, menuItem,
-                    Parkour.getMenuManager().getMenu(menuItem.getTypeValue())
-            );
+                    menuItem.getOpenMenu().getMenu());
         if (menuItem.getType().equals("infinite-mode"))
             return getInfiniteMode(playerStats, menuItem);
         if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("level-sorting"))
@@ -386,9 +385,7 @@ public class MenuItemFormatter
     {
         // get item and levels, clone so it can change properly
         ItemStack item = new ItemStack(menuItem.getItem());
-        Set<Level> levelsInMenu = Parkour.getMenuManager().getLevelsFromMenuDeep(
-                Parkour.getMenuManager().getMenu(menuItem.getMenuName()), menu
-        );
+        Set<Level> levelsInMenu = Parkour.getMenuManager().getLevelsFromMenuDeep(menuItem.getMenu(), menu);
 
         if (levelsInMenu != null && !levelsInMenu.isEmpty())
         {

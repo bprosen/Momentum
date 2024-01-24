@@ -8,22 +8,33 @@ import java.util.List;
 
 public class MenuItem
 {
-    private String name;
-    private int pageNumber;
+    private MenuPage menuPage;
     private int slot;
     private ItemStack item;
     private String title;
     private String type;
     private String typeValue;
+    private MenuPage openOtherMenu;
     private boolean glow;
     private List<String> lore;
     private List<String> commands;
     private List<String> consoleCommands;
-
-    public MenuItem(String menuName, int pageNumber, int slot, ItemStack item, String title, String type, String typeValue, List<String> lore, List<String> commands, List<String> consoleCommands, boolean glow)
+    public MenuItem(
+            MenuPage menuPage,
+            MenuPage openOtherMenu,
+            int slot,
+            ItemStack item,
+            String title,
+            String type,
+            String typeValue,
+            List<String> lore,
+            List<String> commands,
+            List<String> consoleCommands,
+            boolean glow
+    )
     {
-        this.name = menuName;
-        this.pageNumber = pageNumber;
+        this.menuPage = menuPage;
+        this.openOtherMenu = openOtherMenu;
         this.slot = slot;
         this.item = item;
         this.title = title;
@@ -35,25 +46,23 @@ public class MenuItem
         this.glow = glow;
     }
 
-    public MenuItem(Menu menu, MenuPage menuPage, int slot)
+    public MenuItem(MenuPage menuPage, int slot)
     {
-        this.name = menu.getName();
-        this.pageNumber = menuPage.getPageNumber();
+        this.menuPage = menuPage;
         this.slot = slot;
 
-        load(menu, menuPage, String.valueOf(slot));
+        load(menuPage.getMenu(), menuPage, String.valueOf(slot));
     }
 
-    public MenuItem(Menu menu, MenuPage menuPage, int slot, int slotFrom, int slotTo)
+    public MenuItem(MenuPage menuPage, int slot, int slotFrom, int slotTo)
     {
-        this.name = menu.getName();
-        this.pageNumber = menuPage.getPageNumber();
+        this.menuPage = menuPage;
         this.slot = slot;
 
-        load(menu, menuPage, slotFrom + "-" + slotTo);
+        load(menuPage.getMenu(), menuPage, slotFrom + "-" + slotTo);
     }
 
-    private void load(Menu menu, MenuPage menuPage, String rangeWithin)
+    public void load(Menu menu, MenuPage menuPage, String rangeWithin)
     {
         item = MenusYAML.getItem(menu.getName(), menuPage.getPageNumber(), rangeWithin);
         title = MenusYAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), rangeWithin);
@@ -63,21 +72,26 @@ public class MenuItem
         commands = MenusYAML.getCommands(menu.getName(), menuPage.getPageNumber(), rangeWithin);
         consoleCommands = MenusYAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), rangeWithin);
         glow = MenusYAML.getGlow(menu.getName(), menuPage.getPageNumber(), rangeWithin);
+        openOtherMenu = MenusYAML.getOpenOtherMenu(menu.getName(), menuPage.getPageNumber(), rangeWithin);
     }
 
-    public MenuItem clone(int newPageNumber, int newSlot)
+    public MenuPage getOpenMenu() { return openOtherMenu; }
+
+    public boolean hasOpenMenu() { return openOtherMenu != null; }
+
+    public MenuItem clone(MenuPage newPage, int newSlot)
     {
-        return new MenuItem(name, newPageNumber, newSlot, item, title, type, typeValue, lore, commands, consoleCommands, glow);
+        return new MenuItem(newPage, openOtherMenu, newSlot, item, title, type, typeValue, lore, commands, consoleCommands, glow);
     }
 
-    public String getMenuName()
+    public Menu getMenu()
     {
-        return name;
+        return menuPage.getMenu();
     }
 
-    public void setPageNumber(int pageNumber) { this.pageNumber = pageNumber; }
+    public void setPage(MenuPage menuPage) { this.menuPage = menuPage; }
 
-    public int getPageNumber() { return pageNumber; }
+    public MenuPage getPage() { return menuPage; }
 
     public int getSlot() {
         return slot;

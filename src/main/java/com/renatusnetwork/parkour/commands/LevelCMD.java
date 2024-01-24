@@ -335,7 +335,7 @@ public class LevelCMD implements CommandExecutor
 
                     if (level != null)
                     {
-                        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+                        List<LevelCompletion> leaderboard = level.getLeaderboard();
 
                         if (place <= leaderboard.size() && place > 0)
                         {
@@ -354,7 +354,7 @@ public class LevelCMD implements CommandExecutor
                                     // if deleting record
                                     if (place == 1)
                                     {
-                                        HashMap<Integer, LevelCompletion> newLeaderbaord = level.getLeaderboard();
+                                        List<LevelCompletion> newLeaderbaord = level.getLeaderboard();
 
                                         if (!newLeaderbaord.isEmpty())
                                         {
@@ -373,8 +373,8 @@ public class LevelCMD implements CommandExecutor
                                                     newHolderStats.addRecord(newHolder);
                                             }
                                             // update both in db
-                                            CompletionsDB.updateRecord(oldHolder);
-                                            CompletionsDB.updateRecord(newHolder);
+                                            CompletionsDB.updateRecord(oldHolder, false);
+                                            CompletionsDB.updateRecord(newHolder, true);
                                         }
                                     }
 

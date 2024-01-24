@@ -44,30 +44,8 @@ public class RateCMD implements CommandExecutor {
                 if (playerStats.hasCompleted(level))
                 {
                     if (!level.hasRated(playerStats.getName()))
-                    {
                         // menu
-                        String menuName = "rate_level";
-                        MenuManager menuManager = Parkour.getMenuManager();
-
-                        if (menuManager.exists(menuName))
-                        {
-                            Inventory inventory = menuManager.getInventory(playerStats, menuName, 1);
-                            if (inventory != null)
-                            {
-                                // copy it into new inv with new title
-                                Inventory newInv = Bukkit.createInventory(null, inventory.getSize(), Utils.translate(
-                                        inventory.getTitle().replace("%level_name%", level.getTitle())));
-                                newInv.setContents(inventory.getContents());
-
-                                player.openInventory(newInv);
-                                menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, 1);
-                            }
-                            else
-                                player.sendMessage(Utils.translate("&cError loading the inventory"));
-                        }
-                        else
-                            player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
-                    }
+                        Parkour.getMenuManager().openInventory(playerStats, "rate_level", true);
                     else
                         sender.sendMessage(Utils.translate("&cYou have already rated &4" + level.getTitle()));
                 }

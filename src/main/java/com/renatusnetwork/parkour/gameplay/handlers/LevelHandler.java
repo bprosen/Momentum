@@ -133,7 +133,10 @@ public class LevelHandler {
 
             // add mastery
             if (completedMastery)
+            {
                 playerStats.addMasteryCompletion(level.getName());
+                Parkour.getStatsManager().leftMastery(playerStats);
+            }
 
             // used for playing sound!
             int beforeClanLevel = -1;
@@ -293,7 +296,7 @@ public class LevelHandler {
                 Location locationTo = level.getCompletionLocation();
 
                 // If not rank up level or has a start location and is grinding, set to start loc
-                if (!playerStats.isAttemptingRankup() && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
+                if (!playerStats.isAttemptingMastery() && !playerStats.isAttemptingRankup() && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
                 {
                     locationTo = level.getStartLocation();
                     playerStats.resetFails(); // reset fails in grinding
@@ -301,7 +304,10 @@ public class LevelHandler {
 
                 // rank them up!
                 if (level.isRankUpLevel() && playerStats.isAttemptingRankup())
+                {
                     Parkour.getRanksManager().doRankUp(player);
+                    Parkour.getStatsManager().leftRankup(playerStats);
+                }
 
                 // add cooldown
                 levelManager.addLevelCooldown(playerStats.getName(), level);

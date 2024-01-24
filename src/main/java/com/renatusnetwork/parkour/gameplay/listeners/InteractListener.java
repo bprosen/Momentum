@@ -99,27 +99,7 @@ public class InteractListener implements Listener {
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile")))
             {
                 event.setCancelled(true);
-
-                String menuName = "profile";
-                int pageNumber = 1;
-                MenuManager menuManager = Parkour.getMenuManager();
-
-                if (menuManager.exists(menuName))
-                {
-                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                    Inventory inventory = menuManager.getInventory(playerStats, menuName, pageNumber);
-
-                    if (inventory != null)
-                    {
-                        player.openInventory(inventory);
-                        menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
-                        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
-                    }
-                    else
-                    {
-                        player.sendMessage(Utils.translate("&cError loading the inventory"));
-                    }
-                }
+                Parkour.getMenuManager().openInventory(Parkour.getStatsManager().get(player), "profile", true);
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset")))
             {

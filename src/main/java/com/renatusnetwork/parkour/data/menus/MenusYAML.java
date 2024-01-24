@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.menus;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -95,8 +96,6 @@ public class MenusYAML {
             return "perk";
         if (isSet(menuName, itemPath + ".teleport"))
             return "teleport";
-        if (isSet(menuName, itemPath + ".open"))
-            return "open";
         if (isSet(menuName, itemPath + ".rate"))
             return "rate";
         if (isSet(menuName, itemPath + ".type"))
@@ -114,6 +113,23 @@ public class MenusYAML {
     public static String getItemTypeValue(String menuName, int pageNumber, String itemSlot, String type)
     {
         return menusConfig.getString(menuName + "." + pageNumber + "." + itemSlot + "." + type, "");
+    }
+
+    public static MenuPage getOpenOtherMenu(String menuName, int pageNumber, String itemSlot)
+    {
+        if (menusConfig.isConfigurationSection(menuName + "." + pageNumber + "." + itemSlot + ".open"))
+        {
+            String openMenu = menusConfig.getString(menuName + "." + pageNumber + "." + itemSlot + ".open.menu");
+
+            int openPageNumber = 1;
+            if (menusConfig.isSet(menuName + "." + pageNumber + "." + itemSlot + ".open.page"))
+                openPageNumber = menusConfig.getInt(menuName + "." + pageNumber + "." + itemSlot + ".open.page");
+
+            Menu open = Parkour.getMenuManager().getMenu(openMenu);
+            if (open != null)
+                return Parkour.getMenuManager().getMenu(openMenu).getPage(openPageNumber);
+        }
+        return null;
     }
 
     public static boolean hasItem(String menuName, int pageNumber, String itemSlot) {

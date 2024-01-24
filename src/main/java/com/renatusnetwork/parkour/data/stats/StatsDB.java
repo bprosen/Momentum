@@ -225,17 +225,21 @@ public class StatsDB {
         );
     }
 
-    public static void updateAttemptingRankup(PlayerStats playerStats)
+    public static void updateAttemptingRankup(PlayerStats playerStats, boolean value)
     {
+        int valueInt = value ? 1 : 0;
+
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_rankup=NOT attempting_rankup WHERE uuid=?", playerStats.getUUID()
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_rankup=? WHERE uuid=?", valueInt, playerStats.getUUID()
         );
     }
 
-    public static void updateAttemptingMastery(PlayerStats playerStats)
+    public static void updateAttemptingMastery(PlayerStats playerStats, boolean value)
     {
+        int valueInt = value ? 1 : 0;
+
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_mastery=NOT attempting_mastery WHERE uuid=?", playerStats.getUUID()
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_mastery=? WHERE uuid=?", valueInt, playerStats.getUUID()
         );
     }
 

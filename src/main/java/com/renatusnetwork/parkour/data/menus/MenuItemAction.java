@@ -105,7 +105,7 @@ public class MenuItemAction {
             performTeleportItem(playerStats, menuItem);
         else if (itemType.equals("bank"))
             performBankItem(playerStats, menuItem);
-        else if (itemType.equals("open"))
+        else if (menuItem.getOpenMenu() != null) // replacement for type open, since we define page numbers
             performOpenItem(playerStats, menuItem);
         else if (itemType.equals("rate"))
             performLevelRate(player, menuItem);
@@ -121,17 +121,17 @@ public class MenuItemAction {
                      typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite"))
                 performCosmeticsClear(player, typeValue, menuItem);
             else if (typeValue.equals("level-sorting") && !Parkour.getLevelManager().isBuyingLevelMenu(player.getName())) // do not allow switching sorting if buying
-                performLevelSort(playerStats);
+                performLevelSort(playerStats, menuItem.getPage());
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
-    private static void performLevelSort(PlayerStats playerStats)
+    private static void performLevelSort(PlayerStats playerStats, MenuPage menuPage)
     {
         Parkour.getStatsManager().updateMenuSortLevelsType(playerStats, LevelSortingType.getNext(playerStats.getLevelSortingType()));
-        Parkour.getMenuManager().updateInventory(playerStats, playerStats.getPlayer().getOpenInventory());
+        Parkour.getMenuManager().updateInventory(playerStats, playerStats.getPlayer().getOpenInventory(), menuPage);
     }
 
     private static void performInfiniteModeChange(PlayerStats playerStats, MenuItem menuItem)
@@ -320,7 +320,7 @@ public class MenuItemAction {
                     {
                         Parkour.getStatsManager().removeCoins(playerStats, price);
                         Parkour.getPerkManager().bought(playerStats, perk);
-                        Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory());
+                        Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menuItem.getPage());
                         runPerkCommands(perk, playerStats);
                     }
                 }
@@ -358,7 +358,6 @@ public class MenuItemAction {
     public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
     {
         MenuManager menuManager = Parkour.getMenuManager();
-        String menuName = menuItem.getMenuName();
         LevelManager levelManager = Parkour.getLevelManager();
 
         if (!levelManager.isBuyingLevel(player.getName(), level))
@@ -394,7 +393,7 @@ public class MenuItemAction {
 
                 List<Integer> slots = levelManager.getBuyingLevelsSlots(player.getName());
 
-                Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                Inventory newInventory = MenuUtils.createInventory(menuItem.getPage(), openInventory.getSize(), openInventory.getTitle());
                 newInventory.setContents(openInventory.getContents()); // set contents
 
                 // update current bought lore
@@ -445,7 +444,7 @@ public class MenuItemAction {
 
                     ItemStack preCancelItem = openInventory.getItem(menuItem.getSlot());
 
-                    Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                    Inventory newInventory = MenuUtils.createInventory(menuItem.getPage(), openInventory.getSize(), openInventory.getTitle());
                     newInventory.setContents(openInventory.getContents()); // set contents
                     newInventory.setItem(menuItem.getSlot(), itemStack);
 
@@ -468,7 +467,7 @@ public class MenuItemAction {
                                         {
                                             Inventory lastEditedInventory = cancelled.getLastEditedInventory();
 
-                                            Inventory revertInventory = Bukkit.createInventory(null, lastEditedInventory.getSize(), lastEditedInventory.getTitle());
+                                            Inventory revertInventory = MenuUtils.createInventory(menuItem.getPage(), lastEditedInventory.getSize(), lastEditedInventory.getTitle());
                                             revertInventory.setContents(lastEditedInventory.getContents()); // set contents
 
                                             // cancel tasks
@@ -520,12 +519,8 @@ public class MenuItemAction {
 
                 // do not teleport if bought more than one!
                 if (levels.size() > 1)
-                {
                     // update and open inventory
-                    Inventory inventory = Parkour.getMenuManager().getInventory(playerStats, menuName, menuItem.getPageNumber());
-                    player.openInventory(inventory);
-                    Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menuName, menuItem.getPageNumber());
-                }
+                    menuManager.openInventory(playerStats, menuItem.getMenu().getName(), menuItem.getPage().getPageNumber(), false);
                 else
                 {
                     // teleport if only one
@@ -712,20 +707,11 @@ public class MenuItemAction {
         }
     }
 
-    private static void performOpenItem(PlayerStats playerStats, MenuItem menuItem) {
-        Menu menu = Parkour.getMenuManager().getMenuFromStartingChars(menuItem.getTypeValue());
+    private static void performOpenItem(PlayerStats playerStats, MenuItem menuItem)
+    {
+        MenuPage menuPage = menuItem.getOpenMenu();
 
-        if (menu != null) {
-            int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
-
-            Player player = playerStats.getPlayer();
-            Inventory inventory = Parkour.getMenuManager().getInventory(playerStats, menu.getName(), pageNumber);
-
-            if (inventory != null) {
-                player.closeInventory();
-                player.openInventory(inventory);
-                Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menu.getName(), pageNumber);
-            }
-        }
+        if (menuPage != null)
+            Parkour.getMenuManager().openInventory(playerStats, menuPage.getMenu().getName(), menuPage.getPageNumber(), false);
     }
 }

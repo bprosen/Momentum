@@ -379,7 +379,7 @@ public class db implements CommandExecutor
                             while (results.next())
                             {
                                 DatabaseQueries.runQuery(
-                                        "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " SET record=(1) WHERE level_name=? AND time_taken=?",
+                                        "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " SET record=1 WHERE level_name=? AND time_taken=?",
                                         results.getString("level_name"), results.getInt("fastest")
                                 );
                                 recordCounter++;
@@ -540,7 +540,7 @@ public class db implements CommandExecutor
                                             boolean glow = perksConfig.getBoolean(perkName + ".items." + type +".glow", false);
 
                                             if (glow)
-                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=(1) WHERE perk_name=?", perkName);
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=1 WHERE perk_name=?", perkName);
                                         }
                                     }
                                 }

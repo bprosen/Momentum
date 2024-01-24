@@ -186,6 +186,7 @@ public class Parkour extends JavaPlugin {
         stats = new StatsManager(plugin);
         levels = new LevelManager(plugin);
         menus = new MenuManager();
+        menus.loadItems();
         levels.loadLevelsInMenus(); // load after loading menus
         levels.pickFeatured();
         menus.loadConnectedMenus();

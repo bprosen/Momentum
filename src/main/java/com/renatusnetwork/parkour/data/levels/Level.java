@@ -41,7 +41,7 @@ public class Level
     private HashMap<String, Integer> ratings;
     private List<String> requiredLevels;
     private List<PotionEffect> potionEffects;
-    private HashMap<Integer, LevelCompletion> leaderboard;
+    private List<LevelCompletion> leaderboard;
     private List<String> commands;
 
     public Level(String levelName, long creationSeconds)
@@ -50,7 +50,7 @@ public class Level
         this.ratings = new HashMap<>();
         this.requiredLevels = new ArrayList<>();
         this.potionEffects = new ArrayList<>();
-        this.leaderboard = new HashMap<>();
+        this.leaderboard = new ArrayList<>();
         this.commands = new ArrayList<>();
         this.liquidResetPlayer = true; // default is true
         this.creationTime = creationSeconds;
@@ -327,13 +327,13 @@ public class Level
 
     public boolean isAscendance() { return type == LevelType.ASCENDANCE; }
 
-    public HashMap<Integer, LevelCompletion> getLeaderboard() {
+    public List<LevelCompletion> getLeaderboard() {
         return leaderboard;
     }
 
-    public void setLeaderboard(HashMap<Integer, LevelCompletion> leaderboard) { this.leaderboard = leaderboard; }
+    public void setLeaderboard(List<LevelCompletion> leaderboard) { this.leaderboard = leaderboard; }
 
-    public LevelCompletion getRecordCompletion() { return leaderboard.get(1); }
+    public LevelCompletion getRecordCompletion() { return leaderboard.get(0); }
 
     public boolean isRequiredLevel(String levelName) { return requiredLevels.contains(levelName); }
 

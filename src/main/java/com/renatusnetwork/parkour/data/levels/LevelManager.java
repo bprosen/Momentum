@@ -261,7 +261,7 @@ public class LevelManager {
         {
             if (!Parkour.getStatsManager().isLoadingLeaderboards())
             {
-                HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+                List<LevelCompletion> leaderboard = level.getLeaderboard();
 
                 if (!leaderboard.isEmpty())
                 {
@@ -276,34 +276,31 @@ public class LevelManager {
                         if (firstPlace.getName().equalsIgnoreCase(playerName) &&
                             firstPlace.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
                         {
-                            leaderboard.remove(firstPlace);
+                            leaderboard.remove(0);
                             alreadyFirstPlace = true;
                         }
                         // otherwise, search for where it is
                         else
                         {
                             int lbPositionToRemove = -1;
-                            boolean completionSlower = false;
 
-                            for (int i = 1; i < leaderboard.size(); i++)
+                            for (int i = 0; i < leaderboard.size(); i++)
                             {
                                 LevelCompletion completion = leaderboard.get(i);
 
                                 if (completion.getName().equalsIgnoreCase(playerName))
                                 {
                                     if (completion.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
+                                    {
                                         lbPositionToRemove = i;
-                                    else
-                                        completionSlower = true;
-
-                                    break;
+                                        break;
+                                    }
+                                    else return;
                                 }
                             }
 
                             if (lbPositionToRemove > -1)
                                 leaderboard.remove(lbPositionToRemove);
-                            else if (completionSlower)
-                                return;
                         }
                         sortNewCompletion(level, levelCompletion);
                         validCompletion = true;
@@ -311,7 +308,7 @@ public class LevelManager {
                 }
                 else
                 {
-                    leaderboard.put(1, levelCompletion);
+                    leaderboard.add(levelCompletion);
                     firstCompletion = true;
                 }
                 // only do record mod if it is a valid or first completion
@@ -323,34 +320,31 @@ public class LevelManager {
 
     private void sortNewCompletion(Level level, LevelCompletion levelCompletion)
     {
-        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
-        HashMap<Integer, LevelCompletion> newLeaderboard = new HashMap<>(leaderboard);
+        List<LevelCompletion> leaderboard = level.getLeaderboard();
 
-        newLeaderboard.put(newLeaderboard.size() + 1, levelCompletion);
+        leaderboard.add(levelCompletion);
 
-        for (int i = newLeaderboard.size(); i > 1; i--)
+        for (int i = (leaderboard.size() - 1); i > 0; i--)
         {
-            LevelCompletion completion = newLeaderboard.get(i);
-            LevelCompletion nextCompletion = newLeaderboard.get(i - 1);
+            LevelCompletion completion = leaderboard.get(i);
+            LevelCompletion nextCompletion = leaderboard.get(i - 1);
 
             if (nextCompletion.getCompletionTimeElapsedMillis() > completion.getCompletionTimeElapsedMillis())
             {
                 // swap
-                newLeaderboard.replace((i - 1), completion);
-                newLeaderboard.replace(i, nextCompletion);
+                leaderboard.set((i - 1), completion);
+                leaderboard.set(i, nextCompletion);
             }
         }
         // Trimming potential #11 datapoint
-        if (newLeaderboard.size() > 10)
-            newLeaderboard.remove(11);
-
-        level.setLeaderboard(newLeaderboard);
+        if (leaderboard.size() > 10)
+            leaderboard.remove(10);
     }
 
     private void doRecordModification(PlayerStats playerStats, Level level, LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)
     {
 
-        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+        List<LevelCompletion> leaderboard = level.getLeaderboard();
         // broadcast when record is beaten
         if (level.getRecordCompletion().getName().equalsIgnoreCase(levelCompletion.getName()))
         {
@@ -375,11 +369,13 @@ public class LevelManager {
             {
                 // update new #1 records
                 playerStats.addRecord(levelCompletion);
+                // update new
+                CompletionsDB.updateRecord(levelCompletion, true);
 
                 // if more than 1, remove
                 if (leaderboard.size() > 1)
                 {
-                    LevelCompletion previousRecord = leaderboard.get(1);
+                    LevelCompletion previousRecord = leaderboard.get(1); // old record holder
 
                     PlayerStats previousStats = Parkour.getStatsManager().getByName(previousRecord.getName());
 
@@ -387,10 +383,8 @@ public class LevelManager {
                         previousStats.removeRecord(previousRecord);
 
                     // remove previous
-                    CompletionsDB.updateRecord(previousRecord);
+                    CompletionsDB.updateRecord(previousRecord, false);
                 }
-                // update new
-                CompletionsDB.updateRecord(levelCompletion);
             }
             if (playerStats.hasModifier(ModifierType.RECORD_BONUS))
             {

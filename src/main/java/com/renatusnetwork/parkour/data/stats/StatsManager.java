@@ -384,25 +384,25 @@ public class StatsManager {
     public void enteredRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(true);
-        StatsDB.updateAttemptingRankup(playerStats);
+        StatsDB.updateAttemptingRankup(playerStats, true);
     }
 
     public void leftRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(false);
-        StatsDB.updateAttemptingRankup(playerStats);
+        StatsDB.updateAttemptingRankup(playerStats, false);
     }
 
     public void enteredMastery(PlayerStats playerStats)
     {
         playerStats.setAttemptingMastery(true);
-        StatsDB.updateAttemptingMastery(playerStats);
+        StatsDB.updateAttemptingMastery(playerStats, true);
     }
 
     public void leftMastery(PlayerStats playerStats)
     {
         playerStats.setAttemptingMastery(false);
-        StatsDB.updateAttemptingMastery(playerStats);
+        StatsDB.updateAttemptingMastery(playerStats, false);
     }
 
     public void addModifier(PlayerStats playerStats, Modifier modifier)
@@ -516,7 +516,7 @@ public class StatsManager {
                     "name, COUNT(level_name) AS numRecords",
                     "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc " +
                             "ON lc.uuid=p.uuid " +
-                            "WHERE lc.record=(1) " +
+                            "WHERE lc.record=1 " +
                             "GROUP BY p.name " +
                             "ORDER BY numRecords " +
                             "DESC LIMIT " + Parkour.getSettingsManager().max_records_leaderboard_size);

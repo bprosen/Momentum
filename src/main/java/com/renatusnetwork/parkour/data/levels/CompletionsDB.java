@@ -57,12 +57,15 @@ public class CompletionsDB
         );
     }
 
-    public static void updateRecord(LevelCompletion levelCompletion)
+    public static void updateRecord(LevelCompletion levelCompletion, boolean value)
     {
+        int recordInt = value ? 1 : 0;
+
         DatabaseQueries.runQuery(
                 "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
-                        " SET record=NOT record WHERE " +
+                        " SET record=? WHERE " +
                         "uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)",
+                recordInt,
                 levelCompletion.getUUID(),
                 levelCompletion.getLevelName(),
                 levelCompletion.getTimeOfCompletionMillis() / 1000
@@ -79,8 +82,7 @@ public class CompletionsDB
 
     public static void removeCompletion(LevelCompletion levelCompletion, boolean async)
     {
-        String query = "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
-                       "WHERE uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)";
+        String query = "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " WHERE uuid=? AND level_name=? AND completion_date=FROM_UNIXTIME(?)";
 
         if (async)
             DatabaseQueries.runAsyncQuery(query, levelCompletion.getUUID(), levelCompletion.getLevelName(), levelCompletion.getTimeOfCompletionMillis() / 1000);
@@ -90,10 +92,10 @@ public class CompletionsDB
 
     public static boolean hasCompleted(String uuid, String levelName)
     {
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE, "*",
+        Map<String, String> playerResult = DatabaseQueries.getResult(DatabaseManager.LEVEL_COMPLETIONS_TABLE, "*",
                 " WHERE uuid=? AND level_name=?", uuid, levelName);
 
-        return !playerResults.isEmpty();
+        return !playerResult.isEmpty();
     }
 
     public static void loadRecords(PlayerStats playerStats)
@@ -102,7 +104,7 @@ public class CompletionsDB
 
         List<Map<String, String>> recordResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE,
                 "level_name",
-                "WHERE uuid=? AND record=(1)",
+                "WHERE uuid=? AND record=1",
              playerStats.getUUID());
 
         for (Map<String, String> recordResult : recordResults)
@@ -120,7 +122,7 @@ public class CompletionsDB
         List<Map<String, String>> recordResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lr",
                 "level_name, time_taken",
                 "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lr.uuid " +
-                        "WHERE p.name=? AND record=(1)", name);
+                        "WHERE p.name=? AND record=1", name);
 
         HashMap<Level, Long> levels = new HashMap<>();
 
@@ -190,8 +192,7 @@ public class CompletionsDB
         {
             // default values
             Level currentLevel = null;
-            HashMap<Integer, LevelCompletion> currentLB = new HashMap<>();
-            int lbPlace = 1;
+            List<LevelCompletion> currentLB = new ArrayList<>();
 
             try
             {
@@ -206,8 +207,7 @@ public class CompletionsDB
                             currentLevel.setLeaderboard(currentLB);
 
                         // initialize and adjust
-                        lbPlace = 1;
-                        currentLB = new HashMap<>();
+                        currentLB = new ArrayList<>();
                         currentLevel = Parkour.getLevelManager().get(levelName);
                     }
 
@@ -220,8 +220,7 @@ public class CompletionsDB
                             results.getLong("time_taken")
                     );
 
-                    currentLB.put(lbPlace, levelCompletion);
-                    lbPlace++;
+                    currentLB.add(levelCompletion);
                 }
 
                 // this makes it so the last level in the results will still get the leaderboard set
@@ -236,7 +235,7 @@ public class CompletionsDB
         Parkour.getStatsManager().toggleLoadingLeaderboards(false);
     }
 
-    public static HashMap<Integer, LevelCompletion> getLeaderboard(String levelName)
+    public static List<LevelCompletion> getLeaderboard(String levelName)
     {
 
         ResultSet results = DatabaseQueries.getRawResults(
@@ -244,15 +243,15 @@ public class CompletionsDB
                       "     SELECT uuid, level_name, MIN(time_taken) AS fastest_completion FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
                       "     WHERE time_taken > 0 AND level_name=? GROUP BY uuid" +
                       ")" +
-                      "SELECT p.uuid AS player_uuid, p.name AS player_name, min_times.fastest_completion AS fastest, (UNIX_TIMESTAMP(completion_date) * 1000) AS date " +
-                      "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " c " +
-                      "ON c.uuid=min_times.uuid AND c.level_name=min_times.level_name AND c.time_taken=min_times.fastest_completion " +
-                      "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=min_times.uuid ORDER BY min_times.fastest_time ASC LIMIT 10",
+                      "SELECT p.uuid AS player_uuid, p.name AS player_name, m.fastest_completion AS fastest, (UNIX_TIMESTAMP(completion_date) * 1000) AS date " +
+                      "FROM min_times m " +
+                      "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " c ON c.uuid=m.uuid AND c.level_name=m.level_name AND c.time_taken=m.fastest_completion " +
+                      "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=m.uuid " +
+                      "ORDER BY fastest ASC LIMIT 10",
                       levelName
         );
 
-        HashMap<Integer, LevelCompletion> leaderboard = new HashMap<>();
-        int lbPlace = 1;
+        List<LevelCompletion> leaderboard = new ArrayList<>();
 
         if (results != null)
         {
@@ -266,11 +265,10 @@ public class CompletionsDB
                             results.getString("player_uuid"),
                             results.getString("player_name"),
                             results.getLong("date"),
-                            results.getLong("time_taken")
+                            results.getLong("fastest")
                     );
 
-                    leaderboard.put(lbPlace, levelCompletion);
-                    lbPlace++;
+                    leaderboard.add(levelCompletion);
                 }
             }
             catch (SQLException exception)

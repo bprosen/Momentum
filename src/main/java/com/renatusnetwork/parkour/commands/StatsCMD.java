@@ -264,16 +264,16 @@ public class StatsCMD implements CommandExecutor {
                                 level.getTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
                         ));
 
-                        HashMap<Integer, LevelCompletion> leaderboard = level.getLeaderboard();
+                        List<LevelCompletion> leaderboard = level.getLeaderboard();
                         boolean onLB = false;
 
                         if (!leaderboard.isEmpty())
-                            for (int i = 1; i <= leaderboard.size(); i++)
+                            for (int i = 0; i < leaderboard.size(); i++)
                             {
                                 LevelCompletion levelCompletion = leaderboard.get(i);
                                 String lbName = levelCompletion.getName();
                                 double time = levelCompletion.getCompletionTimeElapsedSeconds();
-                                String lbString = " &7" + i;
+                                String lbString = " &7" + (i + 1);
 
                                 if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(levelCompletion.getName()))
                                 {

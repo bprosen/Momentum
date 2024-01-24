@@ -15,31 +15,11 @@ public class CosmeticsCMD implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player))
             return true;
-        }
 
         Player player = (Player) sender;
-
-        if (a.length == 0) {
-            String menuName = "cosmetics";
-            MenuManager menuManager = Parkour.getMenuManager();
-
-            if (menuManager.exists(menuName)) {
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-                Inventory inventory = menuManager.getInventory(playerStats, menuName, 1);
-
-                if (inventory != null) {
-                    player.openInventory(inventory);
-                    menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, 1);
-                } else {
-                    sender.sendMessage(Utils.translate("&cError loading the inventory"));
-                }
-            } else {
-                sender.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
-            }
-        }
+        Parkour.getMenuManager().openInventory(Parkour.getStatsManager().get(player), "cosmetics", true);
         return false;
     }
 }

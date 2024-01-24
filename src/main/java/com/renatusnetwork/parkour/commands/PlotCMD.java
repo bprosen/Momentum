@@ -404,19 +404,19 @@ public class PlotCMD implements CommandExecutor {
     {
         Player player = playerStats.getPlayer();
         Plot plot = Parkour.getPlotsManager().get(player.getName());
-        // they have a plot
-        if (plot != null) {
-            // already submitted
-            if (!plot.isSubmitted()) {
 
+        // they have a plot
+        if (plot != null)
+        {
+            // already submitted
+            if (!plot.isSubmitted())
                 // submit map!
-                openMenu(playerStats, "submit-plot");
-            } else {
+                Parkour.getMenuManager().openInventory(playerStats, "submit-plot", true);
+            else
                 player.sendMessage(Utils.translate("&cYou have already submitted your plot!"));
-            }
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have a plot to submit!"));
         }
+        else
+            player.sendMessage(Utils.translate("&cYou do not have a plot to submit!"));
     }
 
     private void plotInfo(Player player) {
@@ -454,26 +454,6 @@ public class PlotCMD implements CommandExecutor {
                 }
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 30));
-    }
-
-    private void openMenu(PlayerStats playerStats, String menuName)
-    {
-        MenuManager menuManager = Parkour.getMenuManager();
-        Player player = playerStats.getPlayer();
-
-        if (menuManager.exists(menuName)) {
-
-            Inventory inventory = menuManager.getInventory(playerStats, menuName, 1);
-
-            if (inventory != null) {
-                player.openInventory(inventory);
-                menuManager.updateInventory(playerStats, player.getOpenInventory(), menuName, 1);
-            } else {
-                player.sendMessage(Utils.translate("&cError loading the inventory"));
-            }
-        } else {
-            player.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
-        }
     }
 
     private boolean checkConditions(PlayerStats playerStats) {

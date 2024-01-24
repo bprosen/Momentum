@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.menus;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.utils.MenuUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -54,17 +55,17 @@ public class Menu
             if (MenusYAML.isSet(name, pageNumber + ""))
                 pages.put(pageNumber, new MenuPage(this, pageNumber));
         }
-
-        if (sortLevelTypes)
-        {
-            for (LevelSortingType type : LevelSortingType.values())
-                sortLevels(type);
-        }
     }
 
     public boolean haveSortedLevels() { return sortLevelTypes; }
 
-    public void sortLevels(LevelSortingType sortingType)
+    public void sortLevels()
+    {
+        for (LevelSortingType type : LevelSortingType.values())
+            sortLevels(type);
+    }
+
+    private void sortLevels(LevelSortingType sortingType)
     {
         HashMap<Level, MenuItem> levelsInMenu = new HashMap<>();
         HashMap<Integer, ArrayList<Integer>> slots = new HashMap<>();
@@ -153,7 +154,7 @@ public class Menu
                 {
                     int newSlot = slots.get(pageNumber).get(currentSlotIndex);
 
-                    sortedPage.put(newSlot, levelsInMenu.get(max).clone(pageNumber, newSlot)); // need to clone it to the new page number and slot
+                    sortedPage.put(newSlot, levelsInMenu.get(max).clone(pages.get(pageNumber), newSlot)); // need to clone it to the new page number and slot
                     addedLevels.add(max);
                     currentSlotIndex++;
                 }
@@ -188,9 +189,9 @@ public class Menu
     {
         for (MenuPage menuPage : pages.values())
             for (MenuItem menuItem : menuPage.getItems())
-                if (menuItem.getType().equalsIgnoreCase("open"))
+                if (menuItem.hasOpenMenu())
                 {
-                    Menu value = Parkour.getMenuManager().getMenu(menuItem.getTypeValue());
+                    Menu value = menuItem.getOpenMenu().getMenu();
 
                     if (value != null && !value.equals(this))
                         connectedMenus.add(value);
@@ -237,6 +238,8 @@ public class Menu
 
     public Inventory getInventory(PlayerStats playerStats, int pageNumber)
     {
+        String title = getFormattedTitle(pageNumber);
+
         if (sortLevelTypes)
         {
             HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
@@ -245,7 +248,7 @@ public class Menu
             {
                 MenuPage menuPage = sortedMenu.get(pageNumber);
 
-                return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle(pageNumber));
+                return MenuUtils.createInventory(menuPage, menuPage.getRowCount() * 9, title);
             }
         }
 
@@ -253,10 +256,10 @@ public class Menu
         {
             MenuPage menuPage = pages.get(pageNumber);
 
-            return Bukkit.createInventory(null, menuPage.getRowCount() * 9, getFormattedTitle(pageNumber));
+            return MenuUtils.createInventory(menuPage, menuPage.getRowCount() * 9, title);
         }
 
-        return Bukkit.createInventory(null, 54, getFormattedTitle(pageNumber));
+        return MenuUtils.createInventory(getPage(1),  54, title);
     }
 
     public void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber)

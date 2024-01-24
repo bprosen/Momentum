@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -21,7 +22,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
-public class MenuManager {
+public class MenuManager
+{
 
     private HashMap<String, Menu> menus;
     private HashMap<String, CancelTasks> cancelTasks;
@@ -36,6 +38,7 @@ public class MenuManager {
     public void reload()
     {
         load();
+        loadItems();
         Parkour.getLevelManager().loadLevelsInMenus();
         loadConnectedMenus();
     }
@@ -43,15 +46,23 @@ public class MenuManager {
     public void load()
     {
         for (String menuName : MenusYAML.getNames())
-            load(menuName);
+            menus.put(menuName, new Menu(menuName));
 
         Parkour.getPluginLogger().info("Menus loaded: " + menus.size());
     }
 
-    public void load(String menuName)
+    public void loadItems()
     {
-        if (MenusYAML.exists(menuName))
-            menus.put(menuName, new Menu(menuName));
+        for (Menu menu : menus.values())
+        {
+            for (MenuPage page : menu.getPages())
+            {
+                page.load(menu);
+            }
+            // sort levels after page
+            if (menu.haveSortedLevels())
+                menu.sortLevels();
+        }
     }
 
     public void loadConnectedMenus()
@@ -168,24 +179,6 @@ public class MenuManager {
         return menus.get(menuName);
     }
 
-    public Menu getMenuFromStartingChars(String input) {
-        for (Menu menu : menus.values())
-            if (input.startsWith(menu.getName()))
-                return menu;
-
-        return null;
-    }
-
-    public Menu getMenuFromTitle(String menuTitle) {
-        // need to make exception for rate level menu as the title gets changed to replace a placeholder
-        for (Menu menu : menus.values())
-            if (menuTitle.startsWith(menu.getFormattedTitleBase()) ||
-               (menu.getName().equalsIgnoreCase("rate_level") && ChatColor.stripColor(menuTitle).contains("Rate")))
-                return menu;
-
-        return null;
-    }
-
     public Menu getMenuFromSelectItem(ItemStack item) {
         if (item != null)
             for (Menu menu : menus.values())
@@ -201,24 +194,43 @@ public class MenuManager {
 
     public Inventory getInventory(PlayerStats playerStats, String menuName, int pageNumber)
     {
-        if (exists(menuName))
-            return menus.get(menuName).getInventory(playerStats, pageNumber);
+        Menu menu = menus.get(menuName);
 
-        return null;
+        return menu != null ? menu.getInventory(playerStats, pageNumber) : null;
     }
 
-    public void updateInventory(PlayerStats playerStats, InventoryView inventory) {
-        Menu menu = getMenuFromTitle(inventory.getTitle());
+    public void openInventory(PlayerStats playerStats, String menuName, int pageNumber, boolean showError)
+    {
+        Inventory inventory = getInventory(playerStats, menuName, pageNumber);
 
-        if (menu != null)
-            menu.updateInventory(playerStats, inventory, Utils.getTrailingInt(inventory.getTitle()));
+        if (inventory != null)
+        {
+            Player player = playerStats.getPlayer();
+
+            player.openInventory(inventory);
+            updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
+            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+        }
+        else if (showError)
+            playerStats.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
     }
 
-    public void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName, int pageNumber) {
+    public void openInventory(PlayerStats playerStats, String menuName, boolean showError)
+    {
+        openInventory(playerStats, menuName, 1, showError);
+    }
+
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName, int pageNumber)
+    {
         Menu menu = menus.get(menuName);
 
         if (menu != null)
             menu.updateInventory(playerStats, inventory, pageNumber);
+    }
+
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory, MenuPage menuPage)
+    {
+        menuPage.getMenu().updateInventory(playerStats, inventory, menuPage.getPageNumber());
     }
 
     public void renameLevel(String oldLevelName, String newLevelName) {
