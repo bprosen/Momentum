@@ -468,6 +468,7 @@ public class TablesDB
     private static void createLevelCompletions()
     {
         String query = "CREATE TABLE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
+                            "id BIGINT NOT NULL AUTO_INCREMENT, " +
                             "uuid CHAR(36) NOT NULL, " +
                             "level_name VARCHAR(20) NOT NULL, " +
                             "completion_date TIMESTAMP NOT NULL, " +
@@ -475,11 +476,10 @@ public class TablesDB
                             "mastery BIT DEFAULT 0, " +
                             "record BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(uuid, level_name, completion_date), " +
+                            "PRIMARY KEY(id), " +
                             // indexes
                             "INDEX uuid_index(uuid), " + // gets the completions for that user fast
                             "INDEX level_index(level_name), " + // gets the completions for that level fast
-                            "INDEX record_index(uuid, record), " + // get a users records fast, where uuid=player uuid and record=1
                             // constraints
                             "CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_non_negative CHECK (" +
                                 "time_taken >= 0" +

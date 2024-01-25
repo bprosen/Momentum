@@ -121,7 +121,6 @@ public class StatsManager {
         SavesDB.loadSaves(playerStats);
         StatsDB.loadFavoriteLevels(playerStats);
         CompletionsDB.loadCompletions(playerStats);
-        CompletionsDB.loadRecords(playerStats);
         loadIndividualLevelsBeaten(playerStats);
         StatsDB.loadModifiers(playerStats);
         StatsDB.loadBoughtPerks(playerStats);
@@ -177,7 +176,7 @@ public class StatsManager {
 
     public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
 
-    public void toggleLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
+    public void setLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
 
     public int getTotalPlayers() { return totalPlayers; }
 
@@ -442,7 +441,8 @@ public class StatsManager {
     {
         Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLAYERS_TABLE, "SUM(coins) AS total_coins", "");
 
-        totalCoins = (long) Double.parseDouble(result.get("total_coins"));
+        if (!result.isEmpty() && result.get("total_coins") != null)
+            totalCoins = (long) Double.parseDouble(result.get("total_coins"));
     }
 
     public void loadGlobalPersonalCompletionsLB() {

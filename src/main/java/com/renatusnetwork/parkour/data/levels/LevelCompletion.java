@@ -2,14 +2,16 @@ package com.renatusnetwork.parkour.data.levels;
 
 public class LevelCompletion
 {
+    private int id;
     private String levelName;
     private long timeOfCompletion;
     private long completionTimeElapsed; // time elapsed
     private String name;
     private String uuid;
 
-    public LevelCompletion(String levelName, String uuid, String name, long timeOfCompletion, long completionTimeElapsed)
+    public LevelCompletion(int id, String levelName, String uuid, String name, long timeOfCompletion, long completionTimeElapsed)
     {
+        this.id = id;
         this.levelName = levelName;
         this.uuid = uuid;
         this.name = name;
@@ -20,6 +22,8 @@ public class LevelCompletion
         else
             this.completionTimeElapsed = 0L;
     }
+
+    public int getID() { return id; }
 
     public String getLevelName() { return levelName; }
 
@@ -42,4 +46,14 @@ public class LevelCompletion
     }
 
     public String getUUID() { return uuid; }
+
+    public boolean equals(LevelCompletion other)
+    {
+        return other.getID() == this.id;
+    }
+
+    public boolean equals(int id)
+    {
+        return id == this.id;
+    }
 }

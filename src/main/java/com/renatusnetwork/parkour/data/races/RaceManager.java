@@ -268,7 +268,10 @@ public class RaceManager {
             if (disconnected)
                 elapsedTime = 0;
 
+            levelManager.addTotalLevelCompletion();
+
             LevelCompletion levelCompletion = new LevelCompletion(
+                    (int) levelManager.getTotalLevelCompletions(),
                     raceObject.getLevel().getName(),
                     winner.getUniqueId().toString(),
                     winner.getName(),
@@ -277,8 +280,7 @@ public class RaceManager {
             );
 
             winnerStats.setTotalLevelCompletions(winnerStats.getTotalLevelCompletions() + 1);
-            CompletionsDB.insertCompletion(levelCompletion, false);
-            levelManager.addTotalLevelCompletion();
+            CompletionsDB.insertCompletion(levelCompletion, false, false);
             levelManager.addCompletion(winnerStats, raceObject.getLevel(), levelCompletion);
 
             // Update player information

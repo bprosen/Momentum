@@ -331,6 +331,8 @@ public class Level
         return leaderboard;
     }
 
+    public boolean hasLeaderboard() { return !leaderboard.isEmpty(); }
+
     public void setLeaderboard(List<LevelCompletion> leaderboard) { this.leaderboard = leaderboard; }
 
     public LevelCompletion getRecordCompletion() { return leaderboard.get(0); }

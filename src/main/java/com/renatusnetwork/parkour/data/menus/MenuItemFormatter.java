@@ -30,6 +30,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -669,7 +670,7 @@ public class MenuItemFormatter
                     if (record != null)
                     {
                         // add number 1
-                        if (record.getName().equalsIgnoreCase(playerStats.getName()))
+                        if (playerStats.hasRecord(record))
                             bestTime += " &e#1";
                         else
                             bestTime += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getCompletionTimeElapsedMillis()) / 1000d) + "s";

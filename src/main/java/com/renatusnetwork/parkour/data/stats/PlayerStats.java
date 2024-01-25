@@ -107,8 +107,7 @@ public class PlayerStats {
     //
     // Player Info Section
     //
-    public void setPlayer(Player player)
-    {
+    public void setPlayer(Player player) {
         this.player = player;
     }
 
@@ -140,7 +139,9 @@ public class PlayerStats {
         return name;
     }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getDisplayName() {
         return player.getDisplayName();
@@ -154,8 +155,7 @@ public class PlayerStats {
         return board;
     }
 
-    public void deleteBoard()
-    {
+    public void deleteBoard() {
         board.delete();
         board = null;
     }
@@ -284,45 +284,37 @@ public class PlayerStats {
         return level != null;
     }
 
-    public Level getFavoriteLevel(int index)
-    {
+    public Level getFavoriteLevel(int index) {
         if (index < favoriteLevels.size())
             return favoriteLevels.get(index);
         return null;
     }
 
-    public int numFavoriteLevels()
-    {
+    public int numFavoriteLevels() {
         return favoriteLevels.size();
     }
 
-    public void addFavoriteLevel(Level level)
-    {
+    public void addFavoriteLevel(Level level) {
         favoriteLevels.add(level);
     }
 
-    public ArrayList<Level> getFavoriteLevels()
-    {
+    public ArrayList<Level> getFavoriteLevels() {
         return favoriteLevels;
     }
 
-    public boolean hasFavoriteLevels()
-    {
+    public boolean hasFavoriteLevels() {
         return !favoriteLevels.isEmpty();
     }
 
-    public boolean hasFavorite(Level level)
-    {
+    public boolean hasFavorite(Level level) {
         return favoriteLevels.contains(level);
     }
 
-    public void removeFavoriteLevel(Level level)
-    {
+    public void removeFavoriteLevel(Level level) {
         favoriteLevels.remove(level);
     }
 
-    public void setFavoriteLevels(ArrayList<Level> favoriteLevels)
-    {
+    public void setFavoriteLevels(ArrayList<Level> favoriteLevels) {
         this.favoriteLevels = favoriteLevels;
     }
 
@@ -338,43 +330,73 @@ public class PlayerStats {
         return levelStartTime;
     }
 
-    public int getTotalLevelCompletions() { return totalLevelCompletions; }
+    public int getTotalLevelCompletions() {
+        return totalLevelCompletions;
+    }
 
-    public void setTotalLevelCompletions(int totalLevelCompletions) { this.totalLevelCompletions = totalLevelCompletions; }
+    public void setTotalLevelCompletions(int totalLevelCompletions) {
+        this.totalLevelCompletions = totalLevelCompletions;
+    }
 
-    public void addTotalLevelCompletions() { totalLevelCompletions++; }
+    public void addTotalLevelCompletions() {
+        totalLevelCompletions++;
+    }
 
-    public void setIndividualLevelsBeaten(int individualLevelsBeaten) { this.individualLevelsBeaten = individualLevelsBeaten; }
+    public void setIndividualLevelsBeaten(int individualLevelsBeaten) {
+        this.individualLevelsBeaten = individualLevelsBeaten;
+    }
 
-    public int getIndividualLevelsBeaten() { return individualLevelsBeaten; }
+    public int getIndividualLevelsBeaten() {
+        return individualLevelsBeaten;
+    }
 
-    public ItemStack getChestplateSavedFromElytra() { return chestplateSavedFromElytra; }
+    public ItemStack getChestplateSavedFromElytra() {
+        return chestplateSavedFromElytra;
+    }
 
-    public void setChestplateSavedFromElytra(ItemStack chestplate) { chestplateSavedFromElytra = chestplate; }
+    public void setChestplateSavedFromElytra(ItemStack chestplate) {
+        chestplateSavedFromElytra = chestplate;
+    }
 
-    public int getNumRecords() { return records.size(); }
+    public int getNumRecords() {
+        return records.size();
+    }
 
-    public HashSet<LevelCompletion> getRecords() { return records; }
+    public HashSet<LevelCompletion> getRecords() {
+        return records;
+    }
 
-    public void setRecords(HashSet<LevelCompletion> records) { this.records = records; }
+    public boolean hasRecord(LevelCompletion levelCompletion) {
+        return records.contains(levelCompletion);
+    }
 
-    public void removeRecord(LevelCompletion recordCompletion) { records.remove(recordCompletion); }
+    public void setRecords(HashSet<LevelCompletion> records) {
+        this.records = records;
+    }
 
-    public void addRecord(LevelCompletion recordCompletion) { records.add(recordCompletion); }
+    public void removeRecord(LevelCompletion recordCompletion) {
+        records.remove(recordCompletion);
+    }
 
-    public boolean hasBoughtLevel(Level level)
-    {
+    public void addRecord(LevelCompletion recordCompletion) {
+        records.add(recordCompletion);
+    }
+
+    public boolean hasBoughtLevel(Level level) {
         return boughtLevels.contains(level.getName());
     }
 
-    public void buyLevel(Level level)
-    {
+    public void buyLevel(Level level) {
         boughtLevels.add(level.getName());
     }
 
-    public void removeBoughtLevel(Level level) { boughtLevels.remove(level.getName()); }
+    public void removeBoughtLevel(Level level) {
+        boughtLevels.remove(level.getName());
+    }
 
-    public void setBoughtLevels(HashSet<String> levels) { boughtLevels = levels ; }
+    public void setBoughtLevels(HashSet<String> levels) {
+        boughtLevels = levels;
+    }
 
     //
     // Spectator Section
@@ -383,7 +405,9 @@ public class PlayerStats {
         this.spectateSpawn = spectateSpawn;
     }
 
-    public void resetSpectateSpawn() { spectateSpawn = null; }
+    public void resetSpectateSpawn() {
+        spectateSpawn = null;
+    }
 
     public Location getSpectateSpawn() {
         return spectateSpawn;
@@ -393,8 +417,7 @@ public class PlayerStats {
         spectatable = setting;
     }
 
-    public boolean isSpectatable()
-    {
+    public boolean isSpectatable() {
         return spectatable;
     }
 
@@ -406,42 +429,53 @@ public class PlayerStats {
         return playerToSpectate;
     }
 
-    public boolean isSpectating() { return playerToSpectate != null; }
+    public boolean isSpectating() {
+        return playerToSpectate != null;
+    }
 
     //
     // InfinitePK Section
     //
 
-    public int getBestInfiniteScore(InfiniteType type) { return bestInfiniteScores.get(type); }
+    public int getBestInfiniteScore(InfiniteType type) {
+        return bestInfiniteScores.get(type);
+    }
 
-    public int getBestInfiniteScore()
-    {
+    public int getBestInfiniteScore() {
         return bestInfiniteScores.get(infiniteType);
     }
 
-    public void setInfiniteScore(int infiniteScore)
-    {
+    public void setInfiniteScore(int infiniteScore) {
         bestInfiniteScores.replace(infiniteType, infiniteScore);
     }
 
-    public void setInfiniteScore(InfiniteType type, int infiniteScore)
-    {
+    public void setInfiniteScore(InfiniteType type, int infiniteScore) {
         bestInfiniteScores.replace(type, infiniteScore);
     }
 
-    public void setInfinite(boolean inInfinite) { this.inInfinite = inInfinite; }
+    public void setInfinite(boolean inInfinite) {
+        this.inInfinite = inInfinite;
+    }
 
     public boolean isInInfinite() {
         return inInfinite;
     }
 
-    public Material getInfiniteBlock() { return infiniteBlock; }
+    public Material getInfiniteBlock() {
+        return infiniteBlock;
+    }
 
-    public void setInfiniteBlock(Material infiniteBlock) { this.infiniteBlock = infiniteBlock; }
+    public void setInfiniteBlock(Material infiniteBlock) {
+        this.infiniteBlock = infiniteBlock;
+    }
 
-    public InfiniteType getInfiniteType() { return infiniteType; }
+    public InfiniteType getInfiniteType() {
+        return infiniteType;
+    }
 
-    public void setInfiniteType(InfiniteType type) { this.infiniteType = type; }
+    public void setInfiniteType(InfiniteType type) {
+        this.infiniteType = type;
+    }
 
     //
     // Rank Section
@@ -454,63 +488,102 @@ public class PlayerStats {
         return rank;
     }
 
-    public boolean hasRank() { return rank != null; }
+    public boolean hasRank() {
+        return rank != null;
+    }
 
-    public boolean isLastRank()
-    {
+    public boolean isLastRank() {
         // get if they are at last rank
         return rank != null && rank.isMaxRank();
     }
 
-    public boolean hasPrestiges() { return prestiges > 0; }
+    public boolean hasPrestiges() {
+        return prestiges > 0;
+    }
 
-    public int getPrestiges() { return prestiges; }
+    public int getPrestiges() {
+        return prestiges;
+    }
 
-    public void addPrestige() { prestiges++; }
+    public void addPrestige() {
+        prestiges++;
+    }
 
-    public void setPrestiges(int prestiges) { this.prestiges = prestiges; }
+    public void setPrestiges(int prestiges) {
+        this.prestiges = prestiges;
+    }
 
-    public float getPrestigeMultiplier() { return prestigeMultiplier; }
+    public float getPrestigeMultiplier() {
+        return prestigeMultiplier;
+    }
 
-    public void setPrestigeMultiplier(float prestigeMultiplier) { this.prestigeMultiplier = prestigeMultiplier; }
+    public void setPrestigeMultiplier(float prestigeMultiplier) {
+        this.prestigeMultiplier = prestigeMultiplier;
+    }
 
-    public void setAttemptingRankup(boolean attemptingRankup) { this.attemptingRankup = attemptingRankup; }
+    public void setAttemptingRankup(boolean attemptingRankup) {
+        this.attemptingRankup = attemptingRankup;
+    }
 
-    public boolean isAttemptingRankup() { return attemptingRankup; }
+    public boolean isAttemptingRankup() {
+        return attemptingRankup;
+    }
 
     //
     // Mastery Section
     //
-    public void setAttemptingMastery(boolean attemptingMastery) { this.attemptingMastery = attemptingMastery; }
+    public void setAttemptingMastery(boolean attemptingMastery) {
+        this.attemptingMastery = attemptingMastery;
+    }
 
-    public void addMasteryCompletion(String levelName) { masteryCompletions.add(levelName); }
+    public void addMasteryCompletion(String levelName) {
+        masteryCompletions.add(levelName);
+    }
 
-    public void removeMasteryCompletion(String levelName) { masteryCompletions.remove(levelName); }
+    public void removeMasteryCompletion(String levelName) {
+        masteryCompletions.remove(levelName);
+    }
 
-    public boolean hasMasteryCompletion(Level level) { return masteryCompletions.contains(level.getName()); }
+    public boolean hasMasteryCompletion(Level level) {
+        return masteryCompletions.contains(level.getName());
+    }
 
-    public boolean hasMasteryCompletion(String levelName) { return masteryCompletions.contains(levelName); }
+    public boolean hasMasteryCompletion(String levelName) {
+        return masteryCompletions.contains(levelName);
+    }
 
-    public int getNumMasteryCompletions() { return masteryCompletions.size(); }
+    public int getNumMasteryCompletions() {
+        return masteryCompletions.size();
+    }
 
-    public boolean isAttemptingMastery() { return attemptingMastery; }
+    public boolean isAttemptingMastery() {
+        return attemptingMastery;
+    }
 
     //
     //
     // Fails Section
     //
-    public void setFailMode(boolean failsToggled) { this.failsToggled = failsToggled; }
-    public boolean inFailMode() { return failsToggled; }
+    public void setFailMode(boolean failsToggled) {
+        this.failsToggled = failsToggled;
+    }
 
-    public int getFails() { return fails; }
+    public boolean inFailMode() {
+        return failsToggled;
+    }
 
-    public void addFail()
-    {
+    public int getFails() {
+        return fails;
+    }
+
+    public void addFail() {
         if (failsToggled && !inInfinite && !inTutorial && !inRace && !eventParticipant)
             fails++;
     }
 
-    public void resetFails() { fails = 0; }
+    public void resetFails() {
+        fails = 0;
+    }
 
     //
     // Practice Mode Section
@@ -527,7 +600,9 @@ public class PlayerStats {
         return practiceSpawn;
     }
 
-    public boolean inPracticeMode() { return practiceSpawn != null; }
+    public boolean inPracticeMode() {
+        return practiceSpawn != null;
+    }
 
     //
     // Clan Section
@@ -540,77 +615,71 @@ public class PlayerStats {
         return clan;
     }
 
-    public void resetClan() { clan = null; }
+    public void resetClan() {
+        clan = null;
+    }
 
-    public boolean inClan() { return clan != null; }
+    public boolean inClan() {
+        return clan != null;
+    }
 
 
     //
     // Checkpoint Section
     //
-    public void setCurrentCheckpoint(Location location)
-    {
+    public void setCurrentCheckpoint(Location location) {
         currentCheckpoint = location;
     }
 
-    public Location getCurrentCheckpoint()
-    {
+    public Location getCurrentCheckpoint() {
         return currentCheckpoint;
     }
 
-    public boolean hasCurrentCheckpoint()
-    {
+    public boolean hasCurrentCheckpoint() {
         return currentCheckpoint != null;
     }
 
-    public void resetCurrentCheckpoint()
-    {
+    public void resetCurrentCheckpoint() {
         currentCheckpoint = null;
     }
 
-    public void addCheckpoint(Level level, Location location)
-    {
+    public void addCheckpoint(Level level, Location location) {
         checkpoints.put(level.getName(), location);
     }
 
-    public void removeCheckpoint(Level level)
-    {
+    public void removeCheckpoint(Level level) {
         checkpoints.remove(level.getName());
     }
 
-    public Location getCheckpoint(Level level)
-    {
+    public Location getCheckpoint(Level level) {
         return checkpoints.get(level.getName());
     }
 
-    public boolean hasCheckpoint(Level level)
-    {
+    public boolean hasCheckpoint(Level level) {
         return checkpoints.containsKey(level.getName());
     }
 
 
-    public HashMap<String, Location> getCheckpoints() { return checkpoints; }
+    public HashMap<String, Location> getCheckpoints() {
+        return checkpoints;
+    }
 
     //
     // Saves Section
     //
-    public Location getSave(Level level)
-    {
+    public Location getSave(Level level) {
         return saves.get(level.getName());
     }
 
-    public boolean hasSave(Level level)
-    {
+    public boolean hasSave(Level level) {
         return saves.containsKey(level.getName());
     }
 
-    public void removeSave(Level level)
-    {
+    public void removeSave(Level level) {
         saves.remove(level.getName());
     }
 
-    public void addSave(Level level, Location location)
-    {
+    public void addSave(Level level, Location location) {
         saves.put(level.getName(), location);
     }
 
@@ -621,8 +690,7 @@ public class PlayerStats {
     {
         String levelName = levelCompletion.getLevelName();
 
-        if (levelName != null && levelCompletion != null)
-        {
+        if (levelName != null) {
             if (!levelCompletions.containsKey(levelName))
                 levelCompletions.put(levelName, new HashSet<>());
 
@@ -631,23 +699,15 @@ public class PlayerStats {
         }
     }
 
-    public void levelCompletion(String levelName, long timeOfCompletion, long completionTimeElapsed)
-    {
-        this.levelCompletion(new LevelCompletion(levelName, uuid, name, timeOfCompletion, completionTimeElapsed));
-    }
-
-    public boolean hasCompleted(Level level)
-    {
+    public boolean hasCompleted(Level level) {
         return levelCompletions.containsKey(level.getName());
     }
 
-    public boolean hasCompleted(String levelName)
-    {
+    public boolean hasCompleted(String levelName) {
         return levelCompletions.containsKey(levelName);
     }
 
-    public int getLevelCompletionsCount(Level level)
-    {
+    public int getLevelCompletionsCount(Level level) {
         String levelName = level.getName();
 
         if (levelCompletions.containsKey(levelName))
@@ -657,13 +717,11 @@ public class PlayerStats {
     }
 
     // fastest completion
-    public LevelCompletion getQuickestCompletion(Level level)
-    {
+    public LevelCompletion getQuickestCompletion(Level level) {
         String levelName = level.getName();
         LevelCompletion fastestCompletion = null;
 
-        if (levelCompletions.containsKey(levelName))
-        {
+        if (levelCompletions.containsKey(levelName)) {
             // loop through to find fastest completion
             for (LevelCompletion levelCompletion : levelCompletions.get(levelName))
                 // if not null and not including not timed levels, continue
@@ -675,6 +733,21 @@ public class PlayerStats {
         return fastestCompletion;
     }
 
+    public Set<LevelCompletion> getCompletions(String levelName)
+    {
+        return levelCompletions.get(levelName);
+    }
+
+    public LevelCompletion getCompletion(String levelName, int completionID)
+    {
+        Set<LevelCompletion> completions = levelCompletions.get(levelName);
+
+        for (LevelCompletion levelCompletion : completions)
+            if (levelCompletion.equals(completionID))
+                return levelCompletion;
+
+        return null;
+    }
     //
     // Perks Section
     //

@@ -196,29 +196,27 @@ public class MenuListener implements Listener
     }
 
     @EventHandler
-    public void onMenuItemUse(PlayerInteractEvent event) {
+    public void onMenuItemUse(PlayerInteractEvent event)
+    {
         Player player = event.getPlayer();
 
         if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world) &&
            (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK ||
-            event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
+            event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
+        {
 
-            Menu menu = Parkour.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
-
-            if (menu != null)
-            {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                if (!playerStats.isInTutorial())
-                {
-                    player.openInventory(Parkour.getMenuManager().getInventory(playerStats, menu.getName(), 1));
-                    Parkour.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menu.getName(), 1);
-                    player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
-                }
-                else
-                {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
-                }
+            if (!playerStats.isInTutorial())
+            {
+                Menu menu = Parkour.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
+
+                if (menu != null)
+                    Parkour.getMenuManager().openInventory(playerStats, menu.getName(), false);
+            }
+            else
+            {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
             }
         }
     }

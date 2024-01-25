@@ -11,6 +11,7 @@ import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
+import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -82,13 +83,23 @@ public class LevelHandler {
         {
             LevelManager levelManager = Parkour.getLevelManager();
 
+            LevelCompletion oldRecord = null;
+            if (level.hasLeaderboard())
+                oldRecord = level.getRecordCompletion();
+
+            if (oldRecord != null)
+                Bukkit.broadcastMessage("old record: " + oldRecord.getID() + " secnods " + oldRecord.getCompletionTimeElapsedSeconds());
+
+            levelManager.addTotalLevelCompletion();
+
             // if they have not completed this individual level, then add
             if (!playerStats.hasCompleted(level))
                 playerStats.setIndividualLevelsBeaten(playerStats.getIndividualLevelsBeaten() + 1);
 
-            Long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
+            long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
             String time = (((double) elapsedTime) / 1000) + "s";
             LevelCompletion levelCompletion = new LevelCompletion(
+                    (int) levelManager.getTotalLevelCompletions(),
                     levelName,
                     playerStats.getUUID(),
                     playerStats.getName(),
@@ -111,17 +122,6 @@ public class LevelHandler {
 
             boolean completedMastery = !forcedCompletion && level.hasMastery() && playerStats.isAttemptingMastery();
 
-            // small microoptimization running it in async. if it is a record, it will be updated when we do the modifications
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
-                {
-                    CompletionsDB.insertCompletion(levelCompletion, completedMastery);
-                }
-            }.runTaskAsynchronously(Parkour.getPlugin());
-
-            levelManager.addTotalLevelCompletion();
             levelManager.addCompletion(playerStats, level, levelCompletion); // Update totalLevelCompletionsCount
 
             // run commands if there is any
@@ -330,13 +330,67 @@ public class LevelHandler {
                         // apply potion effects if any exist
                         for (PotionEffect potionEffect : newLevel.getPotionEffects())
                             player.addPotionEffect(potionEffect);
-                    } else
+                    }
+                    else
                         playerStats.resetLevel();
                 }
 
                 // teleport
                 player.teleport(locationTo);
                 playerStats.disableLevelStartTime();
+
+                boolean isRecord = level.hasLeaderboard() && level.getRecordCompletion().equals(levelCompletion);
+                if (isRecord)
+                {
+                    // update new #1 records
+                    playerStats.addRecord(levelCompletion);
+                    String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
+
+                    // update old record
+                    if (oldRecord != null)
+                    {
+                        PlayerStats previousStats = Parkour.getStatsManager().get(oldRecord.getUUID());
+
+                        if (previousStats != null)
+                            previousStats.removeRecord(oldRecord);
+
+                        Bukkit.broadcastMessage("running record deletion for " + oldRecord.getID() + " secnods " + oldRecord.getCompletionTimeElapsedSeconds());
+                        // remove previous
+                        CompletionsDB.updateRecord(oldRecord, false);
+                    }
+                    else
+                        brokenRecord = "&e✦ &d&lRECORD SET &e✦";
+
+                    Bukkit.broadcastMessage("");
+                    Bukkit.broadcastMessage(Utils.translate(brokenRecord));
+                    Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getName() +
+                            " &7has the new &8" + level.getTitle() +
+                            " &7record with &a" + levelCompletion.getCompletionTimeElapsedSeconds() + "s"));
+                    Bukkit.broadcastMessage("");
+
+                    Utils.spawnFirework(level.getCompletionLocation(), Color.PURPLE, Color.FUCHSIA, true);
+
+                    if (playerStats.hasModifier(ModifierType.RECORD_BONUS))
+                    {
+                        Bonus bonus = (Bonus) playerStats.getModifier(ModifierType.RECORD_BONUS);
+
+                        // add coins
+                        Parkour.getStatsManager().addCoins(playerStats, bonus.getBonus());
+                        playerStats.getPlayer().sendMessage(Utils.translate("&7You got &6" + Utils.formatNumber(bonus.getBonus()) + " &eCoins &7for getting the record!"));
+                    }
+                    // do gg run
+                    Parkour.getStatsManager().runGGTimer();
+                }
+
+                // small microoptimization running it in async. if it is a record, it will be updated when we do the modifications
+                new BukkitRunnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        CompletionsDB.insertCompletion(levelCompletion, isRecord, completedMastery);
+                    }
+                }.runTaskAsynchronously(Parkour.getPlugin());
 
             }
             else
