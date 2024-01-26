@@ -187,7 +187,10 @@ public class StatsManager {
         return playerStatsUUID;
     }
 
-    public Collection<PlayerStats> getOnlinePlayers() { return playerStatsUUID.values(); }
+    public Collection<PlayerStats> getOnlinePlayers()
+    {
+        return playerStatsUUID.values();
+    }
 
     public void enteredAscendance(PlayerStats playerStats)
     {

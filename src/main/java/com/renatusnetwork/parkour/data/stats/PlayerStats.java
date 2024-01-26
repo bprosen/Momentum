@@ -68,7 +68,7 @@ public class PlayerStats {
 
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
     private HashSet<String> masteryCompletions;
-    private HashSet<LevelCompletion> records;
+    private HashMap<Level, LevelCompletion> records;
     private HashSet<Perk> perks;
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
@@ -90,7 +90,7 @@ public class PlayerStats {
         this.saves = new HashMap<>();
         this.modifiers = new HashMap<>();
         this.bestInfiniteScores = new HashMap<>();
-        this.records = new HashSet<>();
+        this.records = new HashMap<>();
         this.masteryCompletions = new HashSet<>();
         this.favoriteLevels = new ArrayList<>();
 
@@ -362,24 +362,29 @@ public class PlayerStats {
         return records.size();
     }
 
-    public HashSet<LevelCompletion> getRecords() {
+    public HashMap<Level, LevelCompletion> getRecords() {
         return records;
     }
 
-    public boolean hasRecord(LevelCompletion levelCompletion) {
-        return records.contains(levelCompletion);
+    public boolean hasRecord(Level level) {
+        return records.containsKey(level);
     }
 
-    public void setRecords(HashSet<LevelCompletion> records) {
+    public void setRecords(HashMap<Level, LevelCompletion> records) {
         this.records = records;
     }
 
-    public void removeRecord(LevelCompletion recordCompletion) {
-        records.remove(recordCompletion);
+    public void removeRecord(Level level) {
+        records.remove(level);
     }
 
-    public void addRecord(LevelCompletion recordCompletion) {
-        records.add(recordCompletion);
+    public void addRecord(Level level, LevelCompletion levelCompletion) {
+        records.put(level, levelCompletion);
+    }
+
+    public LevelCompletion getRecord(Level level)
+    {
+        return records.get(level);
     }
 
     public boolean hasBoughtLevel(Level level) {

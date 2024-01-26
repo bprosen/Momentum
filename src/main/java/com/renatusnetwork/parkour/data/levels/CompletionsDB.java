@@ -37,7 +37,9 @@ public class CompletionsDB
             playerStats.levelCompletion(completion);
 
             if (Integer.parseInt(completionResult.get("record")) == 1)
-                playerStats.addRecord(completion);
+                playerStats.addRecord(
+                        Parkour.getLevelManager().get(levelName), completion
+                );
         }
 
         // get individual levels beaten by looping through list
@@ -161,19 +163,31 @@ public class CompletionsDB
 
         ResultSet results = DatabaseQueries.getRawResults(
                 "SELECT " +
-                        "level_name, p.uuid AS player_uuid, p.name AS player_name, c.time_taken AS time_taken, c.completion_date AS completion_date " +
+                            "lc.id AS id, " +
+                            "r.uuid AS player_uuid, " +
+                            "p.name AS player_name, " +
+                            "r.level_name AS level_name, " +
+                            "r.time_taken AS time_taken, " +
+                            "r.completion_date AS completion_date " +
                         "FROM (" +
-                        "  SELECT *, ROW_NUMBER() OVER (PARTITION BY level_name ORDER BY time_taken) AS row_num" +
-                        "  FROM (" +
-                        "    SELECT level_name, uuid, MIN(time_taken) AS time_taken, MIN(UNIX_TIMESTAMP(completion_date) * 1000) AS completion_date" +
-                        "    FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
-                        "    WHERE time_taken > 0" +
-                        "    GROUP BY level_name, uuid" +
-                        "  ) AS grouped_completions" +
-                        ") AS c " +
-                        "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON c.uuid=p.uuid " +
-                        "WHERE c.row_num <= 10 " +
-                        "ORDER BY c.level_name, c.time_taken;"
+                            "SELECT " +
+                                "*, " +
+                                "ROW_NUMBER() OVER (PARTITION BY level_name ORDER BY time_taken) AS row_num " +
+                            "FROM (" +
+                                "SELECT " +
+                                    "level_name, " +
+                                    "uuid, " +
+                                    "MIN(time_taken) AS time_taken, " +
+                                    "MIN(UNIX_TIMESTAMP(completion_date) * 1000) AS completion_date " +
+                                "FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
+                                "WHERE time_taken > 0 " +
+                                "GROUP BY level_name, uuid " +
+                            ") AS g " +
+                        ") AS r " +
+                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON r.uuid=p.uuid " +
+                    "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc ON lc.uuid=r.uuid AND lc.level_name=r.level_name AND lc.time_taken=r.time_taken " +
+                    "WHERE r.row_num <= 10 " +
+                    "ORDER BY level_name, time_taken;"
         );
 
         if (results != null)
@@ -269,5 +283,22 @@ public class CompletionsDB
         }
 
         return leaderboard;
+    }
+
+    public static boolean isFasterThanRecord(LevelCompletion levelCompletion)
+    {
+        Map<String, String> singleResult = DatabaseQueries.getResult(
+                DatabaseManager.LEVEL_COMPLETIONS_TABLE, "time_taken",
+                "WHERE level_name=? AND record=1", levelCompletion.getLevelName()
+        );
+
+        if (!singleResult.isEmpty())
+        {
+            long timeTaken = Long.parseLong(singleResult.get("time_taken"));
+
+            return timeTaken > levelCompletion.getCompletionTimeElapsedMillis();
+        }
+
+        return false;
     }
 }

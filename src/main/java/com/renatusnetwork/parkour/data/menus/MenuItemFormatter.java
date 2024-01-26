@@ -670,7 +670,7 @@ public class MenuItemFormatter
                     if (record != null)
                     {
                         // add number 1
-                        if (playerStats.hasRecord(record))
+                        if (playerStats.hasRecord(level))
                             bestTime += " &e#1";
                         else
                             bestTime += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getCompletionTimeElapsedMillis()) / 1000d) + "s";

@@ -121,10 +121,10 @@ public class RecordsCMD implements CommandExecutor
                 // online then offline lookup process
                 if (targetStats != null)
                 {
-                    HashSet<LevelCompletion> completions = targetStats.getRecords();
+                    HashMap<Level, LevelCompletion> completions = targetStats.getRecords();
 
-                    for (LevelCompletion completion : completions)
-                        records.put(Parkour.getLevelManager().get(completion.getLevelName()), completion.getCompletionTimeElapsedSeconds());
+                    for (Map.Entry<Level, LevelCompletion> entry : completions.entrySet())
+                        records.put(entry.getKey(), entry.getValue().getCompletionTimeElapsedSeconds());
                 }
                 else
                 {
@@ -143,7 +143,7 @@ public class RecordsCMD implements CommandExecutor
                 // only continue if they have records!
                 if (!records.isEmpty())
                 {
-                    int currentNum = 0;
+                    int currentNum = Math.max((page * 10) - 10, 0); // prevent going below 0
                     int numRecords = records.size();
                     int max = page * 10;
 

@@ -429,12 +429,12 @@ public class RaceManager {
 
         if (bet) {
             opponentString = Utils.translate(
-                    "&4" + player1.getPlayer().getName() + " &7has sent you a race request with bet amount &6" + Utils.formatNumber(betAmount) + " &eCoins&7! &a&nClick here to accept the race&r"
+                    "&4" + player1.getDisplayName() + " &7has sent you a race request with bet amount &6" + Utils.formatNumber(betAmount) + " &eCoins&7! &a&nClick here to accept the race&r"
             );
-            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request with bet amount &6" + Utils.formatNumber(betAmount) + " &eCoins");
+            senderString = Utils.translate("&7You sent &4" + player2.getDisplayName() + " &7a race request with bet amount &6" + Utils.formatNumber(betAmount) + " &eCoins");
         } else {
-            opponentString = Utils.translate("&4" + player1.getPlayer().getName() + " &7has sent you a race request&7! &a&nClick here to accept the race&r");
-            senderString = Utils.translate("&7You sent &4" + player2.getPlayer().getName() + " &7a race request");
+            opponentString = Utils.translate("&4" + player1.getDisplayName() + " &7has sent you a race request&7! &a&nClick here to accept the race&r");
+            senderString = Utils.translate("&7You sent &4" + player2.getDisplayName() + " &7a race request");
         }
 
         if (!randomLevel) {
@@ -465,7 +465,7 @@ public class RaceManager {
             public void run() {
                 if (getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
                     removeRequest(raceRequest);
-                    player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getPlayer().getName() + " &cdid not accept your race request in time"));
+                    player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getDisplayName() + " &cdid not accept your race request in time"));
                 }
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 30);

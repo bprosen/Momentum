@@ -367,10 +367,11 @@ public class LevelCMD implements CommandExecutor
                                                 PlayerStats newHolderStats = statsManager.get(newHolder.getUUID());
 
                                                 if (oldHolderStats != null)
-                                                    oldHolderStats.removeRecord(oldHolder);
+                                                    oldHolderStats.removeRecord(level);
 
                                                 if (newHolderStats != null)
-                                                    newHolderStats.addRecord(newHolder);
+                                                    newHolderStats.addRecord
+                                                            (level, newHolder);
                                             }
                                             // update both in db
                                             CompletionsDB.updateRecord(oldHolder, false);

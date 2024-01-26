@@ -343,7 +343,7 @@ public class LevelHandler {
                 if (isRecord)
                 {
                     // update new #1 records
-                    playerStats.addRecord(levelCompletion);
+                    playerStats.addRecord(level, levelCompletion);
                     String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
 
                     // update old record
@@ -352,9 +352,8 @@ public class LevelHandler {
                         PlayerStats previousStats = Parkour.getStatsManager().get(oldRecord.getUUID());
 
                         if (previousStats != null)
-                            previousStats.removeRecord(oldRecord);
+                            previousStats.removeRecord(level);
 
-                        Bukkit.broadcastMessage("running record deletion for " + oldRecord.getID() + " secnods " + oldRecord.getCompletionTimeElapsedSeconds());
                         // remove previous
                         CompletionsDB.updateRecord(oldRecord, false);
                     }
@@ -363,7 +362,7 @@ public class LevelHandler {
 
                     Bukkit.broadcastMessage("");
                     Bukkit.broadcastMessage(Utils.translate(brokenRecord));
-                    Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getName() +
+                    Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getDisplayName() +
                             " &7has the new &8" + level.getTitle() +
                             " &7record with &a" + levelCompletion.getCompletionTimeElapsedSeconds() + "s"));
                     Bukkit.broadcastMessage("");
