@@ -13,6 +13,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -112,25 +113,58 @@ public class Utils {
         return result;
     }
 
-    public static ItemStack getSwordIfExists(Inventory inventory)
+    public static ItemStack getSwordIfExists(Player player)
     {
+        Inventory inventory = player.getInventory();
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         ItemStack swordItem = null;
 
-        // try to find the sword in their inventory
-        for (ItemStack item : inventory.getContents()) {
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        if (isItemFromTitle(offHand, settingsManager.sword_title))
+            swordItem = offHand;
 
-            if (item != null &&
-                item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                item.getItemMeta().getDisplayName().equalsIgnoreCase(settingsManager.sword_title))
-            {
+        if (swordItem == null)
+            // try to find the sword in their inventory
+            for (ItemStack item : inventory.getContents())
+                if (isItemFromTitle(item, settingsManager.sword_title))
+                {
+                    swordItem = item;
+                    break;
+                }
 
-                swordItem = item;
-                break;
-            }
-        }
         return swordItem;
+    }
+
+    public static ItemStack getShieldIfExists(Player player)
+    {
+        Inventory inventory = player.getInventory();
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        ItemStack shieldItem = null;
+
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        if (isItemFromTitle(offHand, settingsManager.shield_title))
+            shieldItem = offHand;
+
+        if (shieldItem == null)
+            // try to find the sword in their inventory
+            for (ItemStack item : inventory.getContents())
+                if (isItemFromTitle(item, settingsManager.shield_title))
+                {
+                    shieldItem = item;
+                    break;
+                }
+
+
+        return shieldItem;
+    }
+
+    public static boolean isItemFromTitle(ItemStack item, String title)
+    {
+        return
+            item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
+            item.getItemMeta().getDisplayName().equalsIgnoreCase(title);
     }
 
     public static ItemStack getPracPlateIfExists(Inventory inventory)

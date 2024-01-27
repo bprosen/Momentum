@@ -31,6 +31,8 @@ import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.TablesDB;
 import com.renatusnetwork.parkour.utils.dependencies.ProtocolLib;
 import com.sk89q.worldedit.WorldEdit;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -64,6 +66,7 @@ public class Parkour extends JavaPlugin {
     private static SavesManager saves;
     private static ModifiersManager modifiers;
     private static Placeholders placeholders;
+    private static ViaAPI viaVersion;
 
     @Override
     public void onEnable() {
@@ -151,7 +154,7 @@ public class Parkour extends JavaPlugin {
         getCommand("event").setExecutor(new EventCMD());
         getCommand("prestige").setExecutor(new PrestigeCMD());
         getCommand("rate").setExecutor(new RateCMD());
-        getCommand("sword").setExecutor(new SwordCMD());
+        getCommand("sword").setExecutor(new SwordShieldCMD());
         getCommand("infinite").setExecutor(new InfiniteCMD());
         getCommand("profile").setExecutor(new ProfileCMD());
         getCommand("cosmetics").setExecutor(new CosmeticsCMD());
@@ -213,6 +216,7 @@ public class Parkour extends JavaPlugin {
         modifiers = new ModifiersManager();
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
+        viaVersion = Via.getAPI();
     }
 
     private static void unload()
@@ -277,4 +281,5 @@ public class Parkour extends JavaPlugin {
     public static BankManager getBankManager() { return bank; }
     public static BlackMarketManager getBlackMarketManager() { return blackmarket; }
     public static ModifiersManager getModifiersManager() { return modifiers; }
+    public static ViaAPI getViaVersion() { return  viaVersion; }
 }

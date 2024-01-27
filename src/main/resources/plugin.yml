@@ -4,7 +4,7 @@ main: ${mainClass}
 version: ${project.version}
 author: [CrazySeanPC, xxBen]
 
-depend: [TitleAPI, Vault, WorldGuard, ProtocolLib, WorldEdit]
+depend: [TitleAPI, Vault, WorldGuard, ProtocolLib, WorldEdit, ViaVersion]
 softdepend: [PlaceholderAPI]
 
 commands:
@@ -65,7 +65,7 @@ commands:
     aliases: [ratelevel, levelrate]
   sword:
     description: "RN-Parkour sword command"
-    aliases: [setup, setupsword]
+    aliases: [setup, setupsword, shield, setupshield]
   infinite:
     description: "RN-Parkour InfinitePK command"
     aliases: [infinitepk, endless, endlesspk]

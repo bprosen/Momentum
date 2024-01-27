@@ -141,6 +141,9 @@ setup-sword:
       glow: true
   title: "&cSetup Sword"
   hotbar_slot: 1
+setup-shield:
+  title: "&cSetup Shield"
+  hotbar_slot: 1
 practice-plate:
   type: IRON_PLATE
   title: "&6Practice Checkpoint"

@@ -31,15 +31,14 @@ public class SettingsManager {
     public static final String LEVEL_MAZE_RESPAWN_FORMAT = "%level%-respawn-%num%";
     public static final String LEVEL_MAZE_EXIT_FORMAT = "%level%-exit-%num%";
     public static final int STUCK_URL_LENGTH = 50;
+    public static final int PROTOCOL_1_9 = 107;
 
     public World main_world;
     public double featured_level_reward_multiplier;
     public int max_rated_levels_leaderboard_size;
-
     public String signs_first_line;
     public String signs_second_line_completion;
     public String signs_second_line_spawn;
-
     public int max_event_leaderboard_size;
     public int clans_max_members;
     public int clans_max_level;
@@ -52,14 +51,12 @@ public class SettingsManager {
     public int clan_calc_level_reward_needed;
     public int clan_split_reward_min_needed;
     public List<String> blocked_clan_names = new ArrayList<>();
-
     public String player_submitted_world;
     public int player_submitted_plot_width;
     public int player_submitted_plot_default_y;
     public int player_submitted_plot_buffer_width;
     public String minimum_rank_for_plot_creation;
     public String default_rank;
-
     public int event_reminder_delay;
     public int max_event_run_time;
     public int check_next_event_delay;
@@ -69,11 +66,11 @@ public class SettingsManager {
     public int rising_water_y_below_start_y;
     public int falling_anvil_event_task_delay;
     public int rising_water_event_task_delay;
-
     public LinkedHashMap<Integer, ItemStack> setup_swords;
     public int sword_hotbar_slot;
     public String sword_title;
-
+    public int shield_hotbar_slot;
+    public String shield_title;
     public int max_infinite_leaderboard_size;
     public int max_infinite_y;
     public int infinite_starting_y;
@@ -84,110 +81,80 @@ public class SettingsManager {
     public String infinite_middle_loc;
     public Material infinite_default_block;
     public InfiniteType infinite_default_type;
-
     public int max_global_level_completions_leaderboard_size;
     public int max_global_personal_completions_leaderboard_size;
     public int max_clans_leaderboard_size;
     public int max_race_leaderboard_size;
     public int max_coins_leaderboard_size;
     public int max_records_leaderboard_size;
-
     public int max_prestige_multiplier;
     public int prestige_multiplier_per_prestige;
     public double base_prestige_cost;
     public double additional_cost_per_prestige;
-
     public double min_race_bet_amount;
-
     public String ascendant_realm_world;
     public String ascendance_hub_level;
-
     public double rage_quit_price;
     public List<String> rage_quit_messages;
-
     public int default_gg_timer;
     public int default_gg_coin_reward;
-
     public String tutorial_level_name;
-
     public int prac_hotbar_slot;
     public String prac_title;
     public Material prac_type;
     public ItemStack prac_item;
-
     public int leave_hotbar_slot;
     public String leave_title;
     public Material leave_type;
     public ItemStack leave_item;
-
     public double minimum_pay_amount;
-
     public HashMap<Integer, ItemStack> custom_join_inventory;
-
     public LinkedHashMap<Integer, Float> cooldown_modifiers;
     public Calendar cooldown_calendar;
-
     public int radiant_minimum_bid;
     public int brilliant_minimum_bid;
     public int legendary_minimum_bid;
-
     public int radiant_lock_minimum;
     public int brilliant_lock_minimum;
     public int legendary_lock_minimum;
-
     public float lock_chance;
     public int lock_minutes;
-
     public int jackpot_length;
-
     public int blackmarket_min_player_count;
-
     public Calendar black_market_reset_calendar;
     public int seconds_before_ending_from_no_bids;
-
     public String blackmarket_item_spawn_loc;
     public String blackmarket_tp_loc;
     public String blackmarket_message_prefix;
     public String jackpot_force_remove_permission_cmd;
-
     public int sprint_starting_timer;
     public int sprint_max_timer;
     public float sprint_time_gain;
     public LinkedHashMap<Integer, Float> reduction_factors;
-
     public int timed_timer;
     public float infinite_angle_bound;
     public float infinite_distance_min;
     public float infinite_distance_bound;
     public int infinite_generation_y_min;
     public int infinite_generation_y_max;
-
     public float infinite_generation_positive_y_min;
     public float infinite_generation_positive_y_max;
     public float infinite_generation_positive_y_diff;
     public float infinite_generation_negative_y_min;
     public float infinite_generation_negative_y_max;
     public float infinite_generation_negative_y_diff;
-
     public int infinite_angle_outside_border_min;
     public int infinite_angle_outside_border_max;
-
     public int min_rating;
     public int max_rating;
-
     public int max_difficulty;
     public int min_difficulty;
-
     public float min_mastery_multiplier;
     public float max_mastery_multiplier;
     public HashMap<Integer, Integer> clan_level_xp_required;
-
     public LevelSortingType default_level_sorting_type;
-
     public int max_favorite_levels;
-
     public String main_menu_name;
-
     public int max_offline_cache_size;
 
     public SettingsManager(FileConfiguration settings)
@@ -232,6 +199,8 @@ public class SettingsManager {
         featured_level_reward_multiplier = settings.getDouble("levels.featured_level_reward_multiplier");
         sword_hotbar_slot = settings.getInt("setup-sword.hotbar_slot");
         sword_title = Utils.translate(settings.getString("setup-sword.title"));
+        shield_hotbar_slot = settings.getInt("setup-shield.hotbar_slot");
+        shield_title = Utils.translate(settings.getString("setup-shield.title"));
 
         setup_swords = new LinkedHashMap<>(); // we want it in order!
 

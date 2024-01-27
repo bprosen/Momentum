@@ -51,9 +51,16 @@ public class EventCMD implements CommandExecutor {
                                                         Parkour.getStatsManager().toggleOffElytra(playerStats);
 
                                                     // remove sword item if they have it and the mode is pvp
-                                                    ItemStack swordItem = Utils.getSwordIfExists(player.getInventory());
-                                                    if (eventManager.isPvPEvent() && swordItem != null)
-                                                        player.getInventory().removeItem(swordItem);
+                                                    if (eventManager.isPvPEvent())
+                                                    {
+                                                        ItemStack swordItem = Utils.getSwordIfExists(player);
+                                                        ItemStack shieldItem = Utils.getShieldIfExists(player);
+
+                                                        if (swordItem != null)
+                                                            player.getInventory().removeItem(swordItem);
+                                                        if (shieldItem != null)
+                                                            player.getInventory().removeItem(shieldItem);
+                                                    }
 
                                                     eventManager.addParticipant(player);
                                                 } else {
