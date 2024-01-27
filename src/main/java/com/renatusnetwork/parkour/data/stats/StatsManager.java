@@ -109,6 +109,12 @@ public class StatsManager {
         StatsDB.loadModifiers(playerStats);
         StatsDB.loadBoughtPerks(playerStats);
         loadRestOfPerks(playerStats);
+
+        // if loading lb, cant calculate records normally, get from db
+        if (Parkour.getLevelManager().isLoadingLeaderboards())
+            CompletionsDB.loadRecords(playerStats);
+        else
+            playerStats.setRecords(Parkour.getLevelManager().getRecords(playerStats.getName()));
     }
 
     private void loadRestOfPerks(PlayerStats playerStats)

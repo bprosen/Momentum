@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
 import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
@@ -266,21 +267,21 @@ public class LevelManager {
         {
             if (!isLoadingLeaderboards())
             {
-                List<LevelCompletion> leaderboard = level.getLeaderboard();
+                List<LevelLBPosition> leaderboard = level.getLeaderboard();
 
                 if (!leaderboard.isEmpty())
                 {
                     // Compare completion against scoreboard
                     if (leaderboard.size() < 10 ||
-                        leaderboard.get(leaderboard.size() - 1).getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
+                        leaderboard.get(leaderboard.size() - 1).getTimeTaken() > levelCompletion.getCompletionTimeElapsedMillis())
                     {
-                        LevelCompletion firstPlace = level.getRecordCompletion();
+                        LevelLBPosition firstPlace = level.getRecordCompletion();
                         String playerName = playerStats.getName();
 
                         // check for first place
                         if (
-                            firstPlace.getName().equalsIgnoreCase(playerName) &&
-                            firstPlace.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis()
+                            firstPlace.getPlayerName().equalsIgnoreCase(playerName) &&
+                            firstPlace.getTimeTaken() > levelCompletion.getCompletionTimeElapsedMillis()
                             )
                             leaderboard.remove(0);
                         // otherwise, search for where it is
@@ -290,11 +291,11 @@ public class LevelManager {
 
                             for (int i = 0; i < leaderboard.size(); i++)
                             {
-                                LevelCompletion completion = leaderboard.get(i);
+                                LevelLBPosition completion = leaderboard.get(i);
 
-                                if (completion.getName().equalsIgnoreCase(playerName))
+                                if (completion.getPlayerName().equalsIgnoreCase(playerName))
                                 {
-                                    if (completion.getCompletionTimeElapsedMillis() > levelCompletion.getCompletionTimeElapsedMillis())
+                                    if (completion.getTimeTaken() > levelCompletion.getCompletionTimeElapsedMillis())
                                     {
                                         lbPositionToRemove = i;
                                         break;
@@ -310,23 +311,28 @@ public class LevelManager {
                     }
                 }
                 else
-                    leaderboard.add(levelCompletion);
+                    leaderboard.add(
+                            new LevelLBPosition(
+                            levelCompletion.getLevelName(), levelCompletion.getName(), levelCompletion.getCompletionTimeElapsedMillis()
+                            ));
             }
         }
     }
 
     private void sortNewCompletion(Level level, LevelCompletion levelCompletion)
     {
-        List<LevelCompletion> leaderboard = level.getLeaderboard();
+        List<LevelLBPosition> leaderboard = level.getLeaderboard();
 
-        leaderboard.add(levelCompletion);
+        leaderboard.add(
+                new LevelLBPosition(levelCompletion.getLevelName(), levelCompletion.getName(), levelCompletion.getCompletionTimeElapsedMillis())
+        );
 
         for (int i = (leaderboard.size() - 1); i > 0; i--)
         {
-            LevelCompletion completion = leaderboard.get(i);
-            LevelCompletion nextCompletion = leaderboard.get(i - 1);
+            LevelLBPosition completion = leaderboard.get(i);
+            LevelLBPosition nextCompletion = leaderboard.get(i - 1);
 
-            if (nextCompletion.getCompletionTimeElapsedMillis() > completion.getCompletionTimeElapsedMillis())
+            if (nextCompletion.getTimeTaken() > completion.getTimeTaken())
             {
                 // swap
                 leaderboard.set((i - 1), completion);
@@ -840,14 +846,15 @@ public class LevelManager {
             HashMap<String, Integer> tempRecords = new HashMap<>();
             for (Level level : Parkour.getLevelManager().getLevels().values())
             {
-                LevelCompletion record = level.getRecordCompletion();
+                LevelLBPosition record = level.getRecordCompletion();
 
                 if (record != null)
                 {
-                    if (tempRecords.containsKey(record.getName()))
-                        tempRecords.replace(record.getName(), tempRecords.get(record.getName()) + 1);
+                    String playerName = record.getPlayerName();
+                    if (tempRecords.containsKey(playerName))
+                        tempRecords.replace(playerName, tempRecords.get(playerName) + 1);
                     else
-                        tempRecords.put(record.getName(), 1);
+                        tempRecords.put(playerName, 1);
                 }
             }
 
@@ -871,18 +878,17 @@ public class LevelManager {
 
     public HashMap<Integer, RecordsLBPosition> getRecordsLB() { return recordsLB; }
 
-    public List<LevelCompletion> getOfflineRecords(String search)
+    public HashMap<Level, Long> getRecords(String name)
     {
-        List<LevelCompletion> result = new ArrayList<>();
+        HashMap<Level, Long> result = new HashMap<>();
 
         for (Level level : levels.values())
         {
-            LevelCompletion record = level.getRecordCompletion();
+            LevelLBPosition record = level.getRecordCompletion();
 
-            if (record != null && record.getName().equalsIgnoreCase(search))
-                result.add(record);
+            if (record != null && record.getPlayerName().equalsIgnoreCase(name))
+                result.put(get(record.getLevelName()), record.getTimeTaken());
         }
-
         return result;
     }
 

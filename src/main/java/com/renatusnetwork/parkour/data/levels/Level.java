@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
+import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
@@ -41,7 +42,7 @@ public class Level
     private HashMap<String, Integer> ratings;
     private List<String> requiredLevels;
     private List<PotionEffect> potionEffects;
-    private List<LevelCompletion> leaderboard;
+    private List<LevelLBPosition> leaderboard;
     private List<String> commands;
 
     public Level(String levelName, long creationSeconds)
@@ -327,15 +328,15 @@ public class Level
 
     public boolean isAscendance() { return type == LevelType.ASCENDANCE; }
 
-    public List<LevelCompletion> getLeaderboard() {
+    public List<LevelLBPosition> getLeaderboard() {
         return leaderboard;
     }
 
     public boolean hasLeaderboard() { return !leaderboard.isEmpty(); }
 
-    public void setLeaderboard(List<LevelCompletion> leaderboard) { this.leaderboard = leaderboard; }
+    public void setLeaderboard(List<LevelLBPosition> leaderboard) { this.leaderboard = leaderboard; }
 
-    public LevelCompletion getRecordCompletion() { return !leaderboard.isEmpty() ? leaderboard.get(0) : null; }
+    public LevelLBPosition getRecordCompletion() { return !leaderboard.isEmpty() ? leaderboard.get(0) : null; }
 
     public boolean isRequiredLevel(String levelName) { return requiredLevels.contains(levelName); }
 

@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
@@ -665,7 +666,7 @@ public class MenuItemFormatter
                     String bestTime = "&7  Best time &6" + completionTime + "s";
 
                     // add record if there is one
-                    LevelCompletion record = level.getRecordCompletion();
+                    LevelLBPosition record = level.getRecordCompletion();
 
                     if (record != null)
                     {
@@ -673,7 +674,7 @@ public class MenuItemFormatter
                         if (playerStats.hasRecord(level))
                             bestTime += " &e#1";
                         else
-                            bestTime += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getCompletionTimeElapsedMillis()) / 1000d) + "s";
+                            bestTime += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken()) / 1000d) + "s";
                     }
 
                     itemLore.add(Utils.translate(bestTime));

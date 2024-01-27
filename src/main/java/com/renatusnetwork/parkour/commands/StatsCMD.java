@@ -2,16 +2,11 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
-import com.renatusnetwork.parkour.data.leaderboards.EventLBPosition;
-import com.renatusnetwork.parkour.data.leaderboards.InfiniteLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.*;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.leaderboards.RaceLBPosition;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.*;
-import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
-import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
-import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
@@ -264,18 +259,18 @@ public class StatsCMD implements CommandExecutor {
                                 level.getTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
                         ));
 
-                        List<LevelCompletion> leaderboard = level.getLeaderboard();
+                        List<LevelLBPosition> leaderboard = level.getLeaderboard();
                         boolean onLB = false;
 
                         if (!leaderboard.isEmpty())
                             for (int i = 0; i < leaderboard.size(); i++)
                             {
-                                LevelCompletion levelCompletion = leaderboard.get(i);
-                                String lbName = levelCompletion.getName();
-                                double time = levelCompletion.getCompletionTimeElapsedSeconds();
+                                LevelLBPosition lbPosition = leaderboard.get(i);
+                                String lbName = lbPosition.getPlayerName();
+                                double time = lbPosition.getTimeTakenSeconds();
                                 String lbString = " &7" + (i + 1);
 
-                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(levelCompletion.getName()))
+                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbPosition.getPlayerName()))
                                 {
                                     // we want to show it as blue if they are on it
                                     onLB = true;

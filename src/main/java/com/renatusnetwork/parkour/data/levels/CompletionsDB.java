@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.levels;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -55,7 +56,7 @@ public class CompletionsDB
                             " (uuid, completion_date, level_name, time_taken, mastery)" +
                             " VALUES (?,?,?,?,?)",
                     levelCompletion.getUUID(),
-                    levelCompletion.getTimeOfCompletionMillis() / 1000, // cannot use built in method, need to do int division
+                    levelCompletion.getTimeOfCompletionMillis(), // cannot use built in method, need to do int division
                     levelCompletion.getLevelName(),
                     levelCompletion.getCompletionTimeElapsedMillis(),
                     masteryBit
@@ -66,7 +67,7 @@ public class CompletionsDB
                             " (uuid, completion_date, level_name, mastery)" +
                             " VALUES (?,?,?,?)",
                     levelCompletion.getUUID(),
-                    levelCompletion.getTimeOfCompletionMillis() / 1000, // cannot use built in method, need to do int division
+                    levelCompletion.getTimeOfCompletionMillis(), // cannot use built in method, need to do int division
                     levelCompletion.getLevelName(),
                     masteryBit
             );
@@ -80,14 +81,24 @@ public class CompletionsDB
                 levelName);
     }
 
-    public static void removeCompletion(LevelCompletion levelCompletion, boolean async)
+    public static void removeCompletionFromName(String playerName, String levelName, long timeTaken, boolean async)
     {
-        String query = "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " WHERE uuid=? AND completion_date=?";
+        String query = "DELETE lcOuter FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lcOuter " +
+                            // this gets the single completion date
+                            "JOIN (" +
+                                "SELECT lc.uuid, completion_date " +
+                                "FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc " +
+                                "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lc.uuid " +
+                                "WHERE p.name=? AND lc.level_name=? AND lc.time_taken=? " +
+                                "ORDER BY lc.time_taken " +
+                                "LIMIT 1" +
+                            // deletes the SINGLE result
+                            ") s ON s.uuid=lcOuter.uuid AND s.completion_date=lcOuter.completion_date";
 
         if (async)
-            DatabaseQueries.runAsyncQuery(query, levelCompletion.getUUID(), levelCompletion.getTimeOfCompletionMillis());
+            DatabaseQueries.runAsyncQuery(query, playerName, levelName, timeTaken);
         else
-            DatabaseQueries.runQuery(query, levelCompletion.getUUID(), levelCompletion.getTimeOfCompletionMillis());
+            DatabaseQueries.runQuery(query, playerName, levelName, timeTaken);
     }
 
     public static boolean hasCompleted(String uuid, String levelName)
@@ -124,11 +135,9 @@ public class CompletionsDB
 
         ResultSet results = DatabaseQueries.getRawResults(
                 "SELECT " +
-                            "r.uuid AS player_uuid, " +
                             "p.name AS player_name, " +
                             "r.level_name AS level_name, " +
-                            "r.time_taken AS time_taken, " +
-                            "r.completion_date AS completion_date " +
+                            "r.time_taken AS time_taken " +
                         "FROM (" +
                             "SELECT " +
                                 "*, " +
@@ -137,8 +146,7 @@ public class CompletionsDB
                                 "SELECT " +
                                     "level_name, " +
                                     "uuid, " +
-                                    "MIN(time_taken) AS time_taken, " +
-                                    "MIN(completion_date) AS completion_date " +
+                                    "MIN(time_taken) AS time_taken " +
                                 "FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
                                 "WHERE time_taken IS NOT NULL " +
                                 "GROUP BY level_name, uuid " +
@@ -153,7 +161,7 @@ public class CompletionsDB
         {
             // default values
             Level currentLevel = null;
-            List<LevelCompletion> currentLB = new ArrayList<>();
+            List<LevelLBPosition> currentLB = new ArrayList<>();
 
             try
             {
@@ -172,15 +180,13 @@ public class CompletionsDB
                         currentLevel = Parkour.getLevelManager().get(levelName);
                     }
 
-                    LevelCompletion levelCompletion = Parkour.getLevelManager().createLevelCompletion(
-                            results.getString("player_uuid"),
-                            results.getString("player_name"),
+                    LevelLBPosition lbPosition = new LevelLBPosition(
                             levelName,
-                            results.getLong("completion_date"),
+                            results.getString("player_name"),
                             results.getLong("time_taken")
                     );
 
-                    currentLB.add(levelCompletion);
+                    currentLB.add(lbPosition);
                 }
 
                 // this makes it so the last level in the results will still get the leaderboard set
@@ -195,41 +201,37 @@ public class CompletionsDB
         Parkour.getLevelManager().setLoadingLeaderboards(false);
     }
 
-    public static List<LevelCompletion> getLeaderboard(String levelName)
+    public static List<LevelLBPosition> getLeaderboard(String levelName)
     {
 
         ResultSet results = DatabaseQueries.getRawResults(
                 "WITH min_times AS (" +
-                      "     SELECT uuid, level_name, MIN(time_taken) AS fastest_completion FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
+                      "     SELECT uuid, level_name, MIN(time_taken) AS fastest_completion FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
                       "     WHERE time_taken IS NOT NULL AND level_name=? GROUP BY uuid" +
                       ")" +
-                      "SELECT p.uuid AS player_uuid, p.name AS player_name, m.fastest_completion AS fastest, completion_date " +
+                      "SELECT p.name AS player_name, m.fastest_completion AS fastest " +
                       "FROM min_times m " +
-                      "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc ON lc.uuid=m.uuid AND lc.time_taken=m.fastest_completion " +
                       "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=m.uuid " +
                       "ORDER BY fastest ASC LIMIT 10",
                       levelName
         );
 
-        List<LevelCompletion> leaderboard = new ArrayList<>();
+        List<LevelLBPosition> leaderboard = new ArrayList<>();
 
         if (results != null)
         {
             try
             {
-                LevelManager levelManager = Parkour.getLevelManager();
                 while (results.next())
                 {
                     // if not added already, add to leaderboard
-                    LevelCompletion levelCompletion = levelManager.createLevelCompletion(
-                            results.getString("player_uuid"),
-                            results.getString("player_name"),
+                    LevelLBPosition lbPosition = new LevelLBPosition(
                             levelName,
-                            results.getLong("completion_date"),
+                            results.getString("player_name"),
                             results.getLong("fastest")
                     );
 
-                    leaderboard.add(levelCompletion);
+                    leaderboard.add(lbPosition);
                 }
             }
             catch (SQLException exception)
@@ -257,5 +259,43 @@ public class CompletionsDB
         }
 
         return false;
+    }
+
+    public static void loadRecords(PlayerStats playerStats)
+    {
+        HashMap<Level, Long> records = new HashMap<>();
+
+        ResultSet results = DatabaseQueries.getRawResults(
+                "SELECT DISTINCT " +
+                          "r.level_name AS level_name, " +
+                          "r.time_taken AS time_taken " +
+                      "FROM " +
+                          "(" +
+                              "SELECT " +
+                                  "level_name, " +
+                                  "MIN(time_taken) AS time_taken " +
+                              "FROM " +
+                                  "level_completions " +
+                              "GROUP BY level_name" +
+                          ") AS r " +
+                      "JOIN level_completions ou ON " +
+                          "ou.level_name=r.level_name AND " +
+                          "ou.time_taken=r.time_taken " +
+                      "WHERE ou.uuid=?", playerStats.getUUID());
+
+        if (results != null)
+        {
+            try
+            {
+                while (results.next())
+                    records.put(Parkour.getLevelManager().get(results.getString("level_name")), results.getLong("time_taken"));
+            }
+            catch (SQLException exception)
+            {
+                Parkour.getPluginLogger().info("Error on getLeaderboard()");
+                exception.printStackTrace();
+            }
+        }
+        playerStats.setRecords(records);
     }
 }

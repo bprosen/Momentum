@@ -2,15 +2,10 @@ package com.renatusnetwork.parkour.data.placeholders;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
-import com.renatusnetwork.parkour.data.leaderboards.EventLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.*;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
-import com.renatusnetwork.parkour.data.leaderboards.InfiniteLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.leaderboards.RaceLBPosition;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
-import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
-import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
-import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.utils.Utils;
 
 public class LBPlaceholders
@@ -160,13 +155,13 @@ public class LBPlaceholders
                                     if (level.getLeaderboard().isEmpty())
                                         return "N/A";
 
-                                    LevelCompletion completion = level.getLeaderboard().get(posInt);
+                                    LevelLBPosition completion = level.getLeaderboard().get(posInt);
 
                                     // return name or value
                                     if (value.equals("name"))
-                                        return completion.getName();
+                                        return completion.getPlayerName();
                                     else if (value.equals("time"))
-                                        return String.valueOf(completion.getCompletionTimeElapsedSeconds());
+                                        return String.valueOf(completion.getTimeTakenSeconds());
                                 }
                             }
                             else

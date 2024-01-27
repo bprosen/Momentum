@@ -14,10 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RecordsCMD implements CommandExecutor
 {
@@ -121,24 +118,24 @@ public class RecordsCMD implements CommandExecutor
                 // online then offline lookup process
                 if (targetStats != null)
                 {
-                    HashMap<Level, LevelCompletion> completions = targetStats.getRecords();
+                    HashMap<Level, Long> completions = targetStats.getRecords();
 
-                    for (Map.Entry<Level, LevelCompletion> entry : completions.entrySet())
-                        records.put(entry.getKey(), entry.getValue().getCompletionTimeElapsedSeconds());
+                    for (Map.Entry<Level, Long> entry : completions.entrySet())
+                        records.put(entry.getKey(), (entry.getValue() / 1000d));
                 }
                 else
                 {
-                    List<LevelCompletion> offlineRecords = Parkour.getLevelManager().getOfflineRecords(targetName);
+                    HashMap<Level, Long> offlineRecords = Parkour.getLevelManager().getRecords(targetName);
 
-                    for (LevelCompletion offlineCompletion : offlineRecords)
-                        records.put(Parkour.getLevelManager().get(offlineCompletion.getLevelName()), (offlineCompletion.getCompletionTimeElapsedMillis() / 1000d));
+                    for (Map.Entry<Level, Long> entry : offlineRecords.entrySet())
+                        records.put(entry.getKey(), (entry.getValue() / 1000d));
                 }
 
                 // if they are equal, we print out "Your records"
                 if (sender.getName().equalsIgnoreCase(targetName))
                     sender.sendMessage(Utils.translate("&9&lYour Records"));
                 else // otherwise, print out their name
-                    sender.sendMessage(Utils.translate("&9&l" + targetName + "'s Records"));
+                    sender.sendMessage(Utils.translate("&9" + targetName + " &lRecords"));
 
                 // only continue if they have records!
                 if (!records.isEmpty())
@@ -146,22 +143,33 @@ public class RecordsCMD implements CommandExecutor
                     int currentNum = Math.max((page * 10) - 10, 0); // prevent going below 0
                     int numRecords = records.size();
                     int max = page * 10;
+                    int currentIndex = 0;
+                    int startingIndex = currentNum;
 
                     if ((max - 10) >= records.size())
                         sender.sendMessage(Utils.translate("&7No page exists"));
                     else
+                    {
+                        LinkedHashMap<Level, Double> sortedRecords = sortByTimeTaken(records);
+
                         // iterate through all records
-                        for (Map.Entry<Level, Double> record : records.entrySet())
+                        for (Level record : sortedRecords.keySet())
                         {
-                            if (numRecords > currentNum && max > currentNum)
+                            if (currentIndex >= startingIndex)
                             {
-                                sender.sendMessage(Utils.translate(
-                                        "&7" + (currentNum + 1) + " &a" + record.getKey().getTitle() + "&7 " + record.getValue() + "s"
-                                ));
-                                currentNum++;
+                                if (numRecords > currentNum && max > currentNum)
+                                {
+                                    sender.sendMessage(Utils.translate(
+                                            "&7" + (currentNum + 1) + " &a" + record.getTitle() + "&7 " + sortedRecords.get(record) + "s"
+                                    ));
+                                    currentNum++;
+                                }
+                                else break;
                             }
-                            else break;
+                            else
+                                currentIndex++;
                         }
+                    }
 
                     // send next page option
                     if (records.size() > max)
@@ -177,5 +185,36 @@ public class RecordsCMD implements CommandExecutor
         }
         else
             sender.sendMessage(Utils.translate("&cStill loading records..."));
+    }
+
+    private LinkedHashMap<Level, Double> sortByTimeTaken(HashMap<Level, Double> records)
+    {
+        LinkedHashMap<Level, Double> newRecords = new LinkedHashMap<>();
+        HashSet<String> seenLevels = new HashSet<>();
+
+        int currentSize = 0;
+        while (currentSize < records.size())
+        {
+            Level fastest = null;
+            double fastestTime = Double.MAX_VALUE;
+
+            for (Map.Entry<Level, Double> entry : records.entrySet())
+            {
+                if (fastestTime > entry.getValue() && !seenLevels.contains(entry.getKey().getName()))
+                {
+                    fastest = entry.getKey();
+                    fastestTime = entry.getValue();
+                }
+            }
+
+            if (fastest != null)
+            {
+                newRecords.put(fastest, fastestTime);
+                seenLevels.add(fastest.getName());
+                currentSize++; // prevents infinite looping
+            }
+        }
+
+        return newRecords;
     }
 }

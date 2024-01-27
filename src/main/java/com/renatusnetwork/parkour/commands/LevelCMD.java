@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
@@ -325,7 +326,7 @@ public class LevelCMD implements CommandExecutor
                     }
                 }
             }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("removetime"))
+            else if (a.length == 3 && a[0].equalsIgnoreCase("removelbposition"))
             {
                 if (Utils.isInteger(a[2]))
                 {
@@ -334,19 +335,19 @@ public class LevelCMD implements CommandExecutor
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
-                    if (level != null)
+                    if (level != null && level.hasLeaderboard())
                     {
-                        List<LevelCompletion> leaderboard = level.getLeaderboard();
+                        List<LevelLBPosition> leaderboard = level.getLeaderboard();
 
                         if (place <= leaderboard.size() && place > 0)
                         {
-                            LevelCompletion oldHolder = leaderboard.get(place);
+                            LevelLBPosition oldHolder = leaderboard.get(place - 1);
 
                             // run it in async!
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    CompletionsDB.removeCompletion(oldHolder, false);
+                                    CompletionsDB.removeCompletionFromName(oldHolder.getPlayerName(), oldHolder.getLevelName(), oldHolder.getTimeTaken(), false);
 
                                     level.setTotalCompletionsCount(level.getTotalCompletionsCount() - 1);
                                     level.setLeaderboard(CompletionsDB.getLeaderboard(levelName));
@@ -355,29 +356,34 @@ public class LevelCMD implements CommandExecutor
                                     // if deleting record
                                     if (place == 1)
                                     {
-                                        List<LevelCompletion> newLeaderbaord = level.getLeaderboard();
+                                        List<LevelLBPosition> newLeaderboard = level.getLeaderboard();
 
-                                        if (!newLeaderbaord.isEmpty())
+                                        if (!newLeaderboard.isEmpty())
                                         {
                                             // if the new leaderboard is no longer empty, add record for new holder
-                                            LevelCompletion newHolder = level.getRecordCompletion();
+                                            LevelLBPosition newHolder = newLeaderboard.get(0);
 
                                             // if it is a diff person, need to update their in game stats
-                                            if (!oldHolder.getUUID().equalsIgnoreCase(newHolder.getUUID())) {
-                                                PlayerStats oldHolderStats = statsManager.get(oldHolder.getUUID());
-                                                PlayerStats newHolderStats = statsManager.get(newHolder.getUUID());
+                                            if (!oldHolder.getPlayerName().equalsIgnoreCase(newHolder.getPlayerName())) {
+                                                PlayerStats oldHolderStats = statsManager.getByName(oldHolder.getPlayerName());
+                                                PlayerStats newHolderStats = statsManager.getByName(newHolder.getPlayerName());
 
                                                 if (oldHolderStats != null)
                                                     oldHolderStats.removeRecord(level);
 
                                                 if (newHolderStats != null)
-                                                    newHolderStats.addRecord(level, newHolder);
+                                                    newHolderStats.addRecord(level, newHolder.getTimeTaken());
                                             }
                                         }
                                     }
 
+                                    PlayerStats targetStats = Parkour.getStatsManager().getByName(oldHolder.getPlayerName());
+
+                                    if (targetStats != null)
+                                        targetStats.removeCompletion(oldHolder.getLevelName(), oldHolder.getTimeTaken());
+
                                     sender.sendMessage(Utils.translate(
-                                            "&4" + oldHolder.getName() + "'s &ctime has been removed succesfully from &4" + levelName
+                                            "&4" + oldHolder.getPlayerName() + "'s &ctime has been removed succesfully from &4" + levelName
                                     ));
                                 }
                             }.runTaskAsynchronously(Parkour.getPlugin());
@@ -385,6 +391,8 @@ public class LevelCMD implements CommandExecutor
                         else
                             sender.sendMessage(Utils.translate("&cYou are entering an integer above 9"));
                     }
+                    else
+                        sender.sendMessage(Utils.translate("&c" + a[1] + " is not a level or has no leaderboard"));
                 }
                 else
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer!"));
@@ -982,7 +990,7 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level maxcompletions <level> [completions]  &7View/Set max completions"));
         sender.sendMessage(Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion"));
         sender.sendMessage(Utils.translate("&a/level addrequired/removerequired <level> <levelTheyNeed>  &7Add/Remove required level"));
-        sender.sendMessage(Utils.translate("&a/level removetime <level> <leaderboardPlace>  &7Removes a player's time from a level's leaderboard"));
+        sender.sendMessage(Utils.translate("&a/level removelbposition <level> <leaderboardPlace>  &7Removes a player's time from a level's leaderboard"));
         sender.sendMessage(Utils.translate("&a/level raceset <level> <1/2>  &7Sets the race location for player 1 or 2"));
         sender.sendMessage(Utils.translate("&a/level addrating <level> <rating (0-5)>  &7Adds a rating to a level (ADMIN WAY NOT /rate)"));
         sender.sendMessage(Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name"));

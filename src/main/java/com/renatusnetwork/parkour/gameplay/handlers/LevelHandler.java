@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.api.LevelCompletionEvent;
 import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.events.EventManager;
+import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
@@ -81,7 +82,7 @@ public class LevelHandler {
         if (!event.isCancelled())
         {
             LevelManager levelManager = Parkour.getLevelManager();
-            LevelCompletion oldRecord = level.getRecordCompletion();
+            LevelLBPosition oldRecord = level.getRecordCompletion();
 
             levelManager.addTotalLevelCompletion();
 
@@ -325,19 +326,19 @@ public class LevelHandler {
             player.teleport(locationTo);
             playerStats.disableLevelStartTime();
 
-            boolean isRecord = level.hasLeaderboard() && level.getRecordCompletion().equals(levelCompletion);
+            boolean isRecord = level.hasLeaderboard() && level.getRecordCompletion().getPlayerName().equalsIgnoreCase(levelCompletion.getName());
             if (isRecord)
             {
                 // update new #1 records
-                playerStats.addRecord(level, levelCompletion);
+                playerStats.addRecord(level, levelCompletion.getCompletionTimeElapsedMillis());
                 String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
 
                 // update old record
                 if (oldRecord != null)
                 {
-                    PlayerStats previousStats = Parkour.getStatsManager().get(oldRecord.getUUID());
+                    PlayerStats previousStats = Parkour.getStatsManager().getByName(oldRecord.getPlayerName());
 
-                    if (previousStats != null)
+                    if (previousStats != null && !playerStats.equals(previousStats))
                         previousStats.removeRecord(level);
                 }
                 else

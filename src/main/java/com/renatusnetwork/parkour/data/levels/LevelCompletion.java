@@ -50,6 +50,11 @@ public class LevelCompletion
 
     public boolean equals(LevelCompletion other)
     {
-        return other.getUUID().equalsIgnoreCase(uuid) && other.getCompletionTimeElapsedMillis() == completionTimeElapsed;
+        return other.getUUID().equalsIgnoreCase(uuid) && other.getTimeOfCompletionMillis() == timeOfCompletion;
+    }
+
+    public boolean equals(String playerName, String levelName, long timeTaken)
+    {
+        return playerName.equalsIgnoreCase(name) && timeTaken == completionTimeElapsed;
     }
 }

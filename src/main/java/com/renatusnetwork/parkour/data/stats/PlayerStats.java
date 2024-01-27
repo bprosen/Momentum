@@ -68,7 +68,7 @@ public class PlayerStats {
 
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
     private HashSet<String> masteryCompletions;
-    private HashMap<Level, LevelCompletion> records;
+    private HashMap<Level, Long> records;
     private HashSet<Perk> perks;
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
@@ -362,7 +362,7 @@ public class PlayerStats {
         return records.size();
     }
 
-    public HashMap<Level, LevelCompletion> getRecords() {
+    public HashMap<Level, Long> getRecords() {
         return records;
     }
 
@@ -370,7 +370,7 @@ public class PlayerStats {
         return records.containsKey(level);
     }
 
-    public void setRecords(HashMap<Level, LevelCompletion> records) {
+    public void setRecords(HashMap<Level, Long> records) {
         this.records = records;
     }
 
@@ -378,11 +378,11 @@ public class PlayerStats {
         records.remove(level);
     }
 
-    public void addRecord(Level level, LevelCompletion levelCompletion) {
-        records.put(level, levelCompletion);
+    public void addRecord(Level level, long time) {
+        records.put(level, time);
     }
 
-    public LevelCompletion getRecord(Level level)
+    public long getRecord(Level level)
     {
         return records.get(level);
     }
@@ -738,20 +738,22 @@ public class PlayerStats {
         return fastestCompletion;
     }
 
-    public Set<LevelCompletion> getCompletions(String levelName)
-    {
-        return levelCompletions.get(levelName);
-    }
-
-    public LevelCompletion getCompletion(String levelName, int completionID)
+    public void removeCompletion(String levelName, long timeTaken)
     {
         Set<LevelCompletion> completions = levelCompletions.get(levelName);
 
-        for (LevelCompletion levelCompletion : completions)
-            if (levelCompletion.equals(completionID))
-                return levelCompletion;
+        LevelCompletion found = null;
 
-        return null;
+        if (completions != null)
+            for (LevelCompletion completion : completions)
+                if (completion.equals(name, levelName, timeTaken))
+                {
+                    found = completion;
+                    break;
+                }
+
+        if (found != null)
+            completions.remove(found);
     }
     //
     // Perks Section
