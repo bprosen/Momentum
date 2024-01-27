@@ -110,7 +110,7 @@ public class RecordsCMD implements CommandExecutor
     private void sendStats(Player sender, String targetName, int page)
     {
         // make sure we are not loading lbs
-        if (!Parkour.getStatsManager().isLoadingLeaderboards())
+        if (!Parkour.getLevelManager().isLoadingLeaderboards())
         {
             if (StatsDB.isPlayerInDatabase(targetName))
             {
@@ -128,10 +128,10 @@ public class RecordsCMD implements CommandExecutor
                 }
                 else
                 {
-                    HashMap<Level, Long> offlineCompletions = CompletionsDB.getRecordsFromName(targetName);
+                    List<LevelCompletion> offlineRecords = Parkour.getLevelManager().getOfflineRecords(targetName);
 
-                    for (Map.Entry<Level, Long> offlineCompletion : offlineCompletions.entrySet())
-                        records.put(offlineCompletion.getKey(), (offlineCompletion.getValue() / 1000d));
+                    for (LevelCompletion offlineCompletion : offlineRecords)
+                        records.put(Parkour.getLevelManager().get(offlineCompletion.getLevelName()), (offlineCompletion.getCompletionTimeElapsedMillis() / 1000d));
                 }
 
                 // if they are equal, we print out "Your records"

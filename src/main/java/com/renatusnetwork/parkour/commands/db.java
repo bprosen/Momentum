@@ -192,7 +192,7 @@ public class db implements CommandExecutor
                                 DatabaseQueries.runQuery(
                                         "INSERT INTO " + DatabaseManager.LEVELS_TABLE + " " +
                                                 "(name, creation_date, type, tc, broadcast, liquid_reset) VALUES " +
-                                                "(?,FROM_UNIXTIME(?), ?,?,?,?)",
+                                                "(?,?,?,?,?,?)",
                                                 levelName, System.currentTimeMillis() / 1000, type.name(), tcEnabled, broadcast, liquid
                                 );
 
@@ -350,42 +350,53 @@ public class db implements CommandExecutor
                                 Migration handling level completions
                              */
                             Parkour.getPluginLogger().info("Attempting migration of completions table");
-                            String completionsQuery = "SELECT * FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id";
+                            String completionsQuery = "SELECT *, (UNIX_TIMESTAMP(completion_date) * 1000) AS date FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id";
 
                             int completionCounter = 0;
 
                             PreparedStatement rewardStatement = connection.prepareStatement(completionsQuery);
                             results = rewardStatement.executeQuery();
 
+
+                            int duplicates = 0;
                             while (results.next())
                             {
-                                DatabaseQueries.runQuery(
-                                        "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " (uuid, level_name, completion_date, time_taken) VALUES (?,?,?,?)",
-                                        results.getString("uuid"),
-                                        results.getString("level_name"),
-                                        results.getTimestamp("completion_date"),
-                                        results.getInt("time_taken")
-                                );
+                                String uuid = results.getString("uuid");
+                                long date = results.getLong("date");
+                                long oldDate = date;
+
+                                int timeTaken = results.getInt("time_taken");
+
+                                if (timeTaken > 0)
+                                {
+                                    while (!DatabaseQueries.runQuery(
+                                            "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " (uuid, level_name, completion_date, time_taken) VALUES (?,?,?,?)",
+                                            results.getString("uuid"),
+                                            results.getString("level_name"),
+                                            date,
+                                            results.getInt("time_taken")
+                                    ))
+                                        date++;
+                                }
+                                else
+                                    while (!DatabaseQueries.runQuery(
+                                            "INSERT INTO " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " (uuid, level_name, completion_date) VALUES (?,?,?)",
+                                            results.getString("uuid"),
+                                            results.getString("level_name"),
+                                            date
+                                    ))
+                                        date++;
+
+                                if (oldDate != date)
+                                {
+                                    Parkour.getPluginLogger().info("Duplicate completion from forced found for " + uuid + ", changing date from " + oldDate + " -> " + date);
+                                    duplicates++;
+                                }
+
                                 completionCounter++;
                             }
 
-                            int recordCounter = 0;
-                            // now update levels
-                            String recordQuery = "SELECT level_name, MIN(time_taken) AS fastest FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id WHERE time_taken > 0 GROUP BY level_name";
-                            PreparedStatement recordStatement = connection.prepareStatement(recordQuery);
-                            results = recordStatement.executeQuery();
-                            results.next();
-
-                            while (results.next())
-                            {
-                                DatabaseQueries.runQuery(
-                                        "UPDATE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " SET record=1 WHERE level_name=? AND time_taken=?",
-                                        results.getString("level_name"), results.getInt("fastest")
-                                );
-                                recordCounter++;
-                            }
-
-                            sender.sendMessage(Utils.translate("&cMigrated " + completionCounter + " completions and " + recordCounter + " records"));
+                            sender.sendMessage(Utils.translate("&cMigrated " + completionCounter + " completions (" + duplicates + " duplicates fixed)"));
 
                             /*
                                 Clans migration system

@@ -3,6 +3,8 @@ package com.renatusnetwork.parkour.data.levels;
 import com.comphenix.protocol.PacketType;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.types.EventType;
+import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
+import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
@@ -29,8 +31,9 @@ public class LevelManager {
     private Level featuredLevel;
     private Level tutorialLevel;
     private long totalLevelCompletions;
-
+    private boolean loadingLeaderboards;
     private int masteryLevels;
+
     private HashMap<String, Level> levels;
     private HashMap<Menu, Set<Level>> menuLevels;
     private HashMap<Level, MenuItem> levelMenuItems;
@@ -38,6 +41,7 @@ public class LevelManager {
     private HashMap<Integer, Level> topRatedLevelsLB;
     private HashMap<String, HashMap<Integer, Level>> buyingLevels;
     private HashMap<String, LevelCooldown> cooldowns;
+    private HashMap<Integer, RecordsLBPosition> recordsLB;
 
     public LevelManager(Plugin plugin) {
         this.levels = new HashMap<>();
@@ -47,6 +51,7 @@ public class LevelManager {
         this.topRatedLevelsLB = new HashMap<>(Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
         this.buyingLevels = new HashMap<>();
         this.cooldowns = new HashMap<>();
+        this.recordsLB = new HashMap<>(Parkour.getSettingsManager().max_records_leaderboard_size);
 
         load(); // Loads levels from configuration
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
@@ -249,13 +254,17 @@ public class LevelManager {
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
     }
 
+    public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
+
+    public void setLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
+
     public void addCompletion(PlayerStats playerStats, Level level, LevelCompletion levelCompletion)
     {
         level.addTotalCompletionsCount();
 
         if (levelCompletion.wasTimed())
         {
-            if (!Parkour.getStatsManager().isLoadingLeaderboards())
+            if (!isLoadingLeaderboards())
             {
                 List<LevelCompletion> leaderboard = level.getLeaderboard();
 
@@ -370,8 +379,9 @@ public class LevelManager {
             public void run() {
                 loadGlobalLevelCompletionsLB();
                 loadTopRatedLevelsLB();
+                loadRecordsLB();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 15, 20 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 60, 20 * 180);
     }
 
     public void pickFeatured()
@@ -807,7 +817,74 @@ public class LevelManager {
         }
     }
 
+    public LevelCompletion createLevelCompletion(String uuid, String playerName, String levelName, long creationDate, long timeElapsed)
+    {
+        return timeElapsed >= 0 ?
+                new LevelCompletion(
+                        levelName, uuid, playerName, creationDate, timeElapsed
+                )
+                :
+                new LevelCompletion(
+                        levelName, uuid, playerName, creationDate
+                );
+    }
+
     public int numLevels() { return levels.size(); }
+
+    public void loadRecordsLB() {
+
+        if (!isLoadingLeaderboards())
+        {
+            recordsLB.clear();
+
+            HashMap<String, Integer> tempRecords = new HashMap<>();
+            for (Level level : Parkour.getLevelManager().getLevels().values())
+            {
+                LevelCompletion record = level.getRecordCompletion();
+
+                if (record != null)
+                {
+                    if (tempRecords.containsKey(record.getName()))
+                        tempRecords.replace(record.getName(), tempRecords.get(record.getName()) + 1);
+                    else
+                        tempRecords.put(record.getName(), 1);
+                }
+            }
+
+            HashSet<String> seenNames = new HashSet<>();
+            for (int lbPos = 1; lbPos <= 10; lbPos++)
+            {
+                String currentMax = null;
+                int currentMaxRecords = 0;
+                for (Map.Entry<String, Integer> entry : tempRecords.entrySet())
+                    if ((currentMax == null || entry.getValue() > currentMaxRecords) && !seenNames.contains(entry.getKey()))
+                    {
+                        currentMax = entry.getKey();
+                        currentMaxRecords = entry.getValue();
+                        seenNames.add(entry.getKey());
+                    }
+
+                recordsLB.put(lbPos, new RecordsLBPosition(currentMax, currentMaxRecords));
+            }
+        }
+    }
+
+    public HashMap<Integer, RecordsLBPosition> getRecordsLB() { return recordsLB; }
+
+    public List<LevelCompletion> getOfflineRecords(String search)
+    {
+        List<LevelCompletion> result = new ArrayList<>();
+
+        for (Level level : levels.values())
+        {
+            LevelCompletion record = level.getRecordCompletion();
+
+            if (record != null && record.getName().equalsIgnoreCase(search))
+                result.add(record);
+        }
+
+        return result;
+    }
 
     public Set<String> getNames() {
         return levels.keySet();

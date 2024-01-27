@@ -90,7 +90,7 @@ public class DatabaseQueries
         return null;
     }
 
-    public static void runQuery(String sql, Object... parameters)
+    public static boolean runQuery(String sql, Object... parameters)
     {
         try
         {
@@ -102,11 +102,13 @@ public class DatabaseQueries
 
             statement.executeUpdate();
             statement.close();
+            return true;
         }
         catch (SQLException exception)
         {
             Parkour.getPluginLogger().severe("Failed to run query: " + sql);
             exception.printStackTrace();
+            return false;
         }
     }
 

@@ -123,7 +123,7 @@ public class LBPlaceholders
                         }
                         case "records":
                         {
-                            RecordsLBPosition lbPos = Parkour.getStatsManager().getRecordsLB().get(posInt);
+                            RecordsLBPosition lbPos = Parkour.getLevelManager().getRecordsLB().get(posInt);
 
                             if (lbPos != null)
                             {
@@ -155,7 +155,7 @@ public class LBPlaceholders
                             // stats type!
                             if (level != null)
                             {
-                                if (!Parkour.getStatsManager().isLoadingLeaderboards())
+                                if (!Parkour.getLevelManager().isLoadingLeaderboards())
                                 {
                                     if (level.getLeaderboard().isEmpty())
                                         return "N/A";

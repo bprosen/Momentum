@@ -270,17 +270,16 @@ public class RaceManager {
 
             levelManager.addTotalLevelCompletion();
 
-            LevelCompletion levelCompletion = new LevelCompletion(
-                    (int) levelManager.getTotalLevelCompletions(),
-                    raceObject.getLevel().getName(),
+            LevelCompletion levelCompletion = levelManager.createLevelCompletion(
                     winner.getUniqueId().toString(),
                     winner.getName(),
+                    raceObject.getLevel().getName(),
                     System.currentTimeMillis(),
                     elapsedTime
             );
 
             winnerStats.setTotalLevelCompletions(winnerStats.getTotalLevelCompletions() + 1);
-            CompletionsDB.insertCompletion(levelCompletion, false, false);
+            CompletionsDB.insertCompletion(levelCompletion, false);
             levelManager.addCompletion(winnerStats, raceObject.getLevel(), levelCompletion);
 
             // Update player information

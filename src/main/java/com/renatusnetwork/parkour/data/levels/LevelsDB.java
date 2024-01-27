@@ -21,7 +21,7 @@ import java.util.*;
 public class LevelsDB {
 
     public static HashMap<String, Level> getLevels() {
-        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*, (UNIX_TIMESTAMP(creation_date) * 1000) AS date", "");
+        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*", "");
         HashMap<String, Level> levels = new HashMap<>();
         LocationManager locationManager = Parkour.getLocationManager();
 
@@ -31,7 +31,7 @@ public class LevelsDB {
             LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
 
             Level level;
-            long creationDate = Long.parseLong(result.get("date"));
+            long creationDate = Long.parseLong(result.get("creation_date"));
             if (type == LevelType.RACE)
             {
                 // since we store the 2 locations in the level object, we want a subclass for storage
@@ -196,7 +196,7 @@ public class LevelsDB {
     }
 
     public static void insertLevel(String levelName, long creationSeconds) {
-        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name, creation_date) VALUES (?, FROM_UNIXTIME(?))",
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name, creation_date) VALUES (?,?)",
                 levelName, creationSeconds);
     }
 

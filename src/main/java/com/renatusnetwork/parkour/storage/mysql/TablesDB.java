@@ -167,7 +167,7 @@ public class TablesDB
         String query = "CREATE TABLE " + DatabaseManager.LEVELS_TABLE + "(" +
                             // basic info
                             "name VARCHAR(20) NOT NULL, " +
-                            "creation_date TIMESTAMP NOT NULL, " +
+                            "creation_date BIGINT NOT NULL, " +
                             "reward INT DEFAULT NULL, " +
                             "price INT DEFAULT NULL, " +
                             "title VARCHAR(50) DEFAULT NULL, " + // this needs to be long to allow for storage of colors
@@ -468,21 +468,19 @@ public class TablesDB
     private static void createLevelCompletions()
     {
         String query = "CREATE TABLE " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "(" +
-                            "id BIGINT NOT NULL AUTO_INCREMENT, " +
                             "uuid CHAR(36) NOT NULL, " +
+                            "completion_date BIGINT NOT NULL, " + // allow for max system time
                             "level_name VARCHAR(20) NOT NULL, " +
-                            "completion_date TIMESTAMP NOT NULL, " +
-                            "time_taken MEDIUMINT DEFAULT 0, " +
+                            "time_taken INT DEFAULT NULL, " + // max time taken for an INT is 24 days. no need for big int
                             "mastery BIT DEFAULT 0, " +
-                            "record BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(id), " +
+                            "PRIMARY KEY(uuid, completion_date), " +
                             // indexes
                             "INDEX uuid_index(uuid), " + // gets the completions for that user fast
-                            "INDEX level_index(level_name), " + // gets the completions for that level fast
+                            "INDEX time_taken_index(time_taken), " + // useful for lb loading, record getting, etc
                             // constraints
                             "CONSTRAINT " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + "_non_negative CHECK (" +
-                                "time_taken >= 0" +
+                                "time_taken IS NULL OR time_taken >= 0" +
                             ")" +
                         ")";
 

@@ -335,7 +335,7 @@ public class Level
 
     public void setLeaderboard(List<LevelCompletion> leaderboard) { this.leaderboard = leaderboard; }
 
-    public LevelCompletion getRecordCompletion() { return leaderboard.get(0); }
+    public LevelCompletion getRecordCompletion() { return !leaderboard.isEmpty() ? leaderboard.get(0) : null; }
 
     public boolean isRequiredLevel(String levelName) { return requiredLevels.contains(levelName); }
 

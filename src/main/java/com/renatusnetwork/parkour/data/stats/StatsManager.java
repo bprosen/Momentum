@@ -51,11 +51,9 @@ public class StatsManager {
     private HashSet<PlayerStats> ascendancePlayerList;
     private HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB;
     private HashMap<Integer, CoinsLBPosition> coinsLB;
-    private HashMap<Integer, RecordsLBPosition> recordsLB;
     private HashSet<String> saidGG;
 
     private BukkitTask ggTask;
-    private boolean loadingLeaderboards;
 
     private int totalPlayers;
     private long totalCoins;
@@ -70,7 +68,6 @@ public class StatsManager {
         this.ascendancePlayerList = new HashSet<>();
         this.globalPersonalCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
         this.coinsLB = new HashMap<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
-        this.recordsLB = new HashMap<>(Parkour.getSettingsManager().max_records_leaderboard_size);
         this.saidGG = new HashSet<>();
 
         startScheduler(plugin);
@@ -80,28 +77,15 @@ public class StatsManager {
     private void startScheduler(Plugin plugin)
     {
 
-        // Leader Boards
-        new BukkitRunnable() {
-            public void run() {
-                CompletionsDB.loadTotalCompletions();
-                CompletionsDB.loadLeaderboards();
-                loadGlobalPersonalCompletionsLB();
-                loadCoinsLB();
-                loadRecordsLB();
-                loadTotalCoins();
-            }
-        }.runTaskAsynchronously(plugin);
-
         // run personal lb load and online players perks gained count every 3 mins in async
         new BukkitRunnable() {
             @Override
             public void run() {
                 loadGlobalPersonalCompletionsLB();
                 loadCoinsLB();
-                loadRecordsLB();
                 loadTotalCoins();
             }
-        }.runTaskTimerAsynchronously(plugin, 20 * 180, 20 * 180);
+        }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 180);
 
         // update ascendance players every second
         new BukkitRunnable() {
@@ -173,10 +157,6 @@ public class StatsManager {
     {
         return playerStatsUUID.get(uuid);
     }
-
-    public boolean isLoadingLeaderboards() { return loadingLeaderboards; }
-
-    public void setLoadingLeaderboards(boolean loadingLeaderboards) { this.loadingLeaderboards = loadingLeaderboards; }
 
     public int getTotalPlayers() { return totalPlayers; }
 
@@ -508,46 +488,10 @@ public class StatsManager {
         }
     }
 
-    public void loadRecordsLB() {
-        recordsLB.clear();
-
-        try {
-
-            // find the highest top 10 completion stat
-            List<Map<String, String>> recordsResult = DatabaseQueries.getResults(
-                    DatabaseManager.PLAYERS_TABLE + " p",
-                    "name, COUNT(level_name) AS numRecords",
-                    "JOIN " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc " +
-                            "ON lc.uuid=p.uuid " +
-                            "WHERE lc.record=1 " +
-                            "GROUP BY p.name " +
-                            "ORDER BY numRecords " +
-                            "DESC LIMIT " + Parkour.getSettingsManager().max_records_leaderboard_size);
-
-            int lbPos = 1;
-            for (Map<String, String> recordResult : recordsResult)
-            {
-                String playerName = recordResult.get("name");
-                int records = Integer.parseInt(recordResult.get("numRecords"));
-
-                // if they have more than 0 completions, add (reset stats case)
-                if (records > 0)
-                {
-                    recordsLB.put(lbPos, new RecordsLBPosition(playerName, records));
-                    lbPos++;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public HashMap<Integer, CoinsLBPosition> getCoinsLB()
     {
         return coinsLB;
     }
-
-    public HashMap<Integer, RecordsLBPosition> getRecordsLB() { return recordsLB; }
 
     public HashMap<Integer, GlobalPersonalLBPosition> getGlobalPersonalCompletionsLB() {
         return globalPersonalCompletionsLB;

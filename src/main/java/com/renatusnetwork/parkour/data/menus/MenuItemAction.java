@@ -591,10 +591,15 @@ public class MenuItemAction {
                                 if (playerStats.isAttemptingMastery())
                                     Parkour.getStatsManager().leftMastery(playerStats);
 
-                                Level rankupLevel = playerStats.getRank().getRankupLevel();
-                                // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
-                                if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
-                                    Parkour.getStatsManager().enteredRankup(playerStats);
+                                Rank rank = playerStats.getRank();
+                                if (rank != null)
+                                {
+                                    Level rankupLevel = rank.getRankupLevel();
+
+                                    // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
+                                    if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
+                                        Parkour.getStatsManager().enteredRankup(playerStats);
+                                }
 
                                 if (MenuUtils.containsShiftClicked(player.getName()) &&
                                     level.hasMastery() && playerStats.hasCompleted(level) &&

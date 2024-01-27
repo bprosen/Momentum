@@ -258,7 +258,7 @@ public class StatsCMD implements CommandExecutor {
                 // then check if it is still null
                 if (level != null)
                 {
-                    if (!Parkour.getStatsManager().isLoadingLeaderboards())
+                    if (!Parkour.getLevelManager().isLoadingLeaderboards())
                     {
                         sender.sendMessage(Utils.translate(
                                 level.getTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
@@ -361,7 +361,7 @@ public class StatsCMD implements CommandExecutor {
 
     public static void printRecordsLB(CommandSender sender)
     {
-        HashMap<Integer, RecordsLBPosition> recordsLB = Parkour.getStatsManager().getRecordsLB();
+        HashMap<Integer, RecordsLBPosition> recordsLB = Parkour.getLevelManager().getRecordsLB();
 
         if (!recordsLB.isEmpty()) {
 
