@@ -248,7 +248,7 @@ public class Menu
             {
                 MenuPage menuPage = sortedMenu.get(pageNumber);
 
-                return MenuUtils.createInventory(menuPage, menuPage.getRowCount() * 9, title);
+                return Parkour.getMenuManager().createInventory(menuPage, menuPage.getRowCount() * 9, title);
             }
         }
 
@@ -256,10 +256,10 @@ public class Menu
         {
             MenuPage menuPage = pages.get(pageNumber);
 
-            return MenuUtils.createInventory(menuPage, menuPage.getRowCount() * 9, title);
+            return Parkour.getMenuManager().createInventory(menuPage, menuPage.getRowCount() * 9, title);
         }
 
-        return MenuUtils.createInventory(getPage(1),  54, title);
+        return Parkour.getMenuManager().createInventory(getPage(1),  54, title);
     }
 
     public void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber)

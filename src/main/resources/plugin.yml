@@ -124,3 +124,5 @@ commands:
   favorite:
     description: "RN-Parkour favorite command"
     aliases: [fav]
+  preview:
+    description: "RN-Parkour preview command"

@@ -182,6 +182,9 @@ public class JoinLeaveListener implements Listener
         if (playerStats.hasNightVision())
             playerStats.clearPotionEffects();
 
+        // reset preview if in a level previewing it
+        playerStats.resetPreviewLevel();
+
         if (playerStats.inLevel())
         {
             // if in dropper, respawn them

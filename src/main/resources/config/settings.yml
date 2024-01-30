@@ -48,6 +48,7 @@ levels:
   min_difficulty: 1
   min_mastery_multiplier: 1.00
   max_mastery_multiplier: 4.00
+  preview_max_distance: 25.0
 cooldowns:
   reset_time: "3:15"
   modifiers:

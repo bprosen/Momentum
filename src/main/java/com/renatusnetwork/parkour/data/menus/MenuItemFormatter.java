@@ -493,6 +493,7 @@ public class MenuItemFormatter
                 }
 
                 itemLore.add(Utils.translate("&7Click to buy " + level.getTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
+                itemLore.add(Utils.translate("  &6Shift click to preview"));
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
             }
             else
@@ -654,8 +655,8 @@ public class MenuItemFormatter
                         itemLore.add(Utils.translate("&7  Mastery &a✔"));
                     else
                     {
-                        itemLore.add(Utils.translate("&7  Mastery &c✖"));
-                        itemLore.add(Utils.translate("&7    Shift click &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins (" + level.getMasteryMultiplier() + "x)"));
+                        itemLore.add(Utils.translate("&7  Mastery &c✖ &6(Shift click)"));
+                        itemLore.add(Utils.translate("    &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins &7(" + level.getMasteryMultiplier() + "x)"));
                     }
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);

@@ -27,11 +27,13 @@ public class MenuManager
 
     private HashMap<String, Menu> menus;
     private HashMap<String, CancelTasks> cancelTasks;
+    private  HashSet<String> shiftClicked;
 
     public MenuManager()
     {
         this.menus = new HashMap<>();
         this.cancelTasks = new HashMap<>();
+        this.shiftClicked = new HashSet<>();
         load();
     }
 
@@ -100,6 +102,26 @@ public class MenuManager
     public void removeCancelTasks(String playerName)
     {
         cancelTasks.remove(playerName);
+    }
+
+    public void addShiftClicked(String playerName)
+    {
+        shiftClicked.add(playerName);
+    }
+
+    public boolean containsShiftClicked(String playerName)
+    {
+        return shiftClicked.contains(playerName);
+    }
+
+    public boolean removeShiftClicked(String playerName)
+    {
+        return shiftClicked.remove(playerName);
+    }
+
+    public Inventory createInventory(MenuPage menuPage, int size, String title)
+    {
+        return Bukkit.createInventory(new MenuHolder(menuPage), size, title);
     }
 
     public Set<Level> getLevelsFromMenuDeep(Menu inMenu, Menu clickedMenu)

@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.levels.LevelPreview;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
@@ -30,6 +31,7 @@ public class PlayerStats {
     private String name;
     private double coins;
     private Level level;
+    private LevelPreview previewLevel;
     private long levelStartTime;
     private boolean spectatable;
     private PlayerStats playerToSpectate;
@@ -284,10 +286,22 @@ public class PlayerStats {
         return level != null;
     }
 
+    public boolean isPreviewingLevel() { return previewLevel != null; }
+
+    public LevelPreview getPreviewLevel() { return previewLevel; }
+
+    public void setPreviewLevel(LevelPreview previewLevel) { this.previewLevel = previewLevel; }
+
+    public void resetPreviewLevel()
+    {
+        if (previewLevel != null)
+            previewLevel.reset();
+
+        previewLevel = null;
+    }
+
     public Level getFavoriteLevel(int index) {
-        if (index < favoriteLevels.size())
-            return favoriteLevels.get(index);
-        return null;
+        return index < favoriteLevels.size() ? favoriteLevels.get(index) : null;
     }
 
     public int numFavoriteLevels() {
@@ -582,7 +596,7 @@ public class PlayerStats {
     }
 
     public void addFail() {
-        if (failsToggled && !inInfinite && !inTutorial && !inRace && !eventParticipant)
+        if (failsToggled && !inInfinite && !inTutorial && !inRace && !eventParticipant && previewLevel == null)
             fails++;
     }
 

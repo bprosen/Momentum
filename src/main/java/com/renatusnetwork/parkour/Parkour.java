@@ -176,6 +176,7 @@ public class Parkour extends JavaPlugin {
         getCommand("bid").setExecutor(new BidCMD());
         getCommand("favorite").setExecutor(new FavoriteCMD());
         getCommand("stuck").setExecutor(new StuckCMD());
+        getCommand("preview").setExecutor(new PreviewCMD());
     }
 
     private static void load()
@@ -228,6 +229,7 @@ public class Parkour extends JavaPlugin {
         races.shutdown();
         levels.shutdown();
         blackmarket.shutdown();
+        stats.shutdown();
 
         // close database and unload classes
         database.close();

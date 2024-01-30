@@ -156,6 +156,7 @@ public class SettingsManager {
     public int max_favorite_levels;
     public String main_menu_name;
     public int max_offline_cache_size;
+    public float preview_max_distance;
 
     public SettingsManager(FileConfiguration settings)
     {
@@ -411,5 +412,6 @@ public class SettingsManager {
         default_level_sorting_type = LevelSortingType.valueOf(settings.getString("menu.default_level_sorting"));
         max_favorite_levels = settings.getInt("levels.max_favorite");
         main_menu_name = settings.getString("menu.main_menu_name");
+        preview_max_distance = (float) settings.getDouble("levels.preview_max_distance");
     }
 }

@@ -609,4 +609,14 @@ public class StatsManager {
         );
         return hover;
     }
+
+    public void shutdown()
+    {
+        synchronized (playerStatsUUID)
+        {
+            for (PlayerStats playerStats : playerStatsUUID.values())
+                if (playerStats.isPreviewingLevel())
+                    playerStats.resetPreviewLevel();
+        }
+    }
 }

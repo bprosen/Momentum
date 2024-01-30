@@ -32,7 +32,7 @@ public class LevelHandler {
         EventManager eventManager = Parkour.getEventManager();
 
         // if playerstats and level exists
-        if (level != null && playerStats != null && !playerStats.isSpectating())
+        if (level != null && playerStats != null && !playerStats.isSpectating() && !playerStats.isPreviewingLevel())
         {
             // if they do have the required level
             if (level.playerHasRequiredLevels(playerStats))

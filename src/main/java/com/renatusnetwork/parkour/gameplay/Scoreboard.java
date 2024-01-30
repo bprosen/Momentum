@@ -133,8 +133,8 @@ public class Scoreboard {
 
                 int fails = playerStats.getFails();
                 if (!playerStats.isInInfinite() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
-                        !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendance() &&
-                        playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
+                    !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendance() &&
+                    playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
                     board.add(Utils.translate("  &e&lFails &6" + fails));
 
                 // spectator section of scoreboard
@@ -249,7 +249,14 @@ public class Scoreboard {
                                 String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
                                 board.add(formatSpacing(timing));
                             }
-                        } else {
+                        }
+                        else if (playerStats.isPreviewingLevel())
+                        {
+                            board.add(formatSpacing(Utils.translate("&c&lPreview")));
+                            board.add(formatSpacing(level.getFormattedTitle()));
+                        }
+                        else
+                        {
 
                             // normal scoreboard
                             String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));

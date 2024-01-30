@@ -27,33 +27,9 @@ public class BankDB
 
     public static void updateBid(PlayerStats playerStats, BankItemType type, int bidAmount)
     {
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-                // run in async!
-                if (hasBid(playerStats, type))
-                {
-                    DatabaseQueries.runAsyncQuery(
-                            "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND name='" + playerStats.getName() + "'"
-                    );
-                }
-                else
-                {
-                    DatabaseQueries.runAsyncQuery(
-                            "INSERT INTO bank (uuid, name, type, total_bid) VALUES ('" +
-                            playerStats.getUUID() + "','" +
-                            playerStats.getName() + "','" +
-                            type + "'," + bidAmount + ")");
-                }
-            }
-        }.runTaskAsynchronously(Parkour.getPlugin());
-    }
-
-    private static boolean hasBid(PlayerStats playerStats, BankItemType type)
-    {
-        List<Map<String, String>> results = DatabaseQueries.getResults("bank", "*", " WHERE type='" + type.toString() + "' AND uuid='" + playerStats.getUUID() + "'");
-        return !results.isEmpty();
+        // run in async!
+        DatabaseQueries.runAsyncQuery(
+                    "UPDATE bank SET total_bid=" + bidAmount + " WHERE type='" + type + "' AND name='" + playerStats.getName() + "'"
+        );
     }
 }

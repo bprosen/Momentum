@@ -273,6 +273,7 @@ public class Utils {
 
                                 player.teleport(loc);
 
+                                playerStats.resetPreviewLevel();
                                 playerStats.resetCurrentCheckpoint();
                                 PracticeHandler.resetDataOnly(playerStats);
                                 playerStats.resetLevel();

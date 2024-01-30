@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.storage.mysql;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.LevelType;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
@@ -74,6 +75,7 @@ public class TablesDB
         createLevelPotionEffects();
         createLevelRequiredLevels();
         createFavoriteLevels();
+        createBankBids();
     }
 
     private static void createKeys()
@@ -98,6 +100,7 @@ public class TablesDB
         createLevelPotionEffectsKeys();
         createLevelRequiredLevelsKeys();
         createFavoriteLevelsKeys();
+        createBankBidsKeys();
     }
 
     private static void createPlayers()
@@ -808,6 +811,22 @@ public class TablesDB
                 "ON DELETE CASCADE";
 
         DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+
+    private static void createBankBids()
+    {
+        String query = "CREATE TABLE " + DatabaseManager.BANK_BIDS + "(" +
+                "uuid CHAR(36) NOT NULL, " +
+                "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
+                "total_bid INT NOT NULL DEFAULT 0, " +
+                "PRIMARY KEY(uuid, bank_type), " +
+                "INDEX";
+    }
+
+    private static void createBankBidsKeys()
+    {
+
     }
 
     private static String enumQuotations(Enum<?>[] array)

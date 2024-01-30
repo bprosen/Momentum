@@ -12,6 +12,7 @@ import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.levels.LevelPreview;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.PortalType;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
@@ -266,6 +267,21 @@ public class PacketListener implements Listener {
                                         Parkour.getBlackMarketManager().playerJoined(playerStats);
                                 }
                             }.runTask(Parkour.getPlugin());
+                    }
+                    else if (playerStats.isPreviewingLevel())
+                    {
+                        LevelPreview levelPreview = playerStats.getPreviewLevel();
+
+                        new BukkitRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                // only teleport if they go out of the area
+                                if (levelPreview.shouldTeleport(playerStats.getPlayer().getLocation()))
+                                    levelPreview.teleport();
+                            }
+                        }.runTask(Parkour.getPlugin());
                     }
                     else
                     {
