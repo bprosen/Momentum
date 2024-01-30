@@ -240,6 +240,11 @@ public class MenuManager
         openInventory(playerStats, playerStats.getPlayer(), menuName, 1, showError);
     }
 
+    public void openInventory(PlayerStats playerStats, Player opener, String menuName, boolean showError)
+    {
+        openInventory(playerStats, opener, menuName, 1, showError);
+    }
+
     public void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName, int pageNumber)
     {
         Menu menu = menus.get(menuName);
