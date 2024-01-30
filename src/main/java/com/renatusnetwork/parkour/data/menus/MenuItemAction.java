@@ -549,7 +549,7 @@ public class MenuItemAction {
                 // do not teleport if bought more than one!
                 if (levels.size() > 1)
                     // update and open inventory
-                    menuManager.openInventory(playerStats, menuItem.getMenu().getName(), menuItem.getPage().getPageNumber(), false);
+                    menuManager.openInventory(playerStats, player, menuItem.getMenu().getName(), menuItem.getPage().getPageNumber(), false);
                 else
                 {
                     // teleport if only one
@@ -740,6 +740,6 @@ public class MenuItemAction {
         MenuPage menuPage = menuItem.getOpenMenu();
 
         if (menuPage != null)
-            Parkour.getMenuManager().openInventory(playerStats, menuPage.getMenu().getName(), menuPage.getPageNumber(), false);
+            Parkour.getMenuManager().openInventory(playerStats, playerStats.getPlayer(), menuPage.getMenu().getName(), menuPage.getPageNumber(), false);
     }
 }

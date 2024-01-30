@@ -221,17 +221,15 @@ public class MenuManager
         return menu != null ? menu.getInventory(playerStats, pageNumber) : null;
     }
 
-    public void openInventory(PlayerStats playerStats, String menuName, int pageNumber, boolean showError)
+    public void openInventory(PlayerStats playerStats, Player opener, String menuName, int pageNumber, boolean showError)
     {
         Inventory inventory = getInventory(playerStats, menuName, pageNumber);
 
         if (inventory != null)
         {
-            Player player = playerStats.getPlayer();
-
-            player.openInventory(inventory);
-            updateInventory(playerStats, player.getOpenInventory(), menuName, pageNumber);
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
+            opener.openInventory(inventory);
+            updateInventory(playerStats, opener.getOpenInventory(), menuName, pageNumber);
+            opener.playSound(opener.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
         }
         else if (showError)
             playerStats.sendMessage(Utils.translate("&7'&c" + menuName + "&7' is not an existing menu"));
@@ -239,7 +237,7 @@ public class MenuManager
 
     public void openInventory(PlayerStats playerStats, String menuName, boolean showError)
     {
-        openInventory(playerStats, menuName, 1, showError);
+        openInventory(playerStats, playerStats.getPlayer(), menuName, 1, showError);
     }
 
     public void updateInventory(PlayerStats playerStats, InventoryView inventory, String menuName, int pageNumber)

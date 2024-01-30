@@ -27,7 +27,7 @@ public class MenuCMD implements CommandExecutor {
                 if (a.length == 3 && Utils.isInteger(a[2]))
                     pageNumber = Integer.parseInt(a[2]);
 
-                menuManager.openInventory(Parkour.getStatsManager().get(player), a[1], pageNumber, true);
+                menuManager.openInventory(Parkour.getStatsManager().get(player), player, a[1], pageNumber, true);
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
             {

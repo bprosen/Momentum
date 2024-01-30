@@ -29,7 +29,7 @@ public class ProfileCMD implements CommandExecutor {
             playerStats = Parkour.getStatsManager().get(player);
 
         if (playerStats != null)
-            Parkour.getMenuManager().openInventory(playerStats, "profile", true);
+            Parkour.getMenuManager().openInventory(playerStats, player, "profile", 1, true);
         else
             sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online!"));
         return false;
