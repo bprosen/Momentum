@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.levels.*;
 import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.saves.SavesDB;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -176,13 +177,14 @@ public class LevelCMD implements CommandExecutor
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
             {
-                levelManager.load();
-                sender.sendMessage(Utils.translate("&7Loaded &2" + levelManager.numLevels() + " &7levels"));
+                sender.sendMessage(Utils.translate("&7Loading levels..."));
 
                 // load total completions and leaderboards in async
                 new BukkitRunnable() {
                     @Override
                     public void run() {
+                        levelManager.load();
+                        sender.sendMessage(Utils.translate("&7Loaded &2" + levelManager.numLevels() + " &7levels"));
                         CompletionsDB.loadTotalCompletions();
                         CompletionsDB.loadLeaderboards();
                         levelManager.loadGlobalLevelCompletions();
@@ -956,6 +958,25 @@ public class LevelCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate("&7You have removed &a" + level.getTitle() + "&7's required permission"));
                 }
             }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("rank"))
+            {
+                String levelName = a[1].toLowerCase();
+                Level level = getLevel(sender, levelName);
+
+                if (level != null)
+                {
+                    String rankName = a[2].toLowerCase();
+                    Rank rank = Parkour.getRanksManager().get(rankName);
+
+                    if (rank != null)
+                    {
+                        levelManager.setRequiredRank(level, rank);
+                        sender.sendMessage(Utils.translate("&7You have set &a" + level.getTitle() + "&7's required rank to enter to &a" + rank.getTitle()));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
+                }
+            }
             else
                 sendHelp(sender);
         }
@@ -1016,5 +1037,6 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level masterymultiplier <level> <multiplier>  &7Multiplier the level gives for its mastery version"));
         sender.sendMessage(Utils.translate("&a/level permission <level> <permission>  &7Sets the required permission to enter the level"));
         sender.sendMessage(Utils.translate("&a/level removepermission <level>  &7Resets the required permission to enter (to null)"));
+        sender.sendMessage(Utils.translate("&a/level rank <level> <rank>  &7Ses the required rank for the level"));
     }
 }

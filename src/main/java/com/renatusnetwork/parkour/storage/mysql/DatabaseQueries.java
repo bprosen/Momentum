@@ -5,10 +5,7 @@ import com.renatusnetwork.parkour.Parkour;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DatabaseQueries
 {
@@ -107,6 +104,7 @@ public class DatabaseQueries
         catch (SQLException exception)
         {
             Parkour.getPluginLogger().severe("Failed to run query: " + sql);
+            Parkour.getPluginLogger().severe("Params: " + Arrays.toString(parameters));
             exception.printStackTrace();
             return false;
         }

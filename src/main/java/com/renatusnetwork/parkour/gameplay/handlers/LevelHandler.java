@@ -24,51 +24,64 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class LevelHandler {
+public class LevelHandler
+{
 
-    public static void levelCompletion(Player player, Level level)
+    public static void levelCompletion(PlayerStats playerStats, Level level)
     {
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        Player player = playerStats.getPlayer();
         EventManager eventManager = Parkour.getEventManager();
 
         // if playerstats and level exists
-        if (level != null && playerStats != null && !playerStats.isSpectating() && !playerStats.isPreviewingLevel())
+        if (level != null)
         {
-            // if they do have the required level
-            if (level.playerHasRequiredLevels(playerStats))
+            // if they are not spectating
+            if (!playerStats.isSpectating())
             {
-                // if does not have a practice location
-                if (!playerStats.inPracticeMode())
+                // if they are not previewing
+                if (!playerStats.isPreviewingLevel())
                 {
-                    int playerLevelCompletions = playerStats.getLevelCompletionsCount(level);
-
-                    if (!level.hasMaxCompletions() || playerLevelCompletions < level.getMaxCompletions())
+                    // if they do have the required level
+                    if (level.playerHasRequiredLevels(playerStats))
                     {
-                        // if it is a race completion, end it
-                        if (!playerStats.inRace())
+                        // if does not have a practice location
+                        if (!playerStats.inPracticeMode())
                         {
-                            // if level is not an event level, it is guaranteed normal completion
-                            if (!level.isEventLevel())
-                                dolevelCompletion(playerStats, level);
-                            // otherwise, if there is an event running, end!
-                            else if (eventManager.isEventRunning())
-                                eventManager.endEvent(player, false, false);
-                            // otherwise, they are clicking the sign when the event is not running
+                            int playerLevelCompletions = playerStats.getLevelCompletionsCount(level);
+
+                            if (!level.hasMaxCompletions() || playerLevelCompletions < level.getMaxCompletions())
+                            {
+                                // if it is a race completion, end it
+                                if (!playerStats.inRace())
+                                {
+                                    // if level is not an event level, it is guaranteed normal completion
+                                    if (!level.isEventLevel())
+                                        dolevelCompletion(playerStats, level);
+                                        // otherwise, if there is an event running, end!
+                                    else if (eventManager.isEventRunning())
+                                        eventManager.endEvent(player, false, false);
+                                        // otherwise, they are clicking the sign when the event is not running
+                                    else
+                                        player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
+                                }
+                                else
+                                    // if in race
+                                    Parkour.getRaceManager().endRace(player, false);
+                            }
                             else
-                                player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
+                                player.sendMessage(Utils.translate("&cYou've reached the maximum number of completions"));
                         }
                         else
-                            // if in race
-                            Parkour.getRaceManager().endRace(player, false);
+                            player.sendMessage(Utils.translate("&cYou cannot complete a level in practice mode"));
                     }
                     else
-                        player.sendMessage(Utils.translate("&cYou've reached the maximum number of completions"));
+                        player.sendMessage(Utils.translate("&cYou do not have the required levels to complete this level"));
                 }
                 else
-                    player.sendMessage(Utils.translate("&cYou cannot complete a level in practice mode"));
+                    player.sendMessage(Utils.translate("&cYou cannot do this while previewing"));
             }
             else
-                    player.sendMessage(Utils.translate("&cYou do not have the required levels to complete this level"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
         }
     }
 
@@ -91,19 +104,18 @@ public class LevelHandler {
                 playerStats.setIndividualLevelsBeaten(playerStats.getIndividualLevelsBeaten() + 1);
 
             long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
-
             String time = (((double) elapsedTime) / 1000) + "s";
 
-            LevelCompletion levelCompletion = levelManager.createLevelCompletion(
+            // create level completion with appropriate timing
+            LevelCompletion levelCompletion;
+            if (playerStats.isLevelBeingTimed())
+                levelCompletion = levelManager.createLevelCompletion(
                     playerStats.getUUID(), playerStats.getName(), level.getName(), System.currentTimeMillis(), elapsedTime
-            );
-
-            // get new PB
-            LevelCompletion bestCompletion = playerStats.getQuickestCompletion(level);
-            boolean newPB = false;
-
-            if (bestCompletion != null)
-                newPB = bestCompletion.getCompletionTimeElapsedMillis() > elapsedTime; // if this completion will be a PB!
+                );
+            else
+                levelCompletion = levelManager.createLevelCompletion(
+                        playerStats.getUUID(), playerStats.getName(), level.getName(), System.currentTimeMillis(), -1
+                );
 
             // disable when complete
             if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
@@ -128,9 +140,6 @@ public class LevelHandler {
                 playerStats.addMasteryCompletion(level.getName());
                 Parkour.getStatsManager().leftMastery(playerStats);
             }
-
-            // used for playing sound!
-            int beforeClanLevel = -1;
             BankManager bankManager = Parkour.getBankManager();
 
             // give higher reward if prestiged
@@ -206,27 +215,32 @@ public class LevelHandler {
             player.sendMessage(Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                     + ChatColor.stripColor(level.getFormattedTitle())));
 
+            // get new PB
+            LevelCompletion bestCompletion = playerStats.getQuickestCompletion(level);
+
             // if new pb, send message to player
-            if (newPB)
+            if (levelCompletion.wasTimed() && bestCompletion != null && bestCompletion.getCompletionTimeElapsedMillis() > elapsedTime)
             {
                 String oldTimeString = bestCompletion.getCompletionTimeElapsedSeconds() + "s"; // need to format the long
-
                 player.sendMessage(Utils.translate("&7You have broken your personal best &c(" + oldTimeString + ")&7 with &a" + time));
             }
 
-            // broadcast completed if it the featured level
+            // broadcast completed if it is the featured level
             if (level.isFeaturedLevel())
                 Bukkit.broadcastMessage(Utils.translate(
                         "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getTitle()
                 ));
             else if (completedMastery)
                 Bukkit.broadcastMessage(Utils.translate(
-                        "&c" + playerStats.getDisplayName() + "&7 has completed the &2" + level.getTitle() + "&7 (&5&lMastery&7)"
+                        "&c" + playerStats.getDisplayName() + "&7 has completed the &5&lMastery &7for &2" + level.getTitle()
                 ));
             else if (level.isBroadcasting())
                 Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getTitle()));
 
-            if (playerStats.getClan() != null)
+            // used for playing sound!
+            int beforeClanLevel = -1;
+
+            if (playerStats.inClan())
             {
                 beforeClanLevel = playerStats.getClan().getLevel();
 
@@ -326,7 +340,13 @@ public class LevelHandler {
             player.teleport(locationTo);
             playerStats.disableLevelStartTime();
 
-            boolean isRecord = level.hasLeaderboard() && level.getRecordCompletion().getPlayerName().equalsIgnoreCase(levelCompletion.getName());
+            LevelLBPosition recordCompletion = level.getRecordCompletion();
+
+            boolean isRecord =
+                    level.hasLeaderboard() &&
+                    recordCompletion.getPlayerName().equalsIgnoreCase(levelCompletion.getName()) &&
+                    recordCompletion.getTimeTaken() == levelCompletion.getCompletionTimeElapsedMillis();
+
             if (isRecord)
             {
                 // update new #1 records
@@ -364,16 +384,7 @@ public class LevelHandler {
                 // do gg run
                 Parkour.getStatsManager().runGGTimer();
             }
-
-            // small microoptimization running it in async. if it is a record, it will be updated when we do the modifications
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
-                {
-                    CompletionsDB.insertCompletion(levelCompletion, completedMastery);
-                }
-            }.runTaskAsynchronously(Parkour.getPlugin());
+            CompletionsDB.insertCompletion(levelCompletion, completedMastery);
         }
     }
 

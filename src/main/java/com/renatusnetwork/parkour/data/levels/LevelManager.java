@@ -10,6 +10,7 @@ import com.renatusnetwork.parkour.data.locations.LocationsDB;
 import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
+import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.ranks.RanksManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
@@ -230,6 +231,12 @@ public class LevelManager {
     {
         level.setRequiredPermission(permission);
         LevelsDB.updateRequiredPermission(level.getName(), permission);
+    }
+
+    public void setRequiredRank(Level level, Rank rank)
+    {
+        level.setRequiredRank(rank.getName());
+        LevelsDB.updateRequiredRank(level.getName(), rank.getName());
     }
 
     public void removeRequiredPermission(Level level)

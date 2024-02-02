@@ -104,6 +104,7 @@ public class PlayerStats {
             bestInfiniteScores.put(type, 0); // arbitrary to be replaced when stats load
 
         this.sortingType = Parkour.getSettingsManager().default_level_sorting_type;
+        this.levelStartTime = -1;
     }
 
     //
@@ -337,12 +338,14 @@ public class PlayerStats {
     }
 
     public void disableLevelStartTime() {
-        levelStartTime = 0;
+        levelStartTime = -1;
     }
 
     public long getLevelStartTime() {
         return levelStartTime;
     }
+
+    public boolean isLevelBeingTimed() { return levelStartTime > -1; }
 
     public int getTotalLevelCompletions() {
         return totalLevelCompletions;

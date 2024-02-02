@@ -101,45 +101,41 @@ public class LevelListener implements Listener {
         Block block = event.getClickedBlock();
 
         // Start timer
-        if (event.getAction().equals(Action.PHYSICAL)) {
-            // stone plate = timer start
-            if (block.getType() == Material.STONE_PLATE) {
+        if (event.getAction().equals(Action.PHYSICAL))
+        {
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats != null && playerStats.inLevel() &&
-                    !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isPreviewingLevel() &&
-                    !playerStats.hasCurrentCheckpoint()) {
-
-                    // cancel so no click sound and no hogging plate
+            if (playerStats != null && playerStats.inLevel())
+            {
+                // stone plate = timer start
+                if (block.getType() == Material.STONE_PLATE)
+                {
                     event.setCancelled(true);
-                    playerStats.startedLevel();
+                    if (!playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isPreviewingLevel() && !playerStats.hasCurrentCheckpoint())
+                        // cancel so no click sound and no hogging plate
+                        playerStats.startedLevel();
+
                 }
-            } else if (block.getType() == Material.GOLD_PLATE) {
-                // gold plate = checkpoint
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                if (playerStats != null && playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isAttemptingMastery() && !playerStats.isPreviewingLevel()) {
-                    // cancel so no click sound and no hogging plate
+                else if (block.getType() == Material.GOLD_PLATE)
+                {
                     event.setCancelled(true);
 
-                    if (playerStats.hasCurrentCheckpoint())
+                    // gold plate = checkpoint
+                    if (!playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isAttemptingMastery() && !playerStats.isPreviewingLevel())
                     {
+                        if (playerStats.hasCurrentCheckpoint())
+                        {
+                            int blockX = playerStats.getCurrentCheckpoint().getBlockX();
+                            int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
 
-                        int blockX = playerStats.getCurrentCheckpoint().getBlockX();
-                        int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
-
-                        if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
+                            if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
+                                setCheckpoint(playerStats, block.getLocation());
+                        }
+                        else
                             setCheckpoint(playerStats, block.getLocation());
                     }
-                    else
-                        setCheckpoint(playerStats, block.getLocation());
                 }
-            }
-            else if (block.getType() == Material.IRON_PLATE)
-            {
-                // iron plate = infinite pk or race end
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-                if (playerStats != null)
+                else if (block.getType() == Material.IRON_PLATE)
                 {
                     // cancel so no click sound and no hogging plate
                     event.setCancelled(true);
@@ -216,17 +212,19 @@ public class LevelListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onSignClick(PlayerInteractEvent event) {
+    public void onSignClick(PlayerInteractEvent event)
+    {
         if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
              && event.getClickedBlock().getType().equals(Material.WALL_SIGN)
-             && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-
+             && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+        {
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
             Player player = event.getPlayer();
 
             if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line) &&
-                ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion)) {
+                ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion))
+            {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
                 Level level = playerStats.getLevel();
@@ -248,7 +246,7 @@ public class LevelListener implements Listener {
                             playerStats.setLevel(levelTo);
                         }
                     }
-                    LevelHandler.levelCompletion(player, playerStats.getLevel());
+                    LevelHandler.levelCompletion(playerStats, level);
                 }
             } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
                 Location lobby = Parkour.getLocationManager().getLobbyLocation();

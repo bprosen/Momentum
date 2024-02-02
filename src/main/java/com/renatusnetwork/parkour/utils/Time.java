@@ -1,8 +1,12 @@
 package com.renatusnetwork.parkour.utils;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class Time {
-
-    public static String elapsed(int seconds) {
+public class Time
+{
+    public static String elapsed(int seconds)
+    {
         long minutes = seconds / 60;
         long hours = minutes / 60;
         long days = hours / 24;
@@ -36,7 +40,8 @@ public class Time {
         return time;
     }
 
-    public static String elapsedShortened(int seconds) {
+    public static String elapsedShortened(int seconds)
+    {
         long minutes = seconds / 60;
         long hours = minutes / 60;
         long days = hours / 24;
@@ -56,7 +61,8 @@ public class Time {
         return time;
     }
 
-    public static String elapsed(long milliseconds) {
+    public static String elapsed(long milliseconds)
+    {
         long seconds = milliseconds / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
@@ -89,6 +95,14 @@ public class Time {
         else if (seconds % 60 == 1L)
             time = time.replace("Seconds", "Second");
         return time;
+    }
+
+    public static String getDate(long milliseconds)
+    {
+        Date date = new Date(milliseconds);
+        DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
+
+        return dateFormat.format(date);
     }
 
     public static String elapsedShortened(long milliseconds, boolean includeSeconds) {

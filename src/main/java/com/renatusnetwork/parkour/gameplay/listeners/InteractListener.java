@@ -37,17 +37,18 @@ public class InteractListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event)
     {
-
         Player player = event.getPlayer();
 
         if (event.getHand() == EquipmentSlot.HAND &&
-           (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
+           (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR))
+        {
 
             // this is in case they try to click a trapdoor, door or something openable if they're in spectator
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 event.getClickedBlock() != null &&
                 event.getClickedBlock().getState().getData() instanceof Openable &&
-                Parkour.getStatsManager().get(player).isSpectating()) {
+                Parkour.getStatsManager().get(player).isSpectating())
+            {
                 event.setCancelled(true);
                 return;
             }

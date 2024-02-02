@@ -20,7 +20,8 @@ import java.util.*;
 
 public class LevelsDB {
 
-    public static HashMap<String, Level> getLevels() {
+    public static HashMap<String, Level> getLevels()
+    {
         List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*", "");
         HashMap<String, Level> levels = new HashMap<>();
         LocationManager locationManager = Parkour.getLocationManager();
@@ -272,6 +273,11 @@ public class LevelsDB {
     public static void updateRequiredPermission(String levelName, String permission)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_permission=? WHERE name=?", permission, levelName);
+    }
+
+    public static void updateRequiredRank(String levelName, String rankName)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_rank=? WHERE name=?", rankName, levelName);
     }
 
     public static void removeRequiredPermission(String levelName)

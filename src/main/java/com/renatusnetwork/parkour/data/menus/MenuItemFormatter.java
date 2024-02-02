@@ -453,9 +453,8 @@ public class MenuItemFormatter
 
     private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item)
     {
-
-        if (level != null) {
-
+        if (level != null)
+        {
             item = new ItemStack(item); // clone
             ItemMeta itemMeta = item.getItemMeta();
             String formattedTitle = level.getFormattedTitle();
@@ -470,11 +469,6 @@ public class MenuItemFormatter
             // add new if new level! but dont show new if featured (too messy)
             if (level.isNew())
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
-
-            Rank requiredRank = Parkour.getRanksManager().get(level.getRequiredRank());
-
-            if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
-                itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
 
             BankManager bankManager = Parkour.getBankManager();
 
@@ -497,7 +491,14 @@ public class MenuItemFormatter
                 itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
             }
             else
-                itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
+            {
+                Rank requiredRank = Parkour.getRanksManager().get(level.getRequiredRank());
+
+                if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
+                    itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
+                else
+                    itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
+            }
 
             // Item Title Section
             if (level.getPlayersInLevel() > 0)
@@ -582,7 +583,6 @@ public class MenuItemFormatter
             // only do these if jackpot is not running!
             else
             {
-
                 if (playerStats.hasPrestiges() && level.hasReward())
                     newReward *= playerStats.getPrestigeMultiplier();
 
@@ -616,13 +616,15 @@ public class MenuItemFormatter
                 itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Completions"));
 
             // only show rating if above 5
-            if (level.getRatingsCount() >= 5) {
+            if (level.getRatingsCount() >= 5)
+            {
                 itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
                 itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
             }
 
             // Required Levels Section, but only show it if not featured
-            if (level.hasRequiredLevels() && !level.isFeaturedLevel()) {
+            if (level.hasRequiredLevels() && !level.isFeaturedLevel())
+            {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Required levels"));
 
@@ -655,45 +657,36 @@ public class MenuItemFormatter
                         itemLore.add(Utils.translate("&7  Mastery &a✔"));
                     else
                     {
-                        itemLore.add(Utils.translate("&7  Mastery &c✖ &6(Shift click)"));
-                        itemLore.add(Utils.translate("    &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins &7(" + level.getMasteryMultiplier() + "x)"));
+                        itemLore.add(Utils.translate("&7  Mastery &c✖ &6Shift click"));
+                        itemLore.add(Utils.translate("    &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins &7" + level.getMasteryMultiplier() + "x"));
                     }
 
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
-                if (fastestCompletion != null) {
-                    double completionTime = fastestCompletion.getCompletionTimeElapsedSeconds();
-                    long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletionMillis();
-
-                    String bestTime = "&7  Best time &6" + completionTime + "s";
+                if (fastestCompletion != null)
+                {
+                    itemLore.add(Utils.translate("&7  Best time"));
 
                     // add record if there is one
                     LevelLBPosition record = level.getRecordCompletion();
+                    String bestTimeValue = "    &6" + fastestCompletion.getCompletionTimeElapsedSeconds() + "s";
 
                     if (record != null)
                     {
                         // add number 1
                         if (playerStats.hasRecord(level))
-                            bestTime += " &e#1";
+                            bestTimeValue += " &e#1";
                         else
-                            bestTime += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken()) / 1000d) + "s";
+                            bestTimeValue += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken()) / 1000d) + "s";
                     }
 
-                    itemLore.add(Utils.translate(bestTime));
-
-                    // this makes it so it will not have " ago" if they just completed it
-                    String timeSinceString;
-                    if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
-                        timeSinceString = Utils.translate("  &7Just now");
-                    else
-                        timeSinceString = Utils.translate("  &7" + Time.elapsedShortened(timeSince, false) + "ago");
-
-                    itemLore.add(timeSinceString);
+                    itemLore.add(Utils.translate(bestTimeValue));
+                    itemLore.add(Utils.translate("    &7" + Time.getDate(fastestCompletion.getTimeOfCompletionMillis())));
                 }
             }
 
             // Sections over
             itemMeta.setDisplayName(formattedTitle);
-            itemMeta.setLore((itemLore));
+            itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
         }
         return item;

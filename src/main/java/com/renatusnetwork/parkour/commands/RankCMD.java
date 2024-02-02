@@ -34,7 +34,7 @@ public class RankCMD implements CommandExecutor {
         {
             if (a.length == 0)
                 sendRank(player);
-            else if (a.length == 3 && a[0].equalsIgnoreCase("setrank"))
+            else if (a.length == 3 && a[0].equalsIgnoreCase("set"))
             {
                 PlayerStats victim = Parkour.getStatsManager().getByName(a[1]);
                 String rankName = a[2];
@@ -78,7 +78,7 @@ public class RankCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&4" + rankName + " &calready exists"));
                 }
             }
-            else if (a.length >= 2 && a[0].equalsIgnoreCase("settitle"))
+            else if (a.length >= 2 && a[0].equalsIgnoreCase("title"))
             {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
@@ -99,7 +99,7 @@ public class RankCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
             }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("setrankuplevel"))
+            else if (a.length == 3 && a[0].equalsIgnoreCase("rankuplevel"))
             {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
@@ -127,7 +127,7 @@ public class RankCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
             }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("setnextrank"))
+            else if (a.length == 3 && a[0].equalsIgnoreCase("nextrank"))
             {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
@@ -143,17 +143,13 @@ public class RankCMD implements CommandExecutor {
                         RanksDB.updateNextRank(rankName, nextRankName);
                         // update object
                         rank.setNextRank(nextRankName);
-                        player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's next rank to &c" + nextRank.getTitle()));
+                        player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's next rank to &c" + nextRank.getName()));
                     }
                     else
-                    {
                         player.sendMessage(Utils.translate("&4" + nextRankName + " &cdoes not exist"));
-                    }
                 }
                 else
-                {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
-                }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("remove"))
             {
@@ -188,7 +184,7 @@ public class RankCMD implements CommandExecutor {
                     }
                 }.runTaskAsynchronously(Parkour.getPlugin());
             }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("setprestiges"))
+            else if (a.length == 3 && a[0].equalsIgnoreCase("prestiges"))
             {
                 PlayerStats victim = Parkour.getStatsManager().getByName(a[1]);
 
@@ -269,12 +265,12 @@ public class RankCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&c/ranks list  &7List all ranks"));
         player.sendMessage(Utils.translate("&c/ranks load  &7Reloads ranks"));
         player.sendMessage(Utils.translate("&c/ranks create <rankName>  &7Create a rank"));
-        player.sendMessage(Utils.translate("&c/ranks settitle <rankName> <title>  &7Set's a ranks title (can have spaces)"));
-        player.sendMessage(Utils.translate("&c/ranks setrankuplevel <rankName> <rankupLevel>  &7Set a rank's rankup level"));
-        player.sendMessage(Utils.translate("&c/ranks setnextrank <rankName> <nextRank>  &7Sets a rank's next rank"));
+        player.sendMessage(Utils.translate("&c/ranks title <rankName> <title>  &7Set's a ranks title (can have spaces)"));
+        player.sendMessage(Utils.translate("&c/ranks rankuplevel <rankName> <rankupLevel>  &7Set a rank's rankup level"));
+        player.sendMessage(Utils.translate("&c/ranks nextrank <rankName> <nextRank>  &7Sets a rank's next rank"));
         player.sendMessage(Utils.translate("&c/ranks remove <rankName>  &7Removes a rank and sets players in that rank to default"));
-        player.sendMessage(Utils.translate("&c/ranks setrank <player> <rankName>  &7Sets players rank"));
-        player.sendMessage(Utils.translate("&c/ranks setprestiges <player> <amount>  &7Sets players prestiges from database and cache"));
+        player.sendMessage(Utils.translate("&c/ranks set <player> <rankName>  &7Sets players rank"));
+        player.sendMessage(Utils.translate("&c/ranks prestiges <player> <amount>  &7Sets players prestiges from database and cache"));
         player.sendMessage(Utils.translate("&c/ranks help  &7Displays this page"));
     }
 
