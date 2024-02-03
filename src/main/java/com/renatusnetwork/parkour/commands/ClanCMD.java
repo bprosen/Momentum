@@ -46,19 +46,13 @@ public class ClanCMD implements CommandExecutor
                                     " Max Level to &6" + targetClan.getMaxLevel()));
                         }
                         else
-                        {
                             sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
-                        }
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
-                    }
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
-                }
             }
             else if (a.length == 3 && a[0].equalsIgnoreCase("setmaxmembers"))
             {
@@ -80,24 +74,16 @@ public class ClanCMD implements CommandExecutor
                                         " Max Members to &6" + targetClan.getMaxMembers()));
                             }
                             else
-                            {
                                 sender.sendMessage(Utils.translate("&cYou cannot set &4" + targetClan.getTag() + "&c's max members to less than what they have (" + memberCount + ")"));
-                            }
                         }
                         else
-                        {
                             sender.sendMessage(Utils.translate("&4" + clanName + " &cis not a clan"));
-                        }
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
-                    }
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
-                }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("addmaxlevel"))
             {
@@ -117,19 +103,13 @@ public class ClanCMD implements CommandExecutor
                                     " Max Level to &6" + targetClan.getMaxLevel()));
                         }
                         else
-                        {
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in a clan"));
-                        }
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
-                    }
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
-                }
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("addmaxmember"))
             {
@@ -149,19 +129,13 @@ public class ClanCMD implements CommandExecutor
                                     " Max Members to &6" + targetClan.getMaxMembers()));
                         }
                         else
-                        {
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cis not in a clan"));
-                        }
                     }
                     else
-                    {
                         sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
-                    }
                 }
                 else
-                {
                     sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
-                }
             }
             else if (a[0].equalsIgnoreCase("stats"))
             {

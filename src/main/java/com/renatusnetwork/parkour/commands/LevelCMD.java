@@ -16,6 +16,12 @@ import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import jdk.internal.org.jline.reader.impl.UndoTree;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -977,6 +983,76 @@ public class LevelCMD implements CommandExecutor
                         sender.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
                 }
             }
+            else if (a.length == 2 && a[0].equalsIgnoreCase("makesign"))
+            {
+                if (sender instanceof Player)
+                {
+                    Player player = (Player) sender;
+                    String levelName = a[1].toLowerCase();
+                    Level level = getLevel(sender, levelName);
+
+                    if (level != null)
+                    {
+                        List<Block> blocks = player.getLastTwoTargetBlocks(null, 5);
+
+                        // ensure bocks are adequate and not too far away
+                        if (blocks.size() == 2 && blocks.get(1).getType() != null && blocks.get(1).getType() != Material.AIR)
+                        {
+                            Block adjacentBlock = blocks.get(0);
+                            Block targetBlock = blocks.get(1);
+                            Block signBlock;
+
+                            BlockFace face = targetBlock.getFace(adjacentBlock);
+
+                            // ensure no trying to place a sign on ground or roof
+                            if (face != BlockFace.DOWN && face != BlockFace.UP)
+                            {
+                                boolean overwriteSign = false;
+
+                                // if the block we are looking at is already a sign, we only want to replace the lines
+                                if (targetBlock.getType() == Material.WALL_SIGN)
+                                {
+                                    signBlock = targetBlock;
+                                    overwriteSign = true;
+                                }
+                                else
+                                    signBlock = targetBlock.getRelative(face);
+
+                                // unfortunately we need to seperate these two overwriteSign check as the type has to be set first, and we need the Sign class for both cases
+                                if (!overwriteSign)
+                                    signBlock.setType(Material.WALL_SIGN);
+
+                                Sign sign = (Sign) signBlock.getState();
+
+                                // create sign with direction
+                                if (!overwriteSign)
+                                {
+                                    org.bukkit.material.Sign matSign = new org.bukkit.material.Sign(Material.WALL_SIGN);
+
+                                    matSign.setFacingDirection(face);
+                                    sign.setData(matSign);
+                                }
+
+                                // use config set
+                                sign.setLine(0, Utils.translate("&1&l" + Parkour.getSettingsManager().signs_first_line));
+                                sign.setLine(1, Utils.translate("&9" + Parkour.getSettingsManager().signs_second_line_completion));
+                                sign.setLine(2, Utils.translate("&9the prize for"));
+                                sign.setLine(3, ChatColor.stripColor(level.getFormattedTitle()));
+
+                                sign.update();
+
+                                player.sendMessage(Utils.translate("&7You have created the sign for &8" + level.getTitle()));
+                            }
+                            else
+                                sender.sendMessage(Utils.translate("&cWall signs cannot go on the ground or roof, try the side of a block"));
+                        }
+                        else
+                            sender.sendMessage(Utils.translate("&cNo target block found, make sure you are right in front of and looking at the block to place the sign on"));
+                    }
+                }
+                else
+                    sender.sendMessage(Utils.translate("&cConsole cannot do this"));
+            }
             else
                 sendHelp(sender);
         }
@@ -1037,6 +1113,7 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level masterymultiplier <level> <multiplier>  &7Multiplier the level gives for its mastery version"));
         sender.sendMessage(Utils.translate("&a/level permission <level> <permission>  &7Sets the required permission to enter the level"));
         sender.sendMessage(Utils.translate("&a/level removepermission <level>  &7Resets the required permission to enter (to null)"));
-        sender.sendMessage(Utils.translate("&a/level rank <level> <rank>  &7Ses the required rank for the level"));
+        sender.sendMessage(Utils.translate("&a/level rank <level> <rank>  &7Sets the required rank for the level"));
+        sender.sendMessage(Utils.translate("&a/level makesign <level> &7Places a wall sign on the block you are looking at with the default formatting"));
     }
 }

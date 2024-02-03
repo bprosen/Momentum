@@ -218,58 +218,66 @@ public class LevelListener implements Listener {
              && event.getClickedBlock().getType().equals(Material.WALL_SIGN)
              && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
         {
+            // return if gamemode 0, opped and left clicked
+            Player player = event.getPlayer();
+            if (player.isOp() && player.getGameMode() == GameMode.CREATIVE && event.getAction().equals(Action.LEFT_CLICK_BLOCK))
+                return;
+
             Sign sign = (Sign) event.getClickedBlock().getState();
             String[] signLines = sign.getLines();
-            Player player = event.getPlayer();
 
-            if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line) &&
-                ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion))
+            if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line))
             {
-
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                Level level = playerStats.getLevel();
-
-                if (level != null)
+                if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion))
                 {
-                    // check region null
-                    ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
-                    if (region != null)
-                    {
-                        Level levelTo = Parkour.getLevelManager().get(region.getId());
-                        // make sure the area they are spawning in is a level and not equal
-                        if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
-                        {
-                            // if they are glitching elytra -> !elytra, remove elytra!
-                            if (level.isElytra() && !levelTo.isElytra())
-                                Parkour.getStatsManager().toggleOffElytra(playerStats);
-
-                            playerStats.setLevel(levelTo);
-                        }
-                    }
-                    LevelHandler.levelCompletion(playerStats, level);
-                }
-            } else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn)) {
-                Location lobby = Parkour.getLocationManager().getLobbyLocation();
-
-                if (lobby != null) {
                     PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                    Level level = playerStats.getLevel();
 
-                    // toggle off elytra armor
-                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+                    if (level != null)
+                    {
+                        // check region null
+                        ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
+                        if (region != null)
+                        {
+                            Level levelTo = Parkour.getLevelManager().get(region.getId());
+                            // make sure the area they are spawning in is a level and not equal
+                            if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                            {
+                                // if they are glitching elytra -> !elytra, remove elytra!
+                                if (level.isElytra() && !levelTo.isElytra())
+                                    Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                    playerStats.resetCurrentCheckpoint();
-                    PracticeHandler.resetDataOnly(playerStats);
-                    playerStats.resetLevel();
+                                playerStats.setLevel(levelTo);
+                            }
+                        }
+                        LevelHandler.levelCompletion(playerStats, level);
+                    }
+                }
+                else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn))
+                {
+                    Location lobby = Parkour.getLocationManager().getLobbyLocation();
 
-                    if (playerStats.isAttemptingRankup())
-                        Parkour.getStatsManager().leftRankup(playerStats);
+                    if (lobby != null)
+                    {
+                        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                    if (playerStats.isAttemptingMastery())
-                        Parkour.getStatsManager().leftMastery(playerStats);
+                        // toggle off elytra armor
+                        Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                    playerStats.clearPotionEffects();
+                        playerStats.resetCurrentCheckpoint();
+                        PracticeHandler.resetDataOnly(playerStats);
+                        playerStats.resetLevel();
 
-                    player.teleport(lobby);
+                        if (playerStats.isAttemptingRankup())
+                            Parkour.getStatsManager().leftRankup(playerStats);
+
+                        if (playerStats.isAttemptingMastery())
+                            Parkour.getStatsManager().leftMastery(playerStats);
+
+                        playerStats.clearPotionEffects();
+
+                        player.teleport(lobby);
+                    }
                 }
             }
         }
@@ -282,7 +290,8 @@ public class LevelListener implements Listener {
 
         // this is mainly QOL for staff!
         if (playerStats != null && !playerStats.isSpectating() &&
-           !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff")) {
+           !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff"))
+        {
 
             // boolean for resetting level
             boolean resetLevel = false;
