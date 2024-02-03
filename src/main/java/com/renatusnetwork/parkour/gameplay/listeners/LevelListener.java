@@ -105,13 +105,13 @@ public class LevelListener implements Listener {
         {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (playerStats != null && playerStats.inLevel())
+            if (playerStats != null)
             {
                 // stone plate = timer start
                 if (block.getType() == Material.STONE_PLATE)
                 {
                     event.setCancelled(true);
-                    if (!playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isPreviewingLevel() && !playerStats.hasCurrentCheckpoint())
+                    if (playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isPreviewingLevel() && !playerStats.hasCurrentCheckpoint())
                         // cancel so no click sound and no hogging plate
                         playerStats.startedLevel();
 
@@ -121,7 +121,7 @@ public class LevelListener implements Listener {
                     event.setCancelled(true);
 
                     // gold plate = checkpoint
-                    if (!playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isAttemptingMastery() && !playerStats.isPreviewingLevel())
+                    if (playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isAttemptingMastery() && !playerStats.isPreviewingLevel())
                     {
                         if (playerStats.hasCurrentCheckpoint())
                         {
