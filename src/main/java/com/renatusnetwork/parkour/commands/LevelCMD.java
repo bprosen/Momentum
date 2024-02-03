@@ -998,6 +998,8 @@ public class LevelCMD implements CommandExecutor
                         // ensure bocks are adequate and not too far away
                         if (blocks.size() == 2 && blocks.get(1).getType() != null && blocks.get(1).getType() != Material.AIR)
                         {
+                            final int MAX_SIGN_LENGTH = 15;
+
                             Block adjacentBlock = blocks.get(0);
                             Block targetBlock = blocks.get(1);
                             Block signBlock;
@@ -1037,7 +1039,17 @@ public class LevelCMD implements CommandExecutor
                                 sign.setLine(0, Utils.translate("&1&l" + Parkour.getSettingsManager().signs_first_line));
                                 sign.setLine(1, Utils.translate("&9" + Parkour.getSettingsManager().signs_second_line_completion));
                                 sign.setLine(2, Utils.translate("&9the prize for"));
-                                sign.setLine(3, ChatColor.stripColor(level.getFormattedTitle()));
+
+                                String levelTitle = level.getFormattedTitle();
+
+                                // if the title goes beyond the max length, set it without colors
+                                if (MAX_SIGN_LENGTH < level.getTitle().length())
+                                {
+                                    String noColorTitle = ChatColor.stripColor(levelTitle);
+                                    // if the line is STILL too long with no color, substring it, otherwise just set it with no color
+                                    levelTitle = MAX_SIGN_LENGTH < noColorTitle.length() ? noColorTitle.substring(0, MAX_SIGN_LENGTH) : noColorTitle;
+                                }
+                                sign.setLine(3, levelTitle);
 
                                 sign.update();
 
