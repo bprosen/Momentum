@@ -17,7 +17,7 @@ import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.PortalType;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
 import com.renatusnetwork.parkour.data.plots.Plot;
-import com.renatusnetwork.parkour.data.races.Race;
+import com.renatusnetwork.parkour.data.races.gamemode.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
@@ -297,18 +297,7 @@ public class PacketListener implements Listener {
                                     // teleport
                                     if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
                                         Parkour.getCheckpointManager().teleportToCP(playerStats);
-                                    else if (playerStats.inRace())
-                                    {
-                                        Race race = Parkour.getRaceManager().get(player);
-                                        if (race != null)
-                                        {
-                                            if (race.isPlayer1(player))
-                                                race.getPlayer1().teleport(race.getLevel().getSpawnLocation1());
-                                                // swap tp to loc 2 if player 2
-                                            else
-                                                race.getPlayer2().teleport(race.getLevel().getSpawnLocation2());
-                                        }
-                                    } else
+                                    else
                                         LevelHandler.respawnPlayer(playerStats, level);
                                 }
                             }

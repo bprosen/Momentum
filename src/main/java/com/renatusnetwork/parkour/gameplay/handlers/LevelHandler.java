@@ -15,6 +15,8 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
+import com.renatusnetwork.parkour.data.races.gamemode.RaceRequest;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -51,22 +53,15 @@ public class LevelHandler
 
                             if (!level.hasMaxCompletions() || playerLevelCompletions < level.getMaxCompletions())
                             {
-                                // if it is a race completion, end it
-                                if (!playerStats.inRace())
-                                {
-                                    // if level is not an event level, it is guaranteed normal completion
-                                    if (!level.isEventLevel())
-                                        dolevelCompletion(playerStats, level);
-                                        // otherwise, if there is an event running, end!
-                                    else if (eventManager.isEventRunning())
-                                        eventManager.endEvent(player, false, false);
-                                        // otherwise, they are clicking the sign when the event is not running
-                                    else
-                                        player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
-                                }
+                                // if level is not an event level, it is guaranteed normal completion
+                                if (!level.isEventLevel())
+                                    dolevelCompletion(playerStats, level);
+                                    // otherwise, if there is an event running, end!
+                                else if (eventManager.isEventRunning())
+                                    eventManager.endEvent(player, false, false);
+                                    // otherwise, they are clicking the sign when the event is not running
                                 else
-                                    // if in race
-                                    Parkour.getRaceManager().endRace(player, false);
+                                    player.sendMessage(Utils.translate("&cYou cannot do this when an Event is not running!"));
                             }
                             else
                                 player.sendMessage(Utils.translate("&cYou've reached the maximum number of completions"));
@@ -96,6 +91,11 @@ public class LevelHandler
         {
             LevelManager levelManager = Parkour.getLevelManager();
             LevelLBPosition oldRecord = level.getRecordCompletion();
+            RacePlayer race = playerStats.getRace();
+            boolean inRace = race != null;
+
+            if (inRace)
+                race.end();
 
             levelManager.addTotalLevelCompletion();
 
@@ -118,7 +118,7 @@ public class LevelHandler
                 );
 
             // disable when complete
-            if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
+            if (level.equals(Parkour.getLevelManager().getTutorialLevel()))
                 playerStats.setTutorial(false);
 
             playerStats.addTotalLevelCompletions();
@@ -234,6 +234,14 @@ public class LevelHandler
                 Bukkit.broadcastMessage(Utils.translate(
                         "&c" + playerStats.getDisplayName() + "&7 has completed the &5&lMastery &7for &2" + level.getTitle()
                 ));
+            else if (inRace)
+            {
+                String broadcast = "&4" + playerStats.getDisplayName() + "&7 beat &4" + playerStats.getRace().getOpponent().getPlayerStats().getDisplayName() + "&7 on &c" + level.getTitle();
+                if (race.hasBet())
+                    broadcast += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
+
+                Bukkit.broadcastMessage(Utils.translate(broadcast));
+            }
             else if (level.isBroadcasting())
                 Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getTitle()));
 
@@ -277,12 +285,28 @@ public class LevelHandler
             // clear potion effects
             playerStats.clearPotionEffects();
 
-            String titleMessage = Utils.translate("&7You beat " + level.getTitle());
-            if (levelCompletion.wasTimed())
-                titleMessage += Utils.translate("&7 in &2" + time);
+            String titleMessage = "";
+            String subTitleMessage = "";
 
-            String subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
-                    + ChatColor.stripColor(level.getFormattedTitle()));
+            if (!inRace)
+            {
+                titleMessage = Utils.translate("&7You beat " + level.getTitle());
+                if (levelCompletion.wasTimed())
+                    titleMessage += Utils.translate("&7 in &2" + time);
+
+                subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
+                        + ChatColor.stripColor(level.getFormattedTitle()));
+            }
+            else
+            {
+                titleMessage = Utils.translate("&c" + playerStats.getDisplayName() + "&7 has won the race!");
+                subTitleMessage = Utils.translate("&7On &c" + level.getTitle());
+
+                if (race.hasBet())
+                    subTitleMessage += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
+
+                TitleAPI.sendTitle(race.getOpponent().getPlayerStats().getPlayer(), 10, 60, 10, titleMessage, subTitleMessage);
+            }
 
             TitleAPI.sendTitle(
                     player, 10, 60, 10,
@@ -296,6 +320,17 @@ public class LevelHandler
 
             Location locationTo = level.getCompletionLocation();
 
+            if (inRace)
+            {
+                locationTo = race.getOriginalLocation();
+                RacePlayer opponent = race.getOpponent();
+                PlayerStats opponentStats = opponent.getPlayerStats();
+
+                setLevelInfoOnTeleport(opponentStats, opponent.getOriginalLocation());
+                opponentStats.disableLevelStartTime();
+                opponentStats.teleport(opponent.getOriginalLocation());
+            }
+            else
             // If not rank up level or has a start location and is grinding, set to start loc
             if (!playerStats.isAttemptingMastery() && !playerStats.isAttemptingRankup() && level.getStartLocation() != Parkour.getLocationManager().get("spawn") && playerStats.isGrinding())
             {
@@ -313,32 +348,10 @@ public class LevelHandler
             // add cooldown
             levelManager.addLevelCooldown(playerStats.getName(), level);
 
-            ProtectedRegion getToRegion = WorldGuard.getRegion(locationTo);
-
-            // if area they are teleporting to is empty
-            // if not empty, make sure it is a level
-            // if not a level (like spawn), reset level
-            if (getToRegion == null)
-                playerStats.resetLevel();
-            else
-            {
-                Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
-
-                if (newLevel != null)
-                {
-                    playerStats.setLevel(newLevel);
-
-                    // apply potion effects if any exist
-                    for (PotionEffect potionEffect : newLevel.getPotionEffects())
-                        player.addPotionEffect(potionEffect);
-                }
-                else
-                    playerStats.resetLevel();
-            }
+            setLevelInfoOnTeleport(playerStats, locationTo);
 
             // teleport
             player.teleport(locationTo);
-            playerStats.disableLevelStartTime();
 
             LevelLBPosition recordCompletion = level.getRecordCompletion();
 
@@ -381,8 +394,9 @@ public class LevelHandler
                     Parkour.getStatsManager().addCoins(playerStats, bonus.getBonus());
                     playerStats.getPlayer().sendMessage(Utils.translate("&7You got &6" + Utils.formatNumber(bonus.getBonus()) + " &eCoins &7for getting the record!"));
                 }
-                // do gg run
-                Parkour.getStatsManager().runGGTimer();
+                // do gg run if it wasnt a race completion (gg already runs)
+                if (!inRace)
+                    Parkour.getStatsManager().runGGTimer();
             }
             CompletionsDB.insertCompletion(levelCompletion, completedMastery);
         }
@@ -399,6 +413,38 @@ public class LevelHandler
                 playerStats.getPlayer().teleport(loc);
                 playerStats.addFail(); // used in multiple areas
             }
+        }
+    }
+
+    public static void setLevelInfoOnTeleport(PlayerStats playerStats, Location location)
+    {
+        ProtectedRegion getToRegion = WorldGuard.getRegion(location);
+        Player player = playerStats.getPlayer();
+        playerStats.disableLevelStartTime();
+
+        // if area they are teleporting to is empty
+        // if not empty, make sure it is a level
+        // if not a level (like spawn), reset level
+        if (getToRegion == null)
+            playerStats.resetLevel();
+        else
+        {
+            Level newLevel = Parkour.getLevelManager().get(getToRegion.getId());
+
+            if (newLevel != null)
+            {
+                // apply potion effects if any exist
+                for (PotionEffect potionEffect : newLevel.getPotionEffects())
+                    player.addPotionEffect(potionEffect);
+
+                // if elytra level, give elytra
+                if (newLevel.isElytra() && !playerStats.getLevel().isElytra())
+                    Parkour.getStatsManager().toggleOnElytra(playerStats);
+
+                playerStats.setLevel(newLevel);
+            }
+            else
+                playerStats.resetLevel();
         }
     }
 }

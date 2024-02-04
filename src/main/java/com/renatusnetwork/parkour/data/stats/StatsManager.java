@@ -4,22 +4,17 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
-import com.renatusnetwork.parkour.data.clans.ClanMember;
-import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
-import com.renatusnetwork.parkour.data.modifiers.ModifiersDB;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.perks.Perk;
-import com.renatusnetwork.parkour.data.perks.PerksDB;
+import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.leaderboards.CoinsLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.GlobalPersonalLBPosition;
-import com.renatusnetwork.parkour.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.parkour.data.saves.SavesDB;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
@@ -31,7 +26,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -39,9 +33,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class StatsManager {
@@ -424,6 +415,20 @@ public class StatsManager {
         StatsDB.updateMenuSortLevelsType(playerStats, newType);
     }
 
+    public void updateRaceWins(PlayerStats playerStats, int wins)
+    {
+        playerStats.setRaceWins(wins);
+        StatsDB.updateRaceWins(playerStats.getUUID(), wins);
+        playerStats.calcRaceWinRate();
+    }
+
+    public void updateRaceLosses(PlayerStats playerStats, int losses)
+    {
+        playerStats.setRaceLosses(losses);
+        StatsDB.updateRaceLosses(playerStats.getUUID(), losses);
+        playerStats.calcRaceWinRate();
+    }
+
     public long getTotalCoins() { return totalCoins; }
 
     public void loadTotalCoins()
@@ -615,8 +620,13 @@ public class StatsManager {
         synchronized (playerStatsUUID)
         {
             for (PlayerStats playerStats : playerStatsUUID.values())
+            {
                 if (playerStats.isPreviewingLevel())
                     playerStats.resetPreviewLevel();
+
+                if (playerStats.inRace())
+                    playerStats.getRace().end(RaceEndReason.SHUTDOWN);
+            }
         }
     }
 }

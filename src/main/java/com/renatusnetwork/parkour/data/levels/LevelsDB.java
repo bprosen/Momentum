@@ -31,22 +31,8 @@ public class LevelsDB {
             String levelName = result.get("name");
             LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
 
-            Level level;
             long creationDate = Long.parseLong(result.get("creation_date"));
-            if (type == LevelType.RACE)
-            {
-                // since we store the 2 locations in the level object, we want a subclass for storage
-                level = new RaceLevel(levelName, creationDate);
-                RaceLevel raceLevel = (RaceLevel) level;
-
-                String format = SettingsManager.RACE_LEVEL_SPAWN_FORMAT.replace("%level%", levelName);
-
-                raceLevel.setSpawnLocation1(locationManager.get(format.replace("%spawn%", String.valueOf(1))));
-                raceLevel.setSpawnLocation2(locationManager.get(format.replace("%spawn%", String.valueOf(2))));
-            }
-            else
-                // otherwise normal level, we have the LEVEL_TYPE to define simple things that don't have any extra storage in the level object
-                level = new Level(levelName, creationDate);
+            Level level = new Level(levelName, creationDate);
 
             // set core details
             String reward = result.get("reward");

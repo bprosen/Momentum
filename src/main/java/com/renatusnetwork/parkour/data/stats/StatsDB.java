@@ -136,9 +136,7 @@ public class StatsDB {
             playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
 
             // we do a math.max since we can't divide by 0... so if they have never lost we divide by 1 not zero
-            playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal(
-                    (double) playerStats.getRaceWins() / Math.max(1, playerStats.getRaceLosses())
-            )));
+            playerStats.calcRaceWinRate();
 
             String sortLevelsType = playerResult.get("menu_sort_levels_type");
 
@@ -209,6 +207,16 @@ public class StatsDB {
         DatabaseQueries.runAsyncQuery(
             "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET spectatable=NOT spectatable WHERE uuid=?", playerStats.getUUID()
         );
+    }
+
+    public static void updateRaceLosses(String uuid, int losses)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE players SET race_losses=? WHERE uuid=?", losses, uuid);
+    }
+
+    public static void updateRaceWins(String uuid, int wins)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE players SET race_wins=? WHERE uuid=?", wins, uuid);
     }
 
     public static void updatePlayerNightVision(PlayerStats playerStats)

@@ -11,10 +11,10 @@ import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.Perk;
+import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -39,7 +39,7 @@ public class PlayerStats {
     private Location currentCheckpoint;
     private Location practiceSpawn;
     private Location spectateSpawn;
-    private boolean inRace;
+    private RacePlayer race;
     private Rank rank;
     private ItemStack chestplateSavedFromElytra;
     private int prestiges;
@@ -216,16 +216,29 @@ public class PlayerStats {
     //
     // Race Section
     //
-    public void startedRace() {
-        inRace = true;
+    public void startRace(RacePlayer race)
+    {
+        this.race = race;
     }
 
-    public void endedRace() {
-        inRace = false;
+    public void endRace()
+    {
+        this.race = null;
     }
 
-    public boolean inRace() {
-        return inRace;
+    public boolean inRace()
+    {
+        return race != null;
+    }
+
+    public void setRace(RacePlayer race)
+    {
+        this.race = race;
+    }
+
+    public RacePlayer getRace()
+    {
+        return race;
     }
 
     public int getRaceWins() {
@@ -248,8 +261,12 @@ public class PlayerStats {
         return raceWinRate;
     }
 
-    public void setRaceWinRate(float raceWinRate) {
-        this.raceWinRate = raceWinRate;
+    public void calcRaceWinRate()
+    {
+        if (raceLosses > 0)
+            raceWinRate = Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses));
+        else
+            raceWinRate = raceWins;
     }
 
     //
@@ -599,7 +616,7 @@ public class PlayerStats {
     }
 
     public void addFail() {
-        if (failsToggled && !inInfinite && !inTutorial && !inRace && !eventParticipant && previewLevel == null)
+        if (failsToggled && !inInfinite && !inTutorial && !inRace() && !eventParticipant && previewLevel == null)
             fails++;
     }
 
@@ -909,4 +926,6 @@ public class PlayerStats {
     {
         player.sendMessage(message);
     }
+
+    public void teleport(Location location) { player.teleport(location); }
 }

@@ -24,7 +24,6 @@ public class SettingsManager {
     public static final String INFINITE_PORTAL_NAME = "infinite-portal";
     public static final String ASCENDANCE_PORTAL_NAME = "ascendance-portal";
     public static final String BLACK_MARKET_PORTAL_NAME = "black_market-portal";
-    public static final String RACE_LEVEL_SPAWN_FORMAT = "race-%level%-%spawn%";
     public static final String LEVEL_SPAWN_FORMAT = "%level%-spawn";
     public static final String LEVEL_COMPLETION_FORMAT = "%level%-completion";
     public static final String LEVEL_ASCENT_FORMAT = "%level%-level-%num%";

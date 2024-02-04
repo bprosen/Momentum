@@ -405,38 +405,6 @@ public class LevelCMD implements CommandExecutor
                 else
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer!"));
             }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("raceset"))
-            {
-                if (sender instanceof Player)
-                {
-                    Player player = (Player) sender;
-
-                    if (a[2].equalsIgnoreCase("1") || a[2].equalsIgnoreCase("2"))
-                    {
-                        String levelName = a[1].toLowerCase();
-                        Level level = getLevel(sender, levelName);
-
-                        if (level != null)
-                        {
-                            if (level.isRaceLevel())
-                            {
-                                String locationName = SettingsManager.RACE_LEVEL_SPAWN_FORMAT
-                                        .replace("%level%", level.getName())
-                                        .replace("%spawn%", a[2]);
-
-                                Parkour.getLocationManager().set(locationName, player.getLocation());
-                                player.sendMessage(Utils.translate("&cYou set the location for player &4" + a[2] + " &con level &4" + level.getTitle()));
-                            }
-                            else
-                                sender.sendMessage(Utils.translate("&cYou cannot set the spawn for a non-race level. Do /level type (levelName) RACE"));
-                        }
-                    }
-                    else
-                        sender.sendMessage(Utils.translate("&cArgument must be 1 or 2"));
-                }
-                else
-                    sender.sendMessage(Utils.translate("&cConsole cannot run this"));
-            }
             else if (a.length == 3 && a[0].equalsIgnoreCase("respawny"))
             {
                 if (Utils.isInteger(a[2]))
@@ -1100,7 +1068,6 @@ public class LevelCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&a/level broadcast <level>  &7Toggled broadcast completion"));
         sender.sendMessage(Utils.translate("&a/level addrequired/removerequired <level> <levelTheyNeed>  &7Add/Remove required level"));
         sender.sendMessage(Utils.translate("&a/level removelbposition <level> <leaderboardPlace>  &7Removes a player's time from a level's leaderboard"));
-        sender.sendMessage(Utils.translate("&a/level raceset <level> <1/2>  &7Sets the race location for player 1 or 2"));
         sender.sendMessage(Utils.translate("&a/level addrating <level> <rating (0-5)>  &7Adds a rating to a level (ADMIN WAY NOT /rate)"));
         sender.sendMessage(Utils.translate("&a/level removerating <level> <playerName>  &7Removes a rating from a level by player name"));
         sender.sendMessage(Utils.translate("&a/level hasrated <level> <playerName>  &7Tells you if someone has rated it and with what rating"));

@@ -152,10 +152,12 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
 
                     // race section of scoreboard
-                } else if (playerStats.inRace()) {
+                }
+                else if (playerStats.inRace())
+                {
 
                     board.add(Utils.translate("&7"));
-                    Player opponent = Parkour.getRaceManager().get(playerStats.getPlayer()).getOpponent(playerStats.getPlayer());
+                    Player opponent = playerStats.getRace().getOpponent().getPlayerStats().getPlayer();
                     PlayerStats opponentStats = Parkour.getStatsManager().get(opponent);
 
                     board.add(formatSpacing(Utils.translate("&6You are in a race!")));

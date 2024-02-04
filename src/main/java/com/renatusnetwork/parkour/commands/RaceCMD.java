@@ -50,10 +50,7 @@ public class RaceCMD implements CommandExecutor {
             }
 
             if (opponentStats != null)
-            {
-                if (meetsRaceConditions(playerStats, opponentStats, false, 0.0))
-                    Parkour.getRaceManager().sendRequest(playerStats, opponentStats, true, null, false, 0.0);
-            }
+                Parkour.getRaceManager().sendRequest(playerStats, opponentStats, null,0);
             else
                 sender.sendMessage(Utils.translate("&cCould not find an opponent"));
 
@@ -65,8 +62,7 @@ public class RaceCMD implements CommandExecutor {
             if (target != null)
             {
                 // open menu if they meet requirements
-                if (meetsRaceConditions(playerStats, Parkour.getStatsManager().get(target), false, -1.0))
-                    menuManager.openRaceLevelsGUI(playerStats, target, 0.0);
+                menuManager.openInventory(playerStats, player, "races", true);
             }
             else
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
@@ -92,8 +88,7 @@ public class RaceCMD implements CommandExecutor {
                 if (target != null)
                 {
                     // open menu if meets conditions
-                    if (meetsRaceConditions(playerStats, Parkour.getStatsManager().get(target), true, betAmount))
-                        menuManager.openRaceLevelsGUI(playerStats, target, betAmount);
+                    menuManager.openInventory(playerStats, player, "races", true);
                 }
                 else
                     player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
@@ -105,85 +100,6 @@ public class RaceCMD implements CommandExecutor {
             sendHelp(player);
 
         return false;
-    }
-
-    private boolean meetsRaceConditions(PlayerStats player1, PlayerStats player2, boolean bet, double betAmount) {
-
-        if (player1.inRace())
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
-            return false;
-        }
-
-        // if target is in race
-        if (player2.inRace())
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while &4" + player2.getName() + " &cis in a race"));
-            return false;
-        }
-
-        if (player1.getName().equalsIgnoreCase(player2.getName()))
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race yourself..."));
-            return false;
-        }
-
-        if (player1.isSpectating())
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
-            return false;
-        }
-
-        if (player1.inPracticeMode())
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-            return false;
-        }
-
-        if (player1.isInBlackMarket())
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
-            return false;
-        }
-
-        if (player2.isInBlackMarket())
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&4" + player2.getName() + " &cis busy right now..."));
-            return false;
-        }
-
-        // make sure they have enough money for the bet
-        double victimBalance = player2.getCoins();
-        double senderBalance = player1.getCoins();
-
-        if (bet && senderBalance < betAmount)
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                    " Your Balance &6" + Utils.formatNumber(senderBalance) + " &eCoins"));
-            return false;
-        }
-
-        if (bet && victimBalance < betAmount)
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayer().getName() + " &7does not have enough to do this bet" +
-                    " - &cTheir Balance &6" + Utils.formatNumber(victimBalance) + " &eCoins"));
-            return false;
-        }
-
-        double minBetAmount = Parkour.getSettingsManager().min_race_bet_amount;
-        if (bet && betAmount < minBetAmount)
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot bet less than &6" + Utils.formatNumber(minBetAmount) + " &eCoins"));
-            return false;
-        }
-
-        if (Parkour.getRaceManager().getRequest(player1.getPlayer(), player2.getPlayer()) != null)
-        {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou have already sent a request to them!"));
-            return false;
-        }
-        // if they pass all these checks, return true!
-        return true;
     }
 
     private void sendHelp(Player player)

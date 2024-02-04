@@ -655,14 +655,14 @@ public class LevelManager {
         return tempList;
     }
 
-    public List<RaceLevel> getRaceLevels()
+    public List<Level> getRaceLevels()
     {
-        List<RaceLevel> temporaryRaceLevelList = new ArrayList<>();
+        List<Level> temporaryRaceLevelList = new ArrayList<>();
 
         for (Level level : levels.values())
         {
             if (level.isRaceLevel())
-                temporaryRaceLevelList.add((RaceLevel) level);
+                temporaryRaceLevelList.add(level);
         }
         return temporaryRaceLevelList;
     }

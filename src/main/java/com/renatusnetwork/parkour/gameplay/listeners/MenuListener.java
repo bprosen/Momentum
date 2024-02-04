@@ -2,7 +2,6 @@ package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
-import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -20,9 +19,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class MenuListener implements Listener
@@ -100,52 +96,6 @@ public class MenuListener implements Listener
                                 } else {
                                     player.sendMessage(Utils.translate("&cPlot does not exist"));
                                 }
-                            }
-                    /*
-                        Race Levels GUI, optimize by not including stained glass pane
-                     */
-                        } else if (menu.getFormattedTitleBase().equalsIgnoreCase(pickRaceLevelsTitle) && currentItem.getType() != Material.STAINED_GLASS_PANE) {
-                            // conditions to determine if it is the right item, if it is a random level they selected, etc
-                            boolean randomLevel = false;
-                            RaceLevel selectedLevel = null;
-
-                            if (ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).equalsIgnoreCase("Random Level"))
-                                randomLevel = true;
-                            else
-                                selectedLevel = (RaceLevel) Parkour.getLevelManager().getFromTitle(event.getCurrentItem().getItemMeta().getDisplayName());
-
-                            // if it is an item that can be used for races, continue
-                            if (selectedLevel != null) {
-                                List<String> itemLore = currentItem.getItemMeta().getLore();
-
-                                String lastString = ChatColor.stripColor(itemLore.get(itemLore.size() - 1));
-                                boolean bet = false;
-                                double betAmount = 0.0;
-                                String opponentName = null;
-
-                                if (lastString.toUpperCase().contains("bet amount".toUpperCase())) {
-                                    bet = true;
-                                    // get the right side of the ->
-                                    betAmount = Double.parseDouble(lastString.split("-> ")[1]);
-                                    // this means the against string is second last
-                                    opponentName = ChatColor.stripColor(itemLore.get(itemLore.size() - 2)).split("-> ")[1];
-
-                                } else if (lastString.toUpperCase().contains("against".toUpperCase()))
-                                    opponentName = lastString.split("-> ")[1];
-
-                                PlayerStats opponentStats = Parkour.getStatsManager().getByName(opponentName);
-
-                                // close inventory
-                                player.closeInventory();
-
-                                if (opponentStats != null) {
-                                    // then use the boolean if to run the appropriate conditions
-                                    if (randomLevel)
-                                        Parkour.getRaceManager().sendRequest(playerStats, opponentStats, true, null, bet, betAmount);
-                                    else
-                                        Parkour.getRaceManager().sendRequest(playerStats, opponentStats, false, selectedLevel, bet, betAmount);
-                                } else
-                                    player.sendMessage(Utils.translate("&4" + opponentName + " &cis not online"));
                             }
                         }
                     }

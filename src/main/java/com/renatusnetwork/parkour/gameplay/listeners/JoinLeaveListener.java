@@ -9,6 +9,7 @@ import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.RaceManager;
+import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.saves.SavesDB;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -160,7 +161,7 @@ public class JoinLeaveListener implements Listener
 
         // if left in race, end it
         if (playerStats.inRace())
-            raceManager.endRace(raceManager.get(player).getOpponent(player), true);
+            playerStats.getRace().end(playerStats.getRace().getOpponent(), RaceEndReason.DISCONNECTED);
 
         // if left in black market, remove them
         if (playerStats.isInBlackMarket())

@@ -8,12 +8,10 @@ import com.renatusnetwork.parkour.data.events.types.MazeEvent;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
 import com.renatusnetwork.parkour.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.races.Race;
+import com.renatusnetwork.parkour.data.races.gamemode.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
-import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
-import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -39,7 +37,8 @@ public class LevelListener implements Listener {
         if (event.getTo().getBlock().isLiquid()) {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (playerStats.getLevel() != null) {
+            if (playerStats.getLevel() != null)
+            {
 
                 EventManager eventManager = Parkour.getEventManager();
 
@@ -64,21 +63,11 @@ public class LevelListener implements Listener {
                         ((MazeEvent) eventManager.getRunningEvent()).respawn(player);
                     }
                 }
-                else if (playerStats.inRace())
+                else if (!playerStats.isSpectating())
                 {
-                    Race race = Parkour.getRaceManager().get(player);
-                    if (race != null)
-                    {
-                        if (race.isPlayer1(player))
-                            race.getPlayer1().teleport(race.getLevel().getSpawnLocation1());
-                        // swap tp to loc 2 if player 2
-                        else
-                            race.getPlayer2().teleport(race.getLevel().getSpawnLocation2());
-                    }
-                // if they are not spectating anyone, continue
-                } else if (!playerStats.isSpectating()) {
                     Level level = playerStats.getLevel();
-                    if (level != null && !level.isDropper() && level.doesLiquidResetPlayer()) {
+                    if (level != null && !level.isDropper() && level.doesLiquidResetPlayer())
+                    {
 
                         // if is elytra level, set gliding to false
                         if (level.isElytra())
@@ -121,7 +110,13 @@ public class LevelListener implements Listener {
                     event.setCancelled(true);
 
                     // gold plate = checkpoint
-                    if (playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isAttemptingMastery() && !playerStats.isPreviewingLevel())
+                    if (
+                            playerStats.inLevel() &&
+                            !playerStats.inRace() &&
+                            !playerStats.inPracticeMode() &&
+                            !playerStats.isSpectating() &&
+                            !playerStats.isAttemptingMastery() &&
+                            !playerStats.isPreviewingLevel())
                     {
                         if (playerStats.hasCurrentCheckpoint())
                         {
@@ -141,10 +136,7 @@ public class LevelListener implements Listener {
                     event.setCancelled(true);
                     EventManager eventManager = Parkour.getEventManager();
 
-                    // end if in race
-                    if (playerStats.inRace())
-                        Parkour.getRaceManager().endRace(player, false);
-                    else if (playerStats.isInInfinite())
+                    if (playerStats.isInInfinite())
                     {
                         // prevent double clicking
                         Infinite infinite = Parkour.getInfiniteManager().get(player.getName());

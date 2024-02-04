@@ -2,13 +2,10 @@ package com.renatusnetwork.parkour.data.menus;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.levels.RaceLevel;
 import com.renatusnetwork.parkour.data.plots.Plot;
-import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -16,8 +13,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -336,82 +331,6 @@ public class MenuManager
         }
         else
         {
-            player.sendMessage(Utils.translate("&cUnable to open inventory, null?"));
-        }
-    }
-
-    // in ONE of TWO cases where a different GUI gets auto-filled, we have to use this special method that goes around the normal OOP menus
-    public void openRaceLevelsGUI(PlayerStats playerStats, Player target, double betAmount)
-    {
-        Player player = playerStats.getPlayer();
-        Inventory inventory = getInventory(playerStats, "pick-race-levels", 0);
-
-        if (inventory != null)
-        {
-            RaceManager raceManager = Parkour.getRaceManager();
-            List<RaceLevel> notInUseRaceLevels = raceManager.getNotInUseRaceLevels();
-
-            for (int i = 0; i < notInUseRaceLevels.size() && i < inventory.getSize() - 9; i++) {
-
-                RaceLevel level = notInUseRaceLevels.get(i);
-
-                if (level != null)
-                {
-                    ItemStack item = new ItemStack(Material.QUARTZ_BLOCK);
-                    ItemMeta itemMeta = item.getItemMeta();
-                    itemMeta.setDisplayName(level.getFormattedTitle());
-                    List<String> itemLore = new ArrayList<String>() {{
-                        add(Utils.translate("&7Click to select &c" + level.getTitle()));
-                        add(Utils.translate("&7for your race!"));
-                        add(Utils.translate(""));
-                        add(Utils.translate("&7Wins this Race Level Has &6" + level.getTotalCompletionsCount()));
-                        add(Utils.translate("&7Racing Against &e-> &6" + target.getName()));
-                    }};
-
-                    // this means they put a bet!
-                    if (betAmount > 0.0)
-                        itemLore.add(Utils.translate("&7Bet Amount &e-> &6" + betAmount));
-
-                    itemMeta.setLore(itemLore);
-                    item.setItemMeta(itemMeta);
-                    inventory.setItem(i, item);
-                }
-            }
-
-            // make black glass at the bottom row
-            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++)
-            {
-                int middleSlot = inventory.getSize() - 5;
-                ItemStack item;
-
-                if (i == middleSlot)
-                {
-                    item = new ItemStack(Material.DIAMOND_BLOCK);
-                    ItemMeta itemMeta = item.getItemMeta();
-                    itemMeta.setDisplayName(Utils.translate("&c&lRandom Level"));
-
-                    List<String> itemLore = new ArrayList<String>() {{
-                        add(Utils.translate("&7Click me to select Random Level"));
-                        add(Utils.translate(""));
-                        add(Utils.translate("&7Racing Against &e-> &6" + target.getName()));
-                    }};
-
-                    if (betAmount > 0.0)
-                        itemLore.add(Utils.translate("&7Bet Amount &e-> &6" + betAmount));
-
-                    itemMeta.setLore(itemLore);
-
-                    item.setItemMeta(itemMeta);
-                } else {
-                    item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
-                    ItemMeta itemMeta = item.getItemMeta();
-                    itemMeta.setDisplayName(Utils.translate("&8Renatus Network"));
-                    item.setItemMeta(itemMeta);
-                }
-                inventory.setItem(i, item);
-            }
-            player.openInventory(inventory);
-        } else {
             player.sendMessage(Utils.translate("&cUnable to open inventory, null?"));
         }
     }
