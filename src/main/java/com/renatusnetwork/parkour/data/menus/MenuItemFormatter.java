@@ -19,21 +19,18 @@ import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.utils.Time;
+import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.print.DocFlavor;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -604,7 +601,7 @@ public class MenuItemFormatter
                 {
                     itemLore.add(Utils.translate("  &7On cooldown &6(-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%)"));
                     itemLore.add(Utils.translate("    &7For &e" +
-                            Time.elapsedShortened((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
+                            TimeUtils.elapsedShortened((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
                     );
                 }
             }
@@ -680,7 +677,7 @@ public class MenuItemFormatter
                     }
 
                     itemLore.add(Utils.translate(bestTimeValue));
-                    itemLore.add(Utils.translate("    &7" + Time.getDate(fastestCompletion.getTimeOfCompletionMillis())));
+                    itemLore.add(Utils.translate("    &7" + TimeUtils.getDate(fastestCompletion.getTimeOfCompletionMillis())));
                 }
             }
 

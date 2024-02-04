@@ -5,6 +5,7 @@ import com.renatusnetwork.parkour.commands.EventCMD;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
+import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.PlayerHider;
@@ -64,32 +65,12 @@ public class InteractListener implements Listener {
 
                 player.getInventory().removeItem(item);
                 player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
+                PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
 
-                if (PlayerHider.containsPlayer(player))
-                {
-                    PlayerHider.showPlayer(player);
-
-                    ItemStack newItem = new ItemStack(Material.REDSTONE_TORCH_ON);
-                    ItemMeta meta = newItem.getItemMeta();
-                    meta.setDisplayName(Utils.translate("&2Players &7» &2Enabled"));
-                    newItem.setItemMeta(meta);
-                    player.getInventory().setItemInMainHand(newItem);
-
-                    player.sendMessage(Utils.translate("&aYou have turned on players"));
-                }
+                if (playerHiderManager.containsPlayer(player))
+                    playerHiderManager.toggleOff(player, player.getInventory().getHeldItemSlot());
                 else
-                {
-                    PlayerHider.hidePlayer(player);
-
-                    ItemStack newItem = new ItemStack(Material.LEVER);
-                    ItemMeta meta = newItem.getItemMeta();
-                    meta.setDisplayName(Utils.translate("&2Players &7» &cDisabled"));
-                    newItem.setItemMeta(meta);
-                    player.getInventory().setItemInMainHand(newItem);
-
-                    player.sendMessage(Utils.translate("&cYou have turned off players"));
-                }
-
+                    playerHiderManager.toggleOn(player, player.getInventory().getHeldItemSlot());
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint")))
             {

@@ -8,7 +8,8 @@ import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class Race {
+public class Race
+{
     private RacePlayer[] players;
     private Level level;
     private int bet;

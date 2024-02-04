@@ -64,12 +64,12 @@ public class RaceRequest
                     requestedString += "&7 with a bet for &6" + formatted + " &eCoins";
                 }
 
-                TextComponent opponentComponent = new TextComponent(TextComponent.fromLegacyText(Utils.translate(requestedString)));
+                TextComponent opponentComponent = new TextComponent(TextComponent.fromLegacyText(Utils.translate(requestedString + "&7. &c&nClick here to accept")));
                 opponentComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&aClick to accept!"))));
                 opponentComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/race accept " + sender.getName()));
 
                 // send made messages
-                sender.sendMessage(senderString);
+                sender.sendMessage(Utils.translate(senderString));
                 requested.getPlayer().spigot().sendMessage(opponentComponent); // send clickable
                 Parkour.getRaceManager().addRequest(this);
             }
@@ -140,5 +140,8 @@ public class RaceRequest
 
     public void setBet(int bet) { this.bet = bet; }
 
-    public boolean equals(PlayerStats sender, PlayerStats requester) { return sender.equals(getSender()) && requester.equals(getRequested()); }
+    public boolean equals(PlayerStats sender, PlayerStats requester)
+    {
+        return (sender.equals(getSender()) && requester.equals(getRequested())) || (sender.equals(getRequested()) && requester.equals(getSender()));
+    }
 }

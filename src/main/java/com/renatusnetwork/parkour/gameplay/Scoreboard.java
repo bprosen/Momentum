@@ -16,10 +16,9 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.utils.Time;
+import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -186,7 +185,7 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&6&lTime Left")));
-                    board.add(formatSpacing(Utils.translate("&7" + Time.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
+                    board.add(formatSpacing(Utils.translate("&7" + TimeUtils.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
 
                     if (eventManager.isAscentEvent()) {
                         board.add(Utils.translate(""));

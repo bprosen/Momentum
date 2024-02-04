@@ -115,49 +115,44 @@ public class Utils {
 
     public static ItemStack getSwordIfExists(Player player)
     {
-        Inventory inventory = player.getInventory();
-        SettingsManager settingsManager = Parkour.getSettingsManager();
-
-        ItemStack swordItem = null;
-
-        ItemStack offHand = player.getInventory().getItemInOffHand();
-        if (isItemFromTitle(offHand, settingsManager.sword_title))
-            swordItem = offHand;
-
-        if (swordItem == null)
-            // try to find the sword in their inventory
-            for (ItemStack item : inventory.getContents())
-                if (isItemFromTitle(item, settingsManager.sword_title))
-                {
-                    swordItem = item;
-                    break;
-                }
-
-        return swordItem;
+        return getItemStackIfExists(player, player.getInventory(), Parkour.getSettingsManager().sword_title);
     }
 
     public static ItemStack getShieldIfExists(Player player)
     {
-        Inventory inventory = player.getInventory();
-        SettingsManager settingsManager = Parkour.getSettingsManager();
+        return getItemStackIfExists(player, player.getInventory(), Parkour.getSettingsManager().shield_title);
+    }
 
-        ItemStack shieldItem = null;
+    public static ItemStack getItemStackIfExists(Player player, Inventory inventory, String title)
+    {
+        ItemStack foundItem = null;
 
         ItemStack offHand = player.getInventory().getItemInOffHand();
-        if (isItemFromTitle(offHand, settingsManager.shield_title))
-            shieldItem = offHand;
+        if (isItemFromTitle(offHand, title))
+            foundItem = offHand;
 
-        if (shieldItem == null)
+        if (foundItem == null)
+        {
             // try to find the sword in their inventory
             for (ItemStack item : inventory.getContents())
-                if (isItemFromTitle(item, settingsManager.shield_title))
+            {
+                if (isItemFromTitle(item, title))
                 {
-                    shieldItem = item;
+                    foundItem = item;
                     break;
                 }
+            }
+        }
+        return foundItem;
+    }
 
+    public static int getSlotFromHotbarInventory(String title)
+    {
+        for (Map.Entry<Integer, ItemStack> entry : Parkour.getSettingsManager().custom_join_inventory.entrySet())
+            if (isItemFromTitle(entry.getValue(), title))
+                return entry.getKey();
 
-        return shieldItem;
+        return -1;
     }
 
     public static boolean isItemFromTitle(ItemStack item, String title)

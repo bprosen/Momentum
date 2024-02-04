@@ -236,7 +236,7 @@ public class LevelHandler
                 ));
             else if (inRace)
             {
-                String broadcast = "&4" + playerStats.getDisplayName() + "&7 beat &4" + playerStats.getRace().getOpponent().getPlayerStats().getDisplayName() + "&7 on &c" + level.getTitle();
+                String broadcast = "&4" + playerStats.getDisplayName() + "&7 beat &4" + race.getOpponent().getPlayerStats().getDisplayName() + "&7 on &c" + level.getTitle();
                 if (race.hasBet())
                     broadcast += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
 

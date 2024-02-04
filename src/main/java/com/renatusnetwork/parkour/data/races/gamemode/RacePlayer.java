@@ -3,13 +3,18 @@ package com.renatusnetwork.parkour.data.races.gamemode;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.utils.PlayerHider;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class RacePlayer
@@ -35,8 +40,7 @@ public class RacePlayer
         Level raceLevel = race.getLevel();
 
         // hide player
-        if (!PlayerHider.containsPlayer(playerStats.getPlayer()))
-            PlayerHider.hidePlayer(playerStats.getPlayer());
+        Parkour.getPlayerHiderManager().toggleOn(playerStats.getPlayer(), Utils.getSlotFromHotbarInventory(Utils.translate("&2Players &7» &2Enabled")));
 
         playerStats.setLevel(raceLevel);
         playerStats.disableLevelStartTime();

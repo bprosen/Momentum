@@ -3,7 +3,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Time
+public class TimeUtils
 {
     public static String elapsed(int seconds)
     {
