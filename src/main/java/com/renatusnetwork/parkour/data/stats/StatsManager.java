@@ -106,6 +106,8 @@ public class StatsManager {
             CompletionsDB.loadRecords(playerStats);
         else
             playerStats.setRecords(Parkour.getLevelManager().getRecords(playerStats.getName()));
+
+        playerStats.loaded();
     }
 
     private void loadRestOfPerks(PlayerStats playerStats)
@@ -320,19 +322,34 @@ public class StatsManager {
 
     public void updateCoins(PlayerStats playerStats, double coins)
     {
-        StatsDB.updateCoins(playerStats.getUUID(), coins);
+        updateCoins(playerStats, coins, true);
+    }
+
+    public void updateCoins(PlayerStats playerStats, double coins, boolean async)
+    {
+        StatsDB.updateCoins(playerStats.getUUID(), coins, async);
         playerStats.setCoins(coins);
     }
 
     public void removeCoins(PlayerStats playerStats, double coins)
     {
-        StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() - coins);
+        removeCoins(playerStats, coins, true);
+    }
+
+    public void removeCoins(PlayerStats playerStats, double coins, boolean async)
+    {
+        StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() - coins, async);
         playerStats.removeCoins(coins);
     }
 
     public void addCoins(PlayerStats playerStats, double coins)
     {
-        StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() + coins);
+        addCoins(playerStats, coins, true);
+    }
+
+    public void addCoins(PlayerStats playerStats, double coins, boolean async)
+    {
+        StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() + coins, async);
         playerStats.addCoins(coins);
     }
 

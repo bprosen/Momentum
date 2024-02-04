@@ -74,7 +74,7 @@ public class Scoreboard {
 
     private static void displayScoreboard(PlayerStats playerStats)
     {
-        if (playerStats != null && playerStats.hasBoard())
+        if (playerStats != null && playerStats.isLoaded() && playerStats.hasBoard())
         {
             List<String> board = new ArrayList<>();
             BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
@@ -119,32 +119,37 @@ public class Scoreboard {
                 board.add(coinBalance);
 
                 // if they have a rank, show it
-                if (playerStats.getRank() != null) {
+                if (playerStats.getRank() != null)
+                {
                     String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getTitle());
                     board.add(rankString);
                 }
 
                 // if they have a clan, show it
-                if (playerStats.getClan() != null) {
+                if (playerStats.getClan() != null)
+                {
                     String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
                     board.add(clanString);
                 }
 
                 int fails = playerStats.getFails();
-                if (!playerStats.isInInfinite() && !playerStats.isEventParticipant() && !playerStats.inRace() &&
+                if (!playerStats.isInInfinite() && !playerStats.isEventParticipant() &&
                     !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendance() &&
                     playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
                     board.add(Utils.translate("  &e&lFails &6" + fails));
 
                 // spectator section of scoreboard
-                if (playerStats.isSpectating()) {
+                if (playerStats.isSpectating())
+                {
 
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getName())));
                     board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
 
                     // practice section of scoreboard
-                } else if (playerStats.inPracticeMode()) {
+                }
+                else if (playerStats.inPracticeMode())
+                {
 
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
@@ -159,10 +164,11 @@ public class Scoreboard {
                     Player opponent = playerStats.getRace().getOpponent().getPlayerStats().getPlayer();
                     PlayerStats opponentStats = Parkour.getStatsManager().get(opponent);
 
-                    board.add(formatSpacing(Utils.translate("&6You are in a race!")));
-                    board.add(formatSpacing(Utils.translate("&7vs. &c" + opponent.getName())));
+                    board.add(formatSpacing(Utils.translate("&6&lRace")));
+                    board.add(formatSpacing(Utils.translate("&c" + opponent.getDisplayName())));
                     // add timer
-                    if (playerStats.getLevelStartTime() > 0) {
+                    if (playerStats.getLevelStartTime() > 0)
+                    {
                         double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
                         String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
@@ -178,8 +184,9 @@ public class Scoreboard {
 
 
                     // event section of scoreboard
-                } else if (playerStats.isEventParticipant()) {
-
+                }
+                else if (playerStats.isEventParticipant())
+                {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&2&l" + eventManager.getRunningEvent().getFormattedName())));
                     board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
@@ -194,8 +201,9 @@ public class Scoreboard {
                     }
 
                     // infinite parkour section of scoreboard
-                } else if (playerStats.isInInfinite()) {
-
+                }
+                else if (playerStats.isInInfinite())
+                {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase()) + " &5Infinite")));
 
@@ -218,7 +226,9 @@ public class Scoreboard {
                         board.add(formatSpacing(Utils.translate("&7Time Left &d" + timeLeft + "s")));
 
                     // level section of scoreboard
-                } else if (level != null) {
+                }
+                else if (level != null)
+                {
 
                     board.add(Utils.translate("&7"));
 

@@ -34,10 +34,11 @@ public class LevelListener implements Listener {
 
         Player player = event.getPlayer();
         // In water
-        if (event.getTo().getBlock().isLiquid()) {
+        if (event.getTo().getBlock().isLiquid())
+        {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (playerStats.getLevel() != null)
+            if (playerStats != null && playerStats.isLoaded() && playerStats.inLevel())
             {
 
                 EventManager eventManager = Parkour.getEventManager();
@@ -90,52 +91,60 @@ public class LevelListener implements Listener {
         Block block = event.getClickedBlock();
 
         // Start timer
-        if (event.getAction().equals(Action.PHYSICAL))
+        if (event.getAction().equals(Action.PHYSICAL) && !player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
         {
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (playerStats != null)
+            // stone plate = timer start
+            if (block.getType() == Material.STONE_PLATE)
             {
-                // stone plate = timer start
-                if (block.getType() == Material.STONE_PLATE)
-                {
-                    event.setCancelled(true);
-                    if (playerStats.inLevel() && !playerStats.inPracticeMode() && !playerStats.isSpectating() && !playerStats.isPreviewingLevel() && !playerStats.hasCurrentCheckpoint())
-                        // cancel so no click sound and no hogging plate
-                        playerStats.startedLevel();
+                event.setCancelled(true);
+                if (
+                    playerStats != null &&
+                    playerStats.inLevel() &&
+                    !playerStats.inPracticeMode() &&
+                    !playerStats.isSpectating() &&
+                    !playerStats.isPreviewingLevel() &&
+                    !playerStats.hasCurrentCheckpoint()
+                )
+                    // cancel so no click sound and no hogging plate
+                    playerStats.startedLevel();
 
-                }
-                else if (block.getType() == Material.GOLD_PLATE)
-                {
-                    event.setCancelled(true);
+            }
+            else if (block.getType() == Material.GOLD_PLATE)
+            {
+                event.setCancelled(true);
 
-                    // gold plate = checkpoint
-                    if (
-                            playerStats.inLevel() &&
-                            !playerStats.inRace() &&
-                            !playerStats.inPracticeMode() &&
-                            !playerStats.isSpectating() &&
-                            !playerStats.isAttemptingMastery() &&
-                            !playerStats.isPreviewingLevel())
+                // gold plate = checkpoint
+                if (
+                        playerStats != null &&
+                        playerStats.isLoaded() &&
+                        playerStats.inLevel() &&
+                        !playerStats.inPracticeMode() &&
+                        !playerStats.isSpectating() &&
+                        !playerStats.isAttemptingMastery() &&
+                        !playerStats.isPreviewingLevel())
+                {
+                    if (playerStats.hasCurrentCheckpoint())
                     {
-                        if (playerStats.hasCurrentCheckpoint())
-                        {
-                            int blockX = playerStats.getCurrentCheckpoint().getBlockX();
-                            int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
+                        int blockX = playerStats.getCurrentCheckpoint().getBlockX();
+                        int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
 
-                            if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
-                                setCheckpoint(playerStats, block.getLocation());
-                        }
-                        else
+                        if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
                             setCheckpoint(playerStats, block.getLocation());
                     }
+                    else
+                        setCheckpoint(playerStats, block.getLocation());
                 }
-                else if (block.getType() == Material.IRON_PLATE)
-                {
-                    // cancel so no click sound and no hogging plate
-                    event.setCancelled(true);
-                    EventManager eventManager = Parkour.getEventManager();
+            }
+            else if (block.getType() == Material.IRON_PLATE)
+            {
+                // cancel so no click sound and no hogging plate
+                event.setCancelled(true);
+                EventManager eventManager = Parkour.getEventManager();
 
+                if (playerStats != null)
+                {
                     if (playerStats.isInInfinite())
                     {
                         // prevent double clicking
@@ -165,15 +174,18 @@ public class LevelListener implements Listener {
     private void setCheckpoint(PlayerStats playerStats, Location location)
     {
         Player player = playerStats.getPlayer();
+        boolean inRace = playerStats.inRace();
 
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
 
         // delete if they have a cp
-        if (playerStats.hasCurrentCheckpoint())
+        if (!inRace && playerStats.hasCurrentCheckpoint())
             CheckpointDB.deleteCheckpoint(playerStats.getUUID(), playerStats.getLevel().getName());
 
         playerStats.setCurrentCheckpoint(location);
-        playerStats.removeCheckpoint(playerStats.getLevel());
+
+        if (!inRace)
+            playerStats.removeCheckpoint(playerStats.getLevel());
 
         // update if in ascendance realm
         if (location.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().ascendant_realm_world))
@@ -190,7 +202,8 @@ public class LevelListener implements Listener {
             }
         }
 
-        playerStats.addCheckpoint(playerStats.getLevel(), location);
+        if (!inRace)
+            playerStats.addCheckpoint(playerStats.getLevel(), location);
 
         String msgString = "&eYour checkpoint has been set";
         if (playerStats.getLevelStartTime() > 0)
@@ -200,7 +213,9 @@ public class LevelListener implements Listener {
         }
 
         player.sendMessage(Utils.translate(msgString));
-        CheckpointDB.insertCheckpoint(playerStats, location);
+
+        if (!inRace)
+            CheckpointDB.insertCheckpoint(playerStats, location);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

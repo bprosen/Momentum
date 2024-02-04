@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,11 +50,26 @@ public class PlayerHiderManager
             player.hidePlayer(Parkour.getPlugin(), playerJoined);
     }
 
-    public void toggleOff(Player player, int slot)
+    public void toggleOff(Player player, boolean notify)
     {
-        if (hiddenPlayers.contains(player))
-        {
+        toggleOff(player, Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&2Players &7» &cDisabled")), notify);
+    }
+
+    public void toggleOn(Player player, boolean notify)
+    {
+        toggleOn(player, Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&2Players &7» &2Enabled")), notify);
+    }
+
+    public void toggleOff(Player player, int slot, boolean notify)
+    {
+        if (slot > -1) {
             showPlayer(player);
+
+            if (notify)
+            {
+                player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
+                player.sendMessage(Utils.translate("&aYou have turned on players"));
+            }
 
             ItemStack newItem = new ItemStack(Material.REDSTONE_TORCH_ON);
             ItemMeta meta = newItem.getItemMeta();
@@ -61,23 +77,26 @@ public class PlayerHiderManager
             newItem.setItemMeta(meta);
             player.getInventory().setItem(slot, newItem);
 
-            player.sendMessage(Utils.translate("&aYou have turned on players"));
         }
     }
 
-    public void toggleOn(Player player, int slot)
+    public void toggleOn(Player player, int slot, boolean notify)
     {
-        if (!hiddenPlayers.contains(player))
+        if (slot > -1)
         {
             hidePlayer(player);
+
+            if (notify)
+            {
+                player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
+                player.sendMessage(Utils.translate("&cYou have turned off players"));
+            }
 
             ItemStack newItem = new ItemStack(Material.LEVER);
             ItemMeta meta = newItem.getItemMeta();
             meta.setDisplayName(Utils.translate("&2Players &7» &cDisabled"));
             newItem.setItemMeta(meta);
             player.getInventory().setItem(slot, newItem);
-
-            player.sendMessage(Utils.translate("&cYou have turned off players"));
         }
     }
 }

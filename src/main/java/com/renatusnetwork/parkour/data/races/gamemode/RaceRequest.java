@@ -52,7 +52,7 @@ public class RaceRequest
 
                 if (hasBet)
                 {
-                    String formatted = Utils.formatDecimal(bet);
+                    String formatted = Utils.formatNumber(bet);
 
                     senderString += "&7 with a bet for &6" + formatted + " &eCoins";
                     requestedString += "&7 with a bet for &6" + formatted + " &eCoins";

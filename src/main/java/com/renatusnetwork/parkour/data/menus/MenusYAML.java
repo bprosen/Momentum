@@ -106,6 +106,8 @@ public class MenusYAML {
             return "infinite-mode";
         if (isSet(menuName, itemPath + ".profile"))
             return "profile";
+        if (isSet(menuName, itemPath + ".race"))
+            return "race";
 
         return "display";
     }

@@ -24,8 +24,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-public class PlayerStats {
+public class PlayerStats
+{
 
+    private boolean loaded;
     private Player player;
     private String uuid;
     private String name;
@@ -79,7 +81,8 @@ public class PlayerStats {
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
     private ArrayList<Level> favoriteLevels;
 
-    public PlayerStats(Player player) {
+    public PlayerStats(Player player)
+    {
         this.player = player;
         this.uuid = player.getUniqueId().toString();
         this.name = player.getName();
@@ -105,6 +108,16 @@ public class PlayerStats {
 
         this.sortingType = Parkour.getSettingsManager().default_level_sorting_type;
         this.levelStartTime = -1;
+    }
+
+    public void loaded()
+    {
+        this.loaded = true;
+    }
+
+    public boolean isLoaded()
+    {
+        return loaded;
     }
 
     //
@@ -272,28 +285,30 @@ public class PlayerStats {
     //
     // Level Section
     //
-    public void setLevel(Level level) {
+    public boolean hasAccessTo(Level level)
+    {
+        return hasCompleted(level) || (level.requiresBuying() && hasBoughtLevel(level)) ||
+               (level.hasRequiredLevels() && level.playerHasRequiredLevels(this)) ||
+               (level.hasPermissionNode() && player.hasPermission(level.getRequiredPermission())) ||
+               (level.needsRank() && Parkour.getRanksManager().isPastOrAtRank(this, level.getRequiredRank()));
+    }
+
+    public void setLevel(Level level)
+    {
         // only continue if non null
-        if (level != null) {
-            if (level.isRaceLevel())
-                resetLevel(); // force the item removal
-            else {
-                // set item
-                SettingsManager settingsManager = Parkour.getSettingsManager();
-                player.getInventory().setItem(settingsManager.leave_hotbar_slot, settingsManager.leave_item);
-            }
+        if (level != null)
+        {
+            // set item
+            SettingsManager settingsManager = Parkour.getSettingsManager();
+            player.getInventory().setItem(settingsManager.leave_hotbar_slot, settingsManager.leave_item);
         }
         this.level = level;
     }
 
-    public void resetLevel() {
+    public void resetLevel()
+    {
         level = null;
-
-        ItemStack itemStack = Utils.getSpawnItemIfExists(player.getInventory());
-
-        // remove if not null
-        if (itemStack != null)
-            player.getInventory().remove(itemStack);
+        Utils.removeSpawnItemIfExists(player, player.getInventory());
     }
 
     public Level getLevel() {
@@ -616,7 +631,7 @@ public class PlayerStats {
     }
 
     public void addFail() {
-        if (failsToggled && !inInfinite && !inTutorial && !inRace() && !eventParticipant && previewLevel == null)
+        if (failsToggled && !inInfinite && !inTutorial && !eventParticipant && previewLevel == null)
             fails++;
     }
 

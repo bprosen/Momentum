@@ -3,9 +3,11 @@ package com.renatusnetwork.parkour.data.races.gamemode;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -34,10 +36,16 @@ public class RacePlayer
 
         Level raceLevel = race.getLevel();
 
+        PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
+        Player player = playerStats.getPlayer();
+
         // hide player
-        Parkour.getPlayerHiderManager().toggleOn(playerStats.getPlayer(), Utils.getSlotFromHotbarInventory(Utils.translate("&2Players &7» &2Enabled")));
+        if (!playerHiderManager.containsPlayer(player))
+            playerHiderManager.toggleOn(player, false);
 
         playerStats.setLevel(raceLevel);
+        playerStats.resetFails();
+        playerStats.resetCurrentCheckpoint();
         playerStats.disableLevelStartTime();
         playerStats.teleport(raceLevel.getStartLocation());
 
@@ -127,7 +135,7 @@ public class RacePlayer
     public void loss()
     {
         playerStats.endRace();
-        Parkour.getStatsManager().updateRaceWins(playerStats, playerStats.getRaceWins() + 1);
+        Parkour.getStatsManager().updateRaceLosses(playerStats, playerStats.getRaceLosses() + 1);
     }
 
     public void resetLevelAndTeleport()

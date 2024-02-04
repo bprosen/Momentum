@@ -34,7 +34,7 @@ commands:
     aliases: [clans]
   rn-parkour:
     description: "RN-Parkour main command"
-  toggleplayers:
+  players:
     description: "RN-Parkour player toggling command"
   checkpoint:
     description: "RN-Parkour checkpoint command"

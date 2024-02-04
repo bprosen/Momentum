@@ -251,15 +251,21 @@ public class StatsDB {
         );
     }
 
-    public static void updateCoins(String uuid, double coins)
+    public static void updateCoins(String uuid, double coins, boolean async)
     {
         if (coins < 0)
             coins = 0;
 
-        DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE uuid=?",
-                coins, uuid
-        );
+        if (async)
+            DatabaseQueries.runAsyncQuery(
+                    "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE uuid=?",
+                    coins, uuid
+            );
+        else
+            DatabaseQueries.runQuery(
+                    "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE uuid=?",
+                    coins, uuid
+            );
     }
 
     public static void updateCoinsName(String playerName, double coins)

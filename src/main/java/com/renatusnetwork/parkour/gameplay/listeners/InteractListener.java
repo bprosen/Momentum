@@ -1,17 +1,12 @@
 package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.commands.EventCMD;
-import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.menus.MenuManager;
+import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
-import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,9 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -63,14 +56,12 @@ public class InteractListener implements Listener {
             {
                 event.setCancelled(true);
 
-                player.getInventory().removeItem(item);
-                player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
                 PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
 
                 if (playerHiderManager.containsPlayer(player))
-                    playerHiderManager.toggleOff(player, player.getInventory().getHeldItemSlot());
+                    playerHiderManager.toggleOff(player, player.getInventory().getHeldItemSlot(), true);
                 else
-                    playerHiderManager.toggleOn(player, player.getInventory().getHeldItemSlot());
+                    playerHiderManager.toggleOn(player, player.getInventory().getHeldItemSlot(), true);
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint")))
             {
@@ -190,7 +181,20 @@ public class InteractListener implements Listener {
                     spawnConfirmMap.get(player.getName()).cancel();
                     spawnConfirmMap.remove(player.getName());
 
-                    Utils.teleportToSpawn(Parkour.getStatsManager().get(player));
+                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                    if (playerStats.inRace())
+                    {
+                        String forfeitMessage = "&cYou forfeit the race, giving a loss";
+
+                        if (playerStats.getRace().hasBet())
+                            forfeitMessage += " and not returning the &6" + Utils.formatNumber(playerStats.getRace().getBet()) + " &eCoins &cbet";
+
+                        playerStats.sendMessage(Utils.translate(forfeitMessage));
+                        playerStats.getRace().end(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+                    }
+                    else
+                        Utils.teleportToSpawn(Parkour.getStatsManager().get(player));
                 }
             }
         }

@@ -1,19 +1,10 @@
 package com.renatusnetwork.parkour.gameplay.handlers;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
-import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Map;
-
 public class SpectatorHandler {
 
     public static void spectateToPlayer(Player spectator, Player player, boolean initialSpectate) {

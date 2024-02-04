@@ -122,9 +122,9 @@ public class RaceManager
         choosingLevel.remove(name);
     }
 
-    public ChoosingLevel getChoosingLevelData(PlayerStats playerStats)
+    public ChoosingLevel getChoosingLevelData(String name)
     {
-        return choosingLevel.get(playerStats.getName());
+        return choosingLevel.get(name);
     }
 
     /*

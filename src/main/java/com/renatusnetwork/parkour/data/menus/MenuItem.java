@@ -107,7 +107,7 @@ public class MenuItem
         return type;
     }
 
-    public boolean isLevel() { return type.equalsIgnoreCase("level"); }
+    public boolean isLevel() { return type.equalsIgnoreCase("level") || type.equalsIgnoreCase("race"); }
 
     public String getTypeValue() {
         return typeValue;

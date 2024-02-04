@@ -146,11 +146,13 @@ public class Utils {
         return foundItem;
     }
 
-    public static int getSlotFromHotbarInventory(String title)
+    public static int getSlotFromInventory(Inventory inventory, String title)
     {
-        for (Map.Entry<Integer, ItemStack> entry : Parkour.getSettingsManager().custom_join_inventory.entrySet())
-            if (isItemFromTitle(entry.getValue(), title))
-                return entry.getKey();
+        int maxSize = inventory.getSize();
+
+        for (int slot = 0; slot < maxSize; slot++)
+            if (isItemFromTitle(inventory.getItem(slot), title))
+                return slot;
 
         return -1;
     }
@@ -172,6 +174,15 @@ public class Utils {
     {
         SettingsManager settingsManager = Parkour.getSettingsManager();
         return getItemStackIfExists(inventory, settingsManager.leave_item);
+    }
+
+    public static void removeSpawnItemIfExists(Player player, Inventory inventory)
+    {
+        ItemStack itemStack = Utils.getSpawnItemIfExists(player.getInventory());
+
+        // remove if not null
+        if (itemStack != null)
+            player.getInventory().remove(itemStack);
     }
 
     private static ItemStack getItemStackIfExists(Inventory inventory, ItemStack searchItem)

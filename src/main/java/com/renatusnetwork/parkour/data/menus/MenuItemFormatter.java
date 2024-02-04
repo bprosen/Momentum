@@ -17,6 +17,8 @@ import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.races.gamemode.ChoosingLevel;
+import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.TimeUtils;
@@ -38,6 +40,10 @@ public class MenuItemFormatter
 {
     public static ItemStack format(PlayerStats playerStats, MenuItem menuItem)
     {
+        if (menuItem.getType().equals("race"))
+        {
+            return getRaceLevel(playerStats, menuItem);
+        }
         if (menuItem.getType().equals("level"))
         {
             if (menuItem.getTypeValue().equals("featured"))
@@ -177,7 +183,7 @@ public class MenuItemFormatter
         if (Parkour.getLevelManager().getFeaturedLevel().equals(favoriteLevel))
             return getFeaturedLevel(playerStats, menuItem);
         else
-            return createLevelItem(playerStats, favoriteLevel, menuItem, newItem);
+            return createLevelItem(playerStats, favoriteLevel, menuItem, newItem, null);
     }
 
     private static ItemStack getSortingType(PlayerStats playerStats, MenuItem menuItem)
@@ -356,6 +362,14 @@ public class MenuItemFormatter
         return item;
     }
 
+    private static ItemStack getRaceLevel(PlayerStats playerStats, MenuItem menuItem)
+    {
+        String levelName = menuItem.getTypeValue();
+        Level level = Parkour.getLevelManager().get(levelName);
+
+        return createLevelItem(playerStats, level, menuItem, menuItem.getItem(), Parkour.getRaceManager().getChoosingLevelData(playerStats.getName()));
+    }
+
     private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem, ItemStack item)
     {
         String levelName = menuItem.getTypeValue();
@@ -367,7 +381,7 @@ public class MenuItemFormatter
             if (Parkour.getLevelManager().getFeaturedLevel().equals(level))
                 return getFeaturedLevel(playerStats, menuItem);
             else
-                return createLevelItem(playerStats, level, menuItem, item);
+                return createLevelItem(playerStats, level, menuItem, item, null);
         }
         return item;
     }
@@ -377,7 +391,7 @@ public class MenuItemFormatter
         LevelManager levelManager = Parkour.getLevelManager();
         MenuItem itemFromLevel = levelManager.getMenuItemFromLevel(levelManager.getFeaturedLevel());
 
-        return createLevelItem(playerStats, levelManager.getFeaturedLevel(), menuItem, itemFromLevel.getItem());
+        return createLevelItem(playerStats, levelManager.getFeaturedLevel(), menuItem, itemFromLevel.getItem(), null);
     }
 
     private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu)
@@ -442,13 +456,13 @@ public class MenuItemFormatter
             else
             {
                 Level level = playerStats.getRank().getRankupLevel();
-                return createLevelItem(playerStats, level, menuItem, item);
+                return createLevelItem(playerStats, level, menuItem, item, null);
             }
         }
         return null;
     }
 
-    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item)
+    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item, ChoosingLevel choosingRaceLevel)
     {
         if (level != null)
         {
@@ -469,32 +483,52 @@ public class MenuItemFormatter
 
             BankManager bankManager = Parkour.getBankManager();
 
-            // show they need to buy it and it is not the jackpot level if it is running
-            if (!(bankManager.isJackpotRunning() &&
-                bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
-                level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
+            if (choosingRaceLevel == null)
             {
-
-                int price = level.getPrice();
-
-                if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT))
+                // show they need to buy it and it is not the jackpot level if it is running
+                if (!(bankManager.isJackpotRunning() &&
+                        bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
+                        level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
                 {
-                    Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
-                    price *= (1.00f - discount.getDiscount());
-                }
 
-                itemLore.add(Utils.translate("&7Click to buy " + level.getTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
-                itemLore.add(Utils.translate("  &6Shift click to preview"));
-                itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
+                    int price = level.getPrice();
+
+                    if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT))
+                    {
+                        Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
+                        price *= (1.00f - discount.getDiscount());
+                    }
+
+                    itemLore.add(Utils.translate("&7Click to buy " + level.getTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
+                    itemLore.add(Utils.translate("  &6Shift click to preview"));
+                    itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
+                }
+                else
+                {
+                    Rank requiredRank = Parkour.getRanksManager().get(level.getRequiredRank());
+
+                    if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
+                        itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
+                    else
+                        itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
+                }
             }
             else
             {
-                Rank requiredRank = Parkour.getRanksManager().get(level.getRequiredRank());
+                PlayerStats opponentStats = choosingRaceLevel.getRequested();
 
-                if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
-                    itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
+                // display access if they do not have it
+                if (!playerStats.hasAccessTo(level))
+                    itemLore.add(Utils.translate("&cYou do not have access to this level"));
+                else if (!opponentStats.hasAccessTo(level))
+                    itemLore.add(Utils.translate("&4" + opponentStats.getDisplayName() + "&c does not have access to this level"));
                 else
-                    itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
+                {
+                    itemLore.add(Utils.translate("&7Click to race &c" + opponentStats.getDisplayName() + "&7 on " + level.getTitle()));
+
+                    if (choosingRaceLevel.hasBet())
+                        itemLore.add(Utils.translate("  &6" + Utils.formatNumber(choosingRaceLevel.getBet()) + "&e Coins &7Bet"));
+                }
             }
 
             // Item Title Section
@@ -620,7 +654,7 @@ public class MenuItemFormatter
             }
 
             // Required Levels Section, but only show it if not featured
-            if (level.hasRequiredLevels() && !level.isFeaturedLevel())
+            if (choosingRaceLevel == null && level.hasRequiredLevels() && !level.isFeaturedLevel())
             {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Required levels"));
@@ -649,7 +683,7 @@ public class MenuItemFormatter
                 else
                     itemLore.add(Utils.translate(beatenMessage));
 
-                if (level.hasMastery())
+                if (choosingRaceLevel == null && level.hasMastery())
                     if (playerStats.hasMasteryCompletion(level))
                         itemLore.add(Utils.translate("&7  Mastery &a✔"));
                     else

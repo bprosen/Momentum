@@ -2,35 +2,28 @@ package com.renatusnetwork.parkour.gameplay.listeners;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
-import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.plots.Plot;
-import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
-import com.renatusnetwork.parkour.data.saves.SavesDB;
+import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
-import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sun.tools.sjavac.CopyFile;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
-
 import java.util.List;
 
 public class JoinLeaveListener implements Listener
@@ -56,7 +49,7 @@ public class JoinLeaveListener implements Listener
                 ));
             }
         }
-        PlayerHider.hideHiddenPlayersFromJoined(player);
+        Parkour.getPlayerHiderManager().hideHiddenPlayersFromJoined(player);
 
         // send message to op people that there are undecided plots
         if (player.isOp())
@@ -74,7 +67,6 @@ public class JoinLeaveListener implements Listener
         Location spawnLoc = event.getSpawnLocation();
 
         StatsManager statsManager = Parkour.getStatsManager();
-
         PlayerStats playerStats = statsManager.getOffline(player.getUniqueId().toString());
         boolean fromOffline = playerStats != null;
 
@@ -145,7 +137,7 @@ public class JoinLeaveListener implements Listener
 
         StatsManager statsManager = Parkour.getStatsManager();
         PlayerStats playerStats = statsManager.get(player);
-        RaceManager raceManager = Parkour.getRaceManager();
+        PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
         EventManager eventManager = Parkour.getEventManager();
         InfiniteManager infiniteManager = Parkour.getInfiniteManager();
         ClansManager clansManager = Parkour.getClansManager();
@@ -161,15 +153,15 @@ public class JoinLeaveListener implements Listener
 
         // if left in race, end it
         if (playerStats.inRace())
-            playerStats.getRace().end(playerStats.getRace().getOpponent(), RaceEndReason.DISCONNECTED);
+            playerStats.getRace().end(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
 
         // if left in black market, remove them
         if (playerStats.isInBlackMarket())
             blackMarketManager.playerLeft(playerStats, true);
 
         // if left as hidden, remove them
-        if (PlayerHider.containsPlayer(player))
-            PlayerHider.showPlayer(player);
+        if (playerHiderManager.containsPlayer(player))
+            playerHiderManager.showPlayer(player);
 
         // if event is running and they are a participant, remove
         if (playerStats.isEventParticipant())

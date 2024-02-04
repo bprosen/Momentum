@@ -49,7 +49,7 @@ public class SettingsManager {
     public int clan_calc_percent_max;
     public int clan_calc_level_reward_needed;
     public int clan_split_reward_min_needed;
-    public List<String> blocked_clan_names = new ArrayList<>();
+    public List<String> blocked_clan_names;
     public String player_submitted_world;
     public int player_submitted_plot_width;
     public int player_submitted_plot_default_y;
@@ -84,6 +84,7 @@ public class SettingsManager {
     public int max_global_personal_completions_leaderboard_size;
     public int max_clans_leaderboard_size;
     public int max_race_leaderboard_size;
+    public int max_race_time;
     public int max_coins_leaderboard_size;
     public int max_records_leaderboard_size;
     public int max_prestige_multiplier;
@@ -241,6 +242,7 @@ public class SettingsManager {
         additional_cost_per_prestige = settings.getDouble("prestiges.additional_cost_per_prestige");
         max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
         max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
+        max_race_time = settings.getInt("races.max_time");
         max_records_leaderboard_size = settings.getInt("records.max_leaderboard_size");
         min_race_bet_amount = settings.getInt("races.min_bet_amount");
         ascendant_realm_world = settings.getString("ascendance.realm_world");

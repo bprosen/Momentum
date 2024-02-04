@@ -74,8 +74,24 @@ public class MenuItemAction {
     {
         String itemType = menuItem.getType();
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        boolean choosingRace = Parkour.getRaceManager().containsChoosingRaceLevel(playerStats.getName());
 
-        if (itemType.equals("perk"))
+        if (itemType.equals("race"))
+        {
+            if (choosingRace)
+            {
+                if (menuItem.getTypeValue().equals("random"))
+                    performRandomRaceLevel(playerStats);
+                else
+                    performRaceItem(playerStats, menuItem.getTypeValue());
+            }
+            else
+            {
+                player.sendMessage(Utils.translate("&cYou do not have a pending race request"));
+                player.closeInventory();
+            }
+        }
+        else if (itemType.equals("perk"))
             performPerkItem(player, menuItem);
         else if (itemType.equals("level"))
         {
@@ -100,8 +116,6 @@ public class MenuItemAction {
                 if (favoriteLevel != null)
                     performLevelTeleport(playerStats, favoriteLevel);
             }
-            else if (Parkour.getRaceManager().containsChoosingRaceLevel(playerStats.getName()))
-                performRaceItem(playerStats, menuItem);
             else
                 performLevelItem(player, menuItem);
         }
@@ -132,10 +146,10 @@ public class MenuItemAction {
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
     }
 
-    private static void performRaceItem(PlayerStats playerStats, MenuItem item)
+    private static void performRaceItem(PlayerStats playerStats, String levelName)
     {
-        ChoosingLevel choosingLevel = Parkour.getRaceManager().getChoosingLevelData(playerStats);
-        Level level = Parkour.getLevelManager().get(item.getType());
+        ChoosingLevel choosingLevel = Parkour.getRaceManager().getChoosingLevelData(playerStats.getName());
+        Level level = Parkour.getLevelManager().get(levelName);
 
         Parkour.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
 
@@ -177,27 +191,36 @@ public class MenuItemAction {
         }
     }
 
+    private static void performRandomRaceLevel(PlayerStats playerStats)
+    {
+        List<Level> raceLevels = Parkour.getLevelManager().getRaceLevels();
+        ArrayList<Level> chosenLevels = new ArrayList<>();
+
+        for (Level level : raceLevels)
+        {
+            // cover all conditions that can stop a player from entering a level
+            if (!level.isFeaturedLevel() && !level.isRankUpLevel() && playerStats.hasAccessTo(level) &&
+                !(playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName())))
+                chosenLevels.add(level);
+        }
+        // tp them to randomly chosen level
+        Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
+        ChoosingLevel choosingLevel = Parkour.getRaceManager().getChoosingLevelData(playerStats.getName());
+
+        Parkour.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), chosenLevel, choosingLevel.getBet());
+
+        playerStats.getPlayer().closeInventory();
+    }
+
     private static void performRandomLevel(PlayerStats playerStats)
     {
         Set<Level> menuLevels = Parkour.getLevelManager().getLevelsInAllMenus();
         ArrayList<Level> chosenLevels = new ArrayList<>();
 
         for (Level level : menuLevels)
-        {
-            boolean addLevel = true;
-
             // cover all conditions that can stop a player from entering a level
-            if (((level.requiresBuying() && !playerStats.hasBoughtLevel(level)) ||
-                (level.hasRequiredLevels() && !level.playerHasRequiredLevels(playerStats)) ||
-                (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermission())) ||
-                (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, level.getRequiredRank()))) &&
-                !level.isFeaturedLevel() && !level.isRankUpLevel())
-                addLevel = false;
-
-            // make sure we do not add the level they are already in
-            if (addLevel && !(playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName())))
+            if (playerStats.hasAccessTo(level))
                 chosenLevels.add(level);
-        }
 
         // tp them to randomly chosen level
         Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
@@ -657,7 +680,8 @@ public class MenuItemAction {
                         tpToStart = true;
 
                     // if they have a save and are not attempting mastery
-                    if (save != null) {
+                    if (save != null)
+                    {
                         Parkour.getSavesManager().loadSave(playerStats, save, level);
                         player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getTitle()));
                         player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));

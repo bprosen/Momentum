@@ -5,7 +5,6 @@ import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.events.types.*;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.utils.PlayerHider;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -42,7 +41,7 @@ public class EventCMD implements CommandExecutor {
                     if (!playerStats.inPracticeMode()) {
                         if (!playerStats.isSpectating()) {
                             if (!playerStats.inRace()) {
-                                if (!PlayerHider.containsPlayer(player)) {
+                                if (!Parkour.getPlayerHiderManager().containsPlayer(player)) {
                                     if (!playerStats.isInInfinite()) {
                                         if (!eventManager.isEliminated(player)) {
                                             if (!playerStats.isInBlackMarket()) {

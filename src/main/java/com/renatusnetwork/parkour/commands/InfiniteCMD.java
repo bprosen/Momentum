@@ -21,14 +21,15 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class InfiniteCMD implements CommandExecutor {
+public class InfiniteCMD implements CommandExecutor
+{
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
+    {
 
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player))
             return true;
-        }
 
         Player player = (Player) sender;
         InfiniteManager infiniteManager = Parkour.getInfiniteManager();
@@ -87,7 +88,7 @@ public class InfiniteCMD implements CommandExecutor {
             player.sendMessage(Utils.translate("&cYou have reloaded Infinite Parkour Rewards"));
 
         }
-        else if (player.hasPermission("rn-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("setmode")))
+        else if (player.hasPermission("rn-parkour.admin") && (a.length == 3 && a[0].equalsIgnoreCase("mode")))
         {
             String targetName = a[1];
             String mode = a[2];
@@ -190,7 +191,7 @@ public class InfiniteCMD implements CommandExecutor {
         {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <type> <score>  &7Set the type's score of someone"));
             player.sendMessage(Utils.translate("&5/infinite loadrewards  &7Loads rewards from rewards.yml"));
-            player.sendMessage(Utils.translate("&5/infinite setmode <IGN> <type>  &7Set the mode of a player"));
+            player.sendMessage(Utils.translate("&5/infinite mode <IGN> <type>  &7Set the mode of a player"));
         }
 
         player.sendMessage(Utils.translate("&5/infinite help  &7Shows you this display"));

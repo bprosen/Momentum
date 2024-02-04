@@ -94,9 +94,6 @@ public class LevelHandler
             RacePlayer race = playerStats.getRace();
             boolean inRace = race != null;
 
-            if (inRace)
-                race.end();
-
             levelManager.addTotalLevelCompletion();
 
             // if they have not completed this individual level, then add
@@ -279,14 +276,17 @@ public class LevelHandler
             Parkour.getPluginLogger().info(playerStats.getName() + " beat " + ChatColor.stripColor(level.getFormattedTitle())); // log to console
 
             // reset cp and saves before teleport
-            Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
-            Parkour.getSavesManager().removeSave(playerStats, level); // safety removal (likely will never actually execute)
+            if (!inRace)
+            {
+                Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
+                Parkour.getSavesManager().removeSave(playerStats, level); // safety removal (likely will never actually execute)
+            }
 
             // clear potion effects
             playerStats.clearPotionEffects();
 
-            String titleMessage = "";
-            String subTitleMessage = "";
+            String titleMessage;
+            String subTitleMessage;
 
             if (!inRace)
             {
@@ -322,6 +322,7 @@ public class LevelHandler
 
             if (inRace)
             {
+
                 locationTo = race.getOriginalLocation();
                 RacePlayer opponent = race.getOpponent();
                 PlayerStats opponentStats = opponent.getPlayerStats();
@@ -329,6 +330,8 @@ public class LevelHandler
                 setLevelInfoOnTeleport(opponentStats, opponent.getOriginalLocation());
                 opponentStats.disableLevelStartTime();
                 opponentStats.teleport(opponent.getOriginalLocation());
+
+                race.end();
             }
             else
             // If not rank up level or has a start location and is grinding, set to start loc
@@ -442,6 +445,9 @@ public class LevelHandler
                     Parkour.getStatsManager().toggleOnElytra(playerStats);
 
                 playerStats.setLevel(newLevel);
+
+                if (playerStats.hasCheckpoint(newLevel))
+                    playerStats.setCurrentCheckpoint(playerStats.getCheckpoint(newLevel));
             }
             else
                 playerStats.resetLevel();

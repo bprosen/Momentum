@@ -104,7 +104,8 @@ public class Parkour extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         // save and do all shutdown methods
         unload();
         getLogger().info("RN-Parkour Disabled");
@@ -146,7 +147,7 @@ public class Parkour extends JavaPlugin {
         getCommand("spectate").setExecutor(new SpectateCMD());
         getCommand("clan").setExecutor(new ClanCMD());
         getCommand("rn-parkour").setExecutor(new RNParkourCMD());
-        getCommand("toggleplayers").setExecutor(new PlayerToggleCMD());
+        getCommand("players").setExecutor(new PlayerToggleCMD());
         getCommand("checkpoint").setExecutor(new CheckpointCMD());
         getCommand("spawn").setExecutor(new SpawnCMD());
         getCommand("practice").setExecutor(new PracticeCMD());

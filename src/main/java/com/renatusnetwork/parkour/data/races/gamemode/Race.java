@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
+import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -22,7 +23,8 @@ public class Race
         startTimer();
     }
 
-    public void start() {
+    public void start()
+    {
         getPlayer1().start();
         getPlayer2().start();
     }
@@ -41,9 +43,15 @@ public class Race
         PlayerStats winnerStats = winner.getPlayerStats();
         PlayerStats loserStats = loser.getPlayerStats();
 
+        PracticeHandler.resetDataOnly(winnerStats);
+        PracticeHandler.resetDataOnly(loserStats);
+
+        winnerStats.resetCurrentCheckpoint();
+        loserStats.resetCurrentCheckpoint();
+
         StatsManager statsManager = Parkour.getStatsManager();
 
-        if (endReason == RaceEndReason.DISCONNECTED || endReason == RaceEndReason.COMPLETED)
+        if (endReason == RaceEndReason.FORFEIT || endReason == RaceEndReason.COMPLETED)
         {
             // administer coins, and update data
             winner.win();
@@ -52,15 +60,24 @@ public class Race
             if (endReason == RaceEndReason.COMPLETED)
                 statsManager.runGGTimer();
             else
-                winnerStats.sendMessage(Utils.translate("&cYour opponent disconnected in the race, giving a win and the bet money"));
+            {
+                String message = "&cYour opponent forfeit the race, giving a win";
+
+                if (hasBet())
+                    message += " &cand the &6" + Utils.formatNumber(bet) + " &eCoins &cbet";
+
+                winnerStats.sendMessage(Utils.translate(message));
+            }
         }
         else if (endReason == RaceEndReason.SHUTDOWN || endReason == RaceEndReason.OUT_OF_TIME)
         {
             // give back bet and do not touch stats
             if (hasBet())
             {
-                statsManager.addCoins(winnerStats, getBet());
-                statsManager.addCoins(loserStats, getBet());
+                boolean isOutOfTime = endReason == RaceEndReason.OUT_OF_TIME;
+
+                statsManager.addCoins(winnerStats, getBet(), isOutOfTime);
+                statsManager.addCoins(loserStats, getBet(), isOutOfTime);
             }
 
             winnerStats.endRace();
@@ -109,7 +126,7 @@ public class Race
             {
                 end(getPlayer1(), getPlayer2(), RaceEndReason.OUT_OF_TIME);
             }
-        }.runTaskLater(Parkour.getPlugin(), 20 * 60 * 10);
+        }.runTaskLater(Parkour.getPlugin(), 20 * 60 * Parkour.getSettingsManager().max_race_time);
     }
 
     public boolean hasBet() {

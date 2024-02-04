@@ -269,6 +269,7 @@ prestiges:
 races:
   max_leaderboard_size: 10
   min_bet_amount: 100.0
+  max_time: 10
 rage_quit:
   price: 10000.0
   messages:

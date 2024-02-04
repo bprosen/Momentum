@@ -5,5 +5,5 @@ public enum RaceEndReason
     COMPLETED,
     OUT_OF_TIME,
     SHUTDOWN,
-    DISCONNECTED
+    FORFEIT
 }

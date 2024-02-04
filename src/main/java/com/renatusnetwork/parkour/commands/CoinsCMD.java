@@ -58,7 +58,7 @@ public class CoinsCMD implements CommandExecutor
                     // otherwise cache and db
                     {
                         PlayerStats targetStats = statsManager.get(target);
-                        statsManager.updateCoins(targetStats, coins);
+                        statsManager.updateCoins(targetStats, coins, true);
                     }
 
                     // msg
