@@ -20,6 +20,7 @@ public class RacePlayer
     private Race race;
     private Location originalLocation;
     private RacePlayer opponent;
+    private boolean disabledPlayers;
 
     public RacePlayer(PlayerStats playerStats, Race race, Location originalLocation)
     {
@@ -41,7 +42,10 @@ public class RacePlayer
 
         // hide player
         if (!playerHiderManager.containsPlayer(player))
+        {
             playerHiderManager.toggleOn(player, false);
+            disabledPlayers = true;
+        }
 
         playerStats.setLevel(raceLevel);
         playerStats.resetFails();
@@ -192,5 +196,19 @@ public class RacePlayer
     public RacePlayer getOpponent()
     {
         return opponent;
+    }
+
+    public void resetPracAndCP()
+    {
+        PracticeHandler.resetDataOnly(playerStats);
+        playerStats.resetCurrentCheckpoint();
+    }
+
+    public void showPlayersIfDisabled()
+    {
+        PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
+
+        if (disabledPlayers && playerHiderManager.containsPlayer(playerStats.getPlayer()))
+            playerHiderManager.toggleOff(playerStats.getPlayer(), false);
     }
 }

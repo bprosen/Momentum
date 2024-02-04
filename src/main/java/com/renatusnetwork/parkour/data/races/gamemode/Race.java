@@ -4,7 +4,6 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -43,11 +42,11 @@ public class Race
         PlayerStats winnerStats = winner.getPlayerStats();
         PlayerStats loserStats = loser.getPlayerStats();
 
-        PracticeHandler.resetDataOnly(winnerStats);
-        PracticeHandler.resetDataOnly(loserStats);
+        winner.resetPracAndCP();
+        loser.resetPracAndCP();
 
-        winnerStats.resetCurrentCheckpoint();
-        loserStats.resetCurrentCheckpoint();
+        winner.showPlayersIfDisabled();
+        loser.showPlayersIfDisabled();
 
         StatsManager statsManager = Parkour.getStatsManager();
 
