@@ -22,13 +22,15 @@ public class MenuManager
 
     private HashMap<String, Menu> menus;
     private HashMap<String, CancelTasks> cancelTasks;
-    private  HashSet<String> shiftClicked;
+    private HashSet<String> shiftClicked;
+    private HashMap<String, Integer> choosingRaceLevel;
 
     public MenuManager()
     {
         this.menus = new HashMap<>();
         this.cancelTasks = new HashMap<>();
         this.shiftClicked = new HashSet<>();
+        this.choosingRaceLevel = new HashMap<>();
         load();
     }
 
@@ -109,9 +111,9 @@ public class MenuManager
         return shiftClicked.contains(playerName);
     }
 
-    public boolean removeShiftClicked(String playerName)
+    public void removeShiftClicked(String playerName)
     {
-        return shiftClicked.remove(playerName);
+        shiftClicked.remove(playerName);
     }
 
     public Inventory createInventory(MenuPage menuPage, int size, String title)

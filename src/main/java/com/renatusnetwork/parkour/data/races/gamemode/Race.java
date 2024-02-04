@@ -22,12 +22,6 @@ public class Race
         startTimer();
     }
 
-    public Race(PlayerStats playerStats1, PlayerStats playerStats2, Level level) {
-        initPlayers(playerStats1, playerStats2);
-        this.level = level;
-        startTimer();
-    }
-
     public void start() {
         getPlayer1().start();
         getPlayer2().start();
@@ -89,8 +83,8 @@ public class Race
 
         this.players = new RacePlayer[]{racePlayer1, racePlayer2};
 
-        getPlayer1().setOpponent(this.getPlayer2());
-        getPlayer2().setOpponent(this.getPlayer1());
+        racePlayer1.setOpponent(racePlayer2);
+        racePlayer2.setOpponent(racePlayer1);
 
         playerStats1.setRace(racePlayer1);
         playerStats2.setRace(racePlayer2);
@@ -108,7 +102,6 @@ public class Race
 
     private void startTimer()
     {
-        Race race = this;
         maxTimer = new BukkitRunnable()
         {
             @Override

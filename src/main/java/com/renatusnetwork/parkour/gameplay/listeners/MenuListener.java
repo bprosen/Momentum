@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.LevelManager;
 import com.renatusnetwork.parkour.data.menus.*;
 import com.renatusnetwork.parkour.data.plots.Plot;
+import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.*;
@@ -72,7 +73,6 @@ public class MenuListener implements Listener
                     } else {
                         // submitted plots section
                         String submittedPlotsTitle = Parkour.getMenuManager().getMenu("submitted-plots").getFormattedTitleBase();
-                        String pickRaceLevelsTitle = Parkour.getMenuManager().getMenu("pick-race-levels").getFormattedTitleBase();
 
                     /*
                         Submitted Plots GUI
@@ -112,7 +112,12 @@ public class MenuListener implements Listener
     public void onMenuClose(InventoryCloseEvent event)
     {
         LevelManager levelManager = Parkour.getLevelManager();
+        RaceManager raceManager = Parkour.getRaceManager();
+        MenuManager menuManager = Parkour.getMenuManager();
         String name = event.getPlayer().getName();
+
+        // remove if present
+        raceManager.removeChoosingRaceLevel(name);
 
         new BukkitRunnable()
         {
@@ -122,22 +127,28 @@ public class MenuListener implements Listener
                 Inventory openedInventory = event.getInventory();
                 Inventory nextInventory = event.getPlayer().getOpenInventory().getTopInventory();
 
-                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName()))
+                if (openedInventory instanceof MenuHolder && nextInventory instanceof MenuHolder)
                 {
-                    // remove buying
-                    if (levelManager.isBuyingLevelMenu(name))
-                        levelManager.removeBuyingLevel(name);
+                    Menu openedMenu = ((MenuHolder) openedInventory).getMenu();
+                    Menu nextMenu = ((MenuHolder) nextInventory).getMenu();
 
-                    // cancelled tasks
-                    CancelTasks cancelTasks = Parkour.getMenuManager().getCancelTasks(name);
-
-                    // if not null and contains, we need to cancel remaining tasks!
-                    if (cancelTasks != null && cancelTasks.getCancelledSlots() != null)
+                    if (!openedMenu.equals(nextMenu))
                     {
-                        for (BukkitTask task : cancelTasks.getCancelledSlots())
-                            task.cancel();
+                        // remove buying
+                        if (levelManager.isBuyingLevelMenu(name))
+                            levelManager.removeBuyingLevel(name);
 
-                        Parkour.getMenuManager().removeCancelTasks(name); // remove
+                        // cancelled tasks
+                        CancelTasks cancelTasks = menuManager.getCancelTasks(name);
+
+                        // if not null and contains, we need to cancel remaining tasks!
+                        if (cancelTasks != null && cancelTasks.getCancelledSlots() != null)
+                        {
+                            for (BukkitTask task : cancelTasks.getCancelledSlots())
+                                task.cancel();
+
+                            menuManager.removeCancelTasks(name); // remove
+                        }
                     }
                 }
             }
@@ -154,7 +165,7 @@ public class MenuListener implements Listener
             event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
         {
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+            PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
             if (!playerStats.isInTutorial())
             {

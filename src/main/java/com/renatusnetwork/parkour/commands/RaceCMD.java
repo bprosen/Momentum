@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.menus.MenuManager;
+import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -28,6 +29,7 @@ public class RaceCMD implements CommandExecutor {
         MenuManager menuManager = Parkour.getMenuManager();
         StatsManager statsManager = Parkour.getStatsManager();
         PlayerStats playerStats = statsManager.get(player);
+        RaceManager raceManager = Parkour.getRaceManager();
 
         if (a.length == 0)
             sendHelp(player);
@@ -57,12 +59,13 @@ public class RaceCMD implements CommandExecutor {
         }
         else if (a.length == 1)
         {
-            Player target = Bukkit.getPlayer(a[0]);
+            PlayerStats targetStats = statsManager.getByName(a[0]);
 
-            if (target != null)
+            if (targetStats != null)
             {
                 // open menu if they meet requirements
-                menuManager.openInventory(playerStats, player, "races", true);
+                menuManager.openInventory(playerStats, "race_levels", true);
+                raceManager.addChoosingRaceLevel(playerStats, targetStats, 0); // no bet
             }
             else
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
@@ -80,15 +83,16 @@ public class RaceCMD implements CommandExecutor {
         else if (a.length == 2)
         {
             // send race request with bet
-            if (Utils.isDouble(a[1]))
+            if (Utils.isInteger(a[1]))
             {
-                double betAmount = Double.parseDouble(a[1]);
-                Player target = Bukkit.getPlayer(a[0]);
+                int bet = Integer.parseInt(a[1]);
+                PlayerStats targetStats = statsManager.getByName(a[0]);
 
-                if (target != null)
+                if (targetStats != null)
                 {
                     // open menu if meets conditions
-                    menuManager.openInventory(playerStats, player, "races", true);
+                    menuManager.openInventory(playerStats, "race_levels", true);
+                    raceManager.addChoosingRaceLevel(playerStats, targetStats, bet);
                 }
                 else
                     player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));

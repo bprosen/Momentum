@@ -17,12 +17,6 @@ public class RaceRequest
     private Level level;
     private int bet;
 
-    public RaceRequest(PlayerStats sender, PlayerStats requested, Level level)
-    {
-        this.players = new PlayerStats[]{sender, requested};
-        this.level = level;
-    }
-
     public RaceRequest(PlayerStats sender, PlayerStats requested, Level level, int bet)
     {
         this.players = new PlayerStats[]{sender, requested};
@@ -137,8 +131,6 @@ public class RaceRequest
         raceManager.removeRequest(this);
         return valid;
     }
-
-    public void setBet(int bet) { this.bet = bet; }
 
     public boolean equals(PlayerStats sender, PlayerStats requester)
     {

@@ -15,6 +15,7 @@ import com.renatusnetwork.parkour.data.modifiers.discounts.Discount;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.plots.PlotsDB;
+import com.renatusnetwork.parkour.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -46,10 +47,12 @@ public class MenuItemAction {
         // loop through to see if there is a chest setarmor
         if (!commands.isEmpty())
             for (String cmd : commands)
-                if (cmd.startsWith("setarmor chest")) {
+                if (cmd.startsWith("setarmor chest"))
+                {
                     armorCommand = true;
                     break;
                 }
+
         // if so, check if they are in elytra level
         if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytra()) {
             player.sendMessage(Utils.translate("&cYou cannot change your armor in an Elytra level"));
@@ -97,6 +100,8 @@ public class MenuItemAction {
                 if (favoriteLevel != null)
                     performLevelTeleport(playerStats, favoriteLevel);
             }
+            else if (Parkour.getRaceManager().containsChoosingRaceLevel(playerStats.getName()))
+                performRaceItem(playerStats, menuItem);
             else
                 performLevelItem(player, menuItem);
         }
@@ -125,6 +130,16 @@ public class MenuItemAction {
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performRaceItem(PlayerStats playerStats, MenuItem item)
+    {
+        ChoosingLevel choosingLevel = Parkour.getRaceManager().getChoosingLevelData(playerStats);
+        Level level = Parkour.getLevelManager().get(item.getType());
+
+        Parkour.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
+
+        playerStats.getPlayer().closeInventory();
     }
 
     private static void performLevelSort(PlayerStats playerStats, MenuPage menuPage)

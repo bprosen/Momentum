@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.races;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.*;
+import com.renatusnetwork.parkour.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.parkour.data.races.gamemode.Race;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceRequest;
 import com.renatusnetwork.parkour.data.stats.*;
@@ -28,11 +29,13 @@ public class RaceManager
 {
     private Set<RaceRequest> raceRequests;
     private HashMap<Integer, RaceLBPosition> raceLeaderboard;
+    private HashMap<String, ChoosingLevel> choosingLevel;
 
     public RaceManager()
     {
         this.raceRequests = new HashSet<>();
         this.raceLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_race_leaderboard_size);
+        this.choosingLevel = new HashMap<>();
 
         new BukkitRunnable()
         {
@@ -49,10 +52,8 @@ public class RaceManager
      */
     public void sendRequest(PlayerStats sender, PlayerStats requested, Level level, int bet)
     {
-        RaceRequest raceRequest = new RaceRequest(sender, requested, level);
-
-        if (bet > 0)
-            raceRequest.setBet(bet);
+        RaceRequest raceRequest = new RaceRequest(sender, requested, level, bet);
+        addRequest(raceRequest);
 
         raceRequest.send();
 
@@ -105,6 +106,27 @@ public class RaceManager
     {
         raceRequests.add(request);
     }
+
+    public void addChoosingRaceLevel(PlayerStats sender, PlayerStats requested, int bet)
+    {
+        choosingLevel.put(sender.getName(), new ChoosingLevel(sender, requested, bet));
+    }
+
+    public boolean containsChoosingRaceLevel(String name)
+    {
+        return choosingLevel.containsKey(name);
+    }
+
+    public void removeChoosingRaceLevel(String name)
+    {
+        choosingLevel.remove(name);
+    }
+
+    public ChoosingLevel getChoosingLevelData(PlayerStats playerStats)
+    {
+        return choosingLevel.get(playerStats.getName());
+    }
+
     /*
         Leaderboard Section
      */
