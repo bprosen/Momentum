@@ -655,8 +655,7 @@ public class StatsManager {
                 if (playerStats.isPreviewingLevel())
                     playerStats.resetPreviewLevel();
 
-                if (playerStats.inRace())
-                    playerStats.getRace().end(RaceEndReason.SHUTDOWN);
+                playerStats.endRace(RaceEndReason.SHUTDOWN);
             }
         }
     }

@@ -191,7 +191,7 @@ public class InteractListener implements Listener {
                             forfeitMessage += " and not returning the &6" + Utils.formatNumber(playerStats.getRace().getBet()) + " &eCoins &cbet";
 
                         playerStats.sendMessage(Utils.translate(forfeitMessage));
-                        playerStats.getRace().end(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+                        playerStats.endRace(RaceEndReason.FORFEIT);
                     }
                     else
                         Utils.teleportToSpawn(Parkour.getStatsManager().get(player));

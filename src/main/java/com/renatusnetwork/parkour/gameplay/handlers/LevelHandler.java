@@ -15,6 +15,7 @@ import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.parkour.data.modifiers.boosters.Booster;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
+import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceRequest;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
@@ -331,7 +332,8 @@ public class LevelHandler
                 opponentStats.disableLevelStartTime();
                 opponentStats.teleport(opponent.getOriginalLocation());
 
-                race.end();
+
+                playerStats.endRace(RaceEndReason.WON);
             }
             else
             // If not rank up level or has a start location and is grinding, set to start loc

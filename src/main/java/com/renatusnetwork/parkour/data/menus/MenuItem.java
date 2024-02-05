@@ -54,25 +54,25 @@ public class MenuItem
         load(menuPage.getMenu(), menuPage, String.valueOf(slot));
     }
 
-    public MenuItem(MenuPage menuPage, int slot, int slotFrom, int slotTo)
+    public MenuItem(MenuPage menuPage, int slot, String keyString)
     {
         this.menuPage = menuPage;
         this.slot = slot;
 
-        load(menuPage.getMenu(), menuPage, slotFrom + "-" + slotTo);
+        load(menuPage.getMenu(), menuPage, keyString);
     }
 
-    public void load(Menu menu, MenuPage menuPage, String rangeWithin)
+    public void load(Menu menu, MenuPage menuPage, String keyString)
     {
-        item = MenusYAML.getItem(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        title = MenusYAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        type = MenusYAML.getItemType(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        typeValue = MenusYAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), rangeWithin, type);
-        lore = MenusYAML.getItemLore(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        commands = MenusYAML.getCommands(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        consoleCommands = MenusYAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        glow = MenusYAML.getGlow(menu.getName(), menuPage.getPageNumber(), rangeWithin);
-        openOtherMenu = MenusYAML.getOpenOtherMenu(menu.getName(), menuPage.getPageNumber(), rangeWithin);
+        item = MenusYAML.getItem(menu.getName(), menuPage.getPageNumber(), keyString);
+        title = MenusYAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), keyString);
+        type = MenusYAML.getItemType(menu.getName(), menuPage.getPageNumber(), keyString);
+        typeValue = MenusYAML.getItemTypeValue(menu.getName(), menuPage.getPageNumber(), keyString, type);
+        lore = MenusYAML.getItemLore(menu.getName(), menuPage.getPageNumber(), keyString);
+        commands = MenusYAML.getCommands(menu.getName(), menuPage.getPageNumber(), keyString);
+        consoleCommands = MenusYAML.getConsoleCommands(menu.getName(), menuPage.getPageNumber(), keyString);
+        glow = MenusYAML.getGlow(menu.getName(), menuPage.getPageNumber(), keyString);
+        openOtherMenu = MenusYAML.getOpenOtherMenu(menu.getName(), menuPage.getPageNumber(), keyString);
     }
 
     public MenuPage getOpenMenu() { return openOtherMenu; }

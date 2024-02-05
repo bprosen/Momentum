@@ -2,7 +2,7 @@ package com.renatusnetwork.parkour.data.races.gamemode;
 
 public enum RaceEndReason
 {
-    COMPLETED,
+    WON,
     OUT_OF_TIME,
     SHUTDOWN,
     FORFEIT

@@ -30,15 +30,10 @@ public class Race
 
     public void end(RacePlayer winner, RaceEndReason endReason)
     {
-        RacePlayer loser = winner.getOpponent();
-        end(winner, loser, endReason);
-    }
-
-    public void end(RacePlayer winner, RacePlayer loser, RaceEndReason endReason)
-    {
         // get max timer and cancel right away
         maxTimer.cancel();
 
+        RacePlayer loser = winner.getOpponent();
         PlayerStats winnerStats = winner.getPlayerStats();
         PlayerStats loserStats = loser.getPlayerStats();
 
@@ -50,13 +45,13 @@ public class Race
 
         StatsManager statsManager = Parkour.getStatsManager();
 
-        if (endReason == RaceEndReason.FORFEIT || endReason == RaceEndReason.COMPLETED)
+        if (endReason == RaceEndReason.FORFEIT || endReason == RaceEndReason.WON)
         {
             // administer coins, and update data
             winner.win();
             loser.loss();
 
-            if (endReason == RaceEndReason.COMPLETED)
+            if (endReason == RaceEndReason.WON)
                 statsManager.runGGTimer();
             else
             {
@@ -79,8 +74,8 @@ public class Race
                 statsManager.addCoins(loserStats, getBet(), isOutOfTime);
             }
 
-            winnerStats.endRace();
-            loserStats.endRace();
+            winnerStats.resetRace();
+            loserStats.resetRace();
 
             if (endReason == RaceEndReason.OUT_OF_TIME)
             {
@@ -123,7 +118,7 @@ public class Race
             @Override
             public void run()
             {
-                end(getPlayer1(), getPlayer2(), RaceEndReason.OUT_OF_TIME);
+                end(getPlayer1(), RaceEndReason.OUT_OF_TIME);
             }
         }.runTaskLater(Parkour.getPlugin(), 20 * 60 * Parkour.getSettingsManager().max_race_time);
     }

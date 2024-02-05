@@ -11,6 +11,7 @@ import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.Perk;
+import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
@@ -243,7 +244,7 @@ public class PlayerStats
         this.race = race;
     }
 
-    public void endRace()
+    public void resetRace()
     {
         this.race = null;
     }
@@ -263,6 +264,11 @@ public class PlayerStats
         return race;
     }
 
+    public void endRace(RaceEndReason reason)
+    {
+        if (race != null)
+            race.getRace().end(race, reason);
+    }
     public int getRaceWins() {
         return raceWins;
     }

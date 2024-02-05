@@ -112,24 +112,9 @@ public class RacePlayer
         }.runTaskTimer(Parkour.getPlugin(), 1, 1);
     }
 
-    public void end()
-    {
-        race.end(this, RaceEndReason.COMPLETED);
-    }
-
-    public void end(RaceEndReason raceEndReason)
-    {
-        race.end(this, getOpponent(), raceEndReason);
-    }
-
-    public void end(RacePlayer winner, RaceEndReason endReason)
-    {
-        race.end(winner, winner.getOpponent(), endReason);
-    }
-
     public void win()
     {
-        playerStats.endRace();
+        playerStats.resetRace();
         Parkour.getStatsManager().updateRaceWins(playerStats, playerStats.getRaceWins() + 1);
 
         if (hasBet())
@@ -138,7 +123,7 @@ public class RacePlayer
 
     public void loss()
     {
-        playerStats.endRace();
+        playerStats.resetRace();
         Parkour.getStatsManager().updateRaceLosses(playerStats, playerStats.getRaceLosses() + 1);
     }
 
@@ -146,6 +131,11 @@ public class RacePlayer
     {
         playerStats.teleport(originalLocation);
         LevelHandler.setLevelInfoOnTeleport(playerStats, originalLocation);
+    }
+
+    public Race getRace()
+    {
+        return race;
     }
 
     private void sendTitleAndPlaySound(PlayerStats playerStats, String title)

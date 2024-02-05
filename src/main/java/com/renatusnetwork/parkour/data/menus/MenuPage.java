@@ -1,8 +1,12 @@
 package com.renatusnetwork.parkour.data.menus;
 
+import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.InventoryView;
+
+import java.nio.Buffer;
 import java.util.*;
 
 public class MenuPage
@@ -61,20 +65,36 @@ public class MenuPage
                 int slot = Integer.parseInt(key);
                 pageItemsMap.put(slot, new MenuItem(this, slot));
             }
-            // support for being able to mass set an item (ex: 0-15)
-            else if (key.contains("-"))
+            // support for being able to mass set an item (ex: 0-15,24,19,4-2)
+            else
             {
-                String[] splitKey = key.split("-");
+                List<Integer> slots = new ArrayList<>();
+                String[] commaSplit = {key};
 
-                // make sure each side of the - is an int
-                if (Utils.isInteger(splitKey[0]) && Utils.isInteger(splitKey[1]))
+                if (key.contains(","))
+                    commaSplit = key.split(",");
+
+                for (String subComma : commaSplit)
                 {
-                    int from = Integer.parseInt(splitKey[0]);
-                    int to = Integer.parseInt(splitKey[1]);
+                    if (subComma.contains("-"))
+                    {
+                        String[] subRange = subComma.split("-");
+                        // make sure each side of the - is an int
+                        if (Utils.isInteger(subRange[0]) && Utils.isInteger(subRange[1]))
+                        {
+                            int from = Integer.parseInt(subRange[0]);
+                            int to = Integer.parseInt(subRange[1]);
 
-                    for (int i = from; i <= to; i++)
-                        pageItemsMap.put(i, new MenuItem(this, i, from, to));
+                            for (int i = from; i <= to; i++)
+                                slots.add(i);
+                        }
+                    }
+                    else if (Utils.isInteger(subComma))
+                        slots.add(Integer.parseInt(subComma));
                 }
+
+                for (Integer slot : slots)
+                    pageItemsMap.put(slot, new MenuItem(this, slot, key));
             }
         }
     }
