@@ -24,14 +24,18 @@ public class SpectateCMD implements CommandExecutor {
 
                 if (spectatorStats != null) {
                     if (a.length > 0) {
-                        if (a.length == 1 && a[0].equalsIgnoreCase("toggle")) {
+                        if (a.length == 1 && a[0].equalsIgnoreCase("toggle"))
+                        {
                             if (spectatorStats.isSpectatable())
+                            {
+                                Parkour.getStatsManager().updateSpectatable(spectatorStats, false);
                                 sender.sendMessage(Utils.translate("&7You can no longer be spectated"));
+                            }
                             else
+                            {
+                                Parkour.getStatsManager().updateSpectatable(spectatorStats, true);
                                 sender.sendMessage(Utils.translate("&7You can now be spectated"));
-
-                            spectatorStats.setSpectatable(!spectatorStats.isSpectatable());
-                            StatsDB.updatePlayerSpectatable(spectatorStats);
+                            }
                         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
                             sendHelp(sender);
                         // spectate to player

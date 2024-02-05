@@ -126,3 +126,5 @@ commands:
     aliases: [fav]
   preview:
     description: "RN-Parkour preview command"
+  elo:
+    description: "RN-Parkour elo command"

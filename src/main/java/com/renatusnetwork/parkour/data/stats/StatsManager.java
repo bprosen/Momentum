@@ -171,6 +171,12 @@ public class StatsManager {
         return playerStatsUUID.values();
     }
 
+    public void updateSpectatable(PlayerStats playerStats, boolean spectatable)
+    {
+        playerStats.setSpectatable(spectatable);
+        StatsDB.updatePlayerSpectatable(playerStats.getUUID(), spectatable);
+    }
+
     public void enteredAscendance(PlayerStats playerStats)
     {
         synchronized (ascendancePlayerList)
@@ -182,7 +188,7 @@ public class StatsManager {
         if (!playerStats.hasNightVision())
         {
             playerStats.setNightVision(true);
-            StatsDB.updatePlayerNightVision(playerStats);
+            StatsDB.updatePlayerNightVision(playerStats.getUUID(), true);
         }
     }
 
@@ -198,7 +204,7 @@ public class StatsManager {
         {
             playerStats.setNightVision(false);
             playerStats.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
-            StatsDB.updatePlayerNightVision(playerStats);
+            StatsDB.updatePlayerNightVision(playerStats.getUUID(), false);
         }
     }
 
@@ -216,7 +222,7 @@ public class StatsManager {
         if (!playerStats.getName().equals(playerName))
         {
             playerStats.setName(playerName);
-            StatsDB.updatePlayerName(playerStats);
+            StatsDB.updatePlayerName(playerStats.getUUID(), playerName);
         }
 
         synchronized (playerStatsUUID)
@@ -320,6 +326,12 @@ public class StatsManager {
         StatsDB.updateInfiniteBlock(playerStats.getUUID(), material.name());
     }
 
+    public void updateELO(PlayerStats playerStats, int elo)
+    {
+        playerStats.setELO(elo);
+        StatsDB.updateELO(playerStats.getUUID(), elo);
+    }
+
     public void updateCoins(PlayerStats playerStats, double coins)
     {
         updateCoins(playerStats, coins, true);
@@ -380,25 +392,25 @@ public class StatsManager {
     public void enteredRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(true);
-        StatsDB.updateAttemptingRankup(playerStats, true);
+        StatsDB.updateAttemptingRankup(playerStats.getUUID(), true);
     }
 
     public void leftRankup(PlayerStats playerStats)
     {
         playerStats.setAttemptingRankup(false);
-        StatsDB.updateAttemptingRankup(playerStats, false);
+        StatsDB.updateAttemptingRankup(playerStats.getUUID(), false);
     }
 
     public void enteredMastery(PlayerStats playerStats)
     {
         playerStats.setAttemptingMastery(true);
-        StatsDB.updateAttemptingMastery(playerStats, true);
+        StatsDB.updateAttemptingMastery(playerStats.getUUID(), true);
     }
 
     public void leftMastery(PlayerStats playerStats)
     {
         playerStats.setAttemptingMastery(false);
-        StatsDB.updateAttemptingMastery(playerStats, false);
+        StatsDB.updateAttemptingMastery(playerStats.getUUID(), false);
     }
 
     public void addModifier(PlayerStats playerStats, Modifier modifier)
@@ -429,7 +441,7 @@ public class StatsManager {
     public void updateMenuSortLevelsType(PlayerStats playerStats, LevelSortingType newType)
     {
         playerStats.setLevelSortingType(newType);
-        StatsDB.updateMenuSortLevelsType(playerStats, newType);
+        StatsDB.updateMenuSortLevelsType(playerStats.getUUID(), newType);
     }
 
     public void updateRaceWins(PlayerStats playerStats, int wins)
@@ -614,10 +626,12 @@ public class StatsManager {
         int raceLosses = playerStats.getRaceLosses();
         int eventWins = playerStats.getEventWins();
         int jumps = playerStats.getPlayer().getStatistic(Statistic.JUMP);
+        int elo = playerStats.getELO();
 
         String hover = Utils.translate(
                      "&7Name » &f" + playerName + "\n" +
                      "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
+                     "&7ELO » &2" + Utils.formatNumber(elo) + "\n" +
                      "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
                      "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
                      "&7Clan » &e" + clanString + "\n" +

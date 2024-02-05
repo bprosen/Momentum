@@ -24,12 +24,15 @@ public class NightVisionCMD implements CommandExecutor {
             if (a.length == 0) {
                 PlayerStats playerStats = statsManager.get(player);
 
-                if (!playerStats.hasNightVision()) { // enable
+                if (!playerStats.hasNightVision())
+                { // enable
 
                     playerStats.setNightVision(true);
                     player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
                     sender.sendMessage(Utils.translate("&aYou have enabled Night Vision"));
-                } else { // disable
+                }
+                else
+                { // disable
 
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
@@ -37,7 +40,7 @@ public class NightVisionCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&cYou have disabled Night Vision"));
                 }
                 // update db
-                StatsDB.updatePlayerNightVision(playerStats);
+                StatsDB.updatePlayerNightVision(playerStats.getUUID(), playerStats.hasNightVision());
             }
         }
         return true;

@@ -157,6 +157,7 @@ public class SettingsManager {
     public String main_menu_name;
     public int max_offline_cache_size;
     public float preview_max_distance;
+    public int default_elo;
 
     public SettingsManager(FileConfiguration settings)
     {
@@ -414,5 +415,6 @@ public class SettingsManager {
         max_favorite_levels = settings.getInt("levels.max_favorite");
         main_menu_name = settings.getString("menu.main_menu_name");
         preview_max_distance = (float) settings.getDouble("levels.preview_max_distance");
+        default_elo = settings.getInt("elo.default_amount");
     }
 }

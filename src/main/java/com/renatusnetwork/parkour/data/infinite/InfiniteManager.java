@@ -137,7 +137,7 @@ public class InfiniteManager {
     public void changeType(PlayerStats playerStats, InfiniteType newType)
     {
         playerStats.setInfiniteType(newType);
-        StatsDB.updateInfiniteType(playerStats, newType);
+        StatsDB.updateInfiniteType(playerStats.getUUID(), newType);
     }
 
     private void rewardPlayer(PlayerStats playerStats, Infinite infinite, int coinReward)

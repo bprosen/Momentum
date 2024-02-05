@@ -26,7 +26,6 @@ import java.util.*;
 
 public class PlayerStats
 {
-
     private boolean loaded;
     private Player player;
     private String uuid;
@@ -67,7 +66,7 @@ public class PlayerStats
     private boolean attemptingRankup;
     private boolean attemptingMastery;
     private LevelSortingType sortingType;
-
+    private int elo;
     private FastBoard board;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
@@ -133,6 +132,16 @@ public class PlayerStats
 
     public void updateBoard(List<String> lines) {
         board.updateLines(lines);
+    }
+
+    public void setELO(int elo)
+    {
+        this.elo = elo;
+    }
+
+    public int getELO()
+    {
+        return elo;
     }
 
     public void setLevelSortingType(LevelSortingType type) {

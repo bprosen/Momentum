@@ -9,6 +9,8 @@ database:
 
 main_world: "parkour"
 max_offline_cache_size: 10
+elo:
+  default_amount: 1000
 bank:
   radiant:
     min_starting_bid: 100

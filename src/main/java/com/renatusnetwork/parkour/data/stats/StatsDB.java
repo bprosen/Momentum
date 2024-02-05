@@ -8,19 +8,17 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.Modifier;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
-import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
-import com.renatusnetwork.parkour.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
-public class StatsDB {
+public class StatsDB
+{
 
     /*
      * Player Stats Section
@@ -49,7 +47,7 @@ public class StatsDB {
             // update player names
             if (!nameInDB.equals(playerStats.getName()))
             {
-                updatePlayerName(playerStats);
+                updatePlayerName(playerStats.getUUID(), playerStats.getName());
 
                 if (clan != null)
                     // update name in cache
@@ -61,6 +59,12 @@ public class StatsDB {
 
             playerStats.setCoins(Double.parseDouble(playerResult.get("coins")));
             playerStats.setSpectatable(Integer.parseInt(playerResult.get("spectatable")) == 1);
+
+            String elo = playerResult.get("elo");
+            if (elo != null)
+                playerStats.setELO(Integer.parseInt(elo));
+            else
+                playerStats.setELO(Parkour.getSettingsManager().default_elo);
 
             if (clan != null)
             {
@@ -108,7 +112,7 @@ public class StatsDB {
 
             // get total count of how many levels they've rated
             playerStats.setRatedLevelsCount(getRatedLevelsCount(playerStats));
-            playerStats.setTotalLevelCompletions(getTotalCompletions(playerStats));
+            playerStats.setTotalLevelCompletions(getTotalCompletions(playerStats.getUUID()));
             playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
 
             // set multiplier percentage
@@ -181,31 +185,40 @@ public class StatsDB {
         return Integer.parseInt(result.get("total"));
     }
 
-    public static int getTotalCompletions(PlayerStats playerStats)
+    public static int getTotalCompletions(String uuid)
     {
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE,
                 "COUNT(*) AS total_completions",
-                "WHERE uuid=?", playerStats.getUUID()
+                "WHERE uuid=?", uuid
         );
 
         return Integer.parseInt(playerResult.get("total_completions"));
     }
 
     // this will update the player name all across the database
-    public static void updatePlayerName(PlayerStats playerStats) {
+    public static void updatePlayerName(String uuid, String name)
+    {
         // update in stats
-        DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET name=? WHERE uuid=?", playerStats.getName(), playerStats.getUUID());
+        DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET name=? WHERE uuid=?", name, uuid);
     }
 
-    public static void updateMenuSortLevelsType(PlayerStats playerStats, LevelSortingType type)
+    public static void updateELO(String uuid, int elo)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET menu_sort_levels_type=? WHERE uuid=?", type.name(), playerStats.getUUID());
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET elo=? WHERE uuid=?", elo, uuid);
     }
-    public static void updatePlayerSpectatable(PlayerStats playerStats)
+
+    public static void updateMenuSortLevelsType(String uuid, LevelSortingType type)
     {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET menu_sort_levels_type=? WHERE uuid=?", type.name(), uuid);
+    }
+
+    public static void updatePlayerSpectatable(String uuid, boolean value)
+    {
+        int valueInt = value ? 1 : 0;
+
         DatabaseQueries.runAsyncQuery(
-            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET spectatable=NOT spectatable WHERE uuid=?", playerStats.getUUID()
+            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET spectatable=? WHERE uuid=?", valueInt, uuid
         );
     }
 
@@ -219,35 +232,39 @@ public class StatsDB {
         DatabaseQueries.runAsyncQuery("UPDATE players SET race_wins=? WHERE uuid=?", wins, uuid);
     }
 
-    public static void updatePlayerNightVision(PlayerStats playerStats)
-    {
-        DatabaseQueries.runAsyncQuery(
-            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET night_vision=NOT night_vision WHERE uuid=?", playerStats.getUUID()
-        );
-    }
-
-    public static void updatePlayerGrinding(PlayerStats playerStats)
-    {
-        DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET grinding=NOT grinding WHERE uuid=?", playerStats.getUUID()
-        );
-    }
-
-    public static void updateAttemptingRankup(PlayerStats playerStats, boolean value)
+    public static void updatePlayerNightVision(String uuid, boolean value)
     {
         int valueInt = value ? 1 : 0;
 
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_rankup=? WHERE uuid=?", valueInt, playerStats.getUUID()
+            "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET night_vision=? WHERE uuid=?", valueInt, uuid
         );
     }
 
-    public static void updateAttemptingMastery(PlayerStats playerStats, boolean value)
+    public static void updatePlayerGrinding(String uuid, boolean value)
     {
         int valueInt = value ? 1 : 0;
 
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_mastery=? WHERE uuid=?", valueInt, playerStats.getUUID()
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET grinding=? WHERE uuid=?", valueInt, uuid
+        );
+    }
+
+    public static void updateAttemptingRankup(String uuid, boolean value)
+    {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_rankup=? WHERE uuid=?", valueInt, uuid
+        );
+    }
+
+    public static void updateAttemptingMastery(String uuid, boolean value)
+    {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_mastery=? WHERE uuid=?", valueInt, uuid
         );
     }
 
@@ -279,11 +296,11 @@ public class StatsDB {
         );
     }
 
-    public static void updateInfiniteType(PlayerStats playerStats, InfiniteType newType)
+    public static void updateInfiniteType(String uuid, InfiniteType newType)
     {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_type=? WHERE uuid=?",
-                    newType.toString().toLowerCase(), playerStats.getUUID()
+                    newType.toString().toLowerCase(), uuid
         );
     }
 
@@ -426,10 +443,10 @@ public class StatsDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=NULL WHERE name=?", playerName);
     }
 
-    public static void updatePlayerClan(PlayerStats playerStats, String tag)
+    public static void updatePlayerClan(String uuid, String tag)
     {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, playerStats.getUUID()
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, uuid
         );
     }
 

@@ -28,7 +28,7 @@ public class GrindCMD implements CommandExecutor
                 {
                     // Update cache and DB
                     playerStats.toggleGrinding();
-                    StatsDB.updatePlayerGrinding(playerStats);
+                    StatsDB.updatePlayerGrinding(playerStats.getUUID(), playerStats.isGrinding());
 
                     player.sendMessage(Utils.translate("&7You have turned grind mode " + (playerStats.isGrinding() ? "&aOn" : "&cOff")));
                 }

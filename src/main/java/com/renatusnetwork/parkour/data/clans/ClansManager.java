@@ -53,7 +53,7 @@ public class ClansManager
         // update owner stats
         clan.addMember(new ClanMember(owner.getUUID(), owner.getName()));
         owner.setClan(clan);
-        StatsDB.updatePlayerClan(owner, clan.getTag());
+        StatsDB.updatePlayerClan(owner.getUUID(), clan.getTag());
     }
 
     public void add(Clan clan) {
@@ -98,7 +98,7 @@ public class ClansManager
     {
         clan.addMember(new ClanMember(playerStats.getUUID(), playerStats.getName()));
         playerStats.setClan(clan);
-        StatsDB.updatePlayerClan(playerStats, clan.getTag());
+        StatsDB.updatePlayerClan(playerStats.getUUID(), clan.getTag());
         clan.removeInvite(playerStats.getName());
     }
 
@@ -146,6 +146,7 @@ public class ClansManager
 
         return null;
     }
+
     public void updatePlayerNameInClan(Clan clan, String oldName, String newName)
     {
         for (ClanMember clanMember : clan.getMembers())
