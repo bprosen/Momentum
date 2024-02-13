@@ -1,25 +1,43 @@
 package com.renatusnetwork.parkour.data.leaderboards;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InfiniteLB
 {
     private InfiniteType type;
-    private HashMap<Integer, InfiniteLBPosition> leaderboard;
+    private ArrayList<InfiniteLBPosition> leaderboard;
 
     public InfiniteLB(InfiniteType type)
     {
         this.type = type;
-        this.leaderboard = new HashMap<>();
+
+        int maxSize = 10;
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        switch (type)
+        {
+            case CLASSIC:
+                maxSize = settingsManager.infinite_classic_lb_size;
+                break;
+            case SPEEDRUN:
+                maxSize = settingsManager.infinite_speedrun_lb_size;
+                break;
+            case SPRINT:
+                maxSize = settingsManager.infinite_sprint_lb_size;
+                break;
+            case TIMED:
+                maxSize = settingsManager.infinite_timed_lb_size;
+                break;
+        }
+
+        this.leaderboard = new ArrayList<>(maxSize);
         loadLeaderboard();
     }
 
@@ -38,9 +56,9 @@ public class InfiniteLB
         return leaderboard.get(position);
     }
 
-    public Collection<InfiniteLBPosition> getLeaderboardPositions()
+    public ArrayList<InfiniteLBPosition> getLeaderboardPositions()
     {
-        return leaderboard.values();
+        return leaderboard;
     }
 
     public void loadLeaderboard()
@@ -63,17 +81,13 @@ public class InfiniteLB
                                     " ORDER BY " + typeDBName + " DESC" +
                                     " LIMIT " + Parkour.getSettingsManager().max_infinite_leaderboard_size);
 
-                    int lbPos = 1;
                     for (Map<String, String> scoreResult : scoreResults)
-                    {
-                        leaderboard.put(lbPos,
+                        leaderboard.add(
                                 new InfiniteLBPosition(
                                         scoreResult.get("uuid"),
                                         scoreResult.get("name"),
                                         Integer.parseInt(scoreResult.get(typeDBName)))
                         );
-                        lbPos++;
-                    }
                 }
                 catch (Exception e)
                 {

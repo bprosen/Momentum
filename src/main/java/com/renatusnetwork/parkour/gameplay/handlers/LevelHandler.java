@@ -332,7 +332,6 @@ public class LevelHandler
                 opponentStats.disableLevelStartTime();
                 opponentStats.teleport(opponent.getOriginalLocation());
 
-
                 playerStats.endRace(RaceEndReason.WON);
             }
             else

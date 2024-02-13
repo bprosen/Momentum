@@ -22,14 +22,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ClansManager
 {
     private HashMap<String, Clan> clans;
-    private HashMap<Integer, Clan> clansLeaderboard;
+    private ArrayList<Clan> clansLB;
     private HashMap<String, Clan> clanChat;
     private Set<String> chatSpy;
 
     public ClansManager(Plugin plugin)
     {
         this.clans = new HashMap<>();
-        this.clansLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
+        this.clansLB = new ArrayList<>(Parkour.getSettingsManager().max_clans_leaderboard_size);
         this.clanChat = new HashMap<>();
         this.chatSpy = new HashSet<>();
 
@@ -154,29 +154,26 @@ public class ClansManager
                 clanMember.setName(newName);
     }
 
-    public HashMap<Integer, Clan> getLeaderboard() { return clansLeaderboard; }
+    public ArrayList<Clan> getLeaderboard() { return clansLB; }
 
     public void loadLeaderboard() {
         try {
 
             Clan highestXPClan = null;
-            Set<Clan> alreadyAddedClans = new HashSet<>();
             int lbSize = 0;
-            clansLeaderboard.clear();
-            int lbPos = 1;
+            clansLB.clear();
 
             while (Parkour.getSettingsManager().max_clans_leaderboard_size > lbSize) {
                 // loop through and make sure they are not already added, and higher than previous
                 for (Clan clan : clans.values())
-                    if (!alreadyAddedClans.contains(clan) &&
+                    if (!clansLB.contains(clan) &&
                         (highestXPClan == null || clan.getTotalXP() > highestXPClan.getTotalXP()))
                         highestXPClan = clan;
 
-                if (highestXPClan != null) {
-                    alreadyAddedClans.add(highestXPClan);
-                    clansLeaderboard.put(lbPos, highestXPClan);
+                if (highestXPClan != null)
+                {
+                    clansLB.add(highestXPClan);
                     highestXPClan = null;
-                    lbPos++;
                 }
                 lbSize++;
             }

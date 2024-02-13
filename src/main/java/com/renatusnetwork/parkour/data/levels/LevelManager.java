@@ -39,21 +39,23 @@ public class LevelManager {
     private HashMap<String, Level> levels;
     private HashMap<Menu, Set<Level>> menuLevels;
     private HashMap<Level, MenuItem> levelMenuItems;
-    private HashMap<Integer, Level> globalLevelCompletionsLB;
-    private HashMap<Integer, Level> topRatedLevelsLB;
+
+    private ArrayList<Level> globalLevelCompletionsLB;
+    private ArrayList<Level> topRatedLevelsLB;
+    private ArrayList<RecordsLBPosition> recordsLB;
+
     private HashMap<String, HashMap<Integer, Level>> buyingLevels;
     private HashMap<String, LevelCooldown> cooldowns;
-    private HashMap<Integer, RecordsLBPosition> recordsLB;
 
     public LevelManager(Plugin plugin) {
         this.levels = new HashMap<>();
         this.menuLevels = new HashMap<>();
         this.levelMenuItems = new HashMap<>();
-        this.globalLevelCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
-        this.topRatedLevelsLB = new HashMap<>(Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
+        this.globalLevelCompletionsLB = new ArrayList<>(Parkour.getSettingsManager().max_global_level_completions_leaderboard_size);
+        this.topRatedLevelsLB = new ArrayList<>(Parkour.getSettingsManager().max_rated_levels_leaderboard_size);
         this.buyingLevels = new HashMap<>();
         this.cooldowns = new HashMap<>();
-        this.recordsLB = new HashMap<>(Parkour.getSettingsManager().max_records_leaderboard_size);
+        this.recordsLB = new ArrayList<>(Parkour.getSettingsManager().max_records_leaderboard_size);
 
         load(); // Loads levels from configuration
         totalLevelCompletions = LevelsDB.getGlobalCompletions();
@@ -684,7 +686,6 @@ public class LevelManager {
             Set<String> addedLevels = new HashSet<>();
             int lbSize = 0;
             topRatedLevelsLB.clear();
-            int leaderboardPos = 1;
 
             while (Parkour.getSettingsManager().max_global_level_completions_leaderboard_size > lbSize)
             {
@@ -701,10 +702,7 @@ public class LevelManager {
                     addedLevels.add(highestLevel.getName());
                     // add to temp lb
                     if (highestLevel.hasRating())
-                    {
-                        topRatedLevelsLB.put(leaderboardPos, highestLevel);
-                        leaderboardPos++;
-                    }
+                        topRatedLevelsLB.add(highestLevel);
 
                     highestLevel = null;
                 }
@@ -716,18 +714,19 @@ public class LevelManager {
         }
     }
 
-    public HashMap<Integer, Level> getTopRatedLevelsLB() { return topRatedLevelsLB; }
+    public ArrayList<Level> getTopRatedLevelsLB() { return topRatedLevelsLB; }
 
-    public HashMap<Integer, Level> getGlobalLevelCompletionsLB() {
+    public ArrayList<Level> getGlobalLevelCompletionsLB() {
         return globalLevelCompletionsLB;
     }
 
-    public void loadGlobalLevelCompletionsLB() {
-        try {
+    public void loadGlobalLevelCompletionsLB()
+    {
+        try
+        {
             Level highestLevel = null;
             Set<String> addedLevels = new HashSet<>();
             int lbSize = 0;
-            int leaderboardPos = 1;
 
             globalLevelCompletionsLB.clear();
 
@@ -742,10 +741,9 @@ public class LevelManager {
                 // null check jic
                 if (highestLevel != null)
                 {
-                    globalLevelCompletionsLB.put(leaderboardPos, highestLevel);
+                    globalLevelCompletionsLB.add(highestLevel);
                     addedLevels.add(highestLevel.getName());
                     highestLevel = null;
-                    leaderboardPos++;
                 }
                 lbSize++;
             }
@@ -866,7 +864,7 @@ public class LevelManager {
             }
 
             HashSet<String> seenNames = new HashSet<>();
-            for (int lbPos = 1; lbPos <= 10; lbPos++)
+            for (int lbPos = 0; lbPos < 10; lbPos++)
             {
                 String currentMax = null;
                 int currentMaxRecords = 0;
@@ -878,12 +876,12 @@ public class LevelManager {
                         seenNames.add(entry.getKey());
                     }
 
-                recordsLB.put(lbPos, new RecordsLBPosition(currentMax, currentMaxRecords));
+                recordsLB.add(lbPos, new RecordsLBPosition(currentMax, currentMaxRecords));
             }
         }
     }
 
-    public HashMap<Integer, RecordsLBPosition> getRecordsLB() { return recordsLB; }
+    public ArrayList<RecordsLBPosition> getRecordsLB() { return recordsLB; }
 
     public HashMap<Level, Long> getRecords(String name)
     {

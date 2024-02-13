@@ -158,6 +158,11 @@ public class SettingsManager {
     public int max_offline_cache_size;
     public float preview_max_distance;
     public int default_elo;
+    public int elo_lb_size;
+    public int infinite_classic_lb_size;
+    public int infinite_speedrun_lb_size;
+    public int infinite_timed_lb_size;
+    public int infinite_sprint_lb_size;
 
     public SettingsManager(FileConfiguration settings)
     {
@@ -416,5 +421,10 @@ public class SettingsManager {
         main_menu_name = settings.getString("menu.main_menu_name");
         preview_max_distance = (float) settings.getDouble("levels.preview_max_distance");
         default_elo = settings.getInt("elo.default_amount");
+        elo_lb_size = settings.getInt("elo.lb_size");
+        infinite_classic_lb_size = settings.getInt("infinite.classic.lb_size");
+        infinite_speedrun_lb_size = settings.getInt("infinite.speedrun.lb_size");
+        infinite_sprint_lb_size = settings.getInt("infinite.sprint.lb_size");
+        infinite_timed_lb_size = settings.getInt("infinite.timed.lb_size");
     }
 }

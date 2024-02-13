@@ -11,6 +11,7 @@ main_world: "parkour"
 max_offline_cache_size: 10
 elo:
   default_amount: 1000
+  lb_size: 10
 bank:
   radiant:
     min_starting_bid: 100
@@ -225,6 +226,10 @@ infinite:
   starting_y: 220
   infinite_respawn_loc: "infinite-respawn"
   infinite_middle_loc: "infinite-middle"
+  classic:
+    lb_size: 10
+  speedrun:
+    lb_size: 10
   sprint:
     starting_timer: 30
     max_timer: 60
@@ -240,8 +245,10 @@ infinite:
         reduction: 0.2
       '500':
         reduction: 0.1
+    lb_size: 10
   timed:
     timer: 60
+    lb_size: 10
   generation:
     angle_bound: 5 # means it will choose a random angle betweeen -(Math.PI / angle_bound) and (Math.PI / angle_bound)
     distance_min: 3.2

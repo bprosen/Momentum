@@ -31,10 +31,7 @@ public class ELOCMD implements CommandExecutor
                 {
                     if (Utils.isInteger(a[2]))
                     {
-                        int elo = Integer.parseInt(a[2]);
-
-                        if (elo < 0)
-                            elo = 0;
+                        int elo = Math.max(Integer.parseInt(a[2]), 0);
 
                         Parkour.getStatsManager().updateELO(targetStats, elo);
                         player.sendMessage(Utils.translate("&7You have set &c" + targetStats.getDisplayName() + "&7's &aELO&7 to &2" + Utils.formatNumber(elo)));
@@ -48,6 +45,10 @@ public class ELOCMD implements CommandExecutor
             else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
             {
                 sendHelp(player);
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("top"))
+            {
+                StatsCMD.printELOLB(sender);
             }
             else if (a.length == 0)
             {
@@ -78,6 +79,7 @@ public class ELOCMD implements CommandExecutor
         player.sendMessage(Utils.translate("&2&lELO Help"));
         player.sendMessage(Utils.translate("&a/elo  &7Shows your ELO"));
         player.sendMessage(Utils.translate("&a/elo (player)  &7Shows their ELO"));
+        player.sendMessage(Utils.translate("&a/elo top  &7Shows the ELO leaderboard"));
 
         if (player.hasPermission("rn-parkour.admin"))
             player.sendMessage(Utils.translate("&a/elo set (player) (elo)  &7Sets the person's ELO"));

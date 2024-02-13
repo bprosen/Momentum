@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
+import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
@@ -40,10 +41,12 @@ public class StatsManager {
     private HashMap<String, PlayerStats> playerStatsUUID; // index by uuid
     private HashMap<String, PlayerStats> playerStatsName; // index by name
     private HashSet<PlayerStats> ascendancePlayerList;
-    private HashMap<Integer, GlobalPersonalLBPosition> globalPersonalCompletionsLB;
-    private HashMap<Integer, CoinsLBPosition> coinsLB;
-    private HashSet<String> saidGG;
 
+    private ArrayList<GlobalPersonalLBPosition> globalPersonalCompletionsLB;
+    private ArrayList<CoinsLBPosition> coinsLB;
+    private ArrayList<ELOLBPosition> eloLB;
+
+    private HashSet<String> saidGG;
     private BukkitTask ggTask;
 
     private int totalPlayers;
@@ -57,8 +60,10 @@ public class StatsManager {
         this.playerStatsName = new HashMap<>();
         this.offlineCache = new LinkedHashMap<>();
         this.ascendancePlayerList = new HashSet<>();
-        this.globalPersonalCompletionsLB = new HashMap<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
-        this.coinsLB = new HashMap<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
+        this.globalPersonalCompletionsLB = new ArrayList<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
+        this.coinsLB = new ArrayList<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
+        this.eloLB = new ArrayList<>(Parkour.getSettingsManager().elo_lb_size);
+
         this.saidGG = new HashSet<>();
 
         startScheduler(plugin);
@@ -75,6 +80,7 @@ public class StatsManager {
                 loadGlobalPersonalCompletionsLB();
                 loadCoinsLB();
                 loadTotalCoins();
+                loadELOLB();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 180);
 
@@ -332,6 +338,13 @@ public class StatsManager {
         StatsDB.updateELO(playerStats.getUUID(), elo);
     }
 
+    public void calculateNewELO(PlayerStats competitor, PlayerStats against, ELOOutcomeTypes outcome)
+    {
+        int newELO = competitor.calculateNewELO(against, outcome);
+        competitor.setELO(newELO);
+        StatsDB.updateELO(competitor.getUUID(), newELO);
+    }
+
     public void updateCoins(PlayerStats playerStats, double coins)
     {
         updateCoins(playerStats, coins, true);
@@ -482,35 +495,31 @@ public class StatsManager {
                            "DESC LIMIT " + Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size
             );
 
-            int lbPos = 1;
-
-            for (Map<String, String> playerCompletionStat : playerCompletions) {
+            for (Map<String, String> playerCompletionStat : playerCompletions)
+            {
                 int completions = Integer.parseInt(playerCompletionStat.get("total_completions"));
                 String playerName = playerCompletionStat.get("name");
 
                 // if they have more than 0 completions, add (reset stats case)
                 if (completions > 0)
-                {
                     // add playername to completion in map
-                    globalPersonalCompletionsLB.put(lbPos, new GlobalPersonalLBPosition(playerName, completions));
-                    lbPos++;
-                }
+                    globalPersonalCompletionsLB.add(new GlobalPersonalLBPosition(playerName, completions));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void loadCoinsLB() {
+    public void loadCoinsLB()
+    {
         coinsLB.clear();
 
-        try {
-
+        try
+        {
             // find the highest top 10 completion stat
             List<Map<String, String>> coinsResults = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "name, coins",
                     "ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
 
-            int lbPos = 1;
             for (Map<String, String> coinsResult : coinsResults)
             {
                 String playerName = coinsResult.get("name");
@@ -518,22 +527,51 @@ public class StatsManager {
 
                 // if they have more than 0 completions, add (reset stats case)
                 if (coins > 0)
-                {
-                    coinsLB.put(lbPos, new CoinsLBPosition(playerName, coins));
-                    lbPos++;
-                }
+                    coinsLB.add(new CoinsLBPosition(playerName, coins));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public HashMap<Integer, CoinsLBPosition> getCoinsLB()
+    public void loadELOLB()
+    {
+        eloLB.clear();
+
+        try
+        {
+            // find the highest top 10 completion stat
+            List<Map<String, String>> eloResults = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "name, elo",
+                    "ORDER BY elo DESC LIMIT " + Parkour.getSettingsManager().elo_lb_size);
+
+            for (Map<String, String> eloResult : eloResults)
+            {
+                String playerName = eloResult.get("name");
+                int elo = Parkour.getSettingsManager().default_elo;
+
+                if (eloResult.get("elo") != null)
+                    elo = Integer.parseInt(eloResult.get("elo"));
+
+                eloLB.add(new ELOLBPosition(playerName, elo));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<CoinsLBPosition> getCoinsLB()
     {
         return coinsLB;
     }
 
-    public HashMap<Integer, GlobalPersonalLBPosition> getGlobalPersonalCompletionsLB() {
+    public ArrayList<ELOLBPosition> getELOLB()
+    {
+        return eloLB;
+    }
+
+    public ArrayList<GlobalPersonalLBPosition> getGlobalPersonalCompletionsLB() {
         return globalPersonalCompletionsLB;
     }
 

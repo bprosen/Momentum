@@ -145,6 +145,24 @@ public class PlayerStats
         return elo;
     }
 
+    public int calculateNewELO(PlayerStats opponent, ELOOutcomeTypes outcomeType)
+    {
+        double scoreOutcomeFactor = outcomeType == ELOOutcomeTypes.WIN ? 1.0 : 0.0;
+
+        // expected outcome of the game
+        double expectedOutcome = (1 / (1 + (Math.pow(10, (opponent.getELO() - elo) / 400d))));
+
+        // adjusted k factor based on elo rating
+        int kFactor = 16;
+        if (elo < 2000)
+            kFactor = 32;
+        else if (elo < 2400)
+            kFactor = 24;
+
+        // calculate new elo rating
+        return (int) Math.round(elo + kFactor * (scoreOutcomeFactor - expectedOutcome));
+    }
+
     public void setLevelSortingType(LevelSortingType type) {
         this.sortingType = type;
     }

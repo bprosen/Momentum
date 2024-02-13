@@ -31,13 +31,14 @@ public class EventManager {
 
     private HashMap<String, EventParticipant> participants;
     private Set<String> eliminated;
-    private HashMap<Integer, EventLBPosition> eventLeaderboard;
+
+    private ArrayList<EventLBPosition> eventLB;
 
     public EventManager()
     {
         this.participants = new HashMap<>();
         this.eliminated = new HashSet<>();
-        this.eventLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_event_leaderboard_size);
+        this.eventLB = new ArrayList<>(Parkour.getSettingsManager().max_event_leaderboard_size);
 
         startScheduler();
     }
@@ -355,10 +356,11 @@ public class EventManager {
         }
     }
 
-    public void loadLeaderboard() {
-        try {
-
-            HashMap<Integer, EventLBPosition> leaderboard = eventLeaderboard;
+    public void loadLeaderboard()
+    {
+        try
+        {
+            ArrayList<EventLBPosition> leaderboard = eventLB;
             leaderboard.clear();
 
             List<Map<String, String>> winResults = DatabaseQueries.getResults(
@@ -368,24 +370,19 @@ public class EventManager {
                             " ORDER BY event_wins DESC" +
                             " LIMIT " + Parkour.getSettingsManager().max_event_leaderboard_size);
 
-            int leaderboardPos = 1;
-
-            for (Map<String, String> winResult : winResults) {
-                leaderboard.put(leaderboardPos,
+            for (Map<String, String> winResult : winResults)
+                leaderboard.add(
                         new EventLBPosition(
                                 winResult.get("uuid"), winResult.get("name"), Integer.parseInt(winResult.get("event_wins"))
                         ));
-
-                leaderboardPos++;
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public HashMap<Integer, EventLBPosition> getEventLeaderboard()
+    public ArrayList<EventLBPosition> getEventLeaderboard()
     {
-        return eventLeaderboard;
+        return eventLB;
     }
 
     // easy methods

@@ -8,6 +8,8 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.utils.Utils;
 
+import java.util.ArrayList;
+
 public class LBPlaceholders
 {
     public static final String LB_PREFIX = "lb";
@@ -24,122 +26,177 @@ public class LBPlaceholders
 
             if (Utils.isInteger(position))
             {
-                int posInt = Integer.parseInt(position);
+                int posInt = Integer.parseInt(position) - 1;
 
-                if (posInt >= 1 && posInt <= 10)
+                if (posInt >= 0 && posInt <= 9)
                 {
                     switch (type)
                     {
                         case "races":
                         {
-                            RaceLBPosition raceLBPosition = Parkour.getRaceManager().getLeaderboard().get(posInt);
-
-                            if (raceLBPosition != null)
+                            ArrayList<RaceLBPosition> leaderboard = Parkour.getRaceManager().getLeaderboard();
+                            if (leaderboard.size() > posInt)
                             {
-                                // return name or value
-                                if (value.equals("name"))
-                                    return raceLBPosition.getName();
-                                else if (value.equals("wins"))
-                                    return Utils.formatNumber(raceLBPosition.getWins());
-                                else if (value.equals("winrate"))
-                                    return String.valueOf(raceLBPosition.getWinRate());
+                                RaceLBPosition raceLBPosition = leaderboard.get(posInt);
+
+                                if (raceLBPosition != null)
+                                {
+                                    // return name or value
+                                    if (value.equals("name"))
+                                        return raceLBPosition.getName();
+                                    else if (value.equals("wins"))
+                                        return Utils.formatNumber(raceLBPosition.getWins());
+                                    else if (value.equals("winrate"))
+                                        return String.valueOf(raceLBPosition.getWinRate());
+                                }
                             }
                             break;
                         }
                         case "toprated":
                         {
-                            Level level = Parkour.getLevelManager().getTopRatedLevelsLB().get(posInt);
-
-                            if (level != null)
+                            ArrayList<Level> leaderboard = Parkour.getLevelManager().getTopRatedLevelsLB();
+                            if (leaderboard.size() > posInt)
                             {
-                                // return name or value
-                                if (value.equals("title"))
-                                    return level.getFormattedTitle();
-                                else if (value.equals("rating"))
-                                    return String.valueOf(level.getRating());
+                                Level level = leaderboard.get(posInt);
+
+                                if (level != null)
+                                {
+                                    // return name or value
+                                    if (value.equals("title"))
+                                        return level.getFormattedTitle();
+                                    else if (value.equals("rating"))
+                                        return String.valueOf(level.getRating());
+                                }
                             }
                             break;
                         }
                         case "clans":
                         {
-                            Clan clan = Parkour.getClansManager().getLeaderboard().get(posInt);
-
-                            if (clan != null)
+                            ArrayList<Clan> leaderboard = Parkour.getClansManager().getLeaderboard();
+                            if (leaderboard.size() > posInt)
                             {
-                                // return name or value
-                                if (value.equals("xp"))
-                                    return Utils.shortStyleNumber(clan.getTotalXP());
-                                else if (value.equals("name"))
-                                    return clan.getTag();
-                                else if (value.equals("owner"))
-                                    return clan.getOwner().getName();
+                                Clan clan = leaderboard.get(posInt);
+
+                                if (clan != null)
+                                {
+                                    // return name or value
+                                    if (value.equals("xp"))
+                                        return Utils.shortStyleNumber(clan.getTotalXP());
+                                    else if (value.equals("name"))
+                                        return clan.getTag();
+                                    else if (value.equals("owner"))
+                                        return clan.getOwner().getName();
+                                }
                             }
                             break;
                         }
                         case "players":
                         {
-                            GlobalPersonalLBPosition lbPos = Parkour.getStatsManager().getGlobalPersonalCompletionsLB().get(posInt);
-
-                            if (lbPos != null)
+                            ArrayList<GlobalPersonalLBPosition> leaderboard = Parkour.getStatsManager().getGlobalPersonalCompletionsLB();
+                            if (leaderboard.size() > posInt)
                             {
-                                if (value.equals("name"))
-                                    return lbPos.getName();
-                                else if (value.equals("completions"))
-                                    return Utils.formatNumber(lbPos.getCompletions());
+                                GlobalPersonalLBPosition lbPos = leaderboard.get(posInt);
+
+                                if (lbPos != null)
+                                {
+                                    if (value.equals("name"))
+                                        return lbPos.getName();
+                                    else if (value.equals("completions"))
+                                        return Utils.formatNumber(lbPos.getCompletions());
+                                }
                             }
                             break;
                         }
                         case "levels":
                         {
-                            Level level = Parkour.getLevelManager().getGlobalLevelCompletionsLB().get(posInt);
+                            ArrayList<Level> leaderboard = Parkour.getLevelManager().getGlobalLevelCompletionsLB();
 
-                            if (level != null)
+                            if (leaderboard.size() > posInt)
                             {
-                                // return name or value
-                                if (value.equals("title"))
-                                    return level.getFormattedTitle();
-                                else if (value.equals("completions"))
-                                    return Utils.formatNumber(level.getTotalCompletionsCount());
+                                Level level = Parkour.getLevelManager().getGlobalLevelCompletionsLB().get(posInt);
+
+                                if (level != null)
+                                {
+                                    // return name or value
+                                    if (value.equals("title"))
+                                        return level.getFormattedTitle();
+                                    else if (value.equals("completions"))
+                                        return Utils.formatNumber(level.getTotalCompletionsCount());
+                                }
                             }
                             break;
                         }
                         case "coins":
                         {
-                            CoinsLBPosition lbPos = Parkour.getStatsManager().getCoinsLB().get(posInt);
+                            ArrayList<CoinsLBPosition> leaderboard = Parkour.getStatsManager().getCoinsLB();
 
-                            if (lbPos != null)
+                            if (leaderboard.size() > posInt)
                             {
-                                if (value.equals("name"))
-                                    return lbPos.getName();
-                                else if (value.equals("coins"))
-                                    return Utils.formatNumber(lbPos.getCoins());
+                                CoinsLBPosition lbPos = leaderboard.get(posInt);
+
+                                if (lbPos != null)
+                                {
+                                    if (value.equals("name"))
+                                        return lbPos.getName();
+                                    else if (value.equals("coins"))
+                                        return Utils.formatNumber(lbPos.getCoins());
+                                }
                             }
                             break;
                         }
                         case "records":
                         {
-                            RecordsLBPosition lbPos = Parkour.getLevelManager().getRecordsLB().get(posInt);
+                            ArrayList<RecordsLBPosition> leaderboard = Parkour.getLevelManager().getRecordsLB();
 
-                            if (lbPos != null)
+                            if (leaderboard.size() > posInt)
                             {
-                                if (value.equals("name"))
-                                    return lbPos.getName();
-                                else if (value.equals("records"))
-                                    return Utils.formatNumber(lbPos.getRecords());
+                                RecordsLBPosition lbPos = leaderboard.get(posInt);
+
+                                if (lbPos != null)
+                                {
+                                    if (value.equals("name"))
+                                        return lbPos.getName();
+                                    else if (value.equals("records"))
+                                        return Utils.formatNumber(lbPos.getRecords());
+                                }
                             }
                             break;
                         }
                         case "events":
                         {
-                            EventLBPosition eventLBPosition = Parkour.getEventManager().getEventLeaderboard().get(posInt);
+                            ArrayList<EventLBPosition> leaderboard = Parkour.getEventManager().getEventLeaderboard();
 
-                            if (eventLBPosition != null)
+                            if (leaderboard.size() > posInt)
                             {
-                                // return name or value
-                                if (value.equals("name"))
-                                    return eventLBPosition.getName();
-                                else if (value.equals("wins"))
-                                    return Utils.formatNumber(eventLBPosition.getWins());
+                                EventLBPosition eventLBPosition = leaderboard.get(posInt);
+
+                                if (eventLBPosition != null)
+                                {
+                                    // return name or value
+                                    if (value.equals("name"))
+                                        return eventLBPosition.getName();
+                                    else if (value.equals("wins"))
+                                        return Utils.formatNumber(eventLBPosition.getWins());
+                                }
+                            }
+                            break;
+                        }
+                        case "elo":
+                        {
+                            ArrayList<ELOLBPosition> leaderboard = Parkour.getStatsManager().getELOLB();
+
+                            if (leaderboard.size() > posInt)
+                            {
+                                ELOLBPosition elolbPosition = leaderboard.get(posInt);
+
+                                if (elolbPosition != null)
+                                {
+                                    // return name or value
+                                    if (value.equals("name"))
+                                        return elolbPosition.getName();
+                                    else if (value.equals("elo"))
+                                        return Utils.formatNumber(elolbPosition.getELO());
+                                }
                             }
                             break;
                         }

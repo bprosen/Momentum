@@ -28,13 +28,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RaceManager
 {
     private Set<RaceRequest> raceRequests;
-    private HashMap<Integer, RaceLBPosition> raceLeaderboard;
     private HashMap<String, ChoosingLevel> choosingLevel;
+
+    private ArrayList<RaceLBPosition> raceLB;
 
     public RaceManager()
     {
         this.raceRequests = new HashSet<>();
-        this.raceLeaderboard = new HashMap<>(Parkour.getSettingsManager().max_race_leaderboard_size);
+        this.raceLB = new ArrayList<>(Parkour.getSettingsManager().max_race_leaderboard_size);
         this.choosingLevel = new HashMap<>();
 
         new BukkitRunnable()
@@ -134,7 +135,7 @@ public class RaceManager
     {
         try
         {
-            raceLeaderboard.clear();
+            raceLB.clear();
 
             List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
                     DatabaseManager.PLAYERS_TABLE,
@@ -142,8 +143,6 @@ public class RaceManager
                     "WHERE race_wins > 0 " +
                             "ORDER BY race_wins DESC " +
                             "LIMIT " + Parkour.getSettingsManager().max_race_leaderboard_size);
-
-            int leaderboardPos = 1;
 
             for (Map<String, String> scoreResult : scoreResults)
             {
@@ -157,14 +156,13 @@ public class RaceManager
                 else
                     winRate = wins;
 
-                raceLeaderboard.put(leaderboardPos,
+                raceLB.add(
                         new RaceLBPosition(
                                 scoreResult.get("name"),
                                 wins,
                                 winRate
                         )
                 );
-                leaderboardPos++;
             }
         }
         catch (Exception exception)
@@ -173,5 +171,5 @@ public class RaceManager
         }
     }
 
-    public HashMap<Integer, RaceLBPosition> getLeaderboard() { return raceLeaderboard; }
+    public ArrayList<RaceLBPosition> getLeaderboard() { return raceLB; }
 }

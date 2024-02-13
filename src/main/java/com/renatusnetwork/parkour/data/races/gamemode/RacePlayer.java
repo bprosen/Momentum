@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.races.gamemode;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
+import com.renatusnetwork.parkour.data.stats.ELOOutcomeTypes;
 import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
@@ -119,12 +120,15 @@ public class RacePlayer
 
         if (hasBet())
             Parkour.getStatsManager().addCoins(playerStats, (getBet() * 2));
+
+        Parkour.getStatsManager().calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.WIN);
     }
 
     public void loss()
     {
         playerStats.resetRace();
         Parkour.getStatsManager().updateRaceLosses(playerStats, playerStats.getRaceLosses() + 1);
+        Parkour.getStatsManager().calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.LOSS);
     }
 
     public void resetLevelAndTeleport()
