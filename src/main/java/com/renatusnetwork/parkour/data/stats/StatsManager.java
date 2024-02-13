@@ -542,15 +542,12 @@ public class StatsManager {
         {
             // find the highest top 10 completion stat
             List<Map<String, String>> eloResults = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "name, elo",
-                    "ORDER BY elo DESC LIMIT " + Parkour.getSettingsManager().elo_lb_size);
+                    "WHERE elo IS NOT NULL ORDER BY elo DESC LIMIT " + Parkour.getSettingsManager().elo_lb_size);
 
             for (Map<String, String> eloResult : eloResults)
             {
                 String playerName = eloResult.get("name");
-                int elo = Parkour.getSettingsManager().default_elo;
-
-                if (eloResult.get("elo") != null)
-                    elo = Integer.parseInt(eloResult.get("elo"));
+                int elo = Integer.parseInt(eloResult.get("elo"));
 
                 eloLB.add(new ELOLBPosition(playerName, elo));
             }
