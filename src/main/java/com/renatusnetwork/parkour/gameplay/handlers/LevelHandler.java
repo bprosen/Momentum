@@ -232,16 +232,8 @@ public class LevelHandler
                 Bukkit.broadcastMessage(Utils.translate(
                         "&c" + playerStats.getDisplayName() + "&7 has completed the &5&lMastery &7for &2" + level.getTitle()
                 ));
-            else if (inRace)
-            {
-                String broadcast = "&4" + playerStats.getDisplayName() + "&7 beat &4" + race.getOpponent().getPlayerStats().getDisplayName() + "&7 on &c" + level.getTitle();
-                if (race.hasBet())
-                    broadcast += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
-
-                Bukkit.broadcastMessage(Utils.translate(broadcast));
-            }
             else if (level.isBroadcasting())
-                Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 has beaten " + level.getTitle()));
+                Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 completed " + level.getTitle()));
 
             // used for playing sound!
             int beforeClanLevel = -1;

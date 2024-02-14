@@ -177,8 +177,8 @@ public class Scoreboard {
                     board.add(Utils.translate("&7"));
 
                     // add wins, losses, winrate
-                    board.add(formatSpacing(Utils.translate("&6Your ELO &2" + Utils.formatNumber(playerStats.getELO()))));
-                    board.add(formatSpacing(Utils.translate("&6Their ELO &2" + Utils.formatNumber(opponentStats.getELO()))));
+                    board.add(formatSpacing(Utils.translate("&aYour ELO &2" + Utils.formatNumber(playerStats.getELO()))));
+                    board.add(formatSpacing(Utils.translate("&aTheir ELO &2" + Utils.formatNumber(opponentStats.getELO()))));
 
                     // event section of scoreboard
                 }

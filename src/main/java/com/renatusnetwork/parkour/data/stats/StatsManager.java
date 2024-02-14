@@ -151,7 +151,7 @@ public class StatsManager {
 
     public PlayerStats getByName(String playerName)
     {
-        return playerStatsName.get(playerName);
+        return playerStatsName.get(playerName.toLowerCase());
     }
 
     public PlayerStats get(Player player) {
@@ -234,7 +234,7 @@ public class StatsManager {
         synchronized (playerStatsUUID)
         {
             playerStatsUUID.put(playerStats.getUUID(), playerStats);
-            playerStatsName.put(playerStats.getName(), playerStats);
+            playerStatsName.put(playerStats.getName().toLowerCase(), playerStats);
         }
     }
 
@@ -245,7 +245,7 @@ public class StatsManager {
         {
             PlayerStats playerStats = new PlayerStats(player);
             playerStatsUUID.put(player.getUniqueId().toString(), playerStats);
-            playerStatsName.put(player.getName(), playerStats);
+            playerStatsName.put(player.getName().toLowerCase(), playerStats);
 
             return playerStats;
         }
@@ -257,7 +257,7 @@ public class StatsManager {
         synchronized (playerStatsUUID)
         {
             playerStatsUUID.remove(playerStats.getUUID());
-            playerStatsName.remove(playerStats.getName());
+            playerStatsName.remove(playerStats.getName().toLowerCase());
         }
 
         synchronized (ascendancePlayerList)

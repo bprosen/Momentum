@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.stats.ELOOutcomeTypes;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -51,6 +52,16 @@ public class Race
             // administer coins, and update data
             winner.win();
             loser.loss();
+
+            String broadcast =
+                    "&4" + winnerStats.getDisplayName() + "&a (▲" + winnerStats.getELO() +
+                    ")&7 beat &4" + loserStats.getDisplayName() + "&c (▼" + loserStats.getELO() +
+                    ")&7 on &c" + level.getTitle();
+
+            if (hasBet())
+                broadcast += "&7 for &6" + Utils.formatNumber(bet) + " &eCoins";
+
+            Bukkit.broadcastMessage(Utils.translate(broadcast));
 
             if (endReason == RaceEndReason.WON)
                 statsManager.runGGTimer();
