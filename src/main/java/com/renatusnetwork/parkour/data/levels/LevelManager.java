@@ -775,21 +775,26 @@ public class LevelManager {
                 {
                     if (!level.isRaceLevel())
                     {
-                        boolean teleport = true;
-
-                        // not all levels have a price, so do a boolean switch
-                        if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
+                        if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
                         {
-                            teleport = false;
-                            player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
-                            player.sendMessage(Utils.translate(
-                                    "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
-                            )));
-                        }
+                            boolean teleport = true;
 
-                        // if still allowed, tp them!
-                        if (teleport)
-                            MenuItemAction.performLevelTeleport(playerStats, level);
+                            // not all levels have a price, so do a boolean switch
+                            if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
+                            {
+                                teleport = false;
+                                player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
+                                player.sendMessage(Utils.translate(
+                                        "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
+                                        )));
+                            }
+
+                            // if still allowed, tp them!
+                            if (teleport)
+                                MenuItemAction.performLevelTeleport(playerStats, level);
+                        }
+                        else
+                            player.sendMessage(Utils.translate("&cYou cannot teleport to a level from the plot world, do /spawn first"));
                     }
                     else
                         player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
