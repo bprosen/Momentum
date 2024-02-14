@@ -70,7 +70,6 @@ public class SettingsManager {
     public String sword_title;
     public int shield_hotbar_slot;
     public String shield_title;
-    public int max_infinite_leaderboard_size;
     public int max_infinite_y;
     public int infinite_starting_y;
     public int min_infinite_y;
@@ -163,6 +162,7 @@ public class SettingsManager {
     public int infinite_speedrun_lb_size;
     public int infinite_timed_lb_size;
     public int infinite_sprint_lb_size;
+    public int levels_lb_size;
 
     public SettingsManager(FileConfiguration settings)
     {
@@ -232,24 +232,23 @@ public class SettingsManager {
             setup_swords.put(keyInt, sword); // put in
         }
 
-        max_infinite_leaderboard_size = settings.getInt("infinite.max_leaderboard_size");
         max_infinite_y = settings.getInt("infinite.max_y");
         min_infinite_y = settings.getInt("infinite.min_y");
         infinite_starting_y = settings.getInt("infinite.starting_y");
         infinite_default_block = Material.matchMaterial(settings.getString("infinite.default_block"));
         infinite_default_type = InfiniteType.valueOf(settings.getString("infinite.default_type"));
-        max_global_level_completions_leaderboard_size = settings.getInt("completions.global_level_completions_leaderboard.max_size");
-        max_global_personal_completions_leaderboard_size = settings.getInt("completions.global_personal_completions_leaderboard.max_size");
-        max_clans_leaderboard_size = settings.getInt("clans.max_leaderboard_size");
-        max_coins_leaderboard_size = settings.getInt("stats.max_coins_leaderboard_size");
+        max_global_level_completions_leaderboard_size = settings.getInt("leaderboard_max_size.global_completions");
+        max_global_personal_completions_leaderboard_size = settings.getInt("leaderboard_max_size.player_completions");
+        max_clans_leaderboard_size = settings.getInt("leaderboard_max_size.clans");
+        max_coins_leaderboard_size = settings.getInt("leaderboard_max_size.coins");
         max_prestige_multiplier = settings.getInt("prestiges.max_multiplier");
         prestige_multiplier_per_prestige = settings.getInt("prestiges.multiplier_per_prestige");
         base_prestige_cost = settings.getDouble("prestiges.base_prestige_cost");
         additional_cost_per_prestige = settings.getDouble("prestiges.additional_cost_per_prestige");
-        max_rated_levels_leaderboard_size = settings.getInt("levels.max_rated_levels_leaderboard_size");
-        max_race_leaderboard_size = settings.getInt("races.max_leaderboard_size");
+        max_rated_levels_leaderboard_size = settings.getInt("leaderboard_max_size.top_rated");
+        max_race_leaderboard_size = settings.getInt("leaderboard_max_size.races");
         max_race_time = settings.getInt("races.max_time");
-        max_records_leaderboard_size = settings.getInt("records.max_leaderboard_size");
+        max_records_leaderboard_size = settings.getInt("leaderboard_max_size.records");
         min_race_bet_amount = settings.getInt("races.min_bet_amount");
         ascendant_realm_world = settings.getString("ascendance.realm_world");
         rage_quit_price = settings.getDouble("rage_quit.price");
@@ -257,7 +256,7 @@ public class SettingsManager {
         ascendance_hub_level = settings.getString("ascendance.hub_level");
         default_gg_timer = settings.getInt("gg.default_timer_in_seconds");
         default_gg_coin_reward = settings.getInt("gg.default_coin_reward");
-        max_event_leaderboard_size = settings.getInt("event.max_leaderboard_size");
+        max_event_leaderboard_size = settings.getInt("leaderboard_max_size.event");
         tutorial_level_name = settings.getString("levels.tutorial_level");
         prac_title = Utils.translate(settings.getString("practice-plate.title"));
         prac_type = Material.matchMaterial(settings.getString("practice-plate.type"));
@@ -421,10 +420,11 @@ public class SettingsManager {
         main_menu_name = settings.getString("menu.main_menu_name");
         preview_max_distance = (float) settings.getDouble("levels.preview_max_distance");
         default_elo = settings.getInt("elo.default_amount");
-        elo_lb_size = settings.getInt("elo.lb_size");
-        infinite_classic_lb_size = settings.getInt("infinite.classic.lb_size");
-        infinite_speedrun_lb_size = settings.getInt("infinite.speedrun.lb_size");
-        infinite_sprint_lb_size = settings.getInt("infinite.sprint.lb_size");
-        infinite_timed_lb_size = settings.getInt("infinite.timed.lb_size");
+        elo_lb_size = settings.getInt("leaderboard_max_size.elo");
+        infinite_classic_lb_size = settings.getInt("leaderboard_max_size.infinite.classic");
+        infinite_speedrun_lb_size = settings.getInt("leaderboard_max_size.infinite.speedrun");
+        infinite_sprint_lb_size = settings.getInt("leaderboard_max_size.infinite.sprint");
+        infinite_timed_lb_size = settings.getInt("leaderboard_max_size.infinite.timed");
+        levels_lb_size = settings.getInt("leaderboard_max_size.levels");
     }
 }

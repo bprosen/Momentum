@@ -171,7 +171,7 @@ public class EventManager {
             {
                 loadLeaderboard();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 60, 20 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 10, 20 * 180);
     }
 
     // method to start the timer

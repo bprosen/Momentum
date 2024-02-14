@@ -82,7 +82,7 @@ public class StatsManager {
                 loadTotalCoins();
                 loadELOLB();
             }
-        }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 180);
+        }.runTaskTimerAsynchronously(plugin, 20 * 30, 20 * 180);
 
         // update ascendance players every second
         new BukkitRunnable() {

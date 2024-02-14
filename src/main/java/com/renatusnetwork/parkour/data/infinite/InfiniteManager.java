@@ -41,7 +41,7 @@ public class InfiniteManager {
 
     public void initLeaderboards()
     {
-        this.leaderboards = new HashMap<>(Parkour.getSettingsManager().max_infinite_leaderboard_size);
+        this.leaderboards = new HashMap<>();
 
         leaderboards.put(InfiniteType.CLASSIC, new InfiniteLB(InfiniteType.CLASSIC));
         leaderboards.put(InfiniteType.SPEEDRUN, new InfiniteLB(InfiniteType.SPEEDRUN));
@@ -58,7 +58,7 @@ public class InfiniteManager {
             public void run() {
                 loadLeaderboards();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 5, 20 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 10, 20 * 180);
     }
 
     public void startPK(PlayerStats playerStats, InfiniteType type, boolean fromPortal) {

@@ -17,28 +17,26 @@ public class InfiniteLB
     public InfiniteLB(InfiniteType type)
     {
         this.type = type;
+        this.leaderboard = new ArrayList<>(parseMaxSize());
+        loadLeaderboard();
+    }
 
-        int maxSize = 10;
+    private int parseMaxSize()
+    {
         SettingsManager settingsManager = Parkour.getSettingsManager();
 
         switch (type)
         {
             case CLASSIC:
-                maxSize = settingsManager.infinite_classic_lb_size;
-                break;
+                return settingsManager.infinite_classic_lb_size;
             case SPEEDRUN:
-                maxSize = settingsManager.infinite_speedrun_lb_size;
-                break;
+                return settingsManager.infinite_speedrun_lb_size;
             case SPRINT:
-                maxSize = settingsManager.infinite_sprint_lb_size;
-                break;
+                return settingsManager.infinite_sprint_lb_size;
             case TIMED:
-                maxSize = settingsManager.infinite_timed_lb_size;
-                break;
+                return settingsManager.infinite_timed_lb_size;
         }
-
-        this.leaderboard = new ArrayList<>(maxSize);
-        loadLeaderboard();
+        return 10;
     }
 
     public boolean isEmpty()
@@ -79,7 +77,7 @@ public class InfiniteLB
                             "uuid, name, " + typeDBName,
                             "WHERE " + typeDBName + " > 0" +
                                     " ORDER BY " + typeDBName + " DESC" +
-                                    " LIMIT " + Parkour.getSettingsManager().max_infinite_leaderboard_size);
+                                    " LIMIT " + parseMaxSize());
 
                     for (Map<String, String> scoreResult : scoreResults)
                         leaderboard.add(

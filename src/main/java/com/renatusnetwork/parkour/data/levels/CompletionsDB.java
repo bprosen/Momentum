@@ -153,7 +153,7 @@ public class CompletionsDB
                             ") AS g " +
                         ") AS r " +
                     "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON r.uuid=p.uuid " +
-                    "WHERE r.row_num <= 10 " +
+                    "WHERE r.row_num <= " + Parkour.getSettingsManager().levels_lb_size + " " +
                     "ORDER BY level_name, time_taken;"
         );
 
@@ -212,7 +212,7 @@ public class CompletionsDB
                       "SELECT p.name AS player_name, m.fastest_completion AS fastest " +
                       "FROM min_times m " +
                       "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=m.uuid " +
-                      "ORDER BY fastest ASC LIMIT 10",
+                      "ORDER BY fastest ASC LIMIT " + Parkour.getSettingsManager().levels_lb_size,
                       levelName
         );
 

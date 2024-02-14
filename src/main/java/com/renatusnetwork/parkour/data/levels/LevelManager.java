@@ -348,9 +348,10 @@ public class LevelManager {
                 leaderboard.set(i, nextCompletion);
             }
         }
-        // Trimming potential #11 datapoint
-        if (leaderboard.size() > 10)
-            leaderboard.remove(10);
+        // Trimming potential #max datapoint
+        int maxSize = Parkour.getSettingsManager().levels_lb_size;
+        if (leaderboard.size() > maxSize)
+            leaderboard.remove(maxSize);
     }
 
     private void startScheduler(Plugin plugin)
@@ -396,7 +397,7 @@ public class LevelManager {
                 loadTopRatedLevelsLB();
                 loadRecordsLB();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 60, 20 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 30, 20 * 180);
     }
 
     public void pickFeatured()

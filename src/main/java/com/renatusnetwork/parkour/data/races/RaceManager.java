@@ -45,7 +45,7 @@ public class RaceManager
             {
                 loadLeaderboard();
             }
-        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 60 * 60, 20 * 60 * 180);
+        }.runTaskTimerAsynchronously(Parkour.getPlugin(), 20 * 10, 20 * 180);
     }
 
     /*
@@ -150,19 +150,14 @@ public class RaceManager
                 int losses = Integer.parseInt(scoreResult.get("race_losses"));
 
                 // avoid divided by 0 error
-                float winRate;
-                if (losses > 0)
-                    winRate = Float.parseFloat(Utils.formatDecimal((double) wins / losses));
-                else
-                    winRate = wins;
+                float winRate = losses > 0 ? Float.parseFloat(Utils.formatDecimal((double) wins / losses)) : wins;
 
                 raceLB.add(
                         new RaceLBPosition(
                                 scoreResult.get("name"),
                                 wins,
                                 winRate
-                        )
-                );
+                        ));
             }
         }
         catch (Exception exception)

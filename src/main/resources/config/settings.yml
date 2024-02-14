@@ -11,7 +11,6 @@ main_world: "parkour"
 max_offline_cache_size: 10
 elo:
   default_amount: 1000
-  lb_size: 10
 bank:
   radiant:
     min_starting_bid: 100
@@ -43,7 +42,6 @@ gg:
 levels:
   max_favorite: 5
   featured_level_reward_multiplier: 1.50
-  max_rated_levels_leaderboard_size: 10
   tutorial_level: tutorial
   max_rating: 5
   min_rating: 0
@@ -63,11 +61,6 @@ cooldowns:
       modifier: 0.75
     '9':
       modifier: 0.90
-stats:
-  max_coins_leaderboard_size: 10
-
-records:
-  max_leaderboard_size: 10
 
 join_inventory:
   '0':
@@ -160,7 +153,6 @@ clans:
   max_members: 10
   max_level: 10
   split_reward_min_needed: 300
-  max_leaderboard_size: 10
   price:
     create: 10000
     tag: 1000
@@ -218,7 +210,6 @@ event:
 infinite:
   default_block: "QUARTZ_BLOCK"
   default_type: "CLASSIC"
-  max_leaderboard_size: 10
   soft_border_radius_x: 100
   soft_border_radius_z: 100
   max_y: 240
@@ -226,10 +217,6 @@ infinite:
   starting_y: 220
   infinite_respawn_loc: "infinite-respawn"
   infinite_middle_loc: "infinite-middle"
-  classic:
-    lb_size: 10
-  speedrun:
-    lb_size: 10
   sprint:
     starting_timer: 30
     max_timer: 60
@@ -245,10 +232,8 @@ infinite:
         reduction: 0.2
       '500':
         reduction: 0.1
-    lb_size: 10
   timed:
     timer: 60
-    lb_size: 10
   generation:
     angle_bound: 5 # means it will choose a random angle betweeen -(Math.PI / angle_bound) and (Math.PI / angle_bound)
     distance_min: 3.2
@@ -265,18 +250,12 @@ infinite:
       minimum_difference: 1.0
     angle_outside_border_min: 4
     angle_outside_border_max: 6
-completions:
-  global_level_completions_leaderboard:
-    max_size: 10
-  global_personal_completions_leaderboard:
-    max_size: 10
 prestiges:
   max_multiplier: 30
   multiplier_per_prestige: 10
   base_prestige_cost: 1000000.0
   additional_cost_per_prestige: 1000000.0
 races:
-  max_leaderboard_size: 10
   min_bet_amount: 100.0
   max_time: 10
 rage_quit:
@@ -300,3 +279,19 @@ rage_quit:
 menu:
   default_level_sorting: NEWEST
   main_menu_name: "parkour_levels"
+leaderboard_max_size:
+  levels: 10
+  races: 10
+  clans: 10
+  elo: 10
+  event: 10
+  player_completions: 10
+  global_completions: 10
+  top_rated: 10
+  coins: 10
+  records: 10
+  infinite:
+    classic: 10
+    sprint: 10
+    speedrun: 10
+    timed: 10
