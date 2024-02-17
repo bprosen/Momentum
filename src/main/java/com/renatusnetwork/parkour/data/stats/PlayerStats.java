@@ -287,6 +287,13 @@ public class PlayerStats
         if (race != null)
             race.getRace().end(race, reason);
     }
+
+    public void endRace(RacePlayer winner, RaceEndReason reason)
+    {
+        if (race != null)
+            race.getRace().end(winner, reason);
+    }
+
     public int getRaceWins() {
         return raceWins;
     }

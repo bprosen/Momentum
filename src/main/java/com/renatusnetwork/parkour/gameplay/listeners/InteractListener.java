@@ -185,13 +185,13 @@ public class InteractListener implements Listener {
 
                     if (playerStats.inRace())
                     {
-                        String forfeitMessage = "&cYou forfeit the race, giving a loss";
+                        String forfeitMessage = "&cYou forfeit the race, giving a loss, taking elo";
 
                         if (playerStats.getRace().hasBet())
                             forfeitMessage += " and not returning the &6" + Utils.formatNumber(playerStats.getRace().getBet()) + " &eCoins &cbet";
 
                         playerStats.sendMessage(Utils.translate(forfeitMessage));
-                        playerStats.endRace(RaceEndReason.FORFEIT);
+                        playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
                     }
                     else
                         Utils.teleportToSpawn(Parkour.getStatsManager().get(player));

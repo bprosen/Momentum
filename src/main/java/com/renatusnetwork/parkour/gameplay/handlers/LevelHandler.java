@@ -324,7 +324,7 @@ public class LevelHandler
                 opponentStats.disableLevelStartTime();
                 opponentStats.teleport(opponent.getOriginalLocation());
 
-                playerStats.endRace(RaceEndReason.WON);
+                playerStats.endRace(race, RaceEndReason.WON);
             }
             else
             // If not rank up level or has a start location and is grinding, set to start loc

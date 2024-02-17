@@ -7,7 +7,9 @@ import com.renatusnetwork.parkour.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 
+import java.nio.Buffer;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -33,7 +35,7 @@ public class RaceRequest
         PlayerStats sender = getSender();
 
         // need to validate the sender to themselves and the sender to the requested
-        if (validate(requested, sender) && validate(sender, sender))
+        if (validateOther(requested, sender) && validateSelf(sender))
         {
             boolean randomLevel = level == null;
             boolean hasBet = bet > 0;
@@ -70,66 +72,70 @@ public class RaceRequest
             else
                 sender.sendMessage(Utils.translate("&cSomething went wrong finding a level"));
         }
+        else
+            Parkour.getRaceManager().removeRequest(this);
     }
 
-    public void accept()
-    {
+    public void accept() {
         PlayerStats requested = getRequested();
         PlayerStats sender = getSender();
 
         // need to validate both the sender and send to requested, and also requested to themselves
-        if (validate(sender, requested) && validate(requested, requested))
+        if (validateOther(sender, requested) && validateSelf(requested))
         {
             new Race(sender, requested, level, bet).start();
             Parkour.getRaceManager().removeRequest(this);
         }
     }
 
-    private boolean validate(PlayerStats validate, PlayerStats toSendTo)
+    private boolean validateSelf(PlayerStats playerStats)
     {
-        RaceManager raceManager = Parkour.getRaceManager();
-        boolean valid = false;
+        // send to self
+        String validateReasonResult = validateResult(playerStats, null);
 
-        if (!validate.isSpectating())
+        if (validateReasonResult != null)
+            playerStats.sendMessage(Utils.translate(validateReasonResult));
+
+        Bukkit.broadcastMessage(Utils.translate("&cself reason: " + validateReasonResult));
+        return validateReasonResult == null;
+    }
+
+    private boolean validateOther(PlayerStats validateStats, PlayerStats toSendTo)
+    {
+        String validateReasonResult = validateResult(validateStats, toSendTo); // get other reason
+
+        // send to other instead
+        if (validateReasonResult != null)
+            toSendTo.sendMessage(Utils.translate(validateReasonResult));
+
+        Bukkit.broadcastMessage(Utils.translate("&cother reason: " + validateReasonResult));
+        return validateReasonResult == null;
+    }
+
+    private String validateResult(PlayerStats validateStats, PlayerStats sendToStats)
+    {
+        boolean selfCheck = sendToStats == null;
+
+        if (validateStats.isSpectating())
+            return selfCheck ? "&cYou cannot race while in spectator" : "&c" + validateStats.getDisplayName() + "&c cannot race while in spectator";
+        else if (validateStats.inPracticeMode())
+            return selfCheck ? "&cYou cannot race while in practice" : "&c" +  validateStats.getDisplayName() + "&c cannot race while in practice";
+        else if (validateStats.inRace())
+            return selfCheck ? "&cYou cannot race while in a race" : "&c" + validateStats.getDisplayName() + "&c cannot race while in a race";
+        else if (validateStats.getCoins() < bet)
+            return selfCheck ?
+                    "&cYou do not have enough coins for this bet, need &6" + Utils.formatNumber((bet - validateStats.getCoins())) + "&c more &eCoins" :
+                    "&c" + validateStats.getDisplayName() + "&c does not have enough coins for this bet, need &6" + Utils.formatNumber((bet - validateStats.getCoins())) + "&c more &eCoins";
+        else if (validateStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+            return selfCheck ? "&cYou cannot race while in a plot" : "&c" + validateStats.getDisplayName() + "&c cannot race while in a plot";
+        else if (validateStats.inLevel() && validateStats.getLevel().isElytra())
         {
-            if (!validate.inPracticeMode())
-            {
-                // if accepting race while in race
-                if (!validate.inRace())
-                {
-                    boolean passes = true;
-
-                    if (validate.inLevel() && validate.getLevel().isElytra())
-                    {
-                        if (validate.getPlayer().isOnGround())
-                            Parkour.getStatsManager().toggleOffElytra(validate);
-                        else
-                        {
-                            toSendTo.sendMessage(Utils.translate("&cYou or them cannot race someone when you or them are not on the ground in an elytra level"));
-                            passes = false;
-                        }
-                    }
-                    // if elytra passes, continue
-                    if (passes)
-                    {
-                        double balance = validate.getCoins();
-                        if (balance >= this.bet)
-                            valid = true;
-                        else
-                            toSendTo.sendMessage(Utils.translate("&cYou or them do not have enough money for this bet!"));
-                    }
-                }
-                else
-                    toSendTo.sendMessage(Utils.translate("&cYou or them cannot race someone else while in a race"));
-            }
+            if (validateStats.getPlayer().isOnGround())
+                Parkour.getStatsManager().toggleOffElytra(validateStats);
             else
-                toSendTo.sendMessage(Utils.translate("&cYou or them cannot do this while in practice mode"));
+                return selfCheck ? "&cCannot race when you are in the air in an elytra level" : "&c" + validateStats.getDisplayName() + "&c cannot race while you are in the air in an elytra level";
         }
-        else
-            toSendTo.sendMessage(Utils.translate("&cYou or them cannot do this while in spectator"));
-
-        raceManager.removeRequest(this);
-        return valid;
+        return null;
     }
 
     public boolean equals(PlayerStats sender, PlayerStats requester)
