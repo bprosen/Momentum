@@ -85,7 +85,7 @@ public class RaceManager
         if (raceRequest != null)
             raceRequest.accept();
         else
-            sender.sendMessage(Utils.translate("&cYou do not have a request from &4" + requested.getName()));
+            sender.sendMessage(Utils.translate("&cYou do not have a race request from &4" + requested.getName()));
     }
 
     public RaceRequest getRequest(PlayerStats sender, PlayerStats requested)
