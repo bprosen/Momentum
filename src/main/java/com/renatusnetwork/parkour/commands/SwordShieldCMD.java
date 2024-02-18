@@ -45,51 +45,15 @@ public class SwordShieldCMD implements CommandExecutor {
             if (Parkour.getViaVersion().getPlayerVersion(UUID.fromString(playerStats.getUUID())) >= SettingsManager.PROTOCOL_1_9)
             {
                 if (!removedShield)
-                    addShield(playerStats);
+                    Utils.addShield(playerStats);
             }
             else if (!removedSword)
-                addSword(playerStats);
+                Utils.addSword(playerStats);
         }
         else
             player.sendMessage(Utils.translate("&cYou cannot do this"));
 
         return false;
-    }
-
-    private void addSword(PlayerStats playerStats)
-    {
-        Player player = playerStats.getPlayer();
-        SettingsManager settingsManager = Parkour.getSettingsManager();
-
-        ItemStack swordItem;
-        LinkedHashMap<Integer, ItemStack> swords = settingsManager.setup_swords;
-
-        // create item and give
-        if (swords.containsKey(playerStats.getPrestiges()))
-            swordItem = swords.get(playerStats.getPrestiges());
-        else
-            swordItem = swords.get(swords.size() - 1); // its linked so safe to assume
-
-        player.getInventory().setItem(settingsManager.sword_hotbar_slot, swordItem);
-        player.sendMessage(Utils.translate("&7You have been given a " + settingsManager.sword_title));
-    }
-
-    private void addShield(PlayerStats playerStats)
-    {
-        Player player = playerStats.getPlayer();
-        SettingsManager settingsManager = Parkour.getSettingsManager();
-
-        ItemStack shieldItem = new ItemStack(Material.SHIELD);
-        ItemMeta meta = shieldItem.getItemMeta();
-        meta.setDisplayName(Utils.translate(settingsManager.shield_title));
-
-        if (playerStats.hasPrestiges())
-            Utils.addGlow(meta);
-
-        shieldItem.setItemMeta(meta);
-
-        player.getInventory().setItem(settingsManager.sword_hotbar_slot, shieldItem);
-        player.sendMessage(Utils.translate("&7You have been given a " + settingsManager.shield_title));
     }
 
     private boolean removeItem(Player player, ItemStack itemStack, String itemTitle)

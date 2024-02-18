@@ -60,11 +60,12 @@ public class PracticeCMD implements CommandExecutor {
                                     // in the case of /prac
                                     else if (playerStats.inPracticeMode())
                                         PracticeHandler.resetPlayer(playerStats, true);
-                                    else if (player.isOnGround()) {
+                                    else if (player.isOnGround())
+                                    {
                                         playerStats.setPracticeMode(player.getLocation());
 
                                         SettingsManager settingsManager = Parkour.getSettingsManager();
-                                        player.getInventory().setItem(settingsManager.prac_hotbar_slot, settingsManager.prac_item);
+                                        Utils.addItemToHotbar(settingsManager.prac_item, player.getInventory(), settingsManager.prac_hotbar_slot);
 
                                         player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
                                     }

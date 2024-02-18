@@ -41,6 +41,10 @@ public class JoinLeaveListener implements Listener
             {
                 event.setSpawnLocation(spawn);
                 statsManager.addTotalPlayer();
+
+                // set inventory
+                Utils.setHotbar(player);
+
                 Bukkit.broadcastMessage(Utils.translate(
                         "&7Welcome &a" + player.getDisplayName() + " &7to &b&lParkour &d#" + Utils.formatNumber(statsManager.getTotalPlayers())
                 ));
@@ -57,9 +61,6 @@ public class JoinLeaveListener implements Listener
                 player.sendMessage(Utils.translate("&7There are &c&l" + submittedPlotList.size() + "" +
                         " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
-
-        // set inventory
-        Utils.setHotbar(player);
 
         Location spawnLoc = event.getSpawnLocation();
         PlayerStats playerStats = statsManager.getOffline(player.getUniqueId().toString());

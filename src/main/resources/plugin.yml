@@ -128,3 +128,5 @@ commands:
     description: "RN-Parkour preview command"
   elo:
     description: "RN-Parkour elo command"
+  hotbar:
+    description: "RN-Parkour hotbar command"

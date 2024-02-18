@@ -24,6 +24,7 @@ import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -748,11 +749,7 @@ public class StatsManager {
                 player.sendMessage(Utils.translate("&cYou have turned off players"));
             }
 
-            ItemStack newItem = new ItemStack(Material.LEVER);
-            ItemMeta meta = newItem.getItemMeta();
-            meta.setDisplayName(Utils.translate("&7Players » &cDisabled"));
-            newItem.setItemMeta(meta);
-            player.getInventory().setItem(slot, newItem);
+            Utils.setDisabledPlayersItem(player.getInventory(), slot);
         }
     }
 

@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -100,10 +101,6 @@ public class MenuListener implements Listener
                     }
                 }
             }
-        }
-        else if (!player.isOp() && !player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
-        {
-            event.setCancelled(true);
         }
     }
 

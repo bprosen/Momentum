@@ -340,7 +340,7 @@ public class PlayerStats
         {
             // set item
             SettingsManager settingsManager = Parkour.getSettingsManager();
-            player.getInventory().setItem(settingsManager.leave_hotbar_slot, settingsManager.leave_item);
+            Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
         }
         this.level = level;
     }

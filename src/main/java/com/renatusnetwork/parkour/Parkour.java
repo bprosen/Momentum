@@ -179,6 +179,7 @@ public class Parkour extends JavaPlugin {
         getCommand("stuck").setExecutor(new StuckCMD());
         getCommand("preview").setExecutor(new PreviewCMD());
         getCommand("elo").setExecutor(new ELOCMD());
+        getCommand("hotbar").setExecutor(new HotbarCMD());
     }
 
     private static void load()

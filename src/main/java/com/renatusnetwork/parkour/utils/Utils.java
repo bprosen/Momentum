@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -158,6 +159,29 @@ public class Utils {
                 return slot;
 
         return -1;
+    }
+
+    public static void addItemToHotbar(ItemStack item, Inventory inventory, int defaultSlot)
+    {
+        ItemStack itemInSlot = inventory.getItem(defaultSlot);
+
+        // means something is filling it already
+        if (itemInSlot != null && itemInSlot.getType() != Material.AIR)
+        {
+            // find space in hotbar
+            for (int i = 0; i < 9; i++)
+            {
+                ItemStack invSlot = inventory.getItem(i);
+
+                if (invSlot == null || invSlot.getType() == Material.AIR)
+                {
+                    inventory.setItem(i, item);
+                    break;
+                }
+            }
+        }
+        else
+            inventory.setItem(defaultSlot, item);
     }
 
     public static boolean isItemFromTitle(ItemStack item, String title)
@@ -366,5 +390,50 @@ public class Utils {
     {
         itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+    }
+
+    public static void setDisabledPlayersItem(Inventory inventory, int slot)
+    {
+        ItemStack newItem = new ItemStack(Material.LEVER);
+        ItemMeta meta = newItem.getItemMeta();
+        meta.setDisplayName(Utils.translate("&7Players » &cDisabled"));
+        newItem.setItemMeta(meta);
+        inventory.setItem(slot, newItem);
+    }
+
+    public static void addSword(PlayerStats playerStats)
+    {
+        Player player = playerStats.getPlayer();
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        ItemStack swordItem;
+        LinkedHashMap<Integer, ItemStack> swords = settingsManager.setup_swords;
+
+        // create item and give
+        if (swords.containsKey(playerStats.getPrestiges()))
+            swordItem = swords.get(playerStats.getPrestiges());
+        else
+            swordItem = swords.get(swords.size() - 1); // its linked so safe to assume
+
+        Utils.addItemToHotbar(swordItem, player.getInventory(), settingsManager.sword_hotbar_slot);
+        player.sendMessage(Utils.translate("&7You have been given a " + settingsManager.sword_title));
+    }
+
+    public static void addShield(PlayerStats playerStats)
+    {
+        Player player = playerStats.getPlayer();
+        SettingsManager settingsManager = Parkour.getSettingsManager();
+
+        ItemStack shieldItem = new ItemStack(Material.SHIELD);
+        ItemMeta meta = shieldItem.getItemMeta();
+        meta.setDisplayName(Utils.translate(settingsManager.shield_title));
+
+        if (playerStats.hasPrestiges())
+            Utils.addGlow(meta);
+
+        shieldItem.setItemMeta(meta);
+
+        Utils.addItemToHotbar(shieldItem, player.getInventory(), settingsManager.shield_hotbar_slot);
+        player.sendMessage(Utils.translate("&7You have been given a " + settingsManager.shield_title));
     }
 }
