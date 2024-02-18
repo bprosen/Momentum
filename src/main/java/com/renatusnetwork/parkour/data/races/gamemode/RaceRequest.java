@@ -96,7 +96,6 @@ public class RaceRequest
         if (validateReasonResult != null)
             playerStats.sendMessage(Utils.translate(validateReasonResult));
 
-        Bukkit.broadcastMessage(Utils.translate("&cself reason: " + validateReasonResult));
         return validateReasonResult == null;
     }
 
@@ -108,7 +107,6 @@ public class RaceRequest
         if (validateReasonResult != null)
             toSendTo.sendMessage(Utils.translate(validateReasonResult));
 
-        Bukkit.broadcastMessage(Utils.translate("&cother reason: " + validateReasonResult));
         return validateReasonResult == null;
     }
 

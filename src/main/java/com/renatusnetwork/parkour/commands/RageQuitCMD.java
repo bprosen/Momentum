@@ -53,8 +53,8 @@ public class RageQuitCMD implements CommandExecutor {
             } else {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                double price = Parkour.getSettingsManager().rage_quit_price;
-                double balance = playerStats.getCoins();
+                int price = Parkour.getSettingsManager().rage_quit_price;
+                int balance = playerStats.getCoins();
 
                 // can buy it
                 if (balance >= price) {

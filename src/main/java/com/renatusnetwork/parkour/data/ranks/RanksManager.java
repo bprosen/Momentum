@@ -86,7 +86,7 @@ public class RanksManager {
         Parkour.getStatsManager().runGGTimer();
     }
 
-    public void doPrestige(PlayerStats playerStats, double cost)
+    public void doPrestige(PlayerStats playerStats, int cost)
     {
         Player player = playerStats.getPlayer();
         Rank defaultRank = get(Parkour.getSettingsManager().default_rank);

@@ -26,7 +26,7 @@ bank:
   lock_chance: 0.1 # 10% chance
   lock_minutes: 10 # 10 minute lock time
   jackpot_force_remove_permission_cmd: "lp user %player% permission unset rn-parkour.jackpot.force" # the command it should run when a player uses /jackpot force
-minimum_pay_amount: 10.0
+minimum_pay_amount: 10
 blackmarket:
   start_time:
     day: sunday
@@ -253,13 +253,13 @@ infinite:
 prestiges:
   max_multiplier: 30
   multiplier_per_prestige: 10
-  base_prestige_cost: 1000000.0
-  additional_cost_per_prestige: 1000000.0
+  base_prestige_cost: 1000000
+  additional_cost_per_prestige: 1000000
 races:
-  min_bet_amount: 100.0
+  min_bet_amount: 100
   max_time: 10
 rage_quit:
-  price: 10000.0
+  price: 10000
   messages:
     - "&6&l%player% &7slipped on a pickle and &c&lRage Quit"
     - "&6&l%player% &7lost a 1v1 with a cow and &c&lRage Quit"

@@ -31,7 +31,7 @@ public class PlayerStats
     private Player player;
     private String uuid;
     private String name;
-    private double coins;
+    private int coins;
     private Level level;
     private LevelPreview previewLevel;
     private long levelStartTime;
@@ -231,22 +231,22 @@ public class PlayerStats
     //
     // Coins Sections
     //
-    public double getCoins() {
+    public int getCoins() {
         return coins;
     }
 
-    public void setCoins(double coins) {
+    public void setCoins(int coins) {
         if (coins < 0)
             coins = 0;
 
         this.coins = coins;
     }
 
-    public void addCoins(double coins) {
+    public void addCoins(int coins) {
         this.coins += coins;
     }
 
-    public void removeCoins(double coins) {
+    public void removeCoins(int coins) {
         this.coins -= coins;
 
         // no allowing negative numbers, NO DEBT

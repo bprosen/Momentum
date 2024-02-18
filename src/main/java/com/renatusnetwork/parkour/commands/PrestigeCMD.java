@@ -36,7 +36,7 @@ public class PrestigeCMD implements CommandExecutor {
             if (playerStats.getRank().isMaxRank())
             {
                 int prestiges = playerStats.getPrestiges();
-                double cost = Parkour.getSettingsManager().base_prestige_cost + (prestiges * Parkour.getSettingsManager().additional_cost_per_prestige);
+                int cost = Parkour.getSettingsManager().base_prestige_cost + (prestiges * Parkour.getSettingsManager().additional_cost_per_prestige);
 
                 if (!confirmMap.containsKey(player.getName()))
                 {

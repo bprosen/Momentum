@@ -3,15 +3,15 @@ package com.renatusnetwork.parkour.data.leaderboards;
 public class CoinsLBPosition
 {
     private String playerName;
-    private double coins;
+    private int coins;
 
-    public CoinsLBPosition(String playerName, double coins)
+    public CoinsLBPosition(String playerName, int coins)
     {
         this.playerName = playerName;
         this.coins = coins;
     }
 
-    public double getCoins() { return coins; }
+    public int getCoins() { return coins; }
 
     public String getName() { return playerName; }
 }

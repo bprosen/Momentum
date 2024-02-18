@@ -57,7 +57,7 @@ public class StatsDB
                 Parkour.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getName());
             }
 
-            playerStats.setCoins(Double.parseDouble(playerResult.get("coins")));
+            playerStats.setCoins(Integer.parseInt(playerResult.get("coins")));
             playerStats.setSpectatable(Integer.parseInt(playerResult.get("spectatable")) == 1);
 
             String elo = playerResult.get("elo");
@@ -268,7 +268,7 @@ public class StatsDB
         );
     }
 
-    public static void updateCoins(String uuid, double coins, boolean async)
+    public static void updateCoins(String uuid, int coins, boolean async)
     {
         if (coins < 0)
             coins = 0;
@@ -285,7 +285,7 @@ public class StatsDB
             );
     }
 
-    public static void updateCoinsName(String playerName, double coins)
+    public static void updateCoinsName(String playerName, int coins)
     {
         if (coins < 0)
             coins = 0;
@@ -309,7 +309,7 @@ public class StatsDB
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank_name=? WHERE uuid=?", rank, uuid);
     }
 
-    public static double getCoinsFromName(String playerName)
+    public static int getCoinsFromName(String playerName)
     {
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
@@ -317,13 +317,10 @@ public class StatsDB
                 " WHERE name=?", playerName
         );
 
-        if (!playerResult.isEmpty())
-            return Double.parseDouble(playerResult.get("coins"));
-        else
-            return 0.0;
+        return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get("coins")) : 0;
     }
 
-    public static double getCoinsFromUUID(String UUID)
+    public static int getCoinsFromUUID(String UUID)
     {
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
@@ -331,15 +328,11 @@ public class StatsDB
                 " WHERE uuid=?", UUID
         );
 
-        if (!playerResult.isEmpty())
-            return Double.parseDouble(playerResult.get("coins"));
-        else
-            return 0.0;
+        return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get("coins")) : 0;
     }
 
     public static boolean isPlayerInDatabase(String playerName)
     {
-
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,
                 "uuid",

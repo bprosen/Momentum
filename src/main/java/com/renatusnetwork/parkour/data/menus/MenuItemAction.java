@@ -427,7 +427,7 @@ public class MenuItemAction {
 
         if (!levelManager.isBuyingLevel(player.getName(), level))
         {
-            double coins = playerStats.getCoins();
+            int coins = playerStats.getCoins();
             int total = levelManager.getTotalBuyingLevelsCost(player.getName());
             int price = level.getPrice();
 

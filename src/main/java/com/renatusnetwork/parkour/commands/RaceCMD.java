@@ -106,21 +106,28 @@ public class RaceCMD implements CommandExecutor {
             if (Utils.isInteger(a[1]))
             {
                 int bet = Integer.parseInt(a[1]);
-                PlayerStats targetStats = statsManager.getByName(a[0]);
+                int minBet = Parkour.getSettingsManager().min_race_bet_amount;
 
-                if (targetStats != null)
+                if (bet >= minBet)
                 {
-                    if (!targetStats.equals(playerStats))
+                    PlayerStats targetStats = statsManager.getByName(a[0]);
+
+                    if (targetStats != null)
                     {
-                        // open menu if meets conditions
-                        raceManager.addChoosingRaceLevel(playerStats, targetStats, bet);
-                        menuManager.openInventory(playerStats, "race_levels", true);
+                        if (!targetStats.equals(playerStats))
+                        {
+                            // open menu if meets conditions
+                            raceManager.addChoosingRaceLevel(playerStats, targetStats, bet);
+                            menuManager.openInventory(playerStats, "race_levels", true);
+                        }
+                        else
+                            player.sendMessage(Utils.translate("&cYou cannot race yourself"));
                     }
                     else
-                        player.sendMessage(Utils.translate("&cYou cannot race yourself"));
+                        player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
                 }
                 else
-                    player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
+                    player.sendMessage(Utils.translate("&cYou cannot bet less than &6" + Utils.formatNumber(minBet) + " &eCoins"));
             }
             else
                 player.sendMessage(Utils.translate("&cThat is not a valid amount to bet!"));

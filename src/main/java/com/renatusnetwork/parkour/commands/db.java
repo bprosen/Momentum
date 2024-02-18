@@ -90,7 +90,7 @@ public class db implements CommandExecutor
                             {
                                 String uuid = results.getString("uuid");
                                 String name = results.getString("player_name");
-                                double coins = results.getDouble("coins");
+                                int coins = (int) results.getDouble("coins");
                                 int spectatable = results.getInt("spectatable");
                                 String rankIdTemp = String.valueOf(results.getInt("rank_id")); // will need to manually fix later
                                 String clanTag = results.getString("clan_tag");

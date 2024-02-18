@@ -112,7 +112,7 @@ public class TablesDB
                            "rank_name VARCHAR(10) DEFAULT NULL, " + // default set from settings
                            "prestiges TINYINT DEFAULT 0, " +
                            "elo SMALLINT DEFAULT NULL, " + // default set from settings
-                           "coins DOUBLE DEFAULT 0, " +
+                           "coins INT DEFAULT 0, " +
                            "infinite_classic_score INT DEFAULT 0, " +
                            "infinite_speedrun_score INT DEFAULT 0, " +
                            "infinite_sprint_score INT DEFAULT 0, " +

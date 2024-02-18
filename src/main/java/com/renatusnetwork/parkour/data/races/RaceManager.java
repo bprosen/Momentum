@@ -12,6 +12,7 @@ import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
+import com.sk89q.commandbook.locations.TeleportSession;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -53,32 +54,39 @@ public class RaceManager
      */
     public void sendRequest(PlayerStats sender, PlayerStats requested, Level level, int bet)
     {
-        RaceRequest raceRequest = new RaceRequest(sender, requested, level, bet);
-        addRequest(raceRequest);
+        RaceRequest alreadyExistsRequest = getRequest(sender, requested);
 
-        raceRequest.send();
-
-        new BukkitRunnable()
+        // request exists
+        if (alreadyExistsRequest == null)
         {
-            @Override
-            public void run()
+            RaceRequest raceRequest = new RaceRequest(sender, requested, level, bet);
+            addRequest(raceRequest);
+
+            raceRequest.send();
+
+            new BukkitRunnable()
             {
-                RaceRequest request = getRequest(sender, requested);
-
-                if (request != null)
+                @Override
+                public void run()
                 {
-                    removeRequest(raceRequest);
+                    RaceRequest request = getRequest(sender, requested);
 
-                    if (sender != null)
-                        sender.sendMessage(Utils.translate("&4" + requested.getDisplayName() + "&c did not accept your race request in time"));
+                    if (request != null)
+                    {
+                        removeRequest(raceRequest);
+
+                        if (sender != null)
+                            sender.sendMessage(Utils.translate("&4" + requested.getDisplayName() + "&c did not accept your race request in time"));
+                    }
                 }
-            }
-        }.runTaskLater(Parkour.getPlugin(), 20 * 30);
+            }.runTaskLater(Parkour.getPlugin(), 20 * 30);
+        }
+        else
+            sender.sendMessage(Utils.translate("&cYou have already sent a request to " + requested.getDisplayName()));
     }
 
     public void acceptRequest(PlayerStats sender, PlayerStats requested)
     {
-
         RaceRequest raceRequest = getRequest(sender, requested);
 
         // request exists

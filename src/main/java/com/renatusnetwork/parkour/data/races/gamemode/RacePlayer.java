@@ -88,23 +88,23 @@ public class RacePlayer
                     switch (runCycles)
                     {
                         case 0:
-                            sendTitleAndPlaySound(playerStats, "&25");
+                            sendTitleAndPlaySound(playerStats, "&45");
                             break;
                         case 20:
-                            sendTitleAndPlaySound(playerStats, "&a4");
+                            sendTitleAndPlaySound(playerStats, "&c4");
                             break;
                         case 40:
-                            sendTitleAndPlaySound(playerStats, "&e3");
+                            sendTitleAndPlaySound(playerStats, "&63");
                             break;
                         case 60:
-                            sendTitleAndPlaySound(playerStats, "&62");
+                            sendTitleAndPlaySound(playerStats, "&e2");
                             break;
                         case 80:
-                            sendTitleAndPlaySound(playerStats, "&c1");
+                            sendTitleAndPlaySound(playerStats, "&a1");
                             break;
                         case 100:
                             cancel();
-                            sendTitleAndPlaySound(playerStats, "&4RACE");
+                            sendTitleAndPlaySound(playerStats, "&2RACE");
                             break;
                     }
                     runCycles++;

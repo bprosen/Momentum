@@ -185,7 +185,7 @@ public class ClansManager
     public void doSplitClanReward(Clan clan, Player player, Level level, int reward) {
 
         double percentage = (double) clan.getLevel() / 100;
-        double splitAmountPerMember = reward * percentage;
+        int splitAmountPerMember = (int) (reward * percentage);
 
         for (ClanMember clanMember : clan.getMembers()) {
             // make sure it is not given to the completioner
@@ -205,7 +205,7 @@ public class ClansManager
                 }
                 else
                 {
-                    double coins = StatsDB.getCoinsFromUUID(clanMember.getUUID());
+                    int coins = StatsDB.getCoinsFromUUID(clanMember.getUUID());
                     StatsDB.updateCoins(clanMember.getUUID(), splitAmountPerMember + coins, true);
                 }
             }

@@ -345,34 +345,34 @@ public class StatsManager {
         StatsDB.updateELO(competitor.getUUID(), newELO);
     }
 
-    public void updateCoins(PlayerStats playerStats, double coins)
+    public void updateCoins(PlayerStats playerStats, int coins)
     {
         updateCoins(playerStats, coins, true);
     }
 
-    public void updateCoins(PlayerStats playerStats, double coins, boolean async)
+    public void updateCoins(PlayerStats playerStats, int coins, boolean async)
     {
         StatsDB.updateCoins(playerStats.getUUID(), coins, async);
         playerStats.setCoins(coins);
     }
 
-    public void removeCoins(PlayerStats playerStats, double coins)
+    public void removeCoins(PlayerStats playerStats, int coins)
     {
         removeCoins(playerStats, coins, true);
     }
 
-    public void removeCoins(PlayerStats playerStats, double coins, boolean async)
+    public void removeCoins(PlayerStats playerStats, int coins, boolean async)
     {
         StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() - coins, async);
         playerStats.removeCoins(coins);
     }
 
-    public void addCoins(PlayerStats playerStats, double coins)
+    public void addCoins(PlayerStats playerStats, int coins)
     {
         addCoins(playerStats, coins, true);
     }
 
-    public void addCoins(PlayerStats playerStats, double coins, boolean async)
+    public void addCoins(PlayerStats playerStats, int coins, boolean async)
     {
         StatsDB.updateCoins(playerStats.getUUID(), playerStats.getCoins() + coins, async);
         playerStats.addCoins(coins);
@@ -518,16 +518,13 @@ public class StatsManager {
         {
             // find the highest top 10 completion stat
             List<Map<String, String>> coinsResults = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "name, coins",
-                    "ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
+                    "WHERE coins > 0 ORDER BY coins DESC LIMIT " + Parkour.getSettingsManager().max_coins_leaderboard_size);
 
             for (Map<String, String> coinsResult : coinsResults)
             {
                 String playerName = coinsResult.get("name");
-                double coins = Double.parseDouble(coinsResult.get("coins"));
-
-                // if they have more than 0 completions, add (reset stats case)
-                if (coins > 0)
-                    coinsLB.add(new CoinsLBPosition(playerName, coins));
+                int coins = Integer.parseInt(coinsResult.get("coins"));
+                coinsLB.add(new CoinsLBPosition(playerName, coins));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -640,7 +637,7 @@ public class StatsManager {
     public String createChatHover(PlayerStats playerStats)
     {
         String playerName = playerStats.getName();
-        double coins = playerStats.getCoins();
+        int coins = playerStats.getCoins();
         int hours = playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000;
 
         Clan clan = playerStats.getClan();

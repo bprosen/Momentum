@@ -19,6 +19,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -26,8 +27,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 public class Scoreboard {
-
-    private static int boardWidth = 23;
 
     public static void startScheduler(Plugin plugin) {
         /*
@@ -52,12 +51,10 @@ public class Scoreboard {
     }
 
     private static String formatSpacing(String input) {
-        int padding = boardWidth - input.length();
+        int boardWidth = 16; // max characters, set by ourselves
+        int padding = boardWidth - ChatColor.stripColor(input).length();
 
-        if (padding > 0)
-            return getSpaces(padding / 2) + input;
-
-        return input;
+        return padding > 0 ? (getSpaces(padding / 2) + input) : input;
     }
 
     public static void displayScoreboards()
@@ -104,7 +101,7 @@ public class Scoreboard {
                 board.add(Utils.translate("  &8&lPlaying &7" + Utils.formatNumber(blackMarketEvent.getPlayerCount())));
 
                 board.add(Utils.translate("&7"));
-                board.add(Utils.translate(formatSpacing("&crenatus.cc")));
+                board.add(formatSpacing(Utils.translate("&crenatus.cc")));
             }
             else
             {
@@ -177,8 +174,8 @@ public class Scoreboard {
                     board.add(Utils.translate("&7"));
 
                     // add wins, losses, winrate
-                    board.add(formatSpacing(Utils.translate("&aYour ELO &2" + Utils.formatNumber(playerStats.getELO()))));
-                    board.add(formatSpacing(Utils.translate("&aTheir ELO &2" + Utils.formatNumber(opponentStats.getELO()))));
+                    board.add(Utils.translate("&aYour ELO &2" + Utils.formatNumber(playerStats.getELO())));
+                    board.add(Utils.translate("&aTheir ELO &2" + Utils.formatNumber(opponentStats.getELO())));
 
                     // event section of scoreboard
                 }

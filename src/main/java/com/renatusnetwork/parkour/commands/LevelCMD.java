@@ -58,8 +58,8 @@ public class LevelCMD implements CommandExecutor
                         {
                             if (!playerStats.hasBoughtLevel(level))
                             {
-                                double balance = playerStats.getCoins();
-                                double price = level.getPrice();
+                                int balance = playerStats.getCoins();
+                                int price = level.getPrice();
 
                                 if (balance >= price)
                                 {
@@ -69,7 +69,7 @@ public class LevelCMD implements CommandExecutor
                                 }
                                 else
                                 {
-                                    double amountLeft = price - balance;
+                                    int amountLeft = price - balance;
                                     player.sendMessage(Utils.translate(
                                             "&cYou cannot buy &4" + level.getTitle() + "&c, you need an additional &6" +
                                                     Utils.formatNumber(amountLeft) + " &eCoins"));

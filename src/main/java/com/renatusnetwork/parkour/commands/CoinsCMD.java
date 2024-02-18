@@ -41,11 +41,7 @@ public class CoinsCMD implements CommandExecutor
             {
                 // variable
                 String targetName = a[1];
-                double coins = Double.parseDouble(a[2]);
-
-                // NO NEGATIVES
-                if (coins < 0)
-                    coins = 0;
+                int coins = Math.max(Integer.parseInt(a[2]), 0);
 
                 Player target = Bukkit.getPlayer(targetName);
 
@@ -66,7 +62,7 @@ public class CoinsCMD implements CommandExecutor
                 }
                 else if (a[0].equalsIgnoreCase("add"))
                 {
-                    double total;
+                    int total;
 
                     // if null, update in db
                     if (target == null)
@@ -90,25 +86,21 @@ public class CoinsCMD implements CommandExecutor
                 }
                 else if (a[0].equalsIgnoreCase("remove"))
                 {
-                    double total;
+                    int total;
 
                     // if null, update in db
                     if (target == null)
                     {
-                        total = StatsDB.getCoinsFromName(targetName) - coins;
+                        total = Math.max(StatsDB.getCoinsFromName(targetName) - coins, 0);
                         StatsDB.updateCoinsName(targetName, total);
                     } else
                     // otherwise cache and db
                     {
                         PlayerStats targetStats = statsManager.get(target);
 
-                        total = targetStats.getCoins() - coins;
+                        total = Math.max(targetStats.getCoins() - coins, 0);
                         statsManager.removeCoins(targetStats, coins);
                     }
-
-                    // NO NEGATIVES
-                    if (total < 0)
-                        total = 0;
 
                     // msg
                     sender.sendMessage(Utils.translate(
@@ -121,7 +113,7 @@ public class CoinsCMD implements CommandExecutor
                 sender.sendMessage(Utils.translate("&cYou do not have permission"));
             }
         }
-        else if (a.length >= 0 && a.length <= 1)
+        else if (a.length <= 1)
         {
             if (a.length == 0)
             {
@@ -136,7 +128,7 @@ public class CoinsCMD implements CommandExecutor
                     sender.sendMessage("Console cannot do this");
                 }
             }
-            else if (a.length == 1)
+            else
             {
                 if (!a[0].equalsIgnoreCase("help"))
                 {
@@ -150,12 +142,12 @@ public class CoinsCMD implements CommandExecutor
                     if (target == null)
                     {
                         if (StatsDB.isPlayerInDatabase(playerName))
-                            coins = (int) StatsDB.getCoinsFromName(playerName);
+                            coins = StatsDB.getCoinsFromName(playerName);
                         else
                             exists = false;
                     }
                     else
-                        coins = (int) statsManager.get(target).getCoins();
+                        coins = statsManager.get(target).getCoins();
 
                     if (exists)
                         sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));

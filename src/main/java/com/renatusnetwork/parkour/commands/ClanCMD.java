@@ -337,7 +337,7 @@ public class ClanCMD implements CommandExecutor
                     // Creates a clan at the set price
                     if (clan == null)
                     {
-                        int playerBalance = (int) playerStats.getCoins();
+                        int playerBalance = playerStats.getCoins();
                         int createPrice = Parkour.getSettingsManager().clans_price_create;
 
                         if (playerBalance >= createPrice)
