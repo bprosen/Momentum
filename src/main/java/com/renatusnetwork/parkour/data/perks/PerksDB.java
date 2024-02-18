@@ -212,10 +212,8 @@ public class PerksDB
             itemMeta.setDisplayName(Utils.translate(title));
 
             if (glow)
-            {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+                Utils.addGlow(itemMeta);
+
             item.setItemMeta(itemMeta);
 
             armor.put(armorType, item);

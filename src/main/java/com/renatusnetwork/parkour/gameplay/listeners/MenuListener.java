@@ -24,7 +24,6 @@ import java.util.List;
 
 public class MenuListener implements Listener
 {
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event)
     {

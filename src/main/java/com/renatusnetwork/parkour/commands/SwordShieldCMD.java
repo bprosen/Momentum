@@ -84,10 +84,7 @@ public class SwordShieldCMD implements CommandExecutor {
         meta.setDisplayName(Utils.translate(settingsManager.shield_title));
 
         if (playerStats.hasPrestiges())
-        {
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+            Utils.addGlow(meta);
 
         shieldItem.setItemMeta(meta);
 

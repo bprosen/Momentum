@@ -70,10 +70,7 @@ public class BlackMarketYAML
             boolean glow = blackmarketConfig.getBoolean("items." + name + ".item.glow");
 
             if (glow)
-            {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+                Utils.addGlow(itemMeta);
         }
 
         item.setItemMeta(itemMeta);

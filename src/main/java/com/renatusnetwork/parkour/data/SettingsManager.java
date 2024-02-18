@@ -222,10 +222,7 @@ public class SettingsManager {
 
             // set glow
             if (section.getBoolean(keyInt + ".glow"))
-            {
-                meta.addEnchant(Enchantment.DURABILITY, 1, true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+                Utils.addGlow(meta);
 
             sword.setItemMeta(meta);
 

@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -124,12 +125,7 @@ public class PerkManager
 
         boolean glow = itemMeta.hasEnchant(Enchantment.DURABILITY);
 
-        if (glow)
-        {
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-        else
+        if (!glow)
         {
             itemMeta.removeEnchant(Enchantment.DURABILITY);
             itemMeta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);

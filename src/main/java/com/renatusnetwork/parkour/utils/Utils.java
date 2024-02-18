@@ -9,12 +9,15 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
@@ -357,5 +360,11 @@ public class Utils {
                     firework.detonate();
                 }
             }.runTaskLater(Parkour.getPlugin(), 1);
+    }
+
+    public static void addGlow(ItemMeta itemMeta)
+    {
+        itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
     }
 }

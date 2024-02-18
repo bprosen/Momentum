@@ -222,10 +222,7 @@ public class MenuItemFormatter
 
         // glow if equal
         if (playerStats != null && playerStats.getInfiniteType() != null && playerStats.getInfiniteType().toString().equalsIgnoreCase(infiniteMode))
-        {
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+            Utils.addGlow(itemMeta);
 
         itemMeta.setLore(menuItem.getFormattedLore());
         item.setItemMeta(itemMeta);
@@ -282,10 +279,8 @@ public class MenuItemFormatter
         }
 
         // if glowing, add glow effect
-        if (menuItem.isGlowing()) {
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+        if (menuItem.isGlowing())
+            Utils.addGlow(itemMeta);
 
         item.setItemMeta(itemMeta);
         return item;
@@ -304,10 +299,7 @@ public class MenuItemFormatter
 
             // if glowing, add glow effect
             if (menuItem.isGlowing())
-            {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+                Utils.addGlow(itemMeta);
 
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>();
@@ -421,10 +413,8 @@ public class MenuItemFormatter
 
             // if enchanting, add durability and hide it for glow effect
             if (enchant)
-            {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+                Utils.addGlow(itemMeta);
+
             item.setItemMeta(itemMeta);
         }
         return item;
@@ -671,10 +661,9 @@ public class MenuItemFormatter
 
             // Personal Level Stats Section
             int levelCompletionsCount = playerStats.getLevelCompletionsCount(level);
-            if (levelCompletionsCount > 0) {
-                // add glow effect to all levels they have completed
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            if (levelCompletionsCount > 0)
+            {
+                Utils.addGlow(itemMeta);
 
                 itemLore.add("");
 
