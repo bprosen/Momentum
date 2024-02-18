@@ -156,7 +156,7 @@ public class JoinLeaveListener implements Listener
 
         // if left as hidden, remove them
         if (statsManager.containsHiddenPlayer(player))
-            statsManager.showPlayer(player);
+            statsManager.togglePlayerHiderOff(player, false);
 
         // if event is running and they are a participant, remove
         if (playerStats.isEventParticipant())
