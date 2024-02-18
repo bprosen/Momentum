@@ -147,7 +147,8 @@ public class JoinLeaveListener implements Listener
             PracticeHandler.resetPlayer(playerStats, false);
 
         // if left in race, end it, give winner
-        playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+        if (playerStats.inRace())
+            playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
 
         // if left in black market, remove them
         if (playerStats.isInBlackMarket())
