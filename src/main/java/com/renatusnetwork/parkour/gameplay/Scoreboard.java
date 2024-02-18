@@ -116,14 +116,14 @@ public class Scoreboard {
                 board.add(coinBalance);
 
                 // if they have a rank, show it
-                if (playerStats.getRank() != null)
+                if (playerStats.hasRank())
                 {
                     String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getTitle());
                     board.add(rankString);
                 }
 
                 // if they have a clan, show it
-                if (playerStats.getClan() != null)
+                if (playerStats.inClan())
                 {
                     String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
                     board.add(clanString);
@@ -142,60 +142,8 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&c&lSpectating")));
                     board.add(formatSpacing(Utils.translate("&c" + playerStats.getPlayerToSpectate().getDisplayName())));
                     board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
-
-                    // practice section of scoreboard
                 }
-                else if (playerStats.inPracticeMode())
-                {
-
-                    board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
-                    board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
-
-                    // race section of scoreboard
-                }
-                else if (playerStats.inRace())
-                {
-
-                    board.add(Utils.translate("&7"));
-                    Player opponent = playerStats.getRace().getOpponent().getPlayerStats().getPlayer();
-                    PlayerStats opponentStats = Parkour.getStatsManager().get(opponent);
-
-                    board.add(formatSpacing(Utils.translate("&6&lRace")));
-                    board.add(formatSpacing(Utils.translate("&c" + opponent.getDisplayName())));
-                    // add timer
-                    if (playerStats.getLevelStartTime() > 0)
-                    {
-                        double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-
-                        String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
-                        board.add(formatSpacing(timing));
-                    }
-                    board.add(Utils.translate("&7"));
-
-                    // add wins, losses, winrate
-                    board.add(Utils.translate("&aYour ELO &2" + Utils.formatNumber(playerStats.getELO())));
-                    board.add(Utils.translate("&aTheir ELO &2" + Utils.formatNumber(opponentStats.getELO())));
-
-                    // event section of scoreboard
-                }
-                else if (playerStats.isEventParticipant())
-                {
-                    board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&2&l" + eventManager.getRunningEvent().getFormattedName())));
-                    board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
-                    board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&6&lTime Left")));
-                    board.add(formatSpacing(Utils.translate("&7" + TimeUtils.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
-
-                    if (eventManager.isAscentEvent()) {
-                        board.add(Utils.translate(""));
-                        AscentEvent event = (AscentEvent) eventManager.getRunningEvent();
-                        board.add(formatSpacing(Utils.translate("&e&lLevel &6" + event.getLevelID(playerStats.getPlayer()) + "/" + event.getLevelCount())));
-                    }
-
-                    // infinite parkour section of scoreboard
-                }
+                // infinite parkour section of scoreboard
                 else if (playerStats.isInInfinite())
                 {
                     board.add(Utils.translate("&7"));
@@ -218,9 +166,55 @@ public class Scoreboard {
 
                     if (timeLeft > 0.0)
                         board.add(formatSpacing(Utils.translate("&7Time Left &d" + timeLeft + "s")));
-
-                    // level section of scoreboard
                 }
+                // practice section of scoreboard
+                else if (playerStats.inPracticeMode())
+                {
+                    board.add(Utils.translate("&7"));
+                    board.add(formatSpacing(Utils.translate("&6Practice &a&lOn")));
+                    board.add(formatSpacing(Utils.translate("&c/prac &7to exit")));
+                }
+                // race section of scoreboard
+                else if (playerStats.inRace())
+                {
+
+                    board.add(Utils.translate("&7"));
+                    Player opponent = playerStats.getRace().getOpponent().getPlayerStats().getPlayer();
+                    PlayerStats opponentStats = Parkour.getStatsManager().get(opponent);
+
+                    board.add(formatSpacing(Utils.translate("&6&lRace")));
+                    board.add(formatSpacing(Utils.translate("&c" + opponent.getDisplayName())));
+                    // add timer
+                    if (playerStats.getLevelStartTime() > 0)
+                    {
+                        double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+
+                        String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                        board.add(formatSpacing(timing));
+                    }
+                    board.add(Utils.translate("&7"));
+
+                    // add wins, losses, winrate
+                    board.add(Utils.translate("&aYour ELO &2" + Utils.formatNumber(playerStats.getELO())));
+                    board.add(Utils.translate("&aTheir ELO &2" + Utils.formatNumber(opponentStats.getELO())));
+                }
+                // event section of scoreboard
+                else if (playerStats.isEventParticipant())
+                {
+                    board.add(Utils.translate("&7"));
+                    board.add(formatSpacing(Utils.translate("&2&l" + eventManager.getRunningEvent().getFormattedName())));
+                    board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
+                    board.add(Utils.translate("&7"));
+                    board.add(formatSpacing(Utils.translate("&6&lTime Left")));
+                    board.add(formatSpacing(Utils.translate("&7" + TimeUtils.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
+
+                    if (eventManager.isAscentEvent()) {
+                        board.add(Utils.translate(""));
+                        AscentEvent event = (AscentEvent) eventManager.getRunningEvent();
+                        board.add(formatSpacing(Utils.translate("&e&lLevel &6" + event.getLevelID(playerStats.getPlayer()) + "/" + event.getLevelCount())));
+                    }
+                }
+                // level section of scoreboard
                 else if (level != null)
                 {
 
@@ -240,7 +234,6 @@ public class Scoreboard {
                             }
                         }
                     } else {
-
                         if (level.isAscendance()) {
 
                             // add scoreboard
@@ -262,7 +255,6 @@ public class Scoreboard {
                         }
                         else
                         {
-
                             // normal scoreboard
                             String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
                             BankManager bankManager = Parkour.getBankManager();
@@ -330,7 +322,6 @@ public class Scoreboard {
                                 board.add(formatSpacing(Utils.translate("&7-")));
                             }
                         }
-
                         // grind mode on scoreboard
                         if (playerStats.isGrinding())
                             board.add(formatSpacing(Utils.translate("&aGrinding")));

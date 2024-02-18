@@ -43,10 +43,20 @@ public class CheckpointManager {
             {
                 if (!playerStats.isPreviewingLevel())
                 {
-                    if (playerStats.inPracticeMode())
-                        playerStats.getPlayer().teleport(playerStats.getPracticeLocation());
+                    if (!playerStats.isInInfinite())
+                    {
+                        if (!playerStats.isInBlackMarket())
+                        {
+                            if (playerStats.inPracticeMode())
+                                playerStats.getPlayer().teleport(playerStats.getPracticeLocation());
+                            else
+                                playerStats.sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
+                        }
+                        else
+                            playerStats.sendMessage(Utils.translate("&cYou cannot do this while in black market"));
+                    }
                     else
-                        playerStats.sendMessage(Utils.translate("&cNo location loaded to teleport you to"));
+                        playerStats.sendMessage(Utils.translate("&cYou cannot do this while in infinite"));
                 }
                 else
                     playerStats.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
