@@ -3,8 +3,8 @@ package com.renatusnetwork.parkour.gameplay.listeners;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
-import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Sound;
@@ -48,20 +48,19 @@ public class InteractListener implements Listener {
             }
 
             ItemStack item = event.getItem();
+            StatsManager statsManager = Parkour.getStatsManager();
 
             if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null)
                 return;
 
-            if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&2Players &7»")))
+            if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&7Players »")))
             {
                 event.setCancelled(true);
 
-                PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
-
-                if (playerHiderManager.containsPlayer(player))
-                    playerHiderManager.toggleOff(player, player.getInventory().getHeldItemSlot(), true);
+                if (statsManager.containsHiddenPlayer(player))
+                    statsManager.togglePlayerHiderOff(player, player.getInventory().getHeldItemSlot(), true);
                 else
-                    playerHiderManager.toggleOn(player, player.getInventory().getHeldItemSlot(), true);
+                    statsManager.togglePlayerHiderOn(player, player.getInventory().getHeldItemSlot(), true);
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint")))
             {

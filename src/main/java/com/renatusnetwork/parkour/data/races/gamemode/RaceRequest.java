@@ -120,6 +120,12 @@ public class RaceRequest
             return selfCheck ? "&cYou cannot race while in practice" : "&c" +  validateStats.getDisplayName() + "&c cannot race while in practice";
         else if (validateStats.inRace())
             return selfCheck ? "&cYou cannot race while in a race" : "&c" + validateStats.getDisplayName() + "&c cannot race while in a race";
+        else if (validateStats.isInInfinite())
+            return selfCheck ? "&cYou cannot race while in infinite" : "&c" + validateStats.getDisplayName() + "&c cannot race while in infinite";
+        else if (validateStats.isInBlackMarket())
+            return selfCheck ? "&cYou cannot race while in black market" : "&c" + validateStats.getDisplayName() + "&c is busy right now...";
+        else if (validateStats.isEventParticipant())
+            return selfCheck ? "&cYou cannot race while in an event" : "&c" + validateStats.getDisplayName() + "&c cannot race while in an event";
         else if (validateStats.getCoins() < bet)
             return selfCheck ?
                     "&cYou do not have enough coins for this bet, need &6" + Utils.formatNumber((bet - validateStats.getCoins())) + "&c more &eCoins" :

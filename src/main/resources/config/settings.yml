@@ -80,7 +80,7 @@ join_inventory:
   '8':
     item:
       material: REDSTONE_TORCH_ON
-      title: '&2Players &7» &2Enabled'
+      title: '&7Players » &aEnabled'
   '5':
     item:
       material: GOLD_PLATE

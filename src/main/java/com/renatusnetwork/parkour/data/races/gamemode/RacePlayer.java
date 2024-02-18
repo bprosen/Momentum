@@ -4,12 +4,10 @@ import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.ELOOutcomeTypes;
-import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
-import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -37,14 +35,12 @@ public class RacePlayer
         statsManager.toggleOffElytra(playerStats);
 
         Level raceLevel = race.getLevel();
-
-        PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
         Player player = playerStats.getPlayer();
 
         // hide player
-        if (!playerHiderManager.containsPlayer(player))
+        if (!statsManager.containsHiddenPlayer(player))
         {
-            playerHiderManager.toggleOn(player, false);
+            statsManager.togglePlayerHiderOn(player, false);
             disabledPlayers = true;
         }
 
@@ -200,9 +196,9 @@ public class RacePlayer
 
     public void showPlayersIfDisabled()
     {
-        PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
+        StatsManager statsManager = Parkour.getStatsManager();
 
-        if (disabledPlayers && playerHiderManager.containsPlayer(playerStats.getPlayer()))
-            playerHiderManager.toggleOff(playerStats.getPlayer(), false);
+        if (disabledPlayers && statsManager.containsHiddenPlayer(playerStats.getPlayer()))
+            statsManager.togglePlayerHiderOff(playerStats.getPlayer(), false);
     }
 }

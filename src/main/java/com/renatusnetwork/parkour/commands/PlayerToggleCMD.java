@@ -1,7 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,12 +20,12 @@ public class PlayerToggleCMD implements CommandExecutor {
         Player player = (Player) sender;
         if (a.length == 1 && a[0].equalsIgnoreCase("toggle"))
         {
-            PlayerHiderManager playerHiderManager = Parkour.getPlayerHiderManager();
+            StatsManager statsManager = Parkour.getStatsManager();
 
-            if (playerHiderManager.containsPlayer(player))
-                playerHiderManager.toggleOff(player, true);
+            if (statsManager.containsHiddenPlayer(player))
+                statsManager.togglePlayerHiderOff(player, true);
             else if (!Parkour.getStatsManager().get(player).isEventParticipant())
-                playerHiderManager.toggleOn(player, true);
+                statsManager.togglePlayerHiderOn(player, true);
             else
                 player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
         }

@@ -46,7 +46,7 @@ public class EventCMD implements CommandExecutor {
                         {
                             if (!playerStats.inRace())
                             {
-                                if (!Parkour.getPlayerHiderManager().containsPlayer(player))
+                                if (!Parkour.getStatsManager().containsHiddenPlayer(player))
                                 {
                                     if (!playerStats.isInInfinite())
                                     {

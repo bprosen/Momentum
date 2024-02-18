@@ -138,9 +138,9 @@ public class Scoreboard {
                 // spectator section of scoreboard
                 if (playerStats.isSpectating())
                 {
-
                     board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&c&lSpectating &6" + playerStats.getPlayerToSpectate().getName())));
+                    board.add(formatSpacing(Utils.translate("&c&lSpectating")));
+                    board.add(formatSpacing(Utils.translate("&c" + playerStats.getPlayerToSpectate().getDisplayName())));
                     board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
 
                     // practice section of scoreboard

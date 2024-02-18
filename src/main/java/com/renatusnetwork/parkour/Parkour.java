@@ -20,7 +20,6 @@ import com.renatusnetwork.parkour.data.plots.PlotsManager;
 import com.renatusnetwork.parkour.data.races.RaceManager;
 import com.renatusnetwork.parkour.data.ranks.RanksManager;
 import com.renatusnetwork.parkour.data.saves.SavesManager;
-import com.renatusnetwork.parkour.data.stats.PlayerHiderManager;
 import com.renatusnetwork.parkour.gameplay.*;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.data.SettingsManager;
@@ -67,7 +66,6 @@ public class Parkour extends JavaPlugin {
     private static SavesManager saves;
     private static ModifiersManager modifiers;
     private static Placeholders placeholders;
-    private static PlayerHiderManager playerHider;
     private static ViaAPI viaVersion;
 
     @Override
@@ -221,7 +219,6 @@ public class Parkour extends JavaPlugin {
         modifiers = new ModifiersManager();
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
-        playerHider = new PlayerHiderManager();
         viaVersion = Via.getAPI();
     }
 
@@ -287,6 +284,6 @@ public class Parkour extends JavaPlugin {
     public static BankManager getBankManager() { return bank; }
     public static BlackMarketManager getBlackMarketManager() { return blackmarket; }
     public static ModifiersManager getModifiersManager() { return modifiers; }
-    public static PlayerHiderManager getPlayerHiderManager() { return playerHider; }
+
     public static ViaAPI getViaVersion() { return  viaVersion; }
 }

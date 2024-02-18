@@ -22,10 +22,7 @@ import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Statistic;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +38,8 @@ public class StatsManager {
     private HashMap<String, PlayerStats> playerStatsUUID; // index by uuid
     private HashMap<String, PlayerStats> playerStatsName; // index by name
     private HashSet<PlayerStats> ascendancePlayerList;
+
+    private Set<Player> hiddenPlayers;
 
     private ArrayList<GlobalPersonalLBPosition> globalPersonalCompletionsLB;
     private ArrayList<CoinsLBPosition> coinsLB;
@@ -63,7 +62,7 @@ public class StatsManager {
         this.globalPersonalCompletionsLB = new ArrayList<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
         this.coinsLB = new ArrayList<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
         this.eloLB = new ArrayList<>(Parkour.getSettingsManager().elo_lb_size);
-
+        this.hiddenPlayers = new HashSet<>();
         this.saidGG = new HashSet<>();
 
         startScheduler(plugin);
@@ -676,6 +675,85 @@ public class StatsManager {
                      "&7Event Wins » &b" + eventWins
         );
         return hover;
+    }
+
+    public void hidePlayer(Player player)
+    {
+        hiddenPlayers.add(player);
+
+        for (Player online : Bukkit.getOnlinePlayers())
+            if (!online.isOp())
+                player.hidePlayer(Parkour.getPlugin(), online);
+    }
+
+    public void showPlayer(Player player)
+    {
+        hiddenPlayers.remove(player);
+
+        for (Player online : Bukkit.getOnlinePlayers())
+            if (!online.isOp())
+                player.showPlayer(Parkour.getPlugin(), online);
+    }
+
+    public boolean containsHiddenPlayer(Player player)
+    {
+        return hiddenPlayers.contains(player);
+    }
+
+    public void hideHiddenPlayersFromJoined(Player playerJoined)
+    {
+        for (Player player : hiddenPlayers)
+            player.hidePlayer(Parkour.getPlugin(), playerJoined);
+    }
+
+    public void togglePlayerHiderOff(Player player, boolean notify)
+    {
+        togglePlayerHiderOff(player, Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&7Players » &cDisabled")), notify);
+    }
+
+    public void togglePlayerHiderOn(Player player, boolean notify)
+    {
+        togglePlayerHiderOn(player, Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&7Players » &aEnabled")), notify);
+    }
+
+    public void togglePlayerHiderOff(Player player, int slot, boolean notify)
+    {
+        if (slot > -1) {
+            showPlayer(player);
+
+            if (notify)
+            {
+                player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
+                player.sendMessage(Utils.translate("&aYou have turned on players"));
+            }
+
+            ItemStack newItem = new ItemStack(Material.REDSTONE_TORCH_ON);
+            ItemMeta meta = newItem.getItemMeta();
+            meta.setDisplayName(Utils.translate("&7Players » &aEnabled"));
+            newItem.setItemMeta(meta);
+            player.getInventory().setItem(slot, newItem);
+
+        }
+    }
+
+    public void togglePlayerHiderOn(Player player, int slot, boolean notify)
+    {
+        if (slot > -1)
+        {
+            hidePlayer(player);
+
+            if (notify)
+            {
+                player.playSound(player.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.7f, 0);
+                player.sendMessage(Utils.translate("&cYou have turned off players"));
+            }
+
+            ItemStack newItem = new ItemStack(Material.LEVER);
+            ItemMeta meta = newItem.getItemMeta();
+            meta.setDisplayName(Utils.translate("&7Players » &cDisabled"));
+            newItem.setItemMeta(meta);
+            player.getInventory().setItem(slot, newItem);
+        }
     }
 
     public void shutdown()
