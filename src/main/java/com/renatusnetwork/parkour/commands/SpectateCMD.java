@@ -14,16 +14,20 @@ import org.bukkit.entity.Player;
 
 public class SpectateCMD implements CommandExecutor {
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
-
-        if (sender instanceof Player) {
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
+    {
+        if (sender instanceof Player)
+        {
             Player player = (Player) sender;
-            if (sender.hasPermission("rn-parkour.donator")) {
-
+            if (sender.hasPermission("rn-parkour.donator"))
+            {
                 PlayerStats spectatorStats = Parkour.getStatsManager().get(player);
 
-                if (spectatorStats != null) {
-                    if (a.length > 0) {
+                if (spectatorStats != null)
+                {
+                    if (a.length > 0)
+                    {
                         if (a.length == 1 && a[0].equalsIgnoreCase("toggle"))
                         {
                             if (spectatorStats.isSpectatable())
@@ -47,58 +51,60 @@ public class SpectateCMD implements CommandExecutor {
                                     if (playerStats.isSpectatable()) {
                                         if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
                                             if (!spectatorStats.inPracticeMode()) {
-                                                if (!spectatorStats.inRace()) {
-                                                    if (!spectatorStats.isEventParticipant()) {
-                                                        if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
-                                                            if (!spectatorStats.isInInfinite()) {
-                                                                if (!playerStats.isInBlackMarket()) {
-                                                                    if (player.isOnGround()) {
+                                                if (spectatorStats.isLoaded()) {
+                                                    if (!spectatorStats.inRace()) {
+                                                        if (!spectatorStats.isEventParticipant()) {
+                                                            if (!player.getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world)) {
+                                                                if (!spectatorStats.isInInfinite()) {
+                                                                    if (!playerStats.isInBlackMarket()) {
+                                                                        if (player.isOnGround()) {
 
-                                                                        Location location = player.getLocation().clone();
-                                                                        if (location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
-                                                                            boolean initialSpectate = true;
-                                                                            if (spectatorStats.isSpectating()) {
-                                                                                initialSpectate = false;
+                                                                            Location location = player.getLocation().clone();
+                                                                            if (location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
+                                                                                boolean initialSpectate = true;
+                                                                                if (spectatorStats.isSpectating()) {
+                                                                                    initialSpectate = false;
 
                                                                             /*
                                                                              if they are already spectating and the person they
                                                                              are spectating are who they are trying to spectate again, cancel
                                                                              */
-                                                                                if (spectatorStats.getPlayerToSpectate().getName()
-                                                                                        .equalsIgnoreCase(playerStats.getName())) {
+                                                                                    if (spectatorStats.getPlayerToSpectate().getName()
+                                                                                            .equalsIgnoreCase(playerStats.getName())) {
 
-                                                                                    player.sendMessage(Utils.translate(
-                                                                                            "&cYou cannot spectate the same person you are spectating"));
-                                                                                    return true;
+                                                                                        player.sendMessage(Utils.translate(
+                                                                                                "&cYou cannot spectate the same person you are spectating"));
+                                                                                        return true;
+                                                                                    }
                                                                                 }
-                                                                            }
 
-                                                                            // enable spectator mode
-                                                                            SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, initialSpectate);
+                                                                                // enable spectator mode
+                                                                                SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, initialSpectate);
 
-                                                                            playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                                                                    spectatorStats.getName() + " &7began to spectate you"));
-                                                                        } else
-                                                                            player.sendMessage(Utils.translate("&cYou cannot spectate while in a block"));
+                                                                                playerStats.getPlayer().sendMessage(Utils.translate("&2" +
+                                                                                        spectatorStats.getName() + " &7began to spectate you"));
+                                                                            } else
+                                                                                player.sendMessage(Utils.translate("&cYou cannot spectate while in a block"));
+                                                                        } else {
+                                                                            player.sendMessage(Utils.translate("&cYou cannot use spectate while in the air"));
+                                                                        }
                                                                     } else {
-                                                                        player.sendMessage(Utils.translate("&cYou cannot use spectate while in the air"));
+                                                                        player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
                                                                     }
-                                                                }
-                                                                else
-                                                                {
-                                                                    player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
+                                                                } else {
+                                                                    player.sendMessage(Utils.translate("&cYou cannot spectate while in infinite parkour"));
                                                                 }
                                                             } else {
-                                                                player.sendMessage(Utils.translate("&cYou cannot spectate while in infinite parkour"));
+                                                                player.sendMessage(Utils.translate("&cYou cannot spectate in the plot world"));
                                                             }
                                                         } else {
-                                                            player.sendMessage(Utils.translate("&cYou cannot spectate in the plot world"));
+                                                            player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
                                                         }
                                                     } else {
-                                                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                                        player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                                                     }
                                                 } else {
-                                                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                                                    player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
                                                 }
                                             } else {
                                                 player.sendMessage(Utils.translate("&cYou cannot enter spectator mode while in /prac"));

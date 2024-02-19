@@ -109,41 +109,46 @@ public class InfiniteCMD implements CommandExecutor
         } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
-            if (!playerStats.isInInfinite())
+            if (playerStats != null && playerStats.isLoaded())
             {
-                if (!playerStats.isSpectating())
+                if (!playerStats.isInInfinite())
                 {
-                    if (!playerStats.isEventParticipant())
+                    if (!playerStats.isSpectating())
                     {
-                        if (!playerStats.inRace())
+                        if (!playerStats.isEventParticipant())
                         {
-                            if (!playerStats.inPracticeMode())
+                            if (!playerStats.inRace())
                             {
-                                if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                                if (!playerStats.inPracticeMode())
                                 {
-                                    // if in elytra level, then toggle off
-                                    if (playerStats.inLevel() && playerStats.getLevel().isElytra())
-                                        Parkour.getStatsManager().toggleOffElytra(playerStats);
+                                    if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                                    {
+                                        // if in elytra level, then toggle off
+                                        if (playerStats.inLevel() && playerStats.getLevel().isElytra())
+                                            Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                    infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), false);
+                                        infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), false);
+                                    }
+                                    else
+                                        player.sendMessage(Utils.translate("&cYou cannot start infinite from the plot world, do /spawn first"));
                                 }
                                 else
-                                    player.sendMessage(Utils.translate("&cYou cannot start infinite from the plot world, do /spawn first"));
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
                             }
                             else
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                                player.sendMessage(Utils.translate("&cYou cannot do this while you are in a race"));
                         }
                         else
-                            player.sendMessage(Utils.translate("&cYou cannot do this while you are in a race"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while you are in an event"));
                     }
                     else
-                        player.sendMessage(Utils.translate("&cYou cannot do this while you are in an event"));
+                        player.sendMessage(Utils.translate("&cYou cannot do this while you are spectating"));
                 }
                 else
-                    player.sendMessage(Utils.translate("&cYou cannot do this while you are spectating"));
+                    player.sendMessage(Utils.translate("&cYou are already in infinite parkour"));
             }
             else
-                player.sendMessage(Utils.translate("&cYou are already in infinite parkour"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
         }
         else if (a.length == 2 && a[0].equalsIgnoreCase("rewards"))
         {

@@ -291,47 +291,51 @@ public class Utils {
         Player player = playerStats.getPlayer();
 
         if (loc != null) {
-            if (!playerStats.isInTutorial()) {
-                if (!playerStats.isEventParticipant()) {
-                    if (!playerStats.inRace()) {
-                        if (!playerStats.isInInfinite()) {
-                            if (!playerStats.isSpectating()) {
+            if (playerStats.isLoaded()) {
+                if (!playerStats.isInTutorial()) {
+                    if (!playerStats.isEventParticipant()) {
+                        if (!playerStats.inRace()) {
+                            if (!playerStats.isInInfinite()) {
+                                if (!playerStats.isSpectating()) {
 
-                                BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
-                                if (playerStats.isInBlackMarket())
-                                    blackMarketManager.playerLeft(playerStats, false); // remove from event
+                                    BlackMarketManager blackMarketManager = Parkour.getBlackMarketManager();
+                                    if (playerStats.isInBlackMarket())
+                                        blackMarketManager.playerLeft(playerStats, false); // remove from event
 
-                                // toggle off elytra armor
-                                Parkour.getStatsManager().toggleOffElytra(playerStats);
+                                    // toggle off elytra armor
+                                    Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                player.teleport(loc);
+                                    player.teleport(loc);
 
-                                playerStats.resetPreviewLevel();
-                                playerStats.resetCurrentCheckpoint();
-                                PracticeHandler.resetDataOnly(playerStats);
-                                playerStats.resetLevel();
-                                playerStats.clearPotionEffects();
+                                    playerStats.resetPreviewLevel();
+                                    playerStats.resetCurrentCheckpoint();
+                                    PracticeHandler.resetDataOnly(playerStats);
+                                    playerStats.resetLevel();
+                                    playerStats.clearPotionEffects();
 
-                                if (playerStats.isAttemptingRankup())
-                                    Parkour.getStatsManager().leftRankup(playerStats);
+                                    if (playerStats.isAttemptingRankup())
+                                        Parkour.getStatsManager().leftRankup(playerStats);
 
-                                if (playerStats.isAttemptingMastery())
-                                    Parkour.getStatsManager().leftMastery(playerStats);
+                                    if (playerStats.isAttemptingMastery())
+                                        Parkour.getStatsManager().leftMastery(playerStats);
 
+                                } else {
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                                }
                             } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                         }
                     } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                        Parkour.getEventManager().removeParticipant(player, false); // remove if in event
                     }
                 } else {
-                    Parkour.getEventManager().removeParticipant(player, false); // remove if in event
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
                 }
             } else {
-                player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
         } else {
             Parkour.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");

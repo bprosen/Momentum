@@ -117,6 +117,8 @@ public class JoinLeaveListener implements Listener
                             }.runTask(Parkour.getPlugin());
                     }
                 }
+                // mark player as finished loading
+                finalPlayerStats.loaded();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
     }

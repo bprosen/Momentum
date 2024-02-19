@@ -163,16 +163,23 @@ public class MenuListener implements Listener
 
             PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-            if (!playerStats.isInTutorial())
+            if (playerStats.isLoaded())
             {
-                Menu menu = Parkour.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
+                if (!playerStats.isInTutorial())
+                {
+                    Menu menu = Parkour.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
 
-                if (menu != null)
-                    Parkour.getMenuManager().openInventory(playerStats, menu.getName(), false);
+                    if (menu != null)
+                        Parkour.getMenuManager().openInventory(playerStats, menu.getName(), false);
+                }
+                else
+                {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
+                }
             }
             else
             {
-                player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
         }
     }

@@ -45,10 +45,13 @@ public class WorldGuard implements Listener {
         WorldGuardPlugin guard = getWorldGuard();
         RegionManager manager = guard.getRegionManager(location.getWorld());
 
-        ApplicableRegionSet regions = manager.getApplicableRegions(location);
+        if (manager != null)
+        {
+            ApplicableRegionSet regions = manager.getApplicableRegions(location);
 
-        for (ProtectedRegion region : regions)
-            return region;
+            for (ProtectedRegion region : regions)
+                return region;
+        }
 
         return null;
     }

@@ -41,23 +41,33 @@ public class PayCMD implements CommandExecutor
                                 StatsManager statsManager = Parkour.getStatsManager();
                                 PlayerStats userStats = statsManager.get(user);
 
-                                // if they have the coins to pay up
-                                if (coins <= userStats.getCoins())
+                                if (userStats != null && userStats.isLoaded())
                                 {
-                                    PlayerStats targetStats = statsManager.get(target);
+                                    // if they have the coins to pay up
+                                    if (coins <= userStats.getCoins())
+                                    {
+                                        PlayerStats targetStats = statsManager.get(target);
 
-                                    // add and remove coins
-                                    statsManager.addCoins(targetStats, coins);
-                                    statsManager.removeCoins(userStats, coins);
+                                        if (targetStats != null && targetStats.isLoaded())
+                                        {
+                                            // add and remove coins
+                                            statsManager.addCoins(targetStats, coins);
+                                            statsManager.removeCoins(userStats, coins);
 
-                                    // send messages
-                                    user.sendMessage(Utils.translate("&7You have paid &c" + target.getDisplayName() + " &6" + Utils.formatNumber(coins) + " &eCoins"));
-                                    target.sendMessage(Utils.translate("&c" + user.getDisplayName() + " &7has paid you &6" + Utils.formatNumber(coins) + " &eCoins"));
+                                            // send messages
+                                            user.sendMessage(Utils.translate("&7You have paid &c" + target.getDisplayName() + " &6" + Utils.formatNumber(coins) + " &eCoins"));
+                                            target.sendMessage(Utils.translate("&c" + user.getDisplayName() + " &7has paid you &6" + Utils.formatNumber(coins) + " &eCoins"));
+                                        }
+                                        else
+                                            user.sendMessage(Utils.translate("&cYou cannot do this while loading their stats"));
+                                    }
+                                    else
+                                    {
+                                        user.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(coins) + " &eCoins"));
+                                    }
                                 }
                                 else
-                                {
-                                    user.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(coins) + " &eCoins"));
-                                }
+                                    user.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
                             }
                             else
                             {

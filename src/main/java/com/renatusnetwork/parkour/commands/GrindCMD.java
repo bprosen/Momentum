@@ -24,7 +24,7 @@ public class GrindCMD implements CommandExecutor
             {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                if (playerStats != null)
+                if (playerStats != null && playerStats.isLoaded())
                 {
                     // Update cache and DB
                     playerStats.toggleGrinding();
@@ -32,6 +32,8 @@ public class GrindCMD implements CommandExecutor
 
                     player.sendMessage(Utils.translate("&7You have turned grind mode " + (playerStats.isGrinding() ? "&aOn" : "&cOff")));
                 }
+                else
+                    player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
         }
         return false;

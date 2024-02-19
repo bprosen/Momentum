@@ -101,6 +101,7 @@ public class LevelListener implements Listener {
                 event.setCancelled(true);
                 if (
                     playerStats != null &&
+                    playerStats.isLoaded() &&
                     playerStats.inLevel() &&
                     !playerStats.inPracticeMode() &&
                     !playerStats.isSpectating() &&
@@ -143,7 +144,7 @@ public class LevelListener implements Listener {
                 event.setCancelled(true);
                 EventManager eventManager = Parkour.getEventManager();
 
-                if (playerStats != null)
+                if (playerStats != null && playerStats.isLoaded())
                 {
                     if (playerStats.isInInfinite())
                     {
@@ -235,55 +236,57 @@ public class LevelListener implements Listener {
 
             if (ChatColor.stripColor(signLines[0]).contains(Parkour.getSettingsManager().signs_first_line))
             {
-                if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion))
-                {
-                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                    Level level = playerStats.getLevel();
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                    if (level != null)
+                if (playerStats != null && playerStats.isLoaded())
+                {
+                    if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_completion))
                     {
-                        // check region null
-                        ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
-                        if (region != null)
+                        Level level = playerStats.getLevel();
+
+                        if (level != null)
                         {
-                            Level levelTo = Parkour.getLevelManager().get(region.getId());
-                            // make sure the area they are spawning in is a level and not equal
-                            if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                            // check region null
+                            ProtectedRegion region = WorldGuard.getRegion(event.getClickedBlock().getLocation());
+                            if (region != null)
                             {
-                                // if they are glitching elytra -> !elytra, remove elytra!
-                                if (level.isElytra() && !levelTo.isElytra())
-                                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+                                Level levelTo = Parkour.getLevelManager().get(region.getId());
+                                // make sure the area they are spawning in is a level and not equal
+                                if (levelTo != null && !levelTo.getName().equalsIgnoreCase(level.getName()))
+                                {
+                                    // if they are glitching elytra -> !elytra, remove elytra!
+                                    if (level.isElytra() && !levelTo.isElytra())
+                                        Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                playerStats.setLevel(levelTo);
+                                    playerStats.setLevel(levelTo);
+                                }
                             }
+                            LevelHandler.levelCompletion(playerStats, level);
                         }
-                        LevelHandler.levelCompletion(playerStats, level);
                     }
-                }
-                else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn))
-                {
-                    Location lobby = Parkour.getLocationManager().getLobbyLocation();
-
-                    if (lobby != null)
+                    else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn))
                     {
-                        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                        Location lobby = Parkour.getLocationManager().getLobbyLocation();
 
-                        // toggle off elytra armor
-                        Parkour.getStatsManager().toggleOffElytra(playerStats);
+                        if (lobby != null)
+                        {
+                            // toggle off elytra armor
+                            Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                        playerStats.resetCurrentCheckpoint();
-                        PracticeHandler.resetDataOnly(playerStats);
-                        playerStats.resetLevel();
+                            playerStats.resetCurrentCheckpoint();
+                            PracticeHandler.resetDataOnly(playerStats);
+                            playerStats.resetLevel();
 
-                        if (playerStats.isAttemptingRankup())
-                            Parkour.getStatsManager().leftRankup(playerStats);
+                            if (playerStats.isAttemptingRankup())
+                                Parkour.getStatsManager().leftRankup(playerStats);
 
-                        if (playerStats.isAttemptingMastery())
-                            Parkour.getStatsManager().leftMastery(playerStats);
+                            if (playerStats.isAttemptingMastery())
+                                Parkour.getStatsManager().leftMastery(playerStats);
 
-                        playerStats.clearPotionEffects();
+                            playerStats.clearPotionEffects();
 
-                        player.teleport(lobby);
+                            player.teleport(lobby);
+                        }
                     }
                 }
             }
@@ -296,7 +299,7 @@ public class LevelListener implements Listener {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
         // this is mainly QOL for staff!
-        if (playerStats != null && !playerStats.isSpectating() &&
+        if (playerStats != null && playerStats.isLoaded() && !playerStats.isSpectating() &&
            !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff"))
         {
 
@@ -332,7 +335,7 @@ public class LevelListener implements Listener {
                             }
                         }
                     }
-                    playerStats.setLevel(levelTo, false);
+                    playerStats.setLevel(levelTo);
 
                     // enable tutorial if they tp to it and not in tutorial
                     if (levelTo.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()) && !playerStats.isInTutorial())

@@ -31,7 +31,8 @@ public class PrestigeCMD implements CommandExecutor {
         PlayerStats playerStats = Parkour.getStatsManager().get(player);
         RanksManager rankManager = Parkour.getRanksManager();
 
-        if (a.length == 0) {
+        if (playerStats != null && playerStats.isLoaded())
+        {
             // this means they are max rank
             if (playerStats.getRank().isMaxRank())
             {
@@ -71,6 +72,8 @@ public class PrestigeCMD implements CommandExecutor {
                 player.sendMessage(Utils.translate("&cYou cannot do this yet!" +
                                                         " You need to be Rank &4" + rankManager.getMaxRank().getTitle()));
         }
+        else
+            sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
         return false;
     }
 

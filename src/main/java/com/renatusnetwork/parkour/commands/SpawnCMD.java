@@ -28,7 +28,6 @@ public class SpawnCMD implements CommandExecutor {
 
         if (player.hasPermission("rn-parkour.admin"))
         {
-
             if (a.length == 0)
                 Utils.teleportToSpawn(playerStats);
             else if (a.length == 1)

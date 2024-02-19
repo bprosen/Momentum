@@ -337,17 +337,14 @@ public class PlayerStats
 
     public void setLevel(Level level)
     {
-        setLevel(level, true); // default is true
-    }
-
-    public void setLevel(Level level, boolean addLeaveItem)
-    {
         // only continue if non null
-        if (level != null && addLeaveItem)
+        if (level != null)
         {
-            // set item
             SettingsManager settingsManager = Parkour.getSettingsManager();
-            Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
+
+            // if doesnt exist in inventory, add it
+            if (Utils.getItemStackIfExists(player, player.getInventory(), settingsManager.leave_title) == null)
+                Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
         }
         this.level = level;
     }

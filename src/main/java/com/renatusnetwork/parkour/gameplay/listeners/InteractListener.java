@@ -36,7 +36,6 @@ public class InteractListener implements Listener {
         if (event.getHand() == EquipmentSlot.HAND &&
            (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR))
         {
-
             // this is in case they try to click a trapdoor, door or something openable if they're in spectator
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 event.getClickedBlock() != null &&
@@ -157,44 +156,49 @@ public class InteractListener implements Listener {
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Parkour.getSettingsManager().leave_title)))
             {
-                event.setCancelled(true);
-
-                if (!spawnConfirmMap.containsKey(player.getName()))
+                if (Parkour.getStatsManager().get(player).isLoaded())
                 {
-                    // otherwise, put them in and ask them to confirm within 5 seconds
-                    player.sendMessage(Utils.translate("&cAre you sure you want to leave? Right click again to confirm"));
-                    spawnConfirmMap.put(player.getName(), new BukkitRunnable()
+                    event.setCancelled(true);
+
+                    if (!spawnConfirmMap.containsKey(player.getName()))
                     {
-                        @Override
-                        public void run() {
-                            if (spawnConfirmMap.containsKey(player.getName()))
-                            {
-                                spawnConfirmMap.remove(player.getName());
-                                player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                        // otherwise, put them in and ask them to confirm within 5 seconds
+                        player.sendMessage(Utils.translate("&cAre you sure you want to leave? Right click again to confirm"));
+                        spawnConfirmMap.put(player.getName(), new BukkitRunnable()
+                        {
+                            @Override
+                            public void run() {
+                                if (spawnConfirmMap.containsKey(player.getName()))
+                                {
+                                    spawnConfirmMap.remove(player.getName());
+                                    player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                }
                             }
-                        }
-                    }.runTaskLater(Parkour.getPlugin(), 20 * 5));
-                }
-                else
-                {
-                    spawnConfirmMap.get(player.getName()).cancel();
-                    spawnConfirmMap.remove(player.getName());
-
-                    PlayerStats playerStats = Parkour.getStatsManager().get(player);
-
-                    if (playerStats.inRace())
-                    {
-                        String forfeitMessage = "&cYou forfeit the race, giving a loss, taking elo";
-
-                        if (playerStats.getRace().hasBet())
-                            forfeitMessage += " and not returning the &6" + Utils.formatNumber(playerStats.getRace().getBet()) + " &eCoins &cbet";
-
-                        playerStats.sendMessage(Utils.translate(forfeitMessage));
-                        playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+                        }.runTaskLater(Parkour.getPlugin(), 20 * 5));
                     }
                     else
-                        Utils.teleportToSpawn(Parkour.getStatsManager().get(player));
+                    {
+                        spawnConfirmMap.get(player.getName()).cancel();
+                        spawnConfirmMap.remove(player.getName());
+
+                        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                        if (playerStats.inRace())
+                        {
+                            String forfeitMessage = "&cYou forfeit the race, giving a loss, taking elo";
+
+                            if (playerStats.getRace().hasBet())
+                                forfeitMessage += " and not returning the &6" + Utils.formatNumber(playerStats.getRace().getBet()) + " &eCoins &cbet";
+
+                            playerStats.sendMessage(Utils.translate(forfeitMessage));
+                            playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+                        }
+                        else
+                            Utils.teleportToSpawn(Parkour.getStatsManager().get(player));
+                    }
                 }
+                else
+                    player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
         }
     }

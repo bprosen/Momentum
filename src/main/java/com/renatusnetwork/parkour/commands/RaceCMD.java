@@ -36,41 +36,45 @@ public class RaceCMD implements CommandExecutor {
             sendHelp(player);
         else if ((a.length == 1 || a.length == 2) && a[0].equalsIgnoreCase("random"))
         {
-            int bet = 0;
-            if (a.length == 2)
+            if (playerStats.isLoaded())
             {
-                if (Utils.isInteger(a[1]))
-                    bet = Integer.parseInt(a[1]);
-                else
+                int bet = 0;
+                if (a.length == 2)
                 {
-                    sender.sendMessage(Utils.translate("&4" + a[1] + " &cis not a valid integer"));
-                    return false;
+                    if (Utils.isInteger(a[1]))
+                        bet = Integer.parseInt(a[1]);
+                    else
+                    {
+                        sender.sendMessage(Utils.translate("&4" + a[1] + " &cis not a valid integer"));
+                        return false;
+                    }
                 }
-            }
 
-            Collection<PlayerStats> collection = Parkour.getStatsManager().getOnlinePlayers();
-            PlayerStats opponentStats;
+                Collection<PlayerStats> collection = Parkour.getStatsManager().getOnlinePlayers();
+                PlayerStats opponentStats;
 
-            synchronized (collection)
-            {
-                List<PlayerStats> list = new ArrayList<>();
+                synchronized (collection)
+                {
+                    List<PlayerStats> list = new ArrayList<>();
 
-                for (PlayerStats onlineStats : collection)
-                    if (!onlineStats.equals(playerStats))
-                        list.add(onlineStats);
+                    for (PlayerStats onlineStats : collection)
+                        if (!onlineStats.equals(playerStats) && onlineStats.isLoaded())
+                            list.add(onlineStats);
 
-                opponentStats = list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
-            }
+                    opponentStats = list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
+                }
 
-            if (opponentStats != null)
-            {
-                // open menu if meets conditions
-                raceManager.addChoosingRaceLevel(playerStats, opponentStats, bet);
-                menuManager.openInventory(playerStats, "race_levels", true);
+                if (opponentStats != null)
+                {
+                    // open menu if meets conditions
+                    raceManager.addChoosingRaceLevel(playerStats, opponentStats, bet);
+                    menuManager.openInventory(playerStats, "race_levels", true);
+                }
+                else
+                    sender.sendMessage(Utils.translate("&cCould not find an opponent"));
             }
             else
-                sender.sendMessage(Utils.translate("&cCould not find an opponent"));
-
+                sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
         }
         else if (a.length == 1)
         {
@@ -78,14 +82,19 @@ public class RaceCMD implements CommandExecutor {
 
             if (targetStats != null)
             {
-                if (!targetStats.equals(playerStats))
+                if (playerStats.isLoaded())
                 {
+                    if (!targetStats.equals(playerStats))
+                    {
                     // open menu if meets conditions
                     raceManager.addChoosingRaceLevel(playerStats, targetStats, 0);
                     menuManager.openInventory(playerStats, "race_levels", true);
+                    }
+                    else
+                        player.sendMessage(Utils.translate("&cYou cannot race yourself"));
                 }
                 else
-                    player.sendMessage(Utils.translate("&cYou cannot race yourself"));
+                    player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
             else
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
@@ -114,14 +123,19 @@ public class RaceCMD implements CommandExecutor {
 
                     if (targetStats != null)
                     {
-                        if (!targetStats.equals(playerStats))
+                        if (playerStats.isLoaded())
                         {
-                            // open menu if meets conditions
-                            raceManager.addChoosingRaceLevel(playerStats, targetStats, bet);
-                            menuManager.openInventory(playerStats, "race_levels", true);
+                            if (!targetStats.equals(playerStats))
+                            {
+                                // open menu if meets conditions
+                                raceManager.addChoosingRaceLevel(playerStats, targetStats, bet);
+                                menuManager.openInventory(playerStats, "race_levels", true);
+                            }
+                            else
+                                player.sendMessage(Utils.translate("&cYou cannot race yourself"));
                         }
                         else
-                            player.sendMessage(Utils.translate("&cYou cannot race yourself"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
                     }
                     else
                         player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));

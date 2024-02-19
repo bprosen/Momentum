@@ -44,58 +44,63 @@ public class EventCMD implements CommandExecutor {
                     {
                         if (!playerStats.isSpectating())
                         {
-                            if (!playerStats.inRace())
+                            if (playerStats.isLoaded())
                             {
-                                if (!Parkour.getStatsManager().containsHiddenPlayer(player))
+                                if (!playerStats.inRace())
                                 {
-                                    if (!playerStats.isInInfinite())
+                                    if (!Parkour.getStatsManager().containsHiddenPlayer(player))
                                     {
-                                        if (!eventManager.isEliminated(player))
+                                        if (!playerStats.isInInfinite())
                                         {
-                                            if (!playerStats.isInBlackMarket())
+                                            if (!eventManager.isEliminated(player))
                                             {
-                                                if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                                                if (!playerStats.isInBlackMarket())
                                                 {
-                                                    if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater()))
+                                                    if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
                                                     {
-                                                        if (playerStats.inLevel() && playerStats.getLevel().isElytra())
-                                                            Parkour.getStatsManager().toggleOffElytra(playerStats);
-
-                                                        // remove sword item if they have it and the mode is pvp
-                                                        if (eventManager.isPvPEvent())
+                                                        if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater()))
                                                         {
-                                                            ItemStack swordItem = Utils.getSwordIfExists(player);
-                                                            ItemStack shieldItem = Utils.getShieldIfExists(player);
+                                                            if (playerStats.inLevel() && playerStats.getLevel().isElytra())
+                                                                Parkour.getStatsManager().toggleOffElytra(playerStats);
 
-                                                            if (swordItem != null)
-                                                                player.getInventory().removeItem(swordItem);
-                                                            if (shieldItem != null)
-                                                                player.getInventory().removeItem(shieldItem);
+                                                            // remove sword item if they have it and the mode is pvp
+                                                            if (eventManager.isPvPEvent())
+                                                            {
+                                                                ItemStack swordItem = Utils.getSwordIfExists(player);
+                                                                ItemStack shieldItem = Utils.getShieldIfExists(player);
+
+                                                                if (swordItem != null)
+                                                                    player.getInventory().removeItem(swordItem);
+                                                                if (shieldItem != null)
+                                                                    player.getInventory().removeItem(shieldItem);
+                                                            }
+
+                                                            eventManager.addParticipant(player);
                                                         }
-
-                                                        eventManager.addParticipant(player);
+                                                        else
+                                                            player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
+                                                                    "&cTherefore you cannot join this event"));
                                                     }
                                                     else
-                                                        player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
-                                                                "&cTherefore you cannot join this event"));
+                                                        player.sendMessage(Utils.translate("&cYou cannot teleport to an event from the plot world, do /spawn first"));
                                                 }
                                                 else
-                                                    player.sendMessage(Utils.translate("&cYou cannot teleport to an event from the plot world, do /spawn first"));
+                                                    player.sendMessage(Utils.translate("&cYou cannot join this event while in the Black Market"));
                                             }
                                             else
-                                                player.sendMessage(Utils.translate("&cYou cannot join this event while in the Black Market"));
+                                                player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
                                         }
                                         else
-                                            player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
+                                            player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
                                     }
                                     else
-                                        player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
+                                        player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
                                 }
                                 else
-                                    player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
+                                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                             }
                             else
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
                         }
                         else
                             player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));

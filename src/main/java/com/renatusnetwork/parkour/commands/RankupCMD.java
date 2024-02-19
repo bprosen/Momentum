@@ -20,8 +20,12 @@ public class RankupCMD implements CommandExecutor
             return true;
 
         Player player = (Player) sender;
+        PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-        Parkour.getMenuManager().openInventory(Parkour.getStatsManager().get(player), "rankup", true);
+        if (playerStats.isLoaded())
+            Parkour.getMenuManager().openInventory(Parkour.getStatsManager().get(player), "rankup", true);
+        else
+            player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
         return false;
     }
 }

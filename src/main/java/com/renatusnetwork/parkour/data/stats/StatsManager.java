@@ -112,8 +112,6 @@ public class StatsManager {
             CompletionsDB.loadRecords(playerStats);
         else
             playerStats.setRecords(Parkour.getLevelManager().getRecords(playerStats.getName()));
-
-        playerStats.loaded();
     }
 
     private void loadRestOfPerks(PlayerStats playerStats)
@@ -609,12 +607,12 @@ public class StatsManager {
             for (PlayerStats playerStats : ascendancePlayerList)
             {
                 ProtectedRegion region = WorldGuard.getRegion(playerStats.getPlayer().getLocation());
-                if (region != null) {
+                if (region != null)
+                {
                     Level level = Parkour.getLevelManager().get(region.getId());
 
                     // if their level is not the same as what they moved to, then update it
-                    if (level != null && level.isAscendance() &&
-                            playerStats.inLevel() && !playerStats.getLevel().getName().equalsIgnoreCase(level.getName()))
+                    if (level != null && level.isAscendance() && playerStats.inLevel() && !playerStats.getLevel().equals(level))
                     {
                         playerStats.resetCurrentCheckpoint();
 

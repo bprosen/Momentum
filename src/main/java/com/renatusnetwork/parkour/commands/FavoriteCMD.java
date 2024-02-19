@@ -57,28 +57,33 @@ public class FavoriteCMD implements CommandExecutor
 
             if (level != null)
             {
-                if (playerStats.numFavoriteLevels() < Parkour.getSettingsManager().max_favorite_levels)
+                if (playerStats != null && playerStats.isLoaded())
                 {
-                    if (playerStats.hasCompleted(level))
+                    if (playerStats.numFavoriteLevels() < Parkour.getSettingsManager().max_favorite_levels)
                     {
-                        if (Parkour.getLevelManager().isLevelInMenus(level))
+                        if (playerStats.hasCompleted(level))
                         {
-                            if (!playerStats.hasFavorite(level))
+                            if (Parkour.getLevelManager().isLevelInMenus(level))
                             {
-                                Parkour.getStatsManager().addFavoriteLevel(playerStats, level);
-                                sender.sendMessage(Utils.translate("&7You have added &2" + level.getTitle() + "&7 to your favorite levels"));
+                                if (!playerStats.hasFavorite(level))
+                                {
+                                    Parkour.getStatsManager().addFavoriteLevel(playerStats, level);
+                                    sender.sendMessage(Utils.translate("&7You have added &2" + level.getTitle() + "&7 to your favorite levels"));
+                                }
+                                else
+                                    sender.sendMessage(Utils.translate("&cYou already have &4" + level.getTitle() + "&c as a favorite"));
                             }
                             else
-                                sender.sendMessage(Utils.translate("&cYou already have &4" + level.getTitle() + "&c as a favorite"));
+                                sender.sendMessage(Utils.translate("&cYou cannot favorite &4" + level.getTitle() + "&c when it is not in the menus"));
                         }
                         else
-                            sender.sendMessage(Utils.translate("&cYou cannot favorite &4" + level.getTitle() + "&c when it is not in the menus"));
+                            sender.sendMessage(Utils.translate("&cYou cannot favorite &4" + level.getTitle() + "&c when you haven't completed it"));
                     }
                     else
-                        sender.sendMessage(Utils.translate("&cYou cannot favorite &4" + level.getTitle() + "&c when you haven't completed it"));
+                        sender.sendMessage(Utils.translate("&cYou cannot favorite more than &4" + Parkour.getSettingsManager().max_favorite_levels + " &clevels"));
                 }
                 else
-                    sender.sendMessage(Utils.translate("&cYou cannot favorite more than &4" + Parkour.getSettingsManager().max_favorite_levels + " &clevels"));
+                    sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
         }
         else

@@ -175,8 +175,8 @@ public class PacketListener implements Listener {
 
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
-                // null check jic
-                if (playerStats != null)
+                // null check and check for loaded jic
+                if (playerStats != null && playerStats.isLoaded())
                 {
 
                     InfiniteManager infiniteManager = Parkour.getInfiniteManager();

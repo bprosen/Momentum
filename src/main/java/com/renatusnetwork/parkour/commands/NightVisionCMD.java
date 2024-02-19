@@ -16,31 +16,40 @@ public class NightVisionCMD implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (sender instanceof Player) {
+        if (sender instanceof Player)
+        {
 
             Player player = (Player) sender;
             StatsManager statsManager = Parkour.getStatsManager();
 
-            if (a.length == 0) {
+            if (a.length == 0)
+            {
                 PlayerStats playerStats = statsManager.get(player);
 
-                if (!playerStats.hasNightVision())
-                { // enable
+                if (playerStats.isLoaded())
+                {
+                    if (!playerStats.hasNightVision())
+                    { // enable
 
-                    playerStats.setNightVision(true);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-                    sender.sendMessage(Utils.translate("&aYou have enabled Night Vision"));
+                        playerStats.setNightVision(true);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                        sender.sendMessage(Utils.translate("&aYou have enabled Night Vision"));
+                    }
+                    else
+                    { // disable
+
+                        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+                        playerStats.setNightVision(false);
+                        player.sendMessage(Utils.translate("&cYou have disabled Night Vision"));
+                    }
+                    // update db
+                    StatsDB.updatePlayerNightVision(playerStats.getUUID(), playerStats.hasNightVision());
                 }
                 else
-                { // disable
-
-                    player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-
-                    playerStats.setNightVision(false);
-                    player.sendMessage(Utils.translate("&cYou have disabled Night Vision"));
+                {
+                    sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
                 }
-                // update db
-                StatsDB.updatePlayerNightVision(playerStats.getUUID(), playerStats.hasNightVision());
             }
         }
         return true;

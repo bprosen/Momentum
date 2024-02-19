@@ -765,48 +765,53 @@ public class LevelManager {
     {
         Player player = playerStats.getPlayer();
 
-        // since ascendance is a free-roam map...
-        if (!level.isAscendance())
+        if (playerStats.isLoaded())
         {
-            RanksManager ranksManager = Parkour.getRanksManager();
-            if (!(level.needsRank() && ranksManager.isPastOrAtRank(playerStats, level.getRequiredRank())))
+            // since ascendance is a free-roam map...
+            if (!level.isAscendance())
             {
-                if (!level.isEventLevel())
+                RanksManager ranksManager = Parkour.getRanksManager();
+                if (!(level.needsRank() && ranksManager.isPastOrAtRank(playerStats, level.getRequiredRank())))
                 {
-                    if (!level.isRaceLevel())
+                    if (!level.isEventLevel())
                     {
-                        if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
+                        if (!level.isRaceLevel())
                         {
-                            boolean teleport = true;
-
-                            // not all levels have a price, so do a boolean switch
-                            if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
+                            if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Parkour.getSettingsManager().player_submitted_world))
                             {
-                                teleport = false;
-                                player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
-                                player.sendMessage(Utils.translate(
-                                        "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
-                                        )));
-                            }
+                                boolean teleport = true;
 
-                            // if still allowed, tp them!
-                            if (teleport)
-                                MenuItemAction.performLevelTeleport(playerStats, level);
+                                // not all levels have a price, so do a boolean switch
+                                if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
+                                {
+                                    teleport = false;
+                                    player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
+                                    player.sendMessage(Utils.translate(
+                                            "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
+                                            )));
+                                }
+
+                                // if still allowed, tp them!
+                                if (teleport)
+                                    MenuItemAction.performLevelTeleport(playerStats, level);
+                            }
+                            else
+                                player.sendMessage(Utils.translate("&cYou cannot teleport to a level from the plot world, do /spawn first"));
                         }
                         else
-                            player.sendMessage(Utils.translate("&cYou cannot teleport to a level from the plot world, do /spawn first"));
+                            player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
                     }
                     else
-                        player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
+                        player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
                 }
                 else
-                    player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
+                    player.sendMessage(Utils.translate("&cYou cannot teleport to a level you do not have the rank to"));
             }
             else
-                player.sendMessage(Utils.translate("&cYou cannot teleport to a level you do not have the rank to"));
+                player.sendMessage(Utils.translate("&cYou cannot teleport to an Ascendance level"));
         }
         else
-            player.sendMessage(Utils.translate("&cYou cannot teleport to an Ascendance level"));
+            player.sendMessage(Utils.translate("&cYou cannot teleport to a level while loading your stats"));
     }
 
     public void regionLevelCheck(PlayerStats playerStats, Location location)
