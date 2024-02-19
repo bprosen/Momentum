@@ -177,10 +177,6 @@ public class MenuListener implements Listener
                     player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
                 }
             }
-            else
-            {
-                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
-            }
         }
     }
 }
