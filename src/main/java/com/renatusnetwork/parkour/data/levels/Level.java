@@ -45,7 +45,7 @@ public class Level
     private List<LevelLBPosition> leaderboard;
     private List<String> commands;
 
-    public Level(String levelName, long creationSeconds)
+    public Level(String levelName, long creationMillis)
     {
         this.name = levelName;
         this.ratings = new HashMap<>();
@@ -54,7 +54,7 @@ public class Level
         this.leaderboard = new ArrayList<>();
         this.commands = new ArrayList<>();
         this.liquidResetPlayer = true; // default is true
-        this.creationTime = creationSeconds;
+        this.creationTime = creationMillis;
     }
 
     public long getCreationTime() { return creationTime; }

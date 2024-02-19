@@ -124,9 +124,29 @@ public class db implements CommandExecutor
                             Parkour.getPluginLogger().info("Attempting migration of levels.yml to levels table");
                             Set<String> levelNames = levelsConfig.getKeys(false);
                             int levelCount = 0;
+                            long creationBase = System.currentTimeMillis();
 
                             for (String levelName : levelNames)
                             {
+
+                                String levelIDQuery = "SELECT level_id FROM levels WHERE level_name='" + levelName + "'";
+
+                                PreparedStatement statement2 = connection.prepareStatement(levelIDQuery);
+                                ResultSet results2 = statement2.executeQuery();
+                                int levelID = -1;
+
+                                while (results2.next())
+                                {
+                                    levelID = results2.getInt("level_id");
+                                    break;
+                                }
+
+                                long newBase = creationBase;
+                                if (levelID > -1)
+                                    newBase += levelID;
+                                else
+                                    newBase = System.currentTimeMillis();
+
                                 boolean broadcastComp = levelsConfig.getBoolean(levelName + ".broadcast_completion", false);
                                 int broadcast = broadcastComp ? 1 : 0;
 
@@ -193,7 +213,7 @@ public class db implements CommandExecutor
                                         "INSERT INTO " + DatabaseManager.LEVELS_TABLE + " " +
                                                 "(name, creation_date, type, tc, broadcast, liquid_reset) VALUES " +
                                                 "(?,?,?,?,?,?)",
-                                                levelName, System.currentTimeMillis() / 1000, type.name(), tcEnabled, broadcast, liquid
+                                                levelName, newBase, type.name(), tcEnabled, broadcast, liquid
                                 );
 
                                 String title = levelsConfig.getString(levelName + ".title", null);

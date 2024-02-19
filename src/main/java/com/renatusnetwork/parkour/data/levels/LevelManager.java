@@ -82,7 +82,7 @@ public class LevelManager {
     public void create(String levelName)
     {
         long systemMillis = System.currentTimeMillis();
-        LevelsDB.insertLevel(levelName, systemMillis / 1000);
+        LevelsDB.insertLevel(levelName, systemMillis);
         levels.put(levelName, new Level(levelName, systemMillis));
     }
 

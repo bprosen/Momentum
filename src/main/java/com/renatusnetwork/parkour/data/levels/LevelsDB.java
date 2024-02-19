@@ -182,9 +182,9 @@ public class LevelsDB {
         return ratings;
     }
 
-    public static void insertLevel(String levelName, long creationSeconds) {
+    public static void insertLevel(String levelName, long creationMillis) {
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name, creation_date) VALUES (?,?)",
-                levelName, creationSeconds);
+                levelName, creationMillis);
     }
 
     public static void updateName(String levelName, String newLevelName) {
