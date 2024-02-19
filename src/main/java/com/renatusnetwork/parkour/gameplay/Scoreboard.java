@@ -276,7 +276,7 @@ public class Scoreboard {
                             }
                             // add title and adjust rewardstring if it is a featured level
                             else if (level.isFeaturedLevel()) {
-                                board.add(formatSpacing(Utils.translate("&dFeatured Level")));
+                                board.add(formatSpacing(Utils.translate("&dFeatured")));
                                 newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
                             } else if (bankManager.isJackpotRunning() &&
                                     bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&

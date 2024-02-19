@@ -58,7 +58,7 @@ public class JoinLeaveListener implements Listener
             List<Plot> submittedPlotList = Parkour.getPlotsManager().getSubmittedPlots();
 
             if (!submittedPlotList.isEmpty())
-                player.sendMessage(Utils.translate("&7There are &c&l" + submittedPlotList.size() + "" +
+                player.sendMessage(Utils.translate("&7There are &c&l" + submittedPlotList.size() +
                         " &6Submitted Plots &7that still need to be checked! &a/plot submit list"));
         }
 
@@ -70,24 +70,6 @@ public class JoinLeaveListener implements Listener
             playerStats = statsManager.add(player);
         else
             statsManager.addFromOffline(playerStats, player); // add from offline
-
-        // load level here in sync
-        ProtectedRegion region = WorldGuard.getRegion(spawnLoc);
-
-        if (region != null)
-        {
-            Level level = Parkour.getLevelManager().get(region.getId());
-
-            // make sure the area they are spawning in is a level
-            if (level != null)
-            {
-                playerStats.setLevel(level);
-
-                // toggle tutorial
-                if (level.equals(Parkour.getLevelManager().getTutorialLevel()))
-                    playerStats.setTutorial(true);
-            }
-        }
 
         PlayerStats finalPlayerStats = playerStats;
         new BukkitRunnable()
@@ -101,26 +83,39 @@ public class JoinLeaveListener implements Listener
                 if (!fromOffline)
                     statsManager.loadStats(finalPlayerStats);
 
-                if (finalPlayerStats.inLevel())
+                ProtectedRegion region = WorldGuard.getRegion(spawnLoc);
+
+                if (region != null)
                 {
-                    Level level = finalPlayerStats.getLevel();
+                    Level level = Parkour.getLevelManager().get(region.getId());
 
-                    // if the level they are being added to is an ascendance level, add them to the list
-                    if (level.isAscendance())
-                        statsManager.enteredAscendance(finalPlayerStats);
+                    // make sure the area they are spawning in is a level
+                    if (level != null)
+                    {
+                        // if the level they are being added to is an ascendance level, add them to the list
+                        if (level.isAscendance())
+                            statsManager.enteredAscendance(finalPlayerStats);
 
-                    Location checkpoint = finalPlayerStats.getCheckpoint(level);
-                    if (checkpoint != null && !finalPlayerStats.isAttemptingMastery()) // only load cp if they are not in a mastery attempt
-                        finalPlayerStats.setCurrentCheckpoint(checkpoint);
+                        Location checkpoint = finalPlayerStats.getCheckpoint(level);
+                        if (checkpoint != null && !finalPlayerStats.isAttemptingMastery()) // only load cp if they are not in a mastery attempt
+                            finalPlayerStats.setCurrentCheckpoint(checkpoint);
 
-                    // is elytra level, then set elytra in sync (player inventory changes)
-                    if (level.isElytra())
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                Parkour.getStatsManager().toggleOnElytra(finalPlayerStats);
-                            }
-                        }.runTask(Parkour.getPlugin());
+                        // toggle tutorial
+                        if (level.equals(Parkour.getLevelManager().getTutorialLevel()))
+                            finalPlayerStats.setTutorial(true);
+
+                        // set level AFTER checkpoint, and other important stats have been set
+                        finalPlayerStats.setLevel(level);
+
+                        // is elytra level, then set elytra in sync (player inventory changes)
+                        if (level.isElytra())
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Parkour.getStatsManager().toggleOnElytra(finalPlayerStats);
+                                }
+                            }.runTask(Parkour.getPlugin());
+                    }
                 }
             }
         }.runTaskAsynchronously(Parkour.getPlugin());

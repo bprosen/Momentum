@@ -291,7 +291,7 @@ public class StatsManager {
                     rewardString = "&c&m" + Utils.formatNumber(Parkour.getSettingsManager().default_gg_coin_reward) + "&6 " + Utils.formatNumber(reward);
 
                 saidGG.add(playerStats.getName());
-                playerStats.getPlayer().sendMessage(Utils.translate(rewardString + " &eCoin &7reward for saying &3&lGG&b!"));
+                playerStats.getPlayer().sendMessage(Utils.translate(rewardString + " &eCoins &7for saying &3&lGG"));
                 Parkour.getStatsManager().addCoins(playerStats, reward);
             }
         }

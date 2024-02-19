@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.data.stats;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.bank.types.BankItem;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -16,6 +17,7 @@ import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -335,8 +337,13 @@ public class PlayerStats
 
     public void setLevel(Level level)
     {
+        setLevel(level, true); // default is true
+    }
+
+    public void setLevel(Level level, boolean addLeaveItem)
+    {
         // only continue if non null
-        if (level != null)
+        if (level != null && addLeaveItem)
         {
             // set item
             SettingsManager settingsManager = Parkour.getSettingsManager();
