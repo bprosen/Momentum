@@ -64,10 +64,9 @@ public class Race
                 broadcast += "&7 for &6" + Utils.formatNumber(bet) + " &eCoins";
 
             Bukkit.broadcastMessage(Utils.translate(broadcast));
-
-            if (endReason == RaceEndReason.WON)
-                statsManager.runGGTimer();
-            else
+            statsManager.runGGTimer();
+            
+            if (endReason == RaceEndReason.FORFEIT)
             {
                 String message = "&cYour opponent forfeit the race, giving a win";
 

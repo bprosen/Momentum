@@ -318,7 +318,7 @@ public class StatsManager {
                     if (saidGG.size() > 1)
                         playerString += "s";
 
-                    Bukkit.broadcastMessage(Utils.translate("&3" + saidGG.size() + " &7" + playerString + " said &3&lGG&b!"));
+                    Bukkit.broadcastMessage(Utils.translate("&3" + saidGG.size() + " &7" + playerString + " said &3&lGG"));
                 }
                 saidGG.clear();
                 ggTask = null;
