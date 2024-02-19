@@ -94,7 +94,6 @@ public class JoinLeaveHandler implements Listener {
 
                                 // make sure the area they are spawning in is a level
                                 if (level != null) {
-                                    playerStats.setLevel(level);
 
                                     // toggle tutorial
                                     if (level.getName().equalsIgnoreCase(Parkour.getLevelManager().getTutorialLevel().getName()))
@@ -107,6 +106,8 @@ public class JoinLeaveHandler implements Listener {
                                     Location checkpoint = playerStats.getCheckpoint(level.getName());
                                     if (checkpoint != null)
                                         playerStats.setCurrentCheckpoint(checkpoint);
+
+                                    playerStats.setLevel(level); // set level after everything else
 
                                     // is elytra level, then set elytra in sync (player inventory changes)
                                     if (level.isElytraLevel())
