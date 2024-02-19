@@ -94,7 +94,6 @@ public class db implements CommandExecutor
                                 int spectatable = results.getInt("spectatable");
                                 String rankIdTemp = String.valueOf(results.getInt("rank_id")); // will need to manually fix later
                                 String clanTag = results.getString("clan_tag");
-                                int prestiges = results.getInt("rank_prestiges");
                                 int raceWins = results.getInt("race_wins");
                                 int raceLosses = results.getInt("race_losses");
                                 int nightVision = results.getInt("night_vision");
@@ -109,9 +108,9 @@ public class db implements CommandExecutor
 
                                 DatabaseQueries.runQuery(
                                         "INSERT INTO " + DatabaseManager.PLAYERS_TABLE + " " +
-                                                "(uuid, name, coins, spectatable, rank_name, clan, prestiges, race_wins, race_losses, night_vision, grinding, infinite_block, fail_mode, event_wins) VALUES " +
-                                                "(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                                        uuid, name, coins, spectatable, rankIdTemp, clanTag, prestiges, raceWins, raceLosses, nightVision, grinding, infiniteBlock, failMode, eventWins
+                                                "(uuid, name, coins, spectatable, rank_name, clan, race_wins, race_losses, night_vision, grinding, infinite_block, fail_mode, event_wins) VALUES " +
+                                                "(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                        uuid, name, coins, spectatable, rankIdTemp, clanTag, raceWins, raceLosses, nightVision, grinding, infiniteBlock, failMode, eventWins
                                 );
                                 playersCount++;
                             }
