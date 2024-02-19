@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -111,20 +112,24 @@ public class RacePlayer
 
     public void win()
     {
+        StatsManager statsManager = Parkour.getStatsManager();
+
         playerStats.resetRace();
-        Parkour.getStatsManager().updateRaceWins(playerStats, playerStats.getRaceWins() + 1);
+        statsManager.updateRaceWins(playerStats, playerStats.getRaceWins() + 1);
 
         if (hasBet())
-            Parkour.getStatsManager().addCoins(playerStats, (getBet() * 2));
+            statsManager.addCoins(playerStats, (getBet() * 2));
 
-        Parkour.getStatsManager().calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.WIN);
+        statsManager.calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.WIN);
     }
 
     public void loss()
     {
+        StatsManager statsManager = Parkour.getStatsManager();
+
         playerStats.resetRace();
-        Parkour.getStatsManager().updateRaceLosses(playerStats, playerStats.getRaceLosses() + 1);
-        Parkour.getStatsManager().calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.LOSS);
+        statsManager.updateRaceLosses(playerStats, playerStats.getRaceLosses() + 1);
+        statsManager.calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.LOSS);
     }
 
     public void resetLevelAndTeleport()
@@ -144,6 +149,17 @@ public class RacePlayer
 
         TitleAPI.sendTitle(player, 0, 20, 0, title, "");
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
+    }
+
+    public void sendEndTitle(PlayerStats winner)
+    {
+        String titleMessage = Utils.translate("&c" + winner.getDisplayName() + "&7 won the race");
+        String subTitleMessage = Utils.translate("&7On &c" + getLevel().getTitle());
+
+        if (race.hasBet())
+            subTitleMessage += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
+
+        TitleAPI.sendTitle(getPlayerStats().getPlayer(), 10, 60, 10, titleMessage, subTitleMessage);
     }
 
     private void tpBack(PlayerStats playerStats, Location location)

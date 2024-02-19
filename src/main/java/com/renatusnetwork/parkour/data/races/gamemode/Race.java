@@ -51,7 +51,9 @@ public class Race
         {
             // administer coins, and update data
             winner.win();
+            winner.sendEndTitle(winnerStats);
             loser.loss();
+            loser.sendEndTitle(winnerStats);
 
             String broadcast =
                     "&4" + winnerStats.getDisplayName() + "&a (▲" + winnerStats.getELO() +

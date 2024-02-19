@@ -278,34 +278,21 @@ public class LevelHandler
             // clear potion effects
             playerStats.clearPotionEffects();
 
-            String titleMessage;
-            String subTitleMessage;
-
             if (!inRace)
             {
-                titleMessage = Utils.translate("&7You beat " + level.getTitle());
+                String titleMessage = Utils.translate("&7You beat " + level.getTitle());
                 if (levelCompletion.wasTimed())
                     titleMessage += Utils.translate("&7 in &2" + time);
 
-                subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
+                String subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle()));
+
+                TitleAPI.sendTitle(
+                        player, 10, 60, 10,
+                        titleMessage,
+                        subTitleMessage
+                );
             }
-            else
-            {
-                titleMessage = Utils.translate("&c" + playerStats.getDisplayName() + "&7 has won the race!");
-                subTitleMessage = Utils.translate("&7On &c" + level.getTitle());
-
-                if (race.hasBet())
-                    subTitleMessage += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
-
-                TitleAPI.sendTitle(race.getOpponent().getPlayerStats().getPlayer(), 10, 60, 10, titleMessage, subTitleMessage);
-            }
-
-            TitleAPI.sendTitle(
-                    player, 10, 60, 10,
-                    titleMessage,
-                    subTitleMessage
-            );
 
             // play sound if they did not level up their clan
             if (!(beforeClanLevel > -1 && beforeClanLevel < playerStats.getClan().getLevel()))
