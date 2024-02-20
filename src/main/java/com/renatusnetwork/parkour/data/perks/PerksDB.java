@@ -5,11 +5,13 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.*;
 
@@ -104,6 +106,13 @@ public class PerksDB
     {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET type=? WHERE perk_name=? AND armor_piece=?", typeNum, perkName, armorPiece
+        );
+    }
+
+    public static void updateArmorColor(String perkName, String armorPiece, String armorColor)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET color=? WHERE perk_name=? AND armor_piece=?", armorColor.toUpperCase(), perkName, armorPiece
         );
     }
 
@@ -203,6 +212,7 @@ public class PerksDB
             // get all types
             PerksArmorType armorType = PerksArmorType.valueOf(perkResult.get("armor_piece"));
             Material material = Material.matchMaterial(perkResult.get("material"));
+
             int type = Integer.parseInt(perkResult.get("type"));
             String title = perkResult.get("title");
             boolean glow = Integer.parseInt(perkResult.get("glow")) == 1;
@@ -215,6 +225,21 @@ public class PerksDB
                 Utils.addGlow(itemMeta);
 
             item.setItemMeta(itemMeta);
+
+            String colorString = perkResult.get("color");
+
+            if (colorString != null)
+            {
+                Color color = Utils.getColorFromString(perkResult.get("color"));
+
+                // if colored, need to cast to new meta and set again
+                if (color != null)
+                {
+                    LeatherArmorMeta leatherItemMeta = (LeatherArmorMeta) item.getItemMeta();
+                    leatherItemMeta.setColor(color);
+                    item.setItemMeta(leatherItemMeta);
+                }
+            }
 
             armor.put(armorType, item);
         }

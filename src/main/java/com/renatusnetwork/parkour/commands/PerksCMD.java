@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.perks.PerkManager;
 import com.renatusnetwork.parkour.data.perks.PerksArmorType;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,6 +32,7 @@ public class PerksCMD implements CommandExecutor
         /perk armorglow (perkName) (armorType)
         /perk armormaterial (perkName) (armorType) (material)
         /perk armormaterialtype (perkName) (armorType) (materialType)
+        /perk armorcolor (perkName) (armorType) (color)
         /perk masterylevels (perkName)
         /perk help
      */
@@ -371,6 +373,38 @@ public class PerksCMD implements CommandExecutor
                     }
                 }
             }
+            else if (a.length == 4 && a[0].equalsIgnoreCase("armorcolor"))
+            {
+                String perkName = a[1];
+                // helper method
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    // helper method
+                    PerksArmorType armorType = getArmorType(a[2].toUpperCase(), sender);
+
+                    if (armorType != null)
+                    {
+                        String colorString = a[3].toUpperCase();
+                        Color colorType = Utils.getColorFromString(colorString);
+                        // material types in 1.12 are shorts that can be casted from ints
+                        if (colorType != null)
+                        {
+                            if (perk.hasArmorItem(armorType))
+                            {
+                                perkManager.updateArmorColor(perk, armorType, colorType, colorString);
+                                sender.sendMessage(Utils.translate(
+                                        "&7You have updated armor color of type &6" + armorType.name() +
+                                                "&7 with new color &6" + colorString + " &7to &6" + perk.getTitle()
+                                ));
+                            }
+                            else
+                                sender.sendMessage(Utils.translate("&c" + perk.getTitle() + " &cdoes not have an armor piece on &4" + armorType));
+                        }
+                    }
+                }
+            }
             else if (a.length == 2 && a[0].equalsIgnoreCase("masterylevels"))
             {
                 String perkName = a[1];
@@ -538,6 +572,7 @@ public class PerksCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&e/perks armorglow (perkName) (armorPiece)  &7Toggles glow on the armor piece"));
         sender.sendMessage(Utils.translate("&e/perks armormaterial (perkName) (armorPiece) (material)  &7Updates material on existing armor piece"));
         sender.sendMessage(Utils.translate("&e/perks armormaterialtype (perkName) (armorPiece) (type)  &7Updates material type on existing armor piece"));
+        sender.sendMessage(Utils.translate("&e/perks armorcolor (perkName) (armorPiece) (color)  &7Updates color of that armor piece"));
         sender.sendMessage(Utils.translate("&e/perks setperk (IGN) (perkName)  &7Sets perk armor, hat or infinite block to player if they have it"));
         sender.sendMessage(Utils.translate("&e/perks masterylevels (perkName)  &7Toggles if the perk requires mastery completions instead of normal level completions"));
         sender.sendMessage(Utils.translate("&e/perks addcommand (perkName) (command)  &7Adds a command to a perk to give out on setting (command can be multiple words)"));

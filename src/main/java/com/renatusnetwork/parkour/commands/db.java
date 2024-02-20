@@ -560,17 +560,22 @@ public class db implements CommandExecutor
                                             int itemType = perksConfig.getInt(perkName +".items." + type + ".type", 0);
 
                                             if (itemType > 0)
-                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET type=? WHERE perk_name=?", itemType, perkName);
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET type=? WHERE perk_name=? AND armor_piece=?", itemType, perkName, newType.name());
 
                                             String itemTitle = perksConfig.getString(perkName + ".items." + type + ".title");
 
                                             if (itemTitle != null)
-                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET title=? WHERE perk_name=?", title, perkName);
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET title=? WHERE perk_name=? AND armor_piece=?", title, perkName, newType.name());
 
                                             boolean glow = perksConfig.getBoolean(perkName + ".items." + type +".glow", false);
 
                                             if (glow)
-                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=1 WHERE perk_name=?", perkName);
+                                                DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=1 WHERE perk_name=? AND armor_piece=?", perkName, newType.name());
+
+                                            String color = perksConfig.getString(perkName + ".items." + type + ".color", null);
+
+                                            if (color != null)
+                                                DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET color=? WHERE perk_name=? AND armor_piece=?", color.toUpperCase(), perkName, newType.name());
                                         }
                                     }
                                 }

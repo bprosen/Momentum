@@ -5,12 +5,14 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -161,6 +163,23 @@ public class PerkManager
         perk.setArmorItem(type, newItem);
 
         PerksDB.updateArmorMaterialType(perk.getName(), type.name(), typeNum);
+    }
+
+    public void updateArmorColor(Perk perk, PerksArmorType type, Color color, String colorString)
+    {
+        ItemStack item = perk.getArmorPiece(type);
+
+        // if colored, need to cast to new meta and set again
+        if (color != null)
+        {
+            LeatherArmorMeta leatherItemMeta = (LeatherArmorMeta) item.getItemMeta();
+            leatherItemMeta.setColor(color);
+            item.setItemMeta(leatherItemMeta);
+        }
+
+        perk.setArmorItem(type, item);
+
+        PerksDB.updateArmorColor(perk.getName(), type.name(), colorString);
     }
 
     public void updateRequiresMasteryLevels(Perk perk)

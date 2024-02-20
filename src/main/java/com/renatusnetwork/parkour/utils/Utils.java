@@ -237,9 +237,12 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
 
-    public static Color getColorFromString(String colorName) {
-        if (colorName != null) {
-            switch (colorName.toLowerCase()) {
+    public static Color getColorFromString(String colorName)
+    {
+        if (colorName != null)
+        {
+            switch (colorName.toLowerCase())
+            {
                 case "black":
                     return Color.BLACK;
                 case "white":

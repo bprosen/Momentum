@@ -8,7 +8,10 @@ import com.renatusnetwork.parkour.data.levels.LevelType;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
 import com.renatusnetwork.parkour.data.modifiers.ModifierType;
 import com.renatusnetwork.parkour.data.perks.PerksArmorType;
+import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.entity.Horse;
 import org.bukkit.potion.PotionEffectType;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -641,10 +644,13 @@ public class TablesDB
 
     private static void createPerksArmor()
     {
+        String finalString = "'WHITE','SILVER','GRAY','BLACK','RED','MAROON','YELLOW','OLIVE','LIME','GREEN','AQUA','TEAL','BLUE','NAVY','FUCHSIA','PURPLE','ORANGE'";
+
         String query = "CREATE TABLE " + DatabaseManager.PERKS_ARMOR_TABLE + "(" +
                             "perk_name VARCHAR(30) NOT NULL, " +
                             "armor_piece ENUM(" + enumQuotations(PerksArmorType.values()) + ") NOT NULL, " + // choices are... HELMET, CHESTPLATE, LEGGINGS, BOOTS
                             "material ENUM(" + enumQuotations(Material.values()) + ") NOT NULL, " +
+                            "color ENUM(" + finalString + ") DEFAULT NULL, " +
                             "type TINYINT DEFAULT 0, " +
                             "title VARCHAR(50) DEFAULT NULL, " + // allow for extra length due to color codes
                             "glow BIT DEFAULT 0, " +
