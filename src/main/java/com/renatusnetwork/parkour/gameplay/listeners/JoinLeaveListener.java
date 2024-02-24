@@ -48,9 +48,6 @@ public class JoinLeaveListener implements Listener
                 Bukkit.broadcastMessage(Utils.translate(
                         "&7Welcome &a" + player.getDisplayName() + " &7to &b&lParkour &d#" + Utils.formatNumber(statsManager.getTotalPlayers())
                 ));
-
-                // set xp level to default elo
-                player.setLevel(Parkour.getSettingsManager().default_elo);
             }
         }
         statsManager.hideHiddenPlayersFromJoined(player);
@@ -120,6 +117,9 @@ public class JoinLeaveListener implements Listener
                             }.runTask(Parkour.getPlugin());
                     }
                 }
+                // set xp level to elo
+                player.setLevel(finalPlayerStats.getELO());
+
                 // mark player as finished loading
                 finalPlayerStats.loaded();
             }
