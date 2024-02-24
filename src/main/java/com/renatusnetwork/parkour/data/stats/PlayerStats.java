@@ -140,6 +140,7 @@ public class PlayerStats
     public void setELO(int elo)
     {
         this.elo = elo;
+        player.setLevel(elo); // set xp level as elo
     }
 
     public int getELO()
