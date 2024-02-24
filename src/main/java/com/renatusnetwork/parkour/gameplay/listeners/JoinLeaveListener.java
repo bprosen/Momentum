@@ -119,6 +119,7 @@ public class JoinLeaveListener implements Listener
                 }
                 // set xp level to elo
                 player.setLevel(finalPlayerStats.getELO());
+                player.setExp(0);
 
                 // mark player as finished loading
                 finalPlayerStats.loaded();

@@ -94,6 +94,7 @@ public class LevelHandler
             LevelLBPosition oldRecord = level.getRecordCompletion();
             RacePlayer race = playerStats.getRace();
             boolean inRace = race != null;
+            boolean runGG = inRace;
 
             levelManager.addTotalLevelCompletion();
 
@@ -229,11 +230,17 @@ public class LevelHandler
                         "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getTitle()
                 ));
             else if (completedMastery)
+            {
                 Bukkit.broadcastMessage(Utils.translate(
                         "&c" + playerStats.getDisplayName() + "&7 has completed the &5&lMastery &7for &2" + level.getTitle()
                 ));
+                runGG = true;
+            }
             else if (level.isBroadcasting())
+            {
                 Bukkit.broadcastMessage(Utils.translate("&a" + player.getDisplayName() + "&7 completed " + level.getTitle()));
+                runGG = true;
+            }
 
             // used for playing sound!
             int beforeClanLevel = -1;
@@ -302,7 +309,6 @@ public class LevelHandler
 
             if (inRace)
             {
-
                 locationTo = race.getOriginalLocation();
                 RacePlayer opponent = race.getOpponent();
                 PlayerStats opponentStats = opponent.getPlayerStats();
@@ -378,9 +384,13 @@ public class LevelHandler
                     playerStats.getPlayer().sendMessage(Utils.translate("&7You got &6" + Utils.formatNumber(bonus.getBonus()) + " &eCoins &7for getting the record!"));
                 }
                 // do gg run if it wasnt a race completion (gg already runs)
-                if (!inRace)
-                    Parkour.getStatsManager().runGGTimer();
+                runGG = true;
             }
+
+            // run gg in specific cases
+            if (runGG)
+                Parkour.getStatsManager().runGGTimer();
+
             CompletionsDB.insertCompletion(levelCompletion, completedMastery);
         }
     }

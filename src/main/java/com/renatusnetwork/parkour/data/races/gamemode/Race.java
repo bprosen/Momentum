@@ -64,7 +64,6 @@ public class Race
                 broadcast += "&7 for &6" + Utils.formatNumber(bet) + " &eCoins";
 
             Bukkit.broadcastMessage(Utils.translate(broadcast));
-            statsManager.runGGTimer();
             
             if (endReason == RaceEndReason.FORFEIT)
             {
