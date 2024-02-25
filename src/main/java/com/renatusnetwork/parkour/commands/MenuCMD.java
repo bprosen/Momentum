@@ -15,29 +15,32 @@ public class MenuCMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
         MenuManager menuManager = Parkour.getMenuManager();
 
-        if (sender instanceof Player && sender.isOp())
+        if (sender instanceof Player)
         {
-            if (a.length == 1 && a[0].equalsIgnoreCase("list"))
-                sender.sendMessage(Utils.translate("&7Menus: &2" + menuManager.getMenuNames()));
-            else if (a.length >= 2 && a[0].equalsIgnoreCase("open"))
+            Player player = (Player) sender;
+            if (player.isOp())
             {
-                Player player = (Player) sender;
+                if (a.length == 1 && a[0].equalsIgnoreCase("list"))
+                    sender.sendMessage(Utils.translate("&7Menus: &2" + menuManager.getMenuNames()));
+                else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
+                {
+                    Parkour.getConfigManager().load("menus");
 
+                    sender.sendMessage(Utils.translate("&7Loaded &2menus.yml &7from disk"));
+                    menuManager.reload();
+                    sender.sendMessage(Utils.translate("&7Loaded menus from the config"));
+                }
+            }
+
+            if (a.length >= 2 && a[0].equalsIgnoreCase("open"))
+            {
                 int pageNumber = 1;
                 if (a.length == 3 && Utils.isInteger(a[2]))
                     pageNumber = Integer.parseInt(a[2]);
 
                 menuManager.openInventory(Parkour.getStatsManager().get(player), player, a[1], pageNumber, true);
             }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
-            {
-                Parkour.getConfigManager().load("menus");
-
-                sender.sendMessage(Utils.translate("&7Loaded &2menus.yml &7from disk"));
-                menuManager.reload();
-                sender.sendMessage(Utils.translate("&7Loaded menus from the config"));
-            }
-            else
+            else if (player.isOp())
                 sendHelp(sender);
         }
         return true;
