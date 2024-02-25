@@ -70,7 +70,10 @@ public class InteractListener implements Listener {
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile")))
             {
                 event.setCancelled(true);
-                Parkour.getMenuManager().openInventory(Parkour.getStatsManager().get(player), "profile", true);
+                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+
+                if (playerStats != null && playerStats.isLoaded())
+                    Parkour.getMenuManager().openInventory(playerStats, "profile", true);
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset")))
             {

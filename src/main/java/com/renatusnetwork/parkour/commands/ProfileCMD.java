@@ -28,10 +28,10 @@ public class ProfileCMD implements CommandExecutor {
         else
             playerStats = Parkour.getStatsManager().get(player);
 
-        if (playerStats != null)
+        if (playerStats != null && playerStats.isLoaded())
             Parkour.getMenuManager().openInventory(playerStats, player, "profile", true);
         else
-            sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online!"));
+            sender.sendMessage(Utils.translate("&4" + a[0] + " &cis not online or stats are not loaded yet"));
         return false;
     }
 }

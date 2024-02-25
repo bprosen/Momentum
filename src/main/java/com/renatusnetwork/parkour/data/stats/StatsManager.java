@@ -4,6 +4,7 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
+import com.renatusnetwork.parkour.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -24,7 +25,6 @@ import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -332,13 +332,13 @@ public class StatsManager {
     {
         playerStats.setELO(elo);
         StatsDB.updateELO(playerStats.getUUID(), elo);
+        Parkour.getELOTiersManager().processELOChange(playerStats); // run tier process
     }
 
     public void calculateNewELO(PlayerStats competitor, PlayerStats against, ELOOutcomeTypes outcome)
     {
         int newELO = competitor.calculateNewELO(against, outcome);
-        competitor.setELO(newELO);
-        StatsDB.updateELO(competitor.getUUID(), newELO);
+        updateELO(competitor, newELO);
     }
 
     public void updateCoins(PlayerStats playerStats, int coins)
@@ -655,11 +655,12 @@ public class StatsManager {
         int eventWins = playerStats.getEventWins();
         int jumps = playerStats.getPlayer().getStatistic(Statistic.JUMP);
         int elo = playerStats.getELO();
+        String eloTier = playerStats.getELOTier().getTitle();
 
         String hover = Utils.translate(
                      "&7Name » &f" + playerName + "\n" +
                      "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
-                     "&7ELO » &2" + Utils.formatNumber(elo) + "\n" +
+                     "&7ELO » &2" + eloTier + "&a(" + Utils.formatNumber(elo) + ")\n" +
                      "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
                      "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
                      "&7Clan » &e" + clanString + "\n" +

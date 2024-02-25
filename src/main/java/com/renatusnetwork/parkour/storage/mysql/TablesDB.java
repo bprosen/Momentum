@@ -67,6 +67,7 @@ public class TablesDB
         createLevelCompletions();
         createClans();
         createRanks();
+        createELOTiers();
         createPlotTrustedPlayers();
         createModifiers();
         createPlayerModifiers();
@@ -115,6 +116,7 @@ public class TablesDB
                            "rank_name VARCHAR(10) DEFAULT NULL, " + // default set from settings
                            "prestiges TINYINT DEFAULT 0, " +
                            "elo SMALLINT DEFAULT NULL, " + // default set from settings
+                           "elo_tier VARCHAR(20) DEFAULT NULL, " + // default set from default elo translation
                            "coins INT DEFAULT 0, " +
                            "infinite_classic_score INT DEFAULT 0, " +
                            "infinite_speedrun_score INT DEFAULT 0, " +
@@ -162,6 +164,10 @@ public class TablesDB
                                  "ON DELETE SET NULL, " +
                                  "ADD CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_rank_name_fk " +
                                  "FOREIGN KEY(rank_name) REFERENCES " + DatabaseManager.RANKS_TABLE + "(name) " +
+                                 "ON UPDATE CASCADE " +
+                                 "ON DELETE SET NULL, " +
+                                 "ADD CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_elo_tier_fk " +
+                                 "FOREIGN KEY(elo_tier) REFERENCES " + DatabaseManager.ELO_TIERS + "(name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE SET NULL";
 
@@ -470,6 +476,20 @@ public class TablesDB
                                  "ON DELETE SET NULL";
 
         DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createELOTiers()
+    {
+        String query = "CREATE TABLE " + DatabaseManager.ELO_TIERS + "(" +
+                "name VARCHAR(20) NOT NULL, " +
+                "title VARCHAR(40) DEFAULT NULL, " + // allow space for color codes
+                "required_elo SMALLINT DEFAULT NULL, " +
+                "next_elo_tier VARCHAR(20) DEFAULT NULL, " +
+                // keys
+                "PRIMARY KEY(name)" +
+                ")";
+
+        DatabaseQueries.runQuery(query);
     }
 
     private static void createLevelCompletions()
@@ -824,16 +844,27 @@ public class TablesDB
     private static void createBankBids()
     {
         String query = "CREATE TABLE " + DatabaseManager.BANK_BIDS + "(" +
+                "week SMALLINT NOT NULL DEFAULT 1, " +
                 "uuid CHAR(36) NOT NULL, " +
                 "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
                 "total_bid INT NOT NULL DEFAULT 0, " +
-                "PRIMARY KEY(uuid, bank_type), " +
-                "INDEX";
+                "last_bid_date BIGINT NOT NULL" +
+                // primary key
+                "PRIMARY KEY(week, uuid, bank_type), " +
+                // indexes
+                "INDEX week_uuid_index(week, uuid)";
+
+        DatabaseQueries.runQuery(query);
     }
 
     private static void createBankBidsKeys()
     {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_BIDS + " ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_uuid_fk " +
+                "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE";
 
+        DatabaseQueries.runQuery(foreignKeyQuery);
     }
 
     private static String enumQuotations(Enum<?>[] array)

@@ -3,6 +3,7 @@ package com.renatusnetwork.parkour.data.stats;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
+import com.renatusnetwork.parkour.data.elo.ELOTiersManager;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.menus.LevelSortingType;
@@ -65,6 +66,15 @@ public class StatsDB
                 playerStats.setELO(Integer.parseInt(elo));
             else
                 playerStats.setELO(Parkour.getSettingsManager().default_elo);
+
+            String eloTier = playerResult.get("elo_tier");
+            ELOTiersManager eloTiersManager = Parkour.getELOTiersManager();
+
+            // set tier or translate if null
+            if (eloTier != null)
+                playerStats.setELOTier(eloTiersManager.get(eloTier));
+            else
+                playerStats.setELOTier(eloTiersManager.translate(playerStats.getELO()));
 
             if (clan != null)
             {

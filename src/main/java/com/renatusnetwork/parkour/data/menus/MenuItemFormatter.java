@@ -130,7 +130,7 @@ public class MenuItemFormatter
             {
                 newLore.add("&7Hours &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000));
                 newLore.add("&7Jumps &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
-                newLore.add("&7ELO &c" + Utils.formatNumber(playerStats.getELO()));
+                newLore.add("&7ELO &c" + playerStats.getELOTier().getTitle() + "(" + Utils.formatNumber(playerStats.getELO()) + ")");
                 newLore.add("&7Coins &c" + Utils.formatNumber(playerStats.getCoins()));
                 newLore.add("&7Perks/Total &c" + playerStats.getGainedPerksCount() + "/" + Parkour.getPerkManager().numPerks());
                 newLore.add("&7Rank &c" + playerStats.getRank().getTitle());

@@ -38,6 +38,7 @@ public class DatabaseManager {
     public static final String LEVEL_REQUIRED_LEVELS_TABLE = "level_required_levels";
     public static final String FAVORITE_LEVELS = "favorite_levels";
     public static final String BANK_BIDS = "bank_bids";
+    public static final String ELO_TIERS = "elo_tiers";
 
     public DatabaseManager(Plugin plugin)
     {
