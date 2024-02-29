@@ -136,7 +136,7 @@ public class MenuItemFormatter
 
                 ELOLBPosition elolbPosition = Parkour.getStatsManager().getELOLBPositionIfExists(playerStats.getName());
                 if (elolbPosition != null)
-                    newLore.add("&7Position &c#" + elolbPosition.getPosition());
+                    newLore.add("&7ELO Position &c#" + elolbPosition.getPosition());
 
                 newLore.add("&7Coins &c" + Utils.formatNumber(playerStats.getCoins()));
                 newLore.add("&7Perks/Total &c" + playerStats.getGainedPerksCount() + "/" + Parkour.getPerkManager().numPerks());
