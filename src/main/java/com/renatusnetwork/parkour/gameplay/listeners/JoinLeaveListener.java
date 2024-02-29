@@ -117,9 +117,6 @@ public class JoinLeaveListener implements Listener
                             }.runTask(Parkour.getPlugin());
                     }
                 }
-                // set xp level to elo
-                player.setLevel(finalPlayerStats.getELO());
-                player.setExp(0);
 
                 // mark player as finished loading
                 finalPlayerStats.loaded();

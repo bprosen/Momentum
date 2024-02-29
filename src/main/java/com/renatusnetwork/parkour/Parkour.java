@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
+import com.renatusnetwork.parkour.data.elo.ELOTierDB;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
@@ -182,6 +183,7 @@ public class Parkour extends JavaPlugin {
         getCommand("preview").setExecutor(new PreviewCMD());
         getCommand("elo").setExecutor(new ELOCMD());
         getCommand("hotbar").setExecutor(new HotbarCMD());
+        getCommand("elotier").setExecutor(new ELOTierCMD());
     }
 
     private static void load()

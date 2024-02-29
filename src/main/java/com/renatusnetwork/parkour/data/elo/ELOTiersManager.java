@@ -1,7 +1,4 @@
 package com.renatusnetwork.parkour.data.elo;
-
-import com.renatusnetwork.parkour.data.stats.PlayerStats;
-
 import java.util.HashMap;
 
 public class ELOTiersManager
@@ -10,7 +7,13 @@ public class ELOTiersManager
 
     public ELOTiersManager()
     {
-        this.tiers = new HashMap<>();
+        this.tiers = ELOTierDB.getTiers();
+    }
+
+    public void create(String name)
+    {
+        tiers.put(name, new ELOTier(name));
+        ELOTierDB.create(name);
     }
 
     public ELOTier get(String name)
@@ -18,46 +21,27 @@ public class ELOTiersManager
         return tiers.get(name);
     }
 
-    public ELOTier getNextELOTier(ELOTier tier)
+    public void updateTitle(ELOTier tier, String title)
     {
-        return tier != null ? tier.getNextELOTier() : null;
+        tier.setTitle(title);
+        ELOTierDB.updateTitle(tier.getName(), title);
     }
 
-    public ELOTier translate(int elo)
+    public void updateRequiredELO(ELOTier tier, int requiredELO)
     {
-        for (ELOTier tier : tiers.values())
-            if (tier.getRequiredELO() <= elo)
-            {
-                ELOTier next = tier.getNextELOTier();
-
-                if (next == null || next.getRequiredELO() > elo)
-                    return tier;
-            }
-
-        return null;
+        tier.setRequiredELO(requiredELO);
+        ELOTierDB.updateRequiredELO(tier.getName(), requiredELO);
     }
 
-    public void processELOChange(PlayerStats playerStats)
+    public void updateNextELOTier(ELOTier tier, String nextELOTier)
     {
-        int newELO = playerStats.getELO();
-        ELOTier currentTier = playerStats.getELOTier();
-        ELOTier nextTier = currentTier.getNextELOTier();
+        tier.setNextELOTier(nextELOTier);
+        ELOTierDB.updateNextTier(tier.getName(), nextELOTier);
+    }
 
-        if (nextTier != null)
-        {
-            // means next is last tier
-            if (nextTier.getNextELOTier() == null)
-            {
-                // TODO: find last position in list of top 10, and check if they have passed them
-            }
-            else if (nextTier.getRequiredELO() <= newELO)
-            {
-                // TODO: level up tier, otherwise no change
-            }
-        }
-        else
-        {
-            // TODO: they are currently in legend, update min if they are last in line in legend
-        }
+    public void updatePreviousELOTier(ELOTier tier, String previousELOTier)
+    {
+        tier.setPreviousELOTier(previousELOTier);
+        ELOTierDB.updatePreviousTier(tier.getName(), previousELOTier);
     }
 }

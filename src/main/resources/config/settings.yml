@@ -11,6 +11,7 @@ main_world: "parkour"
 max_offline_cache_size: 10
 elo:
   default_amount: 1000
+  default_tier: silver-i
 bank:
   radiant:
     min_starting_bid: 100
@@ -283,7 +284,7 @@ leaderboard_max_size:
   levels: 10
   races: 10
   clans: 10
-  elo: 10
+  elo: 25
   event: 10
   player_completions: 10
   global_completions: 10

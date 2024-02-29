@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.parkour.data.elo.ELOTier;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.levels.LevelPreview;
@@ -141,13 +142,32 @@ public class PlayerStats
     public void setELO(int elo)
     {
         this.elo = elo;
-        player.setLevel(elo); // set xp level as elo
-        player.setExp(0);
     }
 
     public int getELO()
     {
         return elo;
+    }
+
+    public void loadELOToXPBar()
+    {
+        player.setLevel(elo); // set xp level as elo
+
+        ELOTier nextTier = eloTier.getNextELOTier();
+
+        // if not at end, show progress
+        if (nextTier != null)
+        {
+            // use the xp bar as a progress guage
+            int differenceTo = nextTier.getRequiredELO() - eloTier.getRequiredELO();
+            int differencePlayer = elo - eloTier.getRequiredELO();
+            float ratio = differencePlayer / ((float) differenceTo);
+
+            player.setExp(Math.min(1f, Math.max(ratio, 0f)));
+        }
+        // otherwise show xp bar as full
+        else
+            player.setExp(1f);
     }
 
     public void setELOTier(ELOTier eloTier)
@@ -157,7 +177,25 @@ public class PlayerStats
 
     public ELOTier getELOTier()
     {
-        return this.eloTier;
+        return eloTier;
+    }
+
+    public boolean hasELOTier() { return eloTier != null; }
+
+    public String getELOTierTitleWithLB()
+    {
+        String title = null;
+
+        if (eloTier != null)
+        {
+            title = eloTier.getTitle();
+
+            ELOLBPosition elolbPosition = Parkour.getStatsManager().getELOLBPositionIfExists(name);
+            if (elolbPosition != null)
+                title = "&5#&d&l" + elolbPosition.getPosition();
+        }
+
+        return title;
     }
 
     public int calculateNewELO(PlayerStats opponent, ELOOutcomeTypes outcomeType)

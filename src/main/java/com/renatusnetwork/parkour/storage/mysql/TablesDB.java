@@ -484,6 +484,7 @@ public class TablesDB
                 "name VARCHAR(20) NOT NULL, " +
                 "title VARCHAR(40) DEFAULT NULL, " + // allow space for color codes
                 "required_elo SMALLINT DEFAULT NULL, " +
+                "previous_elo_tier VARCHAR(20) DEFAULT NULL, " +
                 "next_elo_tier VARCHAR(20) DEFAULT NULL, " +
                 // keys
                 "PRIMARY KEY(name)" +
@@ -848,11 +849,12 @@ public class TablesDB
                 "uuid CHAR(36) NOT NULL, " +
                 "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
                 "total_bid INT NOT NULL DEFAULT 0, " +
-                "last_bid_date BIGINT NOT NULL" +
+                "last_bid_date BIGINT NOT NULL, " +
                 // primary key
                 "PRIMARY KEY(week, uuid, bank_type), " +
                 // indexes
-                "INDEX week_uuid_index(week, uuid)";
+                "INDEX week_uuid_index(week, uuid)" +
+                ")";
 
         DatabaseQueries.runQuery(query);
     }

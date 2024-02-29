@@ -61,12 +61,6 @@ public class StatsDB
             playerStats.setCoins(Integer.parseInt(playerResult.get("coins")));
             playerStats.setSpectatable(Integer.parseInt(playerResult.get("spectatable")) == 1);
 
-            String elo = playerResult.get("elo");
-            if (elo != null)
-                playerStats.setELO(Integer.parseInt(elo));
-            else
-                playerStats.setELO(Parkour.getSettingsManager().default_elo);
-
             String eloTier = playerResult.get("elo_tier");
             ELOTiersManager eloTiersManager = Parkour.getELOTiersManager();
 
@@ -74,7 +68,15 @@ public class StatsDB
             if (eloTier != null)
                 playerStats.setELOTier(eloTiersManager.get(eloTier));
             else
-                playerStats.setELOTier(eloTiersManager.translate(playerStats.getELO()));
+                playerStats.setELOTier(eloTiersManager.get(Parkour.getSettingsManager().default_elo_tier));
+
+            String elo = playerResult.get("elo");
+            if (elo != null)
+                playerStats.setELO(Integer.parseInt(elo));
+            else
+                playerStats.setELO(Parkour.getSettingsManager().default_elo);
+
+            playerStats.loadELOToXPBar();
 
             if (clan != null)
             {
@@ -522,5 +524,10 @@ public class StatsDB
     public static void updateInfiniteBlock(String uuid, String material)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block=? WHERE uuid=?", material, uuid);
+    }
+
+    public static void updateELOTier(String uuid, String eloTier)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET elo_tier=? WHERE uuid=?", eloTier, uuid);
     }
 }

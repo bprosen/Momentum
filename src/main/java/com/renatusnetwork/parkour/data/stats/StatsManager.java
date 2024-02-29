@@ -5,6 +5,8 @@ import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.elo.ELOOutcomeTypes;
+import com.renatusnetwork.parkour.data.elo.ELOTier;
+import com.renatusnetwork.parkour.data.elo.ELOTierDB;
 import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -23,6 +25,7 @@ import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import jdk.internal.org.jline.reader.impl.UndoTree;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -45,6 +48,7 @@ public class StatsManager {
     private ArrayList<GlobalPersonalLBPosition> globalPersonalCompletionsLB;
     private ArrayList<CoinsLBPosition> coinsLB;
     private ArrayList<ELOLBPosition> eloLB;
+    private HashMap<String, ELOLBPosition> eloLBNames;
 
     private HashSet<String> saidGG;
     private BukkitTask ggTask;
@@ -63,6 +67,7 @@ public class StatsManager {
         this.globalPersonalCompletionsLB = new ArrayList<>(Parkour.getSettingsManager().max_global_personal_completions_leaderboard_size);
         this.coinsLB = new ArrayList<>(Parkour.getSettingsManager().max_coins_leaderboard_size);
         this.eloLB = new ArrayList<>(Parkour.getSettingsManager().elo_lb_size);
+        this.eloLBNames = new HashMap<>(Parkour.getSettingsManager().elo_lb_size);
         this.hiddenPlayers = new HashSet<>();
         this.saidGG = new HashSet<>();
 
@@ -328,11 +333,41 @@ public class StatsManager {
         StatsDB.updateInfiniteBlock(playerStats.getUUID(), material.name());
     }
 
-    public void updateELO(PlayerStats playerStats, int elo)
+    public void processELOChange(PlayerStats playerStats, int newELO)
+    {
+        ELOTier currentTier = playerStats.getELOTier();
+        ELOTier nextTier = currentTier.getNextELOTier();
+        ELOTier previousTier = currentTier.getPreviousELOTier();
+
+        // means they have now achieved the new tier
+        if (nextTier != null && nextTier.getRequiredELO() <= newELO)
+        {
+            updateELOTier(playerStats, nextTier);
+            Bukkit.broadcastMessage(Utils.translate("&c" + playerStats.getDisplayName() + "&7 advanced to &c" + nextTier.getTitle()));
+        }
+        else if (previousTier != null && currentTier.getRequiredELO() > newELO)
+        {
+            updateELOTier(playerStats, previousTier);
+            Bukkit.broadcastMessage(Utils.translate("&c" + playerStats.getDisplayName() + "&7 is now &c" + previousTier.getTitle()));
+        }
+    }
+
+    public void updateELOData(PlayerStats playerStats, int elo)
     {
         playerStats.setELO(elo);
         StatsDB.updateELO(playerStats.getUUID(), elo);
-        Parkour.getELOTiersManager().processELOChange(playerStats); // run tier process
+    }
+    public void updateELO(PlayerStats playerStats, int elo)
+    {
+        updateELOData(playerStats, elo);
+        processELOChange(playerStats, elo); // run tier process
+        playerStats.loadELOToXPBar();
+    }
+
+    public void updateELOTier(PlayerStats playerStats, ELOTier eloTier)
+    {
+        playerStats.setELOTier(eloTier);
+        StatsDB.updateELOTier(playerStats.getUUID(), eloTier.getName());
     }
 
     public void calculateNewELO(PlayerStats competitor, PlayerStats against, ELOOutcomeTypes outcome)
@@ -530,6 +565,7 @@ public class StatsManager {
     public void loadELOLB()
     {
         eloLB.clear();
+        eloLBNames.clear();
 
         try
         {
@@ -537,12 +573,16 @@ public class StatsManager {
             List<Map<String, String>> eloResults = DatabaseQueries.getResults(DatabaseManager.PLAYERS_TABLE, "name, elo",
                     "WHERE elo IS NOT NULL ORDER BY elo DESC LIMIT " + Parkour.getSettingsManager().elo_lb_size);
 
+            int position = 1;
             for (Map<String, String> eloResult : eloResults)
             {
                 String playerName = eloResult.get("name");
                 int elo = Integer.parseInt(eloResult.get("elo"));
+                ELOLBPosition lbPosition = new ELOLBPosition(playerName, elo, position);
 
-                eloLB.add(new ELOLBPosition(playerName, elo));
+                eloLB.add(lbPosition);
+                eloLBNames.put(playerName, lbPosition);
+                position++;
             }
         }
         catch (Exception e)
@@ -559,6 +599,11 @@ public class StatsManager {
     public ArrayList<ELOLBPosition> getELOLB()
     {
         return eloLB;
+    }
+
+    public ELOLBPosition getELOLBPositionIfExists(String playerName)
+    {
+        return eloLBNames.get(playerName);
     }
 
     public ArrayList<GlobalPersonalLBPosition> getGlobalPersonalCompletionsLB() {
@@ -654,25 +699,23 @@ public class StatsManager {
         int raceLosses = playerStats.getRaceLosses();
         int eventWins = playerStats.getEventWins();
         int jumps = playerStats.getPlayer().getStatistic(Statistic.JUMP);
-        int elo = playerStats.getELO();
-        String eloTier = playerStats.getELOTier().getTitle();
+        String eloTier = playerStats.getELOTierTitleWithLB();
 
-        String hover = Utils.translate(
-                     "&7Name » &f" + playerName + "\n" +
-                     "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
-                     "&7ELO » &2" + eloTier + "&a(" + Utils.formatNumber(elo) + ")\n" +
-                     "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
-                     "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
-                     "&7Clan » &e" + clanString + "\n" +
-                     "&7Rank » &a" + rankString + "\n" +
-                     "&7Prestige » &5" + prestiges + "\n" +
-                     "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
-                     "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
-                     "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
-                     "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses + "\n" +
-                     "&7Event Wins » &b" + eventWins
+        return Utils.translate(
+                "&7Name » &f" + playerName + "\n" +
+                        "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
+                        "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
+                        "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
+                        "&7Rank » &a" + rankString + "\n" +
+                        "&7ELO » &2" + eloTier + "\n" +
+                        "&7Clan » &e" + clanString + "\n" +
+                        "&7Prestige » &5" + prestiges + "\n" +
+                        "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
+                        "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
+                        "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
+                        "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses + "\n" +
+                        "&7Event Wins » &b" + eventWins
         );
-        return hover;
     }
 
     public void hidePlayer(Player player)

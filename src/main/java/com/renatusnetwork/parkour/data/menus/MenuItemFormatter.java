@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCooldown;
@@ -130,7 +131,13 @@ public class MenuItemFormatter
             {
                 newLore.add("&7Hours &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000));
                 newLore.add("&7Jumps &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
-                newLore.add("&7ELO &c" + playerStats.getELOTier().getTitle() + "(" + Utils.formatNumber(playerStats.getELO()) + ")");
+
+                newLore.add("&7ELO Tier &c" + playerStats.getELOTier().getTitle() + " &c(" + Utils.formatNumber(playerStats.getELO()) + ")");
+
+                ELOLBPosition elolbPosition = Parkour.getStatsManager().getELOLBPositionIfExists(playerStats.getName());
+                if (elolbPosition != null)
+                    newLore.add("&7Position &c#" + elolbPosition.getPosition());
+
                 newLore.add("&7Coins &c" + Utils.formatNumber(playerStats.getCoins()));
                 newLore.add("&7Perks/Total &c" + playerStats.getGainedPerksCount() + "/" + Parkour.getPerkManager().numPerks());
                 newLore.add("&7Rank &c" + playerStats.getRank().getTitle());
@@ -359,8 +366,9 @@ public class MenuItemFormatter
     {
         String levelName = menuItem.getTypeValue();
         Level level = Parkour.getLevelManager().get(levelName);
+        ItemStack item = menuItem.getItem();
 
-        return createLevelItem(playerStats, level, menuItem, menuItem.getItem(), Parkour.getRaceManager().getChoosingLevelData(playerStats.getName()));
+        return level != null && level.isRaceLevel() ? createLevelItem(playerStats, level, menuItem, item, Parkour.getRaceManager().getChoosingLevelData(playerStats.getName())) : item;
     }
 
     private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem, ItemStack item)

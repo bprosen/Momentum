@@ -148,12 +148,14 @@ public class MenuItemAction {
 
     private static void performRaceItem(PlayerStats playerStats, String levelName)
     {
-        ChoosingLevel choosingLevel = Parkour.getRaceManager().getChoosingLevelData(playerStats.getName());
         Level level = Parkour.getLevelManager().get(levelName);
 
-        Parkour.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
-
-        playerStats.getPlayer().closeInventory();
+        if (level.isRaceLevel())
+        {
+            ChoosingLevel choosingLevel = Parkour.getRaceManager().getChoosingLevelData(playerStats.getName());
+            Parkour.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
+            playerStats.getPlayer().closeInventory();
+        }
     }
 
     private static void performLevelSort(PlayerStats playerStats, MenuPage menuPage)
@@ -199,7 +201,7 @@ public class MenuItemAction {
         for (Level level : raceLevels)
         {
             // cover all conditions that can stop a player from entering a level
-            if (!level.isFeaturedLevel() && !level.isRankUpLevel() && playerStats.hasAccessTo(level) &&
+            if (!level.isFeaturedLevel() && !level.isRankUpLevel() && playerStats.hasAccessTo(level) && level.isRaceLevel() &&
                 !(playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName())))
                 chosenLevels.add(level);
         }

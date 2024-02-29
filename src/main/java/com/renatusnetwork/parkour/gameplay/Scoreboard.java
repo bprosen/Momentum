@@ -122,6 +122,12 @@ public class Scoreboard {
                     board.add(rankString);
                 }
 
+                if (playerStats.hasELOTier())
+                {
+                    String eloString = Utils.translate("  &e&lELO &6" + playerStats.getELOTierTitleWithLB());
+                    board.add(eloString);
+                }
+
                 // if they have a clan, show it
                 if (playerStats.inClan())
                 {

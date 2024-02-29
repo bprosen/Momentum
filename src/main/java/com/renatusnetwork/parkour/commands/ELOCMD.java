@@ -33,7 +33,7 @@ public class ELOCMD implements CommandExecutor
                     {
                         int elo = Math.max(Integer.parseInt(a[2]), 0);
 
-                        Parkour.getStatsManager().updateELO(targetStats, elo);
+                        Parkour.getStatsManager().updateELOData(targetStats, elo);
                         player.sendMessage(Utils.translate("&7You have set &c" + targetStats.getDisplayName() + "&7's &aELO&7 to &2" + Utils.formatNumber(elo)));
                     }
                     else
@@ -59,9 +59,7 @@ public class ELOCMD implements CommandExecutor
                 PlayerStats targetStats = Parkour.getStatsManager().get(Bukkit.getPlayer(a[1]));
 
                 if (targetStats != null)
-                {
                     player.sendMessage(Utils.translate("&c" + targetStats.getDisplayName() + "&7 has &2" + Utils.formatNumber(targetStats.getELO()) + " &aELO"));
-                }
                 else
                     player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
             }
