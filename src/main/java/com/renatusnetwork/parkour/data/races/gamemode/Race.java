@@ -55,8 +55,8 @@ public class Race
             loser.sendEndTitle(winnerStats);
 
             String broadcast =
-                    "&4" + winnerStats.getDisplayName() + "&a (▲" + winnerStats.getELO() +
-                    ")&7 beat &4" + loserStats.getDisplayName() + "&c (▼" + loserStats.getELO() +
+                    "&4" + winnerStats.getDisplayName() + "&a (▲" + Utils.formatNumber(winnerStats.getELO()) +
+                    ")&7 beat &4" + loserStats.getDisplayName() + "&c (▼" + Utils.formatNumber(loserStats.getELO()) +
                     ")&7 on &c" + level.getTitle();
 
             if (hasBet())
