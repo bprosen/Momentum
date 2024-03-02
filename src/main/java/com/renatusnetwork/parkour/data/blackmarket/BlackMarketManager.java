@@ -136,7 +136,7 @@ public class BlackMarketManager
                                     player.sendMessage(Utils.translate(""));
                                     player.sendMessage(Utils.translate("&8Come to the hollow depths of &c/spawn"));
                                     player.sendMessage(Utils.translate("&8for a risky trade of illegal wares."));
-                                    player.sendMessage(Utils.translate("&8You have &c" + timerCount + " minutes..."));
+                                    player.sendMessage(Utils.translate("&8You have &c" + timerCount + " minute" + (timerCount > 1 ? "s..." : "...")));
                                     player.sendMessage(Utils.translate("&8&m-------------------------------"));
                                 }
                                 else
