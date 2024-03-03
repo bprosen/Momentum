@@ -926,7 +926,7 @@ public class TablesDB
                 "CREATE TABLE " + DatabaseManager.BANK_ITEMS + "(" +
                     "name VARCHAR(20) NOT NULL, " +
                     "title VARCHAR(30) DEFAULT NULL, " + // add room for colors
-                    "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") DEFAULT NULL, " +
+                    "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") DEFAULT NULL, " +
                     "modifier_name VARCHAR(20) DEFAULT NULL, " +
                     // primary key
                     "PRIMARY KEY(name)" +
@@ -951,11 +951,11 @@ public class TablesDB
             "CREATE TABLE " + DatabaseManager.BANK_BIDS + "(" +
                 "week SMALLINT NOT NULL, " +
                 "uuid CHAR(36) NOT NULL, " +
-                "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
+                "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
                 "total_bid INT NOT NULL DEFAULT 0, " +
                 "last_bid_date BIGINT NOT NULL, " +
                 // primary key
-                "PRIMARY KEY(week, uuid, bank_type), " +
+                "PRIMARY KEY(week, uuid, bank_item_type), " +
                 // indexes
                 "INDEX week_uuid_index(week, uuid), " +
                 // constraints
@@ -990,12 +990,12 @@ public class TablesDB
             "CREATE TABLE " + DatabaseManager.BANK_TICKETS + "(" +
                 "week SMALLINT NOT NULL, " +
                 "uuid CHAR(36) NOT NULL, " +
-                "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
+                "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
                 "total_tickets INT NOT NULL DEFAULT 0, " +
                 "seconds_won MEDIUMINT NOT NULL DEFAULT 0, " +
                 "last_bought_date BIGINT NOT NULL, " +
                 // primary key
-                "PRIMARY KEY(week, uuid, bank_type), " +
+                "PRIMARY KEY(week, uuid, bank_item_type), " +
                 // indexes
                 "INDEX week_uuid_index(week, uuid), " +
                 // constraints
