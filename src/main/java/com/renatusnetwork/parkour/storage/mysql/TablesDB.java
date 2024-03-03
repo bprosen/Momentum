@@ -2,6 +2,7 @@ package com.renatusnetwork.parkour.storage.mysql;
 
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
+import com.renatusnetwork.parkour.data.bank.modes.BankModeType;
 import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.LevelType;
@@ -79,7 +80,10 @@ public class TablesDB
         createLevelPotionEffects();
         createLevelRequiredLevels();
         createFavoriteLevels();
+        createBankItems();
+        createBankWeeks();
         createBankBids();
+        createBankTickets();
     }
 
     private static void createKeys()
@@ -105,7 +109,10 @@ public class TablesDB
         createLevelPotionEffectsKeys();
         createLevelRequiredLevelsKeys();
         createFavoriteLevelsKeys();
+        createBankItemsKeys();
+        createBankWeeksKeys();
         createBankBidsKeys();
+        createBankTicketsKeys();
     }
 
     private static void createPlayers()
@@ -267,7 +274,11 @@ public class TablesDB
                             "center_z INT NOT NULL, " +
                             "submitted BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(id)" +
+                            "PRIMARY KEY(id), " +
+                            // constraints
+                            "CONSTRAINT " + DatabaseManager.PLOTS_TABLE + "_non_negative CHECK (" +
+                                "id > 0" +
+                            ")" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -492,14 +503,19 @@ public class TablesDB
 
     private static void createELOTiers()
     {
-        String query = "CREATE TABLE " + DatabaseManager.ELO_TIERS + "(" +
-                "name VARCHAR(20) NOT NULL, " +
-                "title VARCHAR(40) DEFAULT NULL, " + // allow space for color codes
-                "required_elo SMALLINT DEFAULT NULL, " +
-                "previous_elo_tier VARCHAR(20) DEFAULT NULL, " +
-                "next_elo_tier VARCHAR(20) DEFAULT NULL, " +
-                // keys
-                "PRIMARY KEY(name)" +
+        String query =
+                "CREATE TABLE " + DatabaseManager.ELO_TIERS + "(" +
+                    "name VARCHAR(20) NOT NULL, " +
+                    "title VARCHAR(40) DEFAULT NULL, " + // allow space for color codes
+                    "required_elo SMALLINT DEFAULT NULL, " +
+                    "previous_elo_tier VARCHAR(20) DEFAULT NULL, " +
+                    "next_elo_tier VARCHAR(20) DEFAULT NULL, " +
+                    // keys
+                    "PRIMARY KEY(name), " +
+                    // constraints
+                    "CONSTRAINT " + DatabaseManager.ELO_TIERS + "_non_negative CHECK (" +
+                        "required_elo >= 0" +
+                    ")" +
                 ")";
 
         DatabaseQueries.runQuery(query);
@@ -571,7 +587,11 @@ public class TablesDB
                             // keys
                             "PRIMARY KEY(plot_id, trusted_uuid), " +
                             // indexes
-                            "INDEX id_index(plot_id)" +
+                            "INDEX id_index(plot_id), " +
+                            // constraints
+                            "CONSTRAINT " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "_non_negative CHECK (" +
+                                "plot_id > 0" +
+                            ")" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -690,7 +710,11 @@ public class TablesDB
                             // keys
                             "PRIMARY KEY(perk_name, armor_piece), " +
                             // indexes
-                            "INDEX perk_name_index(perk_name)" +
+                            "INDEX perk_name_index(perk_name), " +
+                            // constraints
+                            "CONSTRAINT " + DatabaseManager.PERKS_ARMOR_TABLE + "_non_negative CHECK (" +
+                                "type >= 0" +
+                            ")" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -854,10 +878,82 @@ public class TablesDB
     }
 
 
+    private static void createBankWeeks()
+    {
+        String query =
+            "CREATE TABLE " + DatabaseManager.BANK_WEEKS + "(" +
+                "week SMALLINT NOT NULL AUTO_INCREMENT, " +
+                "mode ENUM(" + enumQuotations(BankModeType.values()) + ") NOT NULL, " +
+                "brilliant_item_name VARCHAR(20) NOT NULL, " +
+                "radiant_item_name VARCHAR(20) NOT NULL, " +
+                "legendary_item_name VARCHAR(20) NOT NULL, " +
+                "start_date BIGINT NOT NULL, " +
+                "end_date BIGINT NOT NULL, " +
+                // primary key
+                "PRIMARY KEY(week), " +
+                // constraints
+                "CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_non_negative CHECK (" +
+                    "week > 0 AND " +
+                    "start_date > 0 AND " +
+                    "end_date > 0" +
+                ")" +
+            ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createBankWeeksKeys()
+    {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_WEEKS + " ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_brilliant_item_name_fk " +
+                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE SET NULL, " +
+                "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_radiant_item_name_fk " +
+                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE SET NULL, " +
+                "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_legendary_item_name_fk " +
+                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE SET NULL";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createBankItems()
+    {
+        String query =
+                "CREATE TABLE " + DatabaseManager.BANK_ITEMS + "(" +
+                    "name VARCHAR(20) NOT NULL, " +
+                    "title VARCHAR(30) DEFAULT NULL, " + // add room for colors
+                    "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") DEFAULT NULL, " +
+                    "modifier_name VARCHAR(20) DEFAULT NULL, " +
+                    // primary key
+                    "PRIMARY KEY(name)" +
+                ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createBankItemsKeys()
+    {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_ITEMS + " ADD CONSTRAINT " + DatabaseManager.BANK_ITEMS + "_week_fk " +
+                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_WEEKS + "(week) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE, " +
+                "ADD CONSTRAINT " + DatabaseManager.BANK_ITEMS + "_modifier_name_fk " +
+                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.MODIFIERS_TABLE + "(name) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
     private static void createBankBids()
     {
-        String query = "CREATE TABLE " + DatabaseManager.BANK_BIDS + "(" +
-                "week SMALLINT NOT NULL DEFAULT 1, " +
+        String query =
+            "CREATE TABLE " + DatabaseManager.BANK_BIDS + "(" +
+                "week SMALLINT NOT NULL, " +
                 "uuid CHAR(36) NOT NULL, " +
                 "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
                 "total_bid INT NOT NULL DEFAULT 0, " +
@@ -865,15 +961,67 @@ public class TablesDB
                 // primary key
                 "PRIMARY KEY(week, uuid, bank_type), " +
                 // indexes
-                "INDEX week_uuid_index(week, uuid)" +
-                ")";
+                "INDEX week_uuid_index(week, uuid), " +
+                // constraints
+                "CONSTRAINT " + DatabaseManager.BANK_BIDS + "_non_negative CHECK (" +
+                    "week > 0 AND " +
+                    "total_bid >= 0 AND " +
+                    "last_bid_date > 0" +
+                ")" +
+            ")";
 
         DatabaseQueries.runQuery(query);
     }
 
+
     private static void createBankBidsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_BIDS + " ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_uuid_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_BIDS + " ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_week_fk " +
+                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_WEEKS + "(week) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE, " +
+                "ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_uuid_fk " +
+                "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createBankTickets()
+    {
+        String query =
+            "CREATE TABLE " + DatabaseManager.BANK_TICKETS + "(" +
+                "week SMALLINT NOT NULL, " +
+                "uuid CHAR(36) NOT NULL, " +
+                "bank_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
+                "total_tickets INT NOT NULL DEFAULT 0, " +
+                "seconds_won MEDIUMINT NOT NULL DEFAULT 0, " +
+                "last_bought_date BIGINT NOT NULL, " +
+                // primary key
+                "PRIMARY KEY(week, uuid, bank_type), " +
+                // indexes
+                "INDEX week_uuid_index(week, uuid), " +
+                // constraints
+                "CONSTRAINT " + DatabaseManager.BANK_BIDS + "_non_negative CHECK (" +
+                    "week > 0 AND " +
+                    "total_tickets >= 0 AND " +
+                    "seconds_won >= 0 AND " +
+                    "last_bought_date > 0" +
+                ")" +
+            ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+
+    private static void createBankTicketsKeys()
+    {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_TICKETS + " ADD CONSTRAINT " + DatabaseManager.BANK_TICKETS + "_week_fk " +
+                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_WEEKS + "(week) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE, " +
+                "ADD CONSTRAINT " + DatabaseManager.BANK_TICKETS + "_uuid_fk " +
                 "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";
