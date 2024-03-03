@@ -937,11 +937,7 @@ public class TablesDB
 
     private static void createBankItemsKeys()
     {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_ITEMS + " ADD CONSTRAINT " + DatabaseManager.BANK_ITEMS + "_week_fk " +
-                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_WEEKS + "(week) " +
-                "ON UPDATE CASCADE " +
-                "ON DELETE CASCADE, " +
-                "ADD CONSTRAINT " + DatabaseManager.BANK_ITEMS + "_modifier_name_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_ITEMS + " ADD CONSTRAINT " + DatabaseManager.BANK_ITEMS + "_modifier_name_fk " +
                 "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.MODIFIERS_TABLE + "(name) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";
