@@ -905,7 +905,7 @@ public class TablesDB
     private static void createBankWeeksKeys()
     {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_WEEKS + " ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_brilliant_item_name_fk " +
-                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE SET NULL, " +
                 "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_radiant_item_name_fk " +
