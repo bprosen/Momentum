@@ -86,6 +86,7 @@ public class TablesDB
     {
         createPlayersKeys();
         createLevelsKeys();
+        createPerksKeys();
         createPlotsKeys();
         createLevelRatingsKeys();
         createLevelCheckpointsKeys();
@@ -142,7 +143,7 @@ public class TablesDB
                            // constraints
                            "CONSTRAINT " + DatabaseManager.PLAYERS_TABLE + "_non_negative CHECK (" +
                                "prestiges >= 0 AND " +
-                               "coins >= 0.0 AND " +
+                               "coins >= 0 AND " +
                                "infinite_classic_score >= 0 AND " +
                                "infinite_speedrun_score >= 0 AND " +
                                "infinite_sprint_score >= 0 AND " +
@@ -233,6 +234,7 @@ public class TablesDB
                             // settings
                             "price INT DEFAULT NULL, " +
                             "required_permission VARCHAR(50) DEFAULT NULL, " +
+                            "required_elo_tier VARCHAR(20) DEFAULT NULL, " +
                             "infinite_block ENUM(" + enumQuotations(Material.values()) + ") DEFAULT NULL, " +
                             "requires_mastery_levels BIT DEFAULT 0, " +
                             // keys
@@ -244,6 +246,16 @@ public class TablesDB
                         ")";
 
         DatabaseQueries.runQuery(query);
+    }
+
+    private static void createPerksKeys()
+    {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.PERKS_TABLE + " ADD CONSTRAINT " + DatabaseManager.PERKS_TABLE + "_required_elo_tier_fk " +
+                "FOREIGN KEY(required_elo_tier) REFERENCES " + DatabaseManager.ELO_TIERS + "(name)" +
+                "ON UPDATE CASCADE " +
+                "ON DELETE SET NULL";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
     }
 
     private static void createPlots()

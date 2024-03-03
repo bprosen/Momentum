@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.bank.types.BankItemType;
 import com.renatusnetwork.parkour.data.bank.types.Jackpot;
 import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.clans.ClanMember;
+import com.renatusnetwork.parkour.data.elo.ELOTier;
 import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.leaderboards.LevelLBPosition;
@@ -338,19 +339,23 @@ public class MenuItemFormatter
                 {
                     // Level Requirements Section
                     for (Level requirement : perk.getRequiredLevels())
-                        itemLore.add(Utils.translate("&7 - " + requirement.getTitle()));
+                        itemLore.add(Utils.translate(" " + requirement.getTitle()));
 
                     if (price > 0)
                     {
-                        int playerBalance = (int) playerStats.getCoins();
+                        int playerBalance = playerStats.getCoins();
 
                         if (playerBalance > price)
-                            itemLore.add(Utils.translate("&7  Click to buy "));
+                            itemLore.add(Utils.translate("&a  Click to buy "));
                         else
                             itemLore.add(Utils.translate(
-                                    "&7  Requires " + Utils.getCoinFormat(perk.getPrice() - playerBalance, price - playerBalance) + " &7more &eCoins"
+                                    "&7 Requires " + Utils.getCoinFormat(perk.getPrice() - playerBalance, price - playerBalance) + " &7more &eCoins"
                             ));
                     }
+
+                    ELOTier eloTier = perk.getRequiredELOTier();
+                    if (eloTier != null)
+                        itemLore.add(Utils.translate("&7 ELO Tier " + eloTier.getTitle()));
                 }
             }
 

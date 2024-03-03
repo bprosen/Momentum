@@ -346,7 +346,7 @@ public class MenuItemAction {
 
                 if (!event.isCancelled())
                 {
-                    int playerBalance = (int) playerStats.getCoins();
+                    int playerBalance = playerStats.getCoins();
                     int price = event.getPrice();
 
                     if (playerStats.hasModifier(ModifierType.SHOP_DISCOUNT))

@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.data.perks;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.elo.ELOTier;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
@@ -71,6 +72,12 @@ public class PerkManager
     {
         perk.setRequiredPermission(requiredPermission);
         PerksDB.updateRequiredPermission(perk.getName(), requiredPermission);
+    }
+
+    public void updateRequiredELOTier(Perk perk, ELOTier eloTier)
+    {
+        perk.setRequiredELOTier(eloTier);
+        PerksDB.updateRequiredELOTier(perk.getName(), eloTier.getName());
     }
 
     public void updateInfiniteBlock(Perk perk, Material material)

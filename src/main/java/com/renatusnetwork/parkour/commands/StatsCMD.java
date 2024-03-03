@@ -14,6 +14,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.lang.model.type.UnionType;
 import java.util.*;
 
 public class StatsCMD implements CommandExecutor {
@@ -249,8 +250,11 @@ public class StatsCMD implements CommandExecutor {
                 printCoinsLB(sender);
             } else if (a.length == 1 && a[0].equalsIgnoreCase("records")) {
                 printRecordsLB(sender);
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("elo")) {
-                printELOLB(sender);
+            } else if (a[0].equalsIgnoreCase("elo")) {
+                StatsCMD.printELOLB(
+                        sender,
+                        a.length == 2 && Utils.isInteger(a[1]) ? Integer.parseInt(a[1]) : 1
+                );
             } else {
 
                 // allow ability to get from title or name
@@ -371,34 +375,45 @@ public class StatsCMD implements CommandExecutor {
             sender.sendMessage(Utils.translate("&cCoins lb not loaded or no lb positions"));
     }
 
-    public static void printELOLB(CommandSender sender)
+    public static void printELOLB(CommandSender sender, int page)
     {
         ArrayList<ELOLBPosition> eloLB = Parkour.getStatsManager().getELOLB();
 
         if (!eloLB.isEmpty())
         {
-            sender.sendMessage(Utils.translate("&aELO &7Leaderboard"));
+            int max = page * 10;
+            int min = max - 10;
+            max = Math.min(page * 10, eloLB.size());
 
-            int lbPositionNum = 1;
-            for (ELOLBPosition eloPosition : eloLB)
+            if (min <= eloLB.size())
             {
-                if (eloPosition != null)
+                sender.sendMessage(Utils.translate("&aELO &7Leaderboard &2" + page));
+
+                for (int i = min; i < max; i++)
                 {
-                    sender.sendMessage(Utils.translate(" &7" +
-                            lbPositionNum + " &2" +
-                            Utils.formatNumber(eloPosition.getELO()) + " &a" +
-                            eloPosition.getName()));
-                    lbPositionNum++;
+                    ELOLBPosition elolbPosition = eloLB.get(i);
+
+                    if (elolbPosition != null)
+                        sender.sendMessage(Utils.translate(" &7" +
+                                (i + 1) + " &2" +
+                                Utils.formatNumber(elolbPosition.getELO()) + " &a" +
+                                elolbPosition.getName()));
+
+                }
+
+                if (max - min == 10)
+                    sender.sendMessage(Utils.translate("&2/elo top " + (page + 1)));
+
+                // if player, send personal total
+                if (sender instanceof Player)
+                {
+                    Player player = (Player) sender;
+                    sender.sendMessage(Utils.translate("&7You have &2" + Utils.formatNumber(
+                            Parkour.getStatsManager().get(player).getELO()) + " &aELO"));
                 }
             }
-
-            // if player, send personal total
-            if (sender instanceof Player)
-            {
-                Player player = (Player) sender;
-                sender.sendMessage(Utils.translate("&7You have &2" + Utils.formatNumber(
-                        Parkour.getStatsManager().get(player).getELO()) + " &aELO"));
-            }
+            else
+                sender.sendMessage(Utils.translate("&4" + page + " &cpage does not exist"));
         }
         else
             sender.sendMessage(Utils.translate("&cELO lb not loaded or no lb positions"));

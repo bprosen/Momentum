@@ -153,21 +153,24 @@ public class PlayerStats
     {
         player.setLevel(elo); // set xp level as elo
 
-        ELOTier nextTier = eloTier.getNextELOTier();
-
-        // if not at end, show progress
-        if (nextTier != null)
+        if (eloTier != null)
         {
-            // use the xp bar as a progress guage
-            int differenceTo = nextTier.getRequiredELO() - eloTier.getRequiredELO();
-            int differencePlayer = elo - eloTier.getRequiredELO();
-            float ratio = differencePlayer / ((float) differenceTo);
+            ELOTier nextTier = eloTier.getNextELOTier();
 
-            player.setExp(Math.min(1f, Math.max(ratio, 0f)));
+            // if not at end, show progress
+            if (nextTier != null)
+            {
+                // use the xp bar as a progress guage
+                int differenceTo = nextTier.getRequiredELO() - eloTier.getRequiredELO();
+                int differencePlayer = elo - eloTier.getRequiredELO();
+                float ratio = differencePlayer / ((float) differenceTo);
+
+                player.setExp(Math.min(1f, Math.max(ratio, 0f)));
+            }
+            // otherwise show xp bar as full
+            else
+                player.setExp(1f);
         }
-        // otherwise show xp bar as full
-        else
-            player.setExp(1f);
     }
 
     public void setELOTier(ELOTier eloTier)

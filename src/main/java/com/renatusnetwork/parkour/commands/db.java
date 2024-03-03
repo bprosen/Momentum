@@ -515,13 +515,13 @@ public class db implements CommandExecutor
                                 if (infiniteBlockString != null)
                                     DatabaseQueries.runQuery("UPDATE " + DatabaseManager.PERKS_TABLE + " SET infinite_block=? WHERE name=?", infiniteBlockString.toUpperCase(), perkName);
 
-                                if (perksConfig.isConfigurationSection(perkName + ".requirements"))
+                                if (perksConfig.isSet(perkName + ".requirements"))
                                 {
                                     List<String> levelRequirements = perksConfig.getStringList(perkName + ".requirements");
                                     for (String levelName : levelRequirements)
                                     {
                                         DatabaseQueries.runQuery(
-                                                "INSERT INTO " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " (perk_name, level_name) VALUES (?,?)",
+                                                "INSERT INTO " + DatabaseManager.PERKS_LEVEL_REQUIREMENTS_TABLE + " (perk_name, required_level_name) VALUES (?,?)",
                                                 perkName, levelName
                                         );
                                     }

@@ -46,9 +46,12 @@ public class ELOCMD implements CommandExecutor
             {
                 sendHelp(player);
             }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("top"))
+            else if (a.length >= 1 && a[0].equalsIgnoreCase("top"))
             {
-                StatsCMD.printELOLB(sender);
+                StatsCMD.printELOLB(
+                        sender,
+                        a.length == 2 && Utils.isInteger(a[1]) ? Integer.parseInt(a[1]) : 1
+                );
             }
             else if (a.length == 0)
             {
@@ -56,12 +59,12 @@ public class ELOCMD implements CommandExecutor
             }
             else if (a.length == 1)
             {
-                PlayerStats targetStats = Parkour.getStatsManager().get(Bukkit.getPlayer(a[1]));
+                PlayerStats targetStats = Parkour.getStatsManager().get(Bukkit.getPlayer(a[0]));
 
                 if (targetStats != null)
                     player.sendMessage(Utils.translate("&c" + targetStats.getDisplayName() + "&7 has &2" + Utils.formatNumber(targetStats.getELO()) + " &aELO"));
                 else
-                    player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
+                    player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
             }
             else
                 sendHelp(player);

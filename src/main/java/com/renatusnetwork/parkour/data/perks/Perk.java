@@ -1,8 +1,11 @@
 package com.renatusnetwork.parkour.data.perks;
 
+import com.renatusnetwork.parkour.data.elo.ELOTier;
+import com.renatusnetwork.parkour.data.elo.ELOTiersManager;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,6 +22,7 @@ public class Perk
     private String requiredPermission;
     private int price;
     private Material infiniteBlock;
+    private ELOTier requiredELOTier;
 
     private HashMap<PerksArmorType, ItemStack> armorItems;
     private List<Level> requiredLevels;
@@ -40,6 +44,13 @@ public class Perk
 
     public String getTitle() {
         return title;
+    }
+
+    public ELOTier getRequiredELOTier() { return requiredELOTier; }
+
+    public void setRequiredELOTier(ELOTier requiredELOTier)
+    {
+        this.requiredELOTier = requiredELOTier;
     }
 
     public void setTitle(String title) { this.title = title; }
@@ -93,11 +104,6 @@ public class Perk
 
     public boolean requiresMasteryLevels() { return requiresMasteryLevels; }
 
-    public boolean hasRequiredPermission(PlayerStats playerStats)
-    {
-        return requiredPermission == null || playerStats.getPlayer().hasPermission(requiredPermission);
-    }
-
     public void setPrice(int price) { this.price = price; }
 
     public int getPrice() {
@@ -144,7 +150,11 @@ public class Perk
         if (price > 0)
             return false;
 
+        // if has elo tier and the required elo is greater than their ELO, do not allow access
+        if (requiredELOTier != null && requiredELOTier.getRequiredELO() > playerStats.getELO())
+            return false;
+
         // simple check of if they have permission, return result
-        return !hasRequiredPermission(playerStats);
+        return requiredPermission == null || player.hasPermission(requiredPermission);
     }
 }

@@ -24,7 +24,7 @@ public class PlayerPlaceholders
                 case "records":
                     return Utils.formatNumber(playerStats.getNumRecords());
                 case "coins":
-                    return Utils.formatNumber((int) playerStats.getCoins());
+                    return Utils.formatNumber(playerStats.getCoins());
                 case "rank":
                     return playerStats.getRank() == null ? "None" : Utils.translate(playerStats.getRank().getTitle());
                 case "clan":
@@ -49,6 +49,10 @@ public class PlayerPlaceholders
                     return Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN));
                 case "event_wins":
                     return Utils.formatNumber(playerStats.getEventWins());
+                case "elo":
+                    return Utils.formatNumber(playerStats.getELO());
+                case "elo_tier":
+                    return Utils.translate(playerStats.getELOTierTitleWithLB());
             }
         }
         return "";

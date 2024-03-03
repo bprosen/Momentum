@@ -60,6 +60,13 @@ public class PerksDB
         );
     }
 
+    public static void updateRequiredELOTier(String perkName, String eloTier)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PERKS_TABLE + " SET required_elo_tier=? WHERE name=?", eloTier, perkName
+        );
+    }
+
     public static void insertRequiredLevel(String perkName, String levelName)
     {
         DatabaseQueries.runAsyncQuery(
@@ -165,6 +172,10 @@ public class PerksDB
 
         perk.setRequiredPermission(result.get("required_permission"));
 
+        String requiredELOTier = result.get("required_elo_tier");
+        if (requiredELOTier != null)
+            perk.setRequiredELOTier(Parkour.getELOTiersManager().get(requiredELOTier));
+
         // parse if not null
         String infiniteString = result.get("infinite_block");
         if (infiniteString != null)
@@ -172,7 +183,7 @@ public class PerksDB
 
         perk.setRequiresMasteryLevels(Integer.parseInt(result.get("requires_mastery_levels")) == 1);
 
-        // set data using 2 extra queries, is fine since it's only done on startup, allows for clean code
+        // set data using 3 extra queries, is fine since it's only done on startup, allows for clean code
         perk.setRequiredLevels(getRequiredLevels(perkName));
         perk.setArmorItems(getArmorItems(perkName));
         perk.setCommands(getCommands(perkName));

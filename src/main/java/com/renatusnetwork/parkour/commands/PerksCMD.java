@@ -1,6 +1,7 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
+import com.renatusnetwork.parkour.data.elo.ELOTier;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.perks.Perk;
 import com.renatusnetwork.parkour.data.perks.PerkManager;
@@ -34,6 +35,10 @@ public class PerksCMD implements CommandExecutor
         /perk armormaterialtype (perkName) (armorType) (materialType)
         /perk armorcolor (perkName) (armorType) (color)
         /perk masterylevels (perkName)
+        /perk requiredelotier (perkName) (eloTier)
+        /perks addcommand (perkName) (command)
+        /perks removecommand (perkName) (command)
+        /perks commands (perkName)
         /perk help
      */
     @Override
@@ -48,13 +53,16 @@ public class PerksCMD implements CommandExecutor
             {
                 String perkName = a[1];
                 // helper method
-                Perk perk = getPerk(perkName, sender);
+                Perk perk = perkManager.get(perkName);
 
                 if (perk == null)
                 {
                     perkManager.create(perkName);
                     sender.sendMessage(Utils.translate("&7You have created the perk &a" + perkName));
                 }
+                else
+                    sender.sendMessage(Utils.translate("&4" + perkName + " &cis not a perk"));
+
             }
             else if (a.length == 2 && a[0].equalsIgnoreCase("remove"))
             {
@@ -416,6 +424,23 @@ public class PerksCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate("&7You have toggled &c" + perk.getTitle() + "&7 requiring mastery level completions to &a" + perk.requiresMasteryLevels()));
                 }
             }
+            else if (a.length == 3 && a[0].equalsIgnoreCase("requiredelotier"))
+            {
+                String perkName = a[1];
+                Perk perk = getPerk(perkName, sender);
+
+                if (perk != null)
+                {
+                    ELOTier eloTier = Parkour.getELOTiersManager().get(a[2]);
+                    if (eloTier != null)
+                    {
+                        perkManager.updateRequiredELOTier(perk, eloTier);
+                        sender.sendMessage(Utils.translate("&7You have set &c" + perk.getTitle() + "&7 required ELO tier to &a" + perk.getRequiredELOTier().getTitle()));
+                    }
+                    else
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an ELO tier"));
+                }
+            }
             else if (a.length >= 3 && a[0].equalsIgnoreCase("addcommand"))
             {
                 String perkName = a[1];
@@ -575,10 +600,11 @@ public class PerksCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&e/perks armorcolor (perkName) (armorPiece) (color)  &7Updates color of that armor piece"));
         sender.sendMessage(Utils.translate("&e/perks setperk (IGN) (perkName)  &7Sets perk armor, hat or infinite block to player if they have it"));
         sender.sendMessage(Utils.translate("&e/perks masterylevels (perkName)  &7Toggles if the perk requires mastery completions instead of normal level completions"));
+        sender.sendMessage(Utils.translate("&e/perks requiredelotier (perkName) (eloTier)  &7Sets the required ELO tier for the perk"));
         sender.sendMessage(Utils.translate("&e/perks addcommand (perkName) (command)  &7Adds a command to a perk to give out on setting (command can be multiple words)"));
         sender.sendMessage(Utils.translate("&e/perks removecommand (perkName) (command)  &7Removes a command to a perk to give out on setting (command can be multiple words)"));
         sender.sendMessage(Utils.translate("&e/perks commands (perkName)  &7Lists the commands for a perka"));
         sender.sendMessage(Utils.translate("&e/perks help  &7Displays this page"));
-        sender.sendMessage(Utils.translate("&e/perks load  &7Loads from disk"));
+        sender.sendMessage(Utils.translate("&e/perks load  &7Loads from db"));
     }
 }
