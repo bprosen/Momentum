@@ -209,7 +209,7 @@ public class Parkour extends JavaPlugin {
             public void run()
             {
                 CompletionsDB.loadLeaderboards(); // needs to happen AFTER loading the manager, in async to speedup start up
-                CompletionsDB.loadTotalAndUniqueCompletions();
+                CompletionsDB.loadTotalAndUniqueAndAverageTimeCompletions();
             }
         }.runTaskAsynchronously(Parkour.getPlugin());
 

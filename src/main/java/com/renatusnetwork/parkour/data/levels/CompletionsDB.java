@@ -112,11 +112,11 @@ public class CompletionsDB
     /*
      * Leader Board Section
      */
-    public static void loadTotalAndUniqueCompletions()
+    public static void loadTotalAndUniqueAndAverageTimeCompletions()
     {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "level_name, COUNT(*) AS total_completions, COUNT(DISTINCT uuid) AS unique_completions",
+                "level_name, COUNT(*) AS total_completions, COUNT(DISTINCT uuid) AS unique_completions, AVG(time_taken) AS average_time",
                 "GROUP BY level_name"
         );
 
@@ -128,6 +128,7 @@ public class CompletionsDB
             {
                 level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
                 level.setTotalUniqueCompletionsCount(Integer.parseInt(levelResult.get("unique_completions")));
+                level.setAverageTimeTaken((float) (Double.parseDouble(levelResult.get("average_time")) / 1000f));
             }
         }
     }

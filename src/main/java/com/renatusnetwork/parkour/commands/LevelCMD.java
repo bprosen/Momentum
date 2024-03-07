@@ -191,7 +191,7 @@ public class LevelCMD implements CommandExecutor
                     public void run() {
                         levelManager.load();
                         sender.sendMessage(Utils.translate("&7Loaded &2" + levelManager.numLevels() + " &7levels"));
-                        CompletionsDB.loadTotalAndUniqueCompletions();
+                        CompletionsDB.loadTotalAndUniqueAndAverageTimeCompletions();
                         CompletionsDB.loadLeaderboards();
                         levelManager.loadGlobalLevelCompletions();
                         levelManager.loadRecordsLB();
