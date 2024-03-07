@@ -98,9 +98,12 @@ public class LevelHandler
 
             levelManager.addTotalLevelCompletion();
 
-            // if they have not completed this individual level, then add
+            // if they have not completed this individual level, then add and add to level stats
             if (!playerStats.hasCompleted(level))
-                playerStats.setIndividualLevelsBeaten(playerStats.getIndividualLevelsBeaten() + 1);
+            {
+                playerStats.addIndividualLevelsBeaten();
+                level.addTotalUniqueCompletionsCount();
+            }
 
             long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
             String time = (((double) elapsedTime) / 1000) + "s";

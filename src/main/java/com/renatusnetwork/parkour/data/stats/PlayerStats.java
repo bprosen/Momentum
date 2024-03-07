@@ -493,6 +493,11 @@ public class PlayerStats
         this.individualLevelsBeaten = individualLevelsBeaten;
     }
 
+    public void addIndividualLevelsBeaten()
+    {
+        this.individualLevelsBeaten++;
+    }
+
     public int getIndividualLevelsBeaten() {
         return individualLevelsBeaten;
     }

@@ -112,11 +112,11 @@ public class CompletionsDB
     /*
      * Leader Board Section
      */
-    public static void loadTotalCompletions()
+    public static void loadTotalAndUniqueCompletions()
     {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "level_name, COUNT(*) AS total_completions",
+                "level_name, COUNT(*) AS total_completions, COUNT(DISTINCT uuid) AS unique_completions",
                 "GROUP BY level_name"
         );
 
@@ -125,7 +125,10 @@ public class CompletionsDB
             Level level = Parkour.getLevelManager().get(levelResult.get("level_name"));
 
             if (level != null)
+            {
                 level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
+                level.setTotalUniqueCompletionsCount(Integer.parseInt(levelResult.get("unique_completions")));
+            }
         }
     }
 

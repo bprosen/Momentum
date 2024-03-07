@@ -28,7 +28,8 @@ public class Level
     private String requiredPermission;
     private int respawnY;
     private boolean liquidResetPlayer;
-    private int totalCompletionsCount;
+    private int totalCompletions;
+    private int totalUniqueCompletions;
     private String requiredRank;
     private int difficulty;
     private boolean cooldown;
@@ -224,15 +225,23 @@ public class Level
         return !commands.isEmpty();
     }
 
-    public void setTotalCompletionsCount(int count) {
-        totalCompletionsCount = count;
+    public void setTotalCompletionsCount(int totalCompletions) {
+        this.totalCompletions = totalCompletions;
     }
 
-    public void addTotalCompletionsCount() { this.totalCompletionsCount++; }
+    public void addTotalCompletionsCount() { this.totalCompletions++; }
 
     public int getTotalCompletionsCount() {
-        return totalCompletionsCount;
+        return totalCompletions;
     }
+
+    public int getTotalUniqueCompletionsCount() { return totalUniqueCompletions; }
+
+    public void setTotalUniqueCompletionsCount(int totalUniqueCompletions) {
+        this.totalUniqueCompletions = totalUniqueCompletions;
+    }
+
+    public void addTotalUniqueCompletionsCount() { this.totalCompletions++; }
 
     public boolean isRankUpLevel()
     {
