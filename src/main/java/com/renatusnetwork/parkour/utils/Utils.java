@@ -21,10 +21,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.util.*;
 
 public class Utils {
 
@@ -90,19 +88,23 @@ public class Utils {
         return 1;
     }
 
-    public static String formatNumber(double amount) {
-
-        double newAmount = Double.valueOf(new BigDecimal(amount).toPlainString());
-        // cannot cast java.lang.Double, need to cast primitive type
-        int intAmount = (int) newAmount;
-        // this makes it seperate digits by commas
-        return String.format("%,d", intAmount);
+    public static String formatNumber(double amount)
+    {
+        DecimalFormat format = new DecimalFormat("#,###");
+        return format.format(amount);
     }
 
-    public static String formatDecimal(double amount) {
-        double newAmount = Double.valueOf(new BigDecimal(amount).toPlainString());
-        // this makes it seperate digits by commands and .2 means round decimal by 2 places
-        return String.format("%,.2f", newAmount);
+    public static String formatDecimal(double amount)
+    {
+        DecimalFormat format = new DecimalFormat("#,###.###"); // default is 3 decimal places for now
+        return format.format(amount);
+    }
+
+    public static String formatSingleDecimal(double amount)
+    {
+        DecimalFormat format = new DecimalFormat("#,###.#");
+        format.setMinimumFractionDigits(1); // keep decimal shown
+        return format.format(amount);
     }
 
     public static String shortStyleNumber(double amount) {

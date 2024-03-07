@@ -106,7 +106,7 @@ public class LevelHandler
             }
 
             long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
-            String time = (((double) elapsedTime) / 1000) + "s";
+            String time = Utils.formatDecimal(elapsedTime / 1000d) + "s";
 
             // create level completion with appropriate timing
             LevelCompletion levelCompletion;
@@ -203,7 +203,7 @@ public class LevelHandler
             String completionMessage = "";
 
             if (levelCompletion.wasTimed())
-                completionMessage = "&7 in &a" + (elapsedTime / 1000f) + "s";
+                completionMessage = "&7 in &a" + time;
 
             String completion = "&7Rewarded &6" + Utils.getCoinFormat(level.getReward(), reward) +
                     " &eCoins &7for " + level.getTitle() + completionMessage +

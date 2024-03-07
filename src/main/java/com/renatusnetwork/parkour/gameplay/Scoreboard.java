@@ -51,10 +51,10 @@ public class Scoreboard {
     }
 
     private static String formatSpacing(String input) {
-        int boardWidth = 16; // max characters, set by ourselves
+        int boardWidth = 18;
         int padding = boardWidth - ChatColor.stripColor(input).length();
 
-        return padding > 0 ? (getSpaces(padding / 2) + input) : input;
+        return padding > 0 ? getSpaces(padding / 2) + input : input;
     }
 
     public static void displayScoreboards()
@@ -195,7 +195,7 @@ public class Scoreboard {
                     {
                         double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                        String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                        String timing = Utils.translate("&7" + Utils.formatSingleDecimal(timeElapsed / 1000d) + "s");
                         board.add(formatSpacing(timing));
                     }
                     board.add(Utils.translate("&7"));
@@ -250,7 +250,7 @@ public class Scoreboard {
                             if (playerStats.getLevelStartTime() > 0) {
                                 double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                                String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                                String timing = Utils.translate("&7" + Utils.formatSingleDecimal(timeElapsed / 1000d) + "s");
                                 board.add(formatSpacing(timing));
                             }
                         }
@@ -277,12 +277,12 @@ public class Scoreboard {
                             // if level has mastery and player is in mastery
                             if (level.hasMastery() && playerStats.isAttemptingMastery())
                             {
-                                board.add(formatSpacing(Utils.translate("&5&lMastery")));
+                                board.add(formatSpacing(Utils.translate("&5&lMASTERY")));
                                 newReward *= level.getMasteryMultiplier();
                             }
                             // add title and adjust rewardstring if it is a featured level
                             else if (level.isFeaturedLevel()) {
-                                board.add(formatSpacing(Utils.translate("&dFeatured")));
+                                board.add(formatSpacing(Utils.translate("&c&lFEATURED")));
                                 newReward *= Parkour.getSettingsManager().featured_level_reward_multiplier;
                             } else if (bankManager.isJackpotRunning() &&
                                     bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
@@ -322,7 +322,7 @@ public class Scoreboard {
                             if (playerStats.getLevelStartTime() > 0) {
                                 double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                                String timing = Utils.translate("&7" + Math.round((timeElapsed / 1000) * 10) / 10.0) + "s";
+                                String timing = Utils.translate("&7" + Utils.formatSingleDecimal(timeElapsed / 1000d) + "s");
                                 board.add(formatSpacing(timing));
                             } else {
                                 board.add(formatSpacing(Utils.translate("&7-")));

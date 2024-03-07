@@ -479,7 +479,7 @@ public class MenuItemFormatter
 
             // add featured title
             if (level.isFeaturedLevel())
-                formattedTitle = Utils.translate("&cFeatured " + formattedTitle);
+                formattedTitle = Utils.translate("&c&lFEATURED " + formattedTitle);
             else
             // add new if new level! but dont show new if featured (too messy)
             if (level.isNew())
@@ -683,15 +683,6 @@ public class MenuItemFormatter
                 else
                     itemLore.add(Utils.translate(beatenMessage));
 
-                if (choosingRaceLevel == null && level.hasMastery())
-                    if (playerStats.hasMasteryCompletion(level))
-                        itemLore.add(Utils.translate("&7  Mastery &a✔"));
-                    else
-                    {
-                        itemLore.add(Utils.translate("&7  Mastery &c✖ &6Shift click"));
-                        itemLore.add(Utils.translate("    &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins &7" + level.getMasteryMultiplier() + "x"));
-                    }
-
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
                 if (fastestCompletion != null)
                 {
@@ -709,8 +700,17 @@ public class MenuItemFormatter
                     }
 
                     itemLore.add(Utils.translate(bestTimeValue));
-                    itemLore.add(Utils.translate("  &7" + TimeUtils.getDate(fastestCompletion.getTimeOfCompletionMillis())));
+                    itemLore.add(Utils.translate("    &7" + TimeUtils.getDate(fastestCompletion.getTimeOfCompletionMillis())));
                 }
+
+                if (choosingRaceLevel == null && level.hasMastery())
+                    if (playerStats.hasMasteryCompletion(level))
+                        itemLore.add(Utils.translate("&7  Mastery &a✔"));
+                    else
+                    {
+                        itemLore.add(Utils.translate("&7  Mastery &c✖ &6Shift click"));
+                        itemLore.add(Utils.translate("    &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins &7" + level.getMasteryMultiplier() + "x"));
+                    }
             }
 
             // Required Levels Section, but only show it if not featured

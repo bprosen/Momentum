@@ -210,7 +210,7 @@ public class LevelListener implements Listener {
         if (playerStats.getLevelStartTime() > 0)
         {
             double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-            msgString += " &6(" + (timeElapsed / 1000.0) + "s)";
+            msgString += " &6(" + Utils.formatDecimal(timeElapsed / 1000d) + "s)";
         }
 
         player.sendMessage(Utils.translate(msgString));

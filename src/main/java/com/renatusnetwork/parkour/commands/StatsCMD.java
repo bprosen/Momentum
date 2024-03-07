@@ -285,7 +285,7 @@ public class StatsCMD implements CommandExecutor {
                             {
                                 LevelLBPosition lbPosition = leaderboard.get(i);
                                 String lbName = lbPosition.getPlayerName();
-                                double time = lbPosition.getTimeTakenSeconds();
+                                String time = Utils.formatDecimal(lbPosition.getTimeTakenSeconds());
                                 String lbString = " &7" + (i + 1);
 
                                 if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbPosition.getPlayerName()))
