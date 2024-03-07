@@ -109,6 +109,8 @@ public class Level
 
     public float getAverageTimeTaken() { return this.averageTimeTaken; }
 
+    public boolean hasAverageTimeTaken() { return averageTimeTaken > 0.0; }
+
     public void setAverageTimeTaken(float averageTimeTaken)
     {
         this.averageTimeTaken = averageTimeTaken;

@@ -313,7 +313,7 @@ public class StatsCMD implements CommandExecutor {
                                 LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
                                 if (levelCompletion != null)
                                 {
-                                    sender.sendMessage(Utils.translate("&7Your best is &2" + levelCompletion.getCompletionTimeElapsedSeconds() + "s"));
+                                    sender.sendMessage(Utils.translate("&7Your best is &2" + Utils.formatDecimal(levelCompletion.getCompletionTimeElapsedSeconds()) + "s"));
                                 }
                             }
                         }

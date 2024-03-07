@@ -223,7 +223,7 @@ public class LevelHandler
             // if new pb, send message to player
             if (levelCompletion.wasTimed() && bestCompletion != null && bestCompletion.getCompletionTimeElapsedMillis() > elapsedTime)
             {
-                String oldTimeString = bestCompletion.getCompletionTimeElapsedSeconds() + "s"; // need to format the long
+                String oldTimeString = Utils.formatDecimal(bestCompletion.getCompletionTimeElapsedSeconds()) + "s"; // need to format the long
                 player.sendMessage(Utils.translate("&7You have broken your personal best &c(" + oldTimeString + ")&7 with &a" + time));
             }
 
@@ -373,7 +373,7 @@ public class LevelHandler
                 Bukkit.broadcastMessage(Utils.translate(brokenRecord));
                 Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getDisplayName() +
                         " &7has the new &8" + level.getTitle() +
-                        " &7record with &a" + levelCompletion.getCompletionTimeElapsedSeconds() + "s"));
+                        " &7record with &a" + Utils.formatDecimal(levelCompletion.getCompletionTimeElapsedSeconds()) + "s"));
                 Bukkit.broadcastMessage("");
 
                 Utils.spawnFirework(level.getCompletionLocation(), Color.PURPLE, Color.FUCHSIA, true);

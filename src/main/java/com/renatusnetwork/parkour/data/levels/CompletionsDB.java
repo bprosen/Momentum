@@ -128,7 +128,10 @@ public class CompletionsDB
             {
                 level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
                 level.setTotalUniqueCompletionsCount(Integer.parseInt(levelResult.get("unique_completions")));
-                level.setAverageTimeTaken((float) (Double.parseDouble(levelResult.get("average_time")) / 1000f));
+
+                String averageTime = levelResult.get("average_time");
+                if (averageTime != null)
+                    level.setAverageTimeTaken((float) (Double.parseDouble(averageTime) / 1000f));
             }
         }
     }

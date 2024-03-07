@@ -166,7 +166,7 @@ public class MenuItemFormatter
 
                         LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
                         if (levelCompletion != null)
-                            newLore.add("  &7Fastest &a" + levelCompletion.getCompletionTimeElapsedSeconds() + "s");
+                            newLore.add("  &7Fastest &a" + Utils.formatDecimal(levelCompletion.getCompletionTimeElapsedSeconds()) + "s");
                     }
                 }
                 else
@@ -514,11 +514,11 @@ public class MenuItemFormatter
                     if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
                         itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
                     else if (playerStats.hasSave(level))
-                        itemLore.add(Utils.translate("&7Click to go to &asave"));
+                        itemLore.add(Utils.translate("&7Click to go to your &aSave"));
                     else if (playerStats.hasCheckpoint(level))
-                        itemLore.add(Utils.translate("&7Click to go to &echeckpoint"));
+                        itemLore.add(Utils.translate("&7Click to go to your &eCheckpoint"));
                     else
-                        itemLore.add(Utils.translate("&7Click to go to the start"));
+                        itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
                 }
             }
             else
@@ -651,9 +651,6 @@ public class MenuItemFormatter
                 itemLore.add(Utils.translate("  &6" + Utils.formatNumber(oldReward) + "&e Coin &7Reward"));
 
 
-            if (level.getTotalCompletionsCount() > 0)
-                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Completions"));
-
             // only show rating if above 5
             if (level.getRatingsCount() >= 5)
             {
@@ -661,19 +658,15 @@ public class MenuItemFormatter
                 itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
             }
 
-            // Required Levels Section, but only show it if not featured
-            if (choosingRaceLevel == null && level.hasRequiredLevels() && !level.isFeaturedLevel())
+            if (level.getTotalCompletionsCount() > 0)
             {
                 itemLore.add("");
-                itemLore.add(Utils.translate("&7Required levels"));
+                itemLore.add(Utils.translate("&7Completions"));
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Total"));
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalUniqueCompletionsCount()) + " &7Unique"));
 
-                for (String requiredLevelName : level.getRequiredLevels())
-                {
-                    Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
-
-                    if (requiredLevel != null)
-                        itemLore.add(Utils.translate("&7 - " + requiredLevel.getTitle()));
-                }
+                if (level.hasAverageTimeTaken())
+                    itemLore.add(Utils.translate("  &6" + Utils.formatDecimal(level.getAverageTimeTaken()) + "s &7Average"));
             }
 
             // Personal Level Stats Section
@@ -702,11 +695,9 @@ public class MenuItemFormatter
                 LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
                 if (fastestCompletion != null)
                 {
-                    itemLore.add(Utils.translate("&7  Best time"));
-
                     // add record if there is one
                     LevelLBPosition record = level.getRecordCompletion();
-                    String bestTimeValue = "    &6" + fastestCompletion.getCompletionTimeElapsedSeconds() + "s";
+                    String bestTimeValue = "  &6" + Utils.formatDecimal(fastestCompletion.getCompletionTimeElapsedSeconds()) + "s";
 
                     if (record != null)
                     {
@@ -714,11 +705,26 @@ public class MenuItemFormatter
                         if (playerStats.hasRecord(level))
                             bestTimeValue += " &e#1";
                         else
-                            bestTimeValue += " &e+" + ((fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken()) / 1000d) + "s";
+                            bestTimeValue += " &e+" + Utils.formatDecimal((fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken()) / 1000d) + "s";
                     }
 
                     itemLore.add(Utils.translate(bestTimeValue));
-                    itemLore.add(Utils.translate("    &7" + TimeUtils.getDate(fastestCompletion.getTimeOfCompletionMillis())));
+                    itemLore.add(Utils.translate("  &7" + TimeUtils.getDate(fastestCompletion.getTimeOfCompletionMillis())));
+                }
+            }
+
+            // Required Levels Section, but only show it if not featured
+            if (choosingRaceLevel == null && level.hasRequiredLevels() && !level.isFeaturedLevel())
+            {
+                itemLore.add("");
+                itemLore.add(Utils.translate("&7Required levels"));
+
+                for (String requiredLevelName : level.getRequiredLevels())
+                {
+                    Level requiredLevel = Parkour.getLevelManager().get(requiredLevelName);
+
+                    if (requiredLevel != null)
+                        itemLore.add(Utils.translate("&7  " + requiredLevel.getTitle()));
                 }
             }
 
