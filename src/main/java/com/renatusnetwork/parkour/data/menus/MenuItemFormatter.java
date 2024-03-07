@@ -513,8 +513,12 @@ public class MenuItemFormatter
 
                     if (level.needsRank() && !Parkour.getRanksManager().isPastOrAtRank(playerStats, requiredRank))
                         itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
+                    else if (playerStats.hasSave(level))
+                        itemLore.add(Utils.translate("&7Click to go to &asave"));
+                    else if (playerStats.hasCheckpoint(level))
+                        itemLore.add(Utils.translate("&7Click to go to &echeckpoint"));
                     else
-                        itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
+                        itemLore.add(Utils.translate("&7Click to go to the start"));
                 }
             }
             else
