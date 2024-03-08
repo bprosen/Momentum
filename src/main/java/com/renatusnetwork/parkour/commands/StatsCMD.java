@@ -7,6 +7,7 @@ import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.*;
+import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
@@ -285,17 +286,17 @@ public class StatsCMD implements CommandExecutor {
                             {
                                 LevelLBPosition lbPosition = leaderboard.get(i);
                                 String lbName = lbPosition.getPlayerName();
-                                String time = Utils.formatDecimal(lbPosition.getTimeTakenSeconds());
+                                String time = TimeUtils.formatCompletionTimeTaken(lbPosition.getTimeTaken(), 3);
                                 String lbString = " &7" + (i + 1);
 
                                 if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbPosition.getPlayerName()))
                                 {
                                     // we want to show it as blue if they are on it
                                     onLB = true;
-                                    lbString += " &3" + time + "s &b" + lbName;
+                                    lbString += " &3" + time + " &b" + lbName;
                                 }
                                 else
-                                    lbString += " &2" + time + "s &a" + lbName;
+                                    lbString += " &2" + time + " &a" + lbName;
 
                                 sender.sendMessage(Utils.translate(lbString));
                             }
@@ -312,9 +313,7 @@ public class StatsCMD implements CommandExecutor {
                                 // send your best if not on it and have beaten it
                                 LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
                                 if (levelCompletion != null)
-                                {
-                                    sender.sendMessage(Utils.translate("&7Your best is &2" + Utils.formatDecimal(levelCompletion.getCompletionTimeElapsedSeconds()) + "s"));
-                                }
+                                    sender.sendMessage(Utils.translate("&7Your best is &2" + TimeUtils.formatCompletionTimeTaken(levelCompletion.getCompletionTimeElapsedMillis(), 3)));
                             }
                         }
                     }

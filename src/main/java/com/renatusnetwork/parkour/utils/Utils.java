@@ -96,14 +96,7 @@ public class Utils {
 
     public static String formatDecimal(double amount)
     {
-        DecimalFormat format = new DecimalFormat("#,###.###"); // default is 3 decimal places for now
-        return format.format(amount);
-    }
-
-    public static String formatSingleDecimal(double amount)
-    {
-        DecimalFormat format = new DecimalFormat("#,###.#");
-        format.setMinimumFractionDigits(1); // keep decimal shown
+        DecimalFormat format = new DecimalFormat("#,###.##"); // default is 3 decimal places for now
         return format.format(amount);
     }
 

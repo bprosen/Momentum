@@ -131,7 +131,7 @@ public class CompletionsDB
 
                 String averageTime = levelResult.get("average_time");
                 if (averageTime != null)
-                    level.setAverageTimeTaken((float) (Double.parseDouble(averageTime) / 1000f));
+                    level.setAverageTimeTaken(Double.valueOf(averageTime).longValue());
             }
         }
     }

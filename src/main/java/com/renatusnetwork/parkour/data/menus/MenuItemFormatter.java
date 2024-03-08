@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -166,7 +167,7 @@ public class MenuItemFormatter
 
                         LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
                         if (levelCompletion != null)
-                            newLore.add("  &7Fastest &a" + Utils.formatDecimal(levelCompletion.getCompletionTimeElapsedSeconds()) + "s");
+                            newLore.add("  &7Fastest &a" + TimeUtils.formatCompletionTimeTaken(levelCompletion.getCompletionTimeElapsedMillis(), 3));
                     }
                 }
                 else
@@ -516,7 +517,7 @@ public class MenuItemFormatter
                     else if (playerStats.hasSave(level))
                         itemLore.add(Utils.translate("&7Click to go to your &aSave"));
                     else if (playerStats.hasCheckpoint(level))
-                        itemLore.add(Utils.translate("&7Click to go to your &eCheckpoint"));
+                        itemLore.add(Utils.translate("&7Click to go to &eCheckpoint"));
                     else
                         itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
                 }
@@ -643,7 +644,7 @@ public class MenuItemFormatter
                 {
                     itemLore.add(Utils.translate("  &7On cooldown &6(-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%)"));
                     itemLore.add(Utils.translate("    &7For &e" +
-                            TimeUtils.elapsedShortened((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()), false)) // get date - current and format
+                            TimeUtils.formatTime((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()))) // get date - current and format
                     );
                 }
             }
@@ -666,7 +667,10 @@ public class MenuItemFormatter
                 itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalUniqueCompletionsCount()) + " &7Unique"));
 
                 if (level.hasAverageTimeTaken())
-                    itemLore.add(Utils.translate("  &6" + Utils.formatDecimal(level.getAverageTimeTaken()) + "s &7Average"));
+                {
+                    String seconds = level.getAverageTimeTaken() < 60000 ? "s" : "";
+                    itemLore.add(Utils.translate("  &6" + TimeUtils.formatCompletionTimeTaken(level.getAverageTimeTaken(), 0) + seconds + " &7Average time"));
+                }
             }
 
             // Personal Level Stats Section
@@ -688,7 +692,7 @@ public class MenuItemFormatter
                 {
                     // add record if there is one
                     LevelLBPosition record = level.getRecordCompletion();
-                    String bestTimeValue = "  &6" + Utils.formatDecimal(fastestCompletion.getCompletionTimeElapsedSeconds()) + "s";
+                    String bestTimeValue = "  &6" + TimeUtils.formatCompletionTimeTaken(fastestCompletion.getCompletionTimeElapsedMillis(), 3);
 
                     if (record != null)
                     {
@@ -696,7 +700,7 @@ public class MenuItemFormatter
                         if (playerStats.hasRecord(level))
                             bestTimeValue += " &e#1";
                         else
-                            bestTimeValue += " &e+" + Utils.formatDecimal((fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken()) / 1000d) + "s";
+                            bestTimeValue += " &e+" + TimeUtils.formatCompletionTimeTaken(fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken(), 3);
                     }
 
                     itemLore.add(Utils.translate(bestTimeValue));

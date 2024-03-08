@@ -193,9 +193,9 @@ public class Scoreboard {
                     // add timer
                     if (playerStats.getLevelStartTime() > 0)
                     {
-                        double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+                        long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                        String timing = Utils.translate("&7" + Utils.formatSingleDecimal(timeElapsed / 1000d) + "s");
+                        String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1) + "s");
                         board.add(formatSpacing(timing));
                     }
                     board.add(Utils.translate("&7"));
@@ -212,7 +212,7 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&6&lTime Left")));
-                    board.add(formatSpacing(Utils.translate("&7" + TimeUtils.elapsedShortened(eventManager.getTimeLeftMillis(), true))));
+                    board.add(formatSpacing(Utils.translate("&7" + TimeUtils.formatTimeWithSeconds(eventManager.getTimeLeftMillis()))));
 
                     if (eventManager.isAscentEvent()) {
                         board.add(Utils.translate(""));
@@ -248,9 +248,9 @@ public class Scoreboard {
 
                             // do time if in a timed level
                             if (playerStats.getLevelStartTime() > 0) {
-                                double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+                                long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                                String timing = Utils.translate("&7" + Utils.formatSingleDecimal(timeElapsed / 1000d) + "s");
+                                String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1) + "s");
                                 board.add(formatSpacing(timing));
                             }
                         }
@@ -320,12 +320,10 @@ public class Scoreboard {
                             board.add(formatSpacing(rewardString));
 
                             if (playerStats.getLevelStartTime() > 0) {
-                                double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+                                long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                                String timing = Utils.translate("&7" + Utils.formatSingleDecimal(timeElapsed / 1000d) + "s");
+                                String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1));
                                 board.add(formatSpacing(timing));
-                            } else {
-                                board.add(formatSpacing(Utils.translate("&7-")));
                             }
                         }
                         // grind mode on scoreboard

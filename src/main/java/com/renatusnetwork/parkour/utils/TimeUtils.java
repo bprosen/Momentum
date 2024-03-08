@@ -1,100 +1,27 @@
 package com.renatusnetwork.parkour.utils;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimeUtils
 {
-    public static String elapsed(int seconds)
-    {
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-        long days = hours / 24;
-        long months = days / 30;
-        long years = months / 12;
-        String time = years + " Years " + months % 12 + " Months " + days % 30 + " Days " + hours % 24 + " Hours " + minutes % 60 + " Minutes " + seconds % 60 + " Seconds ";
-        if (years == 0L)
-            time = time.replace("0 Years ", "");
-        else if (years == 1L)
-            time = time.replace("Years", "Year");
-        if (months % 12 == 0L)
-            time = time.replace("0 Months ", "");
-        else if (months % 12 == 1L)
-            time = time.replace("Months", "Month");
-        if (days % 365 == 0L)
-            time = time.replace("0 Days ", "");
-        else if (days % 365 == 1L)
-            time = time.replace("Days", "Day");
-        if (hours % 24 == 0L)
-            time = time.replace("0 Hours ", "");
-        else if (hours % 24 == 1L)
-            time = time.replace("Hours", "Hour");
-        if (minutes % 60 == 0L)
-            time = time.replace("0 Minutes ", "");
-        else if (minutes % 60 == 1L)
-            time = time.replace("Minutes", "Minute");
-        if (seconds % 60 == 0L)
-            time = time.replace("0 Seconds ", "");
-        else if (seconds % 60 == 1L)
-            time = time.replace("Seconds", "Second");
-        return time;
-    }
 
-    public static String elapsedShortened(int seconds)
+    private static String formatCompletionTimeNoSeconds(long milliseconds)
     {
-        long minutes = seconds / 60;
+        long minutes = milliseconds / 60000;
         long hours = minutes / 60;
-        long days = hours / 24;
-        long months = days / 30;
-        long years = months / 12;
-        String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m ";
-        if (years == 0L)
-            time = time.replace("0Y ", "");
-        if (months % 12 == 0L)
-            time = time.replace("0M ", "");
-        if (days % 365 == 0L)
-            time = time.replace("0D ", "");
-        if (hours % 24 == 0L)
-            time = time.replace("0h ", "");
-        if (minutes % 60 == 0L)
-            time = time.replace("0m ", "");
-        return time;
-    }
 
-    public static String elapsed(long milliseconds)
-    {
-        long seconds = milliseconds / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-        long days = hours / 24;
-        long months = days / 30;
-        long years = months / 12;
-        String time = years + " Years " + months % 12 + " Months " + days % 30 + " Days " + hours % 24 + " Hours " + minutes % 60 + " Minutes " + seconds % 60 + " Seconds ";
-        if (years == 0L)
-            time = time.replace("0 Years ", "");
-        else if (years == 1L)
-            time = time.replace("Years", "Year");
-        if (months % 12 == 0L)
-            time = time.replace("0 Months ", "");
-        else if (months % 12 == 1L)
-            time = time.replace("Months", "Month");
-        if (days % 365 == 0L)
-            time = time.replace("0 Days ", "");
-        else if (days % 365 == 1L)
-            time = time.replace("Days", "Day");
-        if (hours % 24 == 0L)
-            time = time.replace("0 Hours ", "");
-        else if (hours % 24 == 1L)
-            time = time.replace("Hours", "Hour");
-        if (minutes % 60 == 0L)
-            time = time.replace("0 Minutes ", "");
-        else if (minutes % 60 == 1L)
-            time = time.replace("Minutes", "Minute");
-        if (seconds % 60 == 0L)
-            time = time.replace("0 Seconds ", "");
-        else if (seconds % 60 == 1L)
-            time = time.replace("Seconds", "Second");
-        return time;
+        String hourString = "";
+        String minuteString = "";
+
+        if (hours > 0)
+            hourString = hours + ":";
+
+        if (minutes > 0)
+            minuteString = minutes < 10 && hours > 0 ? "0" + minutes : String.valueOf(minutes);
+
+        return hourString + minuteString;
     }
 
     public static String getDate(long milliseconds)
@@ -105,70 +32,57 @@ public class TimeUtils
         return dateFormat.format(date);
     }
 
-    public static String elapsedShortened(long milliseconds, boolean includeSeconds) {
-        long seconds = milliseconds / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-        long days = hours / 24;
-        long months = days / 30;
-        long years = months / 12;
+    public static String formatCompletionTimeTaken(long milliseconds, int decimalPlaces)
+    {
+        String time = formatCompletionTimeNoSeconds(milliseconds);
 
-        String time = years + "Y " + months % 12 + "M " + days % 30 + "D " + hours % 24 + "h " + minutes % 60 + "m ";
-        if (includeSeconds)
-            time += seconds % 60 + "s";
+        double seconds = (milliseconds / 1000d) % 60;
+        String secondsString = String.valueOf((int) seconds);
+        if (decimalPlaces > 0)
+        {
+            DecimalFormat format = new DecimalFormat("#.#");
+            format.setMaximumFractionDigits(decimalPlaces);
+            format.setMinimumFractionDigits(1);
 
-        if (years == 0L)
-            time = time.replace("0Y ", "");
-        if (months % 12 == 0L)
-            time = time.replace("0M ", "");
-        if (days % 365 == 0L)
-            time = time.replace("0D ", "");
-        if (hours % 24 == 0L)
-            time = time.replace("0h ", "");
-        if (minutes % 60 == 0L)
-            time = time.replace("0m ", "");
-        if (includeSeconds && seconds % 60 == 0L)
-            time = time.replace("0s", "");
-
-        return time;
-    }
-
-    public static String elapsedSingle(long milliseconds) {
-        long seconds = milliseconds / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-        long days = hours / 24;
-        long months = days / 30;
-        long years = months / 12;
-        String time = years + " Years " + months % 12 + " Months " + days % 30 + " Days " + hours % 24 + " Hours " + minutes % 60 + " Minutes " + seconds % 60 + " Seconds ";
-        if (years == 0L)
-            time = time.replace("0 Years ", "");
-        else if (years == 1L)
-            time = time.replace("Years", "Year");
-        if (months % 12 == 0L)
-            time = time.replace("0 Months ", "");
-        else if (months % 12 == 1L)
-            time = time.replace("Months", "Month");
-        if (days % 365 == 0L)
-            time = time.replace("0 Days ", "");
-        else if (days % 365 == 1L)
-            time = time.replace("Days", "Day");
-        if (hours % 24 == 0L)
-            time = time.replace("0 Hours ", "");
-        else if (hours % 24 == 1L)
-            time = time.replace("Hours", "Hour");
-        if (minutes % 60 == 0L)
-            time = time.replace("0 Minutes ", "");
-        else if (minutes % 60 == 1L)
-            time = time.replace("Minutes", "Minute");
-        if (time.contains("Min")) {
-            return time.replace(seconds % 60 + " Seconds", "");
+            secondsString = format.format(seconds);
         }
-        if (seconds % 60 == 0L)
-            time = time.replace("0 Seconds ", "");
-        else if (seconds % 60 == 1L)
-            time = time.replace("Seconds", "Second");
-        return time;
+
+        if (!time.equalsIgnoreCase(""))
+        {
+            if (seconds < 10.0)
+                secondsString = time + ":0" + secondsString;
+            else
+                secondsString = time + ":" + secondsString;
+        }
+
+        return secondsString;
     }
 
+    public static String formatTimeWithSeconds(long milliseconds)
+    {
+        return formatTime(milliseconds) + ((milliseconds / 1000) % 60) + "s";
+    }
+
+    public static String formatTime(long milliseconds)
+    {
+        long minutes = milliseconds / 60000;
+        long hours = minutes / 60;
+        long days = hours / 24;
+        long months = days / 30;
+        long years = months / 12;
+
+        String time = "";
+        if (years > 0)
+            time += years + "Y ";
+        if (months > 0)
+            time += months + "M ";
+        if (days > 0)
+            time += days + "D ";
+        if (hours > 0)
+            time += hours + "h ";
+        if (minutes > 0)
+            time += minutes + "m ";
+
+        return time;
+    }
 }

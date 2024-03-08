@@ -12,6 +12,7 @@ import com.renatusnetwork.parkour.data.races.gamemode.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -209,8 +210,8 @@ public class LevelListener implements Listener {
         String msgString = "&eYour checkpoint has been set";
         if (playerStats.getLevelStartTime() > 0)
         {
-            double timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
-            msgString += " &6(" + Utils.formatDecimal(timeElapsed / 1000d) + "s)";
+            long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
+            msgString += " &6(" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 3) + ")";
         }
 
         player.sendMessage(Utils.translate(msgString));

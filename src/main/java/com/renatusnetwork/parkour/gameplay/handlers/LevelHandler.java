@@ -19,6 +19,7 @@ import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceRequest;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -105,8 +106,8 @@ public class LevelHandler
                 level.addTotalUniqueCompletionsCount();
             }
 
-            long elapsedTime = (System.currentTimeMillis() - playerStats.getLevelStartTime());
-            String time = Utils.formatDecimal(elapsedTime / 1000d) + "s";
+            long elapsedTime = System.currentTimeMillis() - playerStats.getLevelStartTime();
+            String time = TimeUtils.formatCompletionTimeTaken(elapsedTime, 3);
 
             // create level completion with appropriate timing
             LevelCompletion levelCompletion;
@@ -373,7 +374,7 @@ public class LevelHandler
                 Bukkit.broadcastMessage(Utils.translate(brokenRecord));
                 Bukkit.broadcastMessage(Utils.translate("&d" + playerStats.getDisplayName() +
                         " &7has the new &8" + level.getTitle() +
-                        " &7record with &a" + Utils.formatDecimal(levelCompletion.getCompletionTimeElapsedSeconds()) + "s"));
+                        " &7record with &a" + TimeUtils.formatCompletionTimeTaken(levelCompletion.getCompletionTimeElapsedMillis(), 3)));
                 Bukkit.broadcastMessage("");
 
                 Utils.spawnFirework(level.getCompletionLocation(), Color.PURPLE, Color.FUCHSIA, true);

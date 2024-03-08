@@ -20,7 +20,7 @@ public class Level
     private int reward;
     private int price;
     private float rating;
-    private float averageTimeTaken;
+    private long averageTimeTaken;
     private Location startLocation;
     private Location completionLocation;
     private int maxCompletions;
@@ -107,11 +107,11 @@ public class Level
 
     public boolean hasReward() { return reward > 0; }
 
-    public float getAverageTimeTaken() { return this.averageTimeTaken; }
+    public long getAverageTimeTaken() { return this.averageTimeTaken; }
 
-    public boolean hasAverageTimeTaken() { return averageTimeTaken > 0.0; }
+    public boolean hasAverageTimeTaken() { return averageTimeTaken > 0; }
 
-    public void setAverageTimeTaken(float averageTimeTaken)
+    public void setAverageTimeTaken(long averageTimeTaken)
     {
         this.averageTimeTaken = averageTimeTaken;
     }

@@ -6,6 +6,7 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.levels.LevelCompletion;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
+import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -113,23 +114,13 @@ public class RecordsCMD implements CommandExecutor
             {
                 PlayerStats targetStats = Parkour.getStatsManager().getByName(targetName);
 
-                HashMap<Level, Double> records = new HashMap<>();
+                HashMap<Level, Long> records;
 
                 // online then offline lookup process
                 if (targetStats != null)
-                {
-                    HashMap<Level, Long> completions = targetStats.getRecords();
-
-                    for (Map.Entry<Level, Long> entry : completions.entrySet())
-                        records.put(entry.getKey(), (entry.getValue() / 1000d));
-                }
+                    records = targetStats.getRecords();
                 else
-                {
-                    HashMap<Level, Long> offlineRecords = Parkour.getLevelManager().getRecords(targetName);
-
-                    for (Map.Entry<Level, Long> entry : offlineRecords.entrySet())
-                        records.put(entry.getKey(), (entry.getValue() / 1000d));
-                }
+                    records = Parkour.getLevelManager().getRecords(targetName);
 
                 // if they are equal, we print out "Your records"
                 if (sender.getName().equalsIgnoreCase(targetName))
@@ -150,7 +141,7 @@ public class RecordsCMD implements CommandExecutor
                         sender.sendMessage(Utils.translate("&7No page exists"));
                     else
                     {
-                        LinkedHashMap<Level, Double> sortedRecords = sortByTimeTaken(records);
+                        LinkedHashMap<Level, Long> sortedRecords = sortByTimeTaken(records);
 
                         // iterate through all records
                         for (Level record : sortedRecords.keySet())
@@ -160,7 +151,7 @@ public class RecordsCMD implements CommandExecutor
                                 if (numRecords > currentNum && max > currentNum)
                                 {
                                     sender.sendMessage(Utils.translate(
-                                            "&7" + (currentNum + 1) + " &a" + record.getTitle() + "&7 " + sortedRecords.get(record) + "s"
+                                            "&7" + (currentNum + 1) + " &a" + record.getTitle() + "&7 " + TimeUtils.formatCompletionTimeTaken(sortedRecords.get(record), 3)
                                     ));
                                     currentNum++;
                                 }
@@ -187,18 +178,18 @@ public class RecordsCMD implements CommandExecutor
             sender.sendMessage(Utils.translate("&cStill loading records..."));
     }
 
-    private LinkedHashMap<Level, Double> sortByTimeTaken(HashMap<Level, Double> records)
+    private LinkedHashMap<Level, Long> sortByTimeTaken(HashMap<Level, Long> records)
     {
-        LinkedHashMap<Level, Double> newRecords = new LinkedHashMap<>();
+        LinkedHashMap<Level, Long> newRecords = new LinkedHashMap<>();
         HashSet<String> seenLevels = new HashSet<>();
 
         int currentSize = 0;
         while (currentSize < records.size())
         {
             Level fastest = null;
-            double fastestTime = Double.MAX_VALUE;
+            long fastestTime = Long.MAX_VALUE;
 
-            for (Map.Entry<Level, Double> entry : records.entrySet())
+            for (Map.Entry<Level, Long> entry : records.entrySet())
             {
                 if (fastestTime > entry.getValue() && !seenLevels.contains(entry.getKey().getName()))
                 {
