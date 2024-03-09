@@ -171,7 +171,7 @@ public class Scoreboard {
                         timeLeft = ((Sprint) infinite).getTimeLeft();
 
                     if (timeLeft > 0.0)
-                        board.add(formatSpacing(Utils.translate("&7Time Left &d" + timeLeft + "s")));
+                        board.add(formatSpacing(Utils.translate("&7Time Left &d" + timeLeft)));
                 }
                 // practice section of scoreboard
                 else if (playerStats.inPracticeMode())
@@ -195,7 +195,7 @@ public class Scoreboard {
                     {
                         long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                        String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1) + "s");
+                        String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1));
                         board.add(formatSpacing(timing));
                     }
                     board.add(Utils.translate("&7"));
@@ -250,7 +250,7 @@ public class Scoreboard {
                             if (playerStats.getLevelStartTime() > 0) {
                                 long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
-                                String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1) + "s");
+                                String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1));
                                 board.add(formatSpacing(timing));
                             }
                         }

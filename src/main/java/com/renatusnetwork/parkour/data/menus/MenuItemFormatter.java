@@ -668,8 +668,21 @@ public class MenuItemFormatter
 
                 if (level.hasAverageTimeTaken())
                 {
-                    String seconds = level.getAverageTimeTaken() < 60000 ? "s" : "";
-                    itemLore.add(Utils.translate("  &6" + TimeUtils.formatCompletionTimeTaken(level.getAverageTimeTaken(), 0) + seconds + " &7Average time"));
+                    String time = "";
+                    long millisAverage = level.getAverageTimeTaken();
+
+                    int seconds = (int) (millisAverage / 1000);
+                    int minutes = seconds / 60;
+                    int hours = minutes / 60;
+
+                    if (hours > 0)
+                        time += hours + "h ";
+                    if (minutes > 0)
+                        time += (minutes % 60) + "m ";
+                    if (seconds > 0)
+                        time += (seconds % 60) + "s";
+
+                    itemLore.add(Utils.translate("  &6" + time + " &7Average"));
                 }
             }
 
