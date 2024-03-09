@@ -6,8 +6,6 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
-import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -135,7 +133,7 @@ public class RacePlayer
     public void resetLevelAndTeleport()
     {
         playerStats.teleport(originalLocation);
-        LevelHandler.setLevelInfoOnTeleport(playerStats, originalLocation);
+        Parkour.getLevelManager().setLevelInfoOnTeleport(playerStats, originalLocation);
     }
 
     public Race getRace()
@@ -206,7 +204,7 @@ public class RacePlayer
 
     public void resetPracAndCP()
     {
-        PracticeHandler.resetDataOnly(playerStats);
+        Parkour.getStatsManager().resetPracticeDataOnly(playerStats);
         playerStats.resetCurrentCheckpoint();
     }
 

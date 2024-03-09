@@ -1,5 +1,6 @@
 package com.renatusnetwork.parkour.data.stats;
 
+import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.api.GGRewardEvent;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointDB;
@@ -793,16 +794,123 @@ public class StatsManager {
         }
     }
 
+    /*
+        Practice management section
+     */
+    public void resetPracticeMode(PlayerStats playerStats, boolean message)
+    {
+        Player player = playerStats.getPlayer();
+
+        player.teleport(playerStats.getPracticeLocation());
+        resetPracticeDataOnly(playerStats);
+
+        if (message)
+            player.sendMessage(Utils.translate("&2You have disabled practice mode"));
+    }
+
+    public void resetPracticeDataOnly(PlayerStats playerStats)
+    {
+        if (playerStats.inPracticeMode())
+        {
+            Player player = playerStats.getPlayer();
+            ItemStack item = Utils.getPracPlateIfExists(player.getInventory());
+
+            if (item != null)
+                player.getInventory().remove(item);
+
+            playerStats.resetPracticeMode();
+        }
+    }
+
+    /*
+        Spectator management
+     */
+    public void spectateToPlayer(Player spectator, Player player, boolean initialSpectate)
+    {
+        if (player.isOnline() && spectator.isOnline())
+        {
+            spectator.teleport(player.getLocation());
+
+            // this is done AFTER teleport to override some world changes that can happen
+            if (initialSpectate)
+            {
+                spectator.setAllowFlight(true);
+                spectator.setFlying(true);
+            }
+
+            TitleAPI.sendTitle(
+                    spectator, 10, 40, 10,
+                    Utils.translate("&7Teleported to " + player.getDisplayName()), Utils.translate("&2/spectate &7 to exit"
+                    ));
+        }
+    }
+
+    public void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean initialSpectate)
+    {
+        Player spectator = spectatorStats.getPlayer();
+        Player player = playerStats.getPlayer();
+
+        spectatorStats.setPlayerToSpectate(playerStats);
+
+        // in case they /spectate while spectating
+        if (initialSpectate)
+        {
+            spectatorStats.setSpectateSpawn(spectator.getLocation());
+            toggleOffElytra(spectatorStats);
+        }
+
+        spectateToPlayer(spectator, player, initialSpectate);
+    }
+
+    public void resetSpectatorMode(PlayerStats spectatorStats)
+    {
+        Player player = spectatorStats.getPlayer();
+
+        spectatorStats.setPlayerToSpectate(null);
+
+        if (!player.isOp())
+        {
+            player.setFlying(false);
+            player.setAllowFlight(false);
+        }
+
+        Location loc = spectatorStats.getSpectateSpawn();
+
+        if (loc != null)
+        {
+
+            player.teleport(loc);
+            TitleAPI.sendTitle(
+                    player, 10, 40, 10,
+                    "",
+                    Utils.translate("&7You are no longer spectating anyone"));
+            spectatorStats.resetSpectateSpawn();
+
+            Parkour.getLevelManager().regionLevelCheck(spectatorStats, loc);
+        }
+    }
+
     public void shutdown()
     {
         synchronized (playerStatsUUID)
         {
             for (PlayerStats playerStats : playerStatsUUID.values())
             {
-                if (playerStats.isPreviewingLevel())
-                    playerStats.resetPreviewLevel();
+                if (playerStats != null && playerStats.isLoaded())
+                {
+                    if (playerStats.isPreviewingLevel())
+                        playerStats.resetPreviewLevel();
 
-                playerStats.endRace(RaceEndReason.SHUTDOWN);
+                    playerStats.endRace(RaceEndReason.SHUTDOWN);
+
+                    if (playerStats.inPracticeMode())
+                        resetPracticeMode(playerStats, false);
+
+                    if (playerStats.isSpectating())
+                        resetSpectatorMode(playerStats);
+
+                    toggleOffElytra(playerStats);
+                }
             }
         }
     }

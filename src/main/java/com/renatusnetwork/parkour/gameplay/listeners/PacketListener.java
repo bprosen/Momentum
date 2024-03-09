@@ -17,22 +17,23 @@ import com.renatusnetwork.parkour.data.locations.LocationManager;
 import com.renatusnetwork.parkour.data.locations.PortalType;
 import com.renatusnetwork.parkour.data.menus.MenuItemAction;
 import com.renatusnetwork.parkour.data.plots.Plot;
-import com.renatusnetwork.parkour.data.races.gamemode.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
-import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class PacketListener implements Listener {
+public class PacketListener implements Listener
+{
 
-    public static void loadListeners(Plugin plugin) {
+    public static void loadListeners(Plugin plugin)
+    {
         registerBlockListener(plugin);
         registerMoveListener(plugin);
     }
@@ -173,12 +174,12 @@ public class PacketListener implements Listener {
                 double playerY = packet.getDoubles().read(1);
                 double playerZ = packet.getDoubles().read(2);
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
+                StatsManager statsManager = Parkour.getStatsManager();
+                PlayerStats playerStats = statsManager.get(player);
 
                 // null check and check for loaded jic
                 if (playerStats != null && playerStats.isLoaded())
                 {
-
                     InfiniteManager infiniteManager = Parkour.getInfiniteManager();
                     LocationManager locationManager = Parkour.getLocationManager();
 
@@ -200,7 +201,7 @@ public class PacketListener implements Listener {
                                     @Override
                                     public void run()
                                     {
-                                        SpectatorHandler.spectateToPlayer(playerStats.getPlayer(), beingSpectated.getPlayer(), false);
+                                        statsManager.spectateToPlayer(playerStats.getPlayer(), beingSpectated.getPlayer(), false);
                                     }
                                 }.runTask(Parkour.getPlugin());
                         }
@@ -212,7 +213,7 @@ public class PacketListener implements Listener {
                                 @Override
                                 public void run()
                                 {
-                                    SpectatorHandler.removeSpectatorMode(playerStats);
+                                    statsManager.resetSpectatorMode(playerStats);
                                 }
                             }.runTask(Parkour.getPlugin());
                         }
@@ -298,7 +299,7 @@ public class PacketListener implements Listener {
                                     if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
                                         Parkour.getCheckpointManager().teleportToCP(playerStats);
                                     else
-                                        LevelHandler.respawnPlayer(playerStats, level);
+                                        Parkour.getLevelManager().respawnPlayer(playerStats, level);
                                 }
                             }
                         }.runTask(plugin);

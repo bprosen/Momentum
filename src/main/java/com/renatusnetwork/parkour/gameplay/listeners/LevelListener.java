@@ -8,10 +8,8 @@ import com.renatusnetwork.parkour.data.events.types.MazeEvent;
 import com.renatusnetwork.parkour.data.events.types.RisingWaterEvent;
 import com.renatusnetwork.parkour.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.parkour.data.levels.Level;
-import com.renatusnetwork.parkour.data.races.gamemode.Race;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.TimeUtils;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -78,7 +76,7 @@ public class LevelListener implements Listener {
                         if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
                             Parkour.getCheckpointManager().teleportToCP(playerStats);
                         else
-                            LevelHandler.respawnPlayer(playerStats, level);
+                            Parkour.getLevelManager().respawnPlayer(playerStats, level);
                     }
                 }
             }
@@ -262,7 +260,7 @@ public class LevelListener implements Listener {
                                     playerStats.setLevel(levelTo);
                                 }
                             }
-                            LevelHandler.levelCompletion(playerStats, level);
+                            Parkour.getLevelManager().levelCompletion(playerStats, level);
                         }
                     }
                     else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn))
@@ -271,18 +269,19 @@ public class LevelListener implements Listener {
 
                         if (lobby != null)
                         {
+                            StatsManager statsManager = Parkour.getStatsManager();
                             // toggle off elytra armor
-                            Parkour.getStatsManager().toggleOffElytra(playerStats);
+                            statsManager.toggleOffElytra(playerStats);
 
                             playerStats.resetCurrentCheckpoint();
-                            PracticeHandler.resetDataOnly(playerStats);
+                            statsManager.resetPracticeDataOnly(playerStats);
                             playerStats.resetLevel();
 
                             if (playerStats.isAttemptingRankup())
-                                Parkour.getStatsManager().leftRankup(playerStats);
+                                statsManager.leftRankup(playerStats);
 
                             if (playerStats.isAttemptingMastery())
-                                Parkour.getStatsManager().leftMastery(playerStats);
+                                statsManager.leftMastery(playerStats);
 
                             playerStats.clearPotionEffects();
 

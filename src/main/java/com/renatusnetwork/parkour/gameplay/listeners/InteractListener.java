@@ -5,7 +5,6 @@ import com.renatusnetwork.parkour.data.levels.Level;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -107,7 +106,7 @@ public class InteractListener implements Listener {
 
                                                 Parkour.getCheckpointManager().deleteCheckpoint(playerStats, level);
 
-                                                PracticeHandler.resetDataOnly(playerStats);
+                                                statsManager.resetPracticeDataOnly(playerStats);
                                                 playerStats.disableLevelStartTime();
 
                                                 if (level.hasPotionEffects()) {

@@ -7,7 +7,6 @@ import com.renatusnetwork.parkour.data.bank.BankManager;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.clans.ClansManager;
 import com.renatusnetwork.parkour.data.checkpoints.CheckpointManager;
-import com.renatusnetwork.parkour.data.elo.ELOTierDB;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.infinite.InfiniteManager;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
@@ -25,8 +24,6 @@ import com.renatusnetwork.parkour.data.elo.ELOTiersManager;
 import com.renatusnetwork.parkour.gameplay.*;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.data.SettingsManager;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
-import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
 import com.renatusnetwork.parkour.gameplay.listeners.*;
 import com.renatusnetwork.parkour.storage.ConfigManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseManager;
@@ -230,11 +227,8 @@ public class Parkour extends JavaPlugin {
 
     private static void unload()
     {
-        PracticeHandler.shutdown();
-        SpectatorHandler.shutdown();
         infinite.shutdown();
         events.shutdown();
-        levels.shutdown();
         blackmarket.shutdown();
         stats.shutdown();
 

@@ -10,8 +10,6 @@ import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsManager;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
-import com.renatusnetwork.parkour.gameplay.handlers.SpectatorHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -138,11 +136,11 @@ public class JoinLeaveListener implements Listener
 
         // if left in spectator, remove it
         if (playerStats.isSpectating())
-            SpectatorHandler.removeSpectatorMode(playerStats);
+            statsManager.resetSpectatorMode(playerStats);
 
         // if left in practice mode, reset it
         if (playerStats.inPracticeMode())
-            PracticeHandler.resetPlayer(playerStats, false);
+            statsManager.resetPracticeMode(playerStats, false);
 
         // if left in race, end it, give winner
         if (playerStats.inRace())

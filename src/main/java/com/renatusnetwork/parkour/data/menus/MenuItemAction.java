@@ -19,7 +19,7 @@ import com.renatusnetwork.parkour.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
 import com.renatusnetwork.parkour.data.stats.StatsDB;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.renatusnetwork.parkour.utils.dependencies.WorldGuard;
@@ -407,7 +407,7 @@ public class MenuItemAction {
         if (nonLevelTeleportConditions(playerStats))
         {
             if (playerStats.inPracticeMode())
-                PracticeHandler.resetPlayer(playerStats, false);
+                Parkour.getStatsManager().resetPracticeMode(playerStats, false);
 
             // add preview and teleport
             LevelPreview levelPreview = new LevelPreview(playerStats, level, player.getLocation());
@@ -600,7 +600,7 @@ public class MenuItemAction {
     public static void performLevelTeleport(PlayerStats playerStats, Level level)
     {
         Player player = playerStats.getPlayer();
-
+        StatsManager statsManager = Parkour.getStatsManager();
         player.closeInventory();
 
         if (nonLevelTeleportConditions(playerStats))
@@ -633,19 +633,19 @@ public class MenuItemAction {
                 playerStats.clearPotionEffects();
 
                 // toggle off if saved
-                Parkour.getStatsManager().toggleOffElytra(playerStats);
+                statsManager.toggleOffElytra(playerStats);
 
                 playerStats.resetCurrentCheckpoint(); // reset
 
                 // if in practice mode
-                PracticeHandler.resetDataOnly(playerStats);
+                statsManager.resetPracticeDataOnly(playerStats);
 
                 // if currently attempting, reset
                 if (playerStats.isAttemptingRankup())
-                    Parkour.getStatsManager().leftRankup(playerStats);
+                    statsManager.leftRankup(playerStats);
 
                 if (playerStats.isAttemptingMastery())
-                    Parkour.getStatsManager().leftMastery(playerStats);
+                    statsManager.leftMastery(playerStats);
 
                 playerStats.resetPreviewLevel();
 
@@ -655,13 +655,13 @@ public class MenuItemAction {
 
                     // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
                     if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName()))
-                        Parkour.getStatsManager().enteredRankup(playerStats);
+                        statsManager.enteredRankup(playerStats);
                 }
 
                 if (Parkour.getMenuManager().containsShiftClicked(player.getName()) &&
                         level.hasMastery() && playerStats.hasCompleted(level) &&
                         !playerStats.hasMasteryCompletion(level))
-                    Parkour.getStatsManager().enteredMastery(playerStats);
+                    statsManager.enteredMastery(playerStats);
 
                 boolean tpToStart = false;
 

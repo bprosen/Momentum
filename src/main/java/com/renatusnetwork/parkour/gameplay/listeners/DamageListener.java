@@ -3,7 +3,6 @@ package com.renatusnetwork.parkour.gameplay.listeners;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.events.EventManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.gameplay.handlers.LevelHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,10 +19,11 @@ public class DamageListener implements Listener {
             EventManager eventManager = Parkour.getEventManager();
 
             // for anvil event
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK)
+            {
                 // only run code if event is running and type HALF_HEART
-                if (eventManager.isEventRunning() && eventManager.isFallingAnvilEvent()) {
-
+                if (eventManager.isEventRunning() && eventManager.isFallingAnvilEvent())
+                {
                     Player victim = (Player) event.getEntity();
                     PlayerStats victimStats = Parkour.getStatsManager().get(victim.getUniqueId().toString());
 
@@ -34,10 +34,12 @@ public class DamageListener implements Listener {
                         player.teleport(eventManager.getRunningEvent().getLevel().getStartLocation());
                 }
             // for elytra
-            } else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
+            }
+            else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL)
                 event.setCancelled(true);
             // for droppers
-            } else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            else if (event.getCause() == EntityDamageEvent.DamageCause.FALL)
+            {
                 PlayerStats playerStats = Parkour.getStatsManager().get(player);
 
                 if (playerStats.inLevel() && playerStats.getLevel().isDropper()) {
@@ -47,7 +49,7 @@ public class DamageListener implements Listener {
                     if (playerStats.hasCurrentCheckpoint())
                         Parkour.getCheckpointManager().teleportToCP(playerStats);
                     else
-                        LevelHandler.respawnPlayer(playerStats, playerStats.getLevel());
+                        Parkour.getLevelManager().respawnPlayer(playerStats, playerStats.getLevel());
                 }
             }
         }

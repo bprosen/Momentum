@@ -3,14 +3,12 @@ package com.renatusnetwork.parkour.commands;
 import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class PracticeCMD implements CommandExecutor {
 
@@ -21,7 +19,8 @@ public class PracticeCMD implements CommandExecutor {
             return true;
 
         Player player = (Player) sender;
-        PlayerStats playerStats = Parkour.getStatsManager().get(player);
+        StatsManager statsManager = Parkour.getStatsManager();
+        PlayerStats playerStats = statsManager.get(player);
 
         if (a.length == 0)
         {
@@ -53,13 +52,13 @@ public class PracticeCMD implements CommandExecutor {
                                     if (label.equalsIgnoreCase("unprac"))
                                     {
                                         if (playerStats.inPracticeMode())
-                                            PracticeHandler.resetPlayer(playerStats, true);
+                                            statsManager.resetPracticeMode(playerStats, true);
                                         else
                                             player.sendMessage(Utils.translate("&cYou are not in practice mode"));
                                     }
                                     // in the case of /prac
                                     else if (playerStats.inPracticeMode())
-                                        PracticeHandler.resetPlayer(playerStats, true);
+                                        statsManager.resetPracticeMode(playerStats, true);
                                     else if (player.isOnGround())
                                     {
                                         playerStats.setPracticeMode(player.getLocation());

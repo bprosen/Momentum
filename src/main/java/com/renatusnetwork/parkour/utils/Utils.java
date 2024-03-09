@@ -4,10 +4,10 @@ import com.renatusnetwork.parkour.Parkour;
 import com.renatusnetwork.parkour.data.SettingsManager;
 import com.renatusnetwork.parkour.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
+import com.renatusnetwork.parkour.data.stats.StatsManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Firework;
@@ -15,12 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -300,22 +297,23 @@ public class Utils {
                                     if (playerStats.isInBlackMarket())
                                         blackMarketManager.playerLeft(playerStats, false); // remove from event
 
+                                    StatsManager statsManager = Parkour.getStatsManager();
                                     // toggle off elytra armor
-                                    Parkour.getStatsManager().toggleOffElytra(playerStats);
+                                    statsManager.toggleOffElytra(playerStats);
 
                                     player.teleport(loc);
 
                                     playerStats.resetPreviewLevel();
                                     playerStats.resetCurrentCheckpoint();
-                                    PracticeHandler.resetDataOnly(playerStats);
+                                    statsManager.resetPracticeDataOnly(playerStats);
                                     playerStats.resetLevel();
                                     playerStats.clearPotionEffects();
 
                                     if (playerStats.isAttemptingRankup())
-                                        Parkour.getStatsManager().leftRankup(playerStats);
+                                        statsManager.leftRankup(playerStats);
 
                                     if (playerStats.isAttemptingMastery())
-                                        Parkour.getStatsManager().leftMastery(playerStats);
+                                        statsManager.leftMastery(playerStats);
 
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));

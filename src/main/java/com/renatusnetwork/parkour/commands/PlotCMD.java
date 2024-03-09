@@ -1,22 +1,18 @@
 package com.renatusnetwork.parkour.commands;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.data.menus.MenuManager;
 import com.renatusnetwork.parkour.data.plots.Plot;
 import com.renatusnetwork.parkour.data.plots.PlotsDB;
 import com.renatusnetwork.parkour.data.ranks.Rank;
 import com.renatusnetwork.parkour.data.stats.PlayerStats;
-import com.renatusnetwork.parkour.gameplay.handlers.PracticeHandler;
 import com.renatusnetwork.parkour.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.mozilla.javascript.ObjArray;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -434,7 +430,7 @@ public class PlotCMD implements CommandExecutor {
             // save checkpoint if had one
             playerStats.resetCurrentCheckpoint();
             playerStats.resetLevel();
-            PracticeHandler.resetDataOnly(playerStats);
+            Parkour.getStatsManager().resetPracticeDataOnly(playerStats);
 
             if (playerStats.isAttemptingRankup())
                 Parkour.getStatsManager().leftRankup(playerStats);
