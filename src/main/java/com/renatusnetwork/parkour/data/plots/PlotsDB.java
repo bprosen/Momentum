@@ -130,4 +130,24 @@ public class PlotsDB {
                     "WHERE name=?",
                 playerName);
     }
+
+    public static Location[] getLastTwoPlotLocations()
+    {
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                DatabaseManager.PLOTS_TABLE,
+                "center_x, center_z",
+                "ORDER BY plot_id DESC LIMIT 2");
+
+        Location[] array = new Location[2];
+
+        int index = 0;
+        for (Map<String, String> result : results)
+            array[index] = new Location(
+                    Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
+                    Double.parseDouble(result.get("center_x")),
+                    0.0,
+                    Double.parseDouble(result.get("center_z")));
+
+        return array;
+    }
 }

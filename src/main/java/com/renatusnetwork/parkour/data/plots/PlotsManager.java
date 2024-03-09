@@ -1,7 +1,6 @@
 package com.renatusnetwork.parkour.data.plots;
 
 import com.renatusnetwork.parkour.Parkour;
-import com.renatusnetwork.parkour.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.parkour.utils.Utils;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
@@ -11,17 +10,16 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
 public class PlotsManager {
 
     private HashMap<String, Plot> plotList = new HashMap<>();
+    private Location lastPlotLocation;
+    private Location nextFreePlotLocation;
+    private PlotDirection currentDirection;
 
     public PlotsManager() {
         load();
@@ -30,8 +28,129 @@ public class PlotsManager {
     public void load()
     {
         plotList = PlotsDB.loadPlots();
+        loadNextFreePlotFromDB();
 
         Parkour.getPluginLogger().info("Plots Loaded: " + plotList.size());
+    }
+
+    private void loadNextFreePlotFromDB()
+    {
+        Location[] lastTwoPlots = PlotsDB.getLastTwoPlotLocations();
+        Location lastPlot = lastTwoPlots[1];
+        Location secondLastPlot = lastTwoPlots[0];
+        int plotWidthAndBuffer = Parkour.getSettingsManager().player_submitted_plot_buffer_width + Parkour.getSettingsManager().player_submitted_plot_width;
+
+        // ensure not null, can do directional difference
+        if (lastPlot != null && secondLastPlot != null)
+        {
+            PlotDirection direction = PlotDirection.NORTH;
+
+            if (lastPlot.getZ() < secondLastPlot.getZ())
+                direction = PlotDirection.NORTH;
+            else if (lastPlot.getX() > secondLastPlot.getX())
+                direction = PlotDirection.EAST;
+            else if (lastPlot.getZ() > secondLastPlot.getZ())
+                direction = PlotDirection.SOUTH;
+            else if (lastPlot.getX() < secondLastPlot.getX())
+                direction = PlotDirection.WEST;
+
+            Location clonedLastPlot = lastPlot.clone();
+
+            Plot foundPlot = null;
+            PlotDirection newDirection = null;
+            // now need to get whatever direction is clockwise to it
+            switch (direction)
+            {
+                case NORTH:
+                    foundPlot = getPlotInLocation(clonedLastPlot.add(plotWidthAndBuffer, 0, 0));
+                    newDirection = PlotDirection.EAST;
+                    break;
+                case EAST:
+                    foundPlot = getPlotInLocation(clonedLastPlot.add(0, 0, plotWidthAndBuffer));
+                    newDirection = PlotDirection.SOUTH;
+                    break;
+                case SOUTH:
+                    foundPlot = getPlotInLocation(clonedLastPlot.subtract(plotWidthAndBuffer, 0, 0));
+                    newDirection = PlotDirection.WEST;
+                    break;
+                case WEST:
+                    foundPlot = getPlotInLocation(clonedLastPlot.subtract(0, 0, plotWidthAndBuffer));
+                    newDirection = PlotDirection.NORTH;
+                    break;
+            }
+
+            // found the plot loc
+            if (foundPlot == null)
+            {
+                this.nextFreePlotLocation = clonedLastPlot;
+                this.currentDirection = newDirection;
+            }
+            else
+            {
+                this.nextFreePlotLocation = lastPlot.clone().add(lastPlot.clone().subtract(secondLastPlot.clone()));
+                this.nextFreePlotLocation.setY(Parkour.getSettingsManager().player_submitted_plot_default_y);
+                this.currentDirection = direction;
+            }
+
+            this.lastPlotLocation = lastPlot;
+        }
+        // only have 1 plot in db
+        else if (secondLastPlot == null && lastPlot != null)
+        {
+            this.nextFreePlotLocation = lastPlot.add(plotWidthAndBuffer, 0, 0);
+            this.currentDirection = PlotDirection.SOUTH;
+        }
+        // no plots have been made
+        else
+        {
+            this.nextFreePlotLocation = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world), 0, Parkour.getSettingsManager().player_submitted_plot_default_y, 0);
+            this.currentDirection = PlotDirection.EAST;
+        }
+    }
+
+    private void loadNextFreePlotLocation(Location oldLastPlot)
+    {
+        Location clonedLastPlot = lastPlotLocation.clone();
+        int plotWidthAndBuffer = Parkour.getSettingsManager().player_submitted_plot_buffer_width + Parkour.getSettingsManager().player_submitted_plot_width;
+        Plot foundPlot = null;
+        PlotDirection newDirection = null;
+
+        if (this.currentDirection != null)
+        {
+            // now need to get whatever direction is clockwise to it
+            switch (this.currentDirection)
+            {
+                case NORTH:
+                    foundPlot = getPlotInLocation(clonedLastPlot.add(plotWidthAndBuffer, 0, 0));
+                    newDirection = PlotDirection.EAST;
+                    break;
+                case EAST:
+                    foundPlot = getPlotInLocation(clonedLastPlot.add(0, 0, plotWidthAndBuffer));
+                    newDirection = PlotDirection.SOUTH;
+                    break;
+                case SOUTH:
+                    foundPlot = getPlotInLocation(clonedLastPlot.subtract(plotWidthAndBuffer, 0, 0));
+                    newDirection = PlotDirection.WEST;
+                    break;
+                case WEST:
+                    foundPlot = getPlotInLocation(clonedLastPlot.subtract(0, 0, plotWidthAndBuffer));
+                    newDirection = PlotDirection.NORTH;
+                    break;
+            }
+        }
+        else
+        {
+            this.nextFreePlotLocation = clonedLastPlot.clone().add(clonedLastPlot.clone().subtract(oldLastPlot.clone()));
+            this.nextFreePlotLocation.setY(Parkour.getSettingsManager().player_submitted_plot_default_y);
+            this.currentDirection = newDirection;
+        }
+
+        // found the plot loc
+        if (foundPlot == null)
+        {
+            this.nextFreePlotLocation = clonedLastPlot;
+            this.currentDirection = newDirection;
+        }
     }
 
     // player param version
@@ -82,41 +201,23 @@ public class PlotsManager {
     // creation algorithm
     public void createPlot(Player player)
     {
+        Location loc = nextFreePlotLocation.clone();
 
-        // run algorithm in async
-        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Parkour.getPlugin(), () -> {
+        // generate next free plot location
+        this.lastPlotLocation = loc;
+        loadNextFreePlotLocation();
 
-        String result = findNextFreePlot();
+        loc.setYaw(player.getLocation().getYaw());
+        loc.setPitch(player.getLocation().getPitch());
 
-        // run teleport and creation in sync
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Parkour.getPlugin(), () -> {
-            if (result != null && !result.equalsIgnoreCase("")) {
+        // set bedrock -1 where they teleport
+        loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
 
-                // if they have a plot
-                if (result.equalsIgnoreCase("hasPlot")) {
-                    player.sendMessage(Utils.translate("&cYou already have a plot!"));
-                    return;
-                }
-
-                String[] split = result.split(":");
-                // teleport to found plot!
-
-                Location loc = new Location(Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
-                        Double.parseDouble(split[0]), Parkour.getSettingsManager().player_submitted_plot_default_y,
-                        Double.parseDouble(split[1]), player.getLocation().getYaw(), player.getLocation().getPitch());
-
-                // set bedrock -1 where they teleport
-                loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
-
-                player.teleport(loc.clone().add(0.5, 0, 0.5));
-                // add data
-                PlotsDB.addPlot(player, loc);
-                add(player);
-                player.sendMessage(Utils.translate("&7Your &a&lPlot &7has been created!" +
-                                                        " &7Type &a/plot home &7to get back!"));
-                }
-            });
-        });
+        player.teleport(loc.clone().add(0.5, 0, 0.5));
+        // add data
+        PlotsDB.addPlot(player, loc);
+        add(player);
+        player.sendMessage(Utils.translate("&7Your &a&lPlot &7has been created! &7Type &a/plot home &7to get back!"));
     }
 
     public void deletePlot(Plot plot)
@@ -177,71 +278,6 @@ public class PlotsManager {
         } else {
             Parkour.getPluginLogger().info("WorldEdit API found null in clearPlot");
         }
-    }
-
-    /*
-      This method works in complete async and operates in an infinite (biggest int) loop.
-      It will start at 0 + half plot width, 0 + half plot width then keeps track of which way it
-      is going so it can check if there is a plot to the right of it based on direction. If there is no
-      plot to the right, it turns right otherwise if there is a plot to the right, it moves forward.
-     */
-    private String findNextFreePlot()
-    {
-        // add buffer so plots will not touch eachother
-        int plotWidth = Parkour.getSettingsManager().player_submitted_plot_width + Parkour.getSettingsManager().player_submitted_plot_buffer_width;
-        List<String> plots = PlotsDB.getPlotCenters();
-
-        // so plots do not hug eachother
-        int x = (plotWidth / 2);
-        int z = (plotWidth / 2);
-        int direction = 1; // direction, 1 = north, 2 = east, 3 = south, 4 = west
-
-        int index = 0;
-
-        while (index < Integer.MAX_VALUE)
-        {
-            String currentCenter = plots.get(index);
-
-            String[] split = currentCenter.split(":");
-            int plotX = Integer.parseInt(split[0]);
-            int plotZ = Integer.parseInt(split[1]);
-
-            if (plotX == x && plotZ == z)
-            {
-                // if is a plot, keep going in algorithm
-                switch (direction)
-                {
-                    // north
-                    case 1:
-                        if (plots.contains((x + plotWidth) + ":" + z))
-                            z -= plotWidth;
-                        else
-                            x += plotWidth;
-                    // east
-                    case 2:
-                        if (plots.contains(x + ":" + (z + plotWidth)))
-                            x += plotWidth;
-                        else
-                            z += plotWidth;
-                    // south
-                    case 3:
-                        if (plots.contains((x - plotWidth) + ":" + z))
-                            z += plotWidth;
-                        else
-                            x -= plotWidth;
-                    // west
-                    case 4:
-                        if (plots.contains(x + ":" + (z - plotWidth)))
-                            x -= plotWidth;
-                        else
-                            z -= plotWidth;
-                }
-                // keep going through 1, 2, 3, 4, if we hit 0, max of 1
-                direction = Math.max((direction + 1) % 4, 1);
-            }
-            index++;
-        }
-        return null;
     }
 
     // get nearest plot from location
