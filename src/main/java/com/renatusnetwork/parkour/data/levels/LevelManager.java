@@ -677,8 +677,6 @@ public class LevelManager
 
     public long getTotalLevelCompletions() { return totalLevelCompletions; }
 
-    public void addTotalLevelCompletion() { totalLevelCompletions++; }
-
     public void removeTotalLevelCompletion() { totalLevelCompletions--; }
 
 
@@ -859,7 +857,7 @@ public class LevelManager
                 );
     }
 
-    public void levelCompletion(PlayerStats playerStats, Level level)
+    public void validateAndRunLevelCompletion(PlayerStats playerStats, Level level)
     {
         Player player = playerStats.getPlayer();
         EventManager eventManager = Parkour.getEventManager();
@@ -885,7 +883,7 @@ public class LevelManager
                             {
                                 // if level is not an event level, it is guaranteed normal completion
                                 if (!level.isEventLevel())
-                                    dolevelCompletion(playerStats, level);
+                                    doLevelCompletion(playerStats, level);
                                     // otherwise, if there is an event running, end!
                                 else if (eventManager.isEventRunning())
                                     eventManager.endEvent(player, false, false);
@@ -910,7 +908,7 @@ public class LevelManager
         }
     }
 
-    public void dolevelCompletion(PlayerStats playerStats, Level level)
+    private void doLevelCompletion(PlayerStats playerStats, Level level)
     {
         LevelCompletionEvent event = new LevelCompletionEvent(playerStats, level);
         Bukkit.getPluginManager().callEvent(event);
@@ -924,7 +922,7 @@ public class LevelManager
             boolean inRace = race != null;
             boolean runGG = inRace;
 
-            addTotalLevelCompletion();
+            totalLevelCompletions++;
 
             // if they have not completed this individual level, then add and add to level stats
             if (!playerStats.hasCompleted(level))

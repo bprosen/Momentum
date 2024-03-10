@@ -260,7 +260,7 @@ public class LevelListener implements Listener {
                                     playerStats.setLevel(levelTo);
                                 }
                             }
-                            Parkour.getLevelManager().levelCompletion(playerStats, level);
+                            Parkour.getLevelManager().validateAndRunLevelCompletion(playerStats, level);
                         }
                     }
                     else if (ChatColor.stripColor(signLines[1]).contains(Parkour.getSettingsManager().signs_second_line_spawn))
