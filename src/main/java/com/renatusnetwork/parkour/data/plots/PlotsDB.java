@@ -79,7 +79,7 @@ public class PlotsDB {
         if (async)
             DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
         else
-            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
+            DatabaseQueries.runQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
     }
 
 
