@@ -156,10 +156,29 @@ public class LevelListener implements Listener {
     private void setCheckpoint(Player player, PlayerStats playerStats, Location location) {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
 
-        // delete if they have a cp
+        // update if they have a cp
         if (playerStats.hasCurrentCheckpoint())
-            Parkour.getDatabaseManager().runAsyncQuery("DELETE FROM checkpoints WHERE level_name='" + playerStats.getLevel().getName() + "'" +
-                    " AND player_name='" + playerStats.getPlayerName() + "'");
+            Parkour.getDatabaseManager().runAsyncQuery("UPDATE checkpoints SET world=?, x=?, y=?, z=? WHERE level_name=? AND uuid=?",
+                    location.getWorld().getName(),
+                    location.getBlockX(),
+                    location.getBlockY(),
+                    location.getBlockZ(),
+                    playerStats.getLevel().getName(),
+                    playerStats.getUUID());
+        else
+            // add to async queue
+            Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO checkpoints " +
+                    "(uuid, player_name, level_name, world, x, y, z)" +
+                    " VALUES ('" +
+                    playerStats.getUUID() + "','" +
+                    playerStats.getPlayerName() + "','" +
+                    playerStats.getLevel().getName() + "','" +
+                    location.getWorld().getName() + "','" +
+                    location.getBlockX() + "','" +
+                    location.getBlockY() + "','" +
+                    location.getBlockZ() +
+                    "')"
+            );
 
         playerStats.setCurrentCheckpoint(location);
         playerStats.removeCheckpoint(playerStats.getLevel().getName());
@@ -189,20 +208,6 @@ public class LevelListener implements Listener {
         }
 
         player.sendMessage(Utils.translate(msgString));
-
-        // add to async queue
-        Parkour.getDatabaseManager().runAsyncQuery("INSERT INTO checkpoints " +
-                "(uuid, player_name, level_name, world, x, y, z)" +
-                " VALUES ('" +
-                playerStats.getUUID() + "','" +
-                playerStats.getPlayerName() + "','" +
-                playerStats.getLevel().getName() + "','" +
-                location.getWorld().getName() + "','" +
-                location.getBlockX() + "','" +
-                location.getBlockY() + "','" +
-                location.getBlockZ() +
-                "')"
-        );
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
