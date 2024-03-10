@@ -199,6 +199,12 @@ public class Level
         calcRating();
     }
 
+    public void updateRating(String playerName, int newRating)
+    {
+        ratings.replace(playerName, newRating);
+        calcRating();
+    }
+
     public void removeRating(String playerName)
     {
         ratings.remove(playerName);

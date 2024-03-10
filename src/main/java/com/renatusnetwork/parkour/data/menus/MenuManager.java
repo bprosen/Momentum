@@ -23,14 +23,14 @@ public class MenuManager
     private HashMap<String, Menu> menus;
     private HashMap<String, CancelTasks> cancelTasks;
     private HashSet<String> shiftClicked;
-    private HashMap<String, Integer> choosingRaceLevel;
+    private HashMap<String, Level> choosingRating;
 
     public MenuManager()
     {
         this.menus = new HashMap<>();
         this.cancelTasks = new HashMap<>();
         this.shiftClicked = new HashSet<>();
-        this.choosingRaceLevel = new HashMap<>();
+        this.choosingRating = new HashMap<>();
         load();
     }
 
@@ -101,19 +101,34 @@ public class MenuManager
         cancelTasks.remove(playerName);
     }
 
-    public void addShiftClicked(String playerName)
+    public void addShiftClicked(PlayerStats playerStats)
     {
-        shiftClicked.add(playerName);
+        shiftClicked.add(playerStats.getName());
     }
 
-    public boolean containsShiftClicked(String playerName)
+    public boolean containsShiftClicked(PlayerStats playerStats)
     {
-        return shiftClicked.contains(playerName);
+        return shiftClicked.contains(playerStats.getName());
     }
 
-    public void removeShiftClicked(String playerName)
+    public void removeShiftClicked(PlayerStats playerStats)
     {
-        shiftClicked.remove(playerName);
+        shiftClicked.remove(playerStats.getName());
+    }
+
+    public void addChoosingRating(PlayerStats playerStats, Level level)
+    {
+        choosingRating.put(playerStats.getName(), level);
+    }
+
+    public Level getChoosingRating(PlayerStats playerStats)
+    {
+        return choosingRating.get(playerStats.getName());
+    }
+
+    public void removeChoosingRating(String playerName)
+    {
+        choosingRating.remove(playerName);
     }
 
     public Inventory createInventory(MenuPage menuPage, int size, String title)

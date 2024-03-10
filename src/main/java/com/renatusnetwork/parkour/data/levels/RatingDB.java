@@ -18,6 +18,13 @@ public class RatingDB
         );
     }
 
+    public static void updateRating(Player player, Level level, int rating)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.LEVEL_RATINGS_TABLE + " SET rating=? WHERE uuid=? AND level_name=?", rating, player.getUniqueId().toString(), level.getName()
+        );
+    }
+
     public static void removeRating(String playerName, Level level)
     {
         DatabaseQueries.runAsyncQuery(

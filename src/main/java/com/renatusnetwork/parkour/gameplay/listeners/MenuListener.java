@@ -62,13 +62,13 @@ public class MenuListener implements Listener
                         boolean shiftClicked = event.isShiftClick();
 
                         if (shiftClicked)
-                            Parkour.getMenuManager().addShiftClicked(player.getName());
+                            Parkour.getMenuManager().addShiftClicked(playerStats);
 
                         MenuItemAction.perform(player, menuItem);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
 
                         if (shiftClicked)
-                            Parkour.getMenuManager().removeShiftClicked(player.getName());
+                            Parkour.getMenuManager().removeShiftClicked(playerStats);
 
                     } else {
                         // submitted plots section
@@ -111,6 +111,9 @@ public class MenuListener implements Listener
         RaceManager raceManager = Parkour.getRaceManager();
         MenuManager menuManager = Parkour.getMenuManager();
         String name = event.getPlayer().getName();
+
+        // remove if present
+        menuManager.removeChoosingRating(name);
 
         // remove if present
         raceManager.removeChoosingRaceLevel(name);

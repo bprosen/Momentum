@@ -139,6 +139,12 @@ public class LevelManager
         RatingDB.addRating(player, level, rating);
     }
 
+    public void updateRating(Player player, Level level, int rating)
+    {
+        level.updateRating(player.getName(), rating);
+        RatingDB.updateRating(player, level, rating);
+    }
+
     public void removeRating(String playerName, Level level) {
         level.removeRating(playerName);
         RatingDB.removeRating(playerName, level);

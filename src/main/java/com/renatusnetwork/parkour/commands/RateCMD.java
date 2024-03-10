@@ -22,14 +22,12 @@ public class RateCMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (!(sender instanceof Player))
-        {
             return true;
-        }
 
         Player player = (Player) sender;
 
-        if (a.length >= 1) {
-
+        if (a.length >= 1)
+        {
             // allow ability to get from title or name
             String[] split = Arrays.copyOfRange(a, 0, a.length);
             String levelName = String.join(" ", split);
@@ -43,11 +41,11 @@ public class RateCMD implements CommandExecutor {
 
                 if (playerStats.hasCompleted(level))
                 {
-                    if (!level.hasRated(playerStats.getName()))
-                        // menu
-                        Parkour.getMenuManager().openInventory(playerStats, "rate_level", true);
-                    else
-                        sender.sendMessage(Utils.translate("&cYou have already rated &4" + level.getTitle()));
+                    MenuManager menuManager = Parkour.getMenuManager();
+
+                    menuManager.addChoosingRating(playerStats, level);
+                    // menu
+                    menuManager.openInventory(playerStats, "rate_level", true);
                 }
                 else
                     player.sendMessage(Utils.translate(

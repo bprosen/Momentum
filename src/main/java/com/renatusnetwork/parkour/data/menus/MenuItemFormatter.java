@@ -655,7 +655,9 @@ public class MenuItemFormatter
             // only show rating if above 5
             if (level.getRatingsCount() >= 5)
             {
-                itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
+                int rating = level.getRating(playerStats.getName());
+
+                itemLore.add(Utils.translate("  &6" + level.getRating() + (rating > -1 ? " &e(" + rating + ")" : "") + " &7Rating"));
                 itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
             }
 
@@ -683,6 +685,13 @@ public class MenuItemFormatter
                         time += (seconds % 60) + "s";
 
                     itemLore.add(Utils.translate("  &6" + time + " &7Average"));
+                }
+
+                LevelLBPosition lbPosition = level.getRecordCompletion();
+                if (lbPosition != null)
+                {
+                    itemLore.add(Utils.translate("  &6" + TimeUtils.formatCompletionTimeTaken(lbPosition.getTimeTaken(), 3) + " &7Fastest"));
+                    itemLore.add(Utils.translate("    &e" + lbPosition.getPlayerName()));
                 }
             }
 

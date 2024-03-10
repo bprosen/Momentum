@@ -126,7 +126,7 @@ public class MenuItemAction {
         else if (menuItem.getOpenMenu() != null) // replacement for type open, since we define page numbers
             performOpenItem(playerStats, menuItem);
         else if (itemType.equals("rate"))
-            performLevelRate(player, menuItem);
+            performLevelRate(playerStats, menuItem);
         else if (itemType.equals("infinite-mode"))
             performInfiniteModeChange(playerStats, menuItem);
         else if (itemType.equals("type"))
@@ -274,34 +274,39 @@ public class MenuItemAction {
         }
     }
 
-    private static void performLevelRate(Player player, MenuItem menuItem) {
+    private static void performLevelRate(PlayerStats playerStats, MenuItem menuItem)
+    {
+        Player player = playerStats.getPlayer();
+        Level level = Parkour.getMenuManager().getChoosingRating(playerStats);
 
-        // strip title since title will be "Rate (levelName)"
-        String levelTitle = ChatColor.stripColor(player.getOpenInventory().getTopInventory().getTitle()).split("Rate ")[1];
         player.closeInventory();
 
-        if (Utils.isInteger(menuItem.getTypeValue())) {
-            Level level = Parkour.getLevelManager().getFromTitle(levelTitle);
+        if (level != null)
+        {
+            int rating = Integer.parseInt(menuItem.getTypeValue());
 
-            if (level != null) {
-                int rating = Integer.parseInt(menuItem.getTypeValue());
-
-                if (rating >= 0 && rating <= 5)
+            if (rating >= 0 && rating <= 5)
+            {
+                if (level.hasRated(player.getName()))
+                {
+                    Parkour.getLevelManager().updateRating(player, level, rating);
+                    player.sendMessage(Utils.translate("&7You updated your rating for &c" + level.getTitle() + "&7 to a &6" + rating + "&7! Thank you for rating!"));
+                }
+                else
                 {
                     Parkour.getLevelManager().addRating(player, level, rating);
                     player.sendMessage(Utils.translate("&7You rated &c" + level.getTitle() + "&7 a &6" + rating + "&7! Thank you for rating!"));
-                } else {
-                    player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
                 }
-            } else {
-                player.sendMessage(Utils.translate("&cSomething went wrong with level &4" + levelTitle + "&c, does it exist?"));
             }
-        } else {
-            player.sendMessage(Utils.translate("&cSomething went wrong, try again?"));
+            else
+                player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
         }
+        else
+            player.sendMessage(Utils.translate("&cSomething went wrong with level, does it exist?"));
     }
 
-    private static void performPlotSubmission(Player player) {
+    private static void performPlotSubmission(Player player)
+    {
         player.closeInventory();
 
         Plot plot = Parkour.getPlotsManager().get(player.getName());
@@ -389,7 +394,7 @@ public class MenuItemAction {
                 !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
             {
-                if (Parkour.getMenuManager().containsShiftClicked(player.getName()))
+                if (Parkour.getMenuManager().containsShiftClicked(playerStats))
                     performLevelPreview(playerStats, level);
                 else
                     performLevelBuying(playerStats, level, menuItem);
@@ -658,7 +663,7 @@ public class MenuItemAction {
                         statsManager.enteredRankup(playerStats);
                 }
 
-                if (Parkour.getMenuManager().containsShiftClicked(player.getName()) &&
+                if (Parkour.getMenuManager().containsShiftClicked(playerStats) &&
                         level.hasMastery() && playerStats.hasCompleted(level) &&
                         !playerStats.hasMasteryCompletion(level))
                     statsManager.enteredMastery(playerStats);
