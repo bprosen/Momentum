@@ -74,8 +74,12 @@ public class PlotsDB {
         );
     }
 
-    public static void removePlot(String uuid) {
-        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
+    public static void removePlot(String uuid, boolean async)
+    {
+        if (async)
+            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
+        else
+            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
     }
 
 
@@ -136,17 +140,21 @@ public class PlotsDB {
         List<Map<String, String>> results = DatabaseQueries.getResults(
                 DatabaseManager.PLOTS_TABLE,
                 "center_x, center_z",
-                "ORDER BY plot_id DESC LIMIT 2");
+                "ORDER BY id DESC LIMIT 2");
 
         Location[] array = new Location[2];
 
         int index = 0;
         for (Map<String, String> result : results)
+        {
             array[index] = new Location(
                     Bukkit.getWorld(Parkour.getSettingsManager().player_submitted_world),
                     Double.parseDouble(result.get("center_x")),
-                    0.0,
-                    Double.parseDouble(result.get("center_z")));
+                    Parkour.getSettingsManager().player_submitted_plot_default_y,
+                    Double.parseDouble(result.get("center_z"))
+            );
+            index++;
+        }
 
         return array;
     }

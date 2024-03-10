@@ -444,7 +444,7 @@ public class db implements CommandExecutor
                                 Plots migration system
                              */
 
-                            Parkour.getPluginLogger().info("Attempting migration of plots table");
+                            /*Parkour.getPluginLogger().info("Attempting migration of plots table");
                             String plotsTable = "SELECT * FROM plots";
                             int plotsCounter = 0;
                             PreparedStatement plotsStatement = connection.prepareStatement(plotsTable);
@@ -485,7 +485,7 @@ public class db implements CommandExecutor
                                 }
                                 plotsCounter++;
                             }
-                            sender.sendMessage(Utils.translate("&cMigrated " + plotsCounter + " plots"));
+                            sender.sendMessage(Utils.translate("&cMigrated " + plotsCounter + " plots"));*/
 
                             /*
                                 Perks migration system
