@@ -538,7 +538,7 @@ public class StatsDB
 
     public static void updateInfiniteScore(String uuid, InfiniteType type, int score)
     {
-        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_" + type.toString().toLowerCase() + "_score=? WHERE uuid=?", score, uuid);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_" + type.name().toLowerCase() + "_score=? WHERE uuid=?", score, uuid);
     }
 
     public static void updateELOTier(String uuid, String eloTier)

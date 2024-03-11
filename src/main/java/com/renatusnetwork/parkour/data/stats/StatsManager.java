@@ -696,49 +696,6 @@ public class StatsManager {
         }
     }
 
-    public String createChatHover(PlayerStats playerStats)
-    {
-        String playerName = playerStats.getName();
-        int coins = playerStats.getCoins();
-        int hours = playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000;
-
-        Clan clan = playerStats.getClan();
-        String clanString = "&cNone";
-        if (clan != null)
-            clanString = clan.getTag();
-
-        Rank rank = playerStats.getRank();
-        String rankString = "&cNone";
-        if (rank != null)
-            rankString = rank.getTitle();
-
-        int prestiges = playerStats.getPrestiges();
-        int records = playerStats.getNumRecords();
-        int totalCompletions = playerStats.getTotalLevelCompletions();
-        int levelsRated = playerStats.getRatedLevelsCount();
-        int raceWins = playerStats.getRaceWins();
-        int raceLosses = playerStats.getRaceLosses();
-        int eventWins = playerStats.getEventWins();
-        int jumps = playerStats.getPlayer().getStatistic(Statistic.JUMP);
-        String eloTier = playerStats.getELOTierTitleWithLB();
-
-        return Utils.translate(
-                "&7Name » &f" + playerName + "\n" +
-                        "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
-                        "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
-                        "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
-                        "&7Rank » &a" + rankString + "\n" +
-                        "&7ELO » &2" + eloTier + "\n" +
-                        "&7Clan » &e" + clanString + "\n" +
-                        "&7Prestige » &5" + prestiges + "\n" +
-                        "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
-                        "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
-                        "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
-                        "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses + "\n" +
-                        "&7Event Wins » &b" + eventWins
-        );
-    }
-
     public void hidePlayer(Player player)
     {
         hiddenPlayers.add(player);
@@ -908,6 +865,52 @@ public class StatsManager {
 
             Parkour.getLevelManager().regionLevelCheck(spectatorStats, loc);
         }
+    }
+
+    public String createChatHover(PlayerStats playerStats)
+    {
+        if (playerStats != null && playerStats.isLoaded())
+        {
+            String playerName = playerStats.getName();
+            int coins = playerStats.getCoins();
+            int hours = playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000;
+
+            Clan clan = playerStats.getClan();
+            String clanString = clan != null ? clan.getTag() : "&cNone";
+
+            Rank rank = playerStats.getRank();
+            String rankString = rank != null ? rank.getTitle() : "&cNone";
+
+            String eloTier = playerStats.getELOTierTitleWithLB();
+            if (eloTier == null)
+                eloTier = "&cNone";
+
+            int prestiges = playerStats.getPrestiges();
+            int records = playerStats.getNumRecords();
+            int totalCompletions = playerStats.getTotalLevelCompletions();
+            int levelsRated = playerStats.getRatedLevelsCount();
+            int raceWins = playerStats.getRaceWins();
+            int raceLosses = playerStats.getRaceLosses();
+            int eventWins = playerStats.getEventWins();
+            int jumps = playerStats.getPlayer().getStatistic(Statistic.JUMP);
+
+            return Utils.translate(
+                    "&7Name » &f" + playerName + "\n" +
+                            "&7Coins » &6" + Utils.formatNumber(coins) + "\n" +
+                            "&7Hours » &b" + Utils.formatNumber(hours) + "\n" +
+                            "&7Jumps » &a" + Utils.formatNumber(jumps) + "\n\n" +
+                            "&7Rank » &a" + rankString + "\n" +
+                            "&7ELO » &2" + eloTier + "\n" +
+                            "&7Clan » &e" + clanString + "\n" +
+                            "&7Prestige » &5" + prestiges + "\n" +
+                            "&7Records » &e✦ " + Utils.formatNumber(records) + "\n" +
+                            "&7Total Completions » &a" + Utils.formatNumber(totalCompletions) + "\n" +
+                            "&7Rated Levels » &3" + Utils.formatNumber(levelsRated) + "\n" +
+                            "&7Race Wins/Losses » &c" + raceWins + "/" + raceLosses + "\n" +
+                            "&7Event Wins » &b" + eventWins
+            );
+        }
+        return Utils.translate("&cLoading stats...");
     }
 
     public void shutdown()
