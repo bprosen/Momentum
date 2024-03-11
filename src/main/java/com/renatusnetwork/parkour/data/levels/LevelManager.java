@@ -925,6 +925,10 @@ public class LevelManager
         {
             LevelLBPosition oldRecord = level.getRecordCompletion();
             RacePlayer race = playerStats.getRace();
+
+            // get current PB
+            LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
+
             boolean inRace = race != null;
             boolean runGG = inRace;
 
@@ -1049,13 +1053,10 @@ public class LevelManager
             player.sendMessage(Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                     + ChatColor.stripColor(level.getFormattedTitle())));
 
-            // get new PB
-            LevelCompletion bestCompletion = playerStats.getQuickestCompletion(level);
-
             // if new pb, send message to player
-            if (levelCompletion.wasTimed() && bestCompletion != null && bestCompletion.getCompletionTimeElapsedMillis() > elapsedTime)
+            if (levelCompletion.wasTimed() && fastestCompletion != null && fastestCompletion.getCompletionTimeElapsedMillis() > elapsedTime)
             {
-                String oldTimeString = Utils.formatDecimal(bestCompletion.getCompletionTimeElapsedSeconds()) + "s"; // need to format the long
+                String oldTimeString = TimeUtils.formatCompletionTimeTaken(fastestCompletion.getCompletionTimeElapsedMillis(), 3); // need to format the long
                 player.sendMessage(Utils.translate("&7You have broken your personal best &c(" + oldTimeString + ")&7 with &a" + time));
             }
 

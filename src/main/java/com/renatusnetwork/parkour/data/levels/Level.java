@@ -224,15 +224,20 @@ public class Level
 
     public void calcRating()
     {
-        long sumRatings = 0;
+        if (!ratings.isEmpty())
+        {
+            long sumRatings = 0;
 
-        for (Integer value : ratings.values())
-            sumRatings += value;
+            for (Integer value : ratings.values())
+                sumRatings += value;
 
-        double newAverageRating = ((double) sumRatings) / ratings.size();
+            double newAverageRating = ((double) sumRatings) / ratings.size();
 
-        // this makes it seperate digits by commands and .2 means round decimal by 2 places
-        rating = Float.parseFloat(String.format("%,.2f", newAverageRating));
+            // this makes it seperate digits by commands and .2 means round decimal by 2 places
+            rating = Float.parseFloat(Utils.formatDecimal(newAverageRating));
+        }
+        else
+            rating = 0.0f;
     }
 
     public List<String> getCommands() { return commands; }
