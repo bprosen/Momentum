@@ -52,12 +52,18 @@ public class CheckpointDB {
         );
     }
 
-    public static void deleteCheckpoint(String playerUUID, String levelName)
+    public static void updateCheckpoint(PlayerStats playerStats, Location newLocation)
     {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " WHERE uuid=? AND level_name=?", playerUUID, levelName
-        );
+                "UPDATE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " SET world=?, x=?, y=?, z=? WHERE level_name=? AND uuid=?",
+                newLocation.getWorld().getName(),
+                            newLocation.getBlockX(),
+                            newLocation.getBlockY(),
+                            newLocation.getBlockZ(),
+                            playerStats.getLevel().getName(),
+                            playerStats.getUUID());
     }
+
     public static void insertCheckpoint(PlayerStats playerStats, Location location)
     {
         DatabaseQueries.runAsyncQuery(

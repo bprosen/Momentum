@@ -179,8 +179,11 @@ public class LevelListener implements Listener {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, 0f);
 
         // delete if they have a cp
-        if (!inRace && playerStats.hasCurrentCheckpoint())
-            CheckpointDB.deleteCheckpoint(playerStats.getUUID(), playerStats.getLevel().getName());
+        if (!inRace)
+            if (playerStats.hasCurrentCheckpoint())
+                CheckpointDB.updateCheckpoint(playerStats, location);
+            else
+                CheckpointDB.insertCheckpoint(playerStats, location);
 
         playerStats.setCurrentCheckpoint(location);
 
@@ -213,9 +216,6 @@ public class LevelListener implements Listener {
         }
 
         player.sendMessage(Utils.translate(msgString));
-
-        if (!inRace)
-            CheckpointDB.insertCheckpoint(playerStats, location);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
