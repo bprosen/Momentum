@@ -1063,12 +1063,12 @@ public class LevelManager
             // broadcast completed if it is the featured level
             if (level.isFeaturedLevel())
                 Bukkit.broadcastMessage(Utils.translate(
-                        "&c" + player.getDisplayName() + " &7has completed the &6Featured Level &4" + level.getTitle()
+                        "&c" + player.getDisplayName() + " &7has completed &c&lFEATURED &4" + level.getTitle()
                 ));
             else if (completedMastery)
             {
                 Bukkit.broadcastMessage(Utils.translate(
-                        "&c" + playerStats.getDisplayName() + "&7 has completed the &5&lMastery &7for &2" + level.getTitle()
+                        "&c" + playerStats.getDisplayName() + "&7 has completed the &5&lMASTERY &7for &2" + level.getTitle()
                 ));
                 runGG = true;
             }

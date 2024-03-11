@@ -743,7 +743,7 @@ public class MenuItemFormatter
             if (choosingRaceLevel == null && level.hasRequiredLevels() && !level.isFeaturedLevel())
             {
                 itemLore.add("");
-                itemLore.add(Utils.translate("&7Required levels"));
+                itemLore.add(Utils.translate("&7Requires"));
 
                 for (String requiredLevelName : level.getRequiredLevels())
                 {
