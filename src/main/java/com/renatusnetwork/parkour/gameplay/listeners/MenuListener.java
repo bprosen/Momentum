@@ -107,7 +107,6 @@ public class MenuListener implements Listener
     @EventHandler
     public void onMenuClose(InventoryCloseEvent event)
     {
-        LevelManager levelManager = Parkour.getLevelManager();
         RaceManager raceManager = Parkour.getRaceManager();
         MenuManager menuManager = Parkour.getMenuManager();
         String name = event.getPlayer().getName();
@@ -126,28 +125,23 @@ public class MenuListener implements Listener
                 Inventory openedInventory = event.getInventory();
                 Inventory nextInventory = event.getPlayer().getOpenInventory().getTopInventory();
 
-                if (openedInventory instanceof MenuHolder && nextInventory instanceof MenuHolder)
+                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName()))
                 {
-                    Menu openedMenu = ((MenuHolder) openedInventory).getMenu();
-                    Menu nextMenu = ((MenuHolder) nextInventory).getMenu();
+                    LevelManager levelManager = Parkour.getLevelManager();
 
-                    if (!openedMenu.equals(nextMenu))
+                    // remove buying
+                    levelManager.removeBuyingLevel(name);
+
+                    // cancelled tasks
+                    CancelTasks cancelTasks = menuManager.getCancelTasks(name);
+
+                    // if not null and contains, we need to cancel remaining tasks!
+                    if (cancelTasks != null && cancelTasks.getCancelledSlots() != null)
                     {
-                        // remove buying
-                        if (levelManager.isBuyingLevelMenu(name))
-                            levelManager.removeBuyingLevel(name);
+                        for (BukkitTask task : cancelTasks.getCancelledSlots())
+                            task.cancel();
 
-                        // cancelled tasks
-                        CancelTasks cancelTasks = menuManager.getCancelTasks(name);
-
-                        // if not null and contains, we need to cancel remaining tasks!
-                        if (cancelTasks != null && cancelTasks.getCancelledSlots() != null)
-                        {
-                            for (BukkitTask task : cancelTasks.getCancelledSlots())
-                                task.cancel();
-
-                            menuManager.removeCancelTasks(name); // remove
-                        }
+                        menuManager.removeCancelTasks(name); // remove
                     }
                 }
             }
