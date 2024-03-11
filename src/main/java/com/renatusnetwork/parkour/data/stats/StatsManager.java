@@ -8,6 +8,7 @@ import com.renatusnetwork.parkour.data.clans.Clan;
 import com.renatusnetwork.parkour.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.parkour.data.elo.ELOTier;
 import com.renatusnetwork.parkour.data.elo.ELOTierDB;
+import com.renatusnetwork.parkour.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.parkour.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.parkour.data.levels.CompletionsDB;
 import com.renatusnetwork.parkour.data.levels.Level;
@@ -332,6 +333,25 @@ public class StatsManager {
     {
         playerStats.setInfiniteBlock(material);
         StatsDB.updateInfiniteBlock(playerStats.getUUID(), material.name());
+    }
+
+    public void resetInfiniteBlock(PlayerStats playerStats)
+    {
+        playerStats.setInfiniteBlock(Parkour.getSettingsManager().infinite_default_block);
+        StatsDB.resetInfiniteBlock(playerStats.getUUID());
+    }
+
+    public void updateInfiniteScore(PlayerStats playerStats, InfiniteType type, int score)
+    {
+        playerStats.setInfiniteScore(type, score);
+        StatsDB.updateInfiniteScore(playerStats.getUUID(), type, score);
+    }
+
+    public void addEventWin(PlayerStats playerStats)
+    {
+        // update wins
+        playerStats.addEventWin();
+        StatsDB.updateEventWins(playerStats.getUUID(), playerStats.getEventWins());
     }
 
     public void processELOChange(PlayerStats playerStats, int newELO)

@@ -182,7 +182,7 @@ public class InfiniteManager {
                     ));
                 }
 
-                updateScore(player.getName(), playerStats.getInfiniteType(), score);
+                Parkour.getStatsManager().updateInfiniteScore(playerStats, playerStats.getInfiniteType(), score);
             }
             else if (player.isOnline())
                 player.sendMessage(Utils.translate(
@@ -236,19 +236,6 @@ public class InfiniteManager {
 
     public void remove(String playerName) {
         participants.remove(playerName);
-    }
-
-    // method to update their score in all 3 possible placed
-    public void updateScore(String playerName, InfiniteType type, int score)
-    {
-        PlayerStats playerStats = Parkour.getStatsManager().getByName(playerName);
-
-        if (playerStats != null)
-            playerStats.setInfiniteScore(type, score);
-
-        DatabaseQueries.runAsyncQuery(
-                "UPDATE players SET infinite_" + type.toString().toLowerCase() + "_score=" + score + " WHERE name=?", playerName
-        );
     }
 
     public Location generateNextBlockLocation(Location oldLocation, Player player, Infinite infinite)

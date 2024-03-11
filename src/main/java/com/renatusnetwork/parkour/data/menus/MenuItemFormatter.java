@@ -642,9 +642,9 @@ public class MenuItemFormatter
                 // on cooldown!
                 if (cooldown != null && cooldown.getModifier() != 1.00f)
                 {
-                    itemLore.add(Utils.translate("  &7On cooldown &6(-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%)"));
+                    itemLore.add(Utils.translate("  &7On cooldown &6-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%"));
                     itemLore.add(Utils.translate("    &7For &e" +
-                            TimeUtils.formatTime((Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis()))) // get date - current and format
+                            TimeUtils.formatTime(Parkour.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis())) // get date - current and format
                     );
                 }
             }

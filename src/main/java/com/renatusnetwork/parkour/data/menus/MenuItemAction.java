@@ -266,10 +266,7 @@ public class MenuItemAction {
                 player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou have cleared your current infinite block"));
 
-                PlayerStats playerStats = Parkour.getStatsManager().get(player);
-                playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
-
-                DatabaseQueries.runAsyncQuery("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
+                Parkour.getStatsManager().resetInfiniteBlock(Parkour.getStatsManager().get(player));
                 break;
         }
     }

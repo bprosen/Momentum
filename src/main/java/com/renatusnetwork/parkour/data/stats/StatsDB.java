@@ -215,6 +215,11 @@ public class StatsDB
         DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET name=? WHERE uuid=?", name, uuid);
     }
 
+    public static void updateEventWins(String uuid, int eventWins)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET event_wins=? WHERE uuid=?", eventWins, uuid);
+    }
+
     public static void updateELO(String uuid, int elo)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET elo=? WHERE uuid=?", elo, uuid);
@@ -524,6 +529,16 @@ public class StatsDB
     public static void updateInfiniteBlock(String uuid, String material)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block=? WHERE uuid=?", material, uuid);
+    }
+
+    public static void resetInfiniteBlock(String uuid)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block=NULL WHERE uuid=?", uuid);
+    }
+
+    public static void updateInfiniteScore(String uuid, InfiniteType type, int score)
+    {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_" + type.toString().toLowerCase() + "_score=? WHERE uuid=?", score, uuid);
     }
 
     public static void updateELOTier(String uuid, String eloTier)

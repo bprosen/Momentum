@@ -49,7 +49,7 @@ public class EventManager {
         runningEvent = event;
         startTime = System.currentTimeMillis();
 
-        broadcastComponent(Utils.translate("&7A &b" + runningEvent.getFormattedName() + " Event &7has begun! &cClick here to join!"));
+        broadcastComponent(Utils.translate("&7A &b" + runningEvent.getFormattedName() + " Event &7has begun! &cClick here to join"));
 
         // start max time timer
         startTimers();
@@ -99,9 +99,7 @@ public class EventManager {
                 
                 playerStats.getPlayer().sendMessage(Utils.translate("&7You have been rewarded " + Utils.getCoinFormat(runningEvent.getLevel().getReward(), reward) + " &eCoins"));
 
-                // update wins
-                playerStats.addEventWin();
-                DatabaseQueries.runAsyncQuery("UPDATE players SET event_wins=" + playerStats.getEventWins() + " WHERE uuid='" + playerStats.getUUID() + "'");
+                Parkour.getStatsManager().addEventWin(playerStats);
             }
 
             if (forceEnded)

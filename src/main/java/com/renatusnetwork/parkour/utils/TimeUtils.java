@@ -75,13 +75,13 @@ public class TimeUtils
         if (years > 0)
             time += years + "Y ";
         if (months > 0)
-            time += months + "M ";
+            time += (months % 12) + "M ";
         if (days > 0)
-            time += days + "D ";
+            time += (days % 30) + "D ";
         if (hours > 0)
-            time += hours + "h ";
+            time += (hours % 24) + "h ";
         if (minutes > 0)
-            time += minutes + "m ";
+            time += (minutes % 60) + "m ";
 
         return time;
     }
