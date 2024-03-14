@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <mainClass>com.renatusnetwork.parkour.Parkour</mainClass>
+        <mainClass>com.renatusnetwork.momentum.Momentum</mainClass>
         <spigotVersion>1.12.2-R0.1-SNAPSHOT</spigotVersion>
     </properties>
 
     <groupId>com.renatusnetwork</groupId>
-    <artifactId>rn-parkour</artifactId>
+    <artifactId>momentum</artifactId>
     <version>3.0.0</version>
-    <name>RN-Parkour</name>
+    <name>Momentum</name>
     <description>Renatus Network Parkour Plugin</description>
 
     <build>
@@ -56,7 +56,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>fr.mrmicky.fastboard</pattern>
-                                    <shadedPattern>com.renatusnetwork.parkour</shadedPattern>
+                                    <shadedPattern>com.renatusnetwork.momentum</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

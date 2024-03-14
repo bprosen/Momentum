@@ -1,0 +1,53 @@
+package com.renatusnetwork.momentum.commands;
+
+import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.menus.MenuManager;
+import com.renatusnetwork.momentum.utils.Utils;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+public class MenuCMD implements CommandExecutor {
+
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        MenuManager menuManager = Momentum.getMenuManager();
+
+        if (sender.isOp() && a.length == 1 && a[0].equalsIgnoreCase("list"))
+            sender.sendMessage(Utils.translate("&7Menus: &2" + menuManager.getMenuNames()));
+        else if (sender.isOp() && a.length == 1 && a[0].equalsIgnoreCase("load"))
+        {
+            Momentum.getConfigManager().load("menus");
+
+            sender.sendMessage(Utils.translate("&7Loaded &2menus.yml &7from disk"));
+            menuManager.reload();
+            sender.sendMessage(Utils.translate("&7Loaded menus from the config"));
+        }
+        else if (a.length >= 2 && a[0].equalsIgnoreCase("open"))
+        {
+            if (sender instanceof Player)
+            {
+                Player player = (Player) sender;
+
+                int pageNumber = 1;
+                if (a.length == 3 && Utils.isInteger(a[2]))
+                    pageNumber = Integer.parseInt(a[2]);
+
+                menuManager.openInventory(Momentum.getStatsManager().get(player), player, a[1], pageNumber, true);
+            }
+        }
+        else if (sender.isOp())
+            sendHelp(sender);
+
+        return true;
+    }
+
+    private static void sendHelp(CommandSender sender)
+    {
+        sender.sendMessage(Utils.translate("&2&lMenus Help"));
+        sender.sendMessage(Utils.translate("&2/menu list  &7Lists the configured menus"));
+        sender.sendMessage(Utils.translate("&2/menu open <menu> [page#]  &7Opens inventory menu"));
+        sender.sendMessage(Utils.translate("&2/menu load  &7Loads menus from config"));
+        sender.sendMessage(Utils.translate("&2/menu help  &7Displays this screen"));
+    }
+}
