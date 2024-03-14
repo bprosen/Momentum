@@ -34,7 +34,7 @@ public class RageQuitCMD implements CommandExecutor {
 
         if (a.length == 0) {
             // run rage quit here
-            if (player.hasPermission("rn-parkour.ragequit")) {
+            if (player.hasPermission("momentum.ragequit")) {
 
                 // find random message
                 Random random = new Random();
@@ -88,7 +88,7 @@ public class RageQuitCMD implements CommandExecutor {
 
                         // remove price and give perm
                         Momentum.getStatsManager().removeCoins(playerStats, price);
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + player.getName() + " permission set rn-parkour.ragequit");
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + player.getName() + " permission set momentum.ragequit");
                         player.sendMessage(Utils.translate("&7You purchased &c/ragequit&7! Type it again to use it"));
                     } else {
                         player.sendMessage(Utils.translate("&7Are you sure you want to buy the &c/ragequit &7command?" +

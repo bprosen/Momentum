@@ -27,7 +27,7 @@ public class CheckpointCMD implements CommandExecutor {
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
             Momentum.getCheckpointManager().teleportToCP(playerStats);
         }
-        else if (player.hasPermission("rn-parkour.admin") && a.length == 2 && a[0].equalsIgnoreCase("list"))
+        else if (player.hasPermission("momentum.admin") && a.length == 2 && a[0].equalsIgnoreCase("list"))
         {
             String playerName = a[1];
 
@@ -60,7 +60,7 @@ public class CheckpointCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&cCheckpoint Help"));
         player.sendMessage(Utils.translate("&c/checkpoint [teleport] &7Teleports you to your previous checkpoint"));
 
-        if (player.hasPermission("rn-parkour.admin"))
+        if (player.hasPermission("momentum.admin"))
             player.sendMessage(Utils.translate("&c/checkpoint list (player) &7Lists checkpoints the player has"));
     }
 }

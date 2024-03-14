@@ -82,7 +82,7 @@ public class Momentum extends JavaPlugin
         Scoreboard.startScheduler(plugin);
         stats.addUnloadedPlayers();
 
-        getLogger().info("RN-Parkour Enabled");
+        getLogger().info("Momentum Enabled");
     }
 
     @Override
@@ -99,7 +99,7 @@ public class Momentum extends JavaPlugin
         database.close();
         unloadClasses();
 
-        getLogger().info("RN-Parkour Disabled");
+        getLogger().info("Momentum Disabled");
 
         plugin = null;
     }
@@ -136,7 +136,7 @@ public class Momentum extends JavaPlugin
         getCommand("perks").setExecutor(new PerksCMD());
         getCommand("spectate").setExecutor(new SpectateCMD());
         getCommand("clan").setExecutor(new ClanCMD());
-        getCommand("rn-parkour").setExecutor(new RNParkourCMD());
+        getCommand("momentum").setExecutor(new MomentumCMD());
         getCommand("toggleplayers").setExecutor(new PlayerToggleCMD());
         getCommand("checkpoint").setExecutor(new CheckpointCMD());
         getCommand("spawn").setExecutor(new SpawnCMD());

@@ -86,7 +86,7 @@ public class ClanCMD implements CommandExecutor {
 
                 if (a.length == 3 && a[0].equalsIgnoreCase("setxp")) {
 
-                    if (player.hasPermission("rn-parkour.admin")) {
+                    if (player.hasPermission("momentum.admin")) {
                         String clanName = a[1];
                         if (Utils.isInteger(a[2])) {
                             int newXp = Integer.parseInt(a[2]);
@@ -115,7 +115,7 @@ public class ClanCMD implements CommandExecutor {
                 // set total gained xp
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("settotalxp")) {
 
-                    if (player.hasPermission("rn-parkour.admin")) {
+                    if (player.hasPermission("momentum.admin")) {
                         String clanName = a[1];
                         if (Utils.isLong(a[2])) {
                             long newXP = Long.parseLong(a[2]);
@@ -143,7 +143,7 @@ public class ClanCMD implements CommandExecutor {
                     }
                 } else if (a.length == 3 && a[0].equalsIgnoreCase("setlevel")) {
 
-                    if (player.hasPermission("rn-parkour.admin")) {
+                    if (player.hasPermission("momentum.admin")) {
                         String clanName = a[1];
 
                         if (Utils.isInteger(a[2])) {
@@ -169,7 +169,7 @@ public class ClanCMD implements CommandExecutor {
                         sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
                     }
                 } else if (a.length == 1 && a[0].equalsIgnoreCase("chatspy")) {
-                    if (player.hasPermission("rn-parkour.staff")) {
+                    if (player.hasPermission("momentum.staff")) {
                         ClansManager clansManager = Momentum.getClansManager();
 
                         clansManager.toggleChatSpy(player.getName(), false);
@@ -465,7 +465,7 @@ public class ClanCMD implements CommandExecutor {
                     } else {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
                     }
-                } else if (player.hasPermission("rn-parkour.admin") && (a.length == 2 && a[0].equalsIgnoreCase("delete"))) {
+                } else if (player.hasPermission("momentum.admin") && (a.length == 2 && a[0].equalsIgnoreCase("delete"))) {
 
                     Clan targetClan = Momentum.getClansManager().get(a[1]);
 
@@ -540,7 +540,7 @@ public class ClanCMD implements CommandExecutor {
         // send admin section
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (player.hasPermission("rn-parkour.admin")) {
+            if (player.hasPermission("momentum.admin")) {
                 sender.sendMessage(getHelp("setlevel"));
                 sender.sendMessage(getHelp("setxp"));
                 sender.sendMessage(getHelp("settotalxp"));

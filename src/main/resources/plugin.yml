@@ -9,97 +9,97 @@ softdepend: [PlaceholderAPI]
 
 commands:
   level:
-    description: "RN-Parkour level management command"
+    description: "Momentum level management command"
     aliases: [lvl, levels]
   location:
-    description: "RN-Parkour location management command"
+    description: "Momentum location management command"
     aliases: [loc, locations]
   menu:
-    description: "RN-Parkour menu management command"
+    description: "Momentum menu management command"
     aliases: [menus]
   perks:
-    description: "RN-Parkour perks management command"
+    description: "Momentum perks management command"
     aliases: [perk]
   stats:
-    description: "RN-Parkour stats display command"
+    description: "Momentum stats display command"
   spectate:
-    description: "RN-Parkour spectate command"
+    description: "Momentum spectate command"
   clan:
-    description: "RN-Parkour clan management command"
+    description: "Momentum clan management command"
     aliases: [clans]
-  rn-parkour:
-    description: "RN-Parkour main command"
+  momentum:
+    description: "Momentum main command"
   toggleplayers:
-    description: "RN-Parkour player toggling command"
+    description: "Momentum player toggling command"
   checkpoint:
-    description: "RN-Parkour checkpoint command"
+    description: "Momentum checkpoint command"
   setspawn:
-    description: "RN-Parkour setspawn command"
+    description: "Momentum setspawn command"
   spawn:
-    description: "RN-Parkour spawn command"
+    description: "Momentum spawn command"
   practice:
-    description: "RN-Parkour practice command"
+    description: "Momentum practice command"
     aliases: [prac, unprac]
   race:
-    description: "RN-Parkour race command"
+    description: "Momentum race command"
     aliases: [races]
   rank:
-    description: "RN-Parkour rank command"
+    description: "Momentum rank command"
     aliases: [ranks]
   rankup:
-    description: "RN-Parkour rankup command"
+    description: "Momentum rankup command"
   plot:
-    description: "RN-Parkour player submitted command"
+    description: "Momentum player submitted command"
     aliases: [plots, playersubmitted, playersubmit]
   event:
-    description: "RN-Parkour events command"
+    description: "Momentum events command"
   prestige:
-    description: "RN-Parkour prestige command"
+    description: "Momentum prestige command"
   rate:
-    description: "RN-Parkour rate command"
+    description: "Momentum rate command"
     aliases: [ratelevel, levelrate]
   sword:
-    description: "RN-Parkour sword command"
+    description: "Momentum sword command"
     aliases: [setup, setupsword]
   infinite:
-    description: "RN-Parkour InfinitePK command"
+    description: "Momentum InfinitePK command"
     aliases: [infinitepk, endless, endlesspk]
   profile:
-    description: "RN-Parkour profile command"
+    description: "Momentum profile command"
     aliases: [profilestats]
   cosmetics:
-    description: "RN-Parkour cosmetics command"
+    description: "Momentum cosmetics command"
     aliases: [shop]
   ragequit:
-    description: "RN-Parkour rage quit command"
+    description: "Momentum rage quit command"
     aliases: [rq, rage]
   nightvision:
-    description: "RN-Parkour night vision command"
+    description: "Momentum night vision command"
     aliases: [nv, nightvision]
   practicego:
-    description: "RN-Parkour practice go command"
+    description: "Momentum practice go command"
     aliases: [pgo, ptp, practicetp, pracgo, practp]
   grinding:
-    description: "RN-Parkour grinding command"
+    description: "Momentum grinding command"
     aliases: [togglegrind, grindmode, grind]
   coins:
-    description: "RN-Parkour coins command"
+    description: "Momentum coins command"
     aliases: [c, coin]
   records:
-    description: "RN-Parkour records command"
+    description: "Momentum records command"
     aliases: [levelrecords]
   tutorial:
-    description: "RN-Parkour tutorial command"
+    description: "Momentum tutorial command"
   fails:
-    description: "RN-Parkour fails command"
+    description: "Momentum fails command"
     aliases: [fail]
   join:
-    description: "RN-Parkour join command"
+    description: "Momentum join command"
   play:
-    description: "RN-Parkour play command"
+    description: "Momentum play command"
   save:
-    description: "RN-Parkour save command"
+    description: "Momentum save command"
     aliases: [saveloc, savelevel, savelocation, saves]
   pay:
-    description: "RN-Parkour pay command"
+    description: "Momentum pay command"
     aliases: [etransfer]

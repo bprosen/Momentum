@@ -37,7 +37,7 @@ public class CoinsCMD implements CommandExecutor
                 a[0].equalsIgnoreCase("add") ||
                 a[0].equalsIgnoreCase("remove")))
         {
-            if (sender.hasPermission("rn-parkour.admin"))
+            if (sender.hasPermission("momentum.admin"))
             {
                 // variable
                 String targetName = a[1];
@@ -179,7 +179,7 @@ public class CoinsCMD implements CommandExecutor
         sender.sendMessage(Utils.translate("&e/coins <IGN>  &7Displays someone else's coins"));
         sender.sendMessage(Utils.translate("&e/coins top  &7Displays the top 10 players with the most coins"));
 
-        if (sender.hasPermission("rn-parkour.admin"))
+        if (sender.hasPermission("momentum.admin"))
         {
             sender.sendMessage(Utils.translate("&e/coins set <IGN> <coins>  &7Sets coins"));
             sender.sendMessage(Utils.translate("&e/coins add <IGN> <coins>  &7Add coins"));

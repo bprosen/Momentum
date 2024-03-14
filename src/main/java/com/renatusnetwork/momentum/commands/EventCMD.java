@@ -28,7 +28,7 @@ public class EventCMD implements CommandExecutor {
         /*
             Admin Section
          */
-        if (player.hasPermission("rn-parkour.admin")) {
+        if (player.hasPermission("momentum.admin")) {
             // join event
             if (a.length == 1 && a[0].equalsIgnoreCase("join")) {
 
@@ -222,7 +222,7 @@ public class EventCMD implements CommandExecutor {
         sender.sendMessage(getHelp("leave"));
 
         // send admin commands if they have permission
-        if (sender.hasPermission("rn-parkour.admin")) {
+        if (sender.hasPermission("momentum.admin")) {
 
             sender.sendMessage(getHelp("start"));
             sender.sendMessage(getHelp("stop"));

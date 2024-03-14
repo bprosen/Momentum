@@ -21,7 +21,7 @@ public class SpawnCMD implements CommandExecutor {
         Player player = (Player) sender;
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-        if (player.hasPermission("rn-parkour.admin"))
+        if (player.hasPermission("momentum.admin"))
         {
 
             if (a.length == 0)

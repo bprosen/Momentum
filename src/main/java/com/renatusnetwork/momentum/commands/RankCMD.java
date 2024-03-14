@@ -28,7 +28,7 @@ public class RankCMD implements CommandExecutor {
         Player player = (Player) sender;
         RanksManager ranksManager = Momentum.getRanksManager();
 
-        if (player.hasPermission("rn-parkour.admin")) {
+        if (player.hasPermission("momentum.admin")) {
             if (a.length == 0) {
                 sendRank(player);
             } else if (a.length == 3 && a[0].equalsIgnoreCase("set")) {

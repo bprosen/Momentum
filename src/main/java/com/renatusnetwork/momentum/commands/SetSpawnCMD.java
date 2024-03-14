@@ -16,7 +16,7 @@ public class SetSpawnCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        if (player.hasPermission("rn-parkour.admin"))
+        if (player.hasPermission("momentum.admin"))
             Bukkit.dispatchCommand(player, "loc set spawn");
 
         return false;

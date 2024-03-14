@@ -266,7 +266,7 @@ public class LevelListener implements Listener {
 
         // this is mainly QOL for staff!
         if (playerStats != null && !playerStats.isSpectating() &&
-           !playerStats.isEventParticipant() && player.hasPermission("rn-parkour.staff")) {
+           !playerStats.isEventParticipant() && player.hasPermission("momentum.staff")) {
 
             // boolean for resetting level
             boolean resetLevel = false;
