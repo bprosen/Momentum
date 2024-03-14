@@ -1,4 +1,4 @@
-# RN-Parkour
+# Momentum
 This plugin is made specifically for Renatus Network's Parkour server, it will not work correctly on other servers without specific conditions set.
 
 <br />
