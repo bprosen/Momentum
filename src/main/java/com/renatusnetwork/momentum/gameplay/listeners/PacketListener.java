@@ -296,7 +296,7 @@ public class PacketListener implements Listener
                                 if (level != null && level.hasRespawnY() && level.getRespawnY() >= player.getLocation().getY()) {
                                     // teleport
                                     if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
-                                        Momentum.getCheckpointManager().teleportToCP(playerStats);
+                                        Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                                     else
                                         Momentum.getLevelManager().respawnPlayer(playerStats, level);
                                 }

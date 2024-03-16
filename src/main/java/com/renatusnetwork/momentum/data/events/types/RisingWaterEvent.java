@@ -100,7 +100,7 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
                     LocationManager locationManager = Momentum.getLocationManager();
 
                     // if there is no start loc, then cancel
-                    if (locationManager.equals(getLevel().getStartLocation(), locationManager.getLobbyLocation()))
+                    if (locationManager.equals(getLevel().getStartLocation(), locationManager.getSpawnLocation()))
                         cancel();
                     else
                     {

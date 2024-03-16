@@ -2,6 +2,10 @@ package com.renatusnetwork.momentum.data.locations;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
+import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsManager;
+import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -12,7 +16,7 @@ import java.util.List;
 public class LocationManager {
 
     private HashMap<String, Location> locations;
-    private Location lobbyLocation;
+    private Location spawnLocation;
     private Location tutorialLocation;
 
     public LocationManager() {
@@ -29,7 +33,7 @@ public class LocationManager {
 
     public void reloadCachedLocations()
     {
-        this.lobbyLocation = get("spawn");
+        this.spawnLocation = get("spawn");
         this.tutorialLocation = get("tutorial");
     }
 
@@ -177,11 +181,66 @@ public class LocationManager {
 
     public int numLocations() { return locations.size(); }
 
-    public Location getLobbyLocation() {
-        return lobbyLocation;
+    public Location getSpawnLocation() {
+        return spawnLocation;
     }
 
     public Location getTutorialLocation() { return tutorialLocation; }
+
+    public void teleportToSpawn(PlayerStats playerStats, Player player) {
+        Location loc = Momentum.getLocationManager().getSpawnLocation();
+
+        if (loc == null)
+        {
+            Momentum.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
+            return;
+        }
+
+        if (playerStats == null || !playerStats.isLoaded())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+            return;
+        }
+
+        if (playerStats.isInTutorial())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
+            return;
+        }
+
+        if (playerStats.isEventParticipant())
+        {
+            Momentum.getEventManager().removeParticipant(player, false); // remove if in event
+            return;
+        }
+
+        if (playerStats.inRace())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+            return;
+        }
+
+        if (playerStats.isInInfinite())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
+            return;
+        }
+
+        if (playerStats.isSpectating())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
+            return;
+        }
+
+        if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
+            return;
+        }
+
+        Momentum.getStatsManager().leaveLevelAndReset(playerStats, true);
+        player.teleport(loc);
+    }
 
     public boolean equals(Location one, Location two)
     {

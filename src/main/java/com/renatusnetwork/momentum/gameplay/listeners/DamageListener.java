@@ -47,7 +47,7 @@ public class DamageListener implements Listener {
 
                     // just in case we use checkpoints for droppers at some point
                     if (playerStats.hasCurrentCheckpoint())
-                        Momentum.getCheckpointManager().teleportToCP(playerStats);
+                        Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                     else
                         Momentum.getLevelManager().respawnPlayer(playerStats, playerStats.getLevel());
                 }

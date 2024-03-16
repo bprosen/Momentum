@@ -25,7 +25,7 @@ public class CheckpointCMD implements CommandExecutor {
         if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("teleport")))
         {
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
-            Momentum.getCheckpointManager().teleportToCP(playerStats);
+            Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
         }
         else if (player.hasPermission("momentum.admin") && a.length == 2 && a[0].equalsIgnoreCase("list"))
         {

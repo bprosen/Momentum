@@ -68,4 +68,22 @@ public class SavesDB
                     "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=ls.uuid WHERE p.name=? AND ls.level_name=?",
                     playerName, levelName);
     }
+
+    public static void updateSave(String uuid, String levelName, Location newLocation)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.LEVEL_SAVES_TABLE +
+                     " SET world=?, " +
+                     "x=?, y=?, z=?, " +
+                     "yaw=?, pitch=? " +
+                     "WHERE uuid=? AND level_name=?",
+                newLocation.getWorld().getName(),
+                newLocation.getX(),
+                newLocation.getY(),
+                newLocation.getZ(),
+                newLocation.getYaw(),
+                newLocation.getPitch(),
+                uuid, levelName
+        );
+    }
 }

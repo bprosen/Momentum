@@ -3,6 +3,7 @@ package com.renatusnetwork.momentum.commands;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsDB;
+import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,8 +27,7 @@ public class GrindCMD implements CommandExecutor
                 if (playerStats != null && playerStats.isLoaded())
                 {
                     // Update cache and DB
-                    playerStats.toggleGrinding();
-                    StatsDB.updatePlayerGrinding(playerStats.getUUID(), playerStats.isGrinding());
+                    Momentum.getStatsManager().toggleGrinding(playerStats);
 
                     player.sendMessage(Utils.translate("&7You have turned grind mode " + (playerStats.isGrinding() ? "&aOn" : "&cOff")));
                 }

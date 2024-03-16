@@ -64,7 +64,7 @@ public class InteractListener implements Listener {
             {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
-                Momentum.getCheckpointManager().teleportToCP(playerStats);
+                Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile")))
             {
@@ -154,7 +154,7 @@ public class InteractListener implements Listener {
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Momentum.getSettingsManager().prac_title)))
             {
                 event.setCancelled(true);
-                Momentum.getCheckpointManager().teleportToPracCP(Momentum.getStatsManager().get(player));
+                Momentum.getCheckpointManager().teleportToPracticeCheckpoint(Momentum.getStatsManager().get(player));
             }
             else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Momentum.getSettingsManager().leave_title)))
             {
@@ -196,7 +196,7 @@ public class InteractListener implements Listener {
                             playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
                         }
                         else
-                            Utils.teleportToSpawn(Momentum.getStatsManager().get(player));
+                            Momentum.getLocationManager().teleportToSpawn(playerStats, player);
                     }
                 }
                 else

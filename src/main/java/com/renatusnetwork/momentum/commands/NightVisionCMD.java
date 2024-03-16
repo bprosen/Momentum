@@ -18,7 +18,6 @@ public class NightVisionCMD implements CommandExecutor {
 
         if (sender instanceof Player)
         {
-
             Player player = (Player) sender;
             StatsManager statsManager = Momentum.getStatsManager();
 
@@ -26,30 +25,14 @@ public class NightVisionCMD implements CommandExecutor {
             {
                 PlayerStats playerStats = statsManager.get(player);
 
-                if (playerStats.isLoaded())
-                {
-                    if (!playerStats.hasNightVision())
-                    { // enable
-
-                        playerStats.setNightVision(true);
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-                        sender.sendMessage(Utils.translate("&aYou have enabled Night Vision"));
-                    }
-                    else
-                    { // disable
-
-                        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-
-                        playerStats.setNightVision(false);
-                        player.sendMessage(Utils.translate("&cYou have disabled Night Vision"));
-                    }
-                    // update db
-                    StatsDB.updatePlayerNightVision(playerStats.getUUID(), playerStats.hasNightVision());
-                }
-                else
+                if (playerStats == null || !playerStats.isLoaded())
                 {
                     sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                    return false;
                 }
+
+                statsManager.toggleNightVision(playerStats);
+                playerStats.sendMessage(Utils.translate("&cYou have turned night vision " + (playerStats.hasNightVision() ? "&aOn" : "&cOff")));
             }
         }
         return true;

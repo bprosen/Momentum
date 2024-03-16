@@ -19,35 +19,41 @@ public class TutorialCMD implements CommandExecutor
             Player player = (Player) sender;
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-            if (a.length == 0)
+            if (playerStats == null || !playerStats.isLoaded())
             {
-                if (!playerStats.isInTutorial())
-                {
-                    // do menu tp
-                    MenuItemAction.performLevelTeleport(playerStats, Momentum.getLevelManager().getTutorialLevel());
-
-                    // if they made it into tutorial, toggle it on
-                    if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(Momentum.getLevelManager().getTutorialLevel().getName()))
-                        playerStats.setTutorial(true);
-                }
-                else
-                    player.sendMessage(Utils.translate("&cYou cannot enter the tutorial while in the tutorial"));
+                player.sendMessage(Utils.translate("&cYou cannot do this while your stats are loading"));
+                return false;
             }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("skip"))
+
+            if (a.length == 0)
             {
                 if (playerStats.isInTutorial())
                 {
-                    // tp to spawn
-                    playerStats.setTutorial(false);
-                    Utils.teleportToSpawn(playerStats);
-                    player.sendMessage("");
-                    player.sendMessage(Utils.translate("&b&lWelcome to Parkour!"));
-                    player.sendMessage("");
+                    player.sendMessage(Utils.translate("&cYou cannot enter the tutorial while in the tutorial"));
+                    return false;
                 }
-                else
+
+                // do menu tp
+                MenuItemAction.performLevelTeleport(playerStats, Momentum.getLevelManager().getTutorialLevel());
+
+                // if they made it into tutorial, toggle it on
+                if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(Momentum.getLevelManager().getTutorialLevel().getName()))
+                    playerStats.setTutorial(true);
+            }
+            else if (a.length == 1 && a[0].equalsIgnoreCase("skip"))
+            {
+                if (!playerStats.isInTutorial())
                 {
                     player.sendMessage(Utils.translate("&cYou cannot skip the tutorial when not in it"));
+                    return false;
                 }
+
+                // tp to spawn
+                playerStats.setTutorial(false);
+                Momentum.getLocationManager().teleportToSpawn(playerStats, player);
+                player.sendMessage("");
+                player.sendMessage(Utils.translate("&b&lWelcome to Parkour!"));
+                player.sendMessage("");
             }
         }
 

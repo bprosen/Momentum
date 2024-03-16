@@ -140,6 +140,7 @@ public class TablesDB
                            "grinding BIT DEFAULT 0, " +
                            "spectatable BIT DEFAULT 1, " +
                            "fail_mode BIT DEFAULT 1, " +
+                           "auto_save BIT DEFAULT 1, " +
                            // keys
                            "PRIMARY KEY(uuid), " +
                            // indexes

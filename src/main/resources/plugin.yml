@@ -104,7 +104,7 @@ commands:
     description: "Momentum play command"
   save:
     description: "Momentum save command"
-    aliases: [saveloc, savelevel, savelocation, saves]
+    aliases: [saveloc, autosave, autosavelevel, savelevel, savelocation, saves]
   jackpot:
     description: "Momentum jackpot command"
     aliases: [jp, sponsor]

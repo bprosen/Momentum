@@ -25,7 +25,7 @@ import java.util.Set;
 public class db implements CommandExecutor
 {
     private Connection connection;
-    private FileConfiguration settings = Momentum.getConfigManager().get("settings");
+    private FileConfiguration settings = Momentum.getConfigManager().get("config");
 
 
     @Override

@@ -616,7 +616,7 @@ public class MenuItemAction {
                 }
 
                 // if player is in level and their level is the level they clicked on, cancel
-                if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName()))
+                if (playerStats.inLevel() && level.equals(playerStats.getLevel()))
                 {
                     player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                     return;
@@ -631,24 +631,14 @@ public class MenuItemAction {
                     }
                 }
 
-                playerStats.clearPotionEffects();
+                if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround())
+                {
+                    player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
+                    return;
+                }
 
-                // toggle off if saved
-                statsManager.toggleOffElytra(playerStats);
-
-                playerStats.resetCurrentCheckpoint(); // reset
-
-                // if in practice mode
-                statsManager.resetPracticeDataOnly(playerStats);
-
-                // if currently attempting, reset
-                if (playerStats.isAttemptingRankup())
-                    statsManager.leftRankup(playerStats);
-
-                if (playerStats.isAttemptingMastery())
-                    statsManager.leftMastery(playerStats);
-
-                playerStats.resetPreviewLevel();
+                // perform leave level steps
+                statsManager.leaveLevelAndReset(playerStats, true);
 
                 Rank rank = playerStats.getRank();
                 if (rank != null) {
@@ -674,8 +664,9 @@ public class MenuItemAction {
                         playerStats.setCurrentCheckpoint(spawn);
 
                         // only tp if dont have a save
-                        if (save == null) {
-                            Momentum.getCheckpointManager().teleportToCP(playerStats);
+                        if (save == null)
+                        {
+                            Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                             player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                         }
                         // tp to start if no save
@@ -685,9 +676,8 @@ public class MenuItemAction {
                     // if they have a save and are not attempting mastery
                     if (save != null)
                     {
-                        Momentum.getSavesManager().loadSave(playerStats, save, level);
+                        Momentum.getSavesManager().teleportAndRemoveSave(playerStats, level, save);
                         player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getTitle()));
-                        player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
                     }
                 } else
                     tpToStart = true;

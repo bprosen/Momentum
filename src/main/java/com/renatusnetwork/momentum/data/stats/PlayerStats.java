@@ -67,6 +67,7 @@ public class PlayerStats
     private boolean inBlackmarket;
     private boolean failsToggled;
     private int fails;
+    private boolean autoSave;
     private boolean attemptingRankup;
     private boolean attemptingMastery;
     private LevelSortingType sortingType;
@@ -266,6 +267,11 @@ public class PlayerStats
 
     public void setNightVision(boolean nightVision) {
         this.nightVision = nightVision;
+    }
+
+    public void toggleNightVision()
+    {
+        this.nightVision = !nightVision;
     }
 
     public boolean isInTutorial() {
@@ -725,6 +731,11 @@ public class PlayerStats
         this.failsToggled = failsToggled;
     }
 
+    public void toggleFailMode()
+    {
+        this.failsToggled = !failsToggled;
+    }
+
     public boolean inFailMode() {
         return failsToggled;
     }
@@ -839,6 +850,16 @@ public class PlayerStats
     public void addSave(Level level, Location location) {
         saves.put(level.getName(), location);
     }
+
+    public void updateSave(Level level, Location location) {
+        saves.replace(level.getName(), location);
+    }
+
+    public boolean hasAutoSave() { return autoSave; }
+
+    public void setAutoSave(boolean autoSave) { this.autoSave = autoSave; }
+
+    public void toggleAutoSave() { this.autoSave = !autoSave; }
 
     //
     // Completions Section

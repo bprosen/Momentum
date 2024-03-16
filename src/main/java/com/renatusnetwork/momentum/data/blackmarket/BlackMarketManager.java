@@ -208,7 +208,7 @@ public class BlackMarketManager
                 for (PlayerStats playerStats : running.getPlayers())
                 {
                     Player player = playerStats.getPlayer();
-                    player.teleport(Momentum.getLocationManager().getLobbyLocation()); // teleport to spawn
+                    player.teleport(Momentum.getLocationManager().getSpawnLocation()); // teleport to spawn
 
                     if (running.hasHighestBidder())
                     {
@@ -316,7 +316,7 @@ public class BlackMarketManager
             running.end(true);
 
             for (PlayerStats playerStats : running.getPlayers())
-                playerStats.getPlayer().teleport(Momentum.getLocationManager().getLobbyLocation()); // teleport to spawn
+                playerStats.getPlayer().teleport(Momentum.getLocationManager().getSpawnLocation()); // teleport to spawn
         }
     }
 }

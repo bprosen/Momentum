@@ -283,63 +283,6 @@ public class Utils {
             player.getInventory().setItem(entry.getKey(), entry.getValue());
     }
 
-    public static void teleportToSpawn(PlayerStats playerStats) {
-        Location loc = Momentum.getLocationManager().getLobbyLocation();
-        Player player = playerStats.getPlayer();
-
-        if (loc != null) {
-            if (playerStats.isLoaded()) {
-                if (!playerStats.isInTutorial()) {
-                    if (!playerStats.isEventParticipant()) {
-                        if (!playerStats.inRace()) {
-                            if (!playerStats.isInInfinite()) {
-                                if (!playerStats.isSpectating()) {
-
-                                    BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
-                                    if (playerStats.isInBlackMarket())
-                                        blackMarketManager.playerLeft(playerStats, false); // remove from event
-
-                                    StatsManager statsManager = Momentum.getStatsManager();
-                                    // toggle off elytra armor
-                                    statsManager.toggleOffElytra(playerStats);
-
-                                    player.teleport(loc);
-
-                                    playerStats.resetPreviewLevel();
-                                    playerStats.resetCurrentCheckpoint();
-                                    statsManager.resetPracticeDataOnly(playerStats);
-                                    playerStats.resetLevel();
-                                    playerStats.clearPotionEffects();
-
-                                    if (playerStats.isAttemptingRankup())
-                                        statsManager.leftRankup(playerStats);
-
-                                    if (playerStats.isAttemptingMastery())
-                                        statsManager.leftMastery(playerStats);
-
-                                } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating someone"));
-                                }
-                            } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
-                            }
-                        } else {
-                            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
-                        }
-                    } else {
-                        Momentum.getEventManager().removeParticipant(player, false); // remove if in event
-                    }
-                } else {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial, use &a/tutorial skip &cif you wish to skip"));
-                }
-            } else {
-                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
-            }
-        } else {
-            Momentum.getPluginLogger().info("Unable to teleport " + player.getName() + " to spawn, null location?");
-        }
-    }
-
     public static void broadcastClickableHoverableCMD(String message, String hoverMessage, String commandClick)
     {
         TextComponent component = new TextComponent(TextComponent.fromLegacyText(Utils.translate(message)));

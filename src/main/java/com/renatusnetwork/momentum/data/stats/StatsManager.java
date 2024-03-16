@@ -3,6 +3,7 @@ package com.renatusnetwork.momentum.data.stats;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.GGRewardEvent;
+import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
@@ -32,6 +33,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -150,6 +152,30 @@ public class StatsManager {
         }
     }
 
+    public void leaveLevelAndReset(PlayerStats playerStats, boolean autoSaveLevel)
+    {
+        if (autoSaveLevel)
+            Momentum.getSavesManager().autoSave(playerStats);
+
+        if (playerStats.isInBlackMarket())
+            Momentum.getBlackMarketManager().playerLeft(playerStats, false); // remove from event
+
+        // toggle off elytra armor
+        toggleOffElytra(playerStats);
+
+        playerStats.resetPreviewLevel();
+        playerStats.resetCurrentCheckpoint();
+        resetPracticeDataOnly(playerStats);
+        playerStats.resetLevel();
+        playerStats.clearPotionEffects();
+
+        if (playerStats.isAttemptingRankup())
+            leftRankup(playerStats);
+
+        if (playerStats.isAttemptingMastery())
+            leftMastery(playerStats);
+    }
+
     public PlayerStats getOffline(String uuid) { return offlineCache.get(uuid); }
 
     public PlayerStats getByName(String playerName)
@@ -183,7 +209,7 @@ public class StatsManager {
     public void updateSpectatable(PlayerStats playerStats, boolean spectatable)
     {
         playerStats.setSpectatable(spectatable);
-        StatsDB.updatePlayerSpectatable(playerStats.getUUID(), spectatable);
+        StatsDB.updateSpectatable(playerStats.getUUID(), spectatable);
     }
 
     public void enteredAscendance(PlayerStats playerStats)
@@ -197,7 +223,7 @@ public class StatsManager {
         if (!playerStats.hasNightVision())
         {
             playerStats.setNightVision(true);
-            StatsDB.updatePlayerNightVision(playerStats.getUUID(), true);
+            StatsDB.updateNightVision(playerStats.getUUID(), true);
         }
     }
 
@@ -213,7 +239,7 @@ public class StatsManager {
         {
             playerStats.setNightVision(false);
             playerStats.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
-            StatsDB.updatePlayerNightVision(playerStats.getUUID(), false);
+            StatsDB.updateNightVision(playerStats.getUUID(), false);
         }
     }
 
@@ -231,7 +257,7 @@ public class StatsManager {
         if (!playerStats.getName().equals(playerName))
         {
             playerStats.setName(playerName);
-            StatsDB.updatePlayerName(playerStats.getUUID(), playerName);
+            StatsDB.updateName(playerStats.getUUID(), playerName);
         }
 
         synchronized (playerStatsUUID)
@@ -350,6 +376,39 @@ public class StatsManager {
         // update wins
         playerStats.addEventWin();
         StatsDB.updateEventWins(playerStats.getUUID(), playerStats.getEventWins());
+    }
+
+    public void toggleGrinding(PlayerStats playerStats)
+    {
+        playerStats.toggleGrinding();
+        StatsDB.updateGrinding(playerStats.getUUID(), playerStats.isGrinding());
+    }
+
+    public void toggleFails(PlayerStats playerStats)
+    {
+        playerStats.toggleFailMode();
+        playerStats.resetFails();
+        StatsDB.updateFailMode(playerStats.getUUID(), playerStats.inFailMode());
+    }
+
+    public void toggleNightVision(PlayerStats playerStats)
+    {
+        Player player = playerStats.getPlayer();
+
+        playerStats.toggleNightVision();
+
+        if (!playerStats.hasNightVision())
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+        else
+            player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+        StatsDB.updateNightVision(playerStats.getUUID(), playerStats.hasNightVision());
+    }
+
+    public void toggleAutoSave(PlayerStats playerStats)
+    {
+        playerStats.toggleAutoSave();
+        StatsDB.updateAutoSave(playerStats.getUUID(), playerStats.hasAutoSave());
     }
 
     public void processELOChange(PlayerStats playerStats, int newELO)
@@ -780,7 +839,7 @@ public class StatsManager {
         resetPracticeDataOnly(playerStats);
 
         if (message)
-            player.sendMessage(Utils.translate("&2You have disabled practice mode"));
+            player.sendMessage(Utils.translate("&7You have turned practice mode &cOff"));
     }
 
     public void resetPracticeDataOnly(PlayerStats playerStats)

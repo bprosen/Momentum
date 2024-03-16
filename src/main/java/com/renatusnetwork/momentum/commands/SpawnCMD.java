@@ -1,9 +1,12 @@
 package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.locations.LocationManager;
+import com.renatusnetwork.momentum.data.saves.SavesManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,11 +23,12 @@ public class SpawnCMD implements CommandExecutor {
 
         Player player = (Player) sender;
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
+        LocationManager locationManager = Momentum.getLocationManager();
 
         if (player.hasPermission("momentum.admin"))
         {
             if (a.length == 0)
-                Utils.teleportToSpawn(playerStats);
+                locationManager.teleportToSpawn(playerStats, player);
             else if (a.length == 1)
             {
 
@@ -38,12 +42,12 @@ public class SpawnCMD implements CommandExecutor {
 
                 PlayerStats victimStats = Momentum.getStatsManager().get(victimPlayer);
 
-                Utils.teleportToSpawn(victimStats);
+                locationManager.teleportToSpawn(victimStats, victimPlayer);
                 player.sendMessage(Utils.translate("&cYou teleported &4" + victim + " &cto spawn"));
             }
-        } else if (a.length == 0) {
-            Utils.teleportToSpawn(playerStats);
         }
+        else if (a.length == 0)
+            locationManager.teleportToSpawn(playerStats, player);
         return false;
     }
 }

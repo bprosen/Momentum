@@ -18,7 +18,7 @@ public class ConfigManager {
     private Map<String, FileConfiguration> configs = new HashMap<>();
 
     public ConfigManager(Plugin plugin) {
-        initialize("settings", plugin);
+        initialize("config", plugin);
         initialize("menus", plugin);
         initialize("rewards", plugin);
         initialize("bank", plugin);

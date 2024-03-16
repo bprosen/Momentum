@@ -186,7 +186,7 @@ public class Momentum extends JavaPlugin {
     private static void load()
     {
         configs = new ConfigManager(plugin);
-        settings = new SettingsManager(configs.get("settings"));
+        settings = new SettingsManager(configs.get("config"));
         database = new DatabaseManager(plugin);
         TablesDB.initTables(); // needs to happen AFTER loading the manager
         locations = new LocationManager();

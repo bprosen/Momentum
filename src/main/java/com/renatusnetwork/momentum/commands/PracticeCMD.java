@@ -24,73 +24,84 @@ public class PracticeCMD implements CommandExecutor {
 
         if (a.length == 0)
         {
-            if (!playerStats.isSpectating())
+            if (playerStats == null || !playerStats.isLoaded())
             {
-                if (!playerStats.isPreviewingLevel())
-                {
-                    if (!playerStats.isEventParticipant())
-                    {
-                        if (!playerStats.isInBlackMarket())
-                        {
-                            if (!playerStats.isInInfinite())
-                            {
-                                if (!playerStats.isAttemptingMastery())
-                                {
-                                    // if it is a dropper level, disable /prac
-                                    if (playerStats.inLevel() && playerStats.getLevel().isDropper())
-                                    {
-                                        player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
-                                        return true;
-                                    }
+                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                return false;
+            }
 
-                                    /*
-                                     check practice location first, if not null then reset or
-                                     then check if they are on ground then enable or cancel
-                                     */
+            if (playerStats.isSpectating())
+            {
+                player.sendMessage(Utils.translate("&cYou cannot enter practice mode while in /spectator"));
+                return false;
+            }
 
-                                    // case of /unprac
-                                    if (label.equalsIgnoreCase("unprac"))
-                                    {
-                                        if (playerStats.inPracticeMode())
-                                            statsManager.resetPracticeMode(playerStats, true);
-                                        else
-                                            player.sendMessage(Utils.translate("&cYou are not in practice mode"));
-                                    }
-                                    // in the case of /prac
-                                    else if (playerStats.inPracticeMode())
-                                        statsManager.resetPracticeMode(playerStats, true);
-                                    else if (player.isOnGround())
-                                    {
-                                        playerStats.setPracticeMode(player.getLocation());
+            if (playerStats.isPreviewingLevel())
+            {
+                player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
+                return false;
+            }
 
-                                        SettingsManager settingsManager = Momentum.getSettingsManager();
-                                        Utils.addItemToHotbar(settingsManager.prac_item, player.getInventory(), settingsManager.prac_hotbar_slot);
+            if (playerStats.isEventParticipant())
+            {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                return false;
+            }
 
-                                        player.sendMessage(Utils.translate("&aYou have enabled practice mode and a temporary checkpoint has been set"));
-                                    }
-                                    else
-                                        player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));
-                                }
-                                else
-                                    player.sendMessage(Utils.translate("&cYou cannot do this while in mastery"));
-                            }
-                            else
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in infinite parkour"));
-                        }
-                        else
-                            player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
-                    }
-                    else
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
-                }
+            if (playerStats.isInBlackMarket())
+            {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
+                return false;
+            }
+
+            if (playerStats.isInInfinite())
+            {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in infinite"));
+                return false;
+            }
+
+            if (playerStats.isAttemptingMastery())
+            {
+                player.sendMessage(Utils.translate("&cYou cannot do this while in mastery"));
+                return false;
+            }
+
+            if (playerStats.inLevel() && playerStats.getLevel().isDropper())
+            {
+                player.sendMessage(Utils.translate("&cPractice is disabled in &3&lDropper &clevels"));
+                return false;
+            }
+
+            /*
+             check practice location first, if not null then reset or
+             then check if they are on ground then enable or cancel
+             */
+
+            // case of /unprac
+            if (label.equalsIgnoreCase("unprac"))
+            {
+                if (playerStats.inPracticeMode())
+                    statsManager.resetPracticeMode(playerStats, true);
                 else
-                    player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
+                    player.sendMessage(Utils.translate("&cYou are not in practice mode"));
+            }
+            // in the case of /prac
+            else if (playerStats.inPracticeMode())
+                statsManager.resetPracticeMode(playerStats, true);
+            else if (player.isOnGround())
+            {
+                playerStats.setPracticeMode(player.getLocation());
+
+                SettingsManager settingsManager = Momentum.getSettingsManager();
+                Utils.addItemToHotbar(settingsManager.prac_item, player.getInventory(), settingsManager.prac_hotbar_slot);
+
+                player.sendMessage(Utils.translate("&7You have turned practice mode &aOn"));
             }
             else
-                player.sendMessage(Utils.translate("&cYou cannot enter practice mode while in /spectator"));
+                player.sendMessage(Utils.translate("&cYou cannot enable practice mode while in the air"));
         }
         else if (label.equalsIgnoreCase("prac") && a.length == 1 && (a[0].equalsIgnoreCase("go") || a[0].equalsIgnoreCase("tp")))
-                Momentum.getCheckpointManager().teleportToPracCP(playerStats);
+                Momentum.getCheckpointManager().teleportToPracticeCheckpoint(playerStats);
         return false;
     }
 }

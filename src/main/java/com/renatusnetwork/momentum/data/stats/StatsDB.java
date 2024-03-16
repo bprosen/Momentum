@@ -48,7 +48,7 @@ public class StatsDB
             // update player names
             if (!nameInDB.equals(playerStats.getName()))
             {
-                updatePlayerName(playerStats.getUUID(), playerStats.getName());
+                updateName(playerStats.getUUID(), playerStats.getName());
 
                 if (clan != null)
                     // update name in cache
@@ -150,6 +150,7 @@ public class StatsDB
             playerStats.setAttemptingMastery(Integer.parseInt(playerResult.get("attempting_mastery")) == 1);
             playerStats.setRaceWins(Integer.parseInt(playerResult.get("race_wins")));
             playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
+            playerStats.setAutoSave(Integer.parseInt(playerResult.get("auto_save")) == 1);
 
             // we do a math.max since we can't divide by 0... so if they have never lost we divide by 1 not zero
             playerStats.calcRaceWinRate();
@@ -209,7 +210,7 @@ public class StatsDB
     }
 
     // this will update the player name all across the database
-    public static void updatePlayerName(String uuid, String name)
+    public static void updateName(String uuid, String name)
     {
         // update in stats
         DatabaseQueries.runAsyncQuery("UPDATE "  + DatabaseManager.PLAYERS_TABLE + " SET name=? WHERE uuid=?", name, uuid);
@@ -230,12 +231,21 @@ public class StatsDB
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET menu_sort_levels_type=? WHERE uuid=?", type.name(), uuid);
     }
 
-    public static void updatePlayerSpectatable(String uuid, boolean value)
+    public static void updateSpectatable(String uuid, boolean value)
     {
         int valueInt = value ? 1 : 0;
 
         DatabaseQueries.runAsyncQuery(
             "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET spectatable=? WHERE uuid=?", valueInt, uuid
+        );
+    }
+
+    public static void updateFailMode(String uuid, boolean value)
+    {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET fail_mode=? WHERE uuid=?", valueInt, uuid
         );
     }
 
@@ -249,7 +259,7 @@ public class StatsDB
         DatabaseQueries.runAsyncQuery("UPDATE players SET race_wins=? WHERE uuid=?", wins, uuid);
     }
 
-    public static void updatePlayerNightVision(String uuid, boolean value)
+    public static void updateNightVision(String uuid, boolean value)
     {
         int valueInt = value ? 1 : 0;
 
@@ -258,7 +268,16 @@ public class StatsDB
         );
     }
 
-    public static void updatePlayerGrinding(String uuid, boolean value)
+    public static void updateAutoSave(String uuid, boolean value)
+    {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET auto_save=? WHERE uuid=?", valueInt, uuid
+        );
+    }
+
+    public static void updateGrinding(String uuid, boolean value)
     {
         int valueInt = value ? 1 : 0;
 

@@ -97,23 +97,13 @@ public class LevelManager
         HashMap<String, PlayerStats> players = statsManager.getPlayerStats();
 
         // thread safety
-        synchronized (players) {
-            for (PlayerStats playerStats : players.values()) {
+        synchronized (players)
+        {
+            for (PlayerStats playerStats : players.values())
+            {
                 // loop through and reset if applicable
-                if (playerStats.inLevel() && playerStats.getLevel().equals(levelName)) {
-                    playerStats.resetLevel();
-                    statsManager.resetPracticeDataOnly(playerStats);
-                    playerStats.resetCurrentCheckpoint();
-
-                    if (playerStats.isAttemptingRankup())
-                        statsManager.leftRankup(playerStats);
-
-                    if (playerStats.isAttemptingMastery())
-                        statsManager.leftMastery(playerStats);
-
-                    // toggle off elytra armor
-                    statsManager.toggleOffElytra(playerStats);
-                }
+                if (playerStats.inLevel() && playerStats.getLevel().equals(levelName))
+                    statsManager.leaveLevelAndReset(playerStats, false);
             }
         }
         levels.remove(levelName);
@@ -1115,7 +1105,7 @@ public class LevelManager
             if (!inRace)
             {
                 Momentum.getCheckpointManager().deleteCheckpoint(playerStats, level);
-                Momentum.getSavesManager().removeSave(playerStats, level); // safety removal (likely will never actually execute)
+                Momentum.getSavesManager().removeSave(playerStats, level);
             }
 
             // clear potion effects

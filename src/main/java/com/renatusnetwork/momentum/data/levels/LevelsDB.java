@@ -92,13 +92,13 @@ public class LevelsDB {
             if (spawnLoc != null)
                 level.setStartLocation(spawnLoc);
             else
-                level.setStartLocation(locationManager.getLobbyLocation());
+                level.setStartLocation(locationManager.getSpawnLocation());
 
             // add completion loc
             if (completionLoc != null)
                 level.setCompletionLocation(completionLoc);
             else
-                level.setCompletionLocation(locationManager.getLobbyLocation());
+                level.setCompletionLocation(locationManager.getSpawnLocation());
 
             // 4 seperate queries... not the greatest but it keeps our code clean and due to our indexes it does still happen quite fast
             level.setCommands(getCompletionCommands(levelName));

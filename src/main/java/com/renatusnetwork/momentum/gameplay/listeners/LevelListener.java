@@ -74,7 +74,7 @@ public class LevelListener implements Listener {
                             player.setGliding(false);
 
                         if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
-                            Momentum.getCheckpointManager().teleportToCP(playerStats);
+                            Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                         else
                             Momentum.getLevelManager().respawnPlayer(playerStats, level);
                     }
@@ -265,26 +265,17 @@ public class LevelListener implements Listener {
                     }
                     else if (ChatColor.stripColor(signLines[1]).contains(Momentum.getSettingsManager().signs_second_line_spawn))
                     {
-                        Location lobby = Momentum.getLocationManager().getLobbyLocation();
+                        Location lobby = Momentum.getLocationManager().getSpawnLocation();
 
                         if (lobby != null)
                         {
-                            StatsManager statsManager = Momentum.getStatsManager();
-                            // toggle off elytra armor
-                            statsManager.toggleOffElytra(playerStats);
+                            if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround())
+                            {
+                                player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
+                                return;
+                            }
 
-                            playerStats.resetCurrentCheckpoint();
-                            statsManager.resetPracticeDataOnly(playerStats);
-                            playerStats.resetLevel();
-
-                            if (playerStats.isAttemptingRankup())
-                                statsManager.leftRankup(playerStats);
-
-                            if (playerStats.isAttemptingMastery())
-                                statsManager.leftMastery(playerStats);
-
-                            playerStats.clearPotionEffects();
-
+                            Momentum.getStatsManager().leaveLevelAndReset(playerStats, true);
                             player.teleport(lobby);
                         }
                     }

@@ -248,9 +248,7 @@ public class PlotCMD implements CommandExecutor {
                     player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getTitle() + " &7to create a &aPlot"));
             }
             else
-            {
                 player.sendMessage(Utils.translate("&cYou already have a plot"));
-            }
         }
     }
 
@@ -424,20 +422,10 @@ public class PlotCMD implements CommandExecutor {
             player.sendMessage(Utils.translate("&cYou are not in any plot currently"));
     }
 
-    private void resetPlayerLevelData(PlayerStats playerStats) {
-        if (playerStats.getLevel() != null) {
-
-            // save checkpoint if had one
-            playerStats.resetCurrentCheckpoint();
-            playerStats.resetLevel();
-            Momentum.getStatsManager().resetPracticeDataOnly(playerStats);
-
-            if (playerStats.isAttemptingRankup())
-                Momentum.getStatsManager().leftRankup(playerStats);
-
-            if (playerStats.isAttemptingMastery())
-                Momentum.getStatsManager().leftMastery(playerStats);
-        }
+    private void resetPlayerLevelData(PlayerStats playerStats)
+    {
+        if (playerStats.inLevel())
+            Momentum.getStatsManager().leaveLevelAndReset(playerStats, true);
     }
 
     private void confirmPlayer(Player player) {
@@ -455,35 +443,49 @@ public class PlotCMD implements CommandExecutor {
     private boolean checkConditions(PlayerStats playerStats) {
         Player player = playerStats.getPlayer();
 
-        boolean passes = false;
-
-        if (!playerStats.inRace()) {
-            if (!playerStats.isInInfinite()) {
-                if (!playerStats.isSpectating()) {
-                    if (!playerStats.isEventParticipant()) {
-                        if (!playerStats.isInBlackMarket()) {
-                            if (!playerStats.inPracticeMode()) {
-                                passes = true;
-                            } else {
-                                player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-                            }
-                        } else {
-                            player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
-                        }
-                    } else {
-                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
-                    }
-                } else {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
-                }
-            } else {
-                player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
-            }
-        } else {
-            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+        if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
+            return false;
         }
 
-        return passes;
+        if (playerStats.inRace())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+            return false;
+        }
+
+        if (playerStats.isInInfinite())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in infinite"));
+            return false;
+        }
+
+        if (playerStats.isSpectating())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
+            return false;
+        }
+
+        if (playerStats.isEventParticipant())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+            return false;
+        }
+
+        if (playerStats.isInBlackMarket())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
+            return false;
+        }
+
+        if (playerStats.inPracticeMode())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+            return false;
+        }
+
+        return true;
     }
 
     private static void sendHelp(CommandSender sender) {

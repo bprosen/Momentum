@@ -11,7 +11,7 @@ public class RespawnListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
 
-        Location spawn = Momentum.getLocationManager().getLobbyLocation();
+        Location spawn = Momentum.getLocationManager().getSpawnLocation();
 
         if (spawn != null)
             event.setRespawnLocation(spawn);

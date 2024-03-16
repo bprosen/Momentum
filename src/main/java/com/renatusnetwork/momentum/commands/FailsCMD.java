@@ -38,22 +38,8 @@ public class FailsCMD implements CommandExecutor
             else if (a.length == 1 && a[0].equalsIgnoreCase("toggle"))
             {
                 // update in cache
-                playerStats.setFailMode(!playerStats.inFailMode());
-                playerStats.resetFails();
-
-                String booleanStr = "&aOn";
-
-                if (!playerStats.inFailMode())
-                    booleanStr = "&cOff";
-
-                player.sendMessage(Utils.translate("&7You have toggled &cFails &7" + booleanStr));
-
-                int failBit = 0;
-                if (playerStats.inFailMode())
-                    failBit = 1;
-
-                // update in db
-                DatabaseQueries.runAsyncQuery("UPDATE players SET fail_mode=" + failBit + " WHERE uuid='" + player.getUniqueId() + "'");
+                Momentum.getStatsManager().toggleFails(playerStats);
+                player.sendMessage(Utils.translate("&7You have toggled &6fails &7" + (playerStats.inFailMode() ? "&aOn" : "&cOff")));
             }
             else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
             {

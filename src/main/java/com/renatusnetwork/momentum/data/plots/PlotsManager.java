@@ -179,7 +179,7 @@ public class PlotsManager {
 
         // if they are in plot world, teleport them
         if (owner.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-            owner.teleport(Momentum.getLocationManager().getLobbyLocation());
+            owner.teleport(Momentum.getLocationManager().getSpawnLocation());
 
         // clear plot!
         clearPlot(plot, true);

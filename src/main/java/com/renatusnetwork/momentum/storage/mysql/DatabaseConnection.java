@@ -18,7 +18,7 @@ public class DatabaseConnection {
 
     private void open()
     {
-        FileConfiguration settings = Momentum.getConfigManager().get("settings");
+        FileConfiguration settings = Momentum.getConfigManager().get("config");
         String dbPath = "database";
 
         String username = settings.getString(dbPath + ".username");
