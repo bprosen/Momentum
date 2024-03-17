@@ -397,7 +397,7 @@ public class StatsManager {
 
         playerStats.toggleNightVision();
 
-        if (!playerStats.hasNightVision())
+        if (playerStats.hasNightVision())
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);

@@ -32,7 +32,7 @@ public class NightVisionCMD implements CommandExecutor {
                 }
 
                 statsManager.toggleNightVision(playerStats);
-                playerStats.sendMessage(Utils.translate("&cYou have turned night vision " + (playerStats.hasNightVision() ? "&aOn" : "&cOff")));
+                playerStats.sendMessage(Utils.translate("&7You have turned night vision " + (playerStats.hasNightVision() ? "&aOn" : "&cOff")));
             }
         }
         return true;
