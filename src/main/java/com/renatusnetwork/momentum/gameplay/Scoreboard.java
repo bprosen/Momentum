@@ -2,7 +2,7 @@ package com.renatusnetwork.momentum.gameplay;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.types.Jackpot;
+import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketEvent;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.events.EventManager;

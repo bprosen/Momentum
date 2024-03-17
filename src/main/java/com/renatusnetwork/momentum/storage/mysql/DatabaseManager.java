@@ -36,7 +36,6 @@ public class DatabaseManager {
     public static final String FAVORITE_LEVELS = "favorite_levels";
     public static final String ELO_TIERS = "elo_tiers";
     public static final String BANK_ITEMS = "bank_items";
-    public static final String BANK_TICKETS = "bank_tickets";
     public static final String BANK_WEEKS = "bank_mode";
     public static final String BANK_BIDS = "bank_bids";
 

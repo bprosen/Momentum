@@ -240,8 +240,7 @@ public class BlackMarketManager
                         public void run()
                         {
                             // LOAD NEW BANK ITEMS!
-                            Momentum.getBankManager().resetItems();
-                            Momentum.getBankManager().broadcastReset();
+                            Momentum.getBankManager().resetBank();
                         }
                     }.runTaskLater(Momentum.getPlugin(), (20 * Momentum.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
                 }

@@ -172,7 +172,6 @@ public class Momentum extends JavaPlugin {
         getCommand("jackpot").setExecutor(new JackpotCMD());
         getCommand("pay").setExecutor(new PayCMD());
         getCommand("modifier").setExecutor(new ModifierCMD());
-        getCommand("bank").setExecutor(new BankCMD());
         getCommand("blackmarket").setExecutor(new BlackMarketCMD());
         getCommand("bid").setExecutor(new BidCMD());
         getCommand("favorite").setExecutor(new FavoriteCMD());

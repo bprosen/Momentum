@@ -1,6 +1,8 @@
 package com.renatusnetwork.momentum.data.stats;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.bank.items.BankItem;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.elo.ELOTiersManager;
@@ -178,6 +180,8 @@ public class StatsDB
                 playerStats.setInfiniteType(InfiniteType.valueOf(infiniteType.toUpperCase()));
             else
                 playerStats.setInfiniteType(Momentum.getSettingsManager().infinite_default_type);
+
+            playerStats.setBankBids(getBankBids(playerStats, Momentum.getBankManager().getCurrentWeek()));
         }
     }
 
@@ -563,5 +567,44 @@ public class StatsDB
     public static void updateELOTier(String uuid, String eloTier)
     {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET elo_tier=? WHERE uuid=?", eloTier, uuid);
+    }
+
+    public static HashMap<BankItemType, BankBid> getBankBids(PlayerStats playerStats, int week)
+    {
+        List<Map<String, String>> bankBidsResults = DatabaseQueries.getResults(
+                DatabaseManager.BANK_BIDS,
+                "*",
+                "WHERE uuid=? AND week=?", playerStats.getUUID(), week
+        );
+
+        HashMap<BankItemType, BankBid> bids = new HashMap<>();
+
+        for (Map<String, String> result : bankBidsResults)
+        {
+            bids.put(
+                    BankItemType.valueOf(result.get("bank_item_type")),
+                    new BankBid(
+                            Integer.parseInt(result.get("total_bid")),
+                            Long.parseLong(result.get("last_bid_date"))
+                    )
+            );
+        }
+
+        return bids;
+    }
+
+    public static void updateBankBid(String uuid, int week, BankItemType type, int totalBid, long lastBidDateMillis)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.BANK_BIDS + " SET total_bid=?,last_bid_date=? WHERE uuid=? AND week=? AND bank_item_type=?",
+                totalBid, lastBidDateMillis, uuid, week, type.name());
+    }
+
+    public static void insertBankBid(String uuid, int week, BankItemType type, int totalBid, long lastBidDateMillis)
+    {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.BANK_BIDS + " (week,uuid,bank_item_type,total_bid,last_bid_date) VALUES(?,?,?,?,?)",
+                week, uuid, type.name(), totalBid, lastBidDateMillis
+        );
     }
 }

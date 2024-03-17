@@ -5,7 +5,8 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.LevelBuyEvent;
 import com.renatusnetwork.momentum.api.ShopBuyEvent;
 import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.types.BankItemType;
+import com.renatusnetwork.momentum.data.bank.items.BankItem;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
@@ -185,8 +186,8 @@ public class MenuItemAction {
 
         if (!typeValue.endsWith("_total"))
         {
-            BankItemType bankItemType = BankItemType.valueOf(menuItem.getTypeValue().toUpperCase());
-            Momentum.getBankManager().bid(playerStats, bankItemType);
+            BankItem item = Momentum.getBankManager().getItem(BankItemType.valueOf(menuItem.getTypeValue().toUpperCase()));
+            Momentum.getBankManager().bid(playerStats, item);
 
             playerStats.getPlayer().closeInventory();
         }

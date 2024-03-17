@@ -5,7 +5,7 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.JackpotRewardEvent;
 import com.renatusnetwork.momentum.api.LevelCompletionEvent;
 import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.types.Jackpot;
+import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.events.EventManager;
 import com.renatusnetwork.momentum.data.events.types.EventType;
 import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;

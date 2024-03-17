@@ -2,8 +2,7 @@ package com.renatusnetwork.momentum.storage.mysql;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
-import com.renatusnetwork.momentum.data.bank.modes.BankModeType;
-import com.renatusnetwork.momentum.data.bank.types.BankItemType;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.LevelType;
 import com.renatusnetwork.momentum.data.menus.LevelSortingType;
@@ -80,7 +79,6 @@ public class TablesDB
         createBankItems();
         createBankWeeks();
         createBankBids();
-        createBankTickets();
     }
 
     private static void createKeys()
@@ -109,7 +107,6 @@ public class TablesDB
         createBankItemsKeys();
         createBankWeeksKeys();
         createBankBidsKeys();
-        createBankTicketsKeys();
     }
 
     private static void createPlayers()
@@ -881,7 +878,6 @@ public class TablesDB
         String query =
             "CREATE TABLE " + DatabaseManager.BANK_WEEKS + "(" +
                 "week SMALLINT NOT NULL AUTO_INCREMENT, " +
-                "mode ENUM(" + enumQuotations(BankModeType.values()) + ") NOT NULL, " +
                 "brilliant_item_name VARCHAR(20) NOT NULL, " +
                 "radiant_item_name VARCHAR(20) NOT NULL, " +
                 "legendary_item_name VARCHAR(20) NOT NULL, " +
@@ -924,6 +920,7 @@ public class TablesDB
                 "CREATE TABLE " + DatabaseManager.BANK_ITEMS + "(" +
                     "name VARCHAR(20) NOT NULL, " +
                     "title VARCHAR(30) DEFAULT NULL, " + // add room for colors
+                    "description VARCHAR(200) DEFAULT NULL, " +
                     "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") DEFAULT NULL, " +
                     "modifier_name VARCHAR(20) DEFAULT NULL, " +
                     // primary key
@@ -975,47 +972,6 @@ public class TablesDB
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE, " +
                 "ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_uuid_fk " +
-                "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
-                "ON UPDATE CASCADE " +
-                "ON DELETE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-    private static void createBankTickets()
-    {
-        String query =
-            "CREATE TABLE " + DatabaseManager.BANK_TICKETS + "(" +
-                "week SMALLINT NOT NULL, " +
-                "uuid CHAR(36) NOT NULL, " +
-                "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
-                "total_tickets INT NOT NULL DEFAULT 0, " +
-                "seconds_won MEDIUMINT NOT NULL DEFAULT 0, " +
-                "last_bought_date BIGINT NOT NULL, " +
-                // primary key
-                "PRIMARY KEY(week, uuid, bank_item_type), " +
-                // indexes
-                "INDEX week_uuid_index(week, uuid), " +
-                // constraints
-                "CONSTRAINT " + DatabaseManager.BANK_BIDS + "_non_negative CHECK (" +
-                    "week > 0 AND " +
-                    "total_tickets >= 0 AND " +
-                    "seconds_won >= 0 AND " +
-                    "last_bought_date > 0" +
-                ")" +
-            ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-
-    private static void createBankTicketsKeys()
-    {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_TICKETS + " ADD CONSTRAINT " + DatabaseManager.BANK_TICKETS + "_week_fk " +
-                "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_WEEKS + "(week) " +
-                "ON UPDATE CASCADE " +
-                "ON DELETE CASCADE, " +
-                "ADD CONSTRAINT " + DatabaseManager.BANK_TICKETS + "_uuid_fk " +
                 "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";

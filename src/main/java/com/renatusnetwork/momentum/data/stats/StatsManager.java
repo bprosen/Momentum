@@ -3,6 +3,8 @@ package com.renatusnetwork.momentum.data.stats;
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.GGRewardEvent;
+import com.renatusnetwork.momentum.data.bank.items.BankItem;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.momentum.data.clans.Clan;
@@ -454,6 +456,22 @@ public class StatsManager {
         updateELO(competitor, newELO);
     }
 
+    public void updateBankBid(PlayerStats playerStats, BankItemType type, int bid)
+    {
+        long bidDateMillis = System.currentTimeMillis();
+        int week = Momentum.getBankManager().getCurrentWeek();
+
+        if (playerStats.hasBankBid(type))
+        {
+            playerStats.updateBankBid(type, bid, bidDateMillis);
+            StatsDB.updateBankBid(playerStats.getUUID(), week, type, bid, bidDateMillis);
+        }
+        else
+        {
+            playerStats.addBankBid(type, bid, bidDateMillis);
+            StatsDB.insertBankBid(playerStats.getUUID(), week, type, bid, bidDateMillis);
+        }
+    }
     public void updateCoins(PlayerStats playerStats, int coins)
     {
         updateCoins(playerStats, coins, true);

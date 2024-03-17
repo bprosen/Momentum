@@ -1,4 +1,4 @@
-package com.renatusnetwork.momentum.data.bank.types;
+package com.renatusnetwork.momentum.data.bank.items;
 
 import com.renatusnetwork.momentum.Momentum;
 

@@ -2,6 +2,9 @@ package com.renatusnetwork.momentum.data.stats;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
+import com.renatusnetwork.momentum.data.bank.BankDB;
+import com.renatusnetwork.momentum.data.bank.items.BankItem;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
@@ -84,6 +87,7 @@ public class PlayerStats
     private HashMap<String, Location> saves;
     private HashMap<ModifierType, Modifier> modifiers;
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
+    private HashMap<BankItemType, BankBid> bids;
     private ArrayList<Level> favoriteLevels;
 
     public PlayerStats(Player player)
@@ -102,6 +106,7 @@ public class PlayerStats
         this.bestInfiniteScores = new HashMap<>();
         this.records = new HashMap<>();
         this.masteryCompletions = new HashSet<>();
+        this.bids = new HashMap<>();
         this.favoriteLevels = new ArrayList<>();
 
         // default for now, if they are not a new player the mysql db loading will adjust these
@@ -1044,6 +1049,63 @@ public class PlayerStats
     public Modifier getModifier(ModifierType modifierType)
     {
         return modifiers.get(modifierType);
+    }
+
+    //
+    // Bank
+    //
+    public boolean hasBankBid(BankItemType type)
+    {
+        return bids.containsKey(type);
+    }
+
+    public BankBid getBankBid(BankItemType type)
+    {
+        return bids.get(type);
+    }
+
+    public int getBankBidAmount(BankItemType type)
+    {
+        BankBid bid = bids.get(type);
+        return bid != null ? bid.getBid() : 0;
+    }
+
+    public long getLastBankBidMillis(BankItemType type)
+    {
+        BankBid bid = bids.get(type);
+        return bid != null ? bid.getLastBidDateMillis() : -1;
+    }
+
+    public void setBankBid(BankItemType type, int bid)
+    {
+        if (hasBankBid(type))
+            bids.get(type).setBid(bid);
+    }
+
+    public void setLastBidDateMillis(BankItemType type, long lastBidDateMillis)
+    {
+        if (hasBankBid(type))
+            bids.get(type).setLastBidDateMillis(lastBidDateMillis);
+    }
+
+    public void updateBankBid(BankItemType type, int bid, long lastBidDateMillis)
+    {
+        if (hasBankBid(type))
+        {
+            BankBid bankBid = bids.get(type);
+
+            bankBid.setBid(bid);
+            bankBid.setLastBidDateMillis(lastBidDateMillis);
+        }
+    }
+    public void setBankBids(HashMap<BankItemType, BankBid> bids)
+    {
+        this.bids = bids;
+    }
+
+    public void addBankBid(BankItemType type, int bid, long lastBidDateMillis)
+    {
+        bids.put(type, new BankBid(bid, lastBidDateMillis));
     }
 
     //

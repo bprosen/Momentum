@@ -1,8 +1,7 @@
-package com.renatusnetwork.momentum.data.bank.types;
+package com.renatusnetwork.momentum.data.bank.items;
 
-import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.BankYAML;
 import com.renatusnetwork.momentum.data.modifiers.Modifier;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 
 public abstract class BankItem
 {
@@ -20,19 +19,29 @@ public abstract class BankItem
     public BankItem(BankItemType type)
     {
         this.type = type;
-        this.title = BankYAML.getTitle(type);
-        this.totalBalance = BankYAML.getTotal(type);
-        this.currentHolder = BankYAML.getHolder(type);
-        this.modifier = Momentum.getModifiersManager().getModifier(BankYAML.getModifier(type));
-        this.description = BankYAML.getDescription(type);
-        this.locked = false;
+    }
 
+    public abstract void calcNextBid();
+
+    public void setTotalBalance(int total)
+    {
+        this.totalBalance = total;
         calcNextBid();
     }
 
     public boolean isLocked()
     {
         return locked;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     public void setLocked(boolean isLocked)
@@ -74,8 +83,6 @@ public abstract class BankItem
         this.totalBalance += amount;
     }
 
-    public abstract void calcNextBid();
-
     public void setNextBid(int nextBid)
     {
         this.nextBid = nextBid;
@@ -89,6 +96,11 @@ public abstract class BankItem
     public String getCurrentHolder()
     {
         return currentHolder;
+    }
+
+    public boolean isCurrentHolder(PlayerStats playerStats)
+    {
+        return this.currentHolder.equalsIgnoreCase(playerStats.getName());
     }
 
     public boolean hasCurrentHolder() { return currentHolder != null && !currentHolder.isEmpty(); }

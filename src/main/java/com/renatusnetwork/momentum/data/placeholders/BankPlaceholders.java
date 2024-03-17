@@ -1,8 +1,8 @@
 package com.renatusnetwork.momentum.data.placeholders;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.types.BankItem;
-import com.renatusnetwork.momentum.data.bank.types.BankItemType;
+import com.renatusnetwork.momentum.data.bank.items.BankItem;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.utils.Utils;
 
 public class BankPlaceholders

@@ -2,9 +2,9 @@ package com.renatusnetwork.momentum.data.menus;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.types.BankItem;
-import com.renatusnetwork.momentum.data.bank.types.BankItemType;
-import com.renatusnetwork.momentum.data.bank.types.Jackpot;
+import com.renatusnetwork.momentum.data.bank.items.BankItem;
+import com.renatusnetwork.momentum.data.bank.items.BankItemType;
+import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClanMember;
 import com.renatusnetwork.momentum.data.elo.ELOTier;

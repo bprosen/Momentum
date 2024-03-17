@@ -2,7 +2,7 @@ package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.types.Jackpot;
+import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.menus.MenuItemAction;
 import com.renatusnetwork.momentum.utils.Utils;

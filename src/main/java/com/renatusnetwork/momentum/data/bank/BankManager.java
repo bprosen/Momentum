@@ -1,10 +1,12 @@
 package com.renatusnetwork.momentum.data.bank;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.types.*;
+import com.renatusnetwork.momentum.data.bank.items.*;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.modifiers.Modifier;
+import com.renatusnetwork.momentum.data.stats.BankBid;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
@@ -20,38 +22,41 @@ public class BankManager
 {
     private HashMap<BankItemType, BankItem> items;
     private Jackpot currentJackpot;
+    private int currentWeek;
 
     public BankManager()
     {
-        currentJackpot = null;
+        this.currentWeek = Math.max(BankDB.getCurrentWeek(), 0);
 
-        load();
+        // no week found, start at 1
+        if (currentWeek == 0)
+        {
+            this.currentWeek = 1;
+            loadNewItems();
+        }
+        else
+            this.items = BankDB.getItems(this.currentWeek);
+
         runScheduler();
     }
 
-    public void resetItems()
+    public void loadNewItems()
     {
-        BankItem radiant = items.get(BankItemType.RADIANT);
-        BankItem brilliant = items.get(BankItemType.BRILLIANT);
-        BankItem legendary = items.get(BankItemType.LEGENDARY);
-        StatsManager statsManager = Momentum.getStatsManager();
+        for (BankItemType type : BankItemType.values())
+        {
+            BankItem item = items.get(type);
 
-        // remove modifiers
-        statsManager.removeModifierName(radiant.getCurrentHolder(), radiant.getModifier());
-        statsManager.removeModifierName(brilliant.getCurrentHolder(), brilliant.getModifier());
-        statsManager.removeModifierName(legendary.getCurrentHolder(), legendary.getModifier());
+            if (item != null)
+                Momentum.getStatsManager().removeModifierName(item.getCurrentHolder(), item.getModifier());
 
-        // reset items
-        String radiantItem = BankYAML.chooseBankItem(BankItemType.RADIANT);
-        String brilliantItem = BankYAML.chooseBankItem(BankItemType.BRILLIANT);
-        String legendaryItem = BankYAML.chooseBankItem(BankItemType.LEGENDARY);
+            items.put(type, BankDB.createRandomBankItem(type));
+        }
+    }
 
-        // reset info and set new modifier
-        BankYAML.resetBid(BankItemType.RADIANT, radiantItem);
-        BankYAML.resetBid(BankItemType.BRILLIANT, brilliantItem);
-        BankYAML.resetBid(BankItemType.LEGENDARY, legendaryItem);
-
-        load();
+    public void resetBank()
+    {
+        loadNewItems();
+        broadcastReset();
     }
 
     public void broadcastReset()
@@ -61,16 +66,6 @@ public class BankManager
         Bukkit.broadcastMessage(Utils.translate("&7Head to &c/spawn &7to start bidding on the bank!"));
         Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
         Utils.playSound(Sound.ENTITY_PLAYER_LEVELUP);
-    }
-
-    public void load()
-    {
-        items = new HashMap<>();
-
-        // add into map as polymorphic
-        items.put(BankItemType.RADIANT, new RadiantItem());
-        items.put(BankItemType.BRILLIANT, new BrilliantItem());
-        items.put(BankItemType.LEGENDARY, new LegendaryItem());
     }
 
     private void runScheduler()
@@ -86,104 +81,9 @@ public class BankManager
         }.runTaskTimerAsynchronously(Momentum.getPlugin(), 20 * 21600, 20 * 21600);
     }
 
-    public void startJackpot()
+    public void bid(PlayerStats playerStats, BankItem bankItem)
     {
-        if (currentJackpot == null)
-        {
-            ArrayList<Level> tempList = new ArrayList<>();
-
-            for (Level level : Momentum.getLevelManager().getLevelsInAllMenus())
-                // only allow levels with reward > 0 and <= 5000
-                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.hasPermissionNode() && !level.isRankUpLevel() && !level.isAscendance() && level.hasReward() && level.getReward() <= 5000)
-                    tempList.add(level);
-
-            Level level = tempList.get(new Random().nextInt(tempList.size()));
-            long totalBalance = totalBalanceInBank();
-
-            // max of 6.25 mill = 50k bonus
-            if (totalBalance > 6250000)
-                totalBalance = 6250000;
-
-            int bonus = (int) (20 * Math.sqrt(totalBalance));
-
-            currentJackpot = new Jackpot(level, bonus);
-            currentJackpot.start(); // begin jackpot
-            Utils.playSound(Sound.BLOCK_NOTE_PLING);
-        }
-        else
-        {
-            Momentum.getPluginLogger().info("Tried to start Jackpot with one already running");
-        }
-    }
-
-    public void chooseJackpot(Level level, int bonus)
-    {
-        if (currentJackpot == null)
-        {
-            currentJackpot = new Jackpot(level, bonus);
-            currentJackpot.start();
-        }
-        else
-        {
-            Momentum.getPluginLogger().info("Tried to choose Jackpot with one already running");
-        }
-    }
-
-    public void endJackpot()
-    {
-        if (currentJackpot != null)
-        {
-            currentJackpot.end();
-            currentJackpot = null;
-        }
-        else
-        {
-            Momentum.getPluginLogger().info("Tried to end Jackpot with none currently running");
-        }
-    }
-    public boolean isJackpotRunning()
-    {
-        return currentJackpot != null;
-    }
-
-    public long totalBalanceInBank()
-    {
-        long balance = 0;
-
-        for (BankItem bankItem : items.values())
-            balance += bankItem.getTotalBalance();
-
-        return balance;
-    }
-
-    public Jackpot getJackpot()
-    {
-        return currentJackpot;
-    }
-
-    public BankItem getItem(BankItemType type)
-    {
-        return items.get(type);
-    }
-    public boolean isType(String typeName)
-    {
-        boolean result = false;
-
-        // try catch to determine
-        try
-        {
-            BankItemType type = BankItemType.valueOf(typeName);
-            result = true;
-        }
-        catch (IllegalArgumentException ignored)
-        {}
-
-        return result;
-    }
-
-    public void bid(PlayerStats playerStats, BankItemType type)
-    {
-        BankItem bankItem = items.get(type);
+        BankItemType type = bankItem.getType();
 
         // make sure they do not bid on themselves
         if (!bankItem.hasCurrentHolder() || !bankItem.getCurrentHolder().equalsIgnoreCase(playerStats.getName()))
@@ -194,33 +94,29 @@ public class BankManager
 
                 if (playerStats.getCoins() >= bidAmount)
                 {
-
-                    boolean alreadyHasTier = false;
-
-                    // check through all items, for the items not currently being picked and if the current holder is the player, deny them (cant have two at once)
-                    for (BankItem item : items.values())
-                        if (item.getType() != type && item.getCurrentHolder().equalsIgnoreCase(playerStats.getName()))
-                            alreadyHasTier = true;
-
-                    if (!alreadyHasTier)
+                    if (!alreadyHoldingOtherItem(playerStats, bankItem.getType()))
                     {
                         String oldHolder = bankItem.getCurrentHolder();
-                        Player player = Bukkit.getPlayer(oldHolder);
 
                         Modifier modifier = bankItem.getModifier();
                         StatsManager statsManager = Momentum.getStatsManager();
+                        PlayerStats holderStats = statsManager.getByName(oldHolder);
+
+                        BankBid bankBid = playerStats.getBankBid(type);
+                        int bidAmountToRemove = bankBid != null ? bidAmount - bankBid.getBid() : bidAmount;
+
                         // remove from cache
-                        if (player != null)
-                            statsManager.removeModifier(statsManager.get(player), modifier);
+                        if (holderStats != null)
+                            statsManager.removeModifier(holderStats, modifier);
                         else
                             statsManager.removeModifierName(oldHolder, modifier);
 
-                        Momentum.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
+                        Momentum.getStatsManager().removeCoins(playerStats, bidAmountToRemove); // remove coins
                         bankItem.setCurrentHolder(playerStats.getName()); // update current holder
-                        bankItem.addTotal(bidAmount); // update in cache
+                        bankItem.addTotal(bidAmountToRemove); // update in cache
                         bankItem.calcNextBid(); // calc next bid
                         broadcastNewBid(playerStats, bankItem, bidAmount); // broadcast bid
-                        BankYAML.updateBid(type, bankItem.getTotalBalance(), playerStats.getName()); // update in config
+                        statsManager.updateBankBid(playerStats, type, bidAmount);
                         playerStats.getPlayer().playSound(playerStats.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         Utils.spawnFirework(playerStats.getPlayer().getLocation(), Color.PURPLE, Color.WHITE, true);
 
@@ -307,5 +203,117 @@ public class BankManager
                 }
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
+    }
+
+    public int getCurrentWeek()
+    {
+        return currentWeek;
+    }
+
+    public boolean alreadyHoldingOtherItem(PlayerStats playerStats, BankItemType type)
+    {
+        for (Map.Entry<BankItemType, BankItem> entry : Momentum.getBankManager().getItems().entrySet())
+            if (entry.getKey() != type && entry.getValue().isCurrentHolder(playerStats))
+                return true;
+
+        return false;
+    }
+
+    public void startJackpot()
+    {
+        if (currentJackpot == null)
+        {
+            ArrayList<Level> tempList = new ArrayList<>();
+
+            for (Level level : Momentum.getLevelManager().getLevelsInAllMenus())
+                // only allow levels with reward > 0 and <= 5000
+                if (level.getRequiredLevels().isEmpty() && !level.isFeaturedLevel() && !level.hasPermissionNode() && !level.isRankUpLevel() && !level.isAscendance() && level.hasReward() && level.getReward() <= 5000)
+                    tempList.add(level);
+
+            Level level = tempList.get(new Random().nextInt(tempList.size()));
+            long totalBalance = totalBalanceInBank();
+
+            // max of 6.25 mill = 50k bonus
+            if (totalBalance > 6250000)
+                totalBalance = 6250000;
+
+            int bonus = (int) (20 * Math.sqrt(totalBalance));
+
+            currentJackpot = new Jackpot(level, bonus);
+            currentJackpot.start(); // begin jackpot
+            Utils.playSound(Sound.BLOCK_NOTE_PLING);
+        }
+        else
+        {
+            Momentum.getPluginLogger().info("Tried to start Jackpot with one already running");
+        }
+    }
+
+    public void chooseJackpot(Level level, int bonus)
+    {
+        if (currentJackpot == null)
+        {
+            currentJackpot = new Jackpot(level, bonus);
+            currentJackpot.start();
+        }
+        else
+        {
+            Momentum.getPluginLogger().info("Tried to choose Jackpot with one already running");
+        }
+    }
+
+    public void endJackpot()
+    {
+        if (currentJackpot != null)
+        {
+            currentJackpot.end();
+            currentJackpot = null;
+        }
+        else
+        {
+            Momentum.getPluginLogger().info("Tried to end Jackpot with none currently running");
+        }
+    }
+    public boolean isJackpotRunning()
+    {
+        return currentJackpot != null;
+    }
+
+    public long totalBalanceInBank()
+    {
+        long balance = 0;
+
+        for (BankItem bankItem : items.values())
+            balance += bankItem.getTotalBalance();
+
+        return balance;
+    }
+
+    public Jackpot getJackpot()
+    {
+        return currentJackpot;
+    }
+
+    public BankItem getItem(BankItemType type)
+    {
+        return items.get(type);
+    }
+
+    public HashMap<BankItemType, BankItem> getItems() { return items; }
+
+    public boolean isType(String typeName)
+    {
+        boolean result = false;
+
+        // try catch to determine
+        try
+        {
+            BankItemType type = BankItemType.valueOf(typeName);
+            result = true;
+        }
+        catch (IllegalArgumentException ignored)
+        {}
+
+        return result;
     }
 }

@@ -114,8 +114,6 @@ commands:
   modifier:
     description: "Momentum modifier command"
     aliases: [modifiers, booster, discount, boosters, discounts]
-  bank:
-    description: "Momentum bank command"
   blackmarket:
     description: "Momentum blackmarket command"
     aliases: [market]
