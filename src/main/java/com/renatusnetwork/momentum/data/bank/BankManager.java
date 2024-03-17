@@ -6,7 +6,6 @@ import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.modifiers.Modifier;
 import com.renatusnetwork.momentum.data.stats.BankBid;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
-import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
@@ -26,17 +25,8 @@ public class BankManager
 
     public BankManager()
     {
-        this.items = new HashMap<>();
         this.currentWeek = Math.max(BankDB.getCurrentWeek(), 0);
-
-        // no week found, start at 1
-        if (currentWeek == 0)
-        {
-            this.currentWeek = 1;
-            loadNewItems();
-        }
-        else
-            this.items = BankDB.getItems(this.currentWeek);
+        this.items = currentWeek > 0 ? BankDB.getItems(this.currentWeek) : new HashMap<>();
 
         runScheduler();
 
@@ -78,7 +68,7 @@ public class BankManager
             @Override
             public void run()
             {
-                if (ThreadLocalRandom.current().nextInt(0, 10) == 0) // 10% chance every 6 hours
+                if (currentWeek > 0 && ThreadLocalRandom.current().nextInt(0, 10) == 0) // 10% chance every 6 hours
                     startJackpot();
             }
         }.runTaskTimerAsynchronously(Momentum.getPlugin(), 20 * 21600, 20 * 21600);

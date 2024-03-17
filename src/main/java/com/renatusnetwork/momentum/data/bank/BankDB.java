@@ -19,40 +19,43 @@ public class BankDB
         Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.BANK_WEEKS, "*", "WHERE week=?", week);
         HashMap<BankItemType, BankItem> items = new HashMap<>();
 
-        for (BankItemType itemType : BankItemType.values())
+        if (!result.isEmpty())
         {
-            BankItem item = null;
-            String itemNameKey = null;
-            switch (itemType)
+            for (BankItemType itemType : BankItemType.values())
             {
-                case RADIANT:
-                    item = new RadiantItem();
-                    itemNameKey = "radiant_item_name";
-                    break;
-                case BRILLIANT:
-                    item = new BrilliantItem();
-                    itemNameKey = "brilliant_item_name";
-                    break;
-                case LEGENDARY:
-                    item = new LegendaryItem();
-                    itemNameKey = "legendary_item_name";
-                    break;
+                BankItem item = null;
+                String itemNameKey = null;
+                switch (itemType)
+                {
+                    case RADIANT:
+                        item = new RadiantItem();
+                        itemNameKey = "radiant_item_name";
+                        break;
+                    case BRILLIANT:
+                        item = new BrilliantItem();
+                        itemNameKey = "brilliant_item_name";
+                        break;
+                    case LEGENDARY:
+                        item = new LegendaryItem();
+                        itemNameKey = "legendary_item_name";
+                        break;
+                }
+
+                if (item != null)
+                {
+                    Map<String, String> itemResults = DatabaseQueries.getResult(
+                            DatabaseManager.BANK_ITEMS, "*",
+                            "WHERE bank_item_type=? AND name=?", itemType.name(), result.get(itemNameKey));
+
+                    item.setTitle(itemResults.get("title"));
+                    item.setDescription(itemResults.get("description"));
+                    item.setModifier(Momentum.getModifiersManager().getModifier(itemResults.get("modifier_name")));
+                    item.setCurrentHolder(getCurrentHolder(week, itemType));
+                    item.setTotalBalance(getTotal(week, itemType));
+                }
+
+                items.put(itemType, item);
             }
-
-            if (item != null)
-            {
-                Map<String, String> itemResults = DatabaseQueries.getResult(
-                        DatabaseManager.BANK_ITEMS, "*",
-              "WHERE bank_item_type=? AND name=?", itemType.name(), result.get(itemNameKey));
-
-                item.setTitle(itemResults.get("title"));
-                item.setDescription(itemResults.get("description"));
-                item.setModifier(Momentum.getModifiersManager().getModifier(itemResults.get("modifier_name")));
-                item.setCurrentHolder(getCurrentHolder(week, itemType));
-                item.setTotalBalance(getTotal(week, itemType));
-            }
-
-            items.put(itemType, item);
         }
 
         return items;
