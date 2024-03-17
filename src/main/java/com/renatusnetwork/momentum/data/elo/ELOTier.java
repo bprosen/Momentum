@@ -19,7 +19,7 @@ public class ELOTier
     public ELOTier(String name, String title, int requiredELO, String previousELOTier, String nextELOTier)
     {
         this.name = name;
-        this.title = title;
+        this.title = title != null ? title : name;
         this.requiredELO = requiredELO;
         this.previousELOTier = previousELOTier;
         this.nextELOTier = nextELOTier;

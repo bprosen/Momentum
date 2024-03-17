@@ -269,11 +269,7 @@ public class TablesDB
                             "center_z INT NOT NULL, " +
                             "submitted BIT DEFAULT 0, " +
                             // keys
-                            "PRIMARY KEY(id), " +
-                            // constraints
-                            "CONSTRAINT " + DatabaseManager.PLOTS_TABLE + "_non_negative CHECK (" +
-                                "id > 0" +
-                            ")" +
+                            "PRIMARY KEY(id)" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -582,11 +578,7 @@ public class TablesDB
                             // keys
                             "PRIMARY KEY(plot_id, trusted_uuid), " +
                             // indexes
-                            "INDEX id_index(plot_id), " +
-                            // constraints
-                            "CONSTRAINT " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + "_non_negative CHECK (" +
-                                "plot_id > 0" +
-                            ")" +
+                            "INDEX id_index(plot_id)" +
                         ")";
 
         DatabaseQueries.runQuery(query);
@@ -887,7 +879,6 @@ public class TablesDB
                 "PRIMARY KEY(week), " +
                 // constraints
                 "CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_non_negative CHECK (" +
-                    "week > 0 AND " +
                     "start_date > 0 AND " +
                     "end_date > 0" +
                 ")" +
@@ -899,17 +890,14 @@ public class TablesDB
     private static void createBankWeeksKeys()
     {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_WEEKS + " ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_brilliant_item_name_fk " +
-                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
-                "ON UPDATE CASCADE " +
-                "ON DELETE SET NULL, " +
+                "FOREIGN KEY(brilliant_item_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "ON UPDATE CASCADE, " +
                 "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_radiant_item_name_fk " +
-                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
-                "ON UPDATE CASCADE " +
-                "ON DELETE SET NULL, " +
+                "FOREIGN KEY(radiant_item_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "ON UPDATE CASCADE, " +
                 "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_legendary_item_name_fk " +
-                "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
-                "ON UPDATE CASCADE " +
-                "ON DELETE SET NULL";
+                "FOREIGN KEY(legendary_item_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
+                "ON UPDATE CASCADE";
 
         DatabaseQueries.runQuery(foreignKeyQuery);
     }
@@ -955,7 +943,6 @@ public class TablesDB
                 "INDEX week_uuid_index(week, uuid), " +
                 // constraints
                 "CONSTRAINT " + DatabaseManager.BANK_BIDS + "_non_negative CHECK (" +
-                    "week > 0 AND " +
                     "total_bid >= 0 AND " +
                     "last_bid_date > 0" +
                 ")" +

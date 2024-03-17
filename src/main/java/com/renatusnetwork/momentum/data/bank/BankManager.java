@@ -26,6 +26,7 @@ public class BankManager
 
     public BankManager()
     {
+        this.items = new HashMap<>();
         this.currentWeek = Math.max(BankDB.getCurrentWeek(), 0);
 
         // no week found, start at 1
@@ -38,6 +39,8 @@ public class BankManager
             this.items = BankDB.getItems(this.currentWeek);
 
         runScheduler();
+
+        Momentum.getPluginLogger().info("Bank week: " + this.currentWeek);
     }
 
     public void loadNewItems()

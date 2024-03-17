@@ -89,26 +89,30 @@ public class BankDB
 
     public static BankItem createRandomBankItem(BankItemType type)
     {
-        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.BANK_ITEMS, "*", "WHERE bank_item_type=?", type);
-        Map<String, String> randomResult = results.get(ThreadLocalRandom.current().nextInt(results.size()));
-
         BankItem item = null;
-        switch (type)
-        {
-            case RADIANT:
-                item = new RadiantItem();
-                break;
-            case BRILLIANT:
-                item = new BrilliantItem();
-                break;
-            case LEGENDARY:
-                item = new LegendaryItem();
-                break;
-        }
+        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.BANK_ITEMS, "*", "WHERE bank_item_type=?", type);
 
-        item.setTitle(randomResult.get("title"));
-        item.setDescription(randomResult.get("description"));
-        item.setModifier(Momentum.getModifiersManager().getModifier(randomResult.get("modifier_name")));
+        if (!results.isEmpty())
+        {
+            Map<String, String> randomResult = results.get(ThreadLocalRandom.current().nextInt(results.size()));
+
+            switch (type)
+            {
+                case RADIANT:
+                    item = new RadiantItem();
+                    break;
+                case BRILLIANT:
+                    item = new BrilliantItem();
+                    break;
+                case LEGENDARY:
+                    item = new LegendaryItem();
+                    break;
+            }
+
+            item.setTitle(randomResult.get("title"));
+            item.setDescription(randomResult.get("description"));
+            item.setModifier(Momentum.getModifiersManager().getModifier(randomResult.get("modifier_name")));
+        }
 
         return item;
     }
