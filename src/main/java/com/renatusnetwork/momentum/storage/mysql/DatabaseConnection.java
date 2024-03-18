@@ -6,11 +6,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class DatabaseConnection {
 
-    private Connection connection;
+    private HikariDataSource dataSource;
 
     public DatabaseConnection() {
         open();
@@ -28,46 +30,37 @@ public class DatabaseConnection {
         String database = settings.getString(dbPath + ".database");
         String port = settings.getString(dbPath + ".port");
 
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true&allowMultiQueries=true&useSSL=false";
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
 
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        HikariConfig hikariConfig = new HikariConfig();
 
-        try {
-            connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        hikariConfig.setJdbcUrl(url);
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
 
-        Momentum.getPluginLogger().info("Successfully opened the connection to the database");
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
+        hikariConfig.addDataSourceProperty("useLocalSessionState", "true");
+        hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
+        hikariConfig.addDataSourceProperty("cacheResultSetMetadata", "true");
+        hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
+        hikariConfig.addDataSourceProperty("maintainTimeStats", "true");
+
+        dataSource = new HikariDataSource(hikariConfig);
+
+        Momentum.getPluginLogger().info("Successfully opened the HikariCP connection pool to the database");
     }
 
-    public void close() {
-        try {
-            if (!connection.isClosed())
-                connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void close()
+    {
+        if (dataSource != null && !dataSource.isClosed())
+            dataSource.close();
     }
 
-    public Connection get() {
-        return connection;
+    public Connection get() throws SQLException
+    {
+        return dataSource.getConnection();
     }
-
-    public DatabaseMetaData getMeta() {
-        DatabaseMetaData meta = null;
-
-        try {
-            meta = get().getMetaData();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return meta;
-    }
-
 }

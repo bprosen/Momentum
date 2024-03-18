@@ -19,7 +19,7 @@ public class TablesDB
 {
     public static void initTables()
     {
-        HashSet<String> tables = getTables(Momentum.getDatabaseManager().getConnection());
+        HashSet<String> tables = getTables(Momentum.getDatabaseManager().getMeta());
 
         // initialize all tables...
         if (tables.isEmpty())
@@ -30,10 +30,9 @@ public class TablesDB
         }
     }
 
-    private static HashSet<String> getTables(DatabaseConnection connection)
+    private static HashSet<String> getTables(DatabaseMetaData meta)
     {
         HashSet<String> tableNames = new HashSet<>();
-        DatabaseMetaData meta = connection.getMeta();
 
         try
         {

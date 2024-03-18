@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -305,44 +306,17 @@ public class LevelsDB {
 
     public static void removeLevel(String levelName)
     {
-        Connection connection = Momentum.getDatabaseManager().getConnection().get();
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVELS_TABLE + " WHERE name=?", levelName);
 
-        try
-        {
-            connection.setAutoCommit(false);
-
-            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVELS_TABLE + " WHERE name=?", levelName);
-
-            // this is just for extra clean up since they are not foreign key relationships
-            DatabaseQueries.runAsyncQuery(
+        // this is just for extra clean up since they are not foreign key relationships
+        DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name=?",
-                    SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName
-                    ));
+                SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName
+                ));
 
-            DatabaseQueries.runAsyncQuery(
+        DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.LOCATIONS_TABLE + " WHERE name=?",
-                    SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName
-                    ));
-
-            // commit
-            connection.commit();
-
-            // fix auto commit
-            connection.setAutoCommit(true);
-        }
-        catch (SQLException exception)
-        {
-            try
-            {
-                connection.rollback();
-                Momentum.getPluginLogger().info("Transaction failed on LevelsDB.removeLevel(), rolling back");
-                exception.printStackTrace();
-            }
-            catch (SQLException rollbackException)
-            {
-                Momentum.getPluginLogger().info("Failure rolling back transaction on LevelsDB.removeLevel()");
-                rollbackException.printStackTrace();
-            }
-        }
+                SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName
+                ));
     }
 }

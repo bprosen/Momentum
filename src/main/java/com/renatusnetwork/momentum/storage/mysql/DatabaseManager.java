@@ -3,6 +3,8 @@ package com.renatusnetwork.momentum.storage.mysql;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -54,19 +56,38 @@ public class DatabaseManager {
         // run async random queue every 10 minutes to keep connection alive if nobody is online and no database activity
         new BukkitRunnable() {
             public void run() {
-                try {
-                    PreparedStatement statement = connection.get().prepareStatement(
+                try (Connection connection = getConnection())
+                {
+                    PreparedStatement statement = connection.prepareStatement(
                             "SELECT * FROM " + DatabaseManager.PLAYERS_TABLE + " WHERE UUID='s'");
                     statement.execute();
                     statement.close();
-                } catch (SQLException e) {
+                }
+                catch (SQLException e)
+                {
                     e.printStackTrace();
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 60 * 10, 20 * 60 * 10);
     }
 
-    public DatabaseConnection getConnection() {
-        return connection;
+    public Connection getConnection() throws SQLException {
+        return connection.get();
+    }
+
+    public DatabaseMetaData getMeta()
+    {
+        DatabaseMetaData meta = null;
+
+        try (Connection connection = getConnection())
+        {
+            meta = connection.getMetaData();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return meta;
     }
 }

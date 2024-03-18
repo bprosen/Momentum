@@ -6,6 +6,8 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -140,38 +142,40 @@ public class CompletionsDB
     {
         Momentum.getLevelManager().setLoadingLeaderboards(true);
 
-        ResultSet results = DatabaseQueries.getRawResults(
-                "SELECT " +
-                            "p.name AS player_name, " +
-                            "r.level_name AS level_name, " +
-                            "r.time_taken AS time_taken " +
-                        "FROM (" +
-                            "SELECT " +
-                                "*, " +
-                                "ROW_NUMBER() OVER (PARTITION BY level_name ORDER BY time_taken) AS row_num " +
+        try (Connection connection = Momentum.getDatabaseManager().getConnection())
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT " +
+                                "p.name AS player_name, " +
+                                "r.level_name AS level_name, " +
+                                "r.time_taken AS time_taken " +
                             "FROM (" +
                                 "SELECT " +
-                                    "level_name, " +
-                                    "uuid, " +
-                                    "MIN(time_taken) AS time_taken " +
-                                "FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
-                                "WHERE time_taken IS NOT NULL " +
-                                "GROUP BY level_name, uuid " +
-                            ") AS g " +
-                        ") AS r " +
-                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON r.uuid=p.uuid " +
-                    "WHERE r.row_num <= " + Momentum.getSettingsManager().levels_lb_size + " " +
-                    "ORDER BY level_name, time_taken;"
-        );
+                                    "*, " +
+                                    "ROW_NUMBER() OVER (PARTITION BY level_name ORDER BY time_taken) AS row_num " +
+                                "FROM (" +
+                                    "SELECT " +
+                                        "level_name, " +
+                                        "uuid, " +
+                                        "MIN(time_taken) AS time_taken " +
+                                    "FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " " +
+                                    "WHERE time_taken IS NOT NULL " +
+                                    "GROUP BY level_name, uuid " +
+                                ") AS g " +
+                            ") AS r " +
+                        "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON r.uuid=p.uuid " +
+                        "WHERE r.row_num <= " + Momentum.getSettingsManager().levels_lb_size + " " +
+                        "ORDER BY level_name, time_taken;"
+            );
 
-        if (results != null)
-        {
-            // default values
-            Level currentLevel = null;
-            List<LevelLBPosition> currentLB = new ArrayList<>();
+            ResultSet results = preparedStatement.executeQuery();
 
-            try
+            if (results != null)
             {
+                // default values
+                Level currentLevel = null;
+                List<LevelLBPosition> currentLB = new ArrayList<>();
+
                 while (results.next())
                 {
                     String levelName = results.getString("level_name");
@@ -200,34 +204,37 @@ public class CompletionsDB
                 if (currentLevel != null)
                     currentLevel.setLeaderboard(currentLB);
             }
-            catch (SQLException exception)
-            {
-                exception.printStackTrace();
-            }
         }
+        catch (SQLException exception)
+        {
+            exception.printStackTrace();
+        }
+
         Momentum.getLevelManager().setLoadingLeaderboards(false);
     }
 
     public static List<LevelLBPosition> getLeaderboard(String levelName)
     {
-
-        ResultSet results = DatabaseQueries.getRawResults(
-                "WITH min_times AS (" +
-                      "     SELECT uuid, level_name, MIN(time_taken) AS fastest_completion FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
-                      "     WHERE time_taken IS NOT NULL AND level_name=? GROUP BY uuid" +
-                      ")" +
-                      "SELECT p.name AS player_name, m.fastest_completion AS fastest " +
-                      "FROM min_times m " +
-                      "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=m.uuid " +
-                      "ORDER BY fastest ASC LIMIT " + Momentum.getSettingsManager().levels_lb_size,
-                      levelName
-        );
-
         List<LevelLBPosition> leaderboard = new ArrayList<>();
 
-        if (results != null)
+        try (Connection connection = Momentum.getDatabaseManager().getConnection())
         {
-            try
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "WITH min_times AS (" +
+                            "     SELECT uuid, level_name, MIN(time_taken) AS fastest_completion FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE +
+                            "     WHERE time_taken IS NOT NULL AND level_name=? GROUP BY uuid" +
+                            ")" +
+                            "SELECT p.name AS player_name, m.fastest_completion AS fastest " +
+                            "FROM min_times m " +
+                            "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=m.uuid " +
+                            "ORDER BY fastest ASC LIMIT " + Momentum.getSettingsManager().levels_lb_size
+            );
+
+            preparedStatement.setString(1, levelName);
+
+            ResultSet results = preparedStatement.executeQuery();
+
+            if (results != null)
             {
                 while (results.next())
                 {
@@ -241,13 +248,11 @@ public class CompletionsDB
                     leaderboard.add(lbPosition);
                 }
             }
-            catch (SQLException exception)
-            {
-                Momentum.getPluginLogger().info("Error on getLeaderboard()");
-                exception.printStackTrace();
-            }
         }
-
+        catch (SQLException exception)
+        {
+            exception.printStackTrace();
+        }
         return leaderboard;
     }
 
@@ -270,39 +275,41 @@ public class CompletionsDB
 
     public static void loadRecords(PlayerStats playerStats)
     {
-        HashMap<Level, Long> records = new HashMap<>();
 
-        ResultSet results = DatabaseQueries.getRawResults(
-                "SELECT DISTINCT " +
-                          "r.level_name AS level_name, " +
-                          "r.time_taken AS time_taken " +
-                      "FROM " +
-                          "(" +
-                              "SELECT " +
-                                  "level_name, " +
-                                  "MIN(time_taken) AS time_taken " +
-                              "FROM " +
-                                  "level_completions " +
-                              "GROUP BY level_name" +
-                          ") AS r " +
-                      "JOIN level_completions ou ON " +
-                          "ou.level_name=r.level_name AND " +
-                          "ou.time_taken=r.time_taken " +
-                      "WHERE ou.uuid=?", playerStats.getUUID());
-
-        if (results != null)
+        try (Connection connection = Momentum.getDatabaseManager().getConnection())
         {
-            try
-            {
+            HashMap<Level, Long> records = new HashMap<>();
+
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT DISTINCT " +
+                                "r.level_name AS level_name, " +
+                                "r.time_taken AS time_taken " +
+                        "FROM " +
+                            "(" +
+                            "SELECT " +
+                                "level_name, " +
+                                "MIN(time_taken) AS time_taken " +
+                            "FROM " +
+                                "level_completions " +
+                            "GROUP BY level_name" +
+                        ") AS r " +
+                        "JOIN level_completions ou ON " +
+                        "ou.level_name=r.level_name AND " +
+                        "ou.time_taken=r.time_taken " +
+                        "WHERE ou.uuid=?");
+
+            statement.setString(1, playerStats.getUUID());
+            ResultSet results = statement.executeQuery();
+
+            if (results != null)
                 while (results.next())
                     records.put(Momentum.getLevelManager().get(results.getString("level_name")), results.getLong("time_taken"));
-            }
-            catch (SQLException exception)
-            {
-                Momentum.getPluginLogger().info("Error on getLeaderboard()");
-                exception.printStackTrace();
-            }
+
+            playerStats.setRecords(records);
         }
-        playerStats.setRecords(records);
+        catch (SQLException exception)
+        {
+            exception.printStackTrace();
+        }
     }
 }

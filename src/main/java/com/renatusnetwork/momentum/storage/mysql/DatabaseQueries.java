@@ -1,6 +1,9 @@
 package com.renatusnetwork.momentum.storage.mysql;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.utils.TimeUtils;
+import com.renatusnetwork.momentum.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
@@ -17,16 +20,15 @@ public class DatabaseQueries
         if (!trailingSQL.isEmpty())
             query = query + " " + trailingSQL;
 
-        try
+        try (Connection connection = Momentum.getDatabaseManager().getConnection())
         {
-            PreparedStatement statement = Momentum.getDatabaseManager().getConnection().get().prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query);
 
             // secure
             for (int i = 0; i < parameters.length; i++)
                 statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
 
             ResultSet results = statement.executeQuery();
-
             while (results.next())
             {
                 // parse results
@@ -58,46 +60,20 @@ public class DatabaseQueries
         List<Map<String, String>> results = getResults(tableName, selection, trailingSQL, parameters);
         Map<String, String> empty = new HashMap<>();
 
-        if (!results.isEmpty())
-            return getResults(tableName, selection, trailingSQL, parameters).get(0);
-        else
-            return empty;
-    }
-
-    public static ResultSet getRawResults(String query, Object... parameters)
-    {
-        try
-        {
-            PreparedStatement statement = Momentum.getDatabaseManager().getConnection().get().prepareStatement(query);
-
-            // secure
-            for (int i = 0; i < parameters.length; i++)
-                statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
-
-            return statement.executeQuery();
-        }
-        catch (SQLException exception)
-        {
-            Momentum.getPluginLogger().info("Error in DatabaseQueries.getRawResults(" + query + ")");
-            Momentum.getPluginLogger().info("Query='" + query + "'");
-            exception.printStackTrace();
-        }
-
-        return null;
+        return !results.isEmpty() ? getResults(tableName, selection, trailingSQL, parameters).get(0) : empty;
     }
 
     public static boolean runQuery(String sql, Object... parameters)
     {
-        try
+        try (Connection connection = Momentum.getDatabaseManager().getConnection())
         {
-            PreparedStatement statement = Momentum.getDatabaseManager().getConnection().get().prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             // secure
             for (int i = 0; i < parameters.length; i++)
                 statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
 
             statement.executeUpdate();
-            statement.close();
             return true;
         }
         catch (SQLException exception)
