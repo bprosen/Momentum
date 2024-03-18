@@ -47,6 +47,7 @@ public class DatabaseConnection {
         hikariConfig.addDataSourceProperty("cacheResultSetMetadata", "true");
         hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
         hikariConfig.addDataSourceProperty("maintainTimeStats", "true");
+        hikariConfig.setMaximumPoolSize(10);
 
         dataSource = new HikariDataSource(hikariConfig);
 
