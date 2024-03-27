@@ -139,7 +139,7 @@ public class TablesDB {
         String sqlQuery = "CREATE TABLE completions(" +
                 "player_id INT NOT NULL, " +
                 "level_id INT NOT NULL, " +
-                "time_taken MEDIUMINT DEFAULT 0, " +
+                "time_taken INT DEFAULT 0, " +
                 "completion_date TIMESTAMP NOT NULL" +
                 ")";
 
