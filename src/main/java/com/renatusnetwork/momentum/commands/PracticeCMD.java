@@ -25,8 +25,7 @@ public class PracticeCMD implements CommandExecutor {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         if (a.length == 0) {
-
-            if (!(playerStats.getLevel() == null && !player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))) {
+            if (!(playerStats.getLevel() == null && !player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) || player.hasPermission("momentum.admin")) {
                 if (!playerStats.inRace()) {
                     if (!playerStats.isSpectating()) {
                         if (!playerStats.isEventParticipant()) {
