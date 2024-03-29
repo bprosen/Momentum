@@ -152,7 +152,7 @@ public class InfiniteManager {
                 for (InfiniteReward reward : getApplicableRewards(infiniteType, playerStats.getBestInfiniteScore(), score))
                 {
                     // loop through and run commands of applicable rewards
-                    player.sendMessage(Utils.translate(" &7You received &d" + reward.getDisplay() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
+                    player.sendMessage(Utils.translate("&7You received &d" + reward.getDisplay() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
 
                     // run commands
                     for (String command : reward.getCommands())
