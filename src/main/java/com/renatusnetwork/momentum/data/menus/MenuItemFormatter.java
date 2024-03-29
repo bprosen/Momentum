@@ -524,9 +524,9 @@ public class MenuItemFormatter
 
                 // display access if they do not have it
                 if (!playerStats.hasAccessTo(level))
-                    itemLore.add(Utils.translate("&cYou do not have access to this level"));
+                    itemLore.add(Utils.translate("&cYou cannot race on &4" + level.getTitle()));
                 else if (!opponentStats.hasAccessTo(level))
-                    itemLore.add(Utils.translate("&4" + opponentStats.getDisplayName() + "&c does not have access to this level"));
+                    itemLore.add(Utils.translate("&4" + opponentStats.getDisplayName() + "&c cannot race on &4" + level.getTitle()));
                 else
                 {
                     itemLore.add(Utils.translate("&7Click to race &c" + opponentStats.getDisplayName() + "&7 on " + level.getTitle()));

@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.blackmarket;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -213,8 +212,7 @@ public class BlackMarketManager
                     if (running.hasHighestBidder())
                     {
                         String display = running.getHighestBidder().getPlayer().getDisplayName();
-                        TitleAPI.sendTitle(player, 0, 20, 20,
-                                Utils.translate("&8&lBlack Market"), Utils.translate("&c" + display + " &7won!"));
+                        playerStats.sendTitle("&8&lBlack Market", "&c" + display + " &7won!", 10, 20, 20);
                         player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F);
                     }
                     playerStats.setBlackMarket(false);
@@ -276,7 +274,7 @@ public class BlackMarketManager
             {
                 running.addPlayer(playerStats);
                 player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_AMBIENT, 1.0F, 1.0F); // play noise
-                TitleAPI.sendTitle(player, 20, 100, 20, "&8&lBlack Market", "&7We will be starting soon..."); // send title
+                playerStats.sendTitle("&8&lBlack Market", "&7We will be starting soon...", 20, 100, 20); // send title
                 playerStats.getPlayer().teleport(Momentum.getLocationManager().get(Momentum.getSettingsManager().blackmarket_tp_loc));
                 playerStats.setBlackMarket(true);
             }

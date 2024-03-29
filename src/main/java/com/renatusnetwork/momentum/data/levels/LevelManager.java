@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.levels;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.JackpotRewardEvent;
 import com.renatusnetwork.momentum.api.LevelCompletionEvent;
@@ -1113,17 +1112,17 @@ public class LevelManager
 
             if (!inRace)
             {
-                String titleMessage = Utils.translate("&7You beat " + level.getTitle());
+                String titleMessage = Utils.translate("&7Beat " + level.getTitle());
                 if (levelCompletion.wasTimed())
                     titleMessage += Utils.translate("&7 in &2" + time);
 
                 String subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle()));
 
-                TitleAPI.sendTitle(
-                        player, 10, 60, 10,
+                playerStats.sendTitle(
                         titleMessage,
-                        subTitleMessage
+                        subTitleMessage,
+                        10, 60, 10
                 );
             }
 

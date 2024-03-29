@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.events;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.ParkourEventEndEvent;
 import com.renatusnetwork.momentum.data.events.types.*;
@@ -299,9 +298,7 @@ public class EventManager {
             ((AscentEvent) runningEvent).remove(player);
 
         if (!disconnected && winner != null)
-            TitleAPI.sendTitle(eventParticipant.getPlayer(), 10, 80, 10,
-                    Utils.translate("&c" + winner.getDisplayName() + " &7has won the &2&l" + runningEvent.getFormattedName() + " &7Event"), ""
-            );
+            playerStats.sendTitle("&c" + winner.getDisplayName() + " &7has won the &2&l" + runningEvent.getFormattedName() + " &7Event", "", 10, 80, 10);
 
         // set back if they came from elytra level
         if (playerStats.inLevel() && playerStats.getLevel().isElytra())

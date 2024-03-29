@@ -200,7 +200,7 @@ public class PacketListener implements Listener
                                     @Override
                                     public void run()
                                     {
-                                        statsManager.spectateToPlayer(playerStats.getPlayer(), beingSpectated.getPlayer(), false);
+                                        statsManager.spectateToPlayer(playerStats, beingSpectated, false);
                                     }
                                 }.runTask(Momentum.getPlugin());
                         }

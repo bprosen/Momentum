@@ -394,10 +394,10 @@ public class PlayerStats
     //
     public boolean hasAccessTo(Level level)
     {
-        return hasCompleted(level) || (level.requiresBuying() && hasBoughtLevel(level)) ||
-               (level.hasRequiredLevels() && level.playerHasRequiredLevels(this)) ||
-               (level.hasPermissionNode() && player.hasPermission(level.getRequiredPermission())) ||
-               (level.needsRank() && Momentum.getRanksManager().isPastOrAtRank(this, level.getRequiredRank()));
+        return !((level.requiresBuying() && !hasBoughtLevel(level)) ||
+                (level.hasRequiredLevels() && !level.playerHasRequiredLevels(this)) ||
+                (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission())) ||
+                (level.needsRank() && !Momentum.getRanksManager().isPastOrAtRank(this, level.getRequiredRank())));
     }
 
     public void setLevel(Level level)
@@ -1131,4 +1131,9 @@ public class PlayerStats
     }
 
     public void teleport(Location location) { player.teleport(location); }
+
+    public void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut)
+    {
+        player.sendTitle(Utils.translate(title), Utils.translate(subTitle), fadeIn, stay, fadeOut);
+    }
 }

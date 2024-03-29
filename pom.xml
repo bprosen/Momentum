@@ -115,14 +115,6 @@
         </dependency>
 
         <dependency>
-            <groupId>api.title</groupId>
-            <artifactId>title-api</artifactId>
-            <version>1.7.4</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/TitleAPI-1.7.4.jar</systemPath>
-        </dependency>
-
-        <dependency>
             <groupId>com.intellectualsites.fawe</groupId>
             <artifactId>FAWE-core</artifactId>
             <version>1.12</version>

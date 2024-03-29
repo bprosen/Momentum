@@ -1,11 +1,8 @@
 package com.renatusnetwork.momentum.data.stats;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.GGRewardEvent;
-import com.renatusnetwork.momentum.data.bank.items.BankItem;
 import com.renatusnetwork.momentum.data.bank.items.BankItemType;
-import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
@@ -877,8 +874,11 @@ public class StatsManager {
     /*
         Spectator management
      */
-    public void spectateToPlayer(Player spectator, Player player, boolean initialSpectate)
+    public void spectateToPlayer(PlayerStats spectatorStats, PlayerStats playerStats, boolean initialSpectate)
     {
+        Player spectator = spectatorStats.getPlayer();
+        Player player = playerStats.getPlayer();
+
         if (player.isOnline() && spectator.isOnline())
         {
             spectator.teleport(player.getLocation());
@@ -890,10 +890,7 @@ public class StatsManager {
                 spectator.setFlying(true);
             }
 
-            TitleAPI.sendTitle(
-                    spectator, 10, 40, 10,
-                    Utils.translate("&7Teleported to " + player.getDisplayName()), Utils.translate("&2/spectate &7 to exit"
-                    ));
+            spectatorStats.sendTitle("&7Teleported to " + player.getDisplayName(), "&2/spectate &7 to exit", 10, 40, 10);
         }
     }
 
@@ -911,7 +908,7 @@ public class StatsManager {
             toggleOffElytra(spectatorStats);
         }
 
-        spectateToPlayer(spectator, player, initialSpectate);
+        spectateToPlayer(spectatorStats, playerStats, initialSpectate);
     }
 
     public void resetSpectatorMode(PlayerStats spectatorStats)
@@ -930,12 +927,8 @@ public class StatsManager {
 
         if (loc != null)
         {
-
             player.teleport(loc);
-            TitleAPI.sendTitle(
-                    player, 10, 40, 10,
-                    "",
-                    Utils.translate("&7You are no longer spectating anyone"));
+            spectatorStats.sendTitle("", "&7You are no longer spectating anyone", 10, 40, 10);
             spectatorStats.resetSpectateSpawn();
 
             Momentum.getLevelManager().regionLevelCheck(spectatorStats, loc);

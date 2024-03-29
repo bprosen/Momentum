@@ -4,7 +4,7 @@ main: ${mainClass}
 version: ${project.version}
 author: [CrazySeanPC, xxBen]
 
-depend: [TitleAPI, Vault, WorldGuard, ProtocolLib, WorldEdit, ViaVersion]
+depend: [Vault, WorldGuard, ProtocolLib, WorldEdit, ViaVersion]
 softdepend: [PlaceholderAPI]
 
 commands:

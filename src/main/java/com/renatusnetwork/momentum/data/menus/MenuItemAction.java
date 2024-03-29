@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.menus;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.LevelBuyEvent;
 import com.renatusnetwork.momentum.api.ShopBuyEvent;
@@ -153,7 +152,15 @@ public class MenuItemAction {
         if (level.isRaceLevel())
         {
             ChoosingLevel choosingLevel = Momentum.getRaceManager().getChoosingLevelData(playerStats.getName());
-            Momentum.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
+            PlayerStats requested = choosingLevel.getRequested();
+
+            if (!playerStats.hasAccessTo(level))
+                playerStats.sendMessage(Utils.translate("&cYou cannot race on &4" + level.getTitle()));
+            else if (!requested.hasAccessTo(level))
+                playerStats.sendMessage(Utils.translate("&4" + requested.getDisplayName() + "&c cannot race on &4" + level.getTitle()));
+            else
+                Momentum.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
+
             playerStats.getPlayer().closeInventory();
         }
     }
@@ -195,19 +202,19 @@ public class MenuItemAction {
 
     private static void performRandomRaceLevel(PlayerStats playerStats)
     {
+        ChoosingLevel choosingLevel = Momentum.getRaceManager().getChoosingLevelData(playerStats.getName());
+
         List<Level> raceLevels = Momentum.getLevelManager().getRaceLevels();
         ArrayList<Level> chosenLevels = new ArrayList<>();
 
         for (Level level : raceLevels)
         {
             // cover all conditions that can stop a player from entering a level
-            if (!level.isFeaturedLevel() && !level.isRankUpLevel() && playerStats.hasAccessTo(level) && level.isRaceLevel() &&
-                !(playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName())))
+            if (playerStats.hasAccessTo(level) && choosingLevel.getRequested().hasAccessTo(level))
                 chosenLevels.add(level);
         }
         // tp them to randomly chosen level
         Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
-        ChoosingLevel choosingLevel = Momentum.getRaceManager().getChoosingLevelData(playerStats.getName());
 
         Momentum.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), chosenLevel, choosingLevel.getBet());
 
@@ -704,11 +711,7 @@ public class MenuItemAction {
                 if (level.isElytra())
                     Momentum.getStatsManager().toggleOnElytra(playerStats);
 
-                TitleAPI.sendTitle(
-                        player, 10, 40, 10,
-                        "",
-                        level.getFormattedTitle()
-                );
+                playerStats.sendTitle("", level.getFormattedTitle(), 10, 40, 10);
             }
             else
                 player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));

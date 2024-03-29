@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.races.gamemode;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
@@ -145,7 +144,7 @@ public class RacePlayer
     {
         Player player = playerStats.getPlayer();
 
-        TitleAPI.sendTitle(player, 0, 20, 0, title, "");
+        playerStats.sendTitle(title, "", 0, 15, 5);
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
     }
 
@@ -157,7 +156,7 @@ public class RacePlayer
         if (race.hasBet())
             subTitleMessage += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
 
-        TitleAPI.sendTitle(getPlayerStats().getPlayer(), 10, 60, 10, titleMessage, subTitleMessage);
+        playerStats.sendTitle(titleMessage, subTitleMessage, 10, 60, 10);
     }
 
     private void tpBack(PlayerStats playerStats, Location location)
