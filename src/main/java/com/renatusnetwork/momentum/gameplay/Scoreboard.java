@@ -156,13 +156,13 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase()) + " &5Infinite")));
 
                     // add best if they have one
-                    String scoreString = "&7Score &d" + Momentum.getInfiniteManager().get(playerStats.getName()).getScore();
-                    if (playerStats.getBestInfiniteScore() > 0)
-                        scoreString += " &7(&dBest " + playerStats.getBestInfiniteScore() + "&7)";
+                    int currentScore = Momentum.getInfiniteManager().get(playerStats.getName()).getScore();
+                    int bestScore = playerStats.getBestInfiniteScore();
+                    String currentScoreFormatted = Utils.formatNumber(currentScore);
 
                     Infinite infinite = Momentum.getInfiniteManager().get(playerStats.getName());
 
-                    board.add(formatSpacing(Utils.translate(scoreString)));
+                    board.add(formatSpacing(Utils.translate(currentScore <= bestScore ? "&7" + currentScoreFormatted : "&d" + currentScoreFormatted)));
 
                     double timeLeft = 0.0;
                     if (infinite.isTimed())
