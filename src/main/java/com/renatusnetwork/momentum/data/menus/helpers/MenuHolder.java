@@ -1,5 +1,7 @@
-package com.renatusnetwork.momentum.data.menus;
+package com.renatusnetwork.momentum.data.menus.helpers;
 
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
+import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 

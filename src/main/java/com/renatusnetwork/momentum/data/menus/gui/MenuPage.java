@@ -1,7 +1,10 @@
-package com.renatusnetwork.momentum.data.menus;
+package com.renatusnetwork.momentum.data.menus.gui;
 
+import com.renatusnetwork.momentum.data.menus.MenuItemFormatter;
+import com.renatusnetwork.momentum.data.menus.MenusYAML;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.InventoryView;
 
 import java.util.*;
@@ -106,7 +109,11 @@ public class MenuPage
 
     public void setItem(MenuItem menuItem)
     {
-        pageItemsMap.replace(menuItem.getSlot(), menuItem);
+        if (pageItemsMap.containsKey(menuItem.getSlot()))
+            pageItemsMap.replace(menuItem.getSlot(), menuItem);
+        else
+            pageItemsMap.put(menuItem.getSlot(), menuItem);
+
         menuItem.setPage(this);
     }
 

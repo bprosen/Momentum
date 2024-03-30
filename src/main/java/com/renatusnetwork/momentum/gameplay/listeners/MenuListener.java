@@ -3,6 +3,10 @@ package com.renatusnetwork.momentum.gameplay.listeners;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.menus.*;
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
+import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
+import com.renatusnetwork.momentum.data.menus.helpers.CancelTasks;
+import com.renatusnetwork.momentum.data.menus.helpers.MenuHolder;
 import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.races.RaceManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
@@ -44,13 +48,12 @@ public class MenuListener implements Listener
                     && currentItem.hasItemMeta()
                     && currentItem.getItemMeta().hasDisplayName())
                 {
-
                     PlayerStats playerStats = Momentum.getStatsManager().get(player);
-
-                    MenuItem menuItem = menu.getMenuItem(playerStats,
-                            Utils.getTrailingInt(event.getInventory().getTitle()),
+                    MenuItem menuItem =
+                        menu.getMenuItem(playerStats,
+                            menuHolder.getMenuPage().getPageNumber(),
                             event.getSlot()
-                    );
+                        );
 
                     if (menuItem != null &&
                             ((menuItem.getItem().getType() == currentItem.getType() ||
@@ -62,7 +65,7 @@ public class MenuListener implements Listener
                         if (shiftClicked)
                             Momentum.getMenuManager().addShiftClicked(playerStats);
 
-                        MenuItemAction.perform(player, menuItem);
+                        MenuItemAction.perform(playerStats, menuItem);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
 
                         if (shiftClicked)

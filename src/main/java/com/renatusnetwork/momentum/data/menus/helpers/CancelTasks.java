@@ -1,4 +1,4 @@
-package com.renatusnetwork.momentum.data.menus;
+package com.renatusnetwork.momentum.data.menus.helpers;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;

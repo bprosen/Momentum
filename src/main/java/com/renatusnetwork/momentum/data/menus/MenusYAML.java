@@ -1,6 +1,8 @@
 package com.renatusnetwork.momentum.data.menus;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
+import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -143,6 +145,7 @@ public class MenusYAML {
     {
         return menusConfig.getBoolean(menuName + ".settings.sort_levels", false);
     }
+
     public static List<String> getCommands(String menuName, int pageNumber, String itemSlot)
     {
         return menusConfig.getStringList(menuName + "." + pageNumber + "." + itemSlot + ".commands");

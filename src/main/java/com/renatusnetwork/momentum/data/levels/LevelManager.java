@@ -11,6 +11,9 @@ import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.momentum.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.momentum.data.locations.LocationsDB;
 import com.renatusnetwork.momentum.data.menus.*;
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
+import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
+import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
 import com.renatusnetwork.momentum.data.modifiers.ModifierType;
 import com.renatusnetwork.momentum.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.momentum.data.modifiers.boosters.Booster;
@@ -629,6 +632,35 @@ public class LevelManager
     public MenuItem getMenuItemFromLevel(Level level)
     {
         return levelMenuItems.get(level);
+    }
+
+    public ArrayList<MenuItem> searchMenuLevelsIgnoreCase(String levelTitle)
+    {
+        int capacity = 7;
+        levelTitle = levelTitle.toLowerCase();
+
+        ArrayList<MenuItem> filtered = new ArrayList<>();
+
+        for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
+        {
+            if (filtered.size() > capacity)
+                break;
+
+            MenuItem menuItem = entry.getValue();
+
+            String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
+
+            if (levelString.equals(levelTitle))
+            {
+                filtered.clear();
+                filtered.add(menuItem);
+                break;
+            }
+            else if (levelString.contains(levelTitle))
+                filtered.add(menuItem);
+        }
+
+        return filtered;
     }
 
     public Level getFeaturedLevel()

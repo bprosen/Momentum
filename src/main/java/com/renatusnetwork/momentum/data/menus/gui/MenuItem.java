@@ -1,5 +1,6 @@
-package com.renatusnetwork.momentum.data.menus;
+package com.renatusnetwork.momentum.data.menus.gui;
 
+import com.renatusnetwork.momentum.data.menus.MenusYAML;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;

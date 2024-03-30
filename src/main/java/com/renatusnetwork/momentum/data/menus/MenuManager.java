@@ -2,6 +2,11 @@ package com.renatusnetwork.momentum.data.menus;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
+import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
+import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
+import com.renatusnetwork.momentum.data.menus.helpers.CancelTasks;
+import com.renatusnetwork.momentum.data.menus.helpers.MenuHolder;
 import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -19,7 +24,6 @@ import java.util.*;
 
 public class MenuManager
 {
-
     private HashMap<String, Menu> menus;
     private HashMap<String, CancelTasks> cancelTasks;
     private HashSet<String> shiftClicked;

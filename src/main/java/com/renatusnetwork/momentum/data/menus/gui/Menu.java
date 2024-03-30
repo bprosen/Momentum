@@ -1,7 +1,9 @@
-package com.renatusnetwork.momentum.data.menus;
+package com.renatusnetwork.momentum.data.menus.gui;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
+import com.renatusnetwork.momentum.data.menus.LevelSortingType;
+import com.renatusnetwork.momentum.data.menus.MenusYAML;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.Inventory;

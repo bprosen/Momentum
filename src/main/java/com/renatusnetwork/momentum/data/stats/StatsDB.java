@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.data.stats;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.items.BankItem;
 import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;

@@ -50,7 +50,20 @@
                                     <pattern>fr.mrmicky.fastboard</pattern>
                                     <shadedPattern>com.renatusnetwork.momentum</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>net.wesjd.anvilgui</pattern>
+                                    <shadedPattern>com.renatusnetwork.momentum.anvilgui</shadedPattern>
+                                </relocation>
                             </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludeDefaults>false</excludeDefaults>
+                                    <includes>
+                                        <include>net/wesjd/anvilgui/**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -83,6 +96,11 @@
         <repository>
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
+        </repository>
+
+        <repository>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
         </repository>
     </repositories>
 
@@ -161,6 +179,12 @@
             <artifactId>viaversion-api</artifactId>
             <version>4.9.2</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.wesjd</groupId>
+            <artifactId>anvilgui</artifactId>
+            <version>1.9.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

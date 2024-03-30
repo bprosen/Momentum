@@ -10,6 +10,10 @@ import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.levels.LevelPreview;
+import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
+import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
+import com.renatusnetwork.momentum.data.menus.helpers.CancelTasks;
+import com.renatusnetwork.momentum.data.menus.helpers.MenuHolder;
 import com.renatusnetwork.momentum.data.modifiers.ModifierType;
 import com.renatusnetwork.momentum.data.modifiers.discounts.Discount;
 import com.renatusnetwork.momentum.data.perks.Perk;
@@ -23,6 +27,7 @@ import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import com.renatusnetwork.momentum.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.wesjd.anvilgui.AnvilGUI;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -34,6 +39,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MenuItemAction {
@@ -69,10 +75,10 @@ public class MenuItemAction {
         player.closeInventory();
     }
 
-    public static void perform(Player player, MenuItem menuItem)
+    public static void perform(PlayerStats playerStats, MenuItem menuItem)
     {
+        Player player = playerStats.getPlayer();
         String itemType = menuItem.getType();
-        PlayerStats playerStats = Momentum.getStatsManager().get(player);
         boolean choosingRace = Momentum.getRaceManager().containsChoosingRaceLevel(playerStats.getName());
 
         if (itemType.equals("race"))
@@ -139,6 +145,8 @@ public class MenuItemAction {
                 performCosmeticsClear(player, typeValue, menuItem);
             else if (typeValue.equals("level-sorting") && !Momentum.getLevelManager().isBuyingLevelMenu(player.getName())) // do not allow switching sorting if buying
                 performLevelSort(playerStats, menuItem.getPage());
+            else if (typeValue.equals("level-search"))
+                performOpenLevelSearch(playerStats);
             else if (typeValue.equals("exit"))
                 player.closeInventory();
         } else if (menuItem.hasCommands())
@@ -754,7 +762,8 @@ public class MenuItemAction {
         Location location = Momentum.getLocationManager().get(menuItem.getTypeValue());
 
         // null check
-        if (location != null) {
+        if (location != null)
+        {
             // region check
             ProtectedRegion region = WorldGuard.getRegion(location);
             if (region != null) {
@@ -774,5 +783,74 @@ public class MenuItemAction {
 
         if (menuPage != null)
             Momentum.getMenuManager().openInventory(playerStats, playerStats.getPlayer(), menuPage.getMenu().getName(), menuPage.getPageNumber(), false);
+    }
+
+    private static void performOpenLevelSearch(PlayerStats playerStats)
+    {
+        AnvilGUI.Builder builder = new AnvilGUI.Builder();
+
+        ItemStack barrierItems = new ItemStack(Material.BARRIER);
+        ItemMeta barrierMeta = barrierItems.getItemMeta();
+        barrierMeta.setDisplayName(Utils.translate("Search level"));
+        barrierMeta.setLore(new ArrayList<String>() {{
+            add(Utils.translate("&cInput must be at least 3 characters"));
+            add(Utils.translate("&cSimilar levels are shown if no match is found"));
+        }});
+
+        barrierItems.setItemMeta(barrierMeta);
+
+        builder.plugin(Momentum.getPlugin())
+                .itemLeft(barrierItems)
+                .itemRight(barrierItems)
+                .itemOutput(new ItemStack(Material.BOOK_AND_QUILL))
+                .onClickAsync((slot, result) -> CompletableFuture.supplyAsync(() -> {
+                    String levelText = result.getText();
+                    ArrayList<MenuItem> menuItems = Momentum.getLevelManager().searchMenuLevelsIgnoreCase(levelText);
+
+                    if (
+                        slot != AnvilGUI.Slot.OUTPUT ||
+                        levelText.isEmpty() ||
+                        levelText.equalsIgnoreCase("Search level") ||
+                        menuItems.isEmpty()
+                    )
+                        return Collections.emptyList();
+
+                    return Arrays.asList(AnvilGUI.ResponseAction.close(), AnvilGUI.ResponseAction.run(() -> {
+                        Inventory openInventory;
+
+                        if (menuItems.size() == 1)
+                        {
+                            Momentum.getMenuManager().openInventory(playerStats, "search_levels_single", false);
+
+                            openInventory = playerStats.getPlayer().getOpenInventory().getTopInventory();
+                            MenuHolder holder = (MenuHolder) openInventory.getHolder();
+                            MenuPage page = holder.getMenuPage();
+                            MenuItem item = menuItems.get(0).clone(page, 13);
+                            page.setItem(item);
+
+                            openInventory.setItem(13, MenuItemFormatter.format(playerStats, item));
+                        }
+                        else
+                        {
+                            Momentum.getMenuManager().openInventory(playerStats, "search_levels_multiple", false);
+                            openInventory = playerStats.getPlayer().getOpenInventory().getTopInventory();
+                            MenuHolder holder = (MenuHolder) openInventory.getHolder();
+                            MenuPage page = holder.getMenuPage();
+
+                            for (int i = 10; i < 17; i++)
+                            {
+                                int invSlotIndex = i - 10;
+                                if (invSlotIndex < menuItems.size())
+                                {
+                                    MenuItem item = menuItems.get(invSlotIndex).clone(page, i);
+                                    page.setItem(item);
+
+                                    openInventory.setItem(i, MenuItemFormatter.format(playerStats, item));
+                                }
+                            }
+                        }
+                    }));
+                }))
+                .open(playerStats.getPlayer());
     }
 }
