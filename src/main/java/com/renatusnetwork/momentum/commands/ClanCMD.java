@@ -297,7 +297,7 @@ public class ClanCMD implements CommandExecutor
                                     if (targetClan.getMaxLevel() >= newLevel)
                                     {
                                         clansManager.updateLevel(clan, newLevel);
-                                        player.sendMessage(Utils.translate("&eYou set &6&l" + clan.getTag() + "&e's level to &6" + newLevel));
+                                        player.sendMessage(Utils.translate("&eYou set &6&l" + targetClan.getTag() + "&e's level to &6" + newLevel));
                                     }
                                     else
                                         player.sendMessage(Utils.translate("&cYou cannot set the level beyond the clan's max (" + targetClan.getMaxLevel() + ")"));

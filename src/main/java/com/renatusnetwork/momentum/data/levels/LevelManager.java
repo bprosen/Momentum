@@ -785,8 +785,8 @@ public class LevelManager
                                     teleport = false;
                                     player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
                                     player.sendMessage(Utils.translate(
-                                            "&7Type &c&m/level buy " + level.getName() + "&7 &6(" + Utils.formatNumber(level.getPrice()) + " &eCoins&e) to buy " + ChatColor.stripColor(level.getFormattedTitle()
-                                            )));
+                                            "&7Type &c/level buy " + ChatColor.stripColor(level.getTitle()) + "&7 for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins &7to buy " + level.getTitle())
+                                    );
                                 }
 
                                 // if still allowed, tp them!
