@@ -637,7 +637,7 @@ public class LevelManager
 
     public ArrayList<MenuItem> searchMenuLevelsIgnoreCase(String levelTitle)
     {
-        String loweredTitle = levelTitle.toLowerCase();
+        levelTitle = levelTitle.toLowerCase();
         ArrayList<MenuItem> filtered = new ArrayList<>();
 
         for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
@@ -645,25 +645,15 @@ public class LevelManager
             MenuItem menuItem = entry.getValue();
             String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
 
-            if (levelString.equals(loweredTitle))
+            if (levelString.equals(levelTitle))
             {
+                filtered.clear();
                 filtered.add(menuItem);
                 break;
             }
+            else if (levelString.contains(levelTitle) && filtered.size() <= LEVEL_SEARCH_MULTIPLE_CAPACITY)
+                filtered.add(menuItem);
         }
-
-        // continue if no exact match is found
-        if (filtered.isEmpty())
-            for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
-            {
-                if (filtered.size() > LEVEL_SEARCH_MULTIPLE_CAPACITY)
-                    break;
-
-                String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
-
-                if (levelString.contains(levelTitle))
-                    filtered.add(entry.getValue());
-            }
 
         return filtered;
     }

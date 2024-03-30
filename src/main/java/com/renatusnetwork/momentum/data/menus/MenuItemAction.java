@@ -847,6 +847,8 @@ public class MenuItemAction {
 
                                     openInventory.setItem(i, MenuItemFormatter.format(playerStats, item));
                                 }
+                                else
+                                    openInventory.setItem(i, null);
                             }
                         }
                     }));
