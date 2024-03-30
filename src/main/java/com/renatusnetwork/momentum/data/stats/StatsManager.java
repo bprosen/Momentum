@@ -179,7 +179,7 @@ public class StatsManager {
 
     public PlayerStats getByName(String playerName)
     {
-        return playerStatsName.get(playerName.toLowerCase());
+        return playerName != null ? playerStatsName.get(playerName.toLowerCase()) : null;
     }
 
     public PlayerStats get(Player player) {

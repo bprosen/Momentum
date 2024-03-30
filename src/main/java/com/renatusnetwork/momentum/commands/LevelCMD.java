@@ -470,7 +470,7 @@ public class LevelCMD implements CommandExecutor
                     if (level.hasRated(targetName))
                     {
                         levelManager.removeRating(targetName, level);
-                        sender.sendMessage(Utils.translate("&cYou removed &4" + targetName + "&7's from &c" + level.getTitle()));
+                        sender.sendMessage(Utils.translate("&cYou removed &4" + targetName + "&c's from " + level.getTitle()));
                     }
                     else
                         sender.sendMessage(Utils.translate("&4" + targetName + " &chas not rated &4" + level.getTitle()));

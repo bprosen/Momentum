@@ -6,6 +6,7 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 public abstract class BankItem
 {
     private BankItemType type;
+    private String name;
     private long totalBalance;
     private int nextBid;
     private String title;
@@ -33,6 +34,10 @@ public abstract class BankItem
     {
         return locked;
     }
+
+    public void setName(String name) { this.name = name; }
+
+    public String getName() { return name; }
 
     public void setTitle(String title)
     {
@@ -100,7 +105,7 @@ public abstract class BankItem
 
     public boolean isCurrentHolder(PlayerStats playerStats)
     {
-        return this.currentHolder.equalsIgnoreCase(playerStats.getName());
+        return hasCurrentHolder() && this.currentHolder.equalsIgnoreCase(playerStats.getName());
     }
 
     public boolean hasCurrentHolder() { return currentHolder != null && !currentHolder.isEmpty(); }

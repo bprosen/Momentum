@@ -44,7 +44,7 @@ public class ModifiersDB
     {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.MODIFIERS_TABLE + " (name, type, title, multiplier) VALUES (?,?,?,?)",
-                name, type, title, multiplier
+                name, type.name(), title, multiplier
         );
     }
 
@@ -52,7 +52,7 @@ public class ModifiersDB
     {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.MODIFIERS_TABLE + " (name, type, title, discount) VALUES (?,?,?,?)",
-                name, type, title, discount
+                name, type.name(), title, discount
         );
     }
 
@@ -60,7 +60,7 @@ public class ModifiersDB
     {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.MODIFIERS_TABLE + " (name, type, title, bonus) VALUES (?,?,?,?)",
-                name, type, title, bonus
+                name, type.name(), title, bonus
         );
     }
 

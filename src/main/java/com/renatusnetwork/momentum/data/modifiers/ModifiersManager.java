@@ -15,7 +15,7 @@ public class ModifiersManager
 
     public ModifiersManager()
     {
-        load();
+        this.modifiers = new HashMap<>();
     }
     public void load()
     {

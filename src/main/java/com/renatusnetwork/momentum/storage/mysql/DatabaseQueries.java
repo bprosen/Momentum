@@ -8,9 +8,26 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class DatabaseQueries
 {
+
+    public static CompletableFuture<List<Map<String, String>>> getResultsAsync(String tableName, String selection, String trailingSQL, Object... parameters)
+    {
+        CompletableFuture<List<Map<String, String>>> future = new CompletableFuture<>();
+
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                future.complete(getResults(tableName, selection, trailingSQL, parameters));
+            }
+        }.runTaskAsynchronously(Momentum.getPlugin());
+
+        return future;
+    }
 
     public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL, Object... parameters)
     {
@@ -18,7 +35,7 @@ public class DatabaseQueries
 
         String query = "SELECT " + selection + " FROM " + tableName;
         if (!trailingSQL.isEmpty())
-            query = query + " " + trailingSQL;
+            query += " " + trailingSQL;
 
         try (Connection connection = Momentum.getDatabaseManager().getConnection())
         {
@@ -58,9 +75,8 @@ public class DatabaseQueries
     {
         // this is a use case where we are using a primary key to get a single result, just cleaner code
         List<Map<String, String>> results = getResults(tableName, selection, trailingSQL, parameters);
-        Map<String, String> empty = new HashMap<>();
 
-        return !results.isEmpty() ? getResults(tableName, selection, trailingSQL, parameters).get(0) : empty;
+        return !results.isEmpty() ? getResults(tableName, selection, trailingSQL, parameters).get(0) : new HashMap<>();
     }
 
     public static boolean runQuery(String sql, Object... parameters)

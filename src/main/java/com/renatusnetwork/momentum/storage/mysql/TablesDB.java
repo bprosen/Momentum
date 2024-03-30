@@ -872,8 +872,8 @@ public class TablesDB
                 "brilliant_item_name VARCHAR(20) NOT NULL, " +
                 "radiant_item_name VARCHAR(20) NOT NULL, " +
                 "legendary_item_name VARCHAR(20) NOT NULL, " +
-                "start_date BIGINT NOT NULL, " +
-                "end_date BIGINT NOT NULL, " +
+                "start_date BIGINT DEFAULT NULL, " +
+                "end_date BIGINT DEFAULT NULL, " +
                 // primary key
                 "PRIMARY KEY(week), " +
                 // constraints

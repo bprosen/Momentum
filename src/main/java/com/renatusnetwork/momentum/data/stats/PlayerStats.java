@@ -1070,6 +1070,11 @@ public class PlayerStats
         return bid != null ? bid.getBid() : 0;
     }
 
+    public void resetBankBids()
+    {
+        bids.clear();
+    }
+
     public long getLastBankBidMillis(BankItemType type)
     {
         BankBid bid = bids.get(type);

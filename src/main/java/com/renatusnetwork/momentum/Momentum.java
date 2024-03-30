@@ -180,6 +180,7 @@ public class Momentum extends JavaPlugin {
         getCommand("elo").setExecutor(new ELOCMD());
         getCommand("hotbar").setExecutor(new HotbarCMD());
         getCommand("elotier").setExecutor(new ELOTierCMD());
+        getCommand("bank").setExecutor(new BankCMD());
     }
 
     private static void load()
@@ -219,6 +220,7 @@ public class Momentum extends JavaPlugin {
         protocol = ProtocolLibrary.getProtocolManager();
         saves = new SavesManager();
         modifiers = new ModifiersManager();
+        modifiers.load();
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
         viaVersion = Via.getAPI();

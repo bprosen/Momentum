@@ -4,6 +4,7 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.modifiers.Modifier;
 import com.renatusnetwork.momentum.data.modifiers.ModifierType;
 import com.renatusnetwork.momentum.data.modifiers.ModifiersManager;
+import com.renatusnetwork.momentum.data.modifiers.bonuses.Bonus;
 import com.renatusnetwork.momentum.data.modifiers.boosters.Booster;
 import com.renatusnetwork.momentum.data.modifiers.discounts.Discount;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
@@ -57,7 +58,7 @@ public class ModifierCMD implements CommandExecutor
                             // create now
                             modifiersManager.create(modifierName, type, title, modifier);
                             sender.sendMessage(Utils.translate(
-                                    "&7You have created the modifier &6" + title + "&7 with type &6" + modifierType + "&7 and modifier of &6" + modifier
+                                    "&7You have created the modifier &6" + modifierName + "&7(" + title + "&7) with type &6" + modifierType + "&7 and modifier of &6" + modifier
                             ));
                         }
                         else
@@ -186,6 +187,11 @@ public class ModifierCMD implements CommandExecutor
             {
                 Discount discount = (Discount) modifier;
                 modifierString += "Discount " + discount.getDiscount() + ")";
+            }
+            else if (modifier instanceof Bonus)
+            {
+                Bonus bonus = (Bonus) modifier;
+                modifierString += "Bonus " + bonus.getBonus() + ")";
             }
 
             // send with info about modifier

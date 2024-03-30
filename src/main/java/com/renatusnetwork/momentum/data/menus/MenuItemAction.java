@@ -120,7 +120,7 @@ public class MenuItemAction {
         }
         else if (itemType.equals("teleport"))
             performTeleportItem(playerStats, menuItem);
-        else if (itemType.equals("bank"))
+        else if (itemType.equals("bank-bid"))
             performBankItem(playerStats, menuItem);
         else if (menuItem.getOpenMenu() != null) // replacement for type open, since we define page numbers
             performOpenItem(playerStats, menuItem);
@@ -189,15 +189,14 @@ public class MenuItemAction {
 
     private static void performBankItem(PlayerStats playerStats, MenuItem menuItem)
     {
-        String typeValue = menuItem.getTypeValue();
+        BankItem item = Momentum.getBankManager().getItem(BankItemType.valueOf(menuItem.getTypeValue().toUpperCase()));
 
-        if (!typeValue.endsWith("_total"))
-        {
-            BankItem item = Momentum.getBankManager().getItem(BankItemType.valueOf(menuItem.getTypeValue().toUpperCase()));
+        if (item != null)
             Momentum.getBankManager().bid(playerStats, item);
+        else
+            playerStats.sendMessage(Utils.translate("&cNo item exists for this"));
 
-            playerStats.getPlayer().closeInventory();
-        }
+        playerStats.getPlayer().closeInventory();
     }
 
     private static void performRandomRaceLevel(PlayerStats playerStats)

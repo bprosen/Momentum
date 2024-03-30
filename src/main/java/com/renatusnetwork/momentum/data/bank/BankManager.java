@@ -6,6 +6,7 @@ import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.modifiers.Modifier;
 import com.renatusnetwork.momentum.data.stats.BankBid;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
@@ -33,23 +34,56 @@ public class BankManager
         Momentum.getPluginLogger().info("Bank week: " + this.currentWeek);
     }
 
-    public void loadNewItems()
+    public boolean resetBank()
+    {
+        if (loadNewItems())
+        {
+            clearPlayersBids();
+            broadcastReset();
+            return true;
+        }
+        return false;
+    }
+
+    public void clearPlayersBids()
+    {
+        HashMap<String, PlayerStats> players = Momentum.getStatsManager().getPlayerStats();
+
+        synchronized (players)
+        {
+            players.values().forEach(PlayerStats::resetBankBids);
+        }
+    }
+    public boolean loadNewItems()
     {
         for (BankItemType type : BankItemType.values())
         {
             BankItem item = items.get(type);
 
-            if (item != null)
+            if (item != null && item.hasCurrentHolder() && item.getModifier() != null)
                 Momentum.getStatsManager().removeModifierName(item.getCurrentHolder(), item.getModifier());
 
-            items.put(type, BankDB.createRandomBankItem(type));
-        }
-    }
+            BankItem bankItem = BankDB.createRandomBankItem(type);
 
-    public void resetBank()
-    {
-        loadNewItems();
-        broadcastReset();
+            if (bankItem != null)
+                items.put(type, bankItem);
+        }
+
+        if (items.size() == 3)
+        {
+            String brilliantItemName = items.get(BankItemType.BRILLIANT).getName();
+            String radiantItemName = items.get(BankItemType.RADIANT).getName();
+            String legendaryItemName = items.get(BankItemType.LEGENDARY).getName();
+
+            this.currentWeek++;
+
+            BankDB.insertWeek(currentWeek, brilliantItemName, radiantItemName, legendaryItemName);
+            return true;
+        }
+        else
+            items.clear();
+
+        return false;
     }
 
     public void broadcastReset()
@@ -101,14 +135,14 @@ public class BankManager
                         // remove from cache
                         if (holderStats != null)
                             statsManager.removeModifier(holderStats, modifier);
-                        else
-                            statsManager.removeModifierName(oldHolder, modifier);
+                        else if (oldHolder != null)
+                            StatsDB.removeModifierName(oldHolder, modifier.getName());
 
                         Momentum.getStatsManager().removeCoins(playerStats, bidAmountToRemove); // remove coins
                         bankItem.setCurrentHolder(playerStats.getName()); // update current holder
                         bankItem.addTotal(bidAmountToRemove); // update in cache
                         bankItem.calcNextBid(); // calc next bid
-                        broadcastNewBid(playerStats, bankItem, bidAmount); // broadcast bid
+                        broadcastNewBid(playerStats, bankItem, bidAmountToRemove); // broadcast bid
                         statsManager.updateBankBid(playerStats, type, bidAmount);
                         playerStats.getPlayer().playSound(playerStats.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         Utils.spawnFirework(playerStats.getPlayer().getLocation(), Color.PURPLE, Color.WHITE, true);
@@ -182,16 +216,18 @@ public class BankManager
                     for (PlayerStats stats : players.values())
                     {
                         Player player = stats.getPlayer();
+                        int amount = stats.getBankBidAmount(item.getType());
+                        int nextBid = amount > 0 ? item.getNextBid() - amount : item.getNextBid();
 
                         // only send new bank bid to people in spawn
-                        if (!stats.inLevel() && player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().main_world.getName()))
-                        {
-                            player.sendMessage(Utils.translate("&d&m----------------------------------------"));
-                            player.sendMessage(Utils.translate("&d&lNEW " + item.getFormattedType() + " &d&lBANK BID"));
-                            player.sendMessage(Utils.translate("&d" + playerStats.getPlayer().getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + item.getTitle()));
-                            player.sendMessage(Utils.translate("&7Pay &6" + Utils.formatNumber(item.getNextBid()) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
-                            player.sendMessage(Utils.translate("&d&m----------------------------------------"));
-                        }
+                        player.sendMessage(Utils.translate("&d&m----------------------------------------"));
+                        player.sendMessage(Utils.translate("&d&lNEW " + item.getFormattedType() + " &d&lBANK BID"));
+                        player.sendMessage(Utils.translate("&d" + playerStats.getPlayer().getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + item.getTitle()));
+
+                        if (!item.isCurrentHolder(stats))
+                            player.sendMessage(Utils.translate("&7Pay &6" + Utils.formatNumber(nextBid) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
+
+                        player.sendMessage(Utils.translate("&d&m----------------------------------------"));
                     }
                 }
             }

@@ -99,8 +99,10 @@ public class MenusYAML {
             return "rate";
         if (isSet(menuName, itemPath + ".type"))
             return "type";
-        if (isSet(menuName, itemPath + ".bank"))
-            return "bank";
+        if (isSet(menuName, itemPath + ".bank-bid"))
+            return "bank-bid";
+        if (isSet(menuName, itemPath + ".bank-info"))
+            return "bank-info";
         if (isSet(menuName, itemPath + ".infinite-mode"))
             return "infinite-mode";
         if (isSet(menuName, itemPath + ".profile"))

@@ -28,9 +28,7 @@ public class RatingDB
     public static void removeRating(String playerName, Level level)
     {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.LEVEL_RATINGS_TABLE + " lr " +
-                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lr.uuid " +
-                    "WHERE p.name=? AND lr.level_name=?",
+                "DELETE FROM " + DatabaseManager.LEVEL_RATINGS_TABLE + " WHERE uuid IN (SELECT uuid FROM " + DatabaseManager.PLAYERS_TABLE + " WHERE name=?) AND level_name=?",
                     playerName,
                     level.getName()
         );

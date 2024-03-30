@@ -1,5 +1,6 @@
 package com.renatusnetwork.momentum.data.menus;
 
+import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.bank.BankManager;
 import com.renatusnetwork.momentum.data.bank.items.BankItem;
@@ -21,6 +22,7 @@ import com.renatusnetwork.momentum.data.perks.Perk;
 import com.renatusnetwork.momentum.data.levels.LevelCompletion;
 import com.renatusnetwork.momentum.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.momentum.data.ranks.Rank;
+import com.renatusnetwork.momentum.data.stats.BankBid;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -67,8 +69,10 @@ public class MenuItemFormatter
 
         if (menuItem.getType().equals("perk"))
             return getPerk(playerStats, menuItem);
-        if (menuItem.getType().equals("bank"))
-            return getBankItem(menuItem);
+        if (menuItem.getType().equals("bank-bid"))
+            return getBankItem(playerStats, menuItem);
+        if (menuItem.getType().equals("bank-info"))
+            return getBankInfo(menuItem);
         if (menuItem.hasOpenMenu() && !menuItem.getOpenMenu().getMenu().getName().equalsIgnoreCase(Momentum.getSettingsManager().main_menu_name))
             return enchantMenuItem(
                     playerStats, menuItem,
@@ -235,29 +239,39 @@ public class MenuItemFormatter
         return item;
     }
 
-    private static ItemStack getBankItem(MenuItem menuItem)
+    private static ItemStack getBankInfo(MenuItem menuItem)
+    {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        String typeValue = menuItem.getTypeValue();
+
+        BankItemType bankItemType = BankItemType.valueOf(typeValue.toUpperCase());
+        BankItem bankItem = Momentum.getBankManager().getItem(bankItemType);
+
+        if (bankItem != null)
+        {
+            ItemMeta itemMeta = item.getItemMeta();
+
+            itemMeta.setDisplayName(Utils.translate(bankItem.getFormattedType() + " &d&lBank's Total"));
+            List<String> lore = new ArrayList<String>() {{ add(Utils.translate("&6" + Utils.formatNumber(bankItem.getTotalBalance()) + " &eCoins")); }};
+            itemMeta.setLore(lore);
+
+            item.setItemMeta(itemMeta);
+        }
+
+        return item;
+    }
+
+    private static ItemStack getBankItem(PlayerStats playerStats, MenuItem menuItem)
     {
         ItemStack item = new ItemStack(menuItem.getItem());
         String typeValue = menuItem.getTypeValue();
         ItemMeta itemMeta = item.getItemMeta();
 
-        BankItemType bankItemType;
-        BankItem bankItem;
+        BankItemType bankItemType = BankItemType.valueOf(typeValue.toUpperCase());
+        BankItem bankItem = Momentum.getBankManager().getItem(bankItemType);
 
-        // if it ends in the total item, show it
-        if (typeValue.endsWith("_total"))
+        if (bankItem != null)
         {
-            bankItemType = BankItemType.valueOf(typeValue.split("_total")[0].toUpperCase());
-            bankItem = Momentum.getBankManager().getItem(bankItemType);
-            itemMeta.setDisplayName(Utils.translate(bankItem.getFormattedType() + " &d&lBank's Total"));
-            List<String> lore = new ArrayList<String>() {{ add(Utils.translate("&6" + Utils.formatNumber(bankItem.getTotalBalance()) + " &eCoins")); }};
-            itemMeta.setLore(lore);
-        }
-        else
-        {
-            bankItemType = BankItemType.valueOf(typeValue.toUpperCase());
-            bankItem = Momentum.getBankManager().getItem(bankItemType);
-
             itemMeta.setDisplayName(Utils.translate(bankItem.getTitle()));
 
             List<String> lore = new ArrayList<>();
@@ -277,8 +291,16 @@ public class MenuItemFormatter
             else
                 lore.add(Utils.translate("&7Current Holder &d" + bankItem.getCurrentHolder()));
 
+            int nextBid = bankItem.getNextBid();
+            BankBid bankBid = playerStats.getBankBid(bankItemType);
+            int bidAmount = bankBid != null ? nextBid - bankBid.getBid() : nextBid;
+
             // next bid
-            lore.add(Utils.translate("&7Pay &6" + Utils.formatNumber(bankItem.getNextBid()) + " &eCoins &7to take"));
+            if (bankBid != null)
+                lore.add(Utils.translate("&7You have bid &6" + Utils.formatNumber(bankBid.getBid()) + " &eCoins"));
+
+            lore.add(Utils.translate("&7Next bid amount is &6" + Utils.formatNumber(nextBid) + " &eCoins"));
+            lore.add(Utils.translate("&7Pay &6" + Utils.formatNumber(bidAmount) + " &eCoins &7to take"));
 
             itemMeta.setLore(lore);
         }

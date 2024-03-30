@@ -523,8 +523,8 @@ public class StatsDB
     public static void removeModifierName(String playerName, String modifierName)
     {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " pm JOIN " + DatabaseManager.PLAYERS_TABLE + " " +
-                    "p ON p.uuid=pm.uuid WHERE p.name=? AND modifier_name=?",
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid IN (SELECT uuid FROM " + DatabaseManager.PLAYERS_TABLE + " " +
+                    "WHERE name=?) AND modifier_name=?",
                     playerName, modifierName
         );
     }
