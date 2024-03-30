@@ -36,7 +36,6 @@ import java.util.*;
 
 public class LevelManager
 {
-
     private Level featuredLevel;
     private Level tutorialLevel;
     private long totalLevelCompletions;
@@ -53,6 +52,8 @@ public class LevelManager
 
     private HashMap<String, HashMap<Integer, Level>> buyingLevels;
     private HashMap<String, LevelCooldown> cooldowns;
+
+    private static final int LEVEL_SEARCH_MULTIPLE_CAPACITY = 7;
 
     public LevelManager(Plugin plugin) {
         this.levels = new HashMap<>();
@@ -636,29 +637,33 @@ public class LevelManager
 
     public ArrayList<MenuItem> searchMenuLevelsIgnoreCase(String levelTitle)
     {
-        int capacity = 7;
-        levelTitle = levelTitle.toLowerCase();
-
+        String loweredTitle = levelTitle.toLowerCase();
         ArrayList<MenuItem> filtered = new ArrayList<>();
 
         for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
         {
-            if (filtered.size() > capacity)
-                break;
-
             MenuItem menuItem = entry.getValue();
-
             String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
 
-            if (levelString.equals(levelTitle))
+            if (levelString.equals(loweredTitle))
             {
-                filtered.clear();
                 filtered.add(menuItem);
                 break;
             }
-            else if (levelString.contains(levelTitle))
-                filtered.add(menuItem);
         }
+
+        // continue if no exact match is found
+        if (filtered.isEmpty())
+            for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
+            {
+                if (filtered.size() > LEVEL_SEARCH_MULTIPLE_CAPACITY)
+                    break;
+
+                String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
+
+                if (levelString.contains(levelTitle))
+                    filtered.add(entry.getValue());
+            }
 
         return filtered;
     }
