@@ -1141,7 +1141,7 @@ public class LevelManager
             {
                 String titleMessage = Utils.translate("&7Beat " + level.getTitle());
                 if (levelCompletion.wasTimed())
-                    titleMessage += Utils.translate("&7 in &2" + time);
+                    titleMessage += Utils.translate("&7 in &a" + time);
 
                 String subTitleMessage = Utils.translate("&7Rate &e" + level.getTitle() + "&7 with &6/rate "
                         + ChatColor.stripColor(level.getFormattedTitle()));
