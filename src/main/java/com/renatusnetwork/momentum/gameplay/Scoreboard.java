@@ -298,7 +298,7 @@ public class Scoreboard {
                                 // add bonus multiplier
                                 newReward += bonus;
 
-                                board.add(formatSpacing(Utils.translate("&a&lJACKPOT LEVEL")));
+                                board.add(formatSpacing(Utils.translate("&a&lJACKPOT")));
                             }
                             // modifier section
                             else

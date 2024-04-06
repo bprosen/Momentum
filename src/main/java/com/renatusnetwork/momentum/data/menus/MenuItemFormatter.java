@@ -493,6 +493,7 @@ public class MenuItemFormatter
             item = new ItemStack(item); // clone
             ItemMeta itemMeta = item.getItemMeta();
             String formattedTitle = level.getFormattedTitle();
+            BankManager bankManager = Momentum.getBankManager();
 
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
@@ -504,14 +505,15 @@ public class MenuItemFormatter
             // add new if new level! but dont show new if featured (too messy)
             if (level.isNew())
                 formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
-
-            BankManager bankManager = Momentum.getBankManager();
+            // show jackpot info if is running and not completed
+            else if (bankManager.isJackpotRunning() && bankManager.getJackpot().getLevel().equals(level) && !bankManager.getJackpot().hasCompleted(playerStats.getName()))
+                formattedTitle = Utils.translate("&a&lJACKPOT " + formattedTitle);
 
             if (choosingRaceLevel == null)
             {
                 // show they need to buy it and it is not the jackpot level if it is running
                 if (!(bankManager.isJackpotRunning() &&
-                        bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
+                        bankManager.getJackpot().getLevel().equals(level)) &&
                         level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
                 {
 
