@@ -50,6 +50,7 @@ public class SavesManager
                 playerStats.isAttemptingMastery() ||
                 playerStats.isInTutorial() ||
                 playerStats.isEventParticipant() ||
+                playerStats.isPreviewingLevel() ||
                 playerStats.inRace() ||
                 playerStats.isInInfinite() ||
                 !playerStats.inLevel() ||
