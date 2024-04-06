@@ -638,21 +638,42 @@ public class LevelManager
     public ArrayList<MenuItem> searchMenuLevelsIgnoreCase(String levelTitle)
     {
         levelTitle = levelTitle.toLowerCase();
+
         ArrayList<MenuItem> filtered = new ArrayList<>();
+        ArrayList<String> searchStrings = new ArrayList<>();
 
-        for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
+        searchStrings.add(levelTitle);
+        searchStrings.addAll(Arrays.asList(levelTitle.split(" ")));
+
+        int currentIndex = 0;
+        outer: while (currentIndex < searchStrings.size())
         {
-            MenuItem menuItem = entry.getValue();
-            String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
+            levelTitle = searchStrings.get(currentIndex);
 
-            if (levelString.equals(levelTitle))
+            for (Map.Entry<Level, MenuItem> entry : levelMenuItems.entrySet())
             {
-                filtered.clear();
-                filtered.add(menuItem);
-                break;
+                MenuItem menuItem = entry.getValue();
+                String levelString = ChatColor.stripColor(entry.getKey().getFormattedTitle()).toLowerCase();
+
+                if (!filtered.contains(menuItem))
+                {
+                    if (levelString.equals(levelTitle))
+                    {
+                        filtered.clear();
+                        filtered.add(menuItem);
+
+                        break outer;
+                    }
+                    else if (levelString.contains(levelTitle))
+                    {
+                        filtered.add(menuItem);
+
+                        if (filtered.size() > LEVEL_SEARCH_MULTIPLE_CAPACITY)
+                            break outer;
+                    }
+                }
             }
-            else if (levelString.contains(levelTitle) && filtered.size() <= LEVEL_SEARCH_MULTIPLE_CAPACITY)
-                filtered.add(menuItem);
+            currentIndex++;
         }
 
         return filtered;
