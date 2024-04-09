@@ -155,6 +155,8 @@ public class PlayerStats
 
     public void loadELOToXPBar()
     {
+        player.setExp(0f);
+        player.setLevel(0);
         player.setLevel(elo); // set xp level as elo
 
         if (eloTier != null)
@@ -169,11 +171,11 @@ public class PlayerStats
                 int differencePlayer = elo - eloTier.getRequiredELO();
                 float ratio = differencePlayer / ((float) differenceTo);
 
-                player.setExp(Math.min(1f, Math.max(ratio, 0f)));
+                player.setExp(Math.min(0.99f, Math.max(ratio, 0f)));
             }
             // otherwise show xp bar as full
             else
-                player.setExp(1f);
+                player.setExp(0.99f);
         }
     }
 
