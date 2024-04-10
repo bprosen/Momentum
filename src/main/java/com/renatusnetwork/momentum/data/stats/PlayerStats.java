@@ -43,8 +43,8 @@ public class PlayerStats
     private PlayerStats playerToSpectate;
     private Clan clan;
     private Location currentCheckpoint;
-    private Location practiceSpawn;
-    private Location practiceCP;
+    private Location practiceStart;
+    private Location practiceCheckpoint;
     private Location spectateSpawn;
     private RacePlayer race;
     private Rank rank;
@@ -760,30 +760,30 @@ public class PlayerStats
     //
     // Practice Mode Section
     //
-    public void setPracticeMode(Location loc) {
-        practiceSpawn = loc;
-        practiceCP = loc;
+    public void setPracticeMode(Location startLocation) {
+        practiceStart = startLocation;
+        practiceCheckpoint = startLocation;
     }
 
-    public void setPracticeCP(Location loc) {
-        practiceCP = loc;
+    public void setPracticeCheckpoint(Location checkpointLocation) {
+        practiceCheckpoint = checkpointLocation;
     }
 
     public void resetPracticeMode() {
-        practiceSpawn = null;
-        practiceCP = null;
+        practiceStart = null;
+        practiceCheckpoint = null;
     }
 
-    public Location getPracticeLocation() {
-        return practiceSpawn;
+    public Location getPracticeStart() {
+        return practiceStart;
     }
 
-    public Location getPracticeCP() {
-        return practiceCP;
+    public Location getPracticeCheckpoint() {
+        return practiceCheckpoint;
     }
 
     public boolean inPracticeMode() {
-        return practiceSpawn != null;
+        return practiceStart != null;
     }
 
     //

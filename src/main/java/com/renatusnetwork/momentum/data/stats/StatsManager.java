@@ -850,7 +850,7 @@ public class StatsManager {
     {
         Player player = playerStats.getPlayer();
 
-        player.teleport(playerStats.getPracticeLocation());
+        player.teleport(playerStats.getPracticeStart());
         resetPracticeDataOnly(playerStats);
 
         if (message)
