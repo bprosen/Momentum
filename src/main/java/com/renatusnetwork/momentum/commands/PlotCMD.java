@@ -485,59 +485,35 @@ public class PlotCMD implements CommandExecutor {
             return false;
         }
 
+        if (playerStats.isInTutorial())
+        {
+            player.sendMessage(Utils.translate("&cYou cannot do this while in tutorial"));
+            return false;
+        }
+
         return true;
     }
 
-    private static void sendHelp(CommandSender sender) {
-        sender.sendMessage(getHelp("create")); // console friendly
-        sender.sendMessage(getHelp("delete"));
-        sender.sendMessage(getHelp("clear"));
-        sender.sendMessage(getHelp("home"));
-        sender.sendMessage(getHelp("visit"));
-        sender.sendMessage(getHelp("trust"));
-        sender.sendMessage(getHelp("untrust"));
-        sender.sendMessage(getHelp("submit"));
+    private static void sendHelp(CommandSender sender)
+    {
+        sender.sendMessage(Utils.translate("&2&lPlots Help"));
+        sender.sendMessage(Utils.translate("&a/plot create  &7Automatically create a plot"));
+        sender.sendMessage(Utils.translate("&a/plot delete  &7Deletes your plot (confirm needed)"));
+        sender.sendMessage(Utils.translate("&a/plot clear  &7Clears your plot but does not delete it"));
+        sender.sendMessage(Utils.translate("&a/plot home  &7Teleports you to your plot"));
+        sender.sendMessage(Utils.translate("&a/plot visit <player>  &7Visit another player's plot"));
+        sender.sendMessage(Utils.translate("&a/plot trust <player>  &7Trust a player to your plot"));
+        sender.sendMessage(Utils.translate("&a/plot untrust <player>  &7Untrust a player from your plot"));
+        sender.sendMessage(Utils.translate("&a/plot submit  &7Submit your plot"));
 
         // send admin commands if they have permission
-        if (sender.hasPermission("momentum.admin")) {
-
-            sender.sendMessage(getHelp("accept"));
-            sender.sendMessage(getHelp("deny"));
-            sender.sendMessage(getHelp("list"));
-            sender.sendMessage(getHelp("bypass"));
+        if (sender.hasPermission("momentum.admin"))
+        {
+            sender.sendMessage(Utils.translate("&a/plot submit accept <player>  &7Accepts a submitted plot"));
+            sender.sendMessage(Utils.translate("&a/plot submit deny <player> (Reason...)  &7Deny a player with reason (10 word max)"));
+            sender.sendMessage(Utils.translate("&a/plot submit list  &7Open the submitted parkours GUI"));
+            sender.sendMessage(Utils.translate("&a/plot bypass  &7Toggles Plot Bypassing"));
         }
-        sender.sendMessage(getHelp("help"));
-    }
-
-    private static String getHelp(String cmd) {
-        switch (cmd.toLowerCase()) {
-            case "create":
-                return Utils.translate("&a/plot create  &7Automatically create a plot");
-            case "delete":
-                return Utils.translate("&a/plot delete  &7Deletes your plot (confirm needed)");
-            case "clear":
-                return Utils.translate("&a/plot clear  &7Clears your plot but does not delete it");
-            case "home":
-                return Utils.translate("&a/plot home  &7Teleports you to your plot");
-            case "visit":
-                return Utils.translate("&a/plot visit <player>  &7Visit another player's plot");
-            case "trust":
-                return Utils.translate("&a/plot trust <player>  &7Trust a player to your plot");
-            case "untrust":
-                return Utils.translate("&a/plot untrust <player>  &7Untrust a player from your plot");
-            case "submit":
-                return Utils.translate("&a/plot submit  &7Submit your plot");
-            case "accept":
-                return Utils.translate("&a/plot submit accept <player>  &7Accepts a subbmited plot");
-            case "deny":
-                return Utils.translate("&a/plot submit deny <player> (Reason...)  &7Deny a player with reason (10 word max)");
-            case "list":
-                return Utils.translate("&a/plot submit list  &7Open the submitted parkours GUI");
-            case "help":
-                return Utils.translate("&a/plot help  &7Sends this display");
-            case "bypass":
-                return Utils.translate("&a/plot bypass  &7Toggles Plot Bypassing");
-        }
-        return "";
+        sender.sendMessage(Utils.translate("&a/plot help  &7Sends this display"));
     }
 }
