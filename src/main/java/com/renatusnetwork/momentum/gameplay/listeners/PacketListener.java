@@ -231,7 +231,7 @@ public class PacketListener implements Listener
                                 @Override
                                 public void run()
                                 {
-                                    infinite.respawn();
+                                    if (playerStats.isInInfinite()) infinite.respawn(); // conditional to avoid glitched tping on roof
                                 }
                             }.runTask(Momentum.getPlugin());
                         }
