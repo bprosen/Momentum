@@ -44,6 +44,7 @@ public class PlayerStats
     private Clan clan;
     private Location currentCheckpoint;
     private Location practiceSpawn;
+    private Location practiceCP;
     private Location spectateSpawn;
     private RacePlayer race;
     private Rank rank;
@@ -761,14 +762,24 @@ public class PlayerStats
     //
     public void setPracticeMode(Location loc) {
         practiceSpawn = loc;
+        practiceCP = loc;
+    }
+
+    public void setPracticeCP(Location loc) {
+        practiceCP = loc;
     }
 
     public void resetPracticeMode() {
         practiceSpawn = null;
+        practiceCP = null;
     }
 
     public Location getPracticeLocation() {
         return practiceSpawn;
+    }
+
+    public Location getPracticeCP() {
+        return practiceCP;
     }
 
     public boolean inPracticeMode() {

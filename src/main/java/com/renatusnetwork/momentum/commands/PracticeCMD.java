@@ -77,7 +77,7 @@ public class PracticeCMD implements CommandExecutor {
              then check if they are on ground then enable or cancel
              */
 
-            // case of /unprac
+            // case of /unprac (can only unprac with /unprac
             if (label.equalsIgnoreCase("unprac"))
             {
                 if (playerStats.inPracticeMode())
@@ -87,7 +87,14 @@ public class PracticeCMD implements CommandExecutor {
             }
             // in the case of /prac
             else if (playerStats.inPracticeMode())
-                statsManager.resetPracticeMode(playerStats, true);
+            {
+                if (player.isOnGround()) {
+                    playerStats.setPracticeCP(player.getLocation());
+                    player.sendMessage(Utils.translate("&7Practice checkpoint set"));
+                }
+                else player.sendMessage(Utils.translate("&cYou cannot set practice checkpoint while in the air"));
+                // statsManager.resetPracticeMode(playerStats, true);
+            }
             else if (player.isOnGround())
             {
                 playerStats.setPracticeMode(player.getLocation());
