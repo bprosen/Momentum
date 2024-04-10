@@ -178,7 +178,8 @@ public class Scoreboard {
                 {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&6&lPracticing")));
-                    board.add(formatSpacing(Utils.translate("&e/prac &7to toggle")));
+                    board.add(formatSpacing(Utils.translate("&e/prac &7to set")));
+                    board.add(formatSpacing(Utils.translate("&e/unprac &7to exit")));
                 }
                 // race section of scoreboard
                 else if (playerStats.inRace())

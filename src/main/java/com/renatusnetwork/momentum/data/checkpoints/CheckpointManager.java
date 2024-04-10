@@ -73,7 +73,7 @@ public class CheckpointManager {
             return;
         }
 
-        playerStats.teleport(playerStats.getPracticeLocation());
+        playerStats.teleport(playerStats.getPracticeCheckpoint());
     }
 
     public void teleportToCheckpoint(PlayerStats playerStats)
@@ -107,7 +107,7 @@ public class CheckpointManager {
         if (!playerStats.isPreviewingLevel())
         {
             if (playerStats.inPracticeMode())
-                loc = playerStats.getPracticeLocation().clone();
+                loc = playerStats.getPracticeCheckpoint().clone();
             else if (playerStats.hasCurrentCheckpoint())
             {
                 loc = playerStats.getCurrentCheckpoint().clone().add(0.5, 0, 0.5);

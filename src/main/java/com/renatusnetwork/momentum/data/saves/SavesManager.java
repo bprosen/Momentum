@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.saves;
 
-import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -61,7 +60,7 @@ public class SavesManager
         )
             return;
 
-        Location location = playerStats.inPracticeMode() ? playerStats.getPracticeLocation() : playerStats.getPlayer().getLocation();
+        Location location = playerStats.inPracticeMode() ? playerStats.getPracticeStart() : playerStats.getPlayer().getLocation();
         Level level = playerStats.getLevel();
 
         saveLevel(playerStats, level, location);
