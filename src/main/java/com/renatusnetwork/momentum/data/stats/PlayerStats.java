@@ -155,8 +155,6 @@ public class PlayerStats
 
     public void loadELOToXPBar()
     {
-        player.setExp(0f);
-        player.setLevel(0);
         player.setLevel(elo); // set xp level as elo
 
         if (eloTier != null)
