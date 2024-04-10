@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.data.plots;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
@@ -42,33 +43,31 @@ public class PlotsDB {
     }
 
 
-    public static void addTrustedPlayer(int plotID, Player trustedPlayer)
+    public static void addTrustedPlayer(int plotID, PlayerStats trustedPlayer)
     {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) " +
-                    "VALUES (" + plotID + ",'" + trustedPlayer.getUniqueId().toString() + "')");
+                    "VALUES (?,?)", plotID, trustedPlayer.getUUID());
     }
 
-    public static void removeTrustedPlayer(int plotID, Player trustedPlayer)
+    public static void removeTrustedPlayer(int plotID, PlayerStats trustedPlayer)
     {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=" + plotID + " AND trusted_uuid='" + trustedPlayer.getUniqueId().toString() + "'");
+                "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=? AND trusted_uuid=?", plotID, trustedPlayer.getUUID());
     }
 
     public static int getPlotID(Player player)
     {
-        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.PLOTS_TABLE, "id", "WHERE owner_uuid='" + player.getUniqueId().toString() + "'");
+        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.PLOTS_TABLE, "id", "WHERE owner_uuid=?", player.getUniqueId().toString());
 
         return results.isEmpty() ? -1 : Integer.parseInt(results.get(0).get("id"));
     }
 
-    public static void addPlot(Player player, Location loc) {
+    public static void addPlot(PlayerStats playerStats, Location loc)
+    {
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PLOTS_TABLE +
                 " (owner_uuid, center_x, center_z)" +
-                " VALUES ('" +
-                player.getUniqueId().toString() + "','" +
-                loc.getBlockX() + "','" +
-                loc.getBlockZ() + "')"
+                " VALUES (?,?,?)", playerStats.getUUID(), loc.getBlockX(), loc.getBlockZ()
         );
     }
 
@@ -116,6 +115,13 @@ public class PlotsDB {
         }
 
         return tempMap;
+    }
+
+    public static int getCurrentMaxPlotID()
+    {
+        Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLOTS_TABLE, "MAX(id) AS last_id", "");
+
+        return !result.isEmpty() ? Integer.parseInt(result.get("last_id")) : 0;
     }
 
     public static void toggleSubmitted(String uuid)

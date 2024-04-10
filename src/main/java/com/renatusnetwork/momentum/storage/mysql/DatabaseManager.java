@@ -25,7 +25,7 @@ public class DatabaseManager {
     public static final String LEVEL_COMPLETIONS_TABLE = "level_completions";
     public static final String CLANS_TABLE = "clans";
     public static final String RANKS_TABLE = "ranks";
-    public static final String PLOTS_TRUSTED_PLAYERS_TABLE = "plot_trusted_players";
+    public static final String PLOTS_TRUSTED_PLAYERS_TABLE = "plots_trusted_players";
     public static final String MODIFIERS_TABLE = "modifiers";
     public static final String PLAYER_MODIFIERS_TABLE = "player_modifiers";
     public static final String PERKS_BOUGHT_TABLE = "perks_bought";
