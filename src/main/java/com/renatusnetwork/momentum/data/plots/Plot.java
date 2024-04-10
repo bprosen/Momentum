@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.data.plots;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,19 +19,14 @@ public class Plot {
     private boolean submitted;
 
     // add via player object (new plot)
-    public Plot(Player owner, Location spawnLoc)
+    public Plot(int plotID, Player owner, Location spawnLoc)
     {
+        this.plotID = plotID;
         this.ownerUUID = owner.getUniqueId().toString();
         this.ownerName = owner.getName();
         this.spawnLoc = spawnLoc;
         this.trustedUUIDs = new ArrayList<>();
         this.submitted = false;
-
-        // sync id
-        int id = PlotsDB.getPlotID(owner);
-
-        if (id > -1)
-            this.plotID = id;
     }
 
     // no player object addition (from db)
@@ -80,9 +76,9 @@ public class Plot {
 
     public boolean isTrusted(String uuid) { return trustedUUIDs.contains(uuid); }
 
-    public void addTrusted(Player player) { trustedUUIDs.add(player.getUniqueId().toString()); }
+    public void addTrusted(PlayerStats playerStats) { trustedUUIDs.add(playerStats.getUUID()); }
 
-    public void removeTrusted(Player player) { trustedUUIDs.remove(player.getUniqueId().toString()); }
+    public void removeTrusted(PlayerStats playerStats) { trustedUUIDs.remove(playerStats.getUUID()); }
 
     public boolean isSubmitted() {
         return submitted;

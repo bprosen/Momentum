@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.data.plots;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
@@ -19,6 +20,7 @@ public class PlotsManager {
 
     private HashMap<String, Plot> plotList;
 
+    private int currentMaxPlotID;
     private Location lastPlotLocation;
     private Location nextFreePlotLocation;
     private PlotDirection currentDirection;
@@ -32,6 +34,8 @@ public class PlotsManager {
     public void load()
     {
         plotList = PlotsDB.loadPlots();
+        currentMaxPlotID = PlotsDB.getCurrentMaxPlotID();
+
         loadLastTwoPlotsFromDB();
 
         Momentum.getPluginLogger().info("Plots loaded: " + plotList.size());
@@ -66,7 +70,7 @@ public class PlotsManager {
     // player param version
     public void add(Player player)
     {
-        plotList.put(player.getName(), new Plot(player, player.getLocation()));
+        plotList.put(player.getName(), new Plot(currentMaxPlotID, player, player.getLocation()));
     }
 
     public Plot get(String name) {
@@ -109,9 +113,11 @@ public class PlotsManager {
     }
 
     // creation algorithm
-    public void createPlot(Player player)
+    public void createPlot(PlayerStats playerStats)
     {
         Location creationLoc;
+        Player player = playerStats.getPlayer();
+
         if (nextFreePlotLocation != null)
             creationLoc = nextFreePlotLocation.clone();
         else
@@ -128,8 +134,10 @@ public class PlotsManager {
         // generate next free plot location
         loadNextFreePlot(creationLoc);
 
+        currentMaxPlotID++;
+
         // add data
-        PlotsDB.addPlot(player, creationLoc);
+        PlotsDB.addPlot(playerStats, creationLoc);
         add(player);
         player.sendMessage(Utils.translate("&7Your &aPlot &7has been created! &7Type &a/plot home &7to get back!"));
     }
@@ -199,6 +207,18 @@ public class PlotsManager {
                     loadLastTwoPlotsFromDB();
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
+    }
+
+    public void addTrusted(Plot plot, PlayerStats playerStats)
+    {
+        plot.addTrusted(playerStats);
+        PlotsDB.addTrustedPlayer(plot.getPlotID(), playerStats);
+    }
+
+    public void removeTrusted(Plot plot, PlayerStats playerStats)
+    {
+        plot.removeTrusted(playerStats);
+        PlotsDB.removeTrustedPlayer(plot.getPlotID(), playerStats);
     }
 
     public void clearPlot(Plot plot, boolean deletePlot)

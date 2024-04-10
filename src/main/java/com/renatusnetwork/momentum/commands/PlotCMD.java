@@ -243,7 +243,7 @@ public class PlotCMD implements CommandExecutor {
                 Rank minimumRank = Momentum.getRanksManager().get(Momentum.getSettingsManager().minimum_rank_for_plot_creation);
 
                 if (Momentum.getRanksManager().isPastOrAtRank(playerStats, minimumRank))
-                    Momentum.getPlotsManager().createPlot(player);
+                    Momentum.getPlotsManager().createPlot(playerStats);
                 else
                     player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getTitle() + " &7to create a &aPlot"));
             }
@@ -294,43 +294,7 @@ public class PlotCMD implements CommandExecutor {
 
     private void untrustPlayer(Player player, String[] a)
     {
-        Player target = Bukkit.getPlayer(a[1]);
-
-        if (target == null)
-        {
-            Plot plot = Momentum.getPlotsManager().get(player.getName());
-
-            // if you have plot
-            if (plot != null)
-            {
-                // if they are not a trusted player
-                if (plot.isTrusted(target.getUniqueId().toString()))
-                {
-                    PlotsDB.removeTrustedPlayer(plot.getPlotID(), target);
-                    plot.removeTrusted(target);
-
-                    player.sendMessage(Utils.translate("&7You removed &3" + target.getName() + " &7from your plot!"));
-                }
-                else
-                {
-                    player.sendMessage(Utils.translate("&4" + player.getName() + " &cis not trusted in your plot"));
-                }
-            }
-            else
-            {
-                player.sendMessage(Utils.translate("&cYou do not have a plot"));
-            }
-        }
-        else
-        {
-            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
-        }
-
-    }
-
-    private void trustPlayer(Player player, String[] a)
-    {
-        Player target = Bukkit.getPlayer(a[1]);
+        PlayerStats target = Momentum.getStatsManager().getByName(a[1]);
 
         if (target != null)
         {
@@ -340,25 +304,47 @@ public class PlotCMD implements CommandExecutor {
             if (plot != null)
             {
                 // if they are not a trusted player
-                if (!plot.isTrusted(target.getUniqueId().toString()))
+                if (plot.isTrusted(target.getUUID()))
                 {
-                    PlotsDB.addTrustedPlayer(plot.getPlotID(), target);
-                    plot.addTrusted(target);
-
-                    player.sendMessage(Utils.translate("&7You trusted &3" + target.getName() + " &7to your plot!"));
+                    Momentum.getPlotsManager().removeTrusted(plot, target);
+                    player.sendMessage(Utils.translate("&7You removed &3" + target.getDisplayName() + " &7from your plot!"));
                 }
                 else
-                    player.sendMessage(Utils.translate("&4" + player.getName() + " &cis already trusted in your plot"));
+                    player.sendMessage(Utils.translate("&4" + target.getDisplayName() + " &cis not trusted in your plot"));
             }
             else
-            {
                 player.sendMessage(Utils.translate("&cYou do not have a plot"));
-            }
         }
         else
-        {
             player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
+
+    }
+
+    private void trustPlayer(Player player, String[] a)
+    {
+        PlayerStats target = Momentum.getStatsManager().getByName(a[1]);
+
+        if (target != null)
+        {
+            Plot plot = Momentum.getPlotsManager().get(player.getName());
+
+            // if you have plot
+            if (plot != null)
+            {
+                // if they are not a trusted player
+                if (!plot.isTrusted(target.getUUID()))
+                {
+                    Momentum.getPlotsManager().addTrusted(plot, target);
+                    player.sendMessage(Utils.translate("&7You trusted &3" + target.getDisplayName() + " &7to your plot!"));
+                }
+                else
+                    player.sendMessage(Utils.translate("&4" + target.getDisplayName() + " &cis already trusted in your plot"));
+            }
+            else
+                player.sendMessage(Utils.translate("&cYou do not have a plot"));
         }
+        else
+            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
     }
 
     private void visitPlot(Player player, String[] a) {
