@@ -321,7 +321,7 @@ public class PlotCMD implements CommandExecutor {
                 }
 
                 Momentum.getPlotsManager().removeTrusted(plot, target);
-                player.sendMessage(Utils.translate("&7You removed &3" + name + " &7from your plot"));
+                player.sendMessage(Utils.translate("&7You untrusted &3" + name + " &7from your plot"));
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
     }

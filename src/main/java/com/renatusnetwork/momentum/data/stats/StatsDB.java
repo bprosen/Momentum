@@ -388,9 +388,8 @@ public class StatsDB
                 "uuid",
                 " WHERE name=?", playerName
         );
-        if (playerResult.isEmpty()) return null;
 
-        return playerResult.keySet().toArray(new String[0])[0];
+        return playerResult.get("uuid");
     }
 
     public static void loadBoughtLevels(PlayerStats playerStats)
