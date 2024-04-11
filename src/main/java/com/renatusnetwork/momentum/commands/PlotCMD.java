@@ -5,8 +5,10 @@ import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.plots.PlotsDB;
 import com.renatusnetwork.momentum.data.ranks.Rank;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -294,57 +296,66 @@ public class PlotCMD implements CommandExecutor {
 
     private void untrustPlayer(Player player, String[] a)
     {
-        PlayerStats target = Momentum.getStatsManager().getByName(a[1]);
+        Plot plot = Momentum.getPlotsManager().get(player.getName());
 
-        if (target != null)
-        {
-            Plot plot = Momentum.getPlotsManager().get(player.getName());
-
-            // if you have plot
-            if (plot != null)
-            {
-                // if they are not a trusted player
-                if (plot.isTrusted(target.getUUID()))
-                {
-                    Momentum.getPlotsManager().removeTrusted(plot, target);
-                    player.sendMessage(Utils.translate("&7You removed &3" + target.getDisplayName() + " &7from your plot!"));
-                }
-                else
-                    player.sendMessage(Utils.translate("&4" + target.getDisplayName() + " &cis not trusted in your plot"));
-            }
-            else
-                player.sendMessage(Utils.translate("&cYou do not have a plot"));
+        // if you have plot
+        if (plot == null) {
+            player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            return;
         }
-        else
-            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
 
+        String name = a[1];
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                PlayerStats playerStats = Momentum.getStatsManager().getByName(name);
+                String target = playerStats == null ? StatsDB.getUUIDByName(name) : playerStats.getUUID();
+                if (target == null) {
+                    player.sendMessage(Utils.translate("&4" + name + " &chas never played before"));
+                    return;
+                }
+
+                if (!plot.isTrusted(target)) {
+                    player.sendMessage(Utils.translate("&4" + name + " &cis not trusted in your plot"));
+                    return;
+                }
+
+                Momentum.getPlotsManager().removeTrusted(plot, target);
+                player.sendMessage(Utils.translate("&7You removed &3" + name + " &7from your plot"));
+            }
+        }.runTaskAsynchronously(Momentum.getPlugin());
     }
 
     private void trustPlayer(Player player, String[] a)
     {
-        PlayerStats target = Momentum.getStatsManager().getByName(a[1]);
+        Plot plot = Momentum.getPlotsManager().get(player.getName());
 
-        if (target != null)
-        {
-            Plot plot = Momentum.getPlotsManager().get(player.getName());
-
-            // if you have plot
-            if (plot != null)
-            {
-                // if they are not a trusted player
-                if (!plot.isTrusted(target.getUUID()))
-                {
-                    Momentum.getPlotsManager().addTrusted(plot, target);
-                    player.sendMessage(Utils.translate("&7You trusted &3" + target.getDisplayName() + " &7to your plot!"));
-                }
-                else
-                    player.sendMessage(Utils.translate("&4" + target.getDisplayName() + " &cis already trusted in your plot"));
-            }
-            else
-                player.sendMessage(Utils.translate("&cYou do not have a plot"));
+        // if you have plot
+        if (plot == null) {
+            player.sendMessage(Utils.translate("&cYou do not have a plot"));
+            return;
         }
-        else
-            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online!"));
+
+        String name = a[1];
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                PlayerStats playerStats = Momentum.getStatsManager().getByName(name);
+                String target = playerStats == null ? StatsDB.getUUIDByName(name) : playerStats.getUUID();
+                if (target == null) {
+                    player.sendMessage(Utils.translate("&4" + name + " &chas never played before"));
+                    return;
+                }
+
+                if (plot.isTrusted(target)) {
+                    player.sendMessage(Utils.translate("&4" + name + " &cis already trusted in your plot"));
+                    return;
+                }
+
+                Momentum.getPlotsManager().addTrusted(plot, target);
+                player.sendMessage(Utils.translate("&7You trusted &3" + name + " &7to your plot"));
+            }
+        }.runTaskAsynchronously(Momentum.getPlugin());
     }
 
     private void visitPlot(Player player, String[] a) {

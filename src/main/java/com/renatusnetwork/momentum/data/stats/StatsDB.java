@@ -14,6 +14,7 @@ import com.renatusnetwork.momentum.data.ranks.Rank;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -379,6 +380,17 @@ public class StatsDB
         );
 
         return !playerResult.isEmpty();
+    }
+
+    public static String getUUIDByName(String playerName) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
+                "uuid",
+                " WHERE name=?", playerName
+        );
+        if (playerResult.isEmpty()) return null;
+
+        return playerResult.keySet().toArray(new String[0])[0];
     }
 
     public static void loadBoughtLevels(PlayerStats playerStats)
