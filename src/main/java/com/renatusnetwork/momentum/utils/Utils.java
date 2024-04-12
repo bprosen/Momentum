@@ -91,11 +91,18 @@ public class Utils {
         return format.format(amount);
     }
 
-    public static String formatDecimal(double amount)
+    public static String formatDecimal(double amount, boolean groupDigits, int maxDecimalDigits)
     {
-        DecimalFormat format = new DecimalFormat("#,###.#");
-        format.setMaximumFractionDigits(2);
+        DecimalFormat format = new DecimalFormat("#.#");
+
+        if (groupDigits)
+        {
+            format.setGroupingUsed(true);
+            format.setGroupingSize(3);
+        }
+        format.setMaximumFractionDigits(maxDecimalDigits);
         format.setMinimumFractionDigits(1);
+
         return format.format(amount);
     }
 

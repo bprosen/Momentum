@@ -145,7 +145,7 @@ public class RaceManager
                 int losses = Integer.parseInt(scoreResult.get("race_losses"));
 
                 // avoid divided by 0 error
-                float winRate = losses > 0 ? Float.parseFloat(Utils.formatDecimal((double) wins / losses)) : wins;
+                float winRate = losses > 0 ? Float.parseFloat(Utils.formatDecimal((double) wins / losses, true, 2)) : wins;
 
                 raceLB.add(
                         new RaceLBPosition(
