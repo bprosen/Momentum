@@ -234,7 +234,7 @@ public class Level
             double newAverageRating = ((double) sumRatings) / ratings.size();
 
             // this makes it seperate digits by commands and .2 means round decimal by 2 places
-            rating = Float.parseFloat(Utils.formatDecimal(newAverageRating, false, 2));
+            rating = Float.parseFloat(Utils.formatDecimal(newAverageRating, false, 1, 2));
         }
         else
             rating = 0.0f;

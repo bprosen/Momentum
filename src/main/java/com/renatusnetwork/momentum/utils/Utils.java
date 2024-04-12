@@ -91,7 +91,7 @@ public class Utils {
         return format.format(amount);
     }
 
-    public static String formatDecimal(double amount, boolean groupDigits, int maxDecimalDigits)
+    public static String formatDecimal(double amount, boolean groupDigits, int minDecimalDigits, int maxDecimalDigits)
     {
         DecimalFormat format = new DecimalFormat("#.#");
 
@@ -100,8 +100,8 @@ public class Utils {
             format.setGroupingUsed(true);
             format.setGroupingSize(3);
         }
+        format.setMinimumFractionDigits(minDecimalDigits);
         format.setMaximumFractionDigits(maxDecimalDigits);
-        format.setMinimumFractionDigits(1);
 
         return format.format(amount);
     }

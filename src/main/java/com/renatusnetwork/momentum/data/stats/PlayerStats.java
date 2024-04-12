@@ -383,7 +383,7 @@ public class PlayerStats
     public void calcRaceWinRate()
     {
         if (raceLosses > 0)
-            raceWinRate = Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses, true, 2));
+            raceWinRate = Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses, true, 1, 2));
         else
             raceWinRate = raceWins;
     }

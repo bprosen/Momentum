@@ -193,9 +193,9 @@ public class Scoreboard {
                     else if (facing < -180.0)
                         facing = (180 + (facing + 180)); // if we're below -180, get the difference and how negatives work, don't need to * -1
 
-                    board.add(formatSpacing(Utils.translate("&7x &6" + Utils.formatDecimal(pracCPLocation.getX(), false, 3))));
-                    board.add(formatSpacing(Utils.translate("&7z &6" + Utils.formatDecimal(pracCPLocation.getZ(), false, 3))));
-                    board.add(formatSpacing(Utils.translate("&7f &6" + Utils.formatDecimal(facing, false, 1))));
+                    board.add(formatSpacing(Utils.translate("&7x &6" + Utils.formatDecimal(pracCPLocation.getX(), false, 3, 3))));
+                    board.add(formatSpacing(Utils.translate("&7z &6" + Utils.formatDecimal(pracCPLocation.getZ(), false, 3, 3))));
+                    board.add(formatSpacing(Utils.translate("&7f &6" + Utils.formatDecimal(facing, false, 1, 1))));
                 }
                 // race section of scoreboard
                 else if (playerStats.inRace())
