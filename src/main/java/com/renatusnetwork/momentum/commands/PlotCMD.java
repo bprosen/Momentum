@@ -245,7 +245,10 @@ public class PlotCMD implements CommandExecutor {
                 Rank minimumRank = Momentum.getRanksManager().get(Momentum.getSettingsManager().minimum_rank_for_plot_creation);
 
                 if (Momentum.getRanksManager().isPastOrAtRank(playerStats, minimumRank))
+                {
+                    resetPlayerLevelData(playerStats);
                     Momentum.getPlotsManager().createPlot(playerStats);
+                }
                 else
                     player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getTitle() + " &7to create a &aPlot"));
             }
@@ -321,7 +324,7 @@ public class PlotCMD implements CommandExecutor {
                 }
 
                 Momentum.getPlotsManager().removeTrusted(plot, target);
-                player.sendMessage(Utils.translate("&7You untrusted &3" + name + " &7from your plot"));
+                player.sendMessage(Utils.translate("&7You untrusted &2" + name + " &7from your plot"));
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
     }
@@ -353,7 +356,7 @@ public class PlotCMD implements CommandExecutor {
                 }
 
                 Momentum.getPlotsManager().addTrusted(plot, target);
-                player.sendMessage(Utils.translate("&7You trusted &3" + name + " &7to your plot"));
+                player.sendMessage(Utils.translate("&7You trusted &2" + name + " &7to your plot"));
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
     }
@@ -366,10 +369,9 @@ public class PlotCMD implements CommandExecutor {
             String playerName = a[1];
             Plot targetPlot = Momentum.getPlotsManager().getIgnoreCase(playerName);
             if (targetPlot != null) {
+                resetPlayerLevelData(playerStats);
                 targetPlot.teleportPlayerToEdge(player);
                 player.sendMessage(Utils.translate("&7Teleporting you to &a" + playerName + "&7's Plot"));
-
-                resetPlayerLevelData(playerStats);
             } else {
                 player.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a plot"));
             }
@@ -383,8 +385,8 @@ public class PlotCMD implements CommandExecutor {
         if (plot != null) {
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
             if (checkConditions(playerStats)) {
-                plot.teleportPlayerToEdge(player);
                 resetPlayerLevelData(playerStats);
+                plot.teleportPlayerToEdge(player);
             }
         } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot to teleport to"));

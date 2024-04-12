@@ -1,5 +1,6 @@
 package com.renatusnetwork.momentum.data.saves;
 
+import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -72,10 +73,10 @@ public class SavesManager
         // no point in saving if they are right beside spawn or checkpoint
         Player player = playerStats.getPlayer();
 
-        return (playerStats.inLevel() &&
+        return playerStats.inLevel() &&
                 (
                     (playerStats.hasCurrentCheckpoint() && playerStats.getCurrentCheckpoint().distance(player.getLocation()) <= 1.0) ||
                     playerStats.getLevel().getStartLocation().distance(player.getLocation()) <= 1.0
-                ));
+                );
     }
 }
