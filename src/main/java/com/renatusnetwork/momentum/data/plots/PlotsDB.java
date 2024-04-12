@@ -42,18 +42,15 @@ public class PlotsDB {
         return trustedUUIDs;
     }
 
-
-    public static void addTrustedPlayer(int plotID, PlayerStats trustedPlayer)
-    {
+    public static void addTrustedPlayer(int plotID, String trustedPlayerUUID) {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) " +
-                    "VALUES (?,?)", plotID, trustedPlayer.getUUID());
+                        "VALUES (?,?)", plotID, trustedPlayerUUID);
     }
 
-    public static void removeTrustedPlayer(int plotID, PlayerStats trustedPlayer)
-    {
+    public static void removeTrustedPlayer(int plotID, String trustedPlayerUUID)  {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=? AND trusted_uuid=?", plotID, trustedPlayer.getUUID());
+                "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=? AND trusted_uuid=?", plotID, trustedPlayerUUID);
     }
 
     public static int getPlotID(Player player)

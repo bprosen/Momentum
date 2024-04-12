@@ -209,16 +209,14 @@ public class PlotsManager {
         }.runTaskAsynchronously(Momentum.getPlugin());
     }
 
-    public void addTrusted(Plot plot, PlayerStats playerStats)
-    {
-        plot.addTrusted(playerStats);
-        PlotsDB.addTrustedPlayer(plot.getPlotID(), playerStats);
+    public void addTrusted(Plot plot, String playerUUID) {
+        plot.addTrusted(playerUUID);
+        PlotsDB.addTrustedPlayer(plot.getPlotID(), playerUUID);
     }
 
-    public void removeTrusted(Plot plot, PlayerStats playerStats)
-    {
-        plot.removeTrusted(playerStats);
-        PlotsDB.removeTrustedPlayer(plot.getPlotID(), playerStats);
+    public void removeTrusted(Plot plot, String playerUUID) {
+        plot.removeTrusted(playerUUID);
+        PlotsDB.removeTrustedPlayer(plot.getPlotID(), playerUUID);
     }
 
     public void clearPlot(Plot plot, boolean deletePlot)

@@ -76,9 +76,9 @@ public class Plot {
 
     public boolean isTrusted(String uuid) { return trustedUUIDs.contains(uuid); }
 
-    public void addTrusted(PlayerStats playerStats) { trustedUUIDs.add(playerStats.getUUID()); }
+    public void addTrusted(String trustedPlayerUUID) { trustedUUIDs.add(trustedPlayerUUID); }
 
-    public void removeTrusted(PlayerStats playerStats) { trustedUUIDs.remove(playerStats.getUUID()); }
+    public void removeTrusted(String trustedPlayerUUID) { trustedUUIDs.remove(trustedPlayerUUID); }
 
     public boolean isSubmitted() {
         return submitted;
