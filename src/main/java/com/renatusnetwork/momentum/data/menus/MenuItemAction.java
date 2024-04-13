@@ -634,13 +634,19 @@ public class MenuItemAction {
 
                 // if theyre entering/leaving the same level from mastery or not
                 if (playerStats.inLevel() && level.equals(playerStats.getLevel())) {
-                    if (!shiftClicked) {
+                    if (!playerStats.isAttemptingMastery()) {
+                        if (!shiftClicked) {
+                            player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                            return;
+                        }
+                        enteringMasteryOfSameLevel = true;
+                    }
+                    else if (!shiftClicked)
+                        leavingMasteryOfSameLevel = true;
+                    else {
                         player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                         return;
                     }
-
-                    if (!playerStats.isAttemptingMastery()) enteringMasteryOfSameLevel = true;
-                    else leavingMasteryOfSameLevel = true;
                 }
 
                 if (level.needsRank()) {
@@ -676,12 +682,11 @@ public class MenuItemAction {
 
                 if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
                         level.hasMastery() && playerStats.hasCompleted(level) &&
-                        !playerStats.hasMasteryCompletion(level)) {
-                    if (leavingMasteryOfSameLevel)
-                        statsManager.leftMastery(playerStats);
-                    else
-                        statsManager.enteredMastery(playerStats);
-                }
+                        !playerStats.hasMasteryCompletion(level))
+                    statsManager.enteredMastery(playerStats);
+
+                if (leavingMasteryOfSameLevel)
+                    statsManager.leftMastery(playerStats);
 
                 boolean tpToStart = false;
 
