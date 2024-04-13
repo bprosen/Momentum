@@ -620,7 +620,6 @@ public class MenuItemAction {
         player.closeInventory();
 
         boolean enteringMasteryOfSameLevel = false;
-        boolean leavingMasteryOfSameLevel = false;
         boolean shiftClicked = Momentum.getMenuManager().containsShiftClicked(playerStats);
 
         if (nonLevelTeleportConditions(playerStats))
@@ -635,14 +634,12 @@ public class MenuItemAction {
                 // if theyre entering/leaving the same level from mastery or not
                 if (playerStats.inLevel() && level.equals(playerStats.getLevel())) {
                     if (!playerStats.isAttemptingMastery()) {
-                        if (!shiftClicked) {
+                        if (!shiftClicked || playerStats.hasMasteryCompletion(level)) {
                             player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                             return;
                         }
                         enteringMasteryOfSameLevel = true;
                     }
-                    else if (!shiftClicked)
-                        leavingMasteryOfSameLevel = true;
                     else {
                         player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                         return;
@@ -664,7 +661,7 @@ public class MenuItemAction {
                 }
 
                 // perform leave level steps if theyre not toggling mastery of same level
-                if (!enteringMasteryOfSameLevel && !leavingMasteryOfSameLevel)
+                if (!enteringMasteryOfSameLevel)
                     statsManager.leaveLevelAndReset(playerStats, true);
 
                 // autosave so when entering mastery progress gets saved from non-mastery attempt
@@ -680,9 +677,7 @@ public class MenuItemAction {
                         statsManager.enteredRankup(playerStats);
                 }
 
-                if (leavingMasteryOfSameLevel)
-                    statsManager.leftMastery(playerStats);
-                else if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
+                if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
                         level.hasMastery() &&
                         playerStats.hasCompleted(level) &&
                         !playerStats.hasMasteryCompletion(level))
@@ -725,7 +720,7 @@ public class MenuItemAction {
                     }
                 }
 
-                if (!enteringMasteryOfSameLevel && !leavingMasteryOfSameLevel) {
+                if (!enteringMasteryOfSameLevel) {
                     playerStats.setLevel(level);
                     playerStats.disableLevelStartTime();
                     playerStats.resetFails();
