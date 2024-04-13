@@ -680,13 +680,13 @@ public class MenuItemAction {
                         statsManager.enteredRankup(playerStats);
                 }
 
-                if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
-                        level.hasMastery() && playerStats.hasCompleted(level) &&
-                        !playerStats.hasMasteryCompletion(level))
-                    statsManager.enteredMastery(playerStats);
-
                 if (leavingMasteryOfSameLevel)
                     statsManager.leftMastery(playerStats);
+                else if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
+                        level.hasMastery() &&
+                        playerStats.hasCompleted(level) &&
+                        !playerStats.hasMasteryCompletion(level))
+                    statsManager.enteredMastery(playerStats);
 
                 boolean tpToStart = false;
 
