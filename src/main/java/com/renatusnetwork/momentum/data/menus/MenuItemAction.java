@@ -639,8 +639,7 @@ public class MenuItemAction {
                             return;
                         }
                         enteringMasteryOfSameLevel = true;
-                    }
-                    else {
+                    } else {
                         player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
                         return;
                     }
@@ -663,9 +662,8 @@ public class MenuItemAction {
                 // perform leave level steps if theyre not toggling mastery of same level
                 if (!enteringMasteryOfSameLevel)
                     statsManager.leaveLevelAndReset(playerStats, true);
-
                 // autosave so when entering mastery progress gets saved from non-mastery attempt
-                if (enteringMasteryOfSameLevel && playerStats.hasAutoSave())
+                else if (playerStats.hasAutoSave())
                     Momentum.getSavesManager().autoSave(playerStats);
 
                 Rank rank = playerStats.getRank();
@@ -733,8 +731,7 @@ public class MenuItemAction {
 
                     playerStats.sendTitle("", level.getFormattedTitle(), 10, 40, 10);
                 }
-            }
-            else
+            } else
                 player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
         }
     }
