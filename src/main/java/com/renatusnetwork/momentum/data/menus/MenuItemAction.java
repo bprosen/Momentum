@@ -720,10 +720,10 @@ public class MenuItemAction {
                     }
                 }
 
+                playerStats.disableLevelStartTime();
+                playerStats.resetFails();
                 if (!enteringMasteryOfSameLevel) {
                     playerStats.setLevel(level);
-                    playerStats.disableLevelStartTime();
-                    playerStats.resetFails();
 
                     for (PotionEffect potionEffect : level.getPotionEffects())
                         player.addPotionEffect(potionEffect);
