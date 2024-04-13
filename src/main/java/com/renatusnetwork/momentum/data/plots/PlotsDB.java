@@ -118,7 +118,8 @@ public class PlotsDB {
     {
         Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLOTS_TABLE, "MAX(id) AS last_id", "");
 
-        return !result.isEmpty() ? Integer.parseInt(result.get("last_id")) : 0;
+        String lastID = result.get("last_id");
+        return  lastID != null ? Integer.parseInt(lastID) : 0;
     }
 
     public static void toggleSubmitted(String uuid)
