@@ -159,6 +159,7 @@ public class SettingsManager {
     public int infinite_timed_lb_size;
     public int infinite_sprint_lb_size;
     public int levels_lb_size;
+    public int prac_history_size;
 
     public SettingsManager(FileConfiguration settings)
     {
@@ -420,5 +421,6 @@ public class SettingsManager {
         infinite_sprint_lb_size = settings.getInt("leaderboard_max_size.infinite.sprint");
         infinite_timed_lb_size = settings.getInt("leaderboard_max_size.infinite.timed");
         levels_lb_size = settings.getInt("leaderboard_max_size.levels");
+        prac_history_size = settings.getInt("practice_history_size");
     }
 }
