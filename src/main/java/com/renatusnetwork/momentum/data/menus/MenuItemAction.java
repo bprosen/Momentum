@@ -10,6 +10,7 @@ import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.levels.LevelPreview;
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
 import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
 import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
 import com.renatusnetwork.momentum.data.menus.helpers.CancelTasks;
@@ -134,6 +135,8 @@ public class MenuItemAction {
             performLevelRate(playerStats, menuItem);
         else if (itemType.equals("infinite-mode"))
             performInfiniteModeChange(playerStats, menuItem);
+        else if (itemType.equals("practice-history"))
+            performPracticeHistory(playerStats, menuItem);
         else if (itemType.equals("type"))
         {
             // certain conditions
@@ -151,6 +154,24 @@ public class MenuItemAction {
                 player.closeInventory();
         } else if (menuItem.hasCommands())
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+    }
+
+    private static void performPracticeHistory(PlayerStats playerStats, MenuItem menuItem)
+    {
+        String typeValue = menuItem.getTypeValue();
+        if (Utils.isInteger(typeValue))
+        {
+            int index = Integer.parseInt(typeValue);
+            Location location = playerStats.getPracticeCheckpointFromHistory(index);
+
+            if (location != null)
+            {
+                playerStats.getPlayer().closeInventory();
+
+                playerStats.setPracticeCheckpoint(location, false);
+                playerStats.teleport(location);
+            }
+        }
     }
 
     private static void performRaceItem(PlayerStats playerStats, String levelName)

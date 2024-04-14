@@ -44,7 +44,8 @@ public class PlayerStats
     private Clan clan;
     private Location currentCheckpoint;
     private Location practiceStart;
-    private Location practiceCheckpoint;
+    private Location currentPracticeCheckpoint;
+    private List<Location> practiceHistory;
     private Location spectateSpawn;
     private RacePlayer race;
     private Rank rank;
@@ -107,6 +108,7 @@ public class PlayerStats
         this.masteryCompletions = new HashSet<>();
         this.bids = new HashMap<>();
         this.favoriteLevels = new ArrayList<>();
+        this.practiceHistory = new ArrayList<>();
 
         // default for now, if they are not a new player the mysql db loading will adjust these
         this.infiniteBlock = Momentum.getSettingsManager().infinite_default_block;
@@ -762,16 +764,26 @@ public class PlayerStats
     //
     public void setPracticeMode(Location startLocation) {
         practiceStart = startLocation;
-        practiceCheckpoint = startLocation;
+        currentPracticeCheckpoint = startLocation;
+        practiceHistory.add(startLocation);
     }
 
-    public void setPracticeCheckpoint(Location checkpointLocation) {
-        practiceCheckpoint = checkpointLocation;
+    public void setPracticeCheckpoint(Location checkpointLocation, boolean addToHistory) {
+        currentPracticeCheckpoint = checkpointLocation;
+
+        if (addToHistory)
+        {
+            practiceHistory.add(checkpointLocation);
+
+            if (practiceHistory.size() > Momentum.getSettingsManager().prac_history_size)
+                practiceHistory.remove(0);
+        }
     }
 
     public void resetPracticeMode() {
         practiceStart = null;
-        practiceCheckpoint = null;
+        currentPracticeCheckpoint = null;
+        practiceHistory.clear();
     }
 
     public Location getPracticeStart() {
@@ -779,7 +791,17 @@ public class PlayerStats
     }
 
     public Location getPracticeCheckpoint() {
-        return practiceCheckpoint;
+        return currentPracticeCheckpoint;
+    }
+
+    public Location getPracticeCheckpointFromHistory(int index)
+    {
+        return practiceHistory.size() > index ? practiceHistory.get(index) : null;
+    }
+
+    public boolean isPracticeHistorySame(Location practiceCheckpoint)
+    {
+        return inPracticeMode() && currentPracticeCheckpoint.equals(practiceCheckpoint);
     }
 
     public boolean inPracticeMode() {

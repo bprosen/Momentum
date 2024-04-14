@@ -29,6 +29,7 @@ import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.inventory.ItemStack;
@@ -84,6 +85,8 @@ public class MenuItemFormatter
             return getSortingType(playerStats, menuItem);
         if (menuItem.getType().equals("profile"))
             return getProfileStats(playerStats, menuItem);
+        if (menuItem.getType().equals("practice-history"))
+            return getPracticeHistory(playerStats, menuItem);
 
         // Add in some '%player%' and such formatters for lore
         return menuItem.getItem();
@@ -186,6 +189,39 @@ public class MenuItemFormatter
         item.setItemMeta(itemMeta);
 
         return item;
+    }
+
+    private static ItemStack getPracticeHistory(PlayerStats playerStats, MenuItem menuItem)
+    {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        String typeValue = menuItem.getTypeValue();
+
+        if (Utils.isInteger(typeValue))
+        {
+            int index = Integer.parseInt(typeValue);
+            Location location = playerStats.getPracticeCheckpointFromHistory(index);
+
+            if (location != null)
+            {
+                ItemMeta itemMeta = item.getItemMeta();
+                List<String> lore = new ArrayList<>();
+
+                itemMeta.setDisplayName(Utils.translate("&eClick to teleport to"));
+                lore.add(Utils.translate(" &7x &6" + Utils.formatDecimal(location.getX(), false, 3, 3)));
+                lore.add(Utils.translate(" &7z &6" + Utils.formatDecimal(location.getZ(), false, 3, 3)));
+                lore.add(Utils.translate(" &7f &6" + Utils.formatDecimal(Utils.translateYawToFacing(location.getYaw()), false, 3, 3)));
+
+                if (playerStats.isPracticeHistorySame(location))
+                    Utils.addGlow(itemMeta);
+
+                itemMeta.setLore(lore);
+                item.setItemMeta(itemMeta);
+                return item;
+            }
+        }
+
+        // set as nothing if doesn't exist
+        return new ItemStack(Material.AIR);
     }
 
     private static ItemStack getFavoriteLevel(PlayerStats playerStats, Level favoriteLevel, MenuItem menuItem, ItemStack newItem)

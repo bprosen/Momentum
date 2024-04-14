@@ -179,19 +179,13 @@ public class Scoreboard {
                 else if (playerStats.inPracticeMode())
                 {
                     board.add(Utils.translate("&7"));
-                    board.add(formatSpacing(Utils.translate("&6&lPracticing")));
-                    board.add(formatSpacing(Utils.translate("&e/prac &7to set")));
+                    board.add(formatSpacing(Utils.translate("&e/prac history")));
                     board.add(formatSpacing(Utils.translate("&e/unprac &7to exit")));
                     board.add("");
 
                     Location pracCPLocation = playerStats.getPracticeCheckpoint();
 
-                    float facing = pracCPLocation.getYaw();
-                    // translate from 0 - 360 to how facing is done in f3 with 0 to 180 and -180 to 0
-                    if (facing > 180.0)
-                        facing = (180 - (facing - 180)) * -1; // if we're over 180, get the difference from 180 and change to negative
-                    else if (facing < -180.0)
-                        facing = (180 + (facing + 180)); // if we're below -180, get the difference and how negatives work, don't need to * -1
+                    float facing = Utils.translateYawToFacing(pracCPLocation.getYaw());
 
                     board.add(formatSpacing(Utils.translate("&7x &6" + Utils.formatDecimal(pracCPLocation.getX(), false, 3, 3))));
                     board.add(formatSpacing(Utils.translate("&7z &6" + Utils.formatDecimal(pracCPLocation.getZ(), false, 3, 3))));

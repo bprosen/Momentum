@@ -111,6 +111,8 @@ public class MenusYAML {
             return "profile";
         if (isSet(menuName, itemPath + ".race"))
             return "race";
+        if (isSet(menuName, itemPath + ".practice-history"))
+            return "practice-history";
 
         return "display";
     }

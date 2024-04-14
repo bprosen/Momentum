@@ -388,4 +388,15 @@ public class Utils {
         Utils.addItemToHotbar(shieldItem, player.getInventory(), settingsManager.shield_hotbar_slot);
         player.sendMessage(Utils.translate("&7You have been given a " + settingsManager.shield_title));
     }
+
+    public static float translateYawToFacing(float yaw)
+    {
+        // translate from 0 - 360 to how facing is done in f3 with 0 to 180 and -180 to 0
+        if (yaw > 180.0)
+            yaw = (180 - (yaw - 180)) * -1; // if we're over 180, get the difference from 180 and change to negative
+        else if (yaw < -180.0)
+            yaw = 180 + (yaw + 180); // if we're below -180, get the difference and how negatives work, don't need to * -1
+
+        return yaw;
+    }
 }
