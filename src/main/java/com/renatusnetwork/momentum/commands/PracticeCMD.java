@@ -69,7 +69,13 @@ public class PracticeCMD implements CommandExecutor {
             else if (a[0].equalsIgnoreCase("history") || a[0].equalsIgnoreCase("hist"))
             {
                 if (validate(playerStats, player))
-                    Momentum.getMenuManager().openInventory(playerStats, "practice_history", true);
+                {
+                    if (playerStats.inPracticeMode())
+                        Momentum.getMenuManager().openInventory(playerStats, "practice_history", true);
+                    else
+                        player.sendMessage(Utils.translate("&cYou are not in practice mode"));
+                }
+
             }
             else
                 sendHelp(sender);
