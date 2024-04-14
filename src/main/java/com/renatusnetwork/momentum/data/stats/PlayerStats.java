@@ -782,6 +782,7 @@ public class PlayerStats
 
     public void resetPracticeMode() {
         practiceStart = null;
+        currentPracticeCheckpoint = null;
         practiceHistory.clear();
     }
 
