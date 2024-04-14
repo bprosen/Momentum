@@ -663,8 +663,13 @@ public class MenuItemAction {
                 if (!enteringMasteryOfSameLevel)
                     statsManager.leaveLevelAndReset(playerStats, true);
                 // autosave so when entering mastery progress gets saved from non-mastery attempt
-                else if (playerStats.hasAutoSave())
-                    Momentum.getSavesManager().autoSave(playerStats);
+                else {
+                    if (playerStats.hasAutoSave())
+                        Momentum.getSavesManager().autoSave(playerStats);
+                    playerStats.resetCurrentCheckpoint();
+                    statsManager.resetPracticeDataOnly(playerStats);
+                }
+
 
                 Rank rank = playerStats.getRank();
                 if (rank != null) {
