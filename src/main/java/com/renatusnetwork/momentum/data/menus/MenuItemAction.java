@@ -619,22 +619,30 @@ public class MenuItemAction {
         StatsManager statsManager = Momentum.getStatsManager();
         player.closeInventory();
 
+        boolean enteringMasteryOfSameLevel = false;
+        boolean shiftClicked = Momentum.getMenuManager().containsShiftClicked(playerStats);
+
         if (nonLevelTeleportConditions(playerStats))
         {
-            if (level.playerHasRequiredLevels(playerStats))
-            {
+            if (level.playerHasRequiredLevels(playerStats)) {
                 // if the level has perm node, and player does not have perm node
-                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission()))
-                {
+                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission())) {
                     player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
                     return;
                 }
 
-                // if player is in level and their level is the level they clicked on, cancel
-                if (playerStats.inLevel() && level.equals(playerStats.getLevel()))
-                {
-                    player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
-                    return;
+                // if theyre entering/leaving the same level from mastery or not
+                if (playerStats.inLevel() && level.equals(playerStats.getLevel())) {
+                    if (!playerStats.isAttemptingMastery()) {
+                        if (!shiftClicked || playerStats.hasMasteryCompletion(level)) {
+                            player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                            return;
+                        }
+                        enteringMasteryOfSameLevel = true;
+                    } else {
+                        player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                        return;
+                    }
                 }
 
                 if (level.needsRank()) {
@@ -646,14 +654,22 @@ public class MenuItemAction {
                     }
                 }
 
-                if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround())
-                {
+                if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround()) {
                     player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
                     return;
                 }
 
-                // perform leave level steps
-                statsManager.leaveLevelAndReset(playerStats, true);
+                // perform leave level steps if theyre not toggling mastery of same level
+                if (!enteringMasteryOfSameLevel)
+                    statsManager.leaveLevelAndReset(playerStats, true);
+                // autosave so when entering mastery progress gets saved from non-mastery attempt
+                else {
+                    if (playerStats.hasAutoSave())
+                        Momentum.getSavesManager().autoSave(playerStats);
+                    playerStats.resetCurrentCheckpoint();
+                    statsManager.resetPracticeDataOnly(playerStats);
+                }
+
 
                 Rank rank = playerStats.getRank();
                 if (rank != null) {
@@ -665,7 +681,8 @@ public class MenuItemAction {
                 }
 
                 if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
-                        level.hasMastery() && playerStats.hasCompleted(level) &&
+                        level.hasMastery() &&
+                        playerStats.hasCompleted(level) &&
                         !playerStats.hasMasteryCompletion(level))
                     statsManager.enteredMastery(playerStats);
 
@@ -679,8 +696,7 @@ public class MenuItemAction {
                         playerStats.setCurrentCheckpoint(spawn);
 
                         // only tp if dont have a save
-                        if (save == null)
-                        {
+                        if (save == null) {
                             Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                             player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
                         }
@@ -689,8 +705,7 @@ public class MenuItemAction {
                         tpToStart = true;
 
                     // if they have a save and are not attempting mastery
-                    if (save != null)
-                    {
+                    if (save != null) {
                         Momentum.getSavesManager().teleportAndRemoveSave(playerStats, level, save);
                         player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getTitle()));
                     }
@@ -708,19 +723,20 @@ public class MenuItemAction {
                     }
                 }
 
-                playerStats.setLevel(level);
                 playerStats.disableLevelStartTime();
                 playerStats.resetFails();
+                if (!enteringMasteryOfSameLevel) {
+                    playerStats.setLevel(level);
 
-                for (PotionEffect potionEffect : level.getPotionEffects())
-                    player.addPotionEffect(potionEffect);
+                    for (PotionEffect potionEffect : level.getPotionEffects())
+                        player.addPotionEffect(potionEffect);
 
-                if (level.isElytra())
-                    Momentum.getStatsManager().toggleOnElytra(playerStats);
+                    if (level.isElytra())
+                        Momentum.getStatsManager().toggleOnElytra(playerStats);
 
-                playerStats.sendTitle("", level.getFormattedTitle(), 10, 40, 10);
-            }
-            else
+                    playerStats.sendTitle("", level.getFormattedTitle(), 10, 40, 10);
+                }
+            } else
                 player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
         }
     }
