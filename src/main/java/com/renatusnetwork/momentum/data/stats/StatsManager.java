@@ -30,6 +30,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -862,10 +863,14 @@ public class StatsManager {
         if (playerStats.inPracticeMode())
         {
             Player player = playerStats.getPlayer();
+            PlayerInventory inv = player.getInventory();
             ItemStack item = Utils.getPracPlateIfExists(player.getInventory());
 
-            if (item != null)
-                player.getInventory().remove(item);
+            if (item != null) {
+                if (inv.getItemInOffHand().isSimilar(item))
+                    inv.setItemInOffHand(new ItemStack(Material.AIR));
+                else player.getInventory().remove(item);
+            }
 
             playerStats.resetPracticeMode();
         }

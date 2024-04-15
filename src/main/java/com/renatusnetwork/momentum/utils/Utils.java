@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -218,13 +219,12 @@ public class Utils {
 
         ItemStack foundItem = null;
 
-        if (searchItem != null && searchItem.hasItemMeta() && searchItem.getItemMeta().hasDisplayName())
+        if (searchItem != null /*&& searchItem.hasItemMeta() && searchItem.getItemMeta().hasDisplayName()*/)
         {
             // try to find the sword in their inventory
             for (ItemStack item : inventory.getContents())
             {
-                if (item != null && item.getType() == searchItem.getType() && item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                        item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(searchItem.getItemMeta().getDisplayName())))
+                if (item != null && item.isSimilar(searchItem))
                 {
                     foundItem = item;
                     break;
@@ -232,6 +232,38 @@ public class Utils {
             }
         }
         return foundItem;
+    }
+
+    public static boolean isInPre1_9(Player player) {
+        return Momentum.getViaVersion().getPlayerVersion(player.getUniqueId()) < SettingsManager.PROTOCOL_1_9;
+    }
+
+    public static void extractOffhand(Player player) {
+        PlayerInventory inv = player.getInventory();
+        ItemStack item = inv.getItemInOffHand();
+        int i = 0;
+        if (item != null && isInPre1_9(player)) {
+            // find first free open slot backwards to bias the hotbar first (1.8: 0-9=hotbar, 10-35=inventory)
+            for (; i <= 35; i++) {
+                ItemStack currentItem = inv.getItem(i);
+                if (currentItem == null || currentItem.getType() == Material.AIR) {
+                    inv.setItemInOffHand(new ItemStack(Material.AIR));
+                    inv.setItem(i, item);
+                    break;
+                }
+            }
+        }
+
+        // if their inventory somehow got full and they try to relog <1.9 with an item in their offhand
+        if (i == 36) {
+            inv.clear();
+            inv.setItemInOffHand(null);
+
+            Utils.setHotbar(player);
+            Utils.refreshHotbarState(player);
+
+            player.sendMessage(Utils.translate("&7Your inventory was refreshed because it was full"));
+        }
     }
 
     public static String translate(String msg) {
@@ -288,6 +320,30 @@ public class Utils {
         // loop through and set
         for (Map.Entry<Integer, ItemStack> entry : Momentum.getSettingsManager().custom_join_inventory.entrySet())
             player.getInventory().setItem(entry.getKey(), entry.getValue());
+    }
+
+    public static void refreshHotbarState(Player player) {
+        boolean hadSword = Utils.getSwordIfExists(player) != null;
+        boolean hadShield = Utils.getShieldIfExists(player) != null;
+
+        StatsManager statsManager = Momentum.getStatsManager();
+        PlayerStats playerStats = statsManager.get(player);
+        SettingsManager settingsManager = Momentum.getSettingsManager();
+
+        // refresh stateful items
+        if (playerStats.inLevel())
+            Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
+
+        if (playerStats.inPracticeMode())
+            Utils.addItemToHotbar(settingsManager.prac_item, player.getInventory(), settingsManager.prac_hotbar_slot);
+
+        if (statsManager.containsHiddenPlayer(player))
+            Utils.setDisabledPlayersItem(player.getInventory(), Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&7Players » &aEnabled")));
+
+        if (hadSword)
+            Utils.addSword(playerStats);
+        else if (hadShield)
+            Utils.addShield(playerStats);
     }
 
     public static void broadcastClickableHoverableCMD(String message, String hoverMessage, String commandClick)

@@ -21,38 +21,12 @@ public class HotbarCMD implements CommandExecutor
         {
             Player player = (Player) sender;
 
-            boolean hadSword = Utils.getSwordIfExists(player) != null;
-            boolean hadShield = Utils.getShieldIfExists(player) != null;
-
             // clear inv first
-            for (int i = 0; i < player.getInventory().getSize(); i++)
-            {
-                ItemStack item = player.getInventory().getItem(i);
-
-                if (item != null && item.getType() != Material.AIR)
-                    player.getInventory().removeItem(item);
-            }
+            player.getInventory().clear();
+            player.getInventory().setItemInOffHand(null); // in case 1.8 doesnt clear item in offhand
 
             Utils.setHotbar(player);
-
-            StatsManager statsManager = Momentum.getStatsManager();
-            PlayerStats playerStats = statsManager.get(player);
-            SettingsManager settingsManager = Momentum.getSettingsManager();
-
-            // refresh stateful items
-            if (playerStats.inLevel())
-                Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
-
-            if (playerStats.inPracticeMode())
-                Utils.addItemToHotbar(settingsManager.prac_item, player.getInventory(), settingsManager.prac_hotbar_slot);
-
-            if (statsManager.containsHiddenPlayer(player))
-                Utils.setDisabledPlayersItem(player.getInventory(), Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&7Players » &aEnabled")));
-
-            if (hadSword)
-                Utils.addSword(playerStats);
-            else if (hadShield)
-                Utils.addShield(playerStats);
+            Utils.refreshHotbarState(player);
 
             player.sendMessage(Utils.translate("&7You have refreshed your hotbar"));
         }
