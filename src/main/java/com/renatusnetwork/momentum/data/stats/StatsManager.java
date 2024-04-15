@@ -864,12 +864,12 @@ public class StatsManager {
         {
             Player player = playerStats.getPlayer();
             PlayerInventory inv = player.getInventory();
-            ItemStack item = Utils.getPracPlateIfExists(player.getInventory());
+            ItemStack item = Utils.getPracPlateIfExists(inv);
 
             if (item != null) {
                 if (inv.getItemInOffHand().isSimilar(item))
                     inv.setItemInOffHand(new ItemStack(Material.AIR));
-                else player.getInventory().remove(item);
+                else inv.remove(item);
             }
 
             playerStats.resetPracticeMode();
