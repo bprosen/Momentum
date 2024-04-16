@@ -250,7 +250,7 @@ public class Utils {
 
         // find first free open slot (<1.9: 0-9=hotbar, 10-35=inventory ; >=1.9: 0-4=crafting 5-8=armor 9-35=inventory 36-44=hotbar 45=offhand)
         // no need to extract if they are >=1.9 though
-        if (item == null && isInPre1_9(player)) {
+        if (item != null && isInPre1_9(player)) {
             for (; i <= 35; i++) {
                 ItemStack currentItem = inv.getItem(i);
                 if (currentItem == null || currentItem.getType() == Material.AIR) {
