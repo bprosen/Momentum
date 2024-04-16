@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -204,13 +205,18 @@ public class Utils {
         return getItemStackIfExists(inventory, settingsManager.leave_item);
     }
 
-    public static void removeSpawnItemIfExists(Player player, Inventory inventory)
+    public static void removeSpawnItemIfExists(Player player)
     {
-        ItemStack itemStack = Utils.getSpawnItemIfExists(player.getInventory());
+        PlayerInventory inventory = player.getInventory();
+        ItemStack itemStack = Utils.getSpawnItemIfExists(inventory);
 
         // remove if not null
-        if (itemStack != null)
-            player.getInventory().remove(itemStack);
+        if (itemStack != null) {
+            if (inventory.getItemInOffHand().isSimilar(itemStack))
+                inventory.setItemInOffHand(null);
+            else
+                inventory.remove(itemStack);
+        }
     }
 
     private static ItemStack getItemStackIfExists(Inventory inventory, ItemStack searchItem)
@@ -218,13 +224,12 @@ public class Utils {
 
         ItemStack foundItem = null;
 
-        if (searchItem != null && searchItem.hasItemMeta() && searchItem.getItemMeta().hasDisplayName())
+        if (searchItem != null)
         {
             // try to find the sword in their inventory
             for (ItemStack item : inventory.getContents())
             {
-                if (item != null && item.getType() == searchItem.getType() && item.hasItemMeta() && item.getItemMeta().hasDisplayName() &&
-                        item.getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(searchItem.getItemMeta().getDisplayName())))
+                if (item != null && item.isSimilar(searchItem))
                 {
                     foundItem = item;
                     break;
@@ -232,6 +237,40 @@ public class Utils {
             }
         }
         return foundItem;
+    }
+
+    public static boolean isInPre1_9(Player player) {
+        return Momentum.getViaVersion().getPlayerVersion(player.getUniqueId()) < SettingsManager.PROTOCOL_1_9;
+    }
+
+    public static void extractOffhand(Player player) {
+        PlayerInventory inv = player.getInventory();
+        ItemStack item = inv.getItemInOffHand();
+        int i = 0;
+
+        // find first free open slot (<1.9: 0-9=hotbar, 10-35=inventory ; >=1.9: 0-4=crafting 5-8=armor 9-35=inventory 36-44=hotbar 45=offhand)
+        // no need to extract if they are >=1.9 though
+        if (item == null && isInPre1_9(player)) {
+            for (; i <= 35; i++) {
+                ItemStack currentItem = inv.getItem(i);
+                if (currentItem == null || currentItem.getType() == Material.AIR) {
+                    inv.setItemInOffHand(null);
+                    inv.setItem(i, item);
+                    break;
+                }
+            }
+        }
+
+        // if their inventory somehow got full and they try leaving a level or relogging into <1.9 with item in offhand
+        if (i == 36) {
+            inv.clear();
+            inv.setItemInOffHand(null);
+
+            Utils.setHotbar(player);
+            Utils.refreshHotbarState(player);
+
+            player.sendMessage(Utils.translate("&7Your inventory was refreshed because it was full"));
+        }
     }
 
     public static String translate(String msg) {
@@ -288,6 +327,30 @@ public class Utils {
         // loop through and set
         for (Map.Entry<Integer, ItemStack> entry : Momentum.getSettingsManager().custom_join_inventory.entrySet())
             player.getInventory().setItem(entry.getKey(), entry.getValue());
+    }
+
+    public static void refreshHotbarState(Player player) {
+        boolean hadSword = Utils.getSwordIfExists(player) != null;
+        boolean hadShield = Utils.getShieldIfExists(player) != null;
+
+        StatsManager statsManager = Momentum.getStatsManager();
+        PlayerStats playerStats = statsManager.get(player);
+        SettingsManager settingsManager = Momentum.getSettingsManager();
+
+        // refresh stateful items
+        if (playerStats.inLevel())
+            Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
+
+        if (playerStats.inPracticeMode())
+            Utils.addItemToHotbar(settingsManager.prac_item, player.getInventory(), settingsManager.prac_hotbar_slot);
+
+        if (statsManager.containsHiddenPlayer(player))
+            Utils.setDisabledPlayersItem(player.getInventory(), Utils.getSlotFromInventory(player.getInventory(), Utils.translate("&7Players » &aEnabled")));
+
+        if (hadSword)
+            Utils.addSword(playerStats);
+        else if (hadShield)
+            Utils.addShield(playerStats);
     }
 
     public static void broadcastClickableHoverableCMD(String message, String hoverMessage, String commandClick)

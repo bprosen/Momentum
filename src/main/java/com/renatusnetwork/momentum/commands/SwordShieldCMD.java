@@ -36,7 +36,7 @@ public class SwordShieldCMD implements CommandExecutor {
             ItemStack shieldItem = Utils.getShieldIfExists(player);
             boolean removedShield = removeItem(player, shieldItem, settingsManager.shield_title);
 
-            if (Momentum.getViaVersion().getPlayerVersion(UUID.fromString(playerStats.getUUID())) >= SettingsManager.PROTOCOL_1_9)
+            if (!Utils.isInPre1_9(player))
             {
                 if (!removedShield)
                     Utils.addShield(playerStats);

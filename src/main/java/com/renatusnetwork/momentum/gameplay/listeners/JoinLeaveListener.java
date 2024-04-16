@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.gameplay.listeners;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
@@ -15,10 +16,14 @@ import com.renatusnetwork.momentum.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import java.util.List;
@@ -120,6 +125,8 @@ public class JoinLeaveListener implements Listener
                 finalPlayerStats.loaded();
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
+
+        Utils.extractOffhand(player); // make sure offhand item isnt in offhand if player joins <1.9
     }
 
     @EventHandler

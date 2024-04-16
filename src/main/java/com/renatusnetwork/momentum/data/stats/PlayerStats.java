@@ -418,7 +418,7 @@ public class PlayerStats
     public void resetLevel()
     {
         level = null;
-        Utils.removeSpawnItemIfExists(player, player.getInventory());
+        Utils.removeSpawnItemIfExists(player);
     }
 
     public Level getLevel() {
