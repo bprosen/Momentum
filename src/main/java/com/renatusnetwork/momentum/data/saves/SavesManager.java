@@ -1,6 +1,5 @@
 package com.renatusnetwork.momentum.data.saves;
 
-import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -24,7 +23,7 @@ public class SavesManager
 
     public void teleportAndRemoveSave(PlayerStats playerStats, Level level, Location location)
     {
-        playerStats.teleport(location);
+        playerStats.teleport(location, false);
         removeSave(playerStats, level);
     }
 

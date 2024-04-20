@@ -46,7 +46,7 @@ public class RacePlayer
         playerStats.resetFails();
         playerStats.resetCurrentCheckpoint();
         playerStats.disableLevelStartTime();
-        playerStats.teleport(raceLevel.getStartLocation());
+        playerStats.teleport(raceLevel.getStartLocation(), false);
 
         if (race.hasBet())
             statsManager.removeCoins(playerStats, getBet());
@@ -131,7 +131,7 @@ public class RacePlayer
 
     public void resetLevelAndTeleport()
     {
-        playerStats.teleport(originalLocation);
+        playerStats.teleport(originalLocation, false);
         Momentum.getLevelManager().setLevelInfoOnTeleport(playerStats, originalLocation);
     }
 

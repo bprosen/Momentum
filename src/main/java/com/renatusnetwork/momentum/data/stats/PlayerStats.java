@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -1166,7 +1167,10 @@ public class PlayerStats
         player.sendMessage(message);
     }
 
-    public void teleport(Location location) { player.teleport(location); }
+    public void teleport(Location location, boolean resetVelocity) {
+        player.teleport(location);
+        if (resetVelocity) player.setVelocity(new Vector(0, 0, 0));
+    }
 
     public void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut)
     {

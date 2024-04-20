@@ -10,7 +10,6 @@ import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.levels.LevelPreview;
-import com.renatusnetwork.momentum.data.menus.gui.Menu;
 import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
 import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
 import com.renatusnetwork.momentum.data.menus.helpers.CancelTasks;
@@ -169,7 +168,7 @@ public class MenuItemAction {
                 playerStats.getPlayer().closeInventory();
 
                 playerStats.setPracticeCheckpoint(location, false);
-                playerStats.teleport(location);
+                playerStats.teleport(location, false);
             }
         }
     }

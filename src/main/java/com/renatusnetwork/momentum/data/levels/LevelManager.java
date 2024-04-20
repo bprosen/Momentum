@@ -1188,7 +1188,7 @@ public class LevelManager
 
                 setLevelInfoOnTeleport(opponentStats, opponent.getOriginalLocation());
                 opponentStats.disableLevelStartTime();
-                opponentStats.teleport(opponent.getOriginalLocation());
+                opponentStats.teleport(opponent.getOriginalLocation(), false);
 
                 playerStats.endRace(race, RaceEndReason.WON);
             }
