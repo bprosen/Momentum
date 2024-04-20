@@ -462,4 +462,9 @@ public class Utils {
 
         return yaw;
     }
+
+    public static boolean isNearby(Location from, Location to, double distance)
+    {
+        return from.distanceSquared(to) <= (distance * distance);
+    }
 }

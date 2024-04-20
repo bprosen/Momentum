@@ -125,7 +125,7 @@ public class CheckpointManager {
 
             if (
                 loc.getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) &&
-                playerStats.getPlayer().getLocation().distance(loc) > 1.0 && !playerStats.inPracticeMode()
+                !Utils.isNearby(playerStats.getPlayer().getLocation(), loc, 1.0) && !playerStats.inPracticeMode()
                ) // only add a fail when no practice
                 playerStats.addFail();
 
@@ -142,7 +142,7 @@ public class CheckpointManager {
 
             if (
                 loc.getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) &&
-                playerStats.getPlayer().getLocation().distance(loc) > 1.0
+                !Utils.isNearby(playerStats.getPlayer().getLocation(), loc, 1.0)
                )
                 playerStats.addFail();
 

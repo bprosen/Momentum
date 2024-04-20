@@ -550,7 +550,7 @@ public class MenuItemFormatter
                 // show they need to buy it and it is not the jackpot level if it is running
                 if (!(bankManager.isJackpotRunning() &&
                         bankManager.getJackpot().getLevel().equals(level)) &&
-                        level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level))
+                        level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level) && !level.isFeaturedLevel())
                 {
 
                     int price = level.getPrice();

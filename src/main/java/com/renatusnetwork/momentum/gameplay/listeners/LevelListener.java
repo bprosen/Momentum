@@ -117,25 +117,16 @@ public class LevelListener implements Listener {
 
                 // gold plate = checkpoint
                 if (
-                        playerStats != null &&
-                        playerStats.isLoaded() &&
-                        playerStats.inLevel() &&
-                        !playerStats.inPracticeMode() &&
-                        !playerStats.isSpectating() &&
-                        !playerStats.isAttemptingMastery() &&
-                        !playerStats.isPreviewingLevel())
-                {
-                    if (playerStats.hasCurrentCheckpoint())
-                    {
-                        int blockX = playerStats.getCurrentCheckpoint().getBlockX();
-                        int blockZ = playerStats.getCurrentCheckpoint().getBlockZ();
-
-                        if (!(blockX == block.getLocation().getBlockX() && blockZ == block.getLocation().getBlockZ()))
-                            setCheckpoint(playerStats, block.getLocation());
-                    }
-                    else
-                        setCheckpoint(playerStats, block.getLocation());
-                }
+                    playerStats != null &&
+                    playerStats.isLoaded() &&
+                    playerStats.inLevel() &&
+                    !playerStats.inPracticeMode() &&
+                    !playerStats.isSpectating() &&
+                    !playerStats.isAttemptingMastery() &&
+                    !playerStats.isPreviewingLevel() &&
+                    (!playerStats.hasCurrentCheckpoint() || !Utils.isNearby(block.getLocation(), playerStats.getCurrentCheckpoint(), 1.5))
+                )
+                    setCheckpoint(playerStats, block.getLocation());
             }
             else if (block.getType() == Material.IRON_PLATE)
             {
