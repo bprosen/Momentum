@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class RankCMD implements CommandExecutor {
 
@@ -31,8 +31,12 @@ public class RankCMD implements CommandExecutor {
 
         if (player.hasPermission("momentum.admin"))
         {
-            if (a.length == 0)
-                sendRank(player);
+            if (a.length == 0) {
+                if (label.equalsIgnoreCase("ranks"))
+                    sendRanks(player);
+                else
+                    sendRank(player);
+            }
             else if (a.length == 3 && a[0].equalsIgnoreCase("set"))
             {
                 PlayerStats victim = Momentum.getStatsManager().getByName(a[1]);
@@ -225,8 +229,12 @@ public class RankCMD implements CommandExecutor {
             else
                 sendAdminHelp(player);
         }
-        else if (a.length == 0)
-            sendRank(player);
+        else if (a.length == 0) {
+            if (label.equalsIgnoreCase("ranks"))
+                sendRanks(player);
+            else
+                sendRank(player);
+        }
         else
             sendPlayerHelp(player);
 
@@ -277,5 +285,16 @@ public class RankCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&c&lRanks Help"));
         player.sendMessage(Utils.translate("&c/rank  &7Tells you your rank"));
         player.sendMessage(Utils.translate("&c/ranks help  &7Displays this page"));
+    }
+
+    private void sendRanks(Player player) {
+        Rank rank = Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank);
+        String msg = "&7" + rank.getTitle();
+        rank = Momentum.getRanksManager().get(rank.getNextRank());
+        while (rank != null) {
+            msg += " &8-> &7" + rank.getTitle();
+            rank = Momentum.getRanksManager().get(rank.getNextRank());
+        }
+        player.sendMessage(Utils.translate(msg));
     }
 }
