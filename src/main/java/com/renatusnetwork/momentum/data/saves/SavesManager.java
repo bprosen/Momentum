@@ -75,8 +75,9 @@ public class SavesManager
 
         return playerStats.inLevel() &&
                 (
-                    (playerStats.hasCurrentCheckpoint() && playerStats.getCurrentCheckpoint().distance(player.getLocation()) <= 1.0) ||
-                    playerStats.getLevel().getStartLocation().distance(player.getLocation()) <= 1.0
+                    (playerStats.hasCurrentCheckpoint() &&
+                    Utils.isNearby(playerStats.getCurrentCheckpoint(), player.getLocation(), 1.0)) ||
+                    Utils.isNearby(playerStats.getLevel().getStartLocation(), player.getLocation(), 1.0)
                 );
     }
 }

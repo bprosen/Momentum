@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.data.levels;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Location;
 
 public class LevelPreview
@@ -24,7 +25,9 @@ public class LevelPreview
 
     public boolean shouldTeleport(Location current)
     {
-        return level.getStartLocation().distance(current) > Momentum.getSettingsManager().preview_max_distance;
+        float distance = Momentum.getSettingsManager().preview_max_distance;
+
+        return !Utils.isNearby(level.getStartLocation(), current, distance);
     }
 
     public void teleport()
