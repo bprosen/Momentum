@@ -207,7 +207,7 @@ public class BlackMarketManager
                 for (PlayerStats playerStats : running.getPlayers())
                 {
                     Player player = playerStats.getPlayer();
-                    player.teleport(Momentum.getLocationManager().getSpawnLocation()); // teleport to spawn
+                    playerStats.teleport(Momentum.getLocationManager().getSpawnLocation(), false); // teleport to spawn
 
                     if (running.hasHighestBidder())
                     {
@@ -275,7 +275,7 @@ public class BlackMarketManager
                 running.addPlayer(playerStats);
                 player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_AMBIENT, 1.0F, 1.0F); // play noise
                 playerStats.sendTitle("&8&lBlack Market", "&7We will be starting soon...", 20, 100, 20); // send title
-                playerStats.getPlayer().teleport(Momentum.getLocationManager().get(Momentum.getSettingsManager().blackmarket_tp_loc));
+                playerStats.teleport(Momentum.getLocationManager().get(Momentum.getSettingsManager().blackmarket_tp_loc), true);
                 playerStats.setBlackMarket(true);
             }
         }
@@ -313,7 +313,7 @@ public class BlackMarketManager
             running.end(true);
 
             for (PlayerStats playerStats : running.getPlayers())
-                playerStats.getPlayer().teleport(Momentum.getLocationManager().getSpawnLocation()); // teleport to spawn
+                playerStats.teleport(Momentum.getLocationManager().getSpawnLocation(), false); // teleport to spawn
         }
     }
 }

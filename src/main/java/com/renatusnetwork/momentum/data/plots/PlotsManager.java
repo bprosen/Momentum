@@ -129,7 +129,7 @@ public class PlotsManager {
         // set bedrock -1 where they teleport
         creationLoc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
 
-        player.teleport(creationLoc.clone().add(0.5, 0, 0.5));
+        playerStats.teleport(creationLoc.clone().add(0.5, 0, 0.5), false);
 
         // generate next free plot location
         loadNextFreePlot(creationLoc);

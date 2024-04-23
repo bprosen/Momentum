@@ -180,7 +180,7 @@ public class JoinLeaveListener implements Listener
         {
             // if in dropper, respawn them
             if (playerStats.getLevel().isDropper())
-                player.teleport(playerStats.getLevel().getStartLocation());
+                playerStats.teleport(playerStats.getLevel().getStartLocation(), true);
 
             // run reset logic
             playerStats.resetLevel();

@@ -129,7 +129,7 @@ public class CheckpointManager {
                ) // only add a fail when no practice
                 playerStats.addFail();
 
-            playerStats.teleport(loc, false);
+            playerStats.teleport(loc, true);
 
         // if the level has a stored start loc (not spawn), tp them to it
         }
@@ -146,7 +146,7 @@ public class CheckpointManager {
                )
                 playerStats.addFail();
 
-            playerStats.teleport(loc, false);
+            playerStats.teleport(loc, true);
         }
         else
             playerStats.sendMessage(Utils.translate("&cNo location loaded to teleport you to"));

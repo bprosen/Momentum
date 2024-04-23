@@ -248,7 +248,7 @@ public class EventManager {
         else if (isMazeEvent())
             ((MazeEvent) runningEvent).respawn(player);
         else
-            player.teleport(runningEvent.getLevel().getStartLocation());
+            playerStats.teleport(runningEvent.getLevel().getStartLocation(), true);
 
         // remove active effects
         playerStats.clearPotionEffects();
@@ -291,7 +291,7 @@ public class EventManager {
         }
 
         playerStats.leftEvent();
-        player.teleport(eventParticipant.getOriginalLocation());
+        playerStats.teleport(eventParticipant.getOriginalLocation(), true);
         player.setHealth(20.0);
 
         if (isAscentEvent())

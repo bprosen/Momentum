@@ -1188,7 +1188,7 @@ public class LevelManager
 
                 setLevelInfoOnTeleport(opponentStats, opponent.getOriginalLocation());
                 opponentStats.disableLevelStartTime();
-                opponentStats.teleport(opponent.getOriginalLocation(), false);
+                opponentStats.teleport(opponent.getOriginalLocation(), true);
 
                 playerStats.endRace(race, RaceEndReason.WON);
             }
@@ -1212,7 +1212,7 @@ public class LevelManager
             setLevelInfoOnTeleport(playerStats, locationTo);
 
             // teleport
-            player.teleport(locationTo);
+            playerStats.teleport(locationTo, true);
 
             LevelLBPosition recordCompletion = level.getRecordCompletion();
 
@@ -1277,7 +1277,7 @@ public class LevelManager
 
             if (loc != null)
             {
-                playerStats.getPlayer().teleport(loc);
+                playerStats.teleport(loc, true);
                 playerStats.addFail(); // used in multiple areas
             }
         }

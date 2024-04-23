@@ -851,7 +851,7 @@ public class StatsManager {
     {
         Player player = playerStats.getPlayer();
 
-        player.teleport(playerStats.getPracticeStart());
+        playerStats.teleport(playerStats.getPracticeStart(), true);
         resetPracticeDataOnly(playerStats);
 
         if (message)
@@ -886,7 +886,7 @@ public class StatsManager {
 
         if (player.isOnline() && spectator.isOnline())
         {
-            spectator.teleport(player.getLocation());
+            spectatorStats.teleport(player.getLocation(), false);
 
             // this is done AFTER teleport to override some world changes that can happen
             if (initialSpectate)
@@ -932,7 +932,7 @@ public class StatsManager {
 
         if (loc != null)
         {
-            player.teleport(loc);
+            spectatorStats.teleport(loc, true);
             spectatorStats.sendTitle("", "&7You are no longer spectating anyone", 10, 40, 10);
             spectatorStats.resetSpectateSpawn();
 

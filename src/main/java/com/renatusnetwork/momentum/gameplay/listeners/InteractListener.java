@@ -123,7 +123,7 @@ public class InteractListener implements Listener {
                                                 }
                                                 resetConfirmMap.remove(player.getName());
 
-                                                player.teleport(level.getStartLocation());
+                                                playerStats.teleport(level.getStartLocation(), true);
                                                 playerStats.resetFails();
                                                 player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
                                             }

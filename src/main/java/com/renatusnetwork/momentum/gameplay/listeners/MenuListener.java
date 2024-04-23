@@ -92,7 +92,7 @@ public class MenuListener implements Listener
                                     plotSpawn.setPitch(player.getLocation().getPitch());
                                     plotSpawn.setYaw(player.getLocation().getYaw());
 
-                                    player.teleport(plotSpawn);
+                                    playerStats.teleport(plotSpawn, true);
                                     player.sendMessage(Utils.translate("&cYou teleported to &4" + plot.getOwnerName() + "&c's Plot"));
                                 } else {
                                     player.sendMessage(Utils.translate("&cPlot does not exist"));
