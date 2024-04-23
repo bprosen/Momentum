@@ -267,7 +267,7 @@ public class LevelListener implements Listener {
                             }
 
                             Momentum.getStatsManager().leaveLevelAndReset(playerStats, true);
-                            player.teleport(lobby);
+                            playerStats.teleport(lobby, true);
                         }
                     }
                 }

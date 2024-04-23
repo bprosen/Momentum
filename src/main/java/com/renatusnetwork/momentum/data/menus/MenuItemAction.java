@@ -168,7 +168,7 @@ public class MenuItemAction {
                 playerStats.getPlayer().closeInventory();
 
                 playerStats.setPracticeCheckpoint(location, false);
-                playerStats.teleport(location, false);
+                playerStats.teleport(location, true);
             }
         }
     }
@@ -733,7 +733,7 @@ public class MenuItemAction {
                     tpToStart = true;
 
                 if (tpToStart) {
-                    player.teleport(level.getStartLocation());
+                    playerStats.teleport(level.getStartLocation(), true);
 
                     player.sendMessage(Utils.translate("&7You were teleported to the start of " + level.getTitle()));
 

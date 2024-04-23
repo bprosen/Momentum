@@ -239,7 +239,7 @@ public class LocationManager {
         }
 
         Momentum.getStatsManager().leaveLevelAndReset(playerStats, true);
-        player.teleport(loc);
+        playerStats.teleport(loc, true);
     }
 
     public boolean equals(Location one, Location two)

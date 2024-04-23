@@ -53,13 +53,13 @@ public abstract class Infinite
         tpLoc.setPitch(getPlayer().getLocation().getPitch());
         tpLoc.setYaw(getPlayer().getLocation().getYaw());
 
-        getPlayer().teleport(tpLoc.add(0.5, 1, 0.5));
+        playerStats.teleport(tpLoc.add(0.5, 1, 0.5), true);
     }
 
     public void end()
     {
         playerStats.setInfinite(false);
-        getPlayer().teleport(getOriginalLoc()); // tp back
+        playerStats.teleport(getOriginalLoc(), true); // tp back
         clearBlocks();
     }
 

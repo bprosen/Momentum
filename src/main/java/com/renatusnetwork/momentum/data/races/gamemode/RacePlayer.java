@@ -131,7 +131,7 @@ public class RacePlayer
 
     public void resetLevelAndTeleport()
     {
-        playerStats.teleport(originalLocation, false);
+        playerStats.teleport(originalLocation, true);
         Momentum.getLevelManager().setLevelInfoOnTeleport(playerStats, originalLocation);
     }
 
@@ -166,7 +166,7 @@ public class RacePlayer
         Location raceLoc = location.clone();
         raceLoc.setYaw(player.getLocation().getYaw());
         raceLoc.setPitch(player.getLocation().getPitch());
-        player.teleport(raceLoc);
+        playerStats.teleport(raceLoc, true);
     }
 
     public PlayerStats getPlayerStats()

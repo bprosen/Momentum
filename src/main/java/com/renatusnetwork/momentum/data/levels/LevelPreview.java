@@ -32,11 +32,11 @@ public class LevelPreview
 
     public void teleport()
     {
-        playerStats.getPlayer().teleport(level.getStartLocation());
+        playerStats.teleport(level.getStartLocation(), false);
     }
 
     public void reset()
     {
-        playerStats.getPlayer().teleport(oldLocation);
+        playerStats.teleport(oldLocation, true);
     }
 }
