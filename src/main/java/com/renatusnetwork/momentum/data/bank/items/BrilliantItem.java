@@ -10,16 +10,14 @@ public class BrilliantItem extends BankItem
     {
         super(BankItemType.BRILLIANT);
         setFormattedType("&aBrilliant");
-        setMinimumLock(Momentum.getSettingsManager().brilliant_lock_minimum);
     }
 
     @Override
-    public void calcNextBid()
+    public void calcNextBid(int previous)
     {
         long total = getTotalBalance();
-        int minimum = Momentum.getSettingsManager().brilliant_minimum_bid;
-        int calculatedAmount = (int) (total + ((int) (ThreadLocalRandom.current().nextInt(8, 13) * Math.sqrt(total))));
+        int calculatedAmount = (int) (ThreadLocalRandom.current().nextDouble(19.5, 20.5) * Math.sqrt(total));
 
-        setNextBid(Math.max(calculatedAmount, minimum));
+        setNextBid(Math.max(calculatedAmount, previous));
     }
 }

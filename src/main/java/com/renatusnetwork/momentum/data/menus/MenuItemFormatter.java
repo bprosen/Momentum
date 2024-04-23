@@ -314,7 +314,7 @@ public class MenuItemFormatter
             List<String> lore = new ArrayList<>();
 
             if (bankItem.isLocked())
-                lore.add(Utils.translate("&4&lLOCKED"));
+                lore.add(Utils.translate("&4&lLOCKED &6" + TimeUtils.formatTimeWithSeconds(bankItem.getLockTimeRemaining())));
 
             lore.add("");
 
@@ -330,14 +330,15 @@ public class MenuItemFormatter
 
             int nextBid = bankItem.getNextBid();
             BankBid bankBid = playerStats.getBankBid(bankItemType);
-            int bidAmount = bankBid != null ? nextBid - bankBid.getBid() : nextBid;
 
             // next bid
             if (bankBid != null)
                 lore.add(Utils.translate("&7You have bid &6" + Utils.formatNumber(bankBid.getBid()) + " &eCoins"));
 
             lore.add(Utils.translate("&7Next bid amount is &6" + Utils.formatNumber(nextBid) + " &eCoins"));
-            lore.add(Utils.translate("&7Pay &6" + Utils.formatNumber(bidAmount) + " &eCoins &7to take"));
+
+            if (!bankItem.isCurrentHolder(playerStats))
+                lore.add(Utils.translate("&7Bid to get access for &6" + Momentum.getBankManager().calculateLockTime(playerStats, bankItemType) + " &7minutes"));
 
             itemMeta.setLore(lore);
         }

@@ -8,6 +8,7 @@ import com.renatusnetwork.momentum.data.stats.BankBid;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
+import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -129,20 +130,17 @@ public class BankManager
                         StatsManager statsManager = Momentum.getStatsManager();
                         PlayerStats holderStats = statsManager.getByName(oldHolder);
 
-                        BankBid bankBid = playerStats.getBankBid(type);
-                        int bidAmountToRemove = bankBid != null ? bidAmount - bankBid.getBid() : bidAmount;
-
                         // remove from cache
                         if (holderStats != null)
                             statsManager.removeModifier(holderStats, modifier);
                         else if (oldHolder != null)
                             StatsDB.removeModifierName(oldHolder, modifier.getName());
 
-                        Momentum.getStatsManager().removeCoins(playerStats, bidAmountToRemove); // remove coins
+                        Momentum.getStatsManager().removeCoins(playerStats, bidAmount); // remove coins
                         bankItem.setCurrentHolder(playerStats.getName()); // update current holder
-                        bankItem.addTotal(bidAmountToRemove); // update in cache
-                        bankItem.calcNextBid(); // calc next bid
-                        broadcastNewBid(playerStats, bankItem, bidAmountToRemove); // broadcast bid
+                        bankItem.addTotal(bidAmount); // update in cache
+                        bankItem.calcNextBid(bidAmount); // calc next bid
+
                         statsManager.updateBankBid(playerStats, type, bidAmount);
                         playerStats.getPlayer().playSound(playerStats.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         Utils.spawnFirework(playerStats.getPlayer().getLocation(), Color.PURPLE, Color.WHITE, true);
@@ -150,40 +148,28 @@ public class BankManager
                         // update player info
                         statsManager.addModifier(playerStats, bankItem.getModifier());
 
-                        // lock chance (has to be minimum and 10% chance)
-                        if (bankItem.getMinimumLock() < bankItem.getTotalBalance() && ThreadLocalRandom.current().nextDouble(0, 100) <= Momentum.getSettingsManager().lock_chance)
-                            lock(playerStats, bankItem);
+                        int lockTime = lock(playerStats, bankItem);
+                        broadcastNewBid(playerStats, bankItem, bidAmount, lockTime); // broadcast bid
                     }
                     else
-                    {
-                        playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot hold two bank items at once!"));
-                    }
+                        playerStats.sendMessage(Utils.translate("&cYou cannot hold two bank items at once!"));
                 }
                 else
-                {
-                    playerStats.getPlayer().sendMessage(Utils.translate("&cYou do not have enough coins to raise the bid to &6" + Utils.formatNumber(bidAmount) + " &eCoins"));
-                }
+                    playerStats.sendMessage(Utils.translate("&cYou do not have enough coins to raise the bid to &6" + Utils.formatNumber(bidAmount) + " &eCoins"));
             }
             else
-            {
-                playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot bid when it is locked!"));
-            }
+                playerStats.sendMessage(Utils.translate("&cYou cannot bid when it is locked!"));
         }
         else
-        {
-            playerStats.getPlayer().sendMessage(Utils.translate("&cYou cannot bid on yourself"));
-        }
+            playerStats.sendMessage(Utils.translate("&cYou cannot bid on yourself"));
     }
 
-    private void lock(PlayerStats playerStats, BankItem bankItem)
+    private int lock(PlayerStats playerStats, BankItem bankItem)
     {
-        // lock timer
-        bankItem.setLocked(true);
+        int lockTime = calculateLockTime(playerStats, bankItem.getType());
 
-        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
-        Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " &d&lBANK HAS LOCKED"));
-        Bukkit.broadcastMessage(Utils.translate("&c" + playerStats.getPlayer().getDisplayName() + " &7gets &d" + bankItem.getTitle() + " &7for &d" + Momentum.getSettingsManager().lock_minutes + " minutes"));
-        Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
+        // lock timer
+        bankItem.lock(lockTime);
 
         // unlock timer
         new BukkitRunnable()
@@ -195,43 +181,40 @@ public class BankManager
                 Bukkit.broadcastMessage(Utils.translate("&d&lTHE " + bankItem.getFormattedType() + " &d&lBANK HAS UNLOCKED"));
                 Bukkit.broadcastMessage(Utils.translate("&d&m----------------------------------------"));
 
-                bankItem.setLocked(false);
+                bankItem.removeLock();
             }
-        }.runTaskLater(Momentum.getPlugin(), 20 * 60 * Momentum.getSettingsManager().lock_minutes);
+        }.runTaskLater(Momentum.getPlugin(), 20L * 60 * lockTime);
+
+        return lockTime;
     }
 
-    private void broadcastNewBid(PlayerStats playerStats, BankItem item, int bidAmount)
+    private void broadcastNewBid(PlayerStats playerStats, BankItem item, int bidAmount, int lockTime)
     {
-        // only for people in spawn
-        new BukkitRunnable()
+        HashMap<String, PlayerStats> players = Momentum.getStatsManager().getPlayerStats();
+
+        // thread safety
+        synchronized (players)
         {
-            @Override
-            public void run()
+            for (PlayerStats stats : players.values())
             {
-                HashMap<String, PlayerStats> players = Momentum.getStatsManager().getPlayerStats();
+                Player player = stats.getPlayer();
+                int nextBid = item.getNextBid();
 
-                // thread safety
-                synchronized (players)
+                // only send new bank bid to people in spawn
+                player.sendMessage(Utils.translate("&d&m----------------------------------------"));
+                player.sendMessage(Utils.translate("&d&lNEW " + item.getFormattedType() + " &d&lBANK BID"));
+                player.sendMessage(Utils.translate("&4&lLOCKED &7for &6" + lockTime + " &eminutes"));
+                player.sendMessage(Utils.translate("&d" + playerStats.getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + item.getTitle()));
+
+                if (!item.isCurrentHolder(stats))
                 {
-                    for (PlayerStats stats : players.values())
-                    {
-                        Player player = stats.getPlayer();
-                        int amount = stats.getBankBidAmount(item.getType());
-                        int nextBid = amount > 0 ? item.getNextBid() - amount : item.getNextBid();
-
-                        // only send new bank bid to people in spawn
-                        player.sendMessage(Utils.translate("&d&m----------------------------------------"));
-                        player.sendMessage(Utils.translate("&d&lNEW " + item.getFormattedType() + " &d&lBANK BID"));
-                        player.sendMessage(Utils.translate("&d" + playerStats.getPlayer().getDisplayName() + " &7bid &6" + Utils.formatNumber(bidAmount) + " &eCoins &7for " + item.getTitle()));
-
-                        if (!item.isCurrentHolder(stats))
-                            player.sendMessage(Utils.translate("&7Pay &6" + Utils.formatNumber(nextBid) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getPlayer().getDisplayName()));
-
-                        player.sendMessage(Utils.translate("&d&m----------------------------------------"));
-                    }
+                    player.sendMessage("");
+                    player.sendMessage(Utils.translate("&7Bid &6" + Utils.formatNumber(nextBid) + " &eCoins &7at &c/spawn &7to overtake " + playerStats.getDisplayName()));
                 }
+
+                player.sendMessage(Utils.translate("&d&m----------------------------------------"));
             }
-        }.runTaskAsynchronously(Momentum.getPlugin());
+        }
     }
 
     public int getCurrentWeek()
@@ -326,6 +309,16 @@ public class BankManager
     public BankItem getItem(BankItemType type)
     {
         return items.get(type);
+    }
+
+    public int calculateLockTime(PlayerStats playerStats, BankItemType type)
+    {
+        BankBid bid = playerStats.getBankBid(type);
+
+        int bidAmount = bid != null ? bid.getBid() : 0;
+        int lockTime = ((int) Math.sqrt(bidAmount / 82f)) + 45;
+
+        return Math.max(Momentum.getSettingsManager().min_lock_time, Math.min(Momentum.getSettingsManager().max_lock_time, lockTime));
     }
 
     public HashMap<BankItemType, BankItem> getItems() { return items; }

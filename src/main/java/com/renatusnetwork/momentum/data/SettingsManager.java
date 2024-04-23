@@ -105,14 +105,11 @@ public class SettingsManager {
     public HashMap<Integer, ItemStack> custom_join_inventory;
     public LinkedHashMap<Integer, Float> cooldown_modifiers;
     public Calendar cooldown_calendar;
-    public int radiant_minimum_bid;
-    public int brilliant_minimum_bid;
-    public int legendary_minimum_bid;
-    public int radiant_lock_minimum;
-    public int brilliant_lock_minimum;
-    public int legendary_lock_minimum;
-    public float lock_chance;
-    public int lock_minutes;
+    public int radiant_starting_total;
+    public int brilliant_starting_total;
+    public int legendary_starting_total;
+    public int min_lock_time;
+    public int max_lock_time;
     public int jackpot_length;
     public int blackmarket_min_player_count;
     public Calendar black_market_reset_calendar;
@@ -270,16 +267,13 @@ public class SettingsManager {
         meta.setDisplayName(Utils.translate(leave_title));
         leave_item.setItemMeta(meta);
 
-        radiant_minimum_bid = settings.getInt("bank.radiant.min_starting_bid");
-        brilliant_minimum_bid = settings.getInt("bank.brilliant.min_starting_bid");
-        legendary_minimum_bid = settings.getInt("bank.legendary.min_starting_bid");
+        radiant_starting_total = settings.getInt("bank.radiant.min_starting_bid");
+        brilliant_starting_total = settings.getInt("bank.brilliant.min_starting_bid");
+        legendary_starting_total = settings.getInt("bank.legendary.min_starting_bid");
         jackpot_length = settings.getInt("bank.jackpot.length");
-        radiant_lock_minimum = settings.getInt("bank.radiant.min_lock");
-        brilliant_lock_minimum = settings.getInt("bank.brilliant.min_lock");
-        legendary_lock_minimum = settings.getInt("bank.legendary.min_lock");
+        min_lock_time = settings.getInt("bank.min_lock_time");
+        max_lock_time = settings.getInt("bank.max_lock_time");
         minimum_pay_amount = settings.getInt("minimum_pay_amount");
-        lock_chance = (float) settings.getDouble("bank.lock_chance");
-        lock_minutes = settings.getInt("bank.lock_minutes");
         black_market_reset_calendar = Calendar.getInstance();
         String day = settings.getString("blackmarket.start_time.day");
         switch (day)
