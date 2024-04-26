@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -466,5 +467,9 @@ public class Utils {
     public static boolean isNearby(Location from, Location to, double distance)
     {
         return from.distanceSquared(to) <= (distance * distance);
+    }
+
+    public static void applySlowness(Player player, int amplifier, int duration /* in ticks */) {
+        player.addPotionEffect(PotionEffectType.SLOW.createEffect(duration, amplifier));
     }
 }

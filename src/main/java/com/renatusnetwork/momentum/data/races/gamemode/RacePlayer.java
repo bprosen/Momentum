@@ -132,6 +132,7 @@ public class RacePlayer
     public void resetLevelAndTeleport()
     {
         playerStats.teleport(originalLocation, true);
+        Utils.applySlowness(playerStats.getPlayer(), 255, 20);
         Momentum.getLevelManager().setLevelInfoOnTeleport(playerStats, originalLocation);
     }
 

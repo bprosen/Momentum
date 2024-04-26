@@ -292,6 +292,7 @@ public class EventManager {
 
         playerStats.leftEvent();
         playerStats.teleport(eventParticipant.getOriginalLocation(), true);
+        Utils.applySlowness(player, 255, 20);
         player.setHealth(20.0);
 
         if (isAscentEvent())
