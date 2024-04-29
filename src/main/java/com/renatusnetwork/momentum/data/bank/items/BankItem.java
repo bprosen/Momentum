@@ -10,29 +10,28 @@ public abstract class BankItem
     private long totalBalance;
     private int nextBid;
     private String title;
-    private int minimumLock;
     private String formattedType;
     private String currentHolder;
     private String description;
     private Modifier modifier;
-    private boolean locked;
+    private long timeOfLock;
+    private int lockTime;
 
     public BankItem(BankItemType type)
     {
         this.type = type;
     }
 
-    public abstract void calcNextBid();
+    public abstract void calcNextBid(int previousBid);
 
     public void setTotalBalance(int total)
     {
         this.totalBalance = total;
-        calcNextBid();
     }
 
     public boolean isLocked()
     {
-        return locked;
+        return timeOfLock > 0;
     }
 
     public void setName(String name) { this.name = name; }
@@ -49,9 +48,21 @@ public abstract class BankItem
         this.description = description;
     }
 
-    public void setLocked(boolean isLocked)
+    public void lock(int lockTime)
     {
-        this.locked = isLocked;
+        this.timeOfLock = System.currentTimeMillis();
+        this.lockTime = lockTime;
+    }
+
+    public void removeLock()
+    {
+        this.timeOfLock = 0;
+        this.lockTime = 0;
+    }
+
+    public long getLockTimeRemaining()
+    {
+        return (timeOfLock + (lockTime * 60000L)) - System.currentTimeMillis();
     }
 
     public String getFormattedType() { return formattedType; }
@@ -59,16 +70,6 @@ public abstract class BankItem
     public String getDescription() { return description; }
 
     public Modifier getModifier() { return modifier; }
-
-    public void setMinimumLock(int minimumLock)
-    {
-        this.minimumLock = minimumLock;
-    }
-
-    public int getMinimumLock()
-    {
-        return minimumLock;
-    }
 
     public void setModifier(Modifier modifier) { this.modifier = modifier; }
 

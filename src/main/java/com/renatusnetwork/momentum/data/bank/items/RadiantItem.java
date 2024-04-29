@@ -10,16 +10,14 @@ public class RadiantItem extends BankItem
     {
         super(BankItemType.RADIANT);
         setFormattedType("&eRadiant");
-        setMinimumLock(Momentum.getSettingsManager().radiant_lock_minimum);
     }
 
     @Override
-    public void calcNextBid()
+    public void calcNextBid(int previous)
     {
         long total = getTotalBalance();
-        int minimum = Momentum.getSettingsManager().radiant_minimum_bid;
-        int calculatedAmount = (int) (total + ((int) (ThreadLocalRandom.current().nextInt(8, 13) * Math.sqrt(total))));
+        int calculatedAmount = (int) (ThreadLocalRandom.current().nextDouble(9.5, 10.5) * Math.sqrt(total));
 
-        setNextBid(Math.max(calculatedAmount, minimum));
+        setNextBid(Math.max(calculatedAmount, previous));
     }
 }

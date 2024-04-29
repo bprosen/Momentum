@@ -13,19 +13,16 @@ elo:
   default_amount: 1000
   default_tier: silver-i
 bank:
+  min_lock_time: 10 # in minutes
+  max_lock_time: 45 # in minutes
   radiant:
-    min_starting_bid: 100
-    min_lock: 10000
+    starting_total: 1000
   brilliant:
-    min_starting_bid: 1000
-    min_lock: 20000
+    starting_total: 5000
   legendary:
-    min_starting_bid: 3000
-    min_lock: 30000
+    starting_total: 15000
   jackpot:
     length: 1800 # in seconds
-  lock_chance: 0.1 # 10% chance
-  lock_minutes: 10 # 10 minute lock time
   jackpot_force_remove_permission_cmd: "lp user %player% permission unset momentum.jackpot.force" # the command it should run when a player uses /jackpot force
 minimum_pay_amount: 10
 blackmarket:

@@ -10,16 +10,14 @@ public class LegendaryItem extends BankItem
     {
         super(BankItemType.LEGENDARY);
         setFormattedType("&4Legendary");
-        setMinimumLock(Momentum.getSettingsManager().legendary_lock_minimum);
     }
 
     @Override
-    public void calcNextBid()
+    public void calcNextBid(int previous)
     {
         long total = getTotalBalance();
-        int minimum = Momentum.getSettingsManager().legendary_minimum_bid;
-        int calculatedAmount = (int) (total + ((int) (ThreadLocalRandom.current().nextInt(28, 33) * Math.sqrt(total))));
+        int calculatedAmount = (int) (ThreadLocalRandom.current().nextDouble(29.5, 30.5) * Math.sqrt(total));
 
-        setNextBid(Math.max(calculatedAmount, minimum));
+        setNextBid(Math.max(calculatedAmount, previous));
     }
 }

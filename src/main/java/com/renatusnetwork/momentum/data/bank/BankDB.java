@@ -99,6 +99,7 @@ public class BankDB
                     item.setModifier(Momentum.getModifiersManager().getModifier(itemResults.get("modifier_name")));
                     item.setCurrentHolder(getCurrentHolder(week, itemType));
                     item.setTotalBalance(getTotal(week, itemType));
+                    item.calcNextBid(-1);
                 }
 
                 items.put(itemType, item);
@@ -146,16 +147,21 @@ public class BankDB
         {
             Map<String, String> randomResult = results.get(ThreadLocalRandom.current().nextInt(results.size()));
 
+            int startingTotal = 0;
+
             switch (type)
             {
                 case RADIANT:
                     item = new RadiantItem();
+                    startingTotal = Momentum.getSettingsManager().radiant_starting_total;
                     break;
                 case BRILLIANT:
                     item = new BrilliantItem();
+                    startingTotal = Momentum.getSettingsManager().brilliant_starting_total;
                     break;
                 case LEGENDARY:
                     item = new LegendaryItem();
+                    startingTotal = Momentum.getSettingsManager().legendary_starting_total;
                     break;
             }
 
@@ -163,7 +169,8 @@ public class BankDB
             item.setTitle(randomResult.get("title"));
             item.setDescription(randomResult.get("description"));
             item.setModifier(Momentum.getModifiersManager().getModifier(randomResult.get("modifier_name")));
-            item.calcNextBid();
+            item.setTotalBalance(startingTotal);
+            item.calcNextBid(-1);
         }
 
         return item;
