@@ -444,7 +444,7 @@ public class RaceManager {
         RaceRequest raceRequest = getRequest(player1.getPlayer(), player2.getPlayer());
 
         // request exists
-        if (raceRequest != null) {
+        if (raceRequest != null && !raceRequest.getPlayer1().equals(player1)) {
 
             boolean doingBet = raceRequest.hasBet();
             double betAmount = raceRequest.getBet();
