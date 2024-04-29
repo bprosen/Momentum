@@ -139,8 +139,12 @@ public class RaceRequest
         return null;
     }
 
-    public boolean equals(PlayerStats sender, PlayerStats requester)
+    public boolean equals(PlayerStats sender, PlayerStats requested)
     {
-        return (sender.equals(getSender()) && requester.equals(getRequested())) || (sender.equals(getRequested()) && requester.equals(getSender()));
+        return (sender.equals(getSender()) && requested.equals(getRequested())) || (sender.equals(getRequested()) && requested.equals(getSender()));
+    }
+
+    public boolean isAcceptableRequest(PlayerStats sender, PlayerStats requested) {
+        return sender.equals(getRequested()) && requested.equals(getSender());
     }
 }
