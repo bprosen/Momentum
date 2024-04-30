@@ -2,7 +2,6 @@ package com.renatusnetwork.momentum.utils;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
-import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -469,7 +468,7 @@ public class Utils {
         return from.distanceSquared(to) <= (distance * distance);
     }
 
-    public static void applySlowness(Player player, int amplifier, int duration /* in ticks */) {
-        player.addPotionEffect(PotionEffectType.SLOW.createEffect(duration, amplifier));
+    public static void applySlowness(Player player   /* in ticks */) {
+        player.addPotionEffect(PotionEffectType.SLOW.createEffect(20, 255));
     }
 }

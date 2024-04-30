@@ -61,7 +61,7 @@ public abstract class Infinite
     {
         playerStats.setInfinite(false);
         playerStats.teleport(getOriginalLoc(), true); // tp back
-        Utils.applySlowness(getPlayer(), 255, 20);
+        Utils.applySlowness(getPlayer());
         clearBlocks();
     }
 
