@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.data.infinite.gamemode;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -60,6 +61,7 @@ public abstract class Infinite
     {
         playerStats.setInfinite(false);
         playerStats.teleport(getOriginalLoc(), true); // tp back
+        Utils.applySlowness(getPlayer());
         clearBlocks();
     }
 

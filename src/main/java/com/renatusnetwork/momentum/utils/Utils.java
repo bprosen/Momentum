@@ -2,7 +2,6 @@ package com.renatusnetwork.momentum.utils;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
-import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -18,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -466,5 +466,9 @@ public class Utils {
     public static boolean isNearby(Location from, Location to, double distance)
     {
         return from.distanceSquared(to) <= (distance * distance);
+    }
+
+    public static void applySlowness(Player player   /* in ticks */) {
+        player.addPotionEffect(PotionEffectType.SLOW.createEffect(20, 255));
     }
 }

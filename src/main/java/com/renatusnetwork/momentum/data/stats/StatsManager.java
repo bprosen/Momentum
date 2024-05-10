@@ -934,6 +934,7 @@ public class StatsManager {
         {
             spectatorStats.teleport(loc, true);
             spectatorStats.sendTitle("", "&7You are no longer spectating anyone", 10, 40, 10);
+            Utils.applySlowness(spectatorStats.getPlayer());
             spectatorStats.resetSpectateSpawn();
 
             Momentum.getLevelManager().regionLevelCheck(spectatorStats, loc);
