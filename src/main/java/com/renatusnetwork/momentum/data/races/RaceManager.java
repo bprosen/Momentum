@@ -74,7 +74,7 @@ public class RaceManager
 
     public void acceptRequest(PlayerStats sender, PlayerStats requested)
     {
-        RaceRequest raceRequest = getRequest(sender, requested);
+        RaceRequest raceRequest = getAcceptableRequest(sender, requested);
 
         // request exists
         if (raceRequest != null)
@@ -88,6 +88,16 @@ public class RaceManager
         for (RaceRequest raceRequest : raceRequests)
         {
             if (raceRequest.equals(sender, requested))
+                return raceRequest;
+        }
+        return null;
+    }
+
+    // returns null if the player REQUESTED for the race isn't the one actually accepting
+    public RaceRequest getAcceptableRequest(PlayerStats sender, PlayerStats requested) {
+        for (RaceRequest raceRequest : raceRequests)
+        {
+            if (raceRequest.isAcceptableRequest(sender, requested))
                 return raceRequest;
         }
         return null;
