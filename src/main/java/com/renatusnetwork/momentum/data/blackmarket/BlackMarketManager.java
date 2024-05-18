@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.data.blackmarket;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -14,7 +15,7 @@ public class BlackMarketManager
 {
     private BlackMarketEvent running;
     private boolean inPreparation;
-    private int timerCount;
+    private long startTime;
     private ArrayList<BlackMarketArtifact> artifacts;
 
     public BlackMarketManager()
@@ -22,7 +23,7 @@ public class BlackMarketManager
         inPreparation = false;
         artifacts = new ArrayList<>();
         running = null;
-        timerCount = 0;
+        startTime = 0;
 
         load();
         runScheduler();
@@ -66,7 +67,8 @@ public class BlackMarketManager
             running = new BlackMarketEvent(artifacts.get(ThreadLocalRandom.current().nextInt(artifacts.size())));
 
             inPreparation = true;
-            timerCount = 5;
+
+            startTime = System.currentTimeMillis();
 
             String prefix = Momentum.getSettingsManager().blackmarket_message_prefix;
 
@@ -92,6 +94,8 @@ public class BlackMarketManager
             // begin timer before starting event
             new BukkitRunnable()
             {
+                int timerCount = 5;
+
                 @Override
                 public void run()
                 {
@@ -116,7 +120,8 @@ public class BlackMarketManager
                             Bukkit.broadcastMessage(Utils.translate("&c(Not enough players, need " + Momentum.getSettingsManager().blackmarket_min_player_count + ")"));
                             Bukkit.broadcastMessage(Utils.translate("&8&m-------------------------------"));
 
-                            running = null; // event shouldnt continue if there arent enough players
+                            running.end(true);
+                            runEndingSchedulers(true);
                         }
                     }
                     else
@@ -209,9 +214,6 @@ public class BlackMarketManager
 
     private void runEndingSchedulers(boolean forceEnded)
     {
-        timerCount = 0;
-        inPreparation = false;
-
         new BukkitRunnable()
         {
             @Override
@@ -314,8 +316,15 @@ public class BlackMarketManager
 
     public boolean isRunning() { return running != null; }
     public boolean isInPreparation() { return inPreparation; }
-    public int getTimeBeforeStart() { return timerCount + 1; } // +1 cuz 3:59 isnt 3 minutes left
     public BlackMarketEvent getRunningEvent() { return running; }
+
+    // check if running before calling
+    public long getTimeBeforeStart() {
+        long time = System.currentTimeMillis();
+        long difference = 300000 - (time - startTime); // 300000 ms = 5 minutes
+
+        return difference > 0 ? difference : -1;
+    }
 
     public void shutdown()
     {

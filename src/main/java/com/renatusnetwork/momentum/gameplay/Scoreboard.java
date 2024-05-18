@@ -90,7 +90,7 @@ public class Scoreboard {
                 // display time left until blackmarket starts for those waiting inside
                 if (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket()) {
                     board.add(Utils.translate("&7"));
-                    board.add(Utils.translate("  &e&o" + blackMarketManager.getTimeBeforeStart() + " minute(s) remaining..."));
+                    board.add(Utils.translate("  &e&o" + TimeUtils.formatTimeWithSeconds(blackMarketManager.getTimeBeforeStart()) + " remaining"));
                     board.add(Utils.translate("&7"));
                 }
                 // add bidding section
