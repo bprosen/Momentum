@@ -65,9 +65,7 @@ public class BlackMarketManager
         if (!isRunning())
         {
             running = new BlackMarketEvent(artifacts.get(ThreadLocalRandom.current().nextInt(artifacts.size())));
-
             inPreparation = true;
-
             startTime = System.currentTimeMillis();
 
             String prefix = Momentum.getSettingsManager().blackmarket_message_prefix;

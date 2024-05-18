@@ -80,7 +80,6 @@ public class Scoreboard {
 
             if (playerStats.isInBlackMarket() && blackMarketManager.isRunning())
             {
-                String timeUntilStart = TimeUtils.formatTimeWithSeconds(blackMarketManager.getTimeBeforeStart());
                 playerStats.getBoard().updateTitle(Utils.translate("&8&lBlack Market"/* + (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket() ? " &7in " + timeUntilStart : "")*/));
 
                 board.add(Utils.translate("&7"));
