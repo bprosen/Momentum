@@ -80,7 +80,7 @@ public class Scoreboard {
 
             if (playerStats.isInBlackMarket() && blackMarketManager.isRunning())
             {
-                playerStats.getBoard().updateTitle(Utils.translate("&8&lBlack Market"/* + (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket() ? " &7in " + timeUntilStart : "")*/));
+                playerStats.getBoard().updateTitle(Utils.translate("&8&lBlack Market"));
 
                 board.add(Utils.translate("&7"));
                 board.add(Utils.translate("  &8&lCoins &7" + Utils.formatNumber(playerStats.getCoins())));
