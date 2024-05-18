@@ -80,21 +80,16 @@ public class Scoreboard {
 
             if (playerStats.isInBlackMarket() && blackMarketManager.isRunning())
             {
-                playerStats.getBoard().updateTitle(Utils.translate("&8&lBlack Market"));
+                String timeUntilStart = TimeUtils.formatTimeWithSeconds(blackMarketManager.getTimeBeforeStart());
+                playerStats.getBoard().updateTitle(Utils.translate("&8&lBlack Market"/* + (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket() ? " &7in " + timeUntilStart : "")*/));
 
                 board.add(Utils.translate("&7"));
                 board.add(Utils.translate("  &8&lCoins &7" + Utils.formatNumber(playerStats.getCoins())));
 
                 BlackMarketEvent blackMarketEvent = blackMarketManager.getRunningEvent();
 
-                // display time left until blackmarket starts for those waiting inside
-                if (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket()) {
-                    board.add(Utils.translate("&7"));
-                    board.add(Utils.translate("  &e&o" + TimeUtils.formatTimeWithSeconds(blackMarketManager.getTimeBeforeStart()) + " remaining"));
-                    board.add(Utils.translate("&7"));
-                }
                 // add bidding section
-                else if (blackMarketEvent.isBiddingAllowed())
+                if (blackMarketEvent.isBiddingAllowed())
                 {
                     if (blackMarketEvent.hasHighestBidder())
                     {
@@ -109,6 +104,13 @@ public class Scoreboard {
                 board.add(Utils.translate("  &8&lPlaying &7" + Utils.formatNumber(blackMarketEvent.getPlayerCount())));
 
                 board.add(Utils.translate("&7"));
+
+                // display time left until blackmarket starts for those waiting inside
+                if (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket()) {
+                    board.add(Utils.translate("  &7&oStarts in " + TimeUtils.formatTimeWithSeconds(blackMarketManager.getTimeBeforeStart())));
+                    board.add(Utils.translate("&7"));
+                }
+
                 board.add(formatSpacing(Utils.translate("&crenatus.cc")));
             }
             else

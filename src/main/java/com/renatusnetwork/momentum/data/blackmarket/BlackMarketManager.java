@@ -214,6 +214,9 @@ public class BlackMarketManager
 
     private void runEndingSchedulers(boolean forceEnded)
     {
+        startTime = 0;
+        inPreparation = false;
+
         new BukkitRunnable()
         {
             @Override
@@ -320,10 +323,7 @@ public class BlackMarketManager
 
     // check if running before calling
     public long getTimeBeforeStart() {
-        long time = System.currentTimeMillis();
-        long difference = 300000 - (time - startTime); // 300000 ms = 5 minutes
-
-        return difference > 0 ? difference : -1;
+        return Math.max(300000 - (System.currentTimeMillis() - startTime), 0); // 300000 ms = 5 minutes
     }
 
     public void shutdown()
