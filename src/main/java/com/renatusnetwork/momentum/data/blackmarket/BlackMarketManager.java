@@ -13,14 +13,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlackMarketManager
 {
     private BlackMarketEvent running;
-    private boolean inPreperation;
+    private boolean inPreparation;
+    private int timerCount;
     private ArrayList<BlackMarketArtifact> artifacts;
 
     public BlackMarketManager()
     {
-        inPreperation = false;
+        inPreparation = false;
         artifacts = new ArrayList<>();
         running = null;
+        timerCount = 0;
 
         load();
         runScheduler();
@@ -63,7 +65,8 @@ public class BlackMarketManager
         {
             running = new BlackMarketEvent(artifacts.get(ThreadLocalRandom.current().nextInt(artifacts.size())));
 
-            inPreperation = true;
+            inPreparation = true;
+            timerCount = 5;
 
             String prefix = Momentum.getSettingsManager().blackmarket_message_prefix;
 
@@ -89,8 +92,6 @@ public class BlackMarketManager
             // begin timer before starting event
             new BukkitRunnable()
             {
-                int timerCount = 5;
-
                 @Override
                 public void run()
                 {
@@ -99,7 +100,7 @@ public class BlackMarketManager
                     else if (timerCount == 0)
                     {
                         cancel();
-                        inPreperation = false;
+                        inPreparation = false;
 
                         // only start if met the minimum
                         if (running.getPlayerCount() >= Momentum.getSettingsManager().blackmarket_min_player_count)
@@ -208,6 +209,9 @@ public class BlackMarketManager
 
     private void runEndingSchedulers(boolean forceEnded)
     {
+        timerCount = 0;
+        inPreparation = false;
+
         new BukkitRunnable()
         {
             @Override
@@ -274,7 +278,7 @@ public class BlackMarketManager
         if (isRunning())
         {
             // if the event is still waiting for players
-            if (!inPreperation)
+            if (!inPreparation)
             {
                 player.sendMessage(Utils.translate(Momentum.getSettingsManager().blackmarket_message_prefix + " &8You're too late... the risk is too high to take you in."));
                 player.sendMessage(Utils.translate(Momentum.getSettingsManager().blackmarket_message_prefix + " &cCome early next time."));
@@ -308,11 +312,9 @@ public class BlackMarketManager
             player.sendMessage(Utils.translate(Momentum.getSettingsManager().blackmarket_message_prefix + " &cYou have missed the opportunity of a lifetime."));
     }
 
-    public boolean isRunning()
-    {
-        return running != null;
-    }
-
+    public boolean isRunning() { return running != null; }
+    public boolean isInPreparation() { return inPreparation; }
+    public int getTimeBeforeStart() { return timerCount + 1; } // +1 cuz 3:59 isnt 3 minutes left
     public BlackMarketEvent getRunningEvent() { return running; }
 
     public void shutdown()

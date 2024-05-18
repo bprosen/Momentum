@@ -87,8 +87,14 @@ public class Scoreboard {
 
                 BlackMarketEvent blackMarketEvent = blackMarketManager.getRunningEvent();
 
+                // display time left until blackmarket starts for those waiting inside
+                if (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket()) {
+                    board.add(Utils.translate("&7"));
+                    board.add(Utils.translate("  &e&o" + blackMarketManager.getTimeBeforeStart() + " minute(s) remaining..."));
+                    board.add(Utils.translate("&7"));
+                }
                 // add bidding section
-                if (blackMarketEvent.isBiddingAllowed())
+                else if (blackMarketEvent.isBiddingAllowed())
                 {
                     if (blackMarketEvent.hasHighestBidder())
                     {
