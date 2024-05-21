@@ -321,7 +321,7 @@ public class BlackMarketManager
 
     // check if running before calling
     public long getTimeBeforeStart() {
-        return Math.max(300000 - (System.currentTimeMillis() - startTime), 0); // 300000 ms = 5 minutes
+        return startTime + 300000 - System.currentTimeMillis(); // 300000 ms = 5 minutes
     }
 
     public void shutdown()
