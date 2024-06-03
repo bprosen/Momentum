@@ -34,18 +34,13 @@ public class BlackMarketCMD implements CommandExecutor
         }
         else if (a.length == 1 && a[0].equalsIgnoreCase("start"))
         {
-            if (!blackMarketManager.isRunning())
-                Momentum.getBlackMarketManager().start();
-            else
+            if (!Momentum.getBlackMarketManager().start())
                 sender.sendMessage(Utils.translate("&cThe Black Market is currently running. Do &4/blackmarket end &cto stop"));
         }
         else if (a.length == 1 && a[0].equalsIgnoreCase("end"))
         {
-            if (blackMarketManager.isRunning())
-            {
-                Momentum.getBlackMarketManager().forceEnd();
+            if (Momentum.getBlackMarketManager().forceEnd())
                 sender.sendMessage(Utils.translate("&7You successfully force ended the &8&lBlack Market"));
-            }
             else
                 sender.sendMessage(Utils.translate("&cThe Black Market is not currently running. Do &4/blackmarket start &cto start"));
         }

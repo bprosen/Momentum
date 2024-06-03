@@ -103,6 +103,13 @@ public class Scoreboard {
                 board.add(Utils.translate("  &8&lPlaying &7" + Utils.formatNumber(blackMarketEvent.getPlayerCount())));
 
                 board.add(Utils.translate("&7"));
+
+                // display time left until blackmarket starts for those waiting inside
+                if (blackMarketManager.isInPreparation() && playerStats.isInBlackMarket()) {
+                    board.add(Utils.translate("  &7&oStarts in " + TimeUtils.formatTimeWithSeconds(blackMarketManager.getTimeBeforeStart())));
+                    board.add(Utils.translate("&7"));
+                }
+
                 board.add(formatSpacing(Utils.translate("&crenatus.cc")));
             }
             else

@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.data.blackmarket;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -13,14 +14,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlackMarketManager
 {
     private BlackMarketEvent running;
-    private boolean inPreperation;
+    private boolean inPreparation;
+    private long startTime;
     private ArrayList<BlackMarketArtifact> artifacts;
 
     public BlackMarketManager()
     {
-        inPreperation = false;
+        inPreparation = false;
         artifacts = new ArrayList<>();
         running = null;
+        startTime = 0;
 
         load();
         runScheduler();
@@ -57,13 +60,13 @@ public class BlackMarketManager
             }
         }.runTaskTimerAsynchronously(Momentum.getPlugin(), 20 * 60 * 60, 20 * 60 * 60); // check every hour
     }
-    public void start()
+    public boolean start()
     {
         if (!isRunning())
         {
             running = new BlackMarketEvent(artifacts.get(ThreadLocalRandom.current().nextInt(artifacts.size())));
-
-            inPreperation = true;
+            inPreparation = true;
+            startTime = System.currentTimeMillis();
 
             String prefix = Momentum.getSettingsManager().blackmarket_message_prefix;
 
@@ -99,7 +102,7 @@ public class BlackMarketManager
                     else if (timerCount == 0)
                     {
                         cancel();
-                        inPreperation = false;
+                        inPreparation = false;
 
                         // only start if met the minimum
                         if (running.getPlayerCount() >= Momentum.getSettingsManager().blackmarket_min_player_count)
@@ -114,6 +117,9 @@ public class BlackMarketManager
                             Bukkit.broadcastMessage(Utils.translate("&8There isn't enough competition."));
                             Bukkit.broadcastMessage(Utils.translate("&c(Not enough players, need " + Momentum.getSettingsManager().blackmarket_min_player_count + ")"));
                             Bukkit.broadcastMessage(Utils.translate("&8&m-------------------------------"));
+
+                            running.end(true);
+                            runEndingSchedulers(true);
                         }
                     }
                     else
@@ -150,14 +156,16 @@ public class BlackMarketManager
                     }
                 }
             }.runTaskTimer(Momentum.getPlugin(), 0, 20 * 60);
+            return true;
         }
         else
         {
             Momentum.getPluginLogger().info("Tried to start a Black Market event with one in-progress");
+            return false;
         }
     }
 
-    public void end()
+    public boolean end()
     {
         if (isRunning())
         {
@@ -177,47 +185,55 @@ public class BlackMarketManager
 
             running.end(false);
             runEndingSchedulers(false);
+
+            return true;
         }
         else
         {
             Momentum.getPluginLogger().info("Tried to end a Black Market event with none in-progress");
+            return false;
         }
     }
 
-    public void forceEnd()
+    public boolean forceEnd()
     {
         if (isRunning())
         {
             running.end(true);
             runEndingSchedulers(true);
+            return true;
         }
         else
         {
             Momentum.getPluginLogger().info("Tried to force end a Black Market event with none in-progress");
+            return false;
         }
     }
 
     private void runEndingSchedulers(boolean forceEnded)
     {
+        startTime = 0;
+        inPreparation = false;
+
         new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                for (PlayerStats playerStats : running.getPlayers())
-                {
-                    Player player = playerStats.getPlayer();
-                    playerStats.teleport(Momentum.getLocationManager().getSpawnLocation(), false); // teleport to spawn
+                if (isRunning()) { // prevent clashing "/blackmarket end" in case cmd executed multiple times before 10 seconds
+                    for (PlayerStats playerStats : running.getPlayers()) {
+                        Player player = playerStats.getPlayer();
+                        playerStats.teleport(Momentum.getLocationManager().getSpawnLocation(), false); // teleport to spawn
 
-                    if (running.hasHighestBidder())
-                    {
-                        String display = running.getHighestBidder().getPlayer().getDisplayName();
-                        playerStats.sendTitle("&8&lBlack Market", "&c" + display + " &7won!", 10, 20, 20);
-                        player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F);
+                        if (running.hasHighestBidder()) {
+                            String display = running.getHighestBidder().getPlayer().getDisplayName();
+                            playerStats.sendTitle("&8&lBlack Market", "&c" + display + " &7won!", 10, 20, 20);
+                            player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F);
+                        }
+                        playerStats.setBlackMarket(false);
                     }
-                    playerStats.setBlackMarket(false);
+                    running = null;
                 }
-                running = null;
             }
         }.runTaskLater(Momentum.getPlugin(), 10 * 20); // teleport them all 10 seconds later
 
@@ -265,7 +281,7 @@ public class BlackMarketManager
         if (isRunning())
         {
             // if the event is still waiting for players
-            if (!inPreperation)
+            if (!inPreparation)
             {
                 player.sendMessage(Utils.translate(Momentum.getSettingsManager().blackmarket_message_prefix + " &8You're too late... the risk is too high to take you in."));
                 player.sendMessage(Utils.translate(Momentum.getSettingsManager().blackmarket_message_prefix + " &cCome early next time."));
@@ -299,12 +315,14 @@ public class BlackMarketManager
             player.sendMessage(Utils.translate(Momentum.getSettingsManager().blackmarket_message_prefix + " &cYou have missed the opportunity of a lifetime."));
     }
 
-    public boolean isRunning()
-    {
-        return running != null;
-    }
-
+    public boolean isRunning() { return running != null; }
+    public boolean isInPreparation() { return inPreparation; }
     public BlackMarketEvent getRunningEvent() { return running; }
+
+    // check if running before calling
+    public long getTimeBeforeStart() {
+        return startTime + 300000 - System.currentTimeMillis(); // 300000 ms = 5 minutes
+    }
 
     public void shutdown()
     {
