@@ -71,7 +71,7 @@ public class CmdSignsDB {
 		);
 	}
 
-	public static boolean hasCommandSign(String world, double x, double y, double z) {
+	public static boolean commandSignExists(String world, double x, double y, double z) {
 		Map<String, String> result = DatabaseQueries.getResult(
 				DatabaseManager.COMMAND_SIGNS,
 				"*",
@@ -106,8 +106,6 @@ public class CmdSignsDB {
 				world, x, y, z
 		);
 
-		if (!result.isEmpty())
-			return result.get("sign_id");
-		return null;
+		return result.getOrDefault("sign_id", null);
 	}
 }

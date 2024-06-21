@@ -4,6 +4,7 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,7 +64,7 @@ public class CommandSignCMD implements CommandExecutor {
 
 			if (csignManager.commandSignExists(signID)) {
 				sender.sendMessage(Utils.translate("&cCommand sign already exists with that id"));
-			} else if (csignManager.commandSignExists(player.getWorld(), x, y, z)) {
+			} else if (csignManager.commandSignExists(csignManager.getSignIDFromLocation(new Location(player.getWorld(), x, y, z)))) {
 				sender.sendMessage(Utils.translate("&cCommand sign already exists at that location"));
 			} else {
 				String cmd = String.join(" ", Arrays.copyOfRange(args, 5, args.length));

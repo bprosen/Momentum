@@ -40,10 +40,6 @@ public class CommandSignManager {
 		return cmdSigns.containsKey(signID);
 	}
 
-	public boolean commandSignExists(World world, double x, double y, double z) {
-		return CmdSignsDB.hasCommandSign(world.getName(), x, y, z);
-	}
-
 	public String getSignCommand(String signID) {
 		return cmdSigns.get(signID);
 	}
