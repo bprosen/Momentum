@@ -181,6 +181,7 @@ public class Momentum extends JavaPlugin {
         getCommand("hotbar").setExecutor(new HotbarCMD());
         getCommand("elotier").setExecutor(new ELOTierCMD());
         getCommand("bank").setExecutor(new BankCMD());
+        getCommand("commandsign").setExecutor(new CommandSignCMD());
     }
 
     private static void load()

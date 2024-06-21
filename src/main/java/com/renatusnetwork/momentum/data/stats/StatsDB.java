@@ -13,8 +13,9 @@ import com.renatusnetwork.momentum.data.modifiers.ModifierType;
 import com.renatusnetwork.momentum.data.ranks.Rank;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.World;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -616,5 +617,56 @@ public class StatsDB
                 "INSERT INTO " + DatabaseManager.BANK_BIDS + " (week,uuid,bank_item_type,total_bid,last_bid_date) VALUES(?,?,?,?,?)",
                 week, uuid, type.name(), totalBid, lastBidDateMillis
         );
+    }
+
+    public static void loadObtainedCommandSigns(PlayerStats playerStats) {
+        List<Map<String, String>> results = DatabaseQueries.getResults(
+                DatabaseManager.COMMAND_SIGNS + " a",
+                "a.*",
+                "INNER JOIN " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " b " +
+                        "ON a.world = b.world AND a.x = b.x AND a.y = b.y AND a.z = b.z " +
+                        "WHERE b.uuid = ?",
+                playerStats.getUUID()
+        );
+
+        for (Map<String, String> result : results) {
+            playerStats.obtainCommandSign(Bukkit.getWorld(result.get("world")), Double.parseDouble(result.get("x")), Double.parseDouble(result.get("y")), Double.parseDouble(result.get("z")));
+        }
+    }
+
+    public static void insertCommandSign(String command, String world, double x, double y, double z) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.COMMAND_SIGNS + " VALUES (?, ?, ?, ?)",
+                command, world, x, y, z
+        );
+    }
+
+    public static void deleteCommandSign(String world, double x, double y, double z) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS + " WHERE world = ? AND x = ? AND y = ? AND z = ?",
+                world, x, y, z
+        );
+    }
+
+    public static boolean hasCommandSign(String world, double x, double y, double z) {
+        Map<String, String> result = DatabaseQueries.getResult(
+                DatabaseManager.COMMAND_SIGNS,
+                "*",
+                "WHERE world = ? AND x = ? AND y = ? AND z = ?",
+                world, x, y, z
+        );
+
+        return !result.isEmpty();
+    }
+
+    public static String getSignCommand(String world, double x, double y, double z) {
+        Map<String, String> result = DatabaseQueries.getResult(
+                DatabaseManager.COMMAND_SIGNS,
+                "command",
+                "WHERE world = ? AND x = ? AND y = ? AND z = ?",
+                world, x, y, z
+        );
+
+        return result.get("command");
     }
 }

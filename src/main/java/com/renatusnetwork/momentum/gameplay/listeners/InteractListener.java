@@ -4,9 +4,11 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,20 +29,17 @@ public class InteractListener implements Listener {
     private HashMap<String, BukkitTask> resetConfirmMap = new HashMap<>();
     private HashMap<String, BukkitTask> spawnConfirmMap = new HashMap<>();
 
-    @EventHandler (priority = EventPriority.LOWEST)
-    public void onInteract(PlayerInteractEvent event)
-    {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
         if (event.getHand() == EquipmentSlot.HAND &&
-           (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR))
-        {
+                (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
             // this is in case they try to click a trapdoor, door or something openable if they're in spectator
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK &&
-                event.getClickedBlock() != null &&
-                event.getClickedBlock().getState().getData() instanceof Openable &&
-                Momentum.getStatsManager().get(player).isSpectating())
-            {
+                    event.getClickedBlock() != null &&
+                    event.getClickedBlock().getState().getData() instanceof Openable &&
+                    Momentum.getStatsManager().get(player).isSpectating()) {
                 event.setCancelled(true);
                 return;
             }
@@ -51,31 +50,24 @@ public class InteractListener implements Listener {
             if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null)
                 return;
 
-            if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&7Players »")))
-            {
+            if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&7Players »"))) {
                 event.setCancelled(true);
 
                 if (statsManager.containsHiddenPlayer(player))
                     statsManager.togglePlayerHiderOff(player, player.getInventory().getHeldItemSlot(), true);
                 else
                     statsManager.togglePlayerHiderOn(player, player.getInventory().getHeldItemSlot(), true);
-            }
-            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint")))
-            {
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
                 Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
-            }
-            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile")))
-            {
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&aYour Profile"))) {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
                 if (playerStats != null && playerStats.isLoaded())
                     Momentum.getMenuManager().openInventory(playerStats, "profile", true);
-            }
-            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset")))
-            {
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
                 Level level = playerStats.getLevel();
@@ -133,8 +125,7 @@ public class InteractListener implements Listener {
                                     } else {
                                         player.sendMessage(Utils.translate("&cYou are not in a level"));
                                     }
-                                }
-                                else
+                                } else
                                     player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
@@ -145,48 +136,35 @@ public class InteractListener implements Listener {
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
                     }
-                }
-                else
-                {
+                } else {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
                 }
-            }
-            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Momentum.getSettingsManager().prac_title)))
-            {
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Momentum.getSettingsManager().prac_title))) {
                 event.setCancelled(true);
                 Momentum.getCheckpointManager().teleportToPracticeCheckpoint(Momentum.getStatsManager().get(player));
-            }
-            else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Momentum.getSettingsManager().leave_title)))
-            {
-                if (Momentum.getStatsManager().get(player).isLoaded())
-                {
+            } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate(Momentum.getSettingsManager().leave_title))) {
+                if (Momentum.getStatsManager().get(player).isLoaded()) {
                     event.setCancelled(true);
 
-                    if (!spawnConfirmMap.containsKey(player.getName()))
-                    {
+                    if (!spawnConfirmMap.containsKey(player.getName())) {
                         // otherwise, put them in and ask them to confirm within 5 seconds
                         player.sendMessage(Utils.translate("&cAre you sure you want to leave? Right click again to confirm"));
-                        spawnConfirmMap.put(player.getName(), new BukkitRunnable()
-                        {
+                        spawnConfirmMap.put(player.getName(), new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (spawnConfirmMap.containsKey(player.getName()))
-                                {
+                                if (spawnConfirmMap.containsKey(player.getName())) {
                                     spawnConfirmMap.remove(player.getName());
                                     player.sendMessage(Utils.translate("&cYou did not confirm in time"));
                                 }
                             }
                         }.runTaskLater(Momentum.getPlugin(), 20 * 5));
-                    }
-                    else
-                    {
+                    } else {
                         spawnConfirmMap.get(player.getName()).cancel();
                         spawnConfirmMap.remove(player.getName());
 
                         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-                        if (playerStats.inRace())
-                        {
+                        if (playerStats.inRace()) {
                             String forfeitMessage = "&cYou forfeit the race, giving a loss, taking elo";
 
                             if (playerStats.getRace().hasBet())
@@ -194,14 +172,29 @@ public class InteractListener implements Listener {
 
                             playerStats.sendMessage(Utils.translate(forfeitMessage));
                             playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
-                        }
-                        else
+                        } else
                             Momentum.getLocationManager().teleportToSpawn(playerStats, player);
                     }
-                }
-                else
+                } else
                     player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onSignClick(PlayerInteractEvent event) {
+        if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
+                && event.getClickedBlock().getType().equals(Material.WALL_SIGN)
+                && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+            // return if gamemode 0, opped and left clicked
+            Player player = event.getPlayer();
+            if (player.isOp() && player.getGameMode() == GameMode.CREATIVE && event.getAction().equals(Action.LEFT_CLICK_BLOCK))
+                return;
+
+            Location location = event.getClickedBlock().getLocation();
+            PlayerStats playerStats = Momentum.getStatsManager().get(player);
+            if (StatsDB.hasCommandSign(location.getWorld().getName(), location.getX(), location.getY(), location.getZ()) && !playerStats.hasCommandSign(location))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), StatsDB.getSignCommand(location.getWorld().getName(), location.getX(), location.getY(), location.getZ()));
         }
     }
 }

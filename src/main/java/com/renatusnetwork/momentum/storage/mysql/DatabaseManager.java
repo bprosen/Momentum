@@ -40,6 +40,8 @@ public class DatabaseManager {
     public static final String BANK_ITEMS = "bank_items";
     public static final String BANK_WEEKS = "bank_weeks";
     public static final String BANK_BIDS = "bank_bids";
+    public static final String COMMAND_SIGNS = "command_signs";
+    public static final String OBTAINED_COMMAND_SIGNS = "obtained_command_signs";
 
     public DatabaseManager(Plugin plugin)
     {

@@ -22,6 +22,7 @@ import com.renatusnetwork.momentum.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -90,6 +91,7 @@ public class PlayerStats
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
     private HashMap<BankItemType, BankBid> bids;
     private ArrayList<Level> favoriteLevels;
+    private Set<Location> obtainedCommandSigns;
 
     public PlayerStats(Player player)
     {
@@ -110,6 +112,7 @@ public class PlayerStats
         this.bids = new HashMap<>();
         this.favoriteLevels = new ArrayList<>();
         this.practiceHistory = new ArrayList<>();
+        this.obtainedCommandSigns = new HashSet<>();
 
         // default for now, if they are not a new player the mysql db loading will adjust these
         this.infiniteBlock = Momentum.getSettingsManager().infinite_default_block;
@@ -1143,6 +1146,18 @@ public class PlayerStats
     public void addBankBid(BankItemType type, int bid, long lastBidDateMillis)
     {
         bids.put(type, new BankBid(bid, lastBidDateMillis));
+    }
+
+    public void obtainCommandSign(World world, double x, double y, double z) {
+        this.obtainedCommandSigns.add(new Location(world, x, y, z));
+    }
+
+    public void unobtainCommandSign(World world, double x, double y, double z) {
+        this.obtainedCommandSigns.remove(new Location(world, x, y, z));
+    }
+
+    public boolean hasCommandSign(Location location) {
+        return this.obtainedCommandSigns.contains(location);
     }
 
     //
