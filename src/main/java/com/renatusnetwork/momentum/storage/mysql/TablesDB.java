@@ -971,12 +971,14 @@ public class TablesDB
     private static void createCommandSigns() {
         String query =
                 "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS + "(" +
+                    "sign_id VARCHAR(20) NOT NULL, " +
                     "command VARCHAR(100), " +
                     "world VARCHAR(30) NOT NULL, " +
                     "x DOUBLE NOT NULL, " +
                     "y DOUBLE NOT NULL, " +
                     "z DOUBLE NOT NULL, " +
-                    "PRIMARY KEY (world, x, y, z)" +
+                    "PRIMARY KEY (sign_id), " +
+                    "INDEX location_index (world, x, y, z)" +
                 ")";
 
         DatabaseQueries.runQuery(query);
@@ -986,10 +988,7 @@ public class TablesDB
         String query =
                 "CREATE TABLE " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "(" +
                     "uuid CHAR(36) NOT NULL, " +
-                    "world VARCHAR(30) NOT NULL, " +
-                    "x DOUBLE NOT NULL, " +
-                    "y DOUBLE NOT NULL, " +
-                    "z DOUBLE NOT NULL" +
+                    "sign_id VARCHAR(20) NOT NULL" +
                 ")";
 
         DatabaseQueries.runQuery(query);
@@ -1001,8 +1000,8 @@ public class TablesDB
                 "FOREIGN KEY (uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + " (uuid) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE, " +
-                "ADD CONSTRAINT " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "_location_fk " +
-                "FOREIGN KEY (world, x, y, z) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (world, x, y, z) " +
+                "ADD CONSTRAINT " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "_sign_id_fk " +
+                "FOREIGN KEY (sign_id) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (sign_id) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";
 

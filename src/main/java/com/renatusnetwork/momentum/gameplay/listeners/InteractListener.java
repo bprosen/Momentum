@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.gameplay.listeners;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
@@ -191,10 +192,14 @@ public class InteractListener implements Listener {
             if (player.isOp() && player.getGameMode() == GameMode.CREATIVE && event.getAction().equals(Action.LEFT_CLICK_BLOCK))
                 return;
 
-            Location location = event.getClickedBlock().getLocation();
+            CommandSignManager csignManager = Momentum.getCommandSignManager();
+            String signID = csignManager.getSignIDFromLocation(event.getClickedBlock().getLocation());
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
-            if (StatsDB.hasCommandSign(location.getWorld().getName(), location.getX(), location.getY(), location.getZ()) && !playerStats.hasCommandSign(location))
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), StatsDB.getSignCommand(location.getWorld().getName(), location.getX(), location.getY(), location.getZ()));
+
+            if (signID != null && !csignManager.hasCommandSign(playerStats, signID)) {
+                csignManager.obtainCommandSign(playerStats, signID);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), csignManager.getSignCommand(signID));
+            }
         }
     }
 }

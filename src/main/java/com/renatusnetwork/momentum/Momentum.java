@@ -7,6 +7,7 @@ import com.renatusnetwork.momentum.data.bank.BankManager;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointManager;
+import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
 import com.renatusnetwork.momentum.data.infinite.InfiniteManager;
 import com.renatusnetwork.momentum.data.levels.CompletionsDB;
@@ -66,6 +67,7 @@ public class Momentum extends JavaPlugin {
     private static ModifiersManager modifiers;
     private static Placeholders placeholders;
     private static ELOTiersManager eloTiers;
+    private static CommandSignManager cmdSigns;
     private static ViaAPI viaVersion;
 
     @Override
@@ -224,6 +226,7 @@ public class Momentum extends JavaPlugin {
         modifiers.load();
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
+        cmdSigns = new CommandSignManager();
         viaVersion = Via.getAPI();
     }
 
@@ -287,6 +290,7 @@ public class Momentum extends JavaPlugin {
     public static BlackMarketManager getBlackMarketManager() { return blackmarket; }
     public static ModifiersManager getModifiersManager() { return modifiers; }
     public static ELOTiersManager getELOTiersManager() { return eloTiers; }
+    public static CommandSignManager getCommandSignManager() { return cmdSigns; }
 
     public static ViaAPI getViaVersion() { return  viaVersion; }
 }

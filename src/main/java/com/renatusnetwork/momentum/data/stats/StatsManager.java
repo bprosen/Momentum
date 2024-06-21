@@ -5,6 +5,7 @@ import com.renatusnetwork.momentum.api.GGRewardEvent;
 import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.momentum.data.clans.Clan;
+import com.renatusnetwork.momentum.data.cmdsigns.CmdSignsDB;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
@@ -113,7 +114,6 @@ public class StatsManager {
         StatsDB.loadModifiers(playerStats);
         StatsDB.loadBoughtPerks(playerStats);
         loadRestOfPerks(playerStats);
-        StatsDB.loadObtainedCommandSigns(playerStats);
 
         // if loading lb, cant calculate records normally, get from db
         if (Momentum.getLevelManager().isLoadingLeaderboards())
