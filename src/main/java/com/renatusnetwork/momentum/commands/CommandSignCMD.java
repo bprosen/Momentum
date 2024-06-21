@@ -91,8 +91,9 @@ public class CommandSignCMD implements CommandExecutor {
 		sender.sendMessage(Utils.translate("&7-- Help --"));
 		sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this menu"));
 		sender.sendMessage(Utils.translate("&a/commandsign list  &7Shows list of all command signs"));
-		sender.sendMessage(Utils.translate("&a/commandsign create <x> <y> <z> <command>  &7Creates a command sign at the specified location that executes the specified command"));
-		sender.sendMessage(Utils.translate("&a/commandsign delete <x> <y> <z>  &7Deletes the command sign at the specified location"));
+		sender.sendMessage(Utils.translate("&a/commandsign create <sign_id> <x> <y> <z> <command>  &7Creates a named command sign at the specified location that executes the specified command"));
+		sender.sendMessage(Utils.translate("&a/commandsign delete <sign_id>  &7Deletes the specified command sign"));
+		sender.sendMessage(Utils.translate("&a/commandsign modify <sign_id> <command>  &7Updates a sign's command"));
 		sender.sendMessage(Utils.translate("&7----------"));
 	}
 
