@@ -71,17 +71,6 @@ public class CmdSignsDB {
 		);
 	}
 
-	public static boolean commandSignExists(String world, double x, double y, double z) {
-		Map<String, String> result = DatabaseQueries.getResult(
-				DatabaseManager.COMMAND_SIGNS,
-				"*",
-				" WHERE world = ? AND x = ? AND y = ? AND z = ?",
-				world, x, y, z
-		);
-
-		return !result.isEmpty();
-	}
-
 	public static String getSignLocation(String signID) {
 		Map<String, String> result = DatabaseQueries.getResult(
 				DatabaseManager.COMMAND_SIGNS,
@@ -107,5 +96,12 @@ public class CmdSignsDB {
 		);
 
 		return result.getOrDefault("sign_id", null);
+	}
+
+	public static void updateCommand(String signID, String newCommand) {
+		DatabaseQueries.runAsyncQuery(
+				"UPDATE " + DatabaseManager.COMMAND_SIGNS + " SET command = " + newCommand + " WHERE sign_id = ?",
+				signID
+		);
 	}
 }

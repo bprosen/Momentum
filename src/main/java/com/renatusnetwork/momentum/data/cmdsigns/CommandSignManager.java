@@ -53,6 +53,11 @@ public class CommandSignManager {
 		return uuids != null && uuids.contains(playerStats.getUUID());
 	}
 
+	public void updateCommand(String signID, String newCommand) {
+		cmdSigns.put(signID, newCommand);
+		CmdSignsDB.updateCommand(signID, newCommand);
+	}
+
 	public Map<String, String> getCommandSigns() {
 		Map<String, String> temp = new HashMap<>();
 		for (String id : cmdSigns.keySet())

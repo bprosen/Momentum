@@ -56,8 +56,7 @@ public class CommandSignCMD implements CommandExecutor {
 				x = Double.parseDouble(args[2]);
 				y = Double.parseDouble(args[3]);
 				z = Double.parseDouble(args[4]);
-			}
-			catch (NumberFormatException ignore) {
+			} catch (NumberFormatException ignore) {
 				sendHelp(sender);
 				return true;
 			}
@@ -74,10 +73,16 @@ public class CommandSignCMD implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("delete")) {
 			csignManager.deleteCommandSign(signID);
 			sender.sendMessage(Utils.translate("&aSuccessfully deleted command sign &2" + signID));
-		} else {
+		} else if (args[1].equalsIgnoreCase("modify")) {
+			if (!csignManager.commandSignExists(signID)) {
+				sender.sendMessage(Utils.translate("&cNo command sign exists with the id &4" + signID));
+				return true;
+			}
+
+			String cmd = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+			csignManager.updateCommand(signID, cmd);
+		} else
 			sendHelp(sender);
-			return true;
-		}
 
 		return true;
 	}
