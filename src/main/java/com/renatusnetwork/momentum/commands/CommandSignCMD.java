@@ -1,8 +1,8 @@
 package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.cmdsigns.CommandSign;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
-import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -11,7 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 public class CommandSignCMD implements CommandExecutor {
 
@@ -63,7 +65,7 @@ public class CommandSignCMD implements CommandExecutor {
 
 			if (csignManager.commandSignExists(signID)) {
 				sender.sendMessage(Utils.translate("&cCommand sign already exists with that id"));
-			} else if (csignManager.commandSignExists(csignManager.getSignIDFromLocation(new Location(player.getWorld(), x, y, z)))) {
+			} else if (csignManager.commandSignExists(new Location(player.getWorld(), x, y, z))) {
 				sender.sendMessage(Utils.translate("&cCommand sign already exists at that location"));
 			} else {
 				String cmd = String.join(" ", Arrays.copyOfRange(args, 5, args.length));
@@ -99,8 +101,10 @@ public class CommandSignCMD implements CommandExecutor {
 
 	private static void showList(CommandSender sender) {
 		sender.sendMessage(Utils.translate("&7-- <sign_id>: <world>(<x>, <y>, <z>) --"));
-		Map<String, String> cmdSigns = Momentum.getCommandSignManager().getCommandSigns();
-		for (Map.Entry<String, String> e : cmdSigns.entrySet())
-			sender.sendMessage(Utils.translate("&a" + e.getKey() + ": " + e.getValue()));
+		Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
+		for (CommandSign csign : csigns) {
+			Location loc = csign.getLocation();
+			sender.sendMessage(Utils.translate("&a" + csign.getID() + ": " + loc.getWorld().getName() + "(" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() +")"));
+		}
 	}
 }

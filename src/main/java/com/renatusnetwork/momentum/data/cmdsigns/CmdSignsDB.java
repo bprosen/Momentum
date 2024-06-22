@@ -2,43 +2,51 @@ package com.renatusnetwork.momentum.data.cmdsigns;
 
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.*;
 
 public class CmdSignsDB {
-	public static Map<String, String> loadCommandSigns() {
+	public static Map<String, CommandSign> loadCommandSigns() {
 		List<Map<String, String>> results = DatabaseQueries.getResults(
 				DatabaseManager.COMMAND_SIGNS,
-				"sign_id, command",
+				"*",
 				""
 		);
 
-		Map<String, String> temp = new HashMap<>();
+		Map<String, CommandSign> temp = new HashMap<>();
 
 		for (Map<String, String> result : results) {
 			String id = result.get("sign_id");
 			String command = result.get("command");
-			temp.put(id, command);
+			World world = Bukkit.getWorld(result.get("world"));
+			double x = Double.parseDouble(result.get("x"));
+			double y = Double.parseDouble(result.get("y"));
+			double z = Double.parseDouble(result.get("z"));
+
+			CommandSign csign = new CommandSign(id, command, new Location(world, x, y, z));
+			csign.loadUsages(loadObtainedCommandSigns(id));
 		}
 
 		return temp;
 	}
 
-	public static Map<String, List<String>> loadObtainedCommandSigns() {
+	private static Set<String> loadObtainedCommandSigns(String signID) {
 		List<Map<String, String>> results = DatabaseQueries.getResults(
 				DatabaseManager.OBTAINED_COMMAND_SIGNS,
-				"*",
-				""
+				"uuid",
+				" WHERE sign_id = ?",
+				signID
 		);
 
-		Map<String, List<String>> temp = new HashMap<>();
+		Set<String> temp = new HashSet<>();
+		if (results.isEmpty())
+			return temp;
 
-		for (Map<String, String> result : results) {
-			String sign_id = result.get("sign_id");
-			String uuid = result.get("uuid");
-
-			temp.computeIfAbsent(sign_id, id -> new ArrayList<>()).add(uuid);
-		}
+		for (Map<String, String> result : results)
+			temp.add(result.get("uuid"));
 
 		return temp;
 	}
@@ -69,33 +77,6 @@ public class CmdSignsDB {
 				"DELETE FROM " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " WHERE uuid = ? AND sign_id = ?",
 				uuid, signID
 		);
-	}
-
-	public static String getSignLocation(String signID) {
-		Map<String, String> result = DatabaseQueries.getResult(
-				DatabaseManager.COMMAND_SIGNS,
-				"world, x, y, z",
-				" WHERE sign_id = ?",
-				signID
-		);
-
-		String world = result.get("world");
-		String x = result.get("x");
-		String y = result.get("y");
-		String z = result.get("z");
-
-		return world + "(" + x + ", " + y + ", " + z + ")";
-	}
-
-	public static String getSignID(String world, double x, double y, double z) {
-		Map<String, String> result = DatabaseQueries.getResult(
-				DatabaseManager.COMMAND_SIGNS,
-				"sign_id",
-				" WHERE world = ? AND x = ? AND y = ? AND z = ?",
-				world, x, y, z
-		);
-
-		return result.getOrDefault("sign_id", null);
 	}
 
 	public static void updateCommand(String signID, String newCommand) {

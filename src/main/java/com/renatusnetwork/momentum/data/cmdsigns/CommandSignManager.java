@@ -1,38 +1,42 @@
 package com.renatusnetwork.momentum.data.cmdsigns;
 
-import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.*;
 
 public class CommandSignManager {
-	private Map<String, String> cmdSigns; // sign id mapped to command
-	private Map<String, List<String>> obtainedCmdSigns; // sign id mapped to players uuids
+	private final Map<String, CommandSign> cmdSigns; // sign id mapped to command sign object
+	private final Map<Location, CommandSign> locations; // sign location mapped to command sign object
 
 	public CommandSignManager() {
 		cmdSigns = CmdSignsDB.loadCommandSigns();
-		obtainedCmdSigns = CmdSignsDB.loadObtainedCommandSigns();
+		locations = new HashMap<>();
+		for (CommandSign csign : cmdSigns.values())
+			locations.put(csign.getLocation(), csign);
 	}
 
-	public void obtainCommandSign(PlayerStats playerStats, String signID) {
-		obtainedCmdSigns.computeIfAbsent(signID, id -> new ArrayList<>()).add(playerStats.getUUID());
-		CmdSignsDB.insertObtainedCommandSign(playerStats.getUUID(), signID);
+	public void obtainCommandSign(String uuid, String signID) {
+		cmdSigns.get(signID).addUsage(uuid);
+		CmdSignsDB.insertObtainedCommandSign(uuid, signID);
 	}
 
-	public void unobtainCommandSign(PlayerStats playerStats, String signID) {
-		obtainedCmdSigns.get(signID).remove(playerStats.getUUID());
-		CmdSignsDB.unobtainCommandSign(playerStats.getUUID(), signID);
+	public void unobtainCommandSign(String uuid, String signID) {
+		cmdSigns.get(signID).removeUsage(uuid);
+		CmdSignsDB.unobtainCommandSign(uuid, signID);
 	}
 
 	public void addCommandSign(String signID, String command, World world, double x, double y, double z) {
-		cmdSigns.put(signID, command);
+		Location loc = new Location(world, x, y, z);
+		CommandSign csign =  new CommandSign(signID, command, loc);
+		cmdSigns.put(signID, csign);
+		locations.put(loc, csign);
 		CmdSignsDB.insertCommandSign(signID, command, world.getName(), x, y, z);
 	}
 
 	public void deleteCommandSign(String signID) {
+		locations.remove(cmdSigns.get(signID).getLocation());
 		cmdSigns.remove(signID);
-		obtainedCmdSigns.remove(signID);
 		CmdSignsDB.deleteCommandSign(signID);
 	}
 
@@ -40,29 +44,20 @@ public class CommandSignManager {
 		return cmdSigns.containsKey(signID);
 	}
 
-	public String getSignCommand(String signID) {
-		return cmdSigns.get(signID);
-	}
-
-	public String getSignIDFromLocation(Location location) {
-		return CmdSignsDB.getSignID(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
-	}
-
-	public boolean hasCommandSign(PlayerStats playerStats, String signID) {
-		List<String> uuids = obtainedCmdSigns.get(signID);
-		return uuids != null && uuids.contains(playerStats.getUUID());
+	public boolean commandSignExists(Location location) {
+		return locations.containsKey(location);
 	}
 
 	public void updateCommand(String signID, String newCommand) {
-		cmdSigns.put(signID, newCommand);
+		cmdSigns.get(signID).updateCommand(newCommand);
 		CmdSignsDB.updateCommand(signID, newCommand);
 	}
 
-	public Map<String, String> getCommandSigns() {
-		Map<String, String> temp = new HashMap<>();
-		for (String id : cmdSigns.keySet())
-			temp.put(id, CmdSignsDB.getSignLocation(id));
+	public CommandSign getCommandSign(Location location) {
+		return locations.get(location);
+	}
 
-		return temp;
+	public Collection<CommandSign> getCommandSigns() {
+		return cmdSigns.values();
 	}
 }
