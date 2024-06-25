@@ -79,7 +79,7 @@ public class TablesDB
         createBankWeeks();
         createBankBids();
         createCommandSigns();
-        createObtainedCommandSigns();
+        createUsedCommandSigns();
     }
 
     private static void createKeys()
@@ -108,7 +108,7 @@ public class TablesDB
         createBankItemsKeys();
         createBankWeeksKeys();
         createBankBidsKeys();
-        createObtainedCommandSignsKeys();
+        createUsedCommandSignsKeys();
     }
 
     private static void createPlayers()
@@ -984,7 +984,7 @@ public class TablesDB
         DatabaseQueries.runQuery(query);
     }
 
-    private static void createObtainedCommandSigns() {
+    private static void createUsedCommandSigns() {
         String query =
                 "CREATE TABLE " + DatabaseManager.USED_COMMAND_SIGNS + "(" +
                     "uuid CHAR(36) NOT NULL, " +
@@ -994,7 +994,7 @@ public class TablesDB
         DatabaseQueries.runQuery(query);
     }
 
-    private static void createObtainedCommandSignsKeys() {
+    private static void createUsedCommandSignsKeys() {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.USED_COMMAND_SIGNS +
                 "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_uuid_fk " +
                 "FOREIGN KEY (uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + " (uuid) " +
