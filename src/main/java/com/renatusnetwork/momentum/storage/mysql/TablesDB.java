@@ -977,8 +977,7 @@ public class TablesDB
                     "x INT NOT NULL, " +
                     "y INT NOT NULL, " +
                     "z INT NOT NULL, " +
-                    "PRIMARY KEY (name), " +
-                    "INDEX location_index (world, x, y, z)" +
+                    "PRIMARY KEY (name)" +
                 ")";
 
         DatabaseQueries.runQuery(query);
