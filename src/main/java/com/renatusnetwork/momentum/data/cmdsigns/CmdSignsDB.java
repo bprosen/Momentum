@@ -19,7 +19,7 @@ public class CmdSignsDB {
 		Map<String, CommandSign> temp = new HashMap<>();
 
 		for (Map<String, String> result : results) {
-			String id = result.get("sign_id");
+			String id = result.get("name");
 			String command = result.get("command");
 			World world = Bukkit.getWorld(result.get("world"));
 			double x = Double.parseDouble(result.get("x"));
@@ -33,12 +33,12 @@ public class CmdSignsDB {
 		return temp;
 	}
 
-	private static Set<String> loadObtainedCommandSigns(String signID) {
+	private static Set<String> loadObtainedCommandSigns(String name) {
 		List<Map<String, String>> results = DatabaseQueries.getResults(
 				DatabaseManager.OBTAINED_COMMAND_SIGNS,
 				"uuid",
-				" WHERE sign_id = ?",
-				signID
+				" WHERE name = ?",
+				name
 		);
 
 		Set<String> temp = new HashSet<>();
@@ -51,38 +51,38 @@ public class CmdSignsDB {
 		return temp;
 	}
 
-	public static void insertCommandSign(String signID, String command, String world, double x, double y, double z) {
+	public static void insertCommandSign(String name, String command, String world, double x, double y, double z) {
 		DatabaseQueries.runAsyncQuery(
-				"INSERT INTO " + DatabaseManager.COMMAND_SIGNS + " VALUES (?, ?, ?, ?, ?)",
-				signID, command, world, x, y, z
+				"INSERT INTO " + DatabaseManager.COMMAND_SIGNS + " (name, command, world, x, y, z) VALUES (?, ?, ?, ?, ?)",
+				name, command, world, x, y, z
 		);
 	}
 
-	public static void insertObtainedCommandSign(String uuid, String signID) {
+	public static void insertObtainedCommandSign(String uuid, String name) {
 		DatabaseQueries.runAsyncQuery(
-				"INSERT INTO " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " VALUES (?, ?)",
-				uuid, signID
+				"INSERT INTO " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " (uuid, name) VALUES (?, ?)",
+				uuid, name
 		);
 	}
 
-	public static void deleteCommandSign(String signID) {
+	public static void deleteCommandSign(String name) {
 		DatabaseQueries.runAsyncQuery(
-				"DELETE FROM " + DatabaseManager.COMMAND_SIGNS + " WHERE sign_id = ?",
-				signID
+				"DELETE FROM " + DatabaseManager.COMMAND_SIGNS + " WHERE name = ?",
+				name
 		);
 	}
 
-	public static void unobtainCommandSign(String uuid, String signID) {
+	public static void unobtainCommandSign(String uuid, String name) {
 		DatabaseQueries.runAsyncQuery(
-				"DELETE FROM " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " WHERE uuid = ? AND sign_id = ?",
-				uuid, signID
+				"DELETE FROM " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " WHERE uuid = ? AND name = ?",
+				uuid, name
 		);
 	}
 
-	public static void updateCommand(String signID, String newCommand) {
+	public static void updateCommand(String name, String newCommand) {
 		DatabaseQueries.runAsyncQuery(
-				"UPDATE " + DatabaseManager.COMMAND_SIGNS + " SET command = " + newCommand + " WHERE sign_id = ?",
-				signID
+				"UPDATE " + DatabaseManager.COMMAND_SIGNS + " SET command = " + newCommand + " WHERE name = ?",
+				name
 		);
 	}
 }

@@ -971,7 +971,7 @@ public class TablesDB
     private static void createCommandSigns() {
         String query =
                 "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS + "(" +
-                    "sign_id VARCHAR(20) NOT NULL, " +
+                    "name VARCHAR(20) NOT NULL, " +
                     "command VARCHAR(100), " +
                     "world VARCHAR(30) NOT NULL, " +
                     "x DOUBLE NOT NULL, " +
@@ -988,7 +988,7 @@ public class TablesDB
         String query =
                 "CREATE TABLE " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "(" +
                     "uuid CHAR(36) NOT NULL, " +
-                    "sign_id VARCHAR(20) NOT NULL" +
+                    "name VARCHAR(20) NOT NULL" +
                 ")";
 
         DatabaseQueries.runQuery(query);
@@ -1001,7 +1001,7 @@ public class TablesDB
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE, " +
                 "ADD CONSTRAINT " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "_sign_id_fk " +
-                "FOREIGN KEY (sign_id) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (sign_id) " +
+                "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (sign_id) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";
 
