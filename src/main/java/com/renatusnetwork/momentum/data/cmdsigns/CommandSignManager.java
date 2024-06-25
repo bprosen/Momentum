@@ -1,5 +1,6 @@
 package com.renatusnetwork.momentum.data.cmdsigns;
 
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.World;
 
 import java.util.*;
@@ -15,14 +16,14 @@ public class CommandSignManager {
 			locations.put(csign.getLocation(), csign);
 	}
 
-	public void obtainCommandSign(String uuid, String name) {
-		cmdSigns.get(name).addUsage(uuid);
-		CmdSignsDB.insertObtainedCommandSign(uuid, name);
+	public void useCommandSign(PlayerStats playerStats, String name) {
+		playerStats.useCommandSign(name);
+		CmdSignsDB.insertUsedCommandSign(playerStats.getUUID(), name);
 	}
 
-	public void unobtainCommandSign(String uuid, String name) {
-		cmdSigns.get(name).removeUsage(uuid);
-		CmdSignsDB.unobtainCommandSign(uuid, name);
+	public void unuseCommandSign(PlayerStats playerStats, String name) {
+		playerStats.unuseCommandSign(name);
+		CmdSignsDB.unuseCommandSign(playerStats.getUUID(), name);
 	}
 
 	public void addCommandSign(String name, String command, World world, int x, int y, int z) {
@@ -50,6 +51,10 @@ public class CommandSignManager {
 	public void updateCommand(String name, String newCommand) {
 		cmdSigns.get(name).updateCommand(newCommand);
 		CmdSignsDB.updateCommand(name, newCommand);
+	}
+
+	public CommandSign getCommandSign(String name) {
+		return cmdSigns.get(name);
 	}
 
 	public CommandSign getCommandSign(CmdSignLocation location) {

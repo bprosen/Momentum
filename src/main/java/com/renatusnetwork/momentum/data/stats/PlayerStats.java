@@ -4,6 +4,7 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.clans.Clan;
+import com.renatusnetwork.momentum.data.cmdsigns.CommandSign;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
@@ -91,6 +92,7 @@ public class PlayerStats
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
     private HashMap<BankItemType, BankBid> bids;
     private ArrayList<Level> favoriteLevels;
+    private Set<String> usedCommandSigns;
 
     public PlayerStats(Player player)
     {
@@ -121,6 +123,8 @@ public class PlayerStats
 
         this.sortingType = Momentum.getSettingsManager().default_level_sorting_type;
         this.levelStartTime = -1;
+
+        this.usedCommandSigns = new HashSet<>();
     }
 
     public void loaded()
@@ -1144,6 +1148,16 @@ public class PlayerStats
     public void addBankBid(BankItemType type, int bid, long lastBidDateMillis)
     {
         bids.put(type, new BankBid(bid, lastBidDateMillis));
+    }
+
+    public boolean hasUsed(String csignName) {
+        return this.usedCommandSigns.contains(csignName);
+    }
+    public boolean useCommandSign(String csignName) {
+        return this.usedCommandSigns.add(csignName);
+    }
+    public void unuseCommandSign(String csignName) {
+        this.usedCommandSigns.remove(csignName);
     }
 
     //

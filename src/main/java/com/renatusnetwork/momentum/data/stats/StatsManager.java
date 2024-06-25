@@ -114,6 +114,7 @@ public class StatsManager {
         StatsDB.loadModifiers(playerStats);
         StatsDB.loadBoughtPerks(playerStats);
         loadRestOfPerks(playerStats);
+        CmdSignsDB.loadUsedCommandSigns(playerStats);
 
         // if loading lb, cant calculate records normally, get from db
         if (Momentum.getLevelManager().isLoadingLeaderboards())

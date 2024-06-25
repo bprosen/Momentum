@@ -1,5 +1,6 @@
 package com.renatusnetwork.momentum.data.cmdsigns;
 
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
@@ -25,31 +26,22 @@ public class CmdSignsDB {
 			int y = Integer.parseInt(result.get("y"));
 			int z = Integer.parseInt(result.get("z"));
 
-			CommandSign csign = new CommandSign(name, command, new CmdSignLocation(world, x, y, z));
-			csign.loadUsages(loadObtainedCommandSigns(name));
-
-			temp.put(csign.getName(), csign);
+			temp.put(name, new CommandSign(name, command, new CmdSignLocation(world, x, y, z)));
 		}
 
 		return temp;
 	}
 
-	private static Set<String> loadObtainedCommandSigns(String name) {
+	public static void loadUsedCommandSigns(PlayerStats playerStats) {
 		List<Map<String, String>> results = DatabaseQueries.getResults(
 				DatabaseManager.USED_COMMAND_SIGNS,
-				"uuid",
-				" WHERE name = ?",
-				name
+				"*",
+				" WHERE uuid = ?",
+				playerStats.getUUID()
 		);
 
-		Set<String> temp = new HashSet<>();
-		if (results.isEmpty())
-			return temp;
-
 		for (Map<String, String> result : results)
-			temp.add(result.get("uuid"));
-
-		return temp;
+			playerStats.useCommandSign(result.get("name"));
 	}
 
 	public static void insertCommandSign(String name, String command, String world, int x, int y, int z) {
@@ -59,7 +51,7 @@ public class CmdSignsDB {
 		);
 	}
 
-	public static void insertObtainedCommandSign(String uuid, String name) {
+	public static void insertUsedCommandSign(String uuid, String name) {
 		DatabaseQueries.runAsyncQuery(
 				"INSERT INTO " + DatabaseManager.USED_COMMAND_SIGNS + " (uuid, name) VALUES (?, ?)",
 				uuid, name
@@ -73,7 +65,7 @@ public class CmdSignsDB {
 		);
 	}
 
-	public static void unobtainCommandSign(String uuid, String name) {
+	public static void unuseCommandSign(String uuid, String name) {
 		DatabaseQueries.runAsyncQuery(
 				"DELETE FROM " + DatabaseManager.USED_COMMAND_SIGNS + " WHERE uuid = ? AND name = ?",
 				uuid, name
