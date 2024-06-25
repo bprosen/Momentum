@@ -1,10 +1,10 @@
 package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.cmdsigns.CmdSignLocation;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSign;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.utils.Utils;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 public class CommandSignCMD implements CommandExecutor {
 
@@ -37,7 +35,7 @@ public class CommandSignCMD implements CommandExecutor {
 		}
 
 		CommandSignManager csignManager = Momentum.getCommandSignManager();
-		String signID = args[1];
+		String name = args[1];
 
 		if (args[0].equalsIgnoreCase("create")) {
 			if (!(sender instanceof Player)) {
@@ -51,38 +49,38 @@ public class CommandSignCMD implements CommandExecutor {
 
 			Player player = (Player) sender;
 
-			double x;
-			double y;
-			double z;
+			int x;
+			int y;
+			int z;
 			try {
-				x = Double.parseDouble(args[2]);
-				y = Double.parseDouble(args[3]);
-				z = Double.parseDouble(args[4]);
+				x = Integer.parseInt(args[2]);
+				y = Integer.parseInt(args[3]);
+				z = Integer.parseInt(args[4]);
 			} catch (NumberFormatException ignore) {
 				sendHelp(sender);
 				return true;
 			}
 
-			if (csignManager.commandSignExists(signID)) {
-				sender.sendMessage(Utils.translate("&cCommand sign already exists with that id"));
-			} else if (csignManager.commandSignExists(new Location(player.getWorld(), x, y, z))) {
+			if (csignManager.commandSignExists(name)) {
+				sender.sendMessage(Utils.translate("&cCommand sign already exists with that name"));
+			} else if (csignManager.commandSignExists(new CmdSignLocation(player.getWorld(), x, y, z))) {
 				sender.sendMessage(Utils.translate("&cCommand sign already exists at that location"));
 			} else {
 				String cmd = String.join(" ", Arrays.copyOfRange(args, 5, args.length));
-				csignManager.addCommandSign(signID, cmd, player.getWorld(), x, y, z);
-				sender.sendMessage(Utils.translate("&aSuccessfully created the command sign at (" + x + ", " + y + ", " + z + ")"));
+				csignManager.addCommandSign(name, cmd, player.getWorld(), x, y, z);
+				sender.sendMessage(Utils.translate("&aSuccessfully created command sign at (" + x + ", " + y + ", " + z + ")"));
 			}
 		} else if (args[0].equalsIgnoreCase("delete")) {
-			csignManager.deleteCommandSign(signID);
-			sender.sendMessage(Utils.translate("&aSuccessfully deleted command sign &2" + signID));
+			csignManager.deleteCommandSign(name);
+			sender.sendMessage(Utils.translate("&aSuccessfully deleted command sign &2" + name));
 		} else if (args[1].equalsIgnoreCase("modify")) {
-			if (!csignManager.commandSignExists(signID)) {
-				sender.sendMessage(Utils.translate("&cNo command sign exists with the id &4" + signID));
+			if (!csignManager.commandSignExists(name)) {
+				sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
 				return true;
 			}
 
 			String cmd = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-			csignManager.updateCommand(signID, cmd);
+			csignManager.updateCommand(name, cmd);
 		} else
 			sendHelp(sender);
 
@@ -93,9 +91,9 @@ public class CommandSignCMD implements CommandExecutor {
 		sender.sendMessage(Utils.translate("&7-- Help --"));
 		sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this menu"));
 		sender.sendMessage(Utils.translate("&a/commandsign list  &7Shows list of all command signs"));
-		sender.sendMessage(Utils.translate("&a/commandsign create <sign_id> <x> <y> <z> <command>  &7Creates a named command sign at the specified location that executes the specified command"));
-		sender.sendMessage(Utils.translate("&a/commandsign delete <sign_id>  &7Deletes the specified command sign"));
-		sender.sendMessage(Utils.translate("&a/commandsign modify <sign_id> <command>  &7Updates a sign's command"));
+		sender.sendMessage(Utils.translate("&a/commandsign create <name> <x> <y> <z> <command>  &7Creates uniquely named command sign at supplied integer coordinates"));
+		sender.sendMessage(Utils.translate("&a/commandsign delete <name>  &7Deletes the specified command sign"));
+		sender.sendMessage(Utils.translate("&a/commandsign modify <name> <command>  &7Updates a sign's command"));
 		sender.sendMessage(Utils.translate("&7----------"));
 	}
 
@@ -103,8 +101,8 @@ public class CommandSignCMD implements CommandExecutor {
 		sender.sendMessage(Utils.translate("&7-- <sign_id>: <world>(<x>, <y>, <z>) --"));
 		Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
 		for (CommandSign csign : csigns) {
-			Location loc = csign.getLocation();
-			sender.sendMessage(Utils.translate("&a" + csign.getID() + ": " + loc.getWorld().getName() + "(" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() +")"));
+			CmdSignLocation loc = csign.getLocation();
+			sender.sendMessage(Utils.translate("&a" + csign.getName() + ": " + loc.getWorld().getName() + "(" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() +")"));
 		}
 	}
 }

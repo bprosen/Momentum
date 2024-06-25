@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.gameplay.listeners;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.cmdsigns.CmdSignLocation;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSign;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.data.levels.Level;
@@ -193,10 +194,13 @@ public class InteractListener implements Listener {
 
             CommandSignManager csignManager = Momentum.getCommandSignManager();
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
-            CommandSign csign = csignManager.getCommandSign(event.getClickedBlock().getLocation());
-            if (csign != null && !csign.hasUsed(playerStats.getUUID())) {
-                csignManager.obtainCommandSign(playerStats.getUUID(), csign.getID());
-                csign.executeCommand();
+            CommandSign csign = csignManager.getCommandSign(new CmdSignLocation(event.getClickedBlock().getLocation()));
+            if (csign != null) {
+                if (!csign.hasUsed(playerStats.getUUID())) {
+                    csignManager.obtainCommandSign(playerStats.getUUID(), csign.getName());
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), csign.getCommand().replaceAll("%player%", playerStats.getName()));
+                } else
+                    player.sendMessage("&cYou have already used this sign!");
             }
         }
     }

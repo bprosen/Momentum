@@ -3,7 +3,6 @@ package com.renatusnetwork.momentum.data.cmdsigns;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.*;
@@ -19,15 +18,17 @@ public class CmdSignsDB {
 		Map<String, CommandSign> temp = new HashMap<>();
 
 		for (Map<String, String> result : results) {
-			String id = result.get("name");
+			String name = result.get("name");
 			String command = result.get("command");
 			World world = Bukkit.getWorld(result.get("world"));
-			double x = Double.parseDouble(result.get("x"));
-			double y = Double.parseDouble(result.get("y"));
-			double z = Double.parseDouble(result.get("z"));
+			int x = Integer.parseInt(result.get("x"));
+			int y = Integer.parseInt(result.get("y"));
+			int z = Integer.parseInt(result.get("z"));
 
-			CommandSign csign = new CommandSign(id, command, new Location(world, x, y, z));
-			csign.loadUsages(loadObtainedCommandSigns(id));
+			CommandSign csign = new CommandSign(name, command, new CmdSignLocation(world, x, y, z));
+			csign.loadUsages(loadObtainedCommandSigns(name));
+
+			temp.put(csign.getName(), csign);
 		}
 
 		return temp;
@@ -35,7 +36,7 @@ public class CmdSignsDB {
 
 	private static Set<String> loadObtainedCommandSigns(String name) {
 		List<Map<String, String>> results = DatabaseQueries.getResults(
-				DatabaseManager.OBTAINED_COMMAND_SIGNS,
+				DatabaseManager.USED_COMMAND_SIGNS,
 				"uuid",
 				" WHERE name = ?",
 				name
@@ -51,7 +52,7 @@ public class CmdSignsDB {
 		return temp;
 	}
 
-	public static void insertCommandSign(String name, String command, String world, double x, double y, double z) {
+	public static void insertCommandSign(String name, String command, String world, int x, int y, int z) {
 		DatabaseQueries.runAsyncQuery(
 				"INSERT INTO " + DatabaseManager.COMMAND_SIGNS + " (name, command, world, x, y, z) VALUES (?, ?, ?, ?, ?)",
 				name, command, world, x, y, z
@@ -60,7 +61,7 @@ public class CmdSignsDB {
 
 	public static void insertObtainedCommandSign(String uuid, String name) {
 		DatabaseQueries.runAsyncQuery(
-				"INSERT INTO " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " (uuid, name) VALUES (?, ?)",
+				"INSERT INTO " + DatabaseManager.USED_COMMAND_SIGNS + " (uuid, name) VALUES (?, ?)",
 				uuid, name
 		);
 	}
@@ -74,7 +75,7 @@ public class CmdSignsDB {
 
 	public static void unobtainCommandSign(String uuid, String name) {
 		DatabaseQueries.runAsyncQuery(
-				"DELETE FROM " + DatabaseManager.OBTAINED_COMMAND_SIGNS + " WHERE uuid = ? AND name = ?",
+				"DELETE FROM " + DatabaseManager.USED_COMMAND_SIGNS + " WHERE uuid = ? AND name = ?",
 				uuid, name
 		);
 	}

@@ -974,10 +974,10 @@ public class TablesDB
                     "name VARCHAR(20) NOT NULL, " +
                     "command VARCHAR(100), " +
                     "world VARCHAR(30) NOT NULL, " +
-                    "x DOUBLE NOT NULL, " +
-                    "y DOUBLE NOT NULL, " +
-                    "z DOUBLE NOT NULL, " +
-                    "PRIMARY KEY (sign_id), " +
+                    "x INT NOT NULL, " +
+                    "y INT NOT NULL, " +
+                    "z INT NOT NULL, " +
+                    "PRIMARY KEY (name), " +
                     "INDEX location_index (world, x, y, z)" +
                 ")";
 
@@ -986,7 +986,7 @@ public class TablesDB
 
     private static void createObtainedCommandSigns() {
         String query =
-                "CREATE TABLE " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "(" +
+                "CREATE TABLE " + DatabaseManager.USED_COMMAND_SIGNS + "(" +
                     "uuid CHAR(36) NOT NULL, " +
                     "name VARCHAR(20) NOT NULL" +
                 ")";
@@ -995,13 +995,13 @@ public class TablesDB
     }
 
     private static void createObtainedCommandSignsKeys() {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.OBTAINED_COMMAND_SIGNS +
-                "ADD CONSTRAINT " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "_uuid_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.USED_COMMAND_SIGNS +
+                "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_uuid_fk " +
                 "FOREIGN KEY (uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + " (uuid) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE, " +
-                "ADD CONSTRAINT " + DatabaseManager.OBTAINED_COMMAND_SIGNS + "_sign_id_fk " +
-                "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (sign_id) " +
+                "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_name_fk " +
+                "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (name) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";
 
