@@ -3,6 +3,8 @@ package com.renatusnetwork.momentum.data.cmdsigns;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.Objects;
+
 public class CmdSignLocation {
 	private final World world;
 	private final int x;
@@ -35,5 +37,10 @@ public class CmdSignLocation {
 
 		CmdSignLocation l = (CmdSignLocation) other;
 		return l.getWorld().getName().equals(this.world.getName()) && l.getX() == this.x && l.getY() == this.y && l.getZ() == this.z;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(world.getName(), x, y, z);
 	}
 }
