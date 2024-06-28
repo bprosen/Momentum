@@ -78,6 +78,8 @@ public class TablesDB
         createBankItems();
         createBankWeeks();
         createBankBids();
+        createCommandSigns();
+        createUsedCommandSigns();
     }
 
     private static void createKeys()
@@ -106,6 +108,7 @@ public class TablesDB
         createBankItemsKeys();
         createBankWeeksKeys();
         createBankBidsKeys();
+        createUsedCommandSignsKeys();
     }
 
     private static void createPlayers()
@@ -959,6 +962,45 @@ public class TablesDB
                 "ON DELETE CASCADE, " +
                 "ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_uuid_fk " +
                 "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createCommandSigns() {
+        String query =
+                "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS + "(" +
+                    "name VARCHAR(20) NOT NULL, " +
+                    "command VARCHAR(100), " +
+                    "world VARCHAR(30) NOT NULL, " +
+                    "x INT NOT NULL, " +
+                    "y INT NOT NULL, " +
+                    "z INT NOT NULL, " +
+                    "PRIMARY KEY (name)" +
+                ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createUsedCommandSigns() {
+        String query =
+                "CREATE TABLE " + DatabaseManager.USED_COMMAND_SIGNS + "(" +
+                    "uuid CHAR(36) NOT NULL, " +
+                    "name VARCHAR(20) NOT NULL" +
+                ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
+    private static void createUsedCommandSignsKeys() {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.USED_COMMAND_SIGNS +
+                "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_uuid_fk " +
+                "FOREIGN KEY (uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + " (uuid) " +
+                "ON UPDATE CASCADE " +
+                "ON DELETE CASCADE, " +
+                "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_name_fk " +
+                "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (name) " +
                 "ON UPDATE CASCADE " +
                 "ON DELETE CASCADE";
 

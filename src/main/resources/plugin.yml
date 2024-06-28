@@ -132,3 +132,6 @@ commands:
     description: "Momentum ELO Tier command"
   bank:
     description: "Momentum Bank command"
+  signs:
+    description: "Momentum command sign creation command"
+    aliases: [csign]
