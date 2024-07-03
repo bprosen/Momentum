@@ -41,7 +41,7 @@ public class CmdSignsDB {
 		);
 
 		for (Map<String, String> result : results)
-			playerStats.useCommandSign(result.get("name"));
+			playerStats.addCommandSign(result.get("name"));
 	}
 
 	public static void insertCommandSign(String name, String command, String world, int x, int y, int z) {

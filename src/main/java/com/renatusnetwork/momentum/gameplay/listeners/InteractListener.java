@@ -195,8 +195,8 @@ public class InteractListener implements Listener {
             CommandSignManager csignManager = Momentum.getCommandSignManager();
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
             CommandSign csign = csignManager.getCommandSign(new CmdSignLocation(event.getClickedBlock().getLocation()));
-            if (csign != null) {
-                if (!playerStats.hasUsed(csign.getName())) {
+            if (playerStats != null && playerStats.isLoaded() && csign != null) {
+                if (!playerStats.hasCommandSign(csign.getName())) {
                     csignManager.useCommandSign(playerStats, csign.getName());
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), csign.getCommand().replaceAll("%player%", playerStats.getName()));
                     // send success message here?

@@ -17,12 +17,12 @@ public class CommandSignManager {
 	}
 
 	public void useCommandSign(PlayerStats playerStats, String name) {
-		playerStats.useCommandSign(name);
+		playerStats.addCommandSign(name);
 		CmdSignsDB.insertUsedCommandSign(playerStats.getUUID(), name);
 	}
 
 	public void unuseCommandSign(PlayerStats playerStats, String name) {
-		playerStats.unuseCommandSign(name);
+		playerStats.removeCommandSign(name);
 		CmdSignsDB.unuseCommandSign(playerStats.getUUID(), name);
 	}
 

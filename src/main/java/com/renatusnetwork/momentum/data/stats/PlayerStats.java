@@ -4,7 +4,6 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.clans.Clan;
-import com.renatusnetwork.momentum.data.cmdsigns.CommandSign;
 import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
@@ -23,7 +22,6 @@ import com.renatusnetwork.momentum.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -1150,13 +1148,13 @@ public class PlayerStats
         bids.put(type, new BankBid(bid, lastBidDateMillis));
     }
 
-    public boolean hasUsed(String csignName) {
+    public boolean hasCommandSign(String csignName) {
         return this.usedCommandSigns.contains(csignName);
     }
-    public boolean useCommandSign(String csignName) {
+    public boolean addCommandSign(String csignName) {
         return this.usedCommandSigns.add(csignName);
     }
-    public void unuseCommandSign(String csignName) {
+    public void removeCommandSign(String csignName) {
         this.usedCommandSigns.remove(csignName);
     }
 
