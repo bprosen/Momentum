@@ -98,7 +98,7 @@ public class CommandSignCMD implements CommandExecutor {
 	}
 
 	private static void showList(CommandSender sender) {
-		sender.sendMessage(Utils.translate("&7-- <sign_id>: <world>(<x>, <y>, <z>) --"));
+		sender.sendMessage(Utils.translate("&7-- <name>: <world>(<x>, <y>, <z>) --"));
 		Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
 		for (CommandSign csign : csigns) {
 			CmdSignLocation loc = csign.getLocation();
