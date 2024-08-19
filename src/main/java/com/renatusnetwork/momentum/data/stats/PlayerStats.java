@@ -90,6 +90,7 @@ public class PlayerStats
     private HashMap<InfiniteType, Integer> bestInfiniteScores;
     private HashMap<BankItemType, BankBid> bids;
     private ArrayList<Level> favoriteLevels;
+    private Set<String> usedCommandSigns;
 
     public PlayerStats(Player player)
     {
@@ -120,6 +121,8 @@ public class PlayerStats
 
         this.sortingType = Momentum.getSettingsManager().default_level_sorting_type;
         this.levelStartTime = -1;
+
+        this.usedCommandSigns = new HashSet<>();
     }
 
     public void loaded()
@@ -1143,6 +1146,16 @@ public class PlayerStats
     public void addBankBid(BankItemType type, int bid, long lastBidDateMillis)
     {
         bids.put(type, new BankBid(bid, lastBidDateMillis));
+    }
+
+    public boolean hasCommandSign(String csignName) {
+        return this.usedCommandSigns.contains(csignName);
+    }
+    public boolean addCommandSign(String csignName) {
+        return this.usedCommandSigns.add(csignName);
+    }
+    public void removeCommandSign(String csignName) {
+        this.usedCommandSigns.remove(csignName);
     }
 
     //
