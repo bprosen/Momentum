@@ -76,7 +76,7 @@ public class DatabaseQueries
         // this is a use case where we are using a primary key to get a single result, just cleaner code
         List<Map<String, String>> results = getResults(tableName, selection, trailingSQL, parameters);
 
-        return !results.isEmpty() ? getResults(tableName, selection, trailingSQL, parameters).get(0) : new HashMap<>();
+        return !results.isEmpty() ? results.get(0) : new HashMap<>();
     }
 
     public static boolean runQuery(String sql, Object... parameters)
