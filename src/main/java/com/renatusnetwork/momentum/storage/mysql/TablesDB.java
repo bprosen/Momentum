@@ -972,11 +972,13 @@ public class TablesDB
         String query =
                 "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS + "(" +
                     "name VARCHAR(20) NOT NULL, " +
-                    "command VARCHAR(100), " +
+                    "title VARCHAR(50) DEFAULT NULL, " +
+                    "command VARCHAR(100) DEFAULT NULL, " +
                     "world VARCHAR(30) NOT NULL, " +
                     "x INT NOT NULL, " +
                     "y INT NOT NULL, " +
                     "z INT NOT NULL, " +
+                    "broadcast BIT DEFAULT 0, " +
                     "PRIMARY KEY (name)" +
                 ")";
 
@@ -987,7 +989,11 @@ public class TablesDB
         String query =
                 "CREATE TABLE " + DatabaseManager.USED_COMMAND_SIGNS + "(" +
                     "uuid CHAR(36) NOT NULL, " +
-                    "name VARCHAR(20) NOT NULL" +
+                    "name VARCHAR(20) NOT NULL, " +
+                    // primary keys
+                    "PRIMARY KEY (uuid, name), " +
+                    // indexes
+                    "INDEX uuid_index(uuid)" +
                 ")";
 
         DatabaseQueries.runQuery(query);

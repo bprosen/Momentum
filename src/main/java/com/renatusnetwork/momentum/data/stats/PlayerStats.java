@@ -111,6 +111,7 @@ public class PlayerStats
         this.bids = new HashMap<>();
         this.favoriteLevels = new ArrayList<>();
         this.practiceHistory = new ArrayList<>();
+        this.usedCommandSigns = new HashSet<>();
 
         // default for now, if they are not a new player the mysql db loading will adjust these
         this.infiniteBlock = Momentum.getSettingsManager().infinite_default_block;
@@ -121,8 +122,6 @@ public class PlayerStats
 
         this.sortingType = Momentum.getSettingsManager().default_level_sorting_type;
         this.levelStartTime = -1;
-
-        this.usedCommandSigns = new HashSet<>();
     }
 
     public void loaded()
@@ -1151,11 +1150,17 @@ public class PlayerStats
     public boolean hasCommandSign(String csignName) {
         return this.usedCommandSigns.contains(csignName);
     }
+
     public boolean addCommandSign(String csignName) {
         return this.usedCommandSigns.add(csignName);
     }
+
     public void removeCommandSign(String csignName) {
         this.usedCommandSigns.remove(csignName);
+    }
+
+    public int getCommandSignSize() {
+        return usedCommandSigns.size();
     }
 
     //

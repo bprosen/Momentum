@@ -904,7 +904,6 @@ public class StatsManager {
     public void setSpectatorMode(PlayerStats spectatorStats, PlayerStats playerStats, boolean initialSpectate)
     {
         Player spectator = spectatorStats.getPlayer();
-        Player player = playerStats.getPlayer();
 
         spectatorStats.setPlayerToSpectate(playerStats);
 

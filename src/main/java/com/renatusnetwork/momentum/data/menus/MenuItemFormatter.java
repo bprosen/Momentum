@@ -156,6 +156,7 @@ public class MenuItemFormatter
                 newLore.add("&7Race Losses &c" + Utils.formatNumber(playerStats.getRaceLosses()));
                 newLore.add("&7Race Win Rate &c" + playerStats.getRaceWinRate());
                 newLore.add("&7Event Wins &c" + Utils.formatNumber(playerStats.getEventWins()));
+                newLore.add("&7Command Signs Claimed &c" + Utils.formatNumber(playerStats.getCommandSignSize()) + "/" + Momentum.getCommandSignManager().getCommandSigns().size());
                 break;
             }
             case "level":

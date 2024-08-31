@@ -148,7 +148,8 @@ public class BankManager
                         // update player info
                         statsManager.addModifier(playerStats, bankItem.getModifier());
 
-                        int lockTime = lock(playerStats, bankItem);
+                        //int lockTime = lock(playerStats, bankItem);
+                        int lockTime = 0;
                         broadcastNewBid(playerStats, bankItem, bidAmount, lockTime); // broadcast bid
                     }
                     else
