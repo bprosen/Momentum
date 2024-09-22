@@ -8,15 +8,18 @@ import java.util.Set;
 public class Squad {
 	private PlayerStats squadLeader;
 	private final Set<PlayerStats> squadMembers; // includes squad leader
+	private final Set<PlayerStats> outgoingInvites;
 
 	private Squad(PlayerStats leader) {
 		this.squadLeader = leader;
 		this.squadMembers = new HashSet<>();
+		this.outgoingInvites = new HashSet<>();
 	}
 
 	private Squad(PlayerStats leader, Set<PlayerStats> members) {
 		this.squadLeader = leader;
 		this.squadMembers = members;
+		this.outgoingInvites = new HashSet<>();
 	}
 
 	// returns true if member was not already in party
@@ -37,12 +40,25 @@ public class Squad {
 		return true;
 	}
 
-	public PlayerStats getSquadLeader() {
+	public boolean hasInvite(PlayerStats invitee) {
+		return outgoingInvites.contains(invitee);
+	}
+
+	// returns false if the player is already invited
+	public boolean addInvite(PlayerStats invitee) {
+		return outgoingInvites.add(invitee);
+	}
+
+	protected PlayerStats getSquadLeader() {
 		return this.squadLeader;
 	}
-	public Set<PlayerStats> getSquadMembers() {
+	protected Set<PlayerStats> getSquadMembers() {
 		return this.squadMembers;
 	}
+	protected int getMemberCount() {
+		return this.squadMembers.size();
+	}
+
 
 	public static class Builder {
 		private PlayerStats leader;

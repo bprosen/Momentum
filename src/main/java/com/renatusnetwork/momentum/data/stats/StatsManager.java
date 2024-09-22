@@ -22,6 +22,7 @@ import com.renatusnetwork.momentum.data.ranks.Rank;
 import com.renatusnetwork.momentum.data.leaderboards.CoinsLBPosition;
 import com.renatusnetwork.momentum.data.leaderboards.GlobalPersonalLBPosition;
 import com.renatusnetwork.momentum.data.saves.SavesDB;
+import com.renatusnetwork.momentum.data.squads.Squad;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -940,6 +941,11 @@ public class StatsManager {
 
             Momentum.getLevelManager().regionLevelCheck(spectatorStats, loc);
         }
+    }
+
+    public void updateSquad(PlayerStats playerStats, Squad squad) {
+        squad.addMember(playerStats);
+        playerStats.updateSquad(squad);
     }
 
     public String createChatHover(PlayerStats playerStats)

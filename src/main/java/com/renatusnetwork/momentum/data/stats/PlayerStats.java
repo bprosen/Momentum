@@ -18,6 +18,7 @@ import com.renatusnetwork.momentum.data.perks.Perk;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.momentum.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.momentum.data.ranks.Rank;
+import com.renatusnetwork.momentum.data.squads.Squad;
 import com.renatusnetwork.momentum.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Location;
@@ -91,6 +92,7 @@ public class PlayerStats
     private HashMap<BankItemType, BankBid> bids;
     private ArrayList<Level> favoriteLevels;
     private Set<String> usedCommandSigns;
+    private Squad squad;
 
     public PlayerStats(Player player)
     {
@@ -1161,6 +1163,13 @@ public class PlayerStats
 
     public int getCommandSignSize() {
         return usedCommandSigns.size();
+    }
+
+    public Squad getSquad() {
+        return this.squad;
+    }
+    public void updateSquad(Squad squad) {
+        this.squad = squad;
     }
 
     //
