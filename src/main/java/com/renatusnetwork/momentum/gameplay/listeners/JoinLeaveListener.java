@@ -9,6 +9,8 @@ import com.renatusnetwork.momentum.data.infinite.InfiniteManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
+import com.renatusnetwork.momentum.data.squads.Squad;
+import com.renatusnetwork.momentum.data.squads.SquadManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -140,6 +142,7 @@ public class JoinLeaveListener implements Listener
         InfiniteManager infiniteManager = Momentum.getInfiniteManager();
         ClansManager clansManager = Momentum.getClansManager();
         BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
+        SquadManager squadManager = Momentum.getSquadManager();
 
         // if left in spectator, remove it
         if (playerStats.isSpectating())
@@ -184,6 +187,18 @@ public class JoinLeaveListener implements Listener
 
             // run reset logic
             playerStats.resetLevel();
+        }
+
+        Squad squad = playerStats.getSquad();
+        if (playerStats.getSquad() != null) {
+            if (SquadManager.isLeader(playerStats)) {
+                SquadManager.notifyMembers(squad, "&3The squad has been disbanded because the leader went offline");
+                squadManager.disband(squad);
+            }
+            else {
+                squadManager.leave(playerStats);
+                SquadManager.notifyMembers(squad, "&9SqC &3" + playerStats.getDisplayName() + " &bhas left the squad");
+            }
         }
 
         // toggle off elytra armor
