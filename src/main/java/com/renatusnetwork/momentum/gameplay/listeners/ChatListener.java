@@ -36,7 +36,7 @@ public class ChatListener implements Listener
                 event.getRecipients().clear();
 
                 // SquadManager#sendMessage handles chatspy messages
-                squadManager.sendMessage(playerStats, "&b[SqC] &9" + playerStats.getDisplayName() + " &3" + msg, true);
+                squadManager.sendMessage(playerStats, "&9[SqC] &3" + playerStats.getDisplayName() + " &b" + msg, true);
                 Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " " + ChatColor.stripColor(msg));
             }
             // iterate through the smaller list first

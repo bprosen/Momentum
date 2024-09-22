@@ -74,6 +74,7 @@ public class Squad {
 
 		public Builder setLeader(PlayerStats leader) {
 			this.leader = leader;
+			this.members.add(leader);
 			return this;
 		}
 
