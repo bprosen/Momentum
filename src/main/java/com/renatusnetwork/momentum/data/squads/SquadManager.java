@@ -72,13 +72,18 @@ public class SquadManager {
 
 		return true;
 	}
-	public boolean isInSquadChat(PlayerStats member) {
-		return inSquadChat.contains(member);
+
+	public boolean toggleSquadChatSpy(PlayerStats playerStats) {
+		if (!inSquadChatSpy.add(playerStats)) {
+			inSquadChatSpy.remove(playerStats);
+			return false;
+		}
+
+		return true;
 	}
 
-	public void toggleSquadChatSpy(PlayerStats playerStats) {
-		if (!inSquadChatSpy.add(playerStats))
-			inSquadChatSpy.remove(playerStats);
+	public boolean isInSquadChat(PlayerStats member) {
+		return inSquadChat.contains(member);
 	}
 
 	public void sendMessage(PlayerStats member, String message, boolean self) {
