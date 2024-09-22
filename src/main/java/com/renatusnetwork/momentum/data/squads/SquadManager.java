@@ -49,7 +49,8 @@ public class SquadManager {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (inviter.getSquad().hasInvite(invitee)) {
+				if (squad.hasInvite(invitee)) {
+					squad.removeInvite(invitee);
 					inviter.sendMessage(Utils.translate("&9" + invitee.getName() + " &3did not accept the squad invite in time"));
 					invitee.sendMessage(Utils.translate("&3You did not accept the squad invite in time"));
 				}

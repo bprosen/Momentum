@@ -49,6 +49,10 @@ public class Squad {
 		return outgoingInvites.add(invitee);
 	}
 
+	public void removeInvite(PlayerStats invitee) {
+		outgoingInvites.remove(invitee);
+	}
+
 	protected PlayerStats getSquadLeader() {
 		return this.squadLeader;
 	}
