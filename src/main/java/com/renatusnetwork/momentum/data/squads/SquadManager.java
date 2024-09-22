@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class SquadManager {
-	Set<PlayerStats> inSquadChat;
-	Set<PlayerStats> inSquadChatSpy;
+	private final Set<PlayerStats> inSquadChat;
+	private final Set<PlayerStats> inSquadChatSpy;
 
 	public SquadManager() {
 		this.inSquadChat = new HashSet<>();
@@ -88,9 +88,13 @@ public class SquadManager {
 		squad.getSquadMembers().forEach(this::leave);
 	}
 
-	public void toggleSquadChat(PlayerStats member) {
-		if (!inSquadChat.add(member))
+	// returns true if player toggled on and false if toggled off
+	public boolean toggleSquadChat(PlayerStats member) {
+		boolean flag = inSquadChat.add(member);
+		if (!flag)
 			inSquadChat.remove(member);
+
+		return flag;
 	}
 	public boolean isInSquadChat(PlayerStats member) {
 		return inSquadChat.contains(member);

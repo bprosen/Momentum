@@ -137,4 +137,4 @@ commands:
     aliases: [csign]
   squad:
     description: "Momentum squads command"
-    aliases: [sq]
+    aliases: [sq, sqc]

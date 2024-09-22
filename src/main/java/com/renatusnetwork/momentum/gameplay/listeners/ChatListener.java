@@ -32,9 +32,10 @@ public class ChatListener implements Listener
         {
             event.setCancelled(true);
 
-            if (playerStats.getSquad() != null && squadManager.isInSquadChat(playerStats)) {
+            if (squadManager.isInSquadChat(playerStats) && playerStats.getSquad() != null) {
                 event.getRecipients().clear();
 
+                // SquadManager#sendMessage handles chatspy messages
                 squadManager.sendMessage(playerStats, "&b[SqC] &9" + playerStats.getDisplayName() + " &3" + msg, true);
                 Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " " + ChatColor.stripColor(msg));
             }
