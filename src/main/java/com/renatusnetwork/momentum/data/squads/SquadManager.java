@@ -86,6 +86,10 @@ public class SquadManager {
 		return inSquadChat.contains(member);
 	}
 
+	public Collection<PlayerStats> getSquadMembers(Squad squad) {
+		return squad.getSquadMembers();
+	}
+
 	public void sendMessage(PlayerStats member, String message, boolean self) {
 		Squad squad = member.getSquad();
 		for (PlayerStats m : squad.getSquadMembers()) {

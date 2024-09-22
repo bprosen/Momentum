@@ -54,6 +54,15 @@ public class SquadCMD implements CommandExecutor {
 					player.sendMessage(Utils.translate("&cYou are already in a squad!"));
 
 				break;
+			case "list":
+				if (squad == null)
+					noSquad(sender);
+				else {
+					player.sendMessage("&Squad Members:");
+					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(member.getDisplayName()));
+				}
+
+				break;
 			case "invite":
 				if (n != 2)
 					sendHelp(sender);

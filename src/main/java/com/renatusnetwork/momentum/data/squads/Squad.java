@@ -23,16 +23,16 @@ public class Squad {
 	}
 
 	// returns true if member was not already in party
-	public boolean addMember(PlayerStats member) {
+	protected boolean addMember(PlayerStats member) {
 		return squadMembers.add(member);
 	}
 
 	// returns true if member was in party
-	public boolean removeMember(PlayerStats member) {
+	protected boolean removeMember(PlayerStats member) {
 		return squadMembers.remove(member);
 	}
 
-	public boolean setLeader(PlayerStats newLeader) {
+	protected boolean setLeader(PlayerStats newLeader) {
 		if (!squadMembers.contains(newLeader))
 			return false;
 
@@ -45,11 +45,11 @@ public class Squad {
 	}
 
 	// returns false if the player is already invited
-	public boolean addInvite(PlayerStats invitee) {
+	protected boolean addInvite(PlayerStats invitee) {
 		return outgoingInvites.add(invitee);
 	}
 
-	public void removeInvite(PlayerStats invitee) {
+	protected void removeInvite(PlayerStats invitee) {
 		outgoingInvites.remove(invitee);
 	}
 
@@ -59,10 +59,6 @@ public class Squad {
 	protected Set<PlayerStats> getSquadMembers() {
 		return this.squadMembers;
 	}
-	protected int getMemberCount() {
-		return this.squadMembers.size();
-	}
-
 
 	public static class Builder {
 		private PlayerStats leader = null;
