@@ -3,6 +3,7 @@ package com.renatusnetwork.momentum.gameplay.listeners;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
+import com.renatusnetwork.momentum.data.squads.SquadManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -24,14 +25,21 @@ public class ChatListener implements Listener
         Player player = event.getPlayer();
         String msg = event.getMessage();
         ClansManager clansManager = Momentum.getClansManager();
+        SquadManager squadManager = Momentum.getSquadManager();
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         if (playerStats != null)
         {
             event.setCancelled(true);
 
+            if (playerStats.getSquad() != null && squadManager.isInSquadChat(playerStats)) {
+                event.getRecipients().clear();
+
+                squadManager.sendMessage(playerStats, "&b[SqC] &9" + playerStats.getDisplayName() + " &3" + msg, true);
+                Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " " + ChatColor.stripColor(msg));
+            }
             // iterate through the smaller list first
-            if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName()))
+            else if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName()))
             {
                 event.getRecipients().clear();
 

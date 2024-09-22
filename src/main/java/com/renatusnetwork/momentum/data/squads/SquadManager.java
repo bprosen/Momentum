@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.data.squads;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -82,9 +83,17 @@ public class SquadManager {
 		leave(member);
 	}
 
+	public void disband(Squad squad) {
+		// notifyMembers(squad, Utils.translate("&3The squad has been disbanded"));
+		squad.getSquadMembers().forEach(this::leave);
+	}
+
 	public void toggleSquadChat(PlayerStats member) {
 		if (!inSquadChat.add(member))
 			inSquadChat.remove(member);
+	}
+	public boolean isInSquadChat(PlayerStats member) {
+		return inSquadChat.contains(member);
 	}
 
 	public void toggleSquadChatSpy(PlayerStats playerStats) {
@@ -92,13 +101,21 @@ public class SquadManager {
 			inSquadChatSpy.remove(playerStats);
 	}
 
-	public void disband(Squad squad) {
-		// notifyMembers(squad, Utils.translate("&3The squad has been disbanded"));
-		squad.getSquadMembers().forEach(this::leave);
+	public void sendMessage(PlayerStats member, String message, boolean self) {
+		Squad squad = member.getSquad();
+		for (PlayerStats m : squad.getSquadMembers()) {
+			if (!self && m.equals(member))
+				continue;
+			m.sendMessage(Utils.translate(message));
+		}
+
+		// chat spy
+		// chat spy persists through relogs so player needs to be online
+		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getUUID()) != null && !squad.getSquadMembers().contains(spy)).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message)));
 	}
 
 	public static void notifyMembers(Squad squad, String message) {
-		squad.getSquadMembers().forEach(member -> member.sendMessage(message));
+		squad.getSquadMembers().forEach(member -> member.sendMessage(Utils.translate(message)));
 	}
 
 	public static boolean isLeader(PlayerStats member) {
