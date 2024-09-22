@@ -61,8 +61,8 @@ public class Squad {
 
 
 	public static class Builder {
-		private PlayerStats leader;
-		private Set<PlayerStats> members;
+		private PlayerStats leader = null;
+		private Set<PlayerStats> members = new HashSet<>();
 
 		public static Builder create() {
 			return new Builder();

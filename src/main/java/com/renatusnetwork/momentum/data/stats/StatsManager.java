@@ -39,6 +39,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 
 public class StatsManager {
@@ -943,8 +945,9 @@ public class StatsManager {
         }
     }
 
-    public void updateSquad(PlayerStats playerStats, Squad squad) {
-        squad.addMember(playerStats);
+    public void updateSquad(PlayerStats playerStats, @Nullable Squad squad) {
+        if (squad != null)
+            squad.addMember(playerStats);
         playerStats.updateSquad(squad);
     }
 

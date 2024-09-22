@@ -4,6 +4,7 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -16,8 +17,14 @@ public class SquadManager {
 		this.inSquadChatSpy = new HashSet<>();
 	}
 
+	public void createSquad(PlayerStats leader) {
+		Squad squad = Squad.Builder.create().setLeader(leader).build();
+		Momentum.getStatsManager().updateSquad(leader, squad);
+	}
+
 	public void invite(PlayerStats inviter, PlayerStats invitee) {
 		Squad squad = inviter.getSquad();
+		/*
 		if (squad == null) {
 			inviter.sendMessage(Utils.translate("&cYou are not in a squad!"));
 			return;
@@ -34,9 +41,10 @@ public class SquadManager {
 			inviter.sendMessage(Utils.translate("&4" + invitee.getName() + " &chas already been invited to the squad!"));
 			return;
 		}
+		 */
 
 		squad.addInvite(invitee);
-		notifyMembers(squad, Utils.translate("&9" + invitee.getName() + " &3has been invited to the squad"));
+		// notifyMembers(squad, Utils.translate("&9" + invitee.getName() + " &3has been invited to the squad"));
 
 		new BukkitRunnable() {
 			@Override
@@ -49,12 +57,44 @@ public class SquadManager {
 		}.runTaskLater(Momentum.getPlugin(), 20 * 30); // 30 seconds to accept invite
 	}
 
-	/*
 	public void join(Squad squad, PlayerStats newMember) {
-
+		leave(newMember);
+		squad.addMember(newMember);
 	}
 
-	 */
+	public void leave(PlayerStats member) {
+		/*
+		if (squad.getSquadLeader().equals(member)) {
+			member.sendMessage(kick ? Utils.translate("&cYou cannot kick yourself!") : Utils.translate("&cYou must transfer ownership before leaving"));
+			return;
+		}
+		 */
+
+		member.getSquad().removeMember(member);
+		inSquadChat.remove(member);
+		// notifyMembers(squad, kick ? Utils.translate("&9" + member.getName() + " &3has been kicked from the squad") : Utils.translate("&9" + member.getName() + " &3has left the squad"));
+		// member.sendMessage(kick ? Utils.translate("&3You have been kicked from the squad") : Utils.translate("&3You have left the squad"));
+		Momentum.getStatsManager().updateSquad(member, null);
+	}
+
+	public void kick(PlayerStats member) {
+		leave(member);
+	}
+
+	public void toggleSquadChat(PlayerStats member) {
+		if (!inSquadChat.add(member))
+			inSquadChat.remove(member);
+	}
+
+	public void toggleSquadChatSpy(PlayerStats playerStats) {
+		if (!inSquadChatSpy.add(playerStats))
+			inSquadChatSpy.remove(playerStats);
+	}
+
+	public void disband(Squad squad) {
+		// notifyMembers(squad, Utils.translate("&3The squad has been disbanded"));
+		squad.getSquadMembers().forEach(this::leave);
+	}
 
 	public static void notifyMembers(Squad squad, String message) {
 		squad.getSquadMembers().forEach(member -> member.sendMessage(message));
