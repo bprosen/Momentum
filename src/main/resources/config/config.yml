@@ -293,3 +293,5 @@ leaderboard_max_size:
     sprint: 10
     speedrun: 10
     timed: 10
+squads:
+  max_members: 4
