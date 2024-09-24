@@ -196,7 +196,7 @@ public class JoinLeaveListener implements Listener
                 squadManager.disband(squad);
             }
             else {
-                squadManager.leave(playerStats);
+                squadManager.leave(playerStats, false);
                 SquadManager.notifyMembers(squad, "&9SqC &3" + playerStats.getDisplayName() + " &bhas left the squad");
             }
         }

@@ -9,6 +9,7 @@ public class Squad {
 	private PlayerStats squadLeader;
 	private final Set<PlayerStats> squadMembers; // includes squad leader
 	private final Set<PlayerStats> outgoingInvites;
+	private boolean warpCooldown = false;
 
 	private Squad(PlayerStats leader) {
 		this.squadLeader = leader;
@@ -59,6 +60,9 @@ public class Squad {
 	protected Set<PlayerStats> getSquadMembers() {
 		return this.squadMembers;
 	}
+
+	public boolean hasWarpCooldown() { return warpCooldown; }
+	protected void setWarpCooldown(boolean cooldown) { warpCooldown = cooldown; }
 
 	public static class Builder {
 		private PlayerStats leader = null;

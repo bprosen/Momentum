@@ -40,19 +40,21 @@ public class SquadManager {
 	}
 
 	public void join(@NotNull Squad squad, PlayerStats newMember) {
+		squad.removeInvite(newMember); // remove invite after joining
 		squad.addMember(newMember);
 		Momentum.getStatsManager().updateSquad(newMember, squad);
 	}
 
-	public void leave(PlayerStats member) {
+	public void leave(PlayerStats member, boolean disband) {
 		Squad squad = member.getSquad();
 		inSquadChat.remove(member);
-		squad.removeMember(member);
+		if (!disband) // avoid concurrent modification exception when disbanding
+			squad.removeMember(member);
 		Momentum.getStatsManager().updateSquad(member, null);
 	}
 
 	public void kick(PlayerStats member) {
-		leave(member);
+		leave(member, false);
 	}
 
 	public void promote(PlayerStats newLeader) {
@@ -60,11 +62,19 @@ public class SquadManager {
 	}
 
 	public void disband(Squad squad) {
-		squad.getSquadMembers().forEach(this::leave);
+		squad.getSquadMembers().forEach(member -> leave(member, true));
 	}
 
 	public void warpMembers(PlayerStats leader) {
-		leader.getSquad().getSquadMembers().stream().filter(member -> !member.equals(leader)).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
+		Squad squad = leader.getSquad();
+		squad.getSquadMembers().stream().filter(member -> !member.equals(leader) && !member.getLevel().equals(leader.getLevel())).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
+		squad.setWarpCooldown(true);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				squad.setWarpCooldown(false);
+			}
+		}.runTaskLater(Momentum.getPlugin(), 20 * 3); // 3 sec cooldown
 	}
 
 	// returns true if player toggled on and false if toggled off
@@ -103,7 +113,7 @@ public class SquadManager {
 		}
 
 		// chat spy persists through relogs so player needs to be online
-		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getUUID()) != null && !squad.getSquadMembers().contains(spy)).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message)));
+		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getPlayer()) != null && !squad.getSquadMembers().contains(spy)).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message)));
 	}
 
 	public static void notifyMembers(Squad squad, String message) {
