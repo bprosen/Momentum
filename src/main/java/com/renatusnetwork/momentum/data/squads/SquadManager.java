@@ -67,7 +67,7 @@ public class SquadManager {
 
 	public void warpMembers(PlayerStats leader) {
 		Squad squad = leader.getSquad();
-		squad.getSquadMembers().stream().filter(member -> !member.equals(leader) && !member.getLevel().equals(leader.getLevel())).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
+		squad.getSquadMembers().stream().filter(member -> !member.equals(leader) && !leader.getLevel().equals(member.getLevel())).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
 		squad.setWarpCooldown(true);
 		new BukkitRunnable() {
 			@Override
