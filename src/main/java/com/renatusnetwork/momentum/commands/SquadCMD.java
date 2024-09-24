@@ -6,6 +6,9 @@ import com.renatusnetwork.momentum.data.squads.Squad;
 import com.renatusnetwork.momentum.data.squads.SquadManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -80,7 +83,13 @@ public class SquadCMD implements CommandExecutor {
 					else {
 						squadManager.invite(player, invitee);
 						SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas invited &3" + invitee.getDisplayName() + " &bto the squad");
+
+						TextComponent component = new TextComponent(Utils.translate("&3Run &b/squad accept " + player.getName() + " &3or &bClick here to accept"));
+						component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&9Click to accept!"))));
+						component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/squad accept " + player.getName()));
+
 						invitee.sendMessage(Utils.translate("&9" + player.getDisplayName() + " &3has invited you to join their squad"));
+						invitee.getPlayer().spigot().sendMessage(component);
 						invitee.sendMessage(Utils.translate("&3You have &b30 seconds &3to accept"));
 					}
 				}
