@@ -78,6 +78,8 @@ public class SquadCMD implements CommandExecutor {
 					PlayerStats invitee = Momentum.getStatsManager().getByName(args[1]);
 					if (invitee == null)
 						player.sendMessage(Utils.translate("&cThat player is not online!"));
+					else if (SquadManager.isMember(squad, invitee))
+						player.sendMessage(Utils.translate("&cThat player is already in the squad!"));
 					else if (squad.hasInvite(invitee))
 						player.sendMessage(Utils.translate("&cThat player has already been invited!"));
 					else {
