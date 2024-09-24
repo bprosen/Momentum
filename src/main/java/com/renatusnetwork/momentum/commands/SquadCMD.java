@@ -59,8 +59,8 @@ public class SquadCMD implements CommandExecutor {
 				if (squad == null)
 					noSquad(sender);
 				else {
-					player.sendMessage("&Squad Members:");
-					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(member.getDisplayName()));
+					player.sendMessage(Utils.translate("&9Squad Members:"));
+					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq ") + member.getDisplayName()));
 				}
 
 				break;
@@ -231,7 +231,7 @@ public class SquadCMD implements CommandExecutor {
 	private void sendHelp(CommandSender sender) {
 		sender.sendMessage(Utils.translate("&9-- Help --"));
 		sender.sendMessage(Utils.translate("&9Command Aliases: &b[squad, sq]"));
-		sender.sendMessage(Utils.translate("&3/squad [help]  &bDisplays this menu"));
+		sender.sendMessage(Utils.translate("&3/squad [help]  &bdisplays this menu"));
 		sender.sendMessage(Utils.translate("&3/squad create  &bcreates a squad"));
 		sender.sendMessage(Utils.translate("&3/squad list  &blists all players in squad"));
 		sender.sendMessage(Utils.translate("&3/squad invite <player>  &binvites player to squad"));
