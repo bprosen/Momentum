@@ -63,6 +63,10 @@ public class SquadManager {
 		squad.getSquadMembers().forEach(this::leave);
 	}
 
+	public void warpMembers(PlayerStats leader) {
+		leader.getSquad().getSquadMembers().stream().filter(member -> !member.equals(leader)).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
+	}
+
 	// returns true if player toggled on and false if toggled off
 	public boolean toggleSquadChat(PlayerStats member) {
 		if (!inSquadChat.add(member)) {

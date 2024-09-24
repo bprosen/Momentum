@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.squads.Squad;
 import com.renatusnetwork.momentum.data.squads.SquadManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
@@ -199,6 +200,25 @@ public class SquadCMD implements CommandExecutor {
 
 				break;
 			case "warp":
+				Level level = player.getLevel();
+
+				if (squad == null)
+					noSquad(sender);
+				else if (!SquadManager.isLeader(player))
+					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
+				else if (player.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+					player.sendMessage(Utils.translate("&cYou cannot warp to a plot!"));
+				else if (!player.inLevel())
+					player.sendMessage(Utils.translate("&cYou are not in a level!"));
+				else if (level.isAscendance())
+					player.sendMessage(Utils.translate("&cYou cannot warp to ascendance!"));
+				else if (level.isEventLevel() || level.isRaceLevel())
+					player.sendMessage("&cYou cannot warp to a race or event!");
+				else {
+					// notify first so failure messages send to individual players after
+					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas warped to " + level.getFormattedTitle());
+					squadManager.warpMembers(player);
+				}
 
 				break;
 			default:
