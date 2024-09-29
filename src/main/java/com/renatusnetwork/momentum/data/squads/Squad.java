@@ -23,43 +23,22 @@ public class Squad {
 		this.outgoingInvites = new HashSet<>();
 	}
 
-	// returns true if member was not already in party
-	protected boolean addMember(PlayerStats member) {
-		return squadMembers.add(member);
-	}
+	protected void addMember(PlayerStats member) { squadMembers.add(member); }
 
-	// returns true if member was in party
-	protected boolean removeMember(PlayerStats member) {
-		return squadMembers.remove(member);
-	}
+	protected void removeMember(PlayerStats member) { squadMembers.remove(member); }
 
-	protected boolean setLeader(PlayerStats newLeader) {
-		if (!squadMembers.contains(newLeader))
-			return false;
+	protected void setLeader(PlayerStats newLeader) { this.squadLeader = newLeader; }
 
-		this.squadLeader = newLeader;
-		return true;
-	}
+	public boolean hasInvite(PlayerStats invitee) { return outgoingInvites.contains(invitee); }
 
-	public boolean hasInvite(PlayerStats invitee) {
-		return outgoingInvites.contains(invitee);
-	}
+	protected void addInvite(PlayerStats invitee) { outgoingInvites.add(invitee); }
 
-	// returns false if the player is already invited
-	protected boolean addInvite(PlayerStats invitee) {
-		return outgoingInvites.add(invitee);
-	}
+	protected void removeInvite(PlayerStats invitee) { outgoingInvites.remove(invitee); }
 
-	protected void removeInvite(PlayerStats invitee) {
-		outgoingInvites.remove(invitee);
-	}
+	protected PlayerStats getSquadLeader() { return this.squadLeader; }
+	protected Set<PlayerStats> getSquadMembers() { return this.squadMembers; }
 
-	protected PlayerStats getSquadLeader() {
-		return this.squadLeader;
-	}
-	protected Set<PlayerStats> getSquadMembers() {
-		return this.squadMembers;
-	}
+	public int count() { return squadMembers.size(); }
 
 	public boolean hasWarpCooldown() { return warpCooldown; }
 	protected void setWarpCooldown(boolean cooldown) { warpCooldown = cooldown; }

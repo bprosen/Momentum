@@ -2,7 +2,6 @@ package com.renatusnetwork.momentum.data.squads;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
-import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +33,8 @@ public class SquadManager {
 					squad.removeInvite(invitee);
 					inviter.sendMessage(Utils.translate("&9" + invitee.getName() + " &3did not accept the squad invite in time"));
 					invitee.sendMessage(Utils.translate("&3You did not accept the squad invite in time"));
+					if (squad.count() == 1)
+						disband(squad);
 				}
 			}
 		}.runTaskLater(Momentum.getPlugin(), 20 * 30); // 30 seconds to accept invite

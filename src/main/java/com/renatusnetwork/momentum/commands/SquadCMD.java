@@ -46,54 +46,50 @@ public class SquadCMD implements CommandExecutor {
 			return true;
 		}
 
-		// prechecks: s > 0, args[0] != "help", label != "sqc"
+		// prechecks: s > 0, args[0] != null, args[0] != "help", label != "sqc"
 
 		switch (args[0].toLowerCase()) {
-			case "create":
-				if (squad == null) {
-					squadManager.createSquad(player);
-					player.sendMessage(Utils.translate("&3Squad has been created"));
-				}
-				else
-					player.sendMessage(Utils.translate("&cYou are already in a squad!"));
-
-				break;
 			case "list":
 				if (squad == null)
 					noSquad(sender);
 				else {
 					player.sendMessage(Utils.translate("&9Squad Members:"));
-					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq ") + member.getDisplayName()));
+					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq " + member.getDisplayName())));
 				}
 
 				break;
 			case "invite":
-				if (n != 2)
+				if (n != 2) {
 					sendHelp(sender);
-				else if (squad == null)
-					noSquad(sender);
-				else if (!SquadManager.isLeader(player))
+					break;
+				}
+				else if (squad == null) {
+					squadManager.createSquad(player);
+					squad = player.getSquad();
+				}
+				else if (!SquadManager.isLeader(player)) {
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
+					break;
+				}
+
+				PlayerStats invitee = Momentum.getStatsManager().getByName(args[1]);
+				if (invitee == null)
+					player.sendMessage(Utils.translate("&cThat player is not online!"));
+				else if (SquadManager.isMember(squad, invitee))
+					player.sendMessage(Utils.translate("&cThat player is already in the squad!"));
+				else if (squad.hasInvite(invitee))
+					player.sendMessage(Utils.translate("&cThat player has already been invited!"));
 				else {
-					PlayerStats invitee = Momentum.getStatsManager().getByName(args[1]);
-					if (invitee == null)
-						player.sendMessage(Utils.translate("&cThat player is not online!"));
-					else if (SquadManager.isMember(squad, invitee))
-						player.sendMessage(Utils.translate("&cThat player is already in the squad!"));
-					else if (squad.hasInvite(invitee))
-						player.sendMessage(Utils.translate("&cThat player has already been invited!"));
-					else {
-						squadManager.invite(player, invitee);
-						SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas invited &3" + invitee.getDisplayName() + " &bto the squad");
+					squadManager.invite(player, invitee);
+					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas invited &3" + invitee.getDisplayName() + " &bto the squad");
 
-						TextComponent component = new TextComponent(Utils.translate("&3Run &b/squad accept " + player.getName() + " &3or &bClick here to accept"));
-						component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&9Click to accept!"))));
-						component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/squad accept " + player.getName()));
+					TextComponent component = new TextComponent(TextComponent.fromLegacyText(Utils.translate("&3Run &b/squad accept " + player.getName() + " &3or &bClick here to accept")));
+					component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&9Click to accept!"))));
+					component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/squad accept " + player.getName()));
 
-						invitee.sendMessage(Utils.translate("&9" + player.getDisplayName() + " &3has invited you to join their squad"));
-						invitee.getPlayer().spigot().sendMessage(component);
-						invitee.sendMessage(Utils.translate("&3You have &b30 seconds &3to accept"));
-					}
+					invitee.sendMessage(Utils.translate("&9" + player.getDisplayName() + " &3has invited you to join their squad"));
+					invitee.getPlayer().spigot().sendMessage(component);
+					invitee.sendMessage(Utils.translate("&3You have &b30 seconds &3to accept"));
 				}
 
 				break;
@@ -130,11 +126,15 @@ public class SquadCMD implements CommandExecutor {
 				if (squad == null)
 					noSquad(sender);
 				else if (SquadManager.isLeader(player))
-					player.sendMessage(Utils.translate("&cYou must relinquish leadership before leaving the squad!"));
+					player.sendMessage(Utils.translate("&cYou must transfer squad ownership before leaving the squad!"));
 				else {
 					squadManager.leave(player, false);
 					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas left the squad");
 					player.sendMessage(Utils.translate("&3You have left the squad"));
+					if (squad.count() == 1) {
+						SquadManager.notifyMembers(squad, "&9SqC &3The squad has been disbanded because all players left");
+						squadManager.disband(squad);
+					}
 				}
 
 				break;
@@ -243,9 +243,8 @@ public class SquadCMD implements CommandExecutor {
 		sender.sendMessage(Utils.translate("&9-- Help --"));
 		sender.sendMessage(Utils.translate("&9Command Aliases: &b[squad, sq]"));
 		sender.sendMessage(Utils.translate("&3/squad [help]  &bdisplays this menu"));
-		sender.sendMessage(Utils.translate("&3/squad create  &bcreates a squad"));
 		sender.sendMessage(Utils.translate("&3/squad list  &blists all players in squad"));
-		sender.sendMessage(Utils.translate("&3/squad invite <player>  &binvites player to squad"));
+		sender.sendMessage(Utils.translate("&3/squad invite <player>  &binvites player to squad (creates squad if not in one)"));
 		sender.sendMessage(Utils.translate("&3/squad accept <player>  &baccepts squad invite from player"));
 		sender.sendMessage(Utils.translate("&3/squad leave  &bleaves current squad"));
 		sender.sendMessage(Utils.translate("&3/squad kick <player>  &bkicks player from the squad"));
