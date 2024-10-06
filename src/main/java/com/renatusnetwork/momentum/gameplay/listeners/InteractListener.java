@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
 import java.util.HashMap;
 
 public class InteractListener implements Listener {
@@ -35,12 +36,12 @@ public class InteractListener implements Listener {
         Player player = event.getPlayer();
 
         if (event.getHand() == EquipmentSlot.HAND &&
-                (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
+            (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
             // this is in case they try to click a trapdoor, door or something openable if they're in spectator
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK &&
-                    event.getClickedBlock() != null &&
-                    event.getClickedBlock().getState().getData() instanceof Openable &&
-                    Momentum.getStatsManager().get(player).isSpectating()) {
+                event.getClickedBlock() != null &&
+                event.getClickedBlock().getState().getData() instanceof Openable &&
+                Momentum.getStatsManager().get(player).isSpectating()) {
                 event.setCancelled(true);
                 return;
             }
@@ -48,16 +49,18 @@ public class InteractListener implements Listener {
             ItemStack item = event.getItem();
             StatsManager statsManager = Momentum.getStatsManager();
 
-            if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null)
+            if (item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) {
                 return;
+            }
 
             if (item.getItemMeta().getDisplayName().startsWith(Utils.translate("&7Players »"))) {
                 event.setCancelled(true);
 
-                if (statsManager.containsHiddenPlayer(player))
+                if (statsManager.containsHiddenPlayer(player)) {
                     statsManager.togglePlayerHiderOff(player, player.getInventory().getHeldItemSlot(), true);
-                else
+                } else {
                     statsManager.togglePlayerHiderOn(player, player.getInventory().getHeldItemSlot(), true);
+                }
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&eLast Checkpoint"))) {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
@@ -66,8 +69,9 @@ public class InteractListener implements Listener {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-                if (playerStats != null && playerStats.isLoaded())
+                if (playerStats != null && playerStats.isLoaded()) {
                     Momentum.getMenuManager().openInventory(playerStats, "profile", true);
+                }
             } else if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(Utils.translate("&cReset"))) {
                 event.setCancelled(true);
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
@@ -107,12 +111,15 @@ public class InteractListener implements Listener {
                                                     playerStats.clearPotionEffects();
 
                                                     // if has nv status, add nv
-                                                    if (playerStats.hasNightVision())
+                                                    if (playerStats.hasNightVision()) {
                                                         player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                                                    }
 
-                                                    for (PotionEffect potionEffect : level.getPotionEffects())
-                                                        if (playerStats.hasNightVision() || potionEffect.getType() != PotionEffectType.NIGHT_VISION)
+                                                    for (PotionEffect potionEffect : level.getPotionEffects()) {
+                                                        if (playerStats.hasNightVision() || potionEffect.getType() != PotionEffectType.NIGHT_VISION) {
                                                             player.addPotionEffect(potionEffect);
+                                                        }
+                                                    }
                                                 }
                                                 resetConfirmMap.remove(player.getName());
 
@@ -126,8 +133,9 @@ public class InteractListener implements Listener {
                                     } else {
                                         player.sendMessage(Utils.translate("&cYou are not in a level"));
                                     }
-                                } else
+                                } else {
                                     player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
+                                }
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
                             }
@@ -168,16 +176,19 @@ public class InteractListener implements Listener {
                         if (playerStats.inRace()) {
                             String forfeitMessage = "&cYou forfeit the race, giving a loss, taking elo";
 
-                            if (playerStats.getRace().hasBet())
+                            if (playerStats.getRace().hasBet()) {
                                 forfeitMessage += " and not returning the &6" + Utils.formatNumber(playerStats.getRace().getBet()) + " &eCoins &cbet";
+                            }
 
                             playerStats.sendMessage(Utils.translate(forfeitMessage));
                             playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
-                        } else
+                        } else {
                             Momentum.getLocationManager().teleportToSpawn(playerStats, player);
+                        }
                     }
-                } else
+                } else {
                     player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                }
             }
         }
     }
@@ -185,12 +196,13 @@ public class InteractListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onSignClick(PlayerInteractEvent event) {
         if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK))
-                && event.getClickedBlock().getType().equals(Material.WALL_SIGN)
-                && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+            && event.getClickedBlock().getType().equals(Material.WALL_SIGN)
+            && !event.getClickedBlock().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
             // return if gamemode 0, opped and left clicked
             Player player = event.getPlayer();
-            if (player.isOp() && player.getGameMode() == GameMode.CREATIVE && event.getAction().equals(Action.LEFT_CLICK_BLOCK))
+            if (player.isOp() && player.getGameMode() == GameMode.CREATIVE && event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 return;
+            }
 
             CommandSignManager csignManager = Momentum.getCommandSignManager();
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
@@ -206,8 +218,9 @@ public class InteractListener implements Listener {
                     } else {
                         player.sendMessage(Utils.translate("&aYou have claimed this sign"));
                     }
-                } else
+                } else {
                     player.sendMessage(Utils.translate("&cYou have already used this sign"));
+                }
             }
         }
     }

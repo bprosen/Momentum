@@ -17,14 +17,12 @@ import java.util.*;
 
 public class LevelsDB {
 
-    public static HashMap<String, Level> getLevels()
-    {
+    public static HashMap<String, Level> getLevels() {
         List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.LEVELS_TABLE, "*", "");
         HashMap<String, Level> levels = new HashMap<>();
         LocationManager locationManager = Momentum.getLocationManager();
 
-        for (Map<String, String> result : results)
-        {
+        for (Map<String, String> result : results) {
             String levelName = result.get("name");
             LevelType type = LevelType.valueOf(result.get("type").toUpperCase());
 
@@ -33,47 +31,57 @@ public class LevelsDB {
 
             // set core details
             String reward = result.get("reward");
-            if (reward != null)
+            if (reward != null) {
                 level.setReward(Integer.parseInt(reward));
+            }
 
             String price = result.get("price");
-            if (price != null)
+            if (price != null) {
                 level.setPrice(Integer.parseInt(price));
+            }
 
             String title = result.get("title");
-            if (title != null)
+            if (title != null) {
                 level.setTitle(Utils.translate(title));
+            }
 
             // settings
             String stuckURL = result.get("stuck_url");
-            if (stuckURL != null)
+            if (stuckURL != null) {
                 level.setStuckURL(stuckURL);
+            }
 
             String permission = result.get("required_permission");
-            if (permission != null)
+            if (permission != null) {
                 level.setRequiredPermission(permission);
+            }
 
             String difficulty = result.get("difficulty");
-            if (difficulty != null)
+            if (difficulty != null) {
                 level.setDifficulty(Integer.parseInt(difficulty));
+            }
 
             String requiredRank = result.get("required_rank");
-            if (requiredRank != null)
+            if (requiredRank != null) {
                 level.setRequiredRank(result.get("required_rank"));
+            }
 
             String respawnY = result.get("respawn_y");
-            if (respawnY != null)
+            if (respawnY != null) {
                 level.setRespawnY(Integer.parseInt(respawnY));
+            }
 
             String maxCompletions = result.get("max_completions");
-            if (maxCompletions != null)
+            if (maxCompletions != null) {
                 level.setMaxCompletions(Integer.parseInt(maxCompletions));
+            }
 
             String masteryMultiplier = result.get("mastery_multiplier");
-            if (masteryMultiplier != null)
+            if (masteryMultiplier != null) {
                 level.setMasteryMultiplier(Float.parseFloat(masteryMultiplier));
-            else
+            } else {
                 level.setMasteryMultiplier(Momentum.getSettingsManager().min_mastery_multiplier);
+            }
 
             level.setLevelType(type);
 
@@ -90,16 +98,18 @@ public class LevelsDB {
             Location completionLoc = locationManager.get(SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName));
 
             // add spawn loc
-            if (spawnLoc != null)
+            if (spawnLoc != null) {
                 level.setStartLocation(spawnLoc);
-            else
+            } else {
                 level.setStartLocation(locationManager.getSpawnLocation());
+            }
 
             // add completion loc
-            if (completionLoc != null)
+            if (completionLoc != null) {
                 level.setCompletionLocation(completionLoc);
-            else
+            } else {
                 level.setCompletionLocation(locationManager.getSpawnLocation());
+            }
 
             // 4 seperate queries... not the greatest but it keeps our code clean and due to our indexes it does still happen quite fast
             level.setCommands(getCompletionCommands(levelName));
@@ -123,8 +133,9 @@ public class LevelsDB {
 
         List<String> requiredLevels = new ArrayList<>();
 
-        for (Map<String, String> result : results)
+        for (Map<String, String> result : results) {
             requiredLevels.add(result.get("required_level_name"));
+        }
 
         return requiredLevels;
     }
@@ -138,8 +149,9 @@ public class LevelsDB {
 
         List<String> commands = new ArrayList<>();
 
-        for (Map<String, String> result : results)
+        for (Map<String, String> result : results) {
             commands.add(result.get("command"));
+        }
 
         return commands;
     }
@@ -173,15 +185,16 @@ public class LevelsDB {
 
         HashMap<String, Integer> ratings = new HashMap<>();
 
-        for (Map<String, String> result : results)
+        for (Map<String, String> result : results) {
             ratings.put(result.get("name"), Integer.parseInt(result.get("rating")));
+        }
 
         return ratings;
     }
 
     public static void insertLevel(String levelName, long creationMillis) {
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name, creation_date) VALUES (?,?)",
-                levelName, creationMillis);
+                                      levelName, creationMillis);
     }
 
     public static void updateName(String levelName, String newLevelName) {
@@ -190,15 +203,15 @@ public class LevelsDB {
 
     public static long getGlobalCompletions() {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "COUNT(*) AS total_completions", "");
+                                                                             "COUNT(*) AS total_completions", "");
 
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
 
     public static long getCompletionsBetweenDates(String levelName, String start, String end) {
         List<Map<String, String>> globalResults = DatabaseQueries.getResults(DatabaseManager.LEVEL_COMPLETIONS_TABLE,
-                "COUNT(*) AS total_completions",
-                " WHERE name=? AND completion_date BETWEEN ? AND ?", levelName, start, end);
+                                                                             "COUNT(*) AS total_completions",
+                                                                             " WHERE name=? AND completion_date BETWEEN ? AND ?", levelName, start, end);
 
         return Long.parseLong(globalResults.get(0).get("total_completions"));
     }
@@ -227,13 +240,11 @@ public class LevelsDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET max_completions=? WHERE name=?", maxCompletions, levelName);
     }
 
-    public static void updateStuckURL(String levelName, String stuckURL)
-    {
+    public static void updateStuckURL(String levelName, String stuckURL) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET stuck_url=? WHERE name=?", stuckURL, levelName);
     }
 
-    public static void resetStuckURL(String levelName)
-    {
+    public static void resetStuckURL(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET stuck_url=NULL WHERE name=?", levelName);
     }
 
@@ -253,59 +264,49 @@ public class LevelsDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET mastery_multiplier=? WHERE name=?", amount, levelName);
     }
 
-    public static void updateRequiredPermission(String levelName, String permission)
-    {
+    public static void updateRequiredPermission(String levelName, String permission) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_permission=? WHERE name=?", permission, levelName);
     }
 
-    public static void updateRequiredRank(String levelName, String rankName)
-    {
+    public static void updateRequiredRank(String levelName, String rankName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_rank=? WHERE name=?", rankName, levelName);
     }
 
-    public static void removeRequiredPermission(String levelName)
-    {
+    public static void removeRequiredPermission(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET required_permission=NULL WHERE name=?", levelName);
     }
 
-    public static void updateCooldown(String levelName)
-    {
+    public static void updateCooldown(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET cooldown=NOT cooldown WHERE name=?", levelName);
     }
 
-    public static void updateTC(String levelName)
-    {
+    public static void updateTC(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET tc=NOT tc WHERE name=?", levelName);
     }
 
-    public static void updateDifficulty(String levelName, int difficulty)
-    {
+    public static void updateDifficulty(String levelName, int difficulty) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET difficulty=? WHERE name=?", difficulty, levelName);
     }
 
-    public static void setLevelType(String levelName, LevelType levelType)
-    {
+    public static void setLevelType(String levelName, LevelType levelType) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET type=? WHERE name=?", levelType.name(), levelName);
     }
 
-    public static void insertLevelRequired(String levelName, String requiredLevelName)
-    {
+    public static void insertLevelRequired(String levelName, String requiredLevelName) {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " (level_name, required_level_name) VALUES (?,?)",
                 levelName, requiredLevelName
         );
     }
 
-    public static void removeLevelRequired(String levelName, String requiredLevelName)
-    {
+    public static void removeLevelRequired(String levelName, String requiredLevelName) {
         DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.LEVEL_REQUIRED_LEVELS_TABLE + " WHERE level_name=? AND required_level_name=?",
                 levelName, requiredLevelName
         );
     }
 
-    public static void removeLevel(String levelName)
-    {
+    public static void removeLevel(String levelName) {
         DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVELS_TABLE + " WHERE name=?", levelName);
 
         // this is just for extra clean up since they are not foreign key relationships

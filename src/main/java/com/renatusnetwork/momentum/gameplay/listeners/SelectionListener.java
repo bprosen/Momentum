@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 public class SelectionListener {
 
     // listen very early to be ahead of normal fawe
-    @Subscribe (priority = EventHandler.Priority.VERY_EARLY)
+    @Subscribe(priority = EventHandler.Priority.VERY_EARLY)
     public void onSelection(EditSessionEvent event) {
 
         Actor actor = event.getActor();
@@ -30,18 +30,17 @@ public class SelectionListener {
         */
         if (event.getStage() == EditSession.Stage.BEFORE_HISTORY &&
             actor != null && actor.isPlayer() &&
-            event.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-        {
+            event.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
             // get bukkit player from name
             Player player = Bukkit.getPlayer(actor.getName());
 
             // only continue if not opped
-            if (player != null)
-            {
+            if (player != null) {
                 // if opped and bypassing plots, return
-                if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+                if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
                     return;
+                }
 
                 // try catch for incomplete regions
                 try {
@@ -49,20 +48,18 @@ public class SelectionListener {
                     LocalSession session = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
                     Region region = session.getSelection(event.getWorld());
 
-                    if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player))
-                    {
+                    if (checkSelection(region.getMinimumPoint(), region.getMaximumPoint(), player)) {
                         // send bypass info if opped
                         String messageToSend = "&cThis WorldEdit selection is out of where you can build";
-                        if (player.isOp())
+                        if (player.isOp()) {
                             messageToSend += " &7You can bypass this with &c/plot bypass";
+                        }
 
                         player.sendMessage(Utils.translate(messageToSend));
 
                         event.setCancelled(true);
                     }
-                }
-                catch (IncompleteRegionException exception)
-                {
+                } catch (IncompleteRegionException exception) {
                     // empty stack trace
                 }
             }
@@ -79,8 +76,9 @@ public class SelectionListener {
             player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
             // if opped and bypassing plots, return
-            if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+            if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
                 return;
+            }
 
             try {
                 // get session and clipboard holder of session
@@ -102,16 +100,17 @@ public class SelectionListener {
                 Vector clipboardOffset = event.getClipboard().getMinimumPoint().subtract(event.getClipboard().getOrigin());
                 Vector max = event.getPosition().add(holder.getTransform().apply(clipboardOffset));
                 Vector min = max.add(holder.getTransform()
-                        .apply(event.getClipboard().getMaximumPoint()
-                                .subtract(event.getClipboard().getMinimumPoint())));
+                                             .apply(event.getClipboard().getMaximumPoint()
+                                                            .subtract(event.getClipboard().getMinimumPoint())));
 
                 if (checkSelection(min, max, player)) {
                     event.setCancelled(true);
 
                     // send bypass info if opped
                     String messageToSend = "&cYour paste selection is out of where you can build";
-                    if (player.isOp())
+                    if (player.isOp()) {
                         messageToSend += " &7You can bypass this with &c/plot bypass";
+                    }
 
                     player.sendMessage(Utils.translate(messageToSend));
                 }
@@ -146,10 +145,11 @@ public class SelectionListener {
         boolean cantInMin = minPlot == null || !minPlot.canBuild(player);
         boolean cantInMax = maxPlot == null || !maxPlot.canBuild(player);
         boolean notSameOwner = ((minPlot != null && maxPlot != null) &&
-                !minPlot.getOwnerName().equalsIgnoreCase(maxPlot.getOwnerName()));
+                                !minPlot.getOwnerName().equalsIgnoreCase(maxPlot.getOwnerName()));
 
-        if (cantInMin || cantInMax || notSameOwner)
+        if (cantInMin || cantInMax || notSameOwner) {
             selectionPasses = true;
+        }
 
         return selectionPasses;
     }

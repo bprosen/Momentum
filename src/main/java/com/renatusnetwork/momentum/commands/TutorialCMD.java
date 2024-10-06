@@ -9,26 +9,22 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TutorialCMD implements CommandExecutor
-{
+public class TutorialCMD implements CommandExecutor {
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (sender instanceof Player)
-        {
+        if (sender instanceof Player) {
             Player player = (Player) sender;
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-            if (playerStats == null || !playerStats.isLoaded())
-            {
+            if (playerStats == null || !playerStats.isLoaded()) {
                 player.sendMessage(Utils.translate("&cYou cannot do this while your stats are loading"));
                 return false;
             }
 
-            if (a.length == 0)
-            {
-                if (playerStats.isInTutorial())
-                {
+            if (a.length == 0) {
+                if (playerStats.isInTutorial()) {
                     player.sendMessage(Utils.translate("&cYou cannot enter the tutorial while in the tutorial"));
                     return false;
                 }
@@ -37,13 +33,11 @@ public class TutorialCMD implements CommandExecutor
                 MenuItemAction.performLevelTeleport(playerStats, Momentum.getLevelManager().getTutorialLevel());
 
                 // if they made it into tutorial, toggle it on
-                if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(Momentum.getLevelManager().getTutorialLevel().getName()))
+                if (playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(Momentum.getLevelManager().getTutorialLevel().getName())) {
                     playerStats.setTutorial(true);
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("skip"))
-            {
-                if (!playerStats.isInTutorial())
-                {
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("skip")) {
+                if (!playerStats.isInTutorial()) {
                     player.sendMessage(Utils.translate("&cYou cannot skip the tutorial when not in it"));
                     return false;
                 }

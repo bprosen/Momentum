@@ -21,20 +21,18 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.*;
 
-public class LevelCMD implements CommandExecutor
-{
+public class LevelCMD implements CommandExecutor {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
         LevelManager levelManager = Momentum.getLevelManager();
         StatsManager statsManager = Momentum.getStatsManager();
 
-        if (a.length >= 2 && a[0].equalsIgnoreCase("buy"))
-        {
-            if (sender instanceof Player)
-            {
+        if (a.length >= 2 && a[0].equalsIgnoreCase("buy")) {
+            if (sender instanceof Player) {
                 Player player = (Player) sender;
                 PlayerStats playerStats = statsManager.get(player);
 
@@ -44,139 +42,114 @@ public class LevelCMD implements CommandExecutor
                 Level level = levelManager.getNameThenTitle(levelName);
 
                 // no level exists otherwise
-                if (level != null)
-                {
-                    if (level.requiresBuying())
-                    {
-                        if (!playerStats.hasCompleted(level))
-                        {
-                            if (!playerStats.hasBoughtLevel(level))
-                            {
+                if (level != null) {
+                    if (level.requiresBuying()) {
+                        if (!playerStats.hasCompleted(level)) {
+                            if (!playerStats.hasBoughtLevel(level)) {
                                 int balance = playerStats.getCoins();
                                 int price = level.getPrice();
 
-                                if (balance >= price)
-                                {
+                                if (balance >= price) {
                                     statsManager.removeCoins(playerStats, price);
                                     statsManager.addBoughtLevel(playerStats, level);
                                     player.sendMessage(Utils.translate("&7You have bought &c" + level.getTitle()));
-                                }
-                                else
-                                {
+                                } else {
                                     int amountLeft = price - balance;
                                     player.sendMessage(Utils.translate(
                                             "&cYou cannot buy &4" + level.getTitle() + "&c, you need an additional &6" +
-                                                    Utils.formatNumber(amountLeft) + " &eCoins"));
+                                            Utils.formatNumber(amountLeft) + " &eCoins"));
 
                                 }
-                            }
-                            else
+                            } else {
                                 player.sendMessage(Utils.translate("&cYou have already bought &4" + level.getTitle()));
-                        }
-                        else
+                            }
+                        } else {
                             player.sendMessage(Utils.translate("&cYou have already completed &4" + level.getTitle()));
-                    }
-                    else
+                        }
+                    } else {
                         player.sendMessage(Utils.translate("&c" + level.getTitle() + "&c does not require buying"));
-                }
-                else
+                    }
+                } else {
                     sender.sendMessage(Utils.translate("&4'&c" + levelName + "&4' &cdoes not exist"));
-            }
-            else
+                }
+            } else {
                 sender.sendMessage(Utils.translate("&cConsole cannot do this"));
-        }
-        else if (sender.isOp())
-        {
-            if (a.length >= 2 && a[0].equalsIgnoreCase("stuckurl"))
-            {
+            }
+        } else if (sender.isOp()) {
+            if (a.length >= 2 && a[0].equalsIgnoreCase("stuckurl")) {
                 String levelName = a[1].toLowerCase();
 
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (a.length > 2)
-                    {
+                if (level != null) {
+                    if (a.length > 2) {
                         String url = a[2];
                         int maxURLLength = SettingsManager.STUCK_URL_LENGTH;
 
-                        if (url.length() <= maxURLLength)
-                        {
+                        if (url.length() <= maxURLLength) {
                             levelManager.updateStuckURL(level, url);
                             sender.sendMessage(Utils.translate("&7You have set &2" + level.getTitle() + "&7's stuck URL to &a" + url));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate(
                                     "&cYou cannot set the stuck URL to longer than &4" + maxURLLength +
-                                         "&c characters, try shortening the link with TinyUrl, Bitly, etc"
+                                    "&c characters, try shortening the link with TinyUrl, Bitly, etc"
                             ));
+                        }
                     }
                     // if it has a stuck url, reset it
-                    else if (level.hasStuckURL())
-                    {
+                    else if (level.hasStuckURL()) {
                         levelManager.resetStuckURL(level);
                         sender.sendMessage(Utils.translate("&7You have reset &2" + level.getTitle() + "&7's stuck URL"));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&2" + level.getTitle() + " &cdoes not have a stuck URL to reset"));
+                    }
                 }
-            }
-            else if (a.length >= 2 && a[0].equalsIgnoreCase("reveal"))
-            {
+            } else if (a.length >= 2 && a[0].equalsIgnoreCase("reveal")) {
                 String[] split = Arrays.copyOfRange(a, 1, a.length);
                 String levelName = String.join(" ", split);
 
                 Level level = levelManager.getNameThenTitle(levelName);
 
-                if (level != null)
+                if (level != null) {
                     sender.sendMessage(Utils.translate("&a" + levelName + "&7 is level name &2" + level.getName()));
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4'&c" + levelName + "&4' &cdoes not exist"));
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("show"))
-            {
-                if (sender instanceof Player)
-                {
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("show")) {
+                if (sender instanceof Player) {
 
                     Player player = (Player) sender;
                     PlayerStats playerStats = statsManager.get(player);
 
-                    if (playerStats.inLevel())
+                    if (playerStats.inLevel()) {
                         sender.sendMessage(Utils.translate("&7You are in &c" + playerStats.getLevel().getTitle()));
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&7You are not in a level"));
-                }
-                else
+                    }
+                } else {
                     sender.sendMessage(Utils.translate("&cConsole cannot run this"));
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("create"))
-            {
+                }
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("create")) {
                 String levelName = a[1].toLowerCase();
 
-                if (levelName.contains("'"))
+                if (levelName.contains("'")) {
                     sender.sendMessage(Utils.translate("&7Please do not use ' ..."));
-                else if (levelManager.exists(levelName))
+                } else if (levelManager.exists(levelName)) {
                     sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7already exists"));
-                else
-                {
+                } else {
                     levelManager.create(levelName);
                     sender.sendMessage(Utils.translate("&7Created level &2" + levelName));
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("delete"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("delete")) {
                 String levelName = a[1];
 
-                if (!levelManager.exists(levelName))
+                if (!levelManager.exists(levelName)) {
                     sender.sendMessage(Utils.translate("&7Level &2" + levelName + " &7does not exist"));
-                else
-                {
+                } else {
                     levelManager.remove(levelName);
                     sender.sendMessage(Utils.translate("&7Deleted level &2" + levelName));
                 }
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
-            {
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
                 sender.sendMessage(Utils.translate("&7Loading levels..."));
 
                 // load total completions and leaderboards in async
@@ -191,14 +164,11 @@ public class LevelCMD implements CommandExecutor
                         levelManager.loadRecordsLB();
                     }
                 }.runTaskAsynchronously(Momentum.getPlugin());
-            }
-            else if (a.length > 2 && a[0].equalsIgnoreCase("title"))
-            {
+            } else if (a.length > 2 && a[0].equalsIgnoreCase("title")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String[] split = Arrays.copyOfRange(a, 2, a.length);
                     String title = String.join(" ", split);
 
@@ -206,119 +176,92 @@ public class LevelCMD implements CommandExecutor
 
                     sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's title to &2" + title));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("reward"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("reward")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (Utils.isInteger(a[2]))
-                    {
+                if (level != null) {
+                    if (Utils.isInteger(a[2])) {
                         int reward = Integer.parseInt(a[2]);
 
                         levelManager.setReward(level, reward);
                         sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's reward to &6" + reward));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&cIncorrect parameters, must enter integer"));
+                    }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("startloc"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("startloc")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (sender instanceof Player)
-                    {
+                if (level != null) {
+                    if (sender instanceof Player) {
                         String spawnPositionName = SettingsManager.LEVEL_SPAWN_FORMAT.replace("%level%", levelName);
                         levelManager.setStartLocation(level, spawnPositionName, ((Player) sender).getLocation());
 
                         sender.sendMessage(Utils.translate("&7Location saved as &2" + spawnPositionName + " &7for &2" + levelName));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&cConsole cannot run this"));
+                    }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("completionloc"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("completionloc")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (sender instanceof Player)
-                    {
+                if (level != null) {
+                    if (sender instanceof Player) {
                         String spawnPositionName = SettingsManager.LEVEL_COMPLETION_FORMAT.replace("%level%", levelName);
                         levelManager.setCompletionLocation(level, spawnPositionName, ((Player) sender).getLocation());
 
                         sender.sendMessage(Utils.translate("&7Location saved as &2" + spawnPositionName + " &7for &2" + levelName));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&cConsole cannot do this"));
+                    }
                 }
-            }
-            else if (a.length > 1 && a[0].equalsIgnoreCase("maxcompletions"))
-            {
+            } else if (a.length > 1 && a[0].equalsIgnoreCase("maxcompletions")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (a.length == 3)
-                    {
-                        if (Utils.isInteger(a[2]))
-                        {
+                if (level != null) {
+                    if (a.length == 3) {
+                        if (Utils.isInteger(a[2])) {
                             int maxCompletions = Integer.parseInt(a[2]);
 
                             levelManager.setMaxCompletions(level, maxCompletions);
                             sender.sendMessage(Utils.translate("&7Set &2" + levelName + "&7's max completions to &2" + maxCompletions));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an integer"));
-                    }
-                    else if (a.length == 2)
+                        }
+                    } else if (a.length == 2) {
                         sender.sendMessage(Utils.translate("&2" + levelName + "&7's current max completions: &2" + level.getMaxCompletions()));
-                    else
+                    } else {
                         sendHelp(sender);
+                    }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("broadcast"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("broadcast")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.toggleBroadcastCompletion(level);
                     sender.sendMessage(Utils.translate("&7Broadcast for &2" + levelName + " &7 set to " + level.isBroadcasting()));
                 }
-            }
-            else if (a.length == 3 && (a[0].equalsIgnoreCase("addrequired") || a[0].equalsIgnoreCase("removerequired")))
-            {
+            } else if (a.length == 3 && (a[0].equalsIgnoreCase("addrequired") || a[0].equalsIgnoreCase("removerequired"))) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String requiredLevelName = a[2].toLowerCase();
                     Level requiredLevel = getLevel(sender, requiredLevelName);
 
-                    if (requiredLevel != null)
-                    {
-                        if (level.isRequiredLevel(requiredLevelName))
-                        {
+                    if (requiredLevel != null) {
+                        if (level.isRequiredLevel(requiredLevelName)) {
                             levelManager.removeRequiredLevel(level, requiredLevelName);
 
                             sender.sendMessage(Utils.translate(
                                     "&7Removed &c" + requiredLevelName + " &7from &2" + levelName + "&7's required levels"
                             ));
-                        }
-                        else
-                        {
+                        } else {
                             levelManager.addRequiredLevel(level, requiredLevelName);
 
                             sender.sendMessage(Utils.translate(
@@ -327,22 +270,17 @@ public class LevelCMD implements CommandExecutor
                         }
                     }
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("removelbposition"))
-            {
-                if (Utils.isInteger(a[2]))
-                {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("removelbposition")) {
+                if (Utils.isInteger(a[2])) {
                     int place = Integer.parseInt(a[2]);
 
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
-                    if (level != null && level.hasLeaderboard())
-                    {
+                    if (level != null && level.hasLeaderboard()) {
                         List<LevelLBPosition> leaderboard = level.getLeaderboard();
 
-                        if (place <= leaderboard.size() && place > 0)
-                        {
+                        if (place <= leaderboard.size() && place > 0) {
                             LevelLBPosition oldHolder = leaderboard.get(place - 1);
 
                             // run it in async!
@@ -356,12 +294,10 @@ public class LevelCMD implements CommandExecutor
                                     levelManager.removeTotalLevelCompletion();
 
                                     // if deleting record
-                                    if (place == 1)
-                                    {
+                                    if (place == 1) {
                                         List<LevelLBPosition> newLeaderboard = level.getLeaderboard();
 
-                                        if (!newLeaderboard.isEmpty())
-                                        {
+                                        if (!newLeaderboard.isEmpty()) {
                                             // if the new leaderboard is no longer empty, add record for new holder
                                             LevelLBPosition newHolder = newLeaderboard.get(0);
 
@@ -370,231 +306,202 @@ public class LevelCMD implements CommandExecutor
                                                 PlayerStats oldHolderStats = statsManager.getByName(oldHolder.getPlayerName());
                                                 PlayerStats newHolderStats = statsManager.getByName(newHolder.getPlayerName());
 
-                                                if (oldHolderStats != null)
+                                                if (oldHolderStats != null) {
                                                     oldHolderStats.removeRecord(level);
+                                                }
 
-                                                if (newHolderStats != null)
+                                                if (newHolderStats != null) {
                                                     newHolderStats.addRecord(level, newHolder.getTimeTaken());
+                                                }
                                             }
                                         }
                                     }
 
                                     PlayerStats targetStats = Momentum.getStatsManager().getByName(oldHolder.getPlayerName());
 
-                                    if (targetStats != null)
+                                    if (targetStats != null) {
                                         targetStats.removeCompletion(oldHolder.getLevelName(), oldHolder.getTimeTaken());
+                                    }
 
                                     sender.sendMessage(Utils.translate(
                                             "&4" + oldHolder.getPlayerName() + "'s &ctime has been removed succesfully from &4" + levelName
                                     ));
                                 }
                             }.runTaskAsynchronously(Momentum.getPlugin());
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&cYou are entering an integer above 9"));
-                    }
-                    else
+                        }
+                    } else {
                         sender.sendMessage(Utils.translate("&c" + a[1] + " is not a level or has no leaderboard"));
-                }
-                else
+                    }
+                } else {
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer!"));
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("respawny"))
-            {
-                if (Utils.isInteger(a[2]))
-                {
+                }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("respawny")) {
+                if (Utils.isInteger(a[2])) {
                     // get new y
                     int newY = Integer.parseInt(a[2]);
 
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
-                    if (level != null)
-                    {
+                    if (level != null) {
                         levelManager.setRespawnY(level, newY);
                         sender.sendMessage(Utils.translate(
                                 "&7You set &c" + level.getTitle() + "&7's respawn y to &c" + newY
                         ));
                     }
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an integer"));
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("addrating"))
-            {
-                if (sender instanceof Player)
-                {
+                }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("addrating")) {
+                if (sender instanceof Player) {
                     Player player = (Player) sender;
 
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
-                    if (level != null)
-                    {
-                        if (!level.hasRated(player.getName()))
-                        {
-                            if (Utils.isInteger(a[2]))
-                            {
+                    if (level != null) {
+                        if (!level.hasRated(player.getName())) {
+                            if (Utils.isInteger(a[2])) {
                                 int rating = Integer.parseInt(a[2]);
                                 int minRating = Momentum.getSettingsManager().min_rating;
                                 int maxRating = Momentum.getSettingsManager().max_rating;
 
-                                if (rating >= minRating && rating <= maxRating)
-                                {
+                                if (rating >= minRating && rating <= maxRating) {
                                     levelManager.addRating(player, level, rating);
                                     sender.sendMessage(Utils.translate(
                                             "&7You added a rating of &4" + rating + " &7to &cLevel &a" + level.getTitle()
                                     ));
-                                }
-                                else
+                                } else {
                                     sender.sendMessage(Utils.translate("&cRating has to be between &4" + minRating + "-" + maxRating));
-                            }
-                            else
+                                }
+                            } else {
                                 sender.sendMessage(Utils.translate("&c" + a[2] + " is not an integer"));
-                        }
-                        else
+                            }
+                        } else {
                             sender.sendMessage(Utils.translate("&cYou have already rated &4" + level.getTitle()));
+                        }
                     }
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&cConsole cannot do this"));
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("removerating"))
-            {
+                }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("removerating")) {
                 String levelName = a[1].toLowerCase();
                 String targetName = a[2];
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (level.hasRated(targetName))
-                    {
+                if (level != null) {
+                    if (level.hasRated(targetName)) {
                         levelManager.removeRating(targetName, level);
                         sender.sendMessage(Utils.translate("&cYou removed &4" + targetName + "&c's from " + level.getTitle()));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&4" + targetName + " &chas not rated &4" + level.getTitle()));
+                    }
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("hasrated"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("hasrated")) {
                 String levelName = a[1].toLowerCase();
                 String playerName = a[2];
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     int rating = level.getRating(playerName);
 
-                    if (rating > -1)
+                    if (rating > -1) {
                         sender.sendMessage(Utils.translate(
                                 "&c" + playerName + " &7has rated &c" + level.getTitle() + "&7 a &6" + rating
                         ));
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate(
                                 "&c" + playerName + " &7has not rated &c" + level.getTitle()
                         ));
+                    }
                 }
-            }
-            else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings")) {
+            } else if (a.length >= 2 && a[0].equalsIgnoreCase("listratings")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (a.length == 2)
-                    {
-                        if (level.getRatingsCount() > 0)
-                        {
+                if (level != null) {
+                    if (a.length == 2) {
+                        if (level.getRatingsCount() > 0) {
                             sender.sendMessage(Utils.translate("&2" + level.getTitle() + "&7's Ratings"));
 
                             // loop through list
-                            for (int i = Momentum.getSettingsManager().max_rating; i >= Momentum.getSettingsManager().min_rating; i--)
-                            {
+                            for (int i = Momentum.getSettingsManager().max_rating; i >= Momentum.getSettingsManager().min_rating; i--) {
                                 String msg = " &2" + i + " &7-";
 
                                 List<String> names = level.getUsersWhoRated(i);
 
-                                for (String name : names)
+                                for (String name : names) {
                                     msg += " &a" + name;
+                                }
 
                                 sender.sendMessage(Utils.translate(msg));
                             }
                             sender.sendMessage(Utils.translate("&a" + level.getRatingsCount() + " &7ratings"));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&cNobody has rated &4" + level.getTitle()));
-                    }
-                    else if (a.length == 3)
-                    {
-                        if (Utils.isInteger(a[2]))
-                        {
+                        }
+                    } else if (a.length == 3) {
+                        if (Utils.isInteger(a[2])) {
                             int rating = Integer.parseInt(a[2]);
                             // make sure it is between 0 and 5
-                            if (rating >= Momentum.getSettingsManager().min_rating && rating <= Momentum.getSettingsManager().max_rating)
-                            {
+                            if (rating >= Momentum.getSettingsManager().min_rating && rating <= Momentum.getSettingsManager().max_rating) {
 
                                 List<String> names = level.getUsersWhoRated(rating);
 
                                 // if it is not empty
-                                if (!names.isEmpty())
-                                {
+                                if (!names.isEmpty()) {
                                     sender.sendMessage(Utils.translate(
                                             "&7Players who rated &2" + level.getTitle() + "&7 a &a" + rating
                                     ));
 
                                     String msg = " &2" + rating + " &7-";
 
-                                    for (String playerName : names)
+                                    for (String playerName : names) {
                                         msg += " &a" + playerName;
+                                    }
 
                                     sender.sendMessage(Utils.translate(msg));
                                     sender.sendMessage(Utils.translate("&a" + names.size() + " &7ratings"));
-                                }
-                                else
+                                } else {
                                     sender.sendMessage(Utils.translate("&cNobody has rated this level a " + rating));
-                            }
-                            else
+                                }
+                            } else {
                                 sender.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
-                        }
-                        else
+                            }
+                        } else {
                             sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an Integer"));
-                    }
-                    else
+                        }
+                    } else {
                         sender.sendMessage(Utils.translate("&cInvalid arguments"));
+                    }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("togglewater"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("togglewater")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.toggleLiquidReset(level);
 
                     String offOrOn = "&cOff";
-                    if (level.doesLiquidResetPlayer())
+                    if (level.doesLiquidResetPlayer()) {
                         offOrOn = "&aOn";
+                    }
 
                     sender.sendMessage(Utils.translate(
                             "&7You toggled " + offOrOn + " &7liquid resetting players for level &c" + level.getTitle()
                     ));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("rename"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("rename")) {
                 String levelName = a[1].toLowerCase();
                 String newLevelName = a[2].toLowerCase();
 
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
-                    if (!levelManager.exists(newLevelName))
-                    {
-                        if (!newLevelName.contains("'"))
-                        {
+                if (level != null) {
+                    if (!levelManager.exists(newLevelName)) {
+                        if (!newLevelName.contains("'")) {
                             // update in yaml and db
                             LevelsDB.updateName(levelName, newLevelName);
 
@@ -622,42 +529,33 @@ public class LevelCMD implements CommandExecutor
                             }.runTaskAsynchronously(Momentum.getPlugin());
 
                             sender.sendMessage(Utils.translate("&7You have renamed &c" + levelName + " &7to &a" + newLevelName));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&7Please do not use ' ..."));
-                    }
-                    else
+                        }
+                    } else {
                         sender.sendMessage(Utils.translate("&4" + newLevelName + " &calready exists"));
+                    }
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("type"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("type")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String levelType = a[2].toUpperCase();
 
-                    try
-                    {
+                    try {
                         LevelType type = LevelType.valueOf(levelType);
                         levelManager.setLevelType(level, type);
                         sender.sendMessage(Utils.translate("&7You have set &2" + level.getTitle() + "&7's type to &2" + type.name()));
-                    }
-                    catch (IllegalArgumentException exception)
-                    {
+                    } catch (IllegalArgumentException exception) {
                         sender.sendMessage(Utils.translate("&cInvalid level type, options are: " + Arrays.toString(LevelType.values())));
                     }
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("resetcheckpoint"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("resetcheckpoint")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String playerName = a[2].toLowerCase();
 
                     Momentum.getCheckpointManager().deleteCheckpoint(playerName, level);
@@ -665,9 +563,7 @@ public class LevelCMD implements CommandExecutor
                             "&7Any checkpoints stored for &c" + playerName + "&7 on level &2" + level.getTitle() + "&7 has been deleted"
                     ));
                 }
-            }
-            else if (a.length == 4 && a[0].equalsIgnoreCase("totalcompletions"))
-            {
+            } else if (a.length == 4 && a[0].equalsIgnoreCase("totalcompletions")) {
                 // asyncify since big db searching
                 new BukkitRunnable() {
                     @Override
@@ -678,288 +574,235 @@ public class LevelCMD implements CommandExecutor
 
                         Level level = getLevel(sender, levelName);
 
-                        if (level != null)
-                        {
+                        if (level != null) {
                             long totalCompletions = LevelsDB.getCompletionsBetweenDates(level.getName(), startDate, endDate);
 
                             sender.sendMessage(Utils.translate(
                                     "&c" + level.getTitle() + "&7 between &a" + startDate + " &7and &a" + endDate +
-                                            " &7has &a" + Utils.formatNumber(totalCompletions) + " &7Completions"
+                                    " &7has &a" + Utils.formatNumber(totalCompletions) + " &7Completions"
                             ));
                         }
                     }
                 }.runTaskAsynchronously(Momentum.getPlugin());
-            } else if (a.length == 3 && a[0].equalsIgnoreCase("price"))
-            {
-                if (Utils.isInteger(a[2]))
-                {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("price")) {
+                if (Utils.isInteger(a[2])) {
                     int price = Integer.parseInt(a[2]);
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
-                    if (level != null)
-                    {
+                    if (level != null) {
                         levelManager.setPrice(level, price);
                         sender.sendMessage(Utils.translate(
                                 "&7You set the price of &c" + level.getTitle() + "&7 to &6" + Utils.formatNumber(price) + " &eCoins"
                         ));
                     }
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid integer"));
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("addboughtlevel"))
-            {
+                }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("addboughtlevel")) {
                 Level level = getLevel(sender, a[2].toLowerCase());
 
-                if (level != null)
-                {
-                    if (level.requiresBuying())
-                    {
+                if (level != null) {
+                    if (level.requiresBuying()) {
                         String playerName = a[1];
                         PlayerStats targetStats = statsManager.getByName(a[1]);
 
-                        if (targetStats != null)
-                        {
-                            if (!targetStats.hasBoughtLevel(level))
-                            {
+                        if (targetStats != null) {
+                            if (!targetStats.hasBoughtLevel(level)) {
                                 statsManager.addBoughtLevel(targetStats, level);
                                 sender.sendMessage(Utils.translate(
                                         "&7You have added &c" + level.getTitle() + "&7 to &4" + playerName + "&c's &7bought levels"
                                 ));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&c'&4" + playerName + "&c' has already bought &4" + level.getTitle()));
-                        }
-                        else
+                            }
+                        } else {
                             sender.sendMessage(Utils.translate("&c'&4" + playerName + "&c' is not online"));
-                    }
-                    else
+                        }
+                    } else {
                         sender.sendMessage(Utils.translate("&c'&4" + level.getTitle() + "&c' is not a buyable level"));
+                    }
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("removeboughtlevel"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("removeboughtlevel")) {
                 Level level = getLevel(sender, a[2].toLowerCase());
 
-                if (level != null)
-                {
+                if (level != null) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             String playerName = a[1];
 
                             // this also acts as a checker of if they have ever joined
-                            if (StatsDB.hasBoughtLevel(playerName, level.getName()))
-                            {
+                            if (StatsDB.hasBoughtLevel(playerName, level.getName())) {
                                 PlayerStats targetStats = statsManager.getByName(playerName);
 
-                                if (targetStats != null)
+                                if (targetStats != null) {
                                     statsManager.removeBoughtLevel(targetStats, level);
+                                }
 
                                 StatsDB.removeBoughtLevelByName(playerName, level.getName());
                                 sender.sendMessage(Utils.translate("&7You have removed &c" + level.getTitle() + "&7 from &4" + playerName + "&c's &7bought levels"));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate(
                                         "&c'&4" + playerName + "&c' has either never joined or not bought &4" + level.getTitle()
                                 ));
+                            }
                         }
                     }.runTaskAsynchronously(Momentum.getPlugin());
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("new"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("new")) {
                 Level level = getLevel(sender, a[1].toLowerCase());
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.toggleNew(level);
                     sender.sendMessage(Utils.translate(
                             "&7You have set the new level value of &c" + level.getTitle() + "&7 to &c" + level.isNew()
                     ));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("difficulty"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("difficulty")) {
                 Level level = getLevel(sender, a[1].toLowerCase());
 
-                if (level != null)
-                {
-                    if (Utils.isInteger(a[2]))
-                    {
+                if (level != null) {
+                    if (Utils.isInteger(a[2])) {
                         int difficulty = Integer.parseInt(a[2]);
                         int maxDifficulty = Momentum.getSettingsManager().max_difficulty;
                         int minDifficulty = Momentum.getSettingsManager().min_difficulty;
 
-                        if (difficulty > maxDifficulty)
+                        if (difficulty > maxDifficulty) {
                             difficulty = maxDifficulty;
+                        }
 
-                        if (difficulty < minDifficulty)
+                        if (difficulty < minDifficulty) {
                             difficulty = minDifficulty;
+                        }
 
                         levelManager.setDifficulty(level, difficulty);
                         sender.sendMessage(Utils.translate(
                                 "&7You have set the difficulty of &c" + level.getTitle() + "&7 to &c" + difficulty
                         ));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&c'&4" + a[2] + "&c' is not a valid integer"));
+                    }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("cooldown"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("cooldown")) {
                 Level level = getLevel(sender, a[1].toLowerCase());
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.toggleCooldown(level);
                     sender.sendMessage(Utils.translate("&7You have turned " + level.getTitle() + "&7's cooldown toggle to &2" + level.hasCooldown()));
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("tc"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("tc")) {
                 Level level = getLevel(sender, a[1].toLowerCase());
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.toggleTC(level);
                     sender.sendMessage(Utils.translate("&7You have turned " + level.getTitle() + "&7's cooldown toggle to &2" + level.hasCooldown()));
                 }
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("pickfeatured"))
-            {
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("pickfeatured")) {
                 levelManager.pickFeatured();
                 sender.sendMessage(Utils.translate("&7You have set the new featured to &c" + levelManager.getFeaturedLevel().getTitle()));
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("resetsave"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("resetsave")) {
                 String playerName = a[1];
                 String levelName = a[2].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     PlayerStats playerStats = statsManager.getByName(playerName);
 
-                    if (playerStats != null)
-                    {
+                    if (playerStats != null) {
                         // if they have save
-                        if (playerStats.hasSave(level))
-                        {
+                        if (playerStats.hasSave(level)) {
                             Momentum.getSavesManager().removeSave(playerStats, level);
                             sender.sendMessage(Utils.translate("&7You have reset &c" + playerName + "'s &7save on &a" + level.getTitle()));
-                        } else
+                        } else {
                             sender.sendMessage(Utils.translate("&4" + playerName + " &cdoes not have a save for " + level.getTitle()));
-                    }
-                    else
-                    {
+                        }
+                    } else {
                         SavesDB.removeSaveFromName(playerName, level.getName());
                         sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online but any record has been deleted from the database"));
                     }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("mastery"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("mastery")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.toggleHasMastery(level);
                     sender.sendMessage(Utils.translate("&7You have set &c" + level.getTitle() + "&7 having a mastery to &a" + level.hasMastery()));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("masterymultiplier"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("masterymultiplier")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String multiplier = a[2];
 
-                    if (Utils.isFloat(multiplier))
-                    {
+                    if (Utils.isFloat(multiplier)) {
                         float multiplierValue = Float.parseFloat(multiplier);
-                        if (level.hasMastery())
-                        {
+                        if (level.hasMastery()) {
                             float minValue = Momentum.getSettingsManager().min_mastery_multiplier;
                             float maxValue = Momentum.getSettingsManager().max_mastery_multiplier;
 
-                            if (multiplierValue < minValue)
+                            if (multiplierValue < minValue) {
                                 multiplierValue = minValue;
+                            }
 
-                            if (multiplierValue > maxValue)
+                            if (multiplierValue > maxValue) {
                                 multiplierValue = maxValue;
+                            }
 
                             levelManager.setMasteryMultiplier(level, multiplierValue);
                             sender.sendMessage(Utils.translate("&7You have set &a" + level.getTitle() + "&7's mastery multiplifer to &a" + multiplierValue));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&4" + levelName + " &cdoes not have a mastery version"));
-                    }
-                    else
+                        }
+                    } else {
                         sender.sendMessage(Utils.translate("&4" + multiplier + " &cis not a valid float"));
+                    }
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("permission"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("permission")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String permission = a[2].toLowerCase();
                     levelManager.setRequiredPermission(level, permission);
                     sender.sendMessage(Utils.translate("&7You have set &a" + level.getTitle() + "&7's required permission to enter to &a" + permission));
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("removepermission"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("removepermission")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     levelManager.removeRequiredPermission(level);
                     sender.sendMessage(Utils.translate("&7You have removed &a" + level.getTitle() + "&7's required permission"));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("rank"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("rank")) {
                 String levelName = a[1].toLowerCase();
                 Level level = getLevel(sender, levelName);
 
-                if (level != null)
-                {
+                if (level != null) {
                     String rankName = a[2].toLowerCase();
                     Rank rank = Momentum.getRanksManager().get(rankName);
 
-                    if (rank != null)
-                    {
+                    if (rank != null) {
                         levelManager.setRequiredRank(level, rank);
                         sender.sendMessage(Utils.translate("&7You have set &a" + level.getTitle() + "&7's required rank to enter to &a" + rank.getTitle()));
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
+                    }
                 }
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("makesign"))
-            {
-                if (sender instanceof Player)
-                {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("makesign")) {
+                if (sender instanceof Player) {
                     Player player = (Player) sender;
                     String levelName = a[1].toLowerCase();
                     Level level = getLevel(sender, levelName);
 
-                    if (level != null)
-                    {
+                    if (level != null) {
                         List<Block> blocks = player.getLastTwoTargetBlocks(null, 5);
 
                         // ensure bocks are adequate and not too far away
-                        if (blocks.size() == 2 && blocks.get(1).getType() != null && blocks.get(1).getType() != Material.AIR)
-                        {
+                        if (blocks.size() == 2 && blocks.get(1).getType() != null && blocks.get(1).getType() != Material.AIR) {
                             final int MAX_SIGN_LENGTH = 15;
 
                             Block adjacentBlock = blocks.get(0);
@@ -969,28 +812,26 @@ public class LevelCMD implements CommandExecutor
                             BlockFace face = targetBlock.getFace(adjacentBlock);
 
                             // ensure no trying to place a sign on ground or roof
-                            if (face != BlockFace.DOWN && face != BlockFace.UP)
-                            {
+                            if (face != BlockFace.DOWN && face != BlockFace.UP) {
                                 boolean overwriteSign = false;
 
                                 // if the block we are looking at is already a sign, we only want to replace the lines
-                                if (targetBlock.getType() == Material.WALL_SIGN)
-                                {
+                                if (targetBlock.getType() == Material.WALL_SIGN) {
                                     signBlock = targetBlock;
                                     overwriteSign = true;
-                                }
-                                else
+                                } else {
                                     signBlock = targetBlock.getRelative(face);
+                                }
 
                                 // unfortunately we need to seperate these two overwriteSign check as the type has to be set first, and we need the Sign class for both cases
-                                if (!overwriteSign)
+                                if (!overwriteSign) {
                                     signBlock.setType(Material.WALL_SIGN);
+                                }
 
                                 Sign sign = (Sign) signBlock.getState();
 
                                 // create sign with direction
-                                if (!overwriteSign)
-                                {
+                                if (!overwriteSign) {
                                     org.bukkit.material.Sign matSign = new org.bukkit.material.Sign(Material.WALL_SIGN);
 
                                     matSign.setFacingDirection(face);
@@ -1005,8 +846,7 @@ public class LevelCMD implements CommandExecutor
                                 String levelTitle = level.getFormattedTitle();
 
                                 // if the title goes beyond the max length, set it without colors
-                                if (MAX_SIGN_LENGTH < level.getTitle().length())
-                                {
+                                if (MAX_SIGN_LENGTH < level.getTitle().length()) {
                                     String noColorTitle = ChatColor.stripColor(levelTitle);
                                     // if the line is STILL too long with no color, substring it, otherwise just set it with no color
                                     levelTitle = MAX_SIGN_LENGTH < noColorTitle.length() ? noColorTitle.substring(0, MAX_SIGN_LENGTH) : noColorTitle;
@@ -1016,35 +856,34 @@ public class LevelCMD implements CommandExecutor
                                 sign.update();
 
                                 player.sendMessage(Utils.translate("&7You have created the sign for &8" + level.getTitle()));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&cWall signs cannot go on the ground or roof, try the side of a block"));
-                        }
-                        else
+                            }
+                        } else {
                             sender.sendMessage(Utils.translate("&cNo target block found, make sure you are right in front of and looking at the block to place the sign on"));
+                        }
                     }
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&cConsole cannot do this"));
-            }
-            else
+                }
+            } else {
                 sendHelp(sender);
+            }
         }
         return true;
     }
 
-    private static Level getLevel(CommandSender sender, String levelName)
-    {
+    private static Level getLevel(CommandSender sender, String levelName) {
         Level level = Momentum.getLevelManager().get(levelName);
 
-        if (level == null)
+        if (level == null) {
             sender.sendMessage(Utils.translate("&4'&c" + levelName + "&4' &cdoes not exist"));
+        }
 
         return level;
     }
 
-    private static void sendHelp(CommandSender sender)
-    {
+    private static void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&aTo reload levels from database, use &2/level load"));
         sender.sendMessage(Utils.translate("&7Level names are all lowercase"));
         sender.sendMessage(Utils.translate("&a/level buy  &7Buys a level if it has a price"));

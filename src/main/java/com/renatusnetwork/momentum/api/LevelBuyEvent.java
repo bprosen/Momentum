@@ -9,8 +9,8 @@ import org.bukkit.event.HandlerList;
 
 import java.util.Collection;
 
-public class LevelBuyEvent extends Event implements Cancellable
-{
+public class LevelBuyEvent extends Event implements Cancellable {
+
     private PlayerStats playerStats;
     private Collection<Level> levels;
     private int totalPrice;
@@ -18,47 +18,44 @@ public class LevelBuyEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    public static HandlerList getHandlerList()
-    {
+    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
-    public LevelBuyEvent(PlayerStats playerStats, Collection<Level> levels, int totalPrice)
-    {
+    public LevelBuyEvent(PlayerStats playerStats, Collection<Level> levels, int totalPrice) {
         this.playerStats = playerStats;
         this.levels = levels;
         this.totalPrice = totalPrice;
         this.cancelled = false;
     }
 
-    public PlayerStats getPlayerStats()
-    {
+    public PlayerStats getPlayerStats() {
         return playerStats;
     }
 
-    public Player getPlayer() { return playerStats.getPlayer(); }
+    public Player getPlayer() {
+        return playerStats.getPlayer();
+    }
 
-    public Collection<Level> getLevels()
-    {
+    public Collection<Level> getLevels() {
         return levels;
     }
 
-    public int getTotalPrice() { return totalPrice; }
+    public int getTotalPrice() {
+        return totalPrice;
+    }
 
-    public void setTotalPrice(int totalPrice)
-    {
+    public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
     }
 
     @Override
-    public boolean isCancelled()
-    {
+    public boolean isCancelled() {
         return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled)
-    {
+    public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 

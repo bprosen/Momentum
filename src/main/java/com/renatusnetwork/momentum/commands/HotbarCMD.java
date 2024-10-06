@@ -12,13 +12,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class HotbarCMD implements CommandExecutor
-{
+public class HotbarCMD implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender instanceof Player)
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender instanceof Player) {
             Player player = (Player) sender;
 
             // clear inv first
@@ -29,9 +26,9 @@ public class HotbarCMD implements CommandExecutor
             Utils.refreshHotbarState(player);
 
             player.sendMessage(Utils.translate("&7You have refreshed your hotbar"));
-        }
-        else
+        } else {
             sender.sendMessage(Utils.translate("&cConsole cannot do this"));
+        }
         return false;
     }
 }

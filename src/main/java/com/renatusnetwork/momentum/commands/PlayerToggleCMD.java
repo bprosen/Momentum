@@ -11,23 +11,23 @@ import org.bukkit.entity.Player;
 public class PlayerToggleCMD implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (!(sender instanceof Player))
+        if (!(sender instanceof Player)) {
             return true;
+        }
 
         Player player = (Player) sender;
-        if (a.length == 1 && a[0].equalsIgnoreCase("toggle"))
-        {
+        if (a.length == 1 && a[0].equalsIgnoreCase("toggle")) {
             StatsManager statsManager = Momentum.getStatsManager();
 
-            if (statsManager.containsHiddenPlayer(player))
+            if (statsManager.containsHiddenPlayer(player)) {
                 statsManager.togglePlayerHiderOff(player, true);
-            else if (!Momentum.getStatsManager().get(player).isEventParticipant())
+            } else if (!Momentum.getStatsManager().get(player).isEventParticipant()) {
                 statsManager.togglePlayerHiderOn(player, true);
-            else
+            } else {
                 player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+            }
         }
         return true;
     }

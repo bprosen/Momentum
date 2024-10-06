@@ -13,24 +13,21 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class RaceManager
-{
+public class RaceManager {
+
     private Set<RaceRequest> raceRequests;
     private HashMap<String, ChoosingLevel> choosingLevel;
 
     private ArrayList<RaceLBPosition> raceLB;
 
-    public RaceManager()
-    {
+    public RaceManager() {
         this.raceRequests = new HashSet<>();
         this.raceLB = new ArrayList<>(Momentum.getSettingsManager().max_race_leaderboard_size);
         this.choosingLevel = new HashMap<>();
 
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 loadLeaderboard();
             }
         }.runTaskTimerAsynchronously(Momentum.getPlugin(), 20 * 10, 20 * 180);
@@ -39,118 +36,104 @@ public class RaceManager
     /*
         Race Requests Section
      */
-    public void sendRequest(PlayerStats sender, PlayerStats requested, Level level, int bet)
-    {
+    public void sendRequest(PlayerStats sender, PlayerStats requested, Level level, int bet) {
         RaceRequest alreadyExistsRequest = getRequest(sender, requested);
 
         // request exists
-        if (alreadyExistsRequest == null)
-        {
+        if (alreadyExistsRequest == null) {
             RaceRequest raceRequest = new RaceRequest(sender, requested, level, bet);
             addRequest(raceRequest);
 
             raceRequest.send();
 
-            new BukkitRunnable()
-            {
+            new BukkitRunnable() {
                 @Override
-                public void run()
-                {
+                public void run() {
                     RaceRequest request = getRequest(sender, requested);
 
-                    if (request != null)
-                    {
+                    if (request != null) {
                         removeRequest(raceRequest);
 
-                        if (sender != null)
+                        if (sender != null) {
                             sender.sendMessage(Utils.translate("&4" + requested.getDisplayName() + "&c did not accept your race request in time"));
+                        }
                     }
                 }
             }.runTaskLater(Momentum.getPlugin(), 20 * 30);
-        }
-        else
+        } else {
             sender.sendMessage(Utils.translate("&cYou have already sent a request to " + requested.getDisplayName()));
+        }
     }
 
-    public void acceptRequest(PlayerStats sender, PlayerStats requested)
-    {
+    public void acceptRequest(PlayerStats sender, PlayerStats requested) {
         RaceRequest raceRequest = getAcceptableRequest(sender, requested);
 
         // request exists
-        if (raceRequest != null)
+        if (raceRequest != null) {
             raceRequest.accept();
-        else
+        } else {
             sender.sendMessage(Utils.translate("&cYou do not have a race request from &4" + requested.getName()));
+        }
     }
 
-    public RaceRequest getRequest(PlayerStats sender, PlayerStats requested)
-    {
-        for (RaceRequest raceRequest : raceRequests)
-        {
-            if (raceRequest.equals(sender, requested))
+    public RaceRequest getRequest(PlayerStats sender, PlayerStats requested) {
+        for (RaceRequest raceRequest : raceRequests) {
+            if (raceRequest.equals(sender, requested)) {
                 return raceRequest;
+            }
         }
         return null;
     }
 
     // returns null if the player REQUESTED for the race isn't the one actually accepting
     public RaceRequest getAcceptableRequest(PlayerStats sender, PlayerStats requested) {
-        for (RaceRequest raceRequest : raceRequests)
-        {
-            if (raceRequest.isAcceptableRequest(sender, requested))
+        for (RaceRequest raceRequest : raceRequests) {
+            if (raceRequest.isAcceptableRequest(sender, requested)) {
                 return raceRequest;
+            }
         }
         return null;
     }
 
-    public void removeRequest(RaceRequest raceRequest)
-    {
+    public void removeRequest(RaceRequest raceRequest) {
         raceRequests.remove(raceRequest);
     }
 
-    public void addRequest(RaceRequest request)
-    {
+    public void addRequest(RaceRequest request) {
         raceRequests.add(request);
     }
 
-    public void addChoosingRaceLevel(PlayerStats sender, PlayerStats requested, int bet)
-    {
+    public void addChoosingRaceLevel(PlayerStats sender, PlayerStats requested, int bet) {
         choosingLevel.put(sender.getName(), new ChoosingLevel(sender, requested, bet));
     }
 
-    public boolean containsChoosingRaceLevel(String name)
-    {
+    public boolean containsChoosingRaceLevel(String name) {
         return choosingLevel.containsKey(name);
     }
 
-    public void removeChoosingRaceLevel(String name)
-    {
+    public void removeChoosingRaceLevel(String name) {
         choosingLevel.remove(name);
     }
 
-    public ChoosingLevel getChoosingLevelData(String name)
-    {
+    public ChoosingLevel getChoosingLevelData(String name) {
         return choosingLevel.get(name);
     }
 
     /*
         Leaderboard Section
      */
-    public void loadLeaderboard()
-    {
-        try
-        {
+    public void loadLeaderboard() {
+        try {
             raceLB.clear();
 
             List<Map<String, String>> scoreResults = DatabaseQueries.getResults(
                     DatabaseManager.PLAYERS_TABLE,
                     "name, race_wins, race_losses",
                     "WHERE race_wins > 0 " +
-                            "ORDER BY race_wins DESC " +
-                            "LIMIT " + Momentum.getSettingsManager().max_race_leaderboard_size);
+                    "ORDER BY race_wins DESC " +
+                    "LIMIT " + Momentum.getSettingsManager().max_race_leaderboard_size);
 
-            for (Map<String, String> scoreResult : scoreResults)
-            {
+            for (Map<String, String> scoreResult : scoreResults) {
                 int wins = Integer.parseInt(scoreResult.get("race_wins"));
                 int losses = Integer.parseInt(scoreResult.get("race_losses"));
 
@@ -164,12 +147,12 @@ public class RaceManager
                                 winRate
                         ));
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
 
-    public ArrayList<RaceLBPosition> getLeaderboard() { return raceLB; }
+    public ArrayList<RaceLBPosition> getLeaderboard() {
+        return raceLB;
+    }
 }

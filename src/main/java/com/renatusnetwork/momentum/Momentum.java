@@ -81,18 +81,18 @@ public class Momentum extends JavaPlugin {
         registerCommands();
 
         // check before loading classes
-        if (!ProtocolLib.setupProtocol())
-        {
+        if (!ProtocolLib.setupProtocol()) {
             getLogger().info("ProtocolLib not found or disabled");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         // register placeholders
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             registerPlaceholders();
-        else
+        } else {
             getLogger().info("Placeholder not found, not able to initialize placeholders");
+        }
 
         // initialize packet listeners
         PacketListener.loadListeners(this);
@@ -104,8 +104,7 @@ public class Momentum extends JavaPlugin {
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         // save and do all shutdown methods
         unload();
         getLogger().info("Momentum Disabled");
@@ -132,8 +131,7 @@ public class Momentum extends JavaPlugin {
 
     }
 
-    private void registerCommands()
-    {
+    private void registerCommands() {
         getCommand("db").setExecutor(new db());
 
         getCommand("practicego").setExecutor(new PracticeGoCMD());
@@ -186,8 +184,7 @@ public class Momentum extends JavaPlugin {
         getCommand("commandsign").setExecutor(new CommandSignCMD());
     }
 
-    private static void load()
-    {
+    private static void load() {
         configs = new ConfigManager(plugin);
         settings = new SettingsManager(configs.get("config"));
         database = new DatabaseManager(plugin);
@@ -203,11 +200,9 @@ public class Momentum extends JavaPlugin {
         levels.pickFeatured();
         menus.loadConnectedMenus();
 
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 CompletionsDB.loadLeaderboards(); // needs to happen AFTER loading the manager, in async to speedup start up
                 CompletionsDB.loadTotalAndUniqueAndAverageTimeCompletions();
             }
@@ -230,8 +225,7 @@ public class Momentum extends JavaPlugin {
         viaVersion = Via.getAPI();
     }
 
-    private static void unload()
-    {
+    private static void unload() {
         infinite.shutdown();
         events.shutdown();
         blackmarket.shutdown();
@@ -241,56 +235,114 @@ public class Momentum extends JavaPlugin {
         database.close();
 
         // unregister if not null
-        if (placeholders != null)
+        if (placeholders != null) {
             placeholders.unregister();
+        }
     }
 
-    private static void registerPlaceholders()
-    {
+    private static void registerPlaceholders() {
         placeholders = new Placeholders();
         placeholders.register();
     }
 
-    public static Plugin getPlugin() { return plugin; }
+    public static Plugin getPlugin() {
+        return plugin;
+    }
+
     public static Logger getPluginLogger() {
         return logger;
     }
 
     // all manager methods
-    public static SettingsManager getSettingsManager() { return settings; }
+    public static SettingsManager getSettingsManager() {
+        return settings;
+    }
+
     public static DatabaseManager getDatabaseManager() {
         return database;
     }
+
     public static ConfigManager getConfigManager() {
         return configs;
     }
-    public static LocationManager getLocationManager() { return locations; }
+
+    public static LocationManager getLocationManager() {
+        return locations;
+    }
+
     public static LevelManager getLevelManager() {
         return levels;
     }
+
     public static PerkManager getPerkManager() {
         return perks;
     }
+
     public static MenuManager getMenuManager() {
         return menus;
     }
-    public static StatsManager getStatsManager() { return stats; }
+
+    public static StatsManager getStatsManager() {
+        return stats;
+    }
+
     public static ClansManager getClansManager() {
         return clans;
     }
-    public static CheckpointManager getCheckpointManager() { return checkpoint; }
-    public static RaceManager getRaceManager() { return races; }
-    public static RanksManager getRanksManager() { return ranks; }
-    public static PlotsManager getPlotsManager() { return plots; }
-    public static EventManager getEventManager() { return events; }
-    public static InfiniteManager getInfiniteManager() { return infinite; }
-    public static ProtocolManager getProtocolManager() { return protocol; }
-    public static SavesManager getSavesManager() { return saves; }
-    public static BankManager getBankManager() { return bank; }
-    public static BlackMarketManager getBlackMarketManager() { return blackmarket; }
-    public static ModifiersManager getModifiersManager() { return modifiers; }
-    public static ELOTiersManager getELOTiersManager() { return eloTiers; }
-    public static CommandSignManager getCommandSignManager() { return cmdSigns; }
 
-    public static ViaAPI getViaVersion() { return  viaVersion; }
+    public static CheckpointManager getCheckpointManager() {
+        return checkpoint;
+    }
+
+    public static RaceManager getRaceManager() {
+        return races;
+    }
+
+    public static RanksManager getRanksManager() {
+        return ranks;
+    }
+
+    public static PlotsManager getPlotsManager() {
+        return plots;
+    }
+
+    public static EventManager getEventManager() {
+        return events;
+    }
+
+    public static InfiniteManager getInfiniteManager() {
+        return infinite;
+    }
+
+    public static ProtocolManager getProtocolManager() {
+        return protocol;
+    }
+
+    public static SavesManager getSavesManager() {
+        return saves;
+    }
+
+    public static BankManager getBankManager() {
+        return bank;
+    }
+
+    public static BlackMarketManager getBlackMarketManager() {
+        return blackmarket;
+    }
+
+    public static ModifiersManager getModifiersManager() {
+        return modifiers;
+    }
+
+    public static ELOTiersManager getELOTiersManager() {
+        return eloTiers;
+    }
+
+    public static CommandSignManager getCommandSignManager() {
+        return cmdSigns;
+    }
+
+    public static ViaAPI getViaVersion() {
+        return viaVersion;
+    }
 }

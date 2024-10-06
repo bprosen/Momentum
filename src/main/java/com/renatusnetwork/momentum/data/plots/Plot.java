@@ -19,8 +19,7 @@ public class Plot {
     private boolean submitted;
 
     // add via player object (new plot)
-    public Plot(int plotID, Player owner, Location spawnLoc)
-    {
+    public Plot(int plotID, Player owner, Location spawnLoc) {
         this.plotID = plotID;
         this.ownerUUID = owner.getUniqueId().toString();
         this.ownerName = owner.getName();
@@ -30,8 +29,7 @@ public class Plot {
     }
 
     // no player object addition (from db)
-    public Plot(int plotID, String ownerName, String ownerUUID, Location spawnLoc, List<String> trustedUUIDs, boolean submitted)
-    {
+    public Plot(int plotID, String ownerName, String ownerUUID, Location spawnLoc, List<String> trustedUUIDs, boolean submitted) {
         this.plotID = plotID;
         this.ownerName = ownerName;
         this.ownerUUID = ownerUUID;
@@ -40,11 +38,17 @@ public class Plot {
         this.submitted = submitted;
     }
 
-    public int getPlotID() { return plotID; }
+    public int getPlotID() {
+        return plotID;
+    }
 
-    public String getOwnerName() { return ownerName; }
+    public String getOwnerName() {
+        return ownerName;
+    }
 
-    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
 
     public String getOwnerUUID() {
         return ownerUUID;
@@ -59,7 +63,7 @@ public class Plot {
         if (player != null) {
             // + 1 so they spawn OUTSIDE their plot, not at the border
             Location loc = spawnLoc.clone();
-            loc.subtract(0, 0,(Momentum.getSettingsManager().player_submitted_plot_width / 2) + 1);
+            loc.subtract(0, 0, (Momentum.getSettingsManager().player_submitted_plot_width / 2) + 1);
             loc.setPitch(0);
             loc.setYaw(0);
             loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
@@ -67,30 +71,35 @@ public class Plot {
         }
     }
 
-    public boolean canBuild(Player player)
-    {
+    public boolean canBuild(Player player) {
         return ownerUUID.equalsIgnoreCase(player.getUniqueId().toString()) || trustedUUIDs.contains(player.getUniqueId().toString());
     }
 
-    public List<String> getTrustedUUIDs() { return trustedUUIDs; }
+    public List<String> getTrustedUUIDs() {
+        return trustedUUIDs;
+    }
 
-    public boolean isTrusted(String uuid) { return trustedUUIDs.contains(uuid); }
+    public boolean isTrusted(String uuid) {
+        return trustedUUIDs.contains(uuid);
+    }
 
-    public void addTrusted(String trustedPlayerUUID) { trustedUUIDs.add(trustedPlayerUUID); }
+    public void addTrusted(String trustedPlayerUUID) {
+        trustedUUIDs.add(trustedPlayerUUID);
+    }
 
-    public void removeTrusted(String trustedPlayerUUID) { trustedUUIDs.remove(trustedPlayerUUID); }
+    public void removeTrusted(String trustedPlayerUUID) {
+        trustedUUIDs.remove(trustedPlayerUUID);
+    }
 
     public boolean isSubmitted() {
         return submitted;
     }
 
-    public void submit()
-    {
+    public void submit() {
         submitted = true;
     }
 
-    public void desubmit()
-    {
+    public void desubmit() {
         submitted = false;
     }
 }

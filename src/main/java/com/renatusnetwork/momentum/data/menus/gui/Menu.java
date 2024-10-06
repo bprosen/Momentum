@@ -12,8 +12,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class Menu
-{
+public class Menu {
+
     private String name;
     private String title;
     private int pageCount;
@@ -24,8 +24,7 @@ public class Menu
 
     private boolean sortLevelTypes;
 
-    public Menu(String name)
-    {
+    public Menu(String name) {
         this.name = name;
         this.pages = new HashMap<>();
         this.sortedPages = new HashMap<>();
@@ -34,10 +33,8 @@ public class Menu
         load();
     }
 
-    private void load()
-    {
-        if (MenusYAML.exists(name))
-        {
+    private void load() {
+        if (MenusYAML.exists(name)) {
             sortLevelTypes = MenusYAML.getSortedLevelTypes(name);
             title = MenusYAML.getTitle(name);
             pageCount = MenusYAML.getPageCount(name);
@@ -47,40 +44,36 @@ public class Menu
         }
     }
 
-    private void loadPages()
-    {
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
-        {
-            if (MenusYAML.isSet(name, pageNumber + ""))
+    private void loadPages() {
+        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+            if (MenusYAML.isSet(name, pageNumber + "")) {
                 pages.put(pageNumber, new MenuPage(this, pageNumber));
+            }
         }
     }
 
-    public boolean haveSortedLevels() { return sortLevelTypes; }
-
-    public void sortLevels()
-    {
-        for (LevelSortingType type : LevelSortingType.values())
-            sortLevels(type);
+    public boolean haveSortedLevels() {
+        return sortLevelTypes;
     }
 
-    private void sortLevels(LevelSortingType sortingType)
-    {
+    public void sortLevels() {
+        for (LevelSortingType type : LevelSortingType.values()) {
+            sortLevels(type);
+        }
+    }
+
+    private void sortLevels(LevelSortingType sortingType) {
         HashMap<Level, MenuItem> levelsInMenu = new HashMap<>();
         HashMap<Integer, ArrayList<Integer>> slots = new HashMap<>();
 
         // parse into levels in menu
         ArrayList<Integer> pageSlots = new ArrayList<>();
 
-        for (MenuPage page : pages.values())
-        {
-            for (MenuItem item : page.getItems())
-            {
-                if (item.isLevel())
-                {
+        for (MenuPage page : pages.values()) {
+            for (MenuItem item : page.getItems()) {
+                if (item.isLevel()) {
                     Level level = Momentum.getLevelManager().get(item.getTypeValue());
-                    if (level != null)
-                    {
+                    if (level != null) {
                         levelsInMenu.put(level, item);
                         pageSlots.add(item.getSlot());
                     }
@@ -94,8 +87,7 @@ public class Menu
             pageSlots = new ArrayList<>();
         }
 
-        if (!levelsInMenu.isEmpty())
-        {
+        if (!levelsInMenu.isEmpty()) {
             HashMap<Integer, HashMap<Integer, MenuItem>> sortedLevels = new HashMap<>();
             HashSet<Level> addedLevels = new HashSet<>();
 
@@ -105,52 +97,48 @@ public class Menu
             HashMap<Integer, MenuItem> sortedPage = new HashMap<>();
 
             // go until we have them all sorted
-            while (addedLevels.size() < levelsInMenu.size())
-            {
+            while (addedLevels.size() < levelsInMenu.size()) {
                 Level max = null;
                 int maxSize = slots.get(pageNumber).size();
 
-                for (Map.Entry<Level, MenuItem> entry : levelsInMenu.entrySet())
-                {
+                for (Map.Entry<Level, MenuItem> entry : levelsInMenu.entrySet()) {
                     Level currentLevel = entry.getKey();
 
                     // only continue if we do not already have the level
-                    if (!addedLevels.contains(currentLevel))
-                    {
+                    if (!addedLevels.contains(currentLevel)) {
                         // if null, just skip sorting
-                        if (max == null)
+                        if (max == null) {
                             max = currentLevel;
-                        else
-                        {
-                            if (sortingType == LevelSortingType.NEWEST && currentLevel.getCreationTime() > max.getCreationTime())
+                        } else {
+                            if (sortingType == LevelSortingType.NEWEST && currentLevel.getCreationTime() > max.getCreationTime()) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.OLDEST && currentLevel.getCreationTime() < max.getCreationTime())
+                            } else if (sortingType == LevelSortingType.OLDEST && currentLevel.getCreationTime() < max.getCreationTime()) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.ALPHABETICAL &&
-                                    ChatColor.stripColor(currentLevel.getFormattedTitle()).compareToIgnoreCase(ChatColor.stripColor(max.getFormattedTitle())) < 0.0)
+                            } else if (sortingType == LevelSortingType.ALPHABETICAL &&
+                                       ChatColor.stripColor(currentLevel.getFormattedTitle()).compareToIgnoreCase(ChatColor.stripColor(max.getFormattedTitle())) < 0.0) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.EASIEST &&
-                                    currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() <= max.getDifficulty()))
+                            } else if (sortingType == LevelSortingType.EASIEST &&
+                                       currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() <= max.getDifficulty())) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.HARDEST &&
-                                    currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() > max.getDifficulty()))
+                            } else if (sortingType == LevelSortingType.HARDEST &&
+                                       currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() > max.getDifficulty())) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.HIGHEST_REWARD && currentLevel.getReward() > max.getReward())
+                            } else if (sortingType == LevelSortingType.HIGHEST_REWARD && currentLevel.getReward() > max.getReward()) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.LOWEST_REWARD && currentLevel.getReward() < max.getReward())
+                            } else if (sortingType == LevelSortingType.LOWEST_REWARD && currentLevel.getReward() < max.getReward()) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.HIGHEST_RATING &&
-                                    currentLevel.hasRating() && (!max.hasRating() || currentLevel.getRating() > max.getRating()))
+                            } else if (sortingType == LevelSortingType.HIGHEST_RATING &&
+                                       currentLevel.hasRating() && (!max.hasRating() || currentLevel.getRating() > max.getRating())) {
                                 max = currentLevel;
-                            else if (sortingType == LevelSortingType.LOWEST_RATING &&
-                                    currentLevel.hasRating() && (!max.hasRating() || currentLevel.getRating() <= max.getRating()))
+                            } else if (sortingType == LevelSortingType.LOWEST_RATING &&
+                                       currentLevel.hasRating() && (!max.hasRating() || currentLevel.getRating() <= max.getRating())) {
                                 max = currentLevel;
+                            }
                         }
                     }
                 }
                 // if not null by the end, then add
-                if (max != null)
-                {
+                if (max != null) {
                     int newSlot = slots.get(pageNumber).get(currentSlotIndex);
 
                     sortedPage.put(newSlot, levelsInMenu.get(max).clone(pages.get(pageNumber), newSlot)); // need to clone it to the new page number and slot
@@ -159,8 +147,7 @@ public class Menu
                 }
 
                 // if it is time to add a new page
-                if (maxSize <= sortedPage.size())
-                {
+                if (maxSize <= sortedPage.size()) {
                     sortedLevels.put(pageNumber, sortedPage);
 
                     pageNumber++;
@@ -174,8 +161,7 @@ public class Menu
             HashMap<Integer, MenuPage> newSortedPages = new HashMap<>();
 
             // update the menu
-            for (Map.Entry<Integer, HashMap<Integer, MenuItem>> entry : sortedLevels.entrySet())
-            {
+            for (Map.Entry<Integer, HashMap<Integer, MenuItem>> entry : sortedLevels.entrySet()) {
                 MenuPage oldMenuPage = pages.get(entry.getKey());
                 HashMap<Integer, MenuItem> newItems = entry.getValue();
                 newSortedPages.put(entry.getKey(), oldMenuPage.clone(entry.getKey(), newItems));
@@ -184,28 +170,28 @@ public class Menu
         }
     }
 
-    public void loadConnectedMenus()
-    {
-        for (MenuPage menuPage : pages.values())
-            for (MenuItem menuItem : menuPage.getItems())
-                if (menuItem.hasOpenMenu())
-                {
+    public void loadConnectedMenus() {
+        for (MenuPage menuPage : pages.values()) {
+            for (MenuItem menuItem : menuPage.getItems()) {
+                if (menuItem.hasOpenMenu()) {
                     Menu value = menuItem.getOpenMenu().getMenu();
 
-                    if (value != null && !value.equals(this))
+                    if (value != null && !value.equals(this)) {
                         connectedMenus.add(value);
+                    }
                 }
+            }
+        }
     }
 
-    public Set<Menu> getConnectedMenus()
-    {
+    public Set<Menu> getConnectedMenus() {
         return connectedMenus;
     }
 
-    public MenuPage getPage(int pageNumber)
-    {
+    public MenuPage getPage(int pageNumber) {
         return pages.get(pageNumber);
     }
+
     public String getName() {
         return name;
     }
@@ -217,8 +203,9 @@ public class Menu
     public String getFormattedTitle(int pageNumber) {
         String menuTitle = ChatColor.translateAlternateColorCodes('&', title);
 
-        if (pageCount > 1)
+        if (pageCount > 1) {
             menuTitle += ChatColor.GRAY + " Pg" + pageNumber;
+        }
 
         return menuTitle;
     }
@@ -235,62 +222,61 @@ public class Menu
         return selectItem;
     }
 
-    public Inventory getInventory(PlayerStats playerStats, int pageNumber)
-    {
+    public Inventory getInventory(PlayerStats playerStats, int pageNumber) {
         String title = getFormattedTitle(pageNumber);
 
-        if (sortLevelTypes)
-        {
+        if (sortLevelTypes) {
             HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
 
-            if (sortedMenu != null && sortedMenu.containsKey(pageNumber))
-            {
+            if (sortedMenu != null && sortedMenu.containsKey(pageNumber)) {
                 MenuPage menuPage = sortedMenu.get(pageNumber);
 
                 return Momentum.getMenuManager().createInventory(menuPage, menuPage.getRowCount() * 9, title);
             }
         }
 
-        if (pages.containsKey(pageNumber))
-        {
+        if (pages.containsKey(pageNumber)) {
             MenuPage menuPage = pages.get(pageNumber);
 
             return Momentum.getMenuManager().createInventory(menuPage, menuPage.getRowCount() * 9, title);
         }
 
-        return Momentum.getMenuManager().createInventory(getPage(1),  54, title);
+        return Momentum.getMenuManager().createInventory(getPage(1), 54, title);
     }
 
-    public void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber)
-    {
-        if (sortLevelTypes)
-        {
+    public void updateInventory(PlayerStats playerStats, InventoryView inventory, int pageNumber) {
+        if (sortLevelTypes) {
             HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
 
-            if (sortedMenu.containsKey(pageNumber))
+            if (sortedMenu.containsKey(pageNumber)) {
                 sortedMenu.get(pageNumber).formatInventory(playerStats, inventory);
-        }
-        else if (pages.containsKey(pageNumber))
+            }
+        } else if (pages.containsKey(pageNumber)) {
             pages.get(pageNumber).formatInventory(playerStats, inventory);
+        }
     }
 
-    public MenuItem getMenuItem(PlayerStats playerStats, int pageNumber, int slot)
-    {
-        if (sortLevelTypes)
-        {
+    public MenuItem getMenuItem(PlayerStats playerStats, int pageNumber, int slot) {
+        if (sortLevelTypes) {
             HashMap<Integer, MenuPage> sortedMenu = sortedPages.get(playerStats.getLevelSortingType());
-            if (sortedMenu.containsKey(pageNumber))
+            if (sortedMenu.containsKey(pageNumber)) {
                 return sortedMenu.get(pageNumber).getMenuItem(slot);
+            }
         }
 
-        if (pages.containsKey(pageNumber))
+        if (pages.containsKey(pageNumber)) {
             return pages.get(pageNumber).getMenuItem(slot);
+        }
 
         return null;
     }
 
-    public Collection<MenuPage> getPages() { return pages.values(); }
+    public Collection<MenuPage> getPages() {
+        return pages.values();
+    }
 
-    public boolean equals(Menu menu) { return menu.getName().equalsIgnoreCase(name); }
+    public boolean equals(Menu menu) {
+        return menu.getName().equalsIgnoreCase(name);
+    }
 
 }

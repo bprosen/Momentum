@@ -18,8 +18,7 @@ public class DatabaseConnection {
         open();
     }
 
-    private void open()
-    {
+    private void open() {
         FileConfiguration settings = Momentum.getConfigManager().get("config");
         String dbPath = "database";
 
@@ -53,14 +52,13 @@ public class DatabaseConnection {
         Momentum.getPluginLogger().info("Successfully opened the HikariCP connection pool to the database");
     }
 
-    public void close()
-    {
-        if (dataSource != null && !dataSource.isClosed())
+    public void close() {
+        if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
+        }
     }
 
-    public Connection get() throws SQLException
-    {
+    public Connection get() throws SQLException {
         return dataSource.getConnection();
     }
 }

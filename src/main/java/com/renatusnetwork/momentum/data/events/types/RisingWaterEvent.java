@@ -12,19 +12,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public class RisingWaterEvent extends Event implements SchedulerInterface
-{
+public class RisingWaterEvent extends Event implements SchedulerInterface {
 
     private BukkitTask scheduler;
     private int delay;
 
     private int currentY;
 
-    public RisingWaterEvent(Level level)
-    {
+    public RisingWaterEvent(Level level) {
         super(level, "Rising Water");
 
         this.delay = Momentum.getSettingsManager().rising_water_event_task_delay;
@@ -34,14 +33,12 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
     }
 
     @Override
-    public void end()
-    {
+    public void end() {
         clearWater();
         cancel();
     }
 
-    private void clearWater()
-    {
+    private void clearWater() {
 
         BlockVector maxPoint = getRegion().getMaximumPoint().toBlockPoint();
         BlockVector minPoint = getRegion().getMinimumPoint().toBlockPoint();
@@ -52,58 +49,51 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
 
         WorldEdit api = WorldEdit.getInstance();
 
-        if (api != null)
-        {
+        if (api != null) {
             LocalWorld world = new BukkitWorld(getLevel().getStartLocation().getWorld());
             Vector pos1 = new Vector(minX, 0, minZ);
             Vector pos2 = new Vector(maxX, 255, maxZ);
             CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
 
-            try
-            {
+            try {
                 // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
                 EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
                 editSession.setFastMode(true);
 
                 // create single base block set for replace
-                Set<BaseBlock> baseBlockSet = new HashSet<BaseBlock>() {{ add(new BaseBlock(Material.WATER.getId())); }};
+                Set<BaseBlock> baseBlockSet = new HashSet<BaseBlock>() {{
+                    add(new BaseBlock(Material.WATER.getId()));
+                }};
 
                 editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.AIR.getId()));
                 editSession.flushQueue();
                 editSession.setFastMode(false);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else
+        } else {
             Momentum.getPluginLogger().info("WorldEdit API found null in Event clearWater()");
+        }
     }
 
-    public boolean isStartCoveredInWater()
-    {
+    public boolean isStartCoveredInWater() {
         Location startLoc = getLevel().getStartLocation();
         return startLoc.clone().getBlock().getType() == Material.WATER || startLoc.clone().add(0, 1, 0).getBlock().getType() == Material.WATER;
     }
 
     @Override
-    public void runScheduler()
-    {
+    public void runScheduler() {
         EventManager eventManager = Momentum.getEventManager();
-        scheduler = new BukkitRunnable()
-        {
+        scheduler = new BukkitRunnable() {
             @Override
-            public void run()
-            {
-                if (!eventManager.getParticipants().isEmpty())
-                {
+            public void run() {
+                if (!eventManager.getParticipants().isEmpty()) {
                     LocationManager locationManager = Momentum.getLocationManager();
 
                     // if there is no start loc, then cancel
-                    if (locationManager.equals(getLevel().getStartLocation(), locationManager.getSpawnLocation()))
+                    if (locationManager.equals(getLevel().getStartLocation(), locationManager.getSpawnLocation())) {
                         cancel();
-                    else
-                    {
+                    } else {
                         // add another layer of water
                         BlockVector maxPoint = getRegion().getMaximumPoint().toBlockPoint();
                         BlockVector minPoint = getRegion().getMinimumPoint().toBlockPoint();
@@ -114,8 +104,7 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
 
                         WorldEdit api = WorldEdit.getInstance();
 
-                        if (api != null)
-                        {
+                        if (api != null) {
 
                             LocalWorld world = new BukkitWorld(getLevel().getStartLocation().getWorld());
 
@@ -123,8 +112,7 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
                             Vector pos2 = new Vector(maxX, currentY, maxZ);
                             CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
 
-                            try
-                            {
+                            try {
                                 // enable fast mode to do it w/o lag, then quickly disable fast mode once queue flushed
                                 EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
                                 editSession.setFastMode(true);
@@ -137,33 +125,30 @@ public class RisingWaterEvent extends Event implements SchedulerInterface
                                 editSession.replaceBlocks(selection, baseBlockSet, new BaseBlock(Material.WATER.getId()));
                                 editSession.flushQueue();
                                 editSession.setFastMode(false);
-                            }
-                            catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             currentY++;
-                        }
-                        else
+                        } else {
                             Momentum.getPluginLogger().info("WorldEdit API found null in RisingWaterEvent runScheduler");
+                        }
                     }
-                }
-                else if (isStartCoveredInWater())
+                } else if (isStartCoveredInWater()) {
                     eventManager.endEvent(null, false, true);
+                }
             }
         }.runTaskTimer(Momentum.getPlugin(), delay, delay);
     }
 
     @Override
-    public BukkitTask getScheduler()
-    {
+    public BukkitTask getScheduler() {
         return scheduler;
     }
 
     @Override
-    public void cancel()
-    {
-        if (!scheduler.isCancelled())
+    public void cancel() {
+        if (!scheduler.isCancelled()) {
             scheduler.cancel();
+        }
     }
 }

@@ -25,14 +25,12 @@ public class PlotsManager {
     private Location nextFreePlotLocation;
     private PlotDirection currentDirection;
 
-    public PlotsManager()
-    {
+    public PlotsManager() {
         this.plotList = new HashMap<>();
         load();
     }
 
-    public void load()
-    {
+    public void load() {
         plotList = PlotsDB.loadPlots();
         currentMaxPlotID = PlotsDB.getCurrentMaxPlotID();
 
@@ -41,8 +39,7 @@ public class PlotsManager {
         Momentum.getPluginLogger().info("Plots loaded: " + plotList.size());
     }
 
-    public void loadLastTwoPlotsFromDB()
-    {
+    public void loadLastTwoPlotsFromDB() {
         Location[] lastTwoPlots = PlotsDB.getLastTwoPlotLocations();
         Location lastPlot = lastTwoPlots[1];
         Location secondLastPlot = lastTwoPlots[0];
@@ -51,25 +48,25 @@ public class PlotsManager {
 
         PlotDirection direction = PlotDirection.NORTH;
         // ensure not null, can do directional difference
-        if (lastPlot != null && secondLastPlot != null)
-        {
-            if (lastPlot.getX() > secondLastPlot.getX())
+        if (lastPlot != null && secondLastPlot != null) {
+            if (lastPlot.getX() > secondLastPlot.getX()) {
                 direction = PlotDirection.EAST;
-            else if (lastPlot.getZ() > secondLastPlot.getZ())
+            } else if (lastPlot.getZ() > secondLastPlot.getZ()) {
                 direction = PlotDirection.SOUTH;
-            else if (lastPlot.getX() < secondLastPlot.getX())
+            } else if (lastPlot.getX() < secondLastPlot.getX()) {
                 direction = PlotDirection.WEST;
+            }
         }
 
         this.currentDirection = direction;
 
-        if (lastPlotLocation != null)
+        if (lastPlotLocation != null) {
             loadNextFreePlot(lastPlotLocation);
+        }
     }
 
     // player param version
-    public void add(Player player)
-    {
+    public void add(Player player) {
         plotList.put(player.getName(), new Plot(currentMaxPlotID, player, player.getLocation()));
     }
 
@@ -77,11 +74,12 @@ public class PlotsManager {
         return plotList.get(name);
     }
 
-    public Plot getIgnoreCase(String name)
-    {
-        for (Map.Entry<String, Plot> entry : plotList.entrySet())
-            if (entry.getKey().equalsIgnoreCase(name))
+    public Plot getIgnoreCase(String name) {
+        for (Map.Entry<String, Plot> entry : plotList.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(name)) {
                 return entry.getValue();
+            }
+        }
 
         return null;
     }
@@ -94,34 +92,32 @@ public class PlotsManager {
         return plotList;
     }
 
-    public void remove(String playerName)
-    {
+    public void remove(String playerName) {
         plotList.remove(playerName);
     }
 
     // this needs to be a list due to #get(int)
-    public List<Plot> getSubmittedPlots()
-    {
+    public List<Plot> getSubmittedPlots() {
         List<Plot> tempList = new ArrayList<>();
 
-        for (Plot plot : plotList.values())
-        {
-            if (plot.isSubmitted())
+        for (Plot plot : plotList.values()) {
+            if (plot.isSubmitted()) {
                 tempList.add(plot);
+            }
         }
         return tempList;
     }
 
     // creation algorithm
-    public void createPlot(PlayerStats playerStats)
-    {
+    public void createPlot(PlayerStats playerStats) {
         Location creationLoc;
         Player player = playerStats.getPlayer();
 
-        if (nextFreePlotLocation != null)
+        if (nextFreePlotLocation != null) {
             creationLoc = nextFreePlotLocation.clone();
-        else
+        } else {
             creationLoc = new Location(Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world), 0, Momentum.getSettingsManager().player_submitted_plot_default_y, 0);
+        }
 
         creationLoc.setYaw(player.getLocation().getYaw());
         creationLoc.setPitch(player.getLocation().getPitch());
@@ -142,16 +138,14 @@ public class PlotsManager {
         player.sendMessage(Utils.translate("&7Your &aPlot &7has been created! &7Type &a/plot home &7to get back!"));
     }
 
-    public void loadNextFreePlot(Location newLastPlot)
-    {
+    public void loadNextFreePlot(Location newLastPlot) {
         Location clonedLastPlot = newLastPlot.clone();
         int plotWidthAndBuffer = Momentum.getSettingsManager().player_submitted_plot_buffer_width + Momentum.getSettingsManager().player_submitted_plot_width;
         Plot foundPlot = null;
         PlotDirection newDirection = this.currentDirection;
 
         // now need to get whatever direction is clockwise to it
-        switch (newDirection)
-        {
+        switch (newDirection) {
             case NORTH:
                 foundPlot = getPlotInLocation(clonedLastPlot.add(plotWidthAndBuffer, 0, 0));
                 newDirection = PlotDirection.EAST;
@@ -170,10 +164,9 @@ public class PlotsManager {
                 break;
         }
         // found the plot loc
-        if (foundPlot == null)
+        if (foundPlot == null) {
             this.nextFreePlotLocation = clonedLastPlot;
-        else
-        {
+        } else {
             this.nextFreePlotLocation = clonedLastPlot.add(clonedLastPlot.clone().subtract(this.lastPlotLocation));
             this.nextFreePlotLocation.setY(Momentum.getSettingsManager().player_submitted_plot_default_y);
         }
@@ -181,13 +174,13 @@ public class PlotsManager {
         this.lastPlotLocation = newLastPlot;
     }
 
-    public void deletePlot(Plot plot)
-    {
+    public void deletePlot(Plot plot) {
         Player owner = Bukkit.getPlayer(plot.getOwnerName());
 
         // if they are in plot world, teleport them
-        if (owner.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+        if (owner.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
             owner.teleport(Momentum.getLocationManager().getSpawnLocation());
+        }
 
         // clear plot!
         clearPlot(plot, true);
@@ -195,16 +188,15 @@ public class PlotsManager {
         // remove from cache and teleport to spawn
         plotList.remove(owner.getName());
 
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 PlotsDB.removePlot(plot.getOwnerUUID(), false);
 
                 // deleted last plot
-                if (getPlotInLocation(lastPlotLocation) == null)
+                if (getPlotInLocation(lastPlotLocation) == null) {
                     loadLastTwoPlotsFromDB();
+                }
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
     }
@@ -219,8 +211,7 @@ public class PlotsManager {
         PlotsDB.removeTrustedPlayer(plot.getPlotID(), playerUUID);
     }
 
-    public void clearPlot(Plot plot, boolean deletePlot)
-    {
+    public void clearPlot(Plot plot, boolean deletePlot) {
         WorldEdit api = WorldEdit.getInstance();
 
         if (api != null) {
@@ -248,8 +239,7 @@ public class PlotsManager {
                 editSession.flushQueue();
 
                 // if plot isnt being deleted then regen the bedrock
-                if (!deletePlot)
-                {
+                if (!deletePlot) {
                     editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
                     editSession.flushQueue();
                 }
@@ -263,13 +253,10 @@ public class PlotsManager {
     }
 
     // get nearest plot from location
-    public Plot getPlotInLocation(Location loc)
-    {
+    public Plot getPlotInLocation(Location loc) {
         Plot nearestPlot = null;
-        for (Plot plot : plotList.values())
-        {
-            if (blockInPlot(loc, plot))
-            {
+        for (Plot plot : plotList.values()) {
+            if (blockInPlot(loc, plot)) {
                 nearestPlot = plot;
                 break;
             }
@@ -277,12 +264,10 @@ public class PlotsManager {
         return nearestPlot;
     }
 
-    public void updatePlayerNameInPlot(String oldName, String newName)
-    {
+    public void updatePlayerNameInPlot(String oldName, String newName) {
         Plot plot = get(oldName);
 
-        if (plot != null)
-        {
+        if (plot != null) {
             // remove
             plotList.remove(oldName);
 
@@ -292,8 +277,7 @@ public class PlotsManager {
         }
     }
 
-    public boolean blockInPlot(Location loc, Plot plot)
-    {
+    public boolean blockInPlot(Location loc, Plot plot) {
         int maxX = plot.getSpawnLoc().getBlockX() + (Momentum.getSettingsManager().player_submitted_plot_width / 2);
         int maxZ = plot.getSpawnLoc().getBlockZ() + (Momentum.getSettingsManager().player_submitted_plot_width / 2);
         int minX = plot.getSpawnLoc().getBlockX() - (Momentum.getSettingsManager().player_submitted_plot_width / 2);

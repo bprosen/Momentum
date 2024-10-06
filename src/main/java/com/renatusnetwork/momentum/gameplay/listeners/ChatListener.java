@@ -16,23 +16,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-public class ChatListener implements Listener
-{
-    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onChat(AsyncPlayerChatEvent event)
-    {
+public class ChatListener implements Listener {
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String msg = event.getMessage();
         ClansManager clansManager = Momentum.getClansManager();
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-        if (playerStats != null)
-        {
+        if (playerStats != null) {
             event.setCancelled(true);
 
             // iterate through the smaller list first
-            if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName()))
-            {
+            if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName())) {
                 event.getRecipients().clear();
 
                 // cancel event, clear recipients, and send to clan members
@@ -42,24 +39,21 @@ public class ChatListener implements Listener
                 Momentum.getPluginLogger().info("Clan Chat: " + playerStats.getClan().getTag() + " " + player.getName() + " " + ChatColor.stripColor(msg));
 
                 // now send to spying players
-                for (String spyPlayers : clansManager.getChatSpyMap())
-                {
+                for (String spyPlayers : clansManager.getChatSpyMap()) {
                     Player spyPlayer = Bukkit.getPlayer(spyPlayers);
 
                     // null check and make sure they will not be sent msgs from their own clan
-                    if (spyPlayer != null)
-                    {
+                    if (spyPlayer != null) {
                         PlayerStats spyStats = Momentum.getStatsManager().get(spyPlayer);
                         Clan spyClan = spyStats.getClan();
 
-                        if (spyClan == null || !spyClan.equals(playerStats.getClan()))
+                        if (spyClan == null || !spyClan.equals(playerStats.getClan())) {
                             spyPlayer.sendMessage(Utils.translate("&6CS " + playerStats.getClan().getTag() + " &e" +
-                                    player.getDisplayName() + " &7" + msg));
+                                                                  player.getDisplayName() + " &7" + msg));
+                        }
                     }
                 }
-            }
-            else
-            {
+            } else {
 
                 String formatted = String.format(event.getFormat(), player.getDisplayName(), msg);
 
@@ -73,8 +67,9 @@ public class ChatListener implements Listener
                 Bukkit.getServer().getConsoleSender().sendMessage(mainComponent.toLegacyText());
 
                 // add to gg if they say it
-                if (ChatColor.stripColor(msg).equalsIgnoreCase("gg"))
+                if (ChatColor.stripColor(msg).equalsIgnoreCase("gg")) {
                     Momentum.getStatsManager().addGG(playerStats);
+                }
             }
         }
     }

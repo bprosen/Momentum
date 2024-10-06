@@ -19,87 +19,73 @@ import java.util.*;
 
 public class StatsCMD implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (a.length > 0) {
             // infinite pk lb
-            if (a.length == 2 && a[0].equalsIgnoreCase("infinite"))
-            {
+            if (a.length == 2 && a[0].equalsIgnoreCase("infinite")) {
                 String typeString = a[1];
                 boolean correct = false;
 
                 // verify type
-                for (InfiniteType type : InfiniteType.values())
-                    if (type.toString().equalsIgnoreCase(typeString))
-                    {
+                for (InfiniteType type : InfiniteType.values()) {
+                    if (type.toString().equalsIgnoreCase(typeString)) {
                         correct = true;
                         break;
                     }
+                }
 
-                if (correct)
-                {
+                if (correct) {
                     InfiniteType type = InfiniteType.valueOf(typeString.toUpperCase());
 
-                    if (!Momentum.getInfiniteManager().getLeaderboard(type).isEmpty())
-                    {
+                    if (!Momentum.getInfiniteManager().getLeaderboard(type).isEmpty()) {
                         sender.sendMessage(Utils.translate("&d" + StringUtils.capitalize(typeString.toLowerCase()) + " &5Infinite &7Leaderboard"));
 
                         int position = 1;
-                        for (InfiniteLBPosition lbPosition : Momentum.getInfiniteManager().getLeaderboard(type).getLeaderboardPositions())
-                        {
-                            if (lbPosition != null)
-                            {
+                        for (InfiniteLBPosition lbPosition : Momentum.getInfiniteManager().getLeaderboard(type).getLeaderboardPositions()) {
+                            if (lbPosition != null) {
                                 sender.sendMessage(Utils.translate(" &7" +
-                                        position + " &5" +
-                                        Utils.formatNumber(lbPosition.getScore()) + " &d" +
-                                        lbPosition.getName()));
+                                                                   position + " &5" +
+                                                                   Utils.formatNumber(lbPosition.getScore()) + " &d" +
+                                                                   lbPosition.getName()));
                             }
                             position++;
                         }
 
-                        if (sender instanceof Player)
-                        {
+                        if (sender instanceof Player) {
                             Player player = (Player) sender;
                             PlayerStats playerStats = Momentum.getStatsManager().get(player.getUniqueId().toString());
                             sender.sendMessage(Utils.translate("&7Your best &d" + Utils.formatNumber(playerStats.getBestInfiniteScore(type))));
                         }
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&c" + StringUtils.capitalize(typeString.toLowerCase()) + " Infinite Parkour lb not loaded or no lb positions"));
-                }
-                else
-                {
+                    }
+                } else {
                     sender.sendMessage(Utils.translate("&4'" + typeString + "' &cis not a infinite type!"));
                 }
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("levels"))
-            {
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("levels")) {
                 ArrayList<Level> globalLevelCompletionsLB = Momentum.getLevelManager().getGlobalLevelCompletionsLB();
 
-                if (!globalLevelCompletionsLB.isEmpty())
-                {
+                if (!globalLevelCompletionsLB.isEmpty()) {
                     sender.sendMessage(Utils.translate("&4Level Completions &7Leaderboard"));
 
                     int lbPositionNum = 1;
-                    for (Level lbPosition : globalLevelCompletionsLB)
-                    {
-                        if (lbPosition != null)
-                        {
+                    for (Level lbPosition : globalLevelCompletionsLB) {
+                        if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    lbPositionNum + " &4" +
-                                    Utils.formatNumber(lbPosition.getTotalCompletionsCount()) + " &c" +
-                                    lbPosition.getTitle()));
+                                                               lbPositionNum + " &4" +
+                                                               Utils.formatNumber(lbPosition.getTotalCompletionsCount()) + " &c" +
+                                                               lbPosition.getTitle()));
                             lbPositionNum++;
                         }
                     }
                     sender.sendMessage(Utils.translate("&7Global Completions &c" + Utils.formatNumber(Momentum.getLevelManager().getTotalLevelCompletions())));
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&cLevels lb not loaded or no lb positions"));
-            // players
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("players"))
-            {
+                }
+                // players
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("players")) {
                 ArrayList<GlobalPersonalLBPosition> globalPersonalCompletionsLB = Momentum.getStatsManager().getGlobalPersonalCompletionsLB();
 
                 if (!globalPersonalCompletionsLB.isEmpty()) {
@@ -107,14 +93,12 @@ public class StatsCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&3Player Completions &7Leaderboard"));
 
                     int lbPositionNum = 1;
-                    for (GlobalPersonalLBPosition globalPersonalLBPosition : globalPersonalCompletionsLB)
-                    {
-                        if (globalPersonalLBPosition != null)
-                        {
+                    for (GlobalPersonalLBPosition globalPersonalLBPosition : globalPersonalCompletionsLB) {
+                        if (globalPersonalLBPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    lbPositionNum + " &3" +
-                                    Utils.formatNumber(globalPersonalLBPosition.getCompletions()) + " &b" +
-                                    globalPersonalLBPosition.getName()));
+                                                               lbPositionNum + " &3" +
+                                                               Utils.formatNumber(globalPersonalLBPosition.getCompletions()) + " &b" +
+                                                               globalPersonalLBPosition.getName()));
                             lbPositionNum++;
                         }
                     }
@@ -127,7 +111,7 @@ public class StatsCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&cPlayers lb not loaded or no lb positions"));
                 }
-            // clans lb
+                // clans lb
             } else if (a.length == 1 && a[0].equalsIgnoreCase("clans")) {
 
                 ArrayList<Clan> clansLB = Momentum.getClansManager().getLeaderboard();
@@ -137,68 +121,56 @@ public class StatsCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&6Clan Total XP &7Leaderboard"));
                     int lbPositionNum = 1;
 
-                    for (Clan clan : clansLB)
-                    {
-                        if (clan != null && clan.getOwner() != null && clan.getOwner().getName() != null)
-                        {
+                    for (Clan clan : clansLB) {
+                        if (clan != null && clan.getOwner() != null && clan.getOwner().getName() != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    lbPositionNum + " &6" +
-                                    Utils.shortStyleNumber(clan.getTotalXP()) + " &e" +
-                                    clan.getTag() + " &6(" + clan.getOwner().getName() + ")"));
+                                                               lbPositionNum + " &6" +
+                                                               Utils.shortStyleNumber(clan.getTotalXP()) + " &e" +
+                                                               clan.getTag() + " &6(" + clan.getOwner().getName() + ")"));
                             lbPositionNum++;
                         }
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&cClans lb not loaded or no lb positions"));
                 }
-            // top rated lb
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("toprated"))
-            {
+                // top rated lb
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("toprated")) {
 
                 ArrayList<Level> topRatedLB = Momentum.getLevelManager().getTopRatedLevelsLB();
 
-                if (!topRatedLB.isEmpty())
-                {
+                if (!topRatedLB.isEmpty()) {
 
                     sender.sendMessage(Utils.translate("&9Rated Levels &7Leaderboard"));
 
                     int lbPositionNum = 1;
-                    for (Level level : topRatedLB)
-                    {
-                        if (level != null)
-                        {
+                    for (Level level : topRatedLB) {
+                        if (level != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    lbPositionNum + " &9" +
-                                    level.getRating() + " &1" +
-                                    level.getTitle()));
+                                                               lbPositionNum + " &9" +
+                                                               level.getRating() + " &1" +
+                                                               level.getTitle()));
                             lbPositionNum++;
                         }
                     }
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&cTop Rated lb not loaded or no lb positions"));
-            // race lb
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("races"))
-            {
+                }
+                // race lb
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("races")) {
 
                 ArrayList<RaceLBPosition> leaderboard = Momentum.getRaceManager().getLeaderboard();
 
-                if (!leaderboard.isEmpty())
-                {
+                if (!leaderboard.isEmpty()) {
                     sender.sendMessage(Utils.translate("&8Race Wins &7Leaderboard"));
 
                     int position = 1;
-                    for (RaceLBPosition lbPosition : leaderboard)
-                    {
-                        if (lbPosition != null)
-                        {
+                    for (RaceLBPosition lbPosition : leaderboard) {
+                        if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    position + " &8" +
-                                    lbPosition.getWins() + " &7" +
-                                    lbPosition.getName() + " &8(" +
-                                    lbPosition.getWinRate() + ")"));
+                                                               position + " &8" +
+                                                               lbPosition.getWins() + " &7" +
+                                                               lbPosition.getName() + " &8(" +
+                                                               lbPosition.getWinRate() + ")"));
                         }
                         position++;
                     }
@@ -207,36 +179,30 @@ public class StatsCMD implements CommandExecutor {
                         Player player = (Player) sender;
                         PlayerStats playerStats = Momentum.getStatsManager().get(player.getUniqueId().toString());
                         sender.sendMessage(Utils.translate("&7Your Wins/Win Rate &8" +
-                                Utils.formatNumber(playerStats.getRaceWins()) + "&7/&8" +
-                                playerStats.getRaceWinRate()));
+                                                           Utils.formatNumber(playerStats.getRaceWins()) + "&7/&8" +
+                                                           playerStats.getRaceWinRate()));
                     }
                 } else {
                     sender.sendMessage(Utils.translate("&cRace lb not loaded or no lb positions"));
                 }
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("events"))
-            {
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("events")) {
                 ArrayList<EventLBPosition> leaderboard = Momentum.getEventManager().getEventLeaderboard();
 
-                if (!leaderboard.isEmpty())
-                {
+                if (!leaderboard.isEmpty()) {
                     sender.sendMessage(Utils.translate("&bEvent Wins &7Leaderboard"));
 
                     int position = 1;
-                    for (EventLBPosition lbPosition : leaderboard)
-                    {
-                        if (lbPosition != null)
-                        {
+                    for (EventLBPosition lbPosition : leaderboard) {
+                        if (lbPosition != null) {
                             sender.sendMessage(Utils.translate(" &7" +
-                                    position + " &9" +
-                                    Utils.formatNumber(lbPosition.getWins()) + " &b" +
-                                    lbPosition.getName()));
+                                                               position + " &9" +
+                                                               Utils.formatNumber(lbPosition.getWins()) + " &b" +
+                                                               lbPosition.getName()));
                         }
                         position++;
                     }
 
-                    if (sender instanceof Player)
-                    {
+                    if (sender instanceof Player) {
                         Player player = (Player) sender;
                         PlayerStats playerStats = Momentum.getStatsManager().get(player.getUniqueId().toString());
 
@@ -259,8 +225,7 @@ public class StatsCMD implements CommandExecutor {
 
                 // allow ability to get from title or name
                 String levelName = a[0].toLowerCase();
-                if (a.length >= 1)
-                {
+                if (a.length >= 1) {
                     String[] split = Arrays.copyOfRange(a, 0, a.length);
                     levelName = String.join(" ", split);
                 }
@@ -269,10 +234,8 @@ public class StatsCMD implements CommandExecutor {
                 Level level = Momentum.getLevelManager().getNameThenTitle(levelName);
 
                 // then check if it is still null
-                if (level != null)
-                {
-                    if (!Momentum.getLevelManager().isLoadingLeaderboards())
-                    {
+                if (level != null) {
+                    if (!Momentum.getLevelManager().isLoadingLeaderboards()) {
                         sender.sendMessage(Utils.translate(
                                 level.getTitle() + "&7 Leaderboard &a(" + Utils.shortStyleNumber(level.getTotalCompletionsCount()) + ")"
                         ));
@@ -280,44 +243,40 @@ public class StatsCMD implements CommandExecutor {
                         List<LevelLBPosition> leaderboard = level.getLeaderboard();
                         boolean onLB = false;
 
-                        if (!leaderboard.isEmpty())
-                            for (int i = 0; i < leaderboard.size(); i++)
-                            {
+                        if (!leaderboard.isEmpty()) {
+                            for (int i = 0; i < leaderboard.size(); i++) {
                                 LevelLBPosition lbPosition = leaderboard.get(i);
                                 String lbName = lbPosition.getPlayerName();
                                 String time = TimeUtils.formatCompletionTimeTaken(lbPosition.getTimeTaken(), 3);
                                 String lbString = " &7" + (i + 1);
 
-                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbPosition.getPlayerName()))
-                                {
+                                if (!onLB && sender instanceof Player && sender.getName().equalsIgnoreCase(lbPosition.getPlayerName())) {
                                     // we want to show it as blue if they are on it
                                     onLB = true;
                                     lbString += " &3" + time + " &b" + lbName;
-                                }
-                                else
+                                } else {
                                     lbString += " &2" + time + " &a" + lbName;
+                                }
 
                                 sender.sendMessage(Utils.translate(lbString));
                             }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&cNo timed completions to display"));
+                        }
 
-                        if (!onLB && sender instanceof Player)
-                        {
+                        if (!onLB && sender instanceof Player) {
                             Player player = (Player) sender;
                             PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-                            if (playerStats != null && playerStats.hasCompleted(level))
-                            {
+                            if (playerStats != null && playerStats.hasCompleted(level)) {
                                 // send your best if not on it and have beaten it
                                 LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
-                                if (levelCompletion != null)
+                                if (levelCompletion != null) {
                                     sender.sendMessage(Utils.translate("&7Your best is &2" + TimeUtils.formatCompletionTimeTaken(levelCompletion.getCompletionTimeElapsedMillis(), 3)));
+                                }
                             }
                         }
-                    }
-                    else
-                    {
+                    } else {
                         sender.sendMessage(Utils.translate("&cLeaderboards are still loading... check back soon"));
                     }
                 } else {
@@ -340,108 +299,95 @@ public class StatsCMD implements CommandExecutor {
         return true;
     }
 
-    public static void printCoinsLB(CommandSender sender)
-    {
+    public static void printCoinsLB(CommandSender sender) {
         ArrayList<CoinsLBPosition> coinsLB = Momentum.getStatsManager().getCoinsLB();
 
-        if (!coinsLB.isEmpty())
-        {
+        if (!coinsLB.isEmpty()) {
             sender.sendMessage(Utils.translate("&eCoins &7Leaderboard"));
 
             int lbPositionNum = 1;
-            for (CoinsLBPosition coinsLBPosition : coinsLB)
-            {
-                if (coinsLBPosition != null)
-                {
+            for (CoinsLBPosition coinsLBPosition : coinsLB) {
+                if (coinsLBPosition != null) {
                     sender.sendMessage(Utils.translate(" &7" +
-                            lbPositionNum + " &6" +
-                            Utils.formatNumber(coinsLBPosition.getCoins()) + " &7" +
-                            coinsLBPosition.getName()));
+                                                       lbPositionNum + " &6" +
+                                                       Utils.formatNumber(coinsLBPosition.getCoins()) + " &7" +
+                                                       coinsLBPosition.getName()));
                     lbPositionNum++;
                 }
             }
 
             // if player, send personal total
-            if (sender instanceof Player)
-            {
+            if (sender instanceof Player) {
                 Player player = (Player) sender;
                 sender.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(
                         Momentum.getStatsManager().get(player).getCoins()) + " &eCoins"));
             }
-        }
-        else
+        } else {
             sender.sendMessage(Utils.translate("&cCoins lb not loaded or no lb positions"));
+        }
     }
 
-    public static void printELOLB(CommandSender sender, int page)
-    {
+    public static void printELOLB(CommandSender sender, int page) {
         ArrayList<ELOLBPosition> eloLB = Momentum.getStatsManager().getELOLB();
 
-        if (!eloLB.isEmpty())
-        {
+        if (!eloLB.isEmpty()) {
             int max = page * 10;
             int min = max - 10;
             max = Math.min(page * 10, eloLB.size());
 
-            if (min <= eloLB.size())
-            {
+            if (min <= eloLB.size()) {
                 sender.sendMessage(Utils.translate("&aELO &7Leaderboard &2" + page));
 
-                for (int i = min; i < max; i++)
-                {
+                for (int i = min; i < max; i++) {
                     ELOLBPosition elolbPosition = eloLB.get(i);
 
-                    if (elolbPosition != null)
+                    if (elolbPosition != null) {
                         sender.sendMessage(Utils.translate(" &7" +
-                                (i + 1) + " &2" +
-                                Utils.formatNumber(elolbPosition.getELO()) + " &a" +
-                                elolbPosition.getName()));
+                                                           (i + 1) + " &2" +
+                                                           Utils.formatNumber(elolbPosition.getELO()) + " &a" +
+                                                           elolbPosition.getName()));
+                    }
 
                 }
 
-                if (max - min == 10)
+                if (max - min == 10) {
                     sender.sendMessage(Utils.translate("&2/elo top " + (page + 1)));
+                }
 
                 // if player, send personal total
-                if (sender instanceof Player)
-                {
+                if (sender instanceof Player) {
                     Player player = (Player) sender;
                     sender.sendMessage(Utils.translate("&7You have &2" + Utils.formatNumber(
                             Momentum.getStatsManager().get(player).getELO()) + " &aELO"));
                 }
-            }
-            else
+            } else {
                 sender.sendMessage(Utils.translate("&4" + page + " &cpage does not exist"));
-        }
-        else
+            }
+        } else {
             sender.sendMessage(Utils.translate("&cELO lb not loaded or no lb positions"));
+        }
     }
 
-    public static void printRecordsLB(CommandSender sender)
-    {
+    public static void printRecordsLB(CommandSender sender) {
         ArrayList<RecordsLBPosition> recordsLB = Momentum.getLevelManager().getRecordsLB();
 
-        if (!recordsLB.isEmpty())
-        {
+        if (!recordsLB.isEmpty()) {
 
             sender.sendMessage(Utils.translate("&9Records &7Leaderboard"));
 
             int lbPositionNum = 1;
-            for (RecordsLBPosition recordsLBPosition : recordsLB)
-            {
-                if (recordsLBPosition != null)
-                {
+            for (RecordsLBPosition recordsLBPosition : recordsLB) {
+                if (recordsLBPosition != null) {
                     sender.sendMessage(Utils.translate(" &7" +
-                            lbPositionNum + " &9" +
-                            Utils.formatNumber(recordsLBPosition.getRecords()) + " &3" +
-                            recordsLBPosition.getName()));
+                                                       lbPositionNum + " &9" +
+                                                       Utils.formatNumber(recordsLBPosition.getRecords()) + " &3" +
+                                                       recordsLBPosition.getName()));
                     lbPositionNum++;
                 }
             }
 
             // if player, send personal total
-            if (sender instanceof Player)
-            {
+            if (sender instanceof Player) {
                 Player player = (Player) sender;
                 sender.sendMessage(Utils.translate("&7You have &e✦ " + Utils.formatNumber(
                         Momentum.getStatsManager().get(player).getNumRecords()) + " &7Records"));

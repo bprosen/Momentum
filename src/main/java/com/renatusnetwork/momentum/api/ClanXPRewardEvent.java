@@ -7,8 +7,8 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class ClanXPRewardEvent extends Event implements Cancellable
-{
+public class ClanXPRewardEvent extends Event implements Cancellable {
+
     private PlayerStats playerStats;
     private Clan clan;
     private int xp;
@@ -16,25 +16,24 @@ public class ClanXPRewardEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    public static HandlerList getHandlerList()
-    {
+    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
-    public ClanXPRewardEvent(PlayerStats playerStats, Clan clan, int xp)
-    {
+    public ClanXPRewardEvent(PlayerStats playerStats, Clan clan, int xp) {
         this.playerStats = playerStats;
         this.clan = clan;
         this.xp = xp;
         this.cancelled = false;
     }
 
-    public PlayerStats getPlayerStats()
-    {
+    public PlayerStats getPlayerStats() {
         return playerStats;
     }
 
-    public Player getPlayer() { return playerStats.getPlayer(); }
+    public Player getPlayer() {
+        return playerStats.getPlayer();
+    }
 
     public Clan getClan() {
         return clan;
@@ -49,14 +48,12 @@ public class ClanXPRewardEvent extends Event implements Cancellable
     }
 
     @Override
-    public boolean isCancelled()
-    {
+    public boolean isCancelled() {
         return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled)
-    {
+    public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 

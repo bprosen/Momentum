@@ -18,13 +18,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class ModifierCMD implements CommandExecutor
-{
+public class ModifierCMD implements CommandExecutor {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender.hasPermission("momentum.admin"))
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender.hasPermission("momentum.admin")) {
             /*
                 /modifier create (modifierName) (type) (modifierValue) (title)
                 /modifier title (modifier) (title)
@@ -36,8 +34,7 @@ public class ModifierCMD implements CommandExecutor
              */
             ModifiersManager modifiersManager = Momentum.getModifiersManager();
 
-            if (a.length >= 5 && a[0].equalsIgnoreCase("create"))
-            {
+            if (a.length >= 5 && a[0].equalsIgnoreCase("create")) {
                 String modifierName = a[1];
                 String modifierType = a[2].toUpperCase();
                 String modifierValue = a[3];
@@ -45,151 +42,120 @@ public class ModifierCMD implements CommandExecutor
                 String[] split = Arrays.copyOfRange(a, 4, a.length);
                 String title = String.join(" ", split);
 
-                if (!modifiersManager.exists(modifierName))
-                {
+                if (!modifiersManager.exists(modifierName)) {
                     ModifierType type = parseType(modifierType, sender);
 
-                    if (type != null)
-                    {
+                    if (type != null) {
                         float modifier = parseModifierValue(modifierValue, type, sender);
 
-                        if (modifier > 0.00f)
-                        {
+                        if (modifier > 0.00f) {
                             // create now
                             modifiersManager.create(modifierName, type, title, modifier);
                             sender.sendMessage(Utils.translate(
                                     "&7You have created the modifier &6" + modifierName + "&7(" + title + "&7) with type &6" + modifierType + "&7 and modifier of &6" + modifier
                             ));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&cYou cannot set a modifier of 0"));
+                        }
                     }
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4" + modifierName + " &calready exists"));
-            }
-            else if (a.length >= 3 && a[0].equalsIgnoreCase("title"))
-            {
+                }
+            } else if (a.length >= 3 && a[0].equalsIgnoreCase("title")) {
                 Modifier modifier = modifiersManager.getModifier(a[1]);
                 String[] split = Arrays.copyOfRange(a, 2, a.length);
                 String title = String.join(" ", split);
 
-                if (modifier != null)
-                {
+                if (modifier != null) {
                     modifiersManager.updateTitle(modifier, title);
                     sender.sendMessage(Utils.translate("&7You have updated &6" + modifier.getName() + "&7's title to &6" + title));
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4" + a[1] + " &cdoes not exist"));
-            }
-            else if (a.length == 3 && (a[0].equalsIgnoreCase("add") || a[0].equalsIgnoreCase("remove")))
-            {
+                }
+            } else if (a.length == 3 && (a[0].equalsIgnoreCase("add") || a[0].equalsIgnoreCase("remove"))) {
                 String playerName = a[1];
                 String modifierName = a[2];
                 PlayerStats playerStats = Momentum.getStatsManager().getByName(playerName);
 
-                if (playerStats != null)
-                {
+                if (playerStats != null) {
                     Modifier modifier = Momentum.getModifiersManager().getModifier(modifierName);
 
-                    if (modifier != null)
-                    {
-                        if (a[0].equalsIgnoreCase("add"))
-                        {
-                            if (!playerStats.hasModifier(modifier.getType()))
-                            {
+                    if (modifier != null) {
+                        if (a[0].equalsIgnoreCase("add")) {
+                            if (!playerStats.hasModifier(modifier.getType())) {
                                 Momentum.getStatsManager().addModifier(playerStats, modifier);
                                 sender.sendMessage(Utils.translate("&7You have added a &c" + modifier.getTitle() + " &cModifier &7to &c" + playerStats.getName()));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&4" + playerStats.getName() + " &calready has a &4" + modifier.getType() + " &cactive!"));
-                        }
-                        else
-                        {
+                            }
+                        } else {
                             // if they have it, we can remove
-                            if (playerStats.hasModifierByName(modifier))
-                            {
+                            if (playerStats.hasModifierByName(modifier)) {
                                 Momentum.getStatsManager().removeModifier(playerStats, modifier);
                                 sender.sendMessage(Utils.translate("&7You have removed a &c" + modifier.getTitle() + " &cModifier &7from &c" + playerStats.getName()));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&4" + playerStats.getName() + " &cdoes not have the modifier &4" + modifier.getName()));
+                            }
                         }
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&4" + modifierName + " &cis not a modifier"));
-                }
-                else
+                    }
+                } else {
                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("list"))
-            {
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
                 sender.sendMessage(Utils.translate("&4List of Modifiers"));
                 listModifiers(sender, Momentum.getModifiersManager().getModifiers());
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("list"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("list")) {
                 String playerName = a[1];
                 PlayerStats targetStats = Momentum.getStatsManager().getByName(playerName);
 
-                if (targetStats != null)
-                {
+                if (targetStats != null) {
                     // list modifiers that the player has
                     sender.sendMessage(Utils.translate("&4List of &c" + targetStats.getName() + "&4's Modifiers"));
                     listModifiers(sender, targetStats.getModifiers());
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4" + playerName + " &cis not online"));
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
-            {
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
                 Momentum.getModifiersManager().load();
                 sender.sendMessage(Utils.translate("&4Modifiers has been reloaded"));
 
                 Collection<PlayerStats> players = Momentum.getStatsManager().getOnlinePlayers();
 
-                new BukkitRunnable()
-                {
+                new BukkitRunnable() {
                     @Override
-                    public void run()
-                    {
+                    public void run() {
                         // thread safety
-                        synchronized (players)
-                        {
+                        synchronized (players) {
                             // load all players modifiers
-                            for (PlayerStats playerStats : players)
+                            for (PlayerStats playerStats : players) {
                                 StatsDB.loadModifiers(playerStats);
+                            }
                         }
                     }
                 }.runTaskAsynchronously(Momentum.getPlugin());
-            }
-            else
+            } else {
                 sendHelp(sender);
-        }
-        else
+            }
+        } else {
             sender.sendMessage(Utils.translate("&cYou cannot do this"));
+        }
         return false;
     }
 
-    private void listModifiers(CommandSender sender, Collection<Modifier> modifiers)
-    {
+    private void listModifiers(CommandSender sender, Collection<Modifier> modifiers) {
 
-        for (Modifier modifier : modifiers)
-        {
+        for (Modifier modifier : modifiers) {
             String modifierString = "&c" + modifier.getName() + " &7(" + modifier.getType() + " ";
 
-            if (modifier instanceof Booster)
-            {
+            if (modifier instanceof Booster) {
                 Booster booster = (Booster) modifier;
                 modifierString += "Multiplier " + booster.getMultiplier() + ")";
-            }
-            else if (modifier instanceof Discount)
-            {
+            } else if (modifier instanceof Discount) {
                 Discount discount = (Discount) modifier;
                 modifierString += "Discount " + discount.getDiscount() + ")";
-            }
-            else if (modifier instanceof Bonus)
-            {
+            } else if (modifier instanceof Bonus) {
                 Bonus bonus = (Bonus) modifier;
                 modifierString += "Bonus " + bonus.getBonus() + ")";
             }
@@ -199,42 +165,32 @@ public class ModifierCMD implements CommandExecutor
         }
     }
 
-    private ModifierType parseType(String argument, CommandSender sender)
-    {
-        try
-        {
+    private ModifierType parseType(String argument, CommandSender sender) {
+        try {
             return ModifierType.valueOf(argument);
-        }
-        catch (IllegalArgumentException exception)
-        {
+        } catch (IllegalArgumentException exception) {
             sender.sendMessage(Utils.translate("&4" + argument + " &cis not a valid type, select from"));
             sender.sendMessage(Utils.translate("&7" + Arrays.toString(ModifierType.values())));
             return null;
         }
     }
 
-    private float parseModifierValue(String modifierValue, ModifierType type, CommandSender sender)
-    {
+    private float parseModifierValue(String modifierValue, ModifierType type, CommandSender sender) {
         float modifier;
 
         // if it is a bonus, we want to make sure they typed an integer
-        if (type == ModifierType.RECORD_BONUS)
-        {
-            if (Utils.isInteger(modifierValue))
+        if (type == ModifierType.RECORD_BONUS) {
+            if (Utils.isInteger(modifierValue)) {
                 modifier = Integer.parseInt(modifierValue);
-            else
-            {
+            } else {
                 // return if failed
                 sender.sendMessage(Utils.translate("&4" + modifierValue + " &cis not an integer"));
                 return -1.00f;
             }
-        }
-        else
-        {
-            if (Utils.isFloat(modifierValue))
+        } else {
+            if (Utils.isFloat(modifierValue)) {
                 modifier = Float.parseFloat(modifierValue);
-            else
-            {
+            } else {
                 sender.sendMessage(Utils.translate("&4" + modifierValue + " &cis not a decimal number"));
                 return -1.00f;
             }
@@ -243,8 +199,7 @@ public class ModifierCMD implements CommandExecutor
         return modifier;
     }
 
-    private void sendHelp(CommandSender sender)
-    {
+    private void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&4&lModifiers Help"));
         sender.sendMessage(Utils.translate(" &c/modifier create (modifierName) (type) (modifierValue) (title)  &7Creates a modifier - title can have spaces"));
         sender.sendMessage(Utils.translate(" &c/modifier title (modifierName) (title)  &7Changes a modifier's table - can have spaces"));

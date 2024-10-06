@@ -5,25 +5,24 @@ import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-public class MenuHolder implements InventoryHolder
-{
+public class MenuHolder implements InventoryHolder {
+
     private MenuPage menuPage;
 
-    public MenuHolder(MenuPage menuPage)
-    {
+    public MenuHolder(MenuPage menuPage) {
         this.menuPage = menuPage;
     }
 
-    public MenuPage getMenuPage()
-    {
+    public MenuPage getMenuPage() {
         return menuPage;
     }
 
-    public Menu getMenu() { return menuPage.getMenu(); }
+    public Menu getMenu() {
+        return menuPage.getMenu();
+    }
 
     @Override
-    public Inventory getInventory()
-    {
+    public Inventory getInventory() {
         return null;
     }
 }

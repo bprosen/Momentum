@@ -11,11 +11,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 
-public class ELOTierCMD implements CommandExecutor
-{
+public class ELOTierCMD implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
         /*
             /elotier create (name)
             /elotier title (name) (title)
@@ -23,130 +21,104 @@ public class ELOTierCMD implements CommandExecutor
             /elotier next (name) (nextName)
             /elotier set (player) (tier)
          */
-        if (sender.hasPermission("momentum.admin"))
-        {
+        if (sender.hasPermission("momentum.admin")) {
             ELOTiersManager eloTiersManager = Momentum.getELOTiersManager();
 
-            if (a.length == 2 && a[0].equalsIgnoreCase("create"))
-            {
+            if (a.length == 2 && a[0].equalsIgnoreCase("create")) {
                 String name = a[1].toLowerCase();
                 ELOTier tier = Momentum.getELOTiersManager().get(name);
 
-                if (tier == null)
-                {
+                if (tier == null) {
                     eloTiersManager.create(name);
                     sender.sendMessage(Utils.translate("&7You have created the ELO tier &c" + name));
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4" + name + " &calready exists"));
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("loadxpbar"))
-            {
+                }
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("loadxpbar")) {
                 PlayerStats playerStats = Momentum.getStatsManager().getByName(a[1]);
-                if (playerStats != null && playerStats.isLoaded())
-                {
+                if (playerStats != null && playerStats.isLoaded()) {
                     playerStats.loadELOToXPBar();
                     sender.sendMessage(Utils.translate("&7You have loaded &c" + playerStats.getDisplayName() + "&7's XP bar based on their ELO and ELO tier"));
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&4" + a[1] + "&c is not online or loaded"));
-            }
-            else if (a.length >= 3 && a[0].equalsIgnoreCase("title"))
-            {
+                }
+            } else if (a.length >= 3 && a[0].equalsIgnoreCase("title")) {
                 String name = a[1].toLowerCase();
                 ELOTier tier = get(sender, name);
 
-                if (tier != null)
-                {
+                if (tier != null) {
                     String[] split = Arrays.copyOfRange(a, 2, a.length);
                     String newTitle = String.join(" ", split);
 
                     eloTiersManager.updateTitle(tier, newTitle);
                     sender.sendMessage(Utils.translate("&7You have set &c" + name + " &7title to &c" + tier.getTitle()));
                 }
-            }
-            else if (a.length == 3)
-            {
-                if (a[0].equalsIgnoreCase("requiredelo"))
-                {
+            } else if (a.length == 3) {
+                if (a[0].equalsIgnoreCase("requiredelo")) {
                     String name = a[1].toLowerCase();
                     ELOTier tier = get(sender, name);
 
-                    if (tier != null)
-                    {
-                        if (Utils.isInteger(a[2]))
-                        {
+                    if (tier != null) {
+                        if (Utils.isInteger(a[2])) {
                             int requiredELO = Integer.parseInt(a[2]);
 
                             eloTiersManager.updateRequiredELO(tier, requiredELO);
                             sender.sendMessage(Utils.translate("&7You have set &c" + name + " &7required ELO to &c" + Utils.formatNumber(tier.getRequiredELO())));
-                        }
-                        else
+                        } else {
                             sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not an integer"));
+                        }
                     }
-                }
-                else if (a[0].equalsIgnoreCase("previous") || a[0].equalsIgnoreCase("next"))
-                {
+                } else if (a[0].equalsIgnoreCase("previous") || a[0].equalsIgnoreCase("next")) {
                     String name = a[1].toLowerCase();
                     ELOTier tier = get(sender, name);
 
-                    if (tier != null)
-                    {
+                    if (tier != null) {
                         String next = a[2];
                         ELOTier otherTier = get(sender, next);
 
-                        if (otherTier != null)
-                        {
-                            if (a[0].equalsIgnoreCase("previous"))
-                            {
+                        if (otherTier != null) {
+                            if (a[0].equalsIgnoreCase("previous")) {
                                 eloTiersManager.updatePreviousELOTier(tier, next);
                                 sender.sendMessage(Utils.translate("&7You have set &c" + name + " &7previous tier to &c" + next));
-                            }
-                            else
-                            {
+                            } else {
                                 eloTiersManager.updateNextELOTier(tier, next);
                                 sender.sendMessage(Utils.translate("&7You have set &c" + name + " &7next tier to &c" + next));
                             }
                         }
                     }
-                }
-                else if (a[0].equalsIgnoreCase("set"))
-                {
+                } else if (a[0].equalsIgnoreCase("set")) {
                     PlayerStats playerStats = Momentum.getStatsManager().getByName(a[1]);
-                    if (playerStats != null && playerStats.isLoaded())
-                    {
+                    if (playerStats != null && playerStats.isLoaded()) {
                         ELOTier tier = get(sender, a[2]);
 
-                        if (tier != null)
-                        {
+                        if (tier != null) {
                             Momentum.getStatsManager().updateELOTier(playerStats, tier);
                             sender.sendMessage(Utils.translate("&7You have set &c" + playerStats.getName() + "&7's ELO tier to &a" + tier.getTitle()));
                         }
-                    }
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&4" + a[1] + "&c is not online or loaded"));
-                }
-                else
+                    }
+                } else {
                     sendHelp(sender);
-            }
-            else
+                }
+            } else {
                 sendHelp(sender);
+            }
         }
         return false;
     }
 
-    private ELOTier get(CommandSender sender, String name)
-    {
+    private ELOTier get(CommandSender sender, String name) {
         ELOTier eloTier = Momentum.getELOTiersManager().get(name);
 
-        if (eloTier == null)
+        if (eloTier == null) {
             sender.sendMessage(Utils.translate("&4" + name + " &cis not a ELO tier"));
+        }
 
         return eloTier;
     }
 
-    private void sendHelp(CommandSender sender)
-    {
+    private void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&2&lELO Tier Help"));
         sender.sendMessage(Utils.translate("&a/elotier create (name)  &7Creates an ELO tier"));
         sender.sendMessage(Utils.translate("&a/elotier title (name) (title)  &7Sets a tier's title"));

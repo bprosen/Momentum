@@ -10,8 +10,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 
-public class Jackpot
-{
+public class Jackpot {
+
     private Level level;
     private int bonus;
     private HashSet<String> completed;
@@ -20,8 +20,7 @@ public class Jackpot
     private BukkitTask reminderTask;
     private BukkitTask endTask;
 
-    public Jackpot(Level level, int bonus)
-    {
+    public Jackpot(Level level, int bonus) {
         this.level = level;
         this.bonus = bonus;
         this.endMillis = System.currentTimeMillis() + 1800000; // 30 mins
@@ -29,19 +28,19 @@ public class Jackpot
         completed = new HashSet<>();
     }
 
-    public void start()
-    {
+    public void start() {
         runSchedulers();
     }
 
-    public void end()
-    {
+    public void end() {
         // cancel reminder
-        if (reminderTask != null)
+        if (reminderTask != null) {
             reminderTask.cancel();
+        }
 
-        if (endTask != null)
+        if (endTask != null) {
             endTask.cancel();
+        }
 
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
         Bukkit.broadcastMessage(Utils.translate("&6&lJACKPOT &e&lENDED"));
@@ -50,30 +49,26 @@ public class Jackpot
         String playersString = "player";
         int playerCount = completed.size();
 
-        if (playerCount > 1)
+        if (playerCount > 1) {
             playersString += "s";
+        }
 
         Bukkit.broadcastMessage(Utils.translate("&a" + Utils.formatNumber(playerCount) + " &7" + playersString + " completed " + level.getTitle()));
         Bukkit.broadcastMessage(Utils.translate("&6" + Utils.formatNumber(completed.size() * (level.getReward() + bonus)) + " &eCoins &7were rewarded"));
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
     }
 
-    private void runSchedulers()
-    {
-        endTask = new BukkitRunnable()
-        {
+    private void runSchedulers() {
+        endTask = new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 end();
             }
         }.runTaskLater(Momentum.getPlugin(), 20 * Momentum.getSettingsManager().jackpot_length);
 
-        reminderTask = new BukkitRunnable()
-        {
+        reminderTask = new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
                 Bukkit.broadcastMessage(Utils.translate("&e&lBANK &6&lJACKPOT &e&lALERT"));
                 Bukkit.broadcastMessage("");
@@ -84,43 +79,39 @@ public class Jackpot
             }
         }.runTaskTimer(Momentum.getPlugin(), 1, 20 * 60 * 3); // every 3 minutes, one tick offset to cancel in time
     }
-    public void addCompleted(String playerName)
-    {
+
+    public void addCompleted(String playerName) {
         completed.add(playerName);
     }
 
-    public boolean hasCompleted(String playerName)
-    {
+    public boolean hasCompleted(String playerName) {
         return completed.contains(playerName);
     }
 
-    public String getLevelName()
-    {
+    public String getLevelName() {
         return level.getName();
     }
 
-    public Level getLevel() { return level; }
+    public Level getLevel() {
+        return level;
+    }
 
-    public int getBonus()
-    {
+    public int getBonus() {
         return bonus;
     }
 
-    public void broadcastCompletion(Player player)
-    {
+    public void broadcastCompletion(Player player) {
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
         Bukkit.broadcastMessage(Utils.translate("&6&l" + player.getDisplayName() + " &e&lCOMPLETED THE &6&lJACKPOT"));
         broadcastJoinComponent();
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
     }
 
-    private void broadcastJoinComponent()
-    {
+    private void broadcastJoinComponent() {
         Utils.broadcastClickableHoverableCMD("&7Type &a/jackpot play&7 or &aclick here&7 to join in", "&aClick me to play the &6&lJACKPOT", "/jackpot play");
     }
 
-    private long millisLeft()
-    {
+    private long millisLeft() {
         return endMillis - System.currentTimeMillis();
     }
 }

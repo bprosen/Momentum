@@ -14,8 +14,9 @@ public class BowListener implements Listener {
             Player player = (Player) event.getEntity();
 
             // if not in plot world
-            if (!player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+            if (!player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
                 event.setCancelled(true);
+            }
         }
     }
 }

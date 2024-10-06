@@ -11,45 +11,34 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-public class PayCMD implements CommandExecutor
-{
+public class PayCMD implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (!(sender instanceof ConsoleCommandSender))
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (!(sender instanceof ConsoleCommandSender)) {
             Player user = (Player) sender;
 
-            if (a.length == 2)
-            {
+            if (a.length == 2) {
                 String playerName = a[0];
                 Player target = Bukkit.getPlayer(playerName);
 
                 // make sure the target is online
-                if (target != null)
-                {
-                    if (!user.getName().equalsIgnoreCase(target.getName()))
-                    {
-                        if (Utils.isInteger(a[1]))
-                        {
+                if (target != null) {
+                    if (!user.getName().equalsIgnoreCase(target.getName())) {
+                        if (Utils.isInteger(a[1])) {
                             int coins = Integer.parseInt(a[1]);
 
                             // if they dont pay 10 coins (no spam)
-                            if (coins >= Momentum.getSettingsManager().minimum_pay_amount)
-                            {
+                            if (coins >= Momentum.getSettingsManager().minimum_pay_amount) {
                                 StatsManager statsManager = Momentum.getStatsManager();
                                 PlayerStats userStats = statsManager.get(user);
 
-                                if (userStats != null && userStats.isLoaded())
-                                {
+                                if (userStats != null && userStats.isLoaded()) {
                                     // if they have the coins to pay up
-                                    if (coins <= userStats.getCoins())
-                                    {
+                                    if (coins <= userStats.getCoins()) {
                                         PlayerStats targetStats = statsManager.get(target);
 
-                                        if (targetStats != null && targetStats.isLoaded())
-                                        {
+                                        if (targetStats != null && targetStats.isLoaded()) {
                                             // add and remove coins
                                             statsManager.addCoins(targetStats, coins);
                                             statsManager.removeCoins(userStats, coins);
@@ -57,40 +46,28 @@ public class PayCMD implements CommandExecutor
                                             // send messages
                                             user.sendMessage(Utils.translate("&7You have paid &c" + target.getDisplayName() + " &6" + Utils.formatNumber(coins) + " &eCoins"));
                                             target.sendMessage(Utils.translate("&c" + user.getDisplayName() + " &7has paid you &6" + Utils.formatNumber(coins) + " &eCoins"));
-                                        }
-                                        else
+                                        } else {
                                             user.sendMessage(Utils.translate("&cYou cannot do this while loading their stats"));
-                                    }
-                                    else
-                                    {
+                                        }
+                                    } else {
                                         user.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(coins) + " &eCoins"));
                                     }
-                                }
-                                else
+                                } else {
                                     user.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
-                            }
-                            else
-                            {
+                                }
+                            } else {
                                 user.sendMessage(Utils.translate("&cYou cannot pay less than &6" + Utils.formatNumber(Momentum.getSettingsManager().minimum_pay_amount) + " &eCoins"));
                             }
-                        }
-                        else
-                        {
+                        } else {
                             user.sendMessage(Utils.translate("&c" + a[1] + " is not a number"));
                         }
-                    }
-                    else
-                    {
+                    } else {
                         user.sendMessage(Utils.translate("&cYou cannot pay yourself"));
                     }
-                }
-                else
-                {
+                } else {
                     user.sendMessage(Utils.translate("&c" + playerName + " is not online"));
                 }
-            }
-            else
-            {
+            } else {
                 user.sendMessage(Utils.translate("&cInvalid usage, do &4/pay (player) (coins)"));
             }
         }

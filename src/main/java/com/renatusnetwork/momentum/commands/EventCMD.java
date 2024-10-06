@@ -36,117 +36,102 @@ public class EventCMD implements CommandExecutor {
         if (a.length == 1 && a[0].equalsIgnoreCase("join")) {
 
             // run through all the conditions that would not allow them to join
-            if (eventManager.isEventRunning())
-            {
-                if (!eventManager.isParticipant(player))
-                {
-                    if (!playerStats.inPracticeMode())
-                    {
-                        if (!playerStats.isSpectating())
-                        {
-                            if (playerStats.isLoaded())
-                            {
-                                if (!playerStats.inRace())
-                                {
-                                    if (!Momentum.getStatsManager().containsHiddenPlayer(player))
-                                    {
-                                        if (!playerStats.isInInfinite())
-                                        {
-                                            if (!eventManager.isEliminated(player))
-                                            {
-                                                if (!playerStats.isInBlackMarket())
-                                                {
-                                                    if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-                                                    {
-                                                        if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater()))
-                                                        {
-                                                            if (playerStats.inLevel() && playerStats.getLevel().isElytra())
+            if (eventManager.isEventRunning()) {
+                if (!eventManager.isParticipant(player)) {
+                    if (!playerStats.inPracticeMode()) {
+                        if (!playerStats.isSpectating()) {
+                            if (playerStats.isLoaded()) {
+                                if (!playerStats.inRace()) {
+                                    if (!Momentum.getStatsManager().containsHiddenPlayer(player)) {
+                                        if (!playerStats.isInInfinite()) {
+                                            if (!eventManager.isEliminated(player)) {
+                                                if (!playerStats.isInBlackMarket()) {
+                                                    if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+                                                        if (!(eventManager.isRisingWaterEvent() && ((RisingWaterEvent) eventManager.getRunningEvent()).isStartCoveredInWater())) {
+                                                            if (playerStats.inLevel() && playerStats.getLevel().isElytra()) {
                                                                 Momentum.getStatsManager().toggleOffElytra(playerStats);
+                                                            }
 
                                                             // remove sword item if they have it and the mode is pvp
-                                                            if (eventManager.isPvPEvent())
-                                                            {
+                                                            if (eventManager.isPvPEvent()) {
                                                                 ItemStack swordItem = Utils.getSwordIfExists(player);
                                                                 ItemStack shieldItem = Utils.getShieldIfExists(player);
 
-                                                                if (swordItem != null)
+                                                                if (swordItem != null) {
                                                                     player.getInventory().removeItem(swordItem);
-                                                                if (shieldItem != null)
+                                                                }
+                                                                if (shieldItem != null) {
                                                                     player.getInventory().removeItem(shieldItem);
+                                                                }
                                                             }
 
                                                             eventManager.addParticipant(player);
-                                                        }
-                                                        else
+                                                        } else {
                                                             player.sendMessage(Utils.translate("&7The water has already passed the spawn location! " +
-                                                                    "&cTherefore you cannot join this event"));
-                                                    }
-                                                    else
+                                                                                               "&cTherefore you cannot join this event"));
+                                                        }
+                                                    } else {
                                                         player.sendMessage(Utils.translate("&cYou cannot teleport to an event from the plot world, do /spawn first"));
-                                                }
-                                                else
+                                                    }
+                                                } else {
                                                     player.sendMessage(Utils.translate("&cYou cannot join this event while in the Black Market"));
-                                            }
-                                            else
+                                                }
+                                            } else {
                                                 player.sendMessage(Utils.translate("&cYou cannot join this event when you were eliminated!"));
-                                        }
-                                        else
+                                            }
+                                        } else {
                                             player.sendMessage(Utils.translate("&cYou cannot do this while in Infinite Parkour"));
-                                    }
-                                    else
+                                        }
+                                    } else {
                                         player.sendMessage(Utils.translate("&cYou cannot do this while you are hiding players"));
-                                }
-                                else
+                                    }
+                                } else {
                                     player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
-                            }
-                            else
+                                }
+                            } else {
                                 player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
-                        }
-                        else
+                            }
+                        } else {
                             player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
-                    }
-                    else
+                        }
+                    } else {
                         player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-                }
-                else
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&cYou are already in this event! &7Type &c/event leave &7to quit!"));
-            }
-            else
+                }
+            } else {
                 player.sendMessage(Utils.translate("&cThere is no event running!"));
-        }
-        else if (a.length == 1 && (a[0].equalsIgnoreCase("leave") || a[0].equalsIgnoreCase("quit")))
-        {
+            }
+        } else if (a.length == 1 && (a[0].equalsIgnoreCase("leave") || a[0].equalsIgnoreCase("quit"))) {
 
-            if (eventManager.isEventRunning())
-            {
-                if (eventManager.isParticipant(player))
+            if (eventManager.isEventRunning()) {
+                if (eventManager.isParticipant(player)) {
                     eventManager.removeParticipant(player, false);
-                else
+                } else {
                     player.sendMessage(Utils.translate("&cYou are not in this event! &7Type &c/event join &7to join!"));
+                }
 
-            }
-            else
+            } else {
                 player.sendMessage(Utils.translate("&cThere is no event running!"));
-        // send help
-        }
-        else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help")))
+            }
+            // send help
+        } else if (a.length == 0 || (a.length == 1 && a[0].equalsIgnoreCase("help"))) {
             sendHelp(sender);
+        }
         /*
             Admin section
          */
-        else if (player.hasPermission("momentum.admin"))
-        {
-            if (a.length == 2 && (a[0].equalsIgnoreCase("start") || a[0].equalsIgnoreCase("choose")))
-            {
-                if (!eventManager.isEventRunning())
-                {
+        else if (player.hasPermission("momentum.admin")) {
+            if (a.length == 2 && (a[0].equalsIgnoreCase("start") || a[0].equalsIgnoreCase("choose"))) {
+                if (!eventManager.isEventRunning()) {
                     try {
                         EventType eventType = EventType.valueOf(a[1].toUpperCase());
                         List<Level> levels = Momentum.getLevelManager().getEventLevelsFromType(eventType);
 
-                        if (levels.isEmpty())
+                        if (levels.isEmpty()) {
                             player.sendMessage(Utils.translate("&cThere are no levels for the type &4" + eventType.name()));
-                        else {
+                        } else {
                             Level level = levels.get(new Random().nextInt(levels.size()));
 
                             switch (eventType) {
@@ -171,29 +156,27 @@ public class EventCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&cInvalid event type!"));
                         e.printStackTrace();
                     }
-                }
-                else
+                } else {
                     player.sendMessage(Utils.translate("&cYou cannot start an event when there is already one active"));
+                }
                 // force end an event
-            }
-            else if (a.length == 1 && (a[0].equalsIgnoreCase("stop") || a[0].equalsIgnoreCase("end"))) {
-                if (eventManager.isEventRunning())
+            } else if (a.length == 1 && (a[0].equalsIgnoreCase("stop") || a[0].equalsIgnoreCase("end"))) {
+                if (eventManager.isEventRunning()) {
                     eventManager.endEvent(null, true, false);
-                else
+                } else {
                     player.sendMessage(Utils.translate("&cYou cannot end an event that is not running!"));
+                }
             }
         }
         return false;
     }
 
-    private void sendHelp(CommandSender sender)
-    {
+    private void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&b/event join  &7Join an active event"));
         sender.sendMessage(Utils.translate("&b/event leave  &7Leave an active event"));
 
         // send admin commands if they have permission
-        if (sender.hasPermission("momentum.admin"))
-        {
+        if (sender.hasPermission("momentum.admin")) {
             sender.sendMessage(Utils.translate("&b/event start <type> &7Starts an event based on type"));
             sender.sendMessage(Utils.translate("&b/event stop  &7Stops the running event"));
         }

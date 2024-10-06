@@ -19,8 +19,7 @@ import java.util.*;
 public class RankCMD implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (!(sender instanceof Player)) {
             return true;
@@ -29,65 +28,51 @@ public class RankCMD implements CommandExecutor {
         Player player = (Player) sender;
         RanksManager ranksManager = Momentum.getRanksManager();
 
-        if (player.hasPermission("momentum.admin"))
-        {
+        if (player.hasPermission("momentum.admin")) {
             if (a.length == 0) {
-                if (label.equalsIgnoreCase("ranks"))
+                if (label.equalsIgnoreCase("ranks")) {
                     sendRanks(player);
-                else
+                } else {
                     sendRank(player);
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("set"))
-            {
+                }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("set")) {
                 PlayerStats victim = Momentum.getStatsManager().getByName(a[1]);
                 String rankName = a[2];
 
-                if (victim != null)
-                {
-                    if (ranksManager.exists(rankName))
-                    {
+                if (victim != null) {
+                    if (ranksManager.exists(rankName)) {
                         Rank rank = ranksManager.get(rankName);
                         victim.setRank(rank);
                         StatsDB.updateRank(victim.getUUID(), rank.getName());
                         player.sendMessage(Utils.translate("&7You set &c" + victim.getName() + "&7's rank to &c" + rank.getTitle()));
-                    }
-                    else
+                    } else {
                         player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
-                }
-                else
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("list"))
-            {
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
 
                 player.sendMessage(Utils.translate("&7Ranks Loaded: &c" + String.join("&7, &c",
-                        Momentum.getRanksManager().getNames())));
+                                                                                      Momentum.getRanksManager().getNames())));
 
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("create"))
-            {
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("create")) {
                 String rankName = a[1].toLowerCase();
 
-                if (!ranksManager.exists(rankName))
-                {
+                if (!ranksManager.exists(rankName)) {
                     // create in db
                     RanksDB.addRank(rankName);
                     // create object
                     ranksManager.add(rankName);
                     player.sendMessage(Utils.translate("&7Created rank &c" + rankName));
-                }
-                else
-                {
+                } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &calready exists"));
                 }
-            }
-            else if (a.length >= 2 && a[0].equalsIgnoreCase("title"))
-            {
+            } else if (a.length >= 2 && a[0].equalsIgnoreCase("title")) {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
 
-                if (rank != null)
-                {
+                if (rank != null) {
                     String[] split = Arrays.copyOfRange(a, 2, a.length);
                     String title = String.join(" ", split);
 
@@ -96,117 +81,91 @@ public class RankCMD implements CommandExecutor {
                     // update object
                     rank.setTitle(title);
                     player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's title to &c" + title));
-                }
-                else
-                {
+                } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("rankuplevel"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("rankuplevel")) {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
 
-                if (rank != null)
-                {
+                if (rank != null) {
                     String levelName = a[2].toLowerCase();
                     Level level = Momentum.getLevelManager().get(levelName);
 
-                    if (level != null)
-                    {
+                    if (level != null) {
                         // update in db
                         RanksDB.updateRankupLevel(rankName, levelName);
                         // update object
                         rank.setRankupLevel(level);
                         player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's rank up level to &c" + level.getTitle()));
-                    }
-                    else
-                    {
+                    } else {
                         player.sendMessage(Utils.translate("&4" + levelName + " &cdoes not exist"));
                     }
-                }
-                else
-                {
+                } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("nextrank"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("nextrank")) {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
 
-                if (rank != null)
-                {
+                if (rank != null) {
                     String nextRankName = a[2].toLowerCase();
                     Rank nextRank = ranksManager.get(nextRankName);
 
-                    if (nextRank != null)
-                    {
+                    if (nextRank != null) {
                         // update in db
                         RanksDB.updateNextRank(rankName, nextRankName);
                         // update object
                         rank.setNextRank(nextRankName);
                         player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's next rank to &c" + nextRank.getName()));
-                    }
-                    else
+                    } else {
                         player.sendMessage(Utils.translate("&4" + nextRankName + " &cdoes not exist"));
-                }
-                else
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
-            }
-            else if (a.length == 2 && a[0].equalsIgnoreCase("remove"))
-            {
+                }
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("remove")) {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
 
-                if (rank != null)
-                {
-                    if (!rankName.equalsIgnoreCase(Momentum.getSettingsManager().default_rank))
-                    {
+                if (rank != null) {
+                    if (!rankName.equalsIgnoreCase(Momentum.getSettingsManager().default_rank)) {
                         // reset people in the rank
                         ranksManager.resetPlayersInRank(rank);
                         // remove object
                         ranksManager.remove(rankName);
                         RanksDB.removeRank(rankName);
                         player.sendMessage(Utils.translate("&7Removed rank &c" + rankName));
-                    }
-                    else
+                    } else {
                         player.sendMessage(Utils.translate("&cYou cannot delete the default rank"));
-                }
-                else
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cis not a rank"));
-            }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
-            {
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
                 new BukkitRunnable() {
                     @Override
-                    public void run()
-                    {
+                    public void run() {
                         Momentum.getRanksManager().load();
                         sender.sendMessage(Utils.translate("&7Loaded &c" + Momentum.getRanksManager().getNames().size() + " ranks"));
                     }
                 }.runTaskAsynchronously(Momentum.getPlugin());
-            }
-            else if (a.length == 3 && a[0].equalsIgnoreCase("prestiges"))
-            {
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("prestiges")) {
                 PlayerStats victim = Momentum.getStatsManager().getByName(a[1]);
 
-                if (victim != null)
-                {
-                    if (Utils.isInteger(a[2]))
-                    {
+                if (victim != null) {
+                    if (Utils.isInteger(a[2])) {
                         int newPrestige = Integer.parseInt(a[2]);
 
-                        if (newPrestige >= 0)
-                        {
+                        if (newPrestige >= 0) {
                             ranksManager.updatePrestiges(victim, newPrestige);
 
-                            if (victim.hasPrestiges())
-                            {
+                            if (victim.hasPrestiges()) {
                                 float prestigeMultiplier = Momentum.getSettingsManager().prestige_multiplier_per_prestige * victim.getPrestiges();
 
-                                if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier)
+                                if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier) {
                                     prestigeMultiplier = Momentum.getSettingsManager().max_prestige_multiplier;
+                                }
 
                                 prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
 
@@ -214,56 +173,54 @@ public class RankCMD implements CommandExecutor {
                             }
                             player.sendMessage(Utils.translate("&cYou have changed &4" + a[1] + "&c's prestiges to &6" + newPrestige));
 
-                        }
-                        else
+                        } else {
                             player.sendMessage(Utils.translate("&cDon't try to set someone into the negatives please :)"));
-                    }
-                    else
+                        }
+                    } else {
                         player.sendMessage(Utils.translate("&4" + a[2] + " &cis not a valid integer"));
-                }
-                else
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
+                sendAdminHelp(player);
+            } else {
+                sendAdminHelp(player);
             }
-            else if (a.length == 1 && a[0].equalsIgnoreCase("help"))
-                sendAdminHelp(player);
-            else
-                sendAdminHelp(player);
-        }
-        else if (a.length == 0) {
-            if (label.equalsIgnoreCase("ranks"))
+        } else if (a.length == 0) {
+            if (label.equalsIgnoreCase("ranks")) {
                 sendRanks(player);
-            else
+            } else {
                 sendRank(player);
-        }
-        else
+            }
+        } else {
             sendPlayerHelp(player);
+        }
 
         return false;
     }
 
-    private void sendRank(Player player)
-    {
+    private void sendRank(Player player) {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-        if (playerStats.hasRank())
-        {
+        if (playerStats.hasRank()) {
             player.sendMessage(Utils.translate("&cYou are &6" + playerStats.getRank().getTitle()));
 
-            if (playerStats.hasPrestiges())
-            {
+            if (playerStats.hasPrestiges()) {
 
                 // add an s if its not one because im OCD with this
                 String endingString = "prestige";
-                if (playerStats.getPrestiges() > 1)
+                if (playerStats.getPrestiges() > 1) {
                     endingString += "s";
+                }
 
                 player.sendMessage(Utils.translate("&cYou have &6" + playerStats.getPrestiges() + " " + endingString));
             }
-        }
-        else if (player.hasPermission("momentum.admin"))
+        } else if (player.hasPermission("momentum.admin")) {
             sendAdminHelp(player);
-        else
+        } else {
             sendPlayerHelp(player);
+        }
     }
 
     private void sendAdminHelp(Player player) {

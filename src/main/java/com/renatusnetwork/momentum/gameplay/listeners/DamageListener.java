@@ -19,47 +19,44 @@ public class DamageListener implements Listener {
             EventManager eventManager = Momentum.getEventManager();
 
             // for anvil event
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK)
-            {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
                 // only run code if event is running and type HALF_HEART
-                if (eventManager.isEventRunning() && eventManager.isFallingAnvilEvent())
-                {
+                if (eventManager.isEventRunning() && eventManager.isFallingAnvilEvent()) {
                     Player victim = (Player) event.getEntity();
                     PlayerStats victimStats = Momentum.getStatsManager().get(victim.getUniqueId().toString());
 
                     // cancel damage event just for safety
                     event.setCancelled(true);
                     // only run code if they are both participants, therefore respawn player
-                    if (victimStats.isEventParticipant())
+                    if (victimStats.isEventParticipant()) {
                         player.teleport(eventManager.getRunningEvent().getLevel().getStartLocation());
+                    }
                 }
-            // for elytra
-            }
-            else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL)
+                // for elytra
+            } else if (event.getCause() == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
                 event.setCancelled(true);
+            }
             // for droppers
-            else if (event.getCause() == EntityDamageEvent.DamageCause.FALL)
-            {
+            else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
                 if (playerStats.inLevel() && playerStats.getLevel().isDropper()) {
                     event.setCancelled(true);
 
                     // just in case we use checkpoints for droppers at some point
-                    if (playerStats.hasCurrentCheckpoint())
+                    if (playerStats.hasCurrentCheckpoint()) {
                         Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
-                    else
+                    } else {
                         Momentum.getLevelManager().respawnPlayer(playerStats, playerStats.getLevel());
+                    }
                 }
             }
         }
     }
 
     @EventHandler
-    public void onDamageOther(EntityDamageByEntityEvent event)
-    {
-        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player)
-        {
+    public void onDamageOther(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
             Player player = (Player) event.getEntity();
             Player damager = (Player) event.getDamager();
 
@@ -69,8 +66,7 @@ public class DamageListener implements Listener {
 
             // we only care about the one being damaged, make sure they are in the pvp event
             if (eventManager.isEventRunning() && eventManager.isPvPEvent() &&
-                playerStats.isEventParticipant() && damagerStats.isEventParticipant())
-            {
+                playerStats.isEventParticipant() && damagerStats.isEventParticipant()) {
                 // damage to 0
                 event.setDamage(0.0);
                 return;

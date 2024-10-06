@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,9 @@ public class WorldGuard implements Listener {
         Plugin plugin = Momentum.getPlugin().getServer().getPluginManager().getPlugin("WorldGuard");
 
         // WorldGuard may not be loaded
-        if (plugin == null || !(plugin instanceof WorldGuardPlugin))
+        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
             return null;
+        }
 
         return (WorldGuardPlugin) plugin;
     }
@@ -35,8 +37,9 @@ public class WorldGuard implements Listener {
         ApplicableRegionSet regions = manager.getApplicableRegions(location);
         List<String> regionName = new ArrayList<>();
 
-        for (ProtectedRegion region : regions)
+        for (ProtectedRegion region : regions) {
             regionName.add(region.getId());
+        }
 
         return regionName;
     }
@@ -45,12 +48,12 @@ public class WorldGuard implements Listener {
         WorldGuardPlugin guard = getWorldGuard();
         RegionManager manager = guard.getRegionManager(location.getWorld());
 
-        if (manager != null)
-        {
+        if (manager != null) {
             ApplicableRegionSet regions = manager.getApplicableRegions(location);
 
-            for (ProtectedRegion region : regions)
+            for (ProtectedRegion region : regions) {
                 return region;
+            }
         }
 
         return null;

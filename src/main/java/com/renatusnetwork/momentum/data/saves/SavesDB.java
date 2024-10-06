@@ -11,18 +11,16 @@ import org.bukkit.Location;
 import java.util.List;
 import java.util.Map;
 
-public class SavesDB
-{
-    public static void loadSaves(PlayerStats playerStats)
-    {
+public class SavesDB {
+
+    public static void loadSaves(PlayerStats playerStats) {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                 DatabaseManager.LEVEL_SAVES_TABLE,
+                DatabaseManager.LEVEL_SAVES_TABLE,
                 "*",
                 "WHERE uuid=?", playerStats.getUUID()
-        );
+                                                                            );
 
-        for (Map<String, String> levelResult : levelsResults)
-        {
+        for (Map<String, String> levelResult : levelsResults) {
             String worldName = levelResult.get("world");
             Level level = Momentum.getLevelManager().get(levelResult.get("level_name"));
 
@@ -39,44 +37,39 @@ public class SavesDB
         }
     }
 
-    public static void addSave(String uuid, String levelName, Location location)
-    {
+    public static void addSave(String uuid, String levelName, Location location) {
         // add to async queue
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVEL_SAVES_TABLE + " " +
-                "(uuid, level_name, world, x, y, z, yaw, pitch)" +
-                " VALUES (?,?,?,?,?,?,?,?)",
-                uuid,
-                levelName,
-                location.getWorld().getName(),
-                location.getX(),
-                location.getY(),
-                location.getZ(),
-                location.getYaw(),
-                location.getPitch()
-        );
+                                      "(uuid, level_name, world, x, y, z, yaw, pitch)" +
+                                      " VALUES (?,?,?,?,?,?,?,?)",
+                                      uuid,
+                                      levelName,
+                                      location.getWorld().getName(),
+                                      location.getX(),
+                                      location.getY(),
+                                      location.getZ(),
+                                      location.getYaw(),
+                                      location.getPitch());
     }
 
-    public static void removeSave(String uuid, String levelName)
-    {
+    public static void removeSave(String uuid, String levelName) {
         DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.LEVEL_SAVES_TABLE + " WHERE uuid=? AND level_name=?", uuid, levelName);
     }
 
-    public static void removeSaveFromName(String playerName, String levelName)
-    {
+    public static void removeSaveFromName(String playerName, String levelName) {
         DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.LEVEL_SAVES_TABLE + " ls " +
-                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=ls.uuid WHERE p.name=? AND ls.level_name=?",
-                    playerName, levelName);
+                "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=ls.uuid WHERE p.name=? AND ls.level_name=?",
+                playerName, levelName);
     }
 
-    public static void updateSave(String uuid, String levelName, Location newLocation)
-    {
+    public static void updateSave(String uuid, String levelName, Location newLocation) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.LEVEL_SAVES_TABLE +
-                     " SET world=?, " +
-                     "x=?, y=?, z=?, " +
-                     "yaw=?, pitch=? " +
-                     "WHERE uuid=? AND level_name=?",
+                " SET world=?, " +
+                "x=?, y=?, z=?, " +
+                "yaw=?, pitch=? " +
+                "WHERE uuid=? AND level_name=?",
                 newLocation.getWorld().getName(),
                 newLocation.getX(),
                 newLocation.getY(),
@@ -84,6 +77,6 @@ public class SavesDB
                 newLocation.getYaw(),
                 newLocation.getPitch(),
                 uuid, levelName
-        );
+                                     );
     }
 }

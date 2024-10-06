@@ -6,45 +6,39 @@ import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class SavesManager
-{
+public class SavesManager {
+
     // add save
-    public void addSave(PlayerStats playerStats, Level level, Location location)
-    {
+    public void addSave(PlayerStats playerStats, Level level, Location location) {
         playerStats.addSave(level, location);
         SavesDB.addSave(playerStats.getUUID(), level.getName(), location);
     }
 
-    public void removeSave(PlayerStats playerStats, Level level)
-    {
+    public void removeSave(PlayerStats playerStats, Level level) {
         playerStats.removeSave(level);
         SavesDB.removeSave(playerStats.getUUID(), level.getName());
     }
 
-    public void teleportAndRemoveSave(PlayerStats playerStats, Level level, Location location)
-    {
+    public void teleportAndRemoveSave(PlayerStats playerStats, Level level, Location location) {
         playerStats.teleport(location, false);
         removeSave(playerStats, level);
     }
 
-    public void updateSave(PlayerStats playerStats, Level level, Location location)
-    {
+    public void updateSave(PlayerStats playerStats, Level level, Location location) {
         playerStats.updateSave(level, location);
         SavesDB.updateSave(playerStats.getUUID(), level.getName(), location);
     }
 
-    public void saveLevel(PlayerStats playerStats, Level level, Location location)
-    {
+    public void saveLevel(PlayerStats playerStats, Level level, Location location) {
         // update here
-        if (playerStats.hasSave(level))
+        if (playerStats.hasSave(level)) {
             updateSave(playerStats, level, location);
-        else
-            // add here
+        } else {
             addSave(playerStats, level, location);
+        }
     }
 
-    public void autoSave(PlayerStats playerStats)
-    {
+    public void autoSave(PlayerStats playerStats) {
         if (
                 playerStats.isAttemptingMastery() ||
                 playerStats.isInTutorial() ||
@@ -57,8 +51,9 @@ public class SavesManager
                 playerStats.isSpectating() ||
                 !playerStats.hasAutoSave() ||
                 isNearSpawnOrCheckpoint(playerStats)
-        )
+        ) {
             return;
+        }
 
         Location location = playerStats.inPracticeMode() ? playerStats.getPracticeStart() : playerStats.getPlayer().getLocation();
         Level level = playerStats.getLevel();
@@ -67,16 +62,15 @@ public class SavesManager
         playerStats.sendMessage(Utils.translate("&7Your progress on &c" + level.getTitle() + "&7 has been automatically saved"));
     }
 
-    private boolean isNearSpawnOrCheckpoint(PlayerStats playerStats)
-    {
+    private boolean isNearSpawnOrCheckpoint(PlayerStats playerStats) {
         // no point in saving if they are right beside spawn or checkpoint
         Player player = playerStats.getPlayer();
 
         return playerStats.inLevel() &&
-                (
-                    (playerStats.hasCurrentCheckpoint() &&
-                    Utils.isNearby(playerStats.getCurrentCheckpoint(), player.getLocation(), 1.0)) ||
-                    Utils.isNearby(playerStats.getLevel().getStartLocation(), player.getLocation(), 1.0)
-                );
+               (
+                       (playerStats.hasCurrentCheckpoint() &&
+                        Utils.isNearby(playerStats.getCurrentCheckpoint(), player.getLocation(), 1.0)) ||
+                       Utils.isNearby(playerStats.getLevel().getStartLocation(), player.getLocation(), 1.0)
+               );
     }
 }

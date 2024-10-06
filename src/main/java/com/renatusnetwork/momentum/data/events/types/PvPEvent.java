@@ -2,17 +2,14 @@ package com.renatusnetwork.momentum.data.events.types;
 
 import com.renatusnetwork.momentum.data.levels.Level;
 
-public class PvPEvent extends Event
-{
+public class PvPEvent extends Event {
 
-    public PvPEvent(Level level)
-    {
+    public PvPEvent(Level level) {
         super(level, "PvP");
     }
 
     @Override
-    public void end()
-    {
+    public void end() {
         // empty method!
     }
 }

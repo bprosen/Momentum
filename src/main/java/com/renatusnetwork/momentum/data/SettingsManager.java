@@ -158,8 +158,7 @@ public class SettingsManager {
     public int levels_lb_size;
     public int prac_history_size;
 
-    public SettingsManager(FileConfiguration settings)
-    {
+    public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
         cooldown_calendar.setTime(new Date());
         load(settings);
@@ -206,8 +205,7 @@ public class SettingsManager {
         setup_swords = new LinkedHashMap<>(); // we want it in order!
 
         ConfigurationSection section = settings.getConfigurationSection("setup-sword.prestiges");
-        for (String key : section.getKeys(false))
-        {
+        for (String key : section.getKeys(false)) {
             int keyInt = Integer.parseInt(key);
 
             ItemStack sword = new ItemStack(Material.matchMaterial(section.getString(keyInt + ".type")));
@@ -215,8 +213,9 @@ public class SettingsManager {
             meta.setDisplayName(sword_title);
 
             // set glow
-            if (section.getBoolean(keyInt + ".glow"))
+            if (section.getBoolean(keyInt + ".glow")) {
                 Utils.addGlow(meta);
+            }
 
             sword.setItemMeta(meta);
 
@@ -276,8 +275,7 @@ public class SettingsManager {
         minimum_pay_amount = settings.getInt("minimum_pay_amount");
         black_market_reset_calendar = Calendar.getInstance();
         String day = settings.getString("blackmarket.start_time.day");
-        switch (day)
-        {
+        switch (day) {
             case "sunday":
                 black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 break;
@@ -305,16 +303,15 @@ public class SettingsManager {
         custom_join_inventory = new HashMap<>();
 
         // hotbar length!
-        for (int i = 0; i < 9; i++)
-        {
-            if (settings.isConfigurationSection("join_inventory." + i))
-            {
+        for (int i = 0; i < 9; i++) {
+            if (settings.isConfigurationSection("join_inventory." + i)) {
                 // set if type exists
                 ItemStack itemStack;
-                if (settings.isSet("join_inventory." + i + ".item.type"))
+                if (settings.isSet("join_inventory." + i + ".item.type")) {
                     itemStack = new ItemStack(Material.matchMaterial(settings.getString("join_inventory." + i + ".item.material")), 1, (short) 3);
-                else
+                } else {
                     itemStack = new ItemStack(Material.matchMaterial(settings.getString("join_inventory." + i + ".item.material")));
+                }
 
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 itemMeta.setDisplayName(Utils.translate(settings.getString("join_inventory." + i + ".item.title")));
@@ -323,8 +320,9 @@ public class SettingsManager {
                 List<String> lore = settings.getStringList("join_inventory." + i + ".item.lore");
                 List<String> tempLore = new ArrayList<>();
 
-                for (String string : lore)
+                for (String string : lore) {
                     tempLore.add(Utils.translate(string));
+                }
 
                 itemMeta.setLore(tempLore);
 
@@ -347,8 +345,9 @@ public class SettingsManager {
         Set<String> keys = settings.getConfigurationSection("infinite.sprint.time_reduction_factors").getKeys(false);
 
         reduction_factors = new LinkedHashMap<>();
-        for (String key : keys)
+        for (String key : keys) {
             reduction_factors.put(Integer.parseInt(key), (float) settings.getDouble("infinite.time_reduction_factors." + key + ".reduction"));
+        }
 
         timed_timer = settings.getInt("infinite.timed.timer");
         infinite_angle_bound = (float) settings.getDouble("infinite.generation.angle_bound");
@@ -371,8 +370,9 @@ public class SettingsManager {
         cooldown_modifiers = new LinkedHashMap<>();
 
         Set<String> modifiers = settings.getConfigurationSection("cooldowns.modifiers").getKeys(false);
-        for (String modifier : modifiers)
+        for (String modifier : modifiers) {
             cooldown_modifiers.put(Integer.parseInt(modifier), (float) settings.getDouble("cooldowns.modifiers." + modifier + ".modifier"));
+        }
 
         String[] time = settings.getString("cooldowns.reset_time").split(":");
 
@@ -393,14 +393,15 @@ public class SettingsManager {
 
         clan_level_xp_required = new HashMap<>();
 
-        for (int i = 1;; i++)
-        {
+        for (int i = 1; ; i++) {
             int xpNeeded = settings.getInt("clans.levels." + i + ".xp-needed", -1);
 
             // more than default, means it exists
-            if (xpNeeded > -1)
+            if (xpNeeded > -1) {
                 clan_level_xp_required.put(i, xpNeeded);
-            else break;
+            } else {
+                break;
+            }
         }
 
         default_level_sorting_type = LevelSortingType.valueOf(settings.getString("menu.default_level_sorting"));

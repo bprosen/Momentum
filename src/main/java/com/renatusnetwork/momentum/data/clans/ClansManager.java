@@ -19,15 +19,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ClansManager
-{
+public class ClansManager {
+
     private HashMap<String, Clan> clans;
     private ArrayList<Clan> clansLB;
     private HashMap<String, Clan> clanChat;
     private Set<String> chatSpy;
 
-    public ClansManager(Plugin plugin)
-    {
+    public ClansManager(Plugin plugin) {
         this.clans = new HashMap<>();
         this.clansLB = new ArrayList<>(Momentum.getSettingsManager().max_clans_leaderboard_size);
         this.clanChat = new HashMap<>();
@@ -37,13 +36,11 @@ public class ClansManager
         startScheduler(plugin);
     }
 
-    private void load()
-    {
+    private void load() {
         clans = ClansDB.getClans();
     }
 
-    public void create(String tag, PlayerStats owner)
-    {
+    public void create(String tag, PlayerStats owner) {
         Clan clan = new Clan(tag, owner.getUUID());
 
         // add to cache and db
@@ -60,8 +57,7 @@ public class ClansManager
         clans.put(clan.getTag(), clan);
     }
 
-    public void updateClanTag(Clan clan, String newTag)
-    {
+    public void updateClanTag(Clan clan, String newTag) {
         // update in data
         clans.remove(clan.getTag());
         clans.put(clan.getTag(), clan);
@@ -70,66 +66,63 @@ public class ClansManager
         ClansDB.updateTag(clan.getTag(), newTag);
     }
 
-    public void updateTotalXP(Clan clan, long totalXP)
-    {
+    public void updateTotalXP(Clan clan, long totalXP) {
         clan.setTotalXP(totalXP);
         ClansDB.updateTotalXP(clan.getTag(), totalXP);
     }
 
-    public void updateXP(Clan clan, int xp)
-    {
+    public void updateXP(Clan clan, int xp) {
         clan.setXP(xp);
         ClansDB.updateXP(clan.getTag(), xp);
     }
 
-    public void updateLevel(Clan clan, int level)
-    {
+    public void updateLevel(Clan clan, int level) {
         clan.setLevel(level);
         ClansDB.updateLevel(clan.getTag(), level);
     }
 
-    public void updateClanOwner(Clan clan, String uuid)
-    {
+    public void updateClanOwner(Clan clan, String uuid) {
         clan.setOwner(uuid);
         ClansDB.updateOwner(clan.getTag(), uuid);
     }
 
-    public void addMember(Clan clan, PlayerStats playerStats)
-    {
+    public void addMember(Clan clan, PlayerStats playerStats) {
         clan.addMember(new ClanMember(playerStats.getUUID(), playerStats.getName()));
         playerStats.setClan(clan);
         StatsDB.updatePlayerClan(playerStats.getUUID(), clan.getTag());
         clan.removeInvite(playerStats.getName());
     }
 
-    public void kickMember(Clan clan, String playerName)
-    {
+    public void kickMember(Clan clan, String playerName) {
         clan.removeMember(playerName);
         StatsDB.resetPlayerClan(playerName);
 
         PlayerStats victimStats = Momentum.getStatsManager().getByName(playerName);
 
-        if (victimStats != null)
+        if (victimStats != null) {
             victimStats.resetClan();
+        }
     }
 
-    public void remove(String clanTag) { clans.remove(clanTag); }
+    public void remove(String clanTag) {
+        clans.remove(clanTag);
+    }
 
-    public boolean existsIgnoreCase(String clanTag)
-    {
-        for (String tag : clans.keySet())
-        {
-            if (tag.equalsIgnoreCase(clanTag))
+    public boolean existsIgnoreCase(String clanTag) {
+        for (String tag : clans.keySet()) {
+            if (tag.equalsIgnoreCase(clanTag)) {
                 return true;
+            }
         }
         return false;
     }
 
-    public Clan getFromMember(String memberName)
-    {
-        for (Clan clan : clans.values())
-            if (clan.isMember(memberName))
+    public Clan getFromMember(String memberName) {
+        for (Clan clan : clans.values()) {
+            if (clan.isMember(memberName)) {
                 return clan;
+            }
+        }
 
         return null;
     }
@@ -138,23 +131,27 @@ public class ClansManager
         return clans.get(clanTag);
     }
 
-    public Clan getIgnoreCase(String clanTag)
-    {
-        for (Clan clan : clans.values())
-            if (clan.getTag().equalsIgnoreCase(clanTag))
+    public Clan getIgnoreCase(String clanTag) {
+        for (Clan clan : clans.values()) {
+            if (clan.getTag().equalsIgnoreCase(clanTag)) {
                 return clan;
+            }
+        }
 
         return null;
     }
 
-    public void updatePlayerNameInClan(Clan clan, String oldName, String newName)
-    {
-        for (ClanMember clanMember : clan.getMembers())
-            if (clanMember.getName().equalsIgnoreCase(oldName))
+    public void updatePlayerNameInClan(Clan clan, String oldName, String newName) {
+        for (ClanMember clanMember : clan.getMembers()) {
+            if (clanMember.getName().equalsIgnoreCase(oldName)) {
                 clanMember.setName(newName);
+            }
+        }
     }
 
-    public ArrayList<Clan> getLeaderboard() { return clansLB; }
+    public ArrayList<Clan> getLeaderboard() {
+        return clansLB;
+    }
 
     public void loadLeaderboard() {
         try {
@@ -165,13 +162,14 @@ public class ClansManager
 
             while (Momentum.getSettingsManager().max_clans_leaderboard_size > lbSize) {
                 // loop through and make sure they are not already added, and higher than previous
-                for (Clan clan : clans.values())
+                for (Clan clan : clans.values()) {
                     if (!clansLB.contains(clan) &&
-                        (highestXPClan == null || clan.getTotalXP() > highestXPClan.getTotalXP()))
+                        (highestXPClan == null || clan.getTotalXP() > highestXPClan.getTotalXP())) {
                         highestXPClan = clan;
+                    }
+                }
 
-                if (highestXPClan != null)
-                {
+                if (highestXPClan != null) {
                     clansLB.add(highestXPClan);
                     highestXPClan = null;
                 }
@@ -200,11 +198,9 @@ public class ClansManager
                     Momentum.getStatsManager().addCoins(memberStats, splitAmountPerMember);
 
                     onlineMember.sendMessage(Utils.translate("&6" + player.getDisplayName() + " &7completed &6" +
-                            level.getTitle() + "&7 and you received &6" + Utils.formatNumber(splitAmountPerMember)
-                            + " &eCoins &7from your clan"));
-                }
-                else
-                {
+                                                             level.getTitle() + "&7 and you received &6" + Utils.formatNumber(splitAmountPerMember)
+                                                             + " &eCoins &7from your clan"));
+                } else {
                     int coins = StatsDB.getCoinsFromUUID(clanMember.getUUID());
                     StatsDB.updateCoins(clanMember.getUUID(), splitAmountPerMember + coins, true);
                 }
@@ -212,8 +208,7 @@ public class ClansManager
         }
     }
 
-    public void doClanXPCalc(Clan clan, PlayerStats playerStats, int reward)
-    {
+    public void doClanXPCalc(Clan clan, PlayerStats playerStats, int reward) {
         SettingsManager settingsManager = Momentum.getSettingsManager();
         int min = settingsManager.clan_calc_percent_min;
         int max = settingsManager.clan_calc_percent_max;
@@ -225,30 +220,26 @@ public class ClansManager
         ClanXPRewardEvent event = new ClanXPRewardEvent(playerStats, clan, clanXP);
         Bukkit.getPluginManager().callEvent(event);
 
-        if (!event.isCancelled())
-        {
+        if (!event.isCancelled()) {
             clanXP = event.getXP(); // override from event
 
-            if (playerStats.hasModifier(ModifierType.CLAN_XP_BOOSTER))
-            {
+            if (playerStats.hasModifier(ModifierType.CLAN_XP_BOOSTER)) {
                 Booster booster = (Booster) playerStats.getModifier(ModifierType.CLAN_XP_BOOSTER);
                 clanXP *= booster.getMultiplier();
             }
             int totalXP = clanXP + clan.getXP();
 
             // if max level, keep calculating xp
-            if (clan.isMaxLevel())
-            {
+            if (clan.isMaxLevel()) {
                 clan.addXP(clanXP);
                 ClansDB.updateXP(clan.getTag(), totalXP);
 
-            // level them up
-            }
-            else if (totalXP > settingsManager.clan_level_xp_required.get(clan.getLevel()))
+                // level them up
+            } else if (totalXP > settingsManager.clan_level_xp_required.get(clan.getLevel())) {
                 processClanLevelUp(clan, totalXP);
+            }
             // add xp to clan
-            else
-            {
+            else {
                 // otherwise add xp to cache and database
                 clan.addXP(clanXP);
                 ClansDB.updateXP(clan.getTag(), totalXP);
@@ -261,19 +252,17 @@ public class ClansManager
         }
     }
 
-    public void deleteClan(Clan clan, boolean messageMembers)
-    {
+    public void deleteClan(Clan clan, boolean messageMembers) {
         // iterate through existing clan members to reset/remove their data
-        for (ClanMember clanMember : clan.getMembers())
-        {
+        for (ClanMember clanMember : clan.getMembers()) {
             // we do not need to delete from db for each player as the foreign key will set null on cascading
             PlayerStats clanPlayer = Momentum.getStatsManager().get(clanMember.getUUID());
-            if (clanPlayer != null)
-            {
-                if (messageMembers)
+            if (clanPlayer != null) {
+                if (messageMembers) {
                     clanPlayer.sendMessage(Utils.translate(
                             "&6" + clan.getOwner().getName() + " &ehas disbanded your &6&lClan &6" + clan.getTag()
                     ));
+                }
 
                 // reset data on the players
                 clanPlayer.resetClan();
@@ -285,8 +274,7 @@ public class ClansManager
         clans.remove(clan.getTag());
     }
 
-    public void leaveClan(Clan clan, PlayerStats playerStats)
-    {
+    public void leaveClan(Clan clan, PlayerStats playerStats) {
         // reset cache
         StatsDB.resetPlayerClan(playerStats.getName());
         clan.removeMember(playerStats.getName());
@@ -294,32 +282,32 @@ public class ClansManager
         playerStats.resetClan();
     }
 
-    public void sendMessageToMembers(Clan clan, String msg, String dontSendTo)
-    {
-        for (ClanMember clanMember : clan.getMembers())
-        {
+    public void sendMessageToMembers(Clan clan, String msg, String dontSendTo) {
+        for (ClanMember clanMember : clan.getMembers()) {
             // make sure they are online
             Player clanPlayer = Bukkit.getPlayer(clanMember.getName());
 
-            if (clanPlayer != null && (dontSendTo == null || !clanPlayer.getName().equalsIgnoreCase(dontSendTo)))
+            if (clanPlayer != null && (dontSendTo == null || !clanPlayer.getName().equalsIgnoreCase(dontSendTo))) {
                 clanPlayer.sendMessage(Utils.translate(msg));
+            }
         }
     }
 
-    public void updateMaxLevel(Clan clan, int newMaxLevel)
-    {
+    public void updateMaxLevel(Clan clan, int newMaxLevel) {
         int oldMaxLevel = clan.getMaxLevel();
 
         SettingsManager settingsManager = Momentum.getSettingsManager();
 
-        if (newMaxLevel > settingsManager.clans_max_level)
+        if (newMaxLevel > settingsManager.clans_max_level) {
             newMaxLevel = settingsManager.clans_max_level;
+        }
 
         if (newMaxLevel < 5) // default max level
-            newMaxLevel = 5;
-
-        if (oldMaxLevel != newMaxLevel)
         {
+            newMaxLevel = 5;
+        }
+
+        if (oldMaxLevel != newMaxLevel) {
             // update in cache and config
             clan.setMaxLevel(newMaxLevel);
             ClansDB.updateMaxLevel(clan.getTag(), newMaxLevel);
@@ -330,11 +318,10 @@ public class ClansManager
             if (currLevel == oldMaxLevel && currLevel < newMaxLevel) // means they were max but not anymore!
             {
                 // means they can level up
-                if (settingsManager.clan_level_xp_required.get(clan.getLevel()) <= clan.getXP())
+                if (settingsManager.clan_level_xp_required.get(clan.getLevel()) <= clan.getXP()) {
                     processClanLevelUp(clan, clan.getXP());
-            }
-            else if (newMaxLevel < currLevel)
-            {
+                }
+            } else if (newMaxLevel < currLevel) {
                 // means they went down in max level but were past the new max (force their level down)
                 clan.setLevel(clan.getMaxLevel());
                 ClansDB.updateLevel(clan.getTag(), clan.getLevel());
@@ -342,8 +329,7 @@ public class ClansManager
         }
     }
 
-    private void processClanLevelUp(Clan clan, int totalXP)
-    {
+    private void processClanLevelUp(Clan clan, int totalXP) {
         SettingsManager settingsManager = Momentum.getSettingsManager();
 
         // left over after level up
@@ -351,33 +337,32 @@ public class ClansManager
         int newLevel = clan.getLevel() + 1;
 
         // this is the section that will determine if they will skip any levels
-        for (int i = clan.getLevel(); i < clan.getMaxLevel(); i++)
-        {
+        for (int i = clan.getLevel(); i < clan.getMaxLevel(); i++) {
             // this means they are still above the next level amount
-            if (clanXPOverflow >= settingsManager.clan_level_xp_required.get(newLevel))
-            {
+            if (clanXPOverflow >= settingsManager.clan_level_xp_required.get(newLevel)) {
                 // remove from overflow and add +1 level
                 clanXPOverflow -= settingsManager.clan_level_xp_required.get(newLevel);
                 newLevel++;
-            }
-            else
+            } else {
                 break;
+            }
         }
 
         // if > or = max level, manually set jic
-        if (newLevel >= clan.getMaxLevel())
+        if (newLevel >= clan.getMaxLevel()) {
             newLevel = clan.getMaxLevel();
+        }
 
         clan.setLevel(newLevel);
         sendMessageToMembers(clan, "&eYour clan has leveled up to &6Level " + newLevel, null);
 
         // play level up sound to online clan members
-        for (ClanMember clanMember : clan.getMembers())
-        {
+        for (ClanMember clanMember : clan.getMembers()) {
             Player onlineMember = Bukkit.getPlayer(clanMember.getName());
 
-            if (onlineMember != null)
+            if (onlineMember != null) {
                 onlineMember.playSound(onlineMember.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2f, 0f);
+            }
         }
 
         // add rest of xp after leveling up
@@ -386,13 +371,15 @@ public class ClansManager
         clan.setXP(clanXPOverflow);
     }
 
-    public void updateMaxMembers(Clan clan, int newMaxMembers)
-    {
-        if (newMaxMembers > Momentum.getSettingsManager().clans_max_members)
+    public void updateMaxMembers(Clan clan, int newMaxMembers) {
+        if (newMaxMembers > Momentum.getSettingsManager().clans_max_members) {
             newMaxMembers = Momentum.getSettingsManager().clans_max_members;
+        }
 
         if (newMaxMembers < 5) // default max members
+        {
             newMaxMembers = 5;
+        }
 
         // update in cache and config
         clan.setMaxMembers(newMaxMembers);
@@ -414,10 +401,11 @@ public class ClansManager
     }
 
     public void toggleClanChat(String playerName, Clan clan) {
-        if (isInClanChat(playerName) || clan == null)
+        if (isInClanChat(playerName) || clan == null) {
             clanChat.remove(playerName);
-        else
+        } else {
             clanChat.put(playerName, clan);
+        }
     }
 
     public boolean isInChatSpy(String playerName) {
@@ -425,13 +413,18 @@ public class ClansManager
     }
 
     public void toggleChatSpy(String playerName, boolean disconnected) {
-        if (isInChatSpy(playerName) || disconnected)
+        if (isInChatSpy(playerName) || disconnected) {
             chatSpy.remove(playerName);
-        else
+        } else {
             chatSpy.add(playerName);
+        }
     }
 
-    public HashMap<String, Clan> getClans() { return clans; }
+    public HashMap<String, Clan> getClans() {
+        return clans;
+    }
 
-    public Set<String> getChatSpyMap() { return chatSpy; }
+    public Set<String> getChatSpyMap() {
+        return chatSpy;
+    }
 }

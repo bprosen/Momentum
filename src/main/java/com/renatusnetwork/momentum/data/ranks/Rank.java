@@ -10,51 +10,50 @@ public class Rank {
     private Level rankupLevel;
     private String nextRank;
 
-    public Rank(String name)
-    {
+    public Rank(String name) {
         this.name = name;
     }
 
-    public Rank(String name, String title, String rankupLevel, String nextRank)
-    {
+    public Rank(String name, String title, String rankupLevel, String nextRank) {
         this.name = name;
         this.title = title;
         this.rankupLevel = Momentum.getLevelManager().get(rankupLevel);
         this.nextRank = nextRank;
     }
 
-    public void setTitle(String title)
-    {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public void setRankupLevel(Level level)
-    {
+    public void setRankupLevel(Level level) {
         this.rankupLevel = level;
     }
 
-    public void setNextRank(String nextRank)
-    {
+    public void setNextRank(String nextRank) {
         this.nextRank = nextRank;
     }
 
-    public String getNextRank() { return nextRank; }
+    public String getNextRank() {
+        return nextRank;
+    }
 
-    public Level getRankupLevel() { return rankupLevel; }
+    public Level getRankupLevel() {
+        return rankupLevel;
+    }
 
     public String getName() {
         return name;
     }
 
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public boolean equals(Rank other)
-    {
+    public boolean equals(Rank other) {
         return this.name.equalsIgnoreCase(other.getName());
     }
 
-    public boolean isMaxRank()
-    {
+    public boolean isMaxRank() {
         return nextRank == null;
     }
 }

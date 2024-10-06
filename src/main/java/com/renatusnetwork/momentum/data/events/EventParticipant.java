@@ -10,8 +10,7 @@ public class EventParticipant {
     private Location originalLocation;
     private Level originalLevel;
 
-    public EventParticipant(Player participant, Level originalLevel)
-    {
+    public EventParticipant(Player participant, Level originalLevel) {
         this.participant = participant;
         this.originalLocation = participant.getLocation();
         this.originalLevel = originalLevel;

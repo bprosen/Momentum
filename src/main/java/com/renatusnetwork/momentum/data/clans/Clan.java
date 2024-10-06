@@ -14,16 +14,14 @@ public class Clan {
     private HashMap<String, ClanMember> members;
     private HashSet<String> invitedPlayerNames;
 
-    public Clan(String tag, String ownerUUID)
-    {
+    public Clan(String tag, String ownerUUID) {
         this.tag = tag;
         this.ownerUUID = ownerUUID;
         this.members = new HashMap<>();
         this.invitedPlayerNames = new HashSet<>();
     }
 
-    public Clan(String tag, String ownerUUID, int clanLevel, int clanXP, long totalXP, int maxLevel, int maxMembers)
-    {
+    public Clan(String tag, String ownerUUID, int clanLevel, int clanXP, long totalXP, int maxLevel, int maxMembers) {
         this(tag, ownerUUID);
 
         this.clanLevel = clanLevel;
@@ -41,44 +39,51 @@ public class Clan {
         return tag;
     }
 
-    public int getLevel() { return clanLevel; }
+    public int getLevel() {
+        return clanLevel;
+    }
 
-    public int getXP() { return clanXP; }
+    public int getXP() {
+        return clanXP;
+    }
 
     public void resetXP() {
         clanXP = 0;
     }
 
-    public void setXP(int clanXP) { this.clanXP = clanXP; }
+    public void setXP(int clanXP) {
+        this.clanXP = clanXP;
+    }
 
-    public void setTotalXP(long totalXP) { this.totalXP = totalXP; }
+    public void setTotalXP(long totalXP) {
+        this.totalXP = totalXP;
+    }
 
-    public long getTotalXP() { return totalXP; }
+    public long getTotalXP() {
+        return totalXP;
+    }
 
-    public void addXP(int clanXP) { this.clanXP += clanXP; }
+    public void addXP(int clanXP) {
+        this.clanXP += clanXP;
+    }
 
-    public boolean isMaxLevel()
-    {
+    public boolean isMaxLevel() {
         return clanLevel == maxLevel;
     }
 
-    public int getMaxLevel()
-    {
+    public int getMaxLevel() {
         return maxLevel;
     }
 
-    public int getMaxMembers()
-    {
+    public int getMaxMembers() {
         return maxMembers;
     }
 
-    public void setMaxLevel(int maxLevel)
-    {
+    public void setMaxLevel(int maxLevel) {
         this.maxLevel = maxLevel;
     }
 
-    public void setMaxMembers(int maxMembers)
-    {
+    public void setMaxMembers(int maxMembers) {
         this.maxMembers = maxMembers;
     }
 
@@ -94,8 +99,7 @@ public class Clan {
         return this.ownerUUID;
     }
 
-    public boolean isMember(String playerName)
-    {
+    public boolean isMember(String playerName) {
         return members.containsKey(playerName);
     }
 
@@ -103,30 +107,27 @@ public class Clan {
         return members.get(playerName);
     }
 
-    public ClanMember getOwner()
-    {
+    public ClanMember getOwner() {
         return getMember(ownerUUID);
     }
 
-    public boolean isOwner(String playerName) { return getMember(ownerUUID).getName().equalsIgnoreCase(playerName); }
+    public boolean isOwner(String playerName) {
+        return getMember(ownerUUID).getName().equalsIgnoreCase(playerName);
+    }
 
-    public void setOwner(String ownerUUID)
-    {
+    public void setOwner(String ownerUUID) {
         this.ownerUUID = ownerUUID;
     }
 
-    public void addMember(ClanMember clanMember)
-    {
+    public void addMember(ClanMember clanMember) {
         members.put(clanMember.getUUID(), clanMember);
     }
 
-    public void removeMember(String playerUUID)
-    {
+    public void removeMember(String playerUUID) {
         members.remove(playerUUID);
     }
 
-    public void addInvite(String playerName)
-    {
+    public void addInvite(String playerName) {
         invitedPlayerNames.add(playerName);
     }
 
@@ -134,20 +135,19 @@ public class Clan {
         invitedPlayerNames.remove(playerName);
     }
 
-    public boolean isInvited(String playerName)
-    {
+    public boolean isInvited(String playerName) {
         return invitedPlayerNames.contains(playerName);
     }
 
-    public Collection<ClanMember> getMembers()
-    {
+    public Collection<ClanMember> getMembers() {
         return members.values();
     }
 
-    public int numMembers() { return members.size(); }
+    public int numMembers() {
+        return members.size();
+    }
 
-    public boolean equals(Clan clan)
-    {
+    public boolean equals(Clan clan) {
         return this.getOwner().getName().equalsIgnoreCase(clan.getOwner().getName());
     }
 }

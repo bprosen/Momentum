@@ -17,13 +17,13 @@ public class RateCMD implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (!(sender instanceof Player))
+        if (!(sender instanceof Player)) {
             return true;
+        }
 
         Player player = (Player) sender;
 
-        if (a.length >= 1)
-        {
+        if (a.length >= 1) {
             // allow ability to get from title or name
             String[] split = Arrays.copyOfRange(a, 0, a.length);
             String levelName = String.join(" ", split);
@@ -31,25 +31,23 @@ public class RateCMD implements CommandExecutor {
             // if it does not get it from name, then attempt to get it from title
             Level level = Momentum.getLevelManager().getNameThenTitle(levelName);
 
-            if (level != null)
-            {
+            if (level != null) {
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-                if (playerStats.hasCompleted(level))
-                {
+                if (playerStats.hasCompleted(level)) {
                     MenuManager menuManager = Momentum.getMenuManager();
 
                     menuManager.addChoosingRating(playerStats, level);
                     // menu
                     menuManager.openInventory(playerStats, "rate_level", true);
-                }
-                else
+                } else {
                     player.sendMessage(Utils.translate(
                             "&cYou have not completed &c" + level.getTitle() + "&c to be able to rate it"
                     ));
-            }
-            else
+                }
+            } else {
                 player.sendMessage(Utils.translate("&cNo level named &4" + levelName + " &cexists"));
+            }
 
         }
         return false;

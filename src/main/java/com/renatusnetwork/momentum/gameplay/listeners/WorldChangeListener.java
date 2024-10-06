@@ -21,15 +21,16 @@ public class WorldChangeListener implements Listener {
         // avoid all this code if spectating someone
         if (!playerStats.isSpectating()) {
             // if entering ascendance world, add to list to start tracking
-            if (player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().ascendant_realm_world))
+            if (player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().ascendant_realm_world)) {
                 statsManager.enteredAscendance(playerStats);
-                // if they are switching to not ascendance world and were in ascendance, remove them
-            else if (statsManager.isInAscendance(playerStats))
+            // if they are switching to not ascendance world and were in ascendance, remove them
+            } else if (statsManager.isInAscendance(playerStats)) {
                 statsManager.leftAscendance(playerStats);
+            }
 
             // if going to/from plot world, clear inv, armor and potions
             if (player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world) ||
-                    event.getFrom().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+                event.getFrom().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
                 player.getInventory().clear();
                 player.getInventory().setArmorContents(null);
 
@@ -37,8 +38,10 @@ public class WorldChangeListener implements Listener {
                 playerStats.clearPotionEffects();
 
                 if (event.getFrom().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-                    // reset hotbar
+                // reset hotbar
+                {
                     Utils.setHotbar(player);
+                }
             }
         }
     }

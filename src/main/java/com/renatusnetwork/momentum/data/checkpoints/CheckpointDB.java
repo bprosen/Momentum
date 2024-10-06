@@ -13,8 +13,7 @@ import java.util.Map;
 
 public class CheckpointDB {
 
-    public static void loadCheckpoints(PlayerStats playerStats)
-    {
+    public static void loadCheckpoints(PlayerStats playerStats) {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
                 DatabaseManager.LEVEL_CHECKPOINTS_TABLE,
                 "*",
@@ -22,14 +21,12 @@ public class CheckpointDB {
         );
 
         // if they have a checkpoint, load it
-        for (Map<String, String> levelResult : levelsResults)
-        {
+        for (Map<String, String> levelResult : levelsResults) {
             // get player name, world name and level
             String worldName = levelResult.get("world");
             Level level = Momentum.getLevelManager().get(levelResult.get("level_name"));
 
-            if (level != null)
-            {
+            if (level != null) {
                 // x, y, z
                 int x = Integer.parseInt(levelResult.get("x"));
                 int y = Integer.parseInt(levelResult.get("y"));
@@ -41,34 +38,31 @@ public class CheckpointDB {
         }
     }
 
-    public static void deleteCheckpointFromName(String playerName, String levelName)
-    {
+    public static void deleteCheckpointFromName(String playerName, String levelName) {
         DatabaseQueries.runAsyncQuery(
                 "DELETE lc FROM " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE +
-                    " lc JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON lc.uuid=p.uuid WHERE p.name=? AND lc.level_name=?",
-                    playerName,
-                    levelName
+                " lc JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON lc.uuid=p.uuid WHERE p.name=? AND lc.level_name=?",
+                playerName,
+                levelName
         );
     }
 
-    public static void updateCheckpoint(PlayerStats playerStats, Location newLocation)
-    {
+    public static void updateCheckpoint(PlayerStats playerStats, Location newLocation) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " SET world=?, x=?, y=?, z=? WHERE level_name=? AND uuid=?",
                 newLocation.getWorld().getName(),
-                            newLocation.getBlockX(),
-                            newLocation.getBlockY(),
-                            newLocation.getBlockZ(),
-                            playerStats.getLevel().getName(),
-                            playerStats.getUUID());
+                newLocation.getBlockX(),
+                newLocation.getBlockY(),
+                newLocation.getBlockZ(),
+                playerStats.getLevel().getName(),
+                playerStats.getUUID());
     }
 
-    public static void insertCheckpoint(PlayerStats playerStats, Location location)
-    {
+    public static void insertCheckpoint(PlayerStats playerStats, Location location) {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " " +
-                    "(uuid, level_name, world, x, y, z)" +
-                    " VALUES (?,?,?,?,?,?)",
+                "(uuid, level_name, world, x, y, z)" +
+                " VALUES (?,?,?,?,?,?)",
                 playerStats.getUUID(),
                 playerStats.getLevel().getName(),
                 location.getWorld().getName(),

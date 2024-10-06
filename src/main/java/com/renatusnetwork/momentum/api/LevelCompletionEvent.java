@@ -7,8 +7,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class LevelCompletionEvent extends Event implements Cancellable
-{
+public class LevelCompletionEvent extends Event implements Cancellable {
 
     private PlayerStats playerStats;
     private Level level;
@@ -17,59 +16,49 @@ public class LevelCompletionEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    public static HandlerList getHandlerList()
-    {
+    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
-    public LevelCompletionEvent(PlayerStats playerStats, Level level)
-    {
+    public LevelCompletionEvent(PlayerStats playerStats, Level level) {
         this.playerStats = playerStats;
         this.level = level;
         this.reward = level.getReward();
         this.cancelled = false;
     }
 
-    public void setReward(int reward)
-    {
+    public void setReward(int reward) {
         this.reward = reward;
     }
 
-    public int getReward()
-    {
+    public int getReward() {
         return reward;
     }
 
-    public PlayerStats getPlayerStats()
-    {
+    public PlayerStats getPlayerStats() {
         return playerStats;
     }
 
-    public Player getPlayer()
-    {
+    public Player getPlayer() {
         return playerStats.getPlayer();
     }
 
-    public Level getLevel()
-    {
+    public Level getLevel() {
         return level;
     }
 
     @Override
-    public boolean isCancelled()
-    {
+    public boolean isCancelled() {
         return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled)
-    {
+    public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 
     @Override
-    public HandlerList getHandlers()
-    {
+    public HandlerList getHandlers() {
         return HANDLERS;
     }
 }

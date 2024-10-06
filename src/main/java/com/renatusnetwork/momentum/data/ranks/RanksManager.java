@@ -24,8 +24,7 @@ public class RanksManager {
         Momentum.getPluginLogger().info("Ranks loaded: " + ranks.size());
     }
 
-    public void add(String rankName)
-    {
+    public void add(String rankName) {
         Rank rank = new Rank(rankName);
         ranks.put(rankName, rank);
     }
@@ -42,34 +41,32 @@ public class RanksManager {
         return ranks.keySet();
     }
 
-    public void remove(String rankName)
-    {
+    public void remove(String rankName) {
         ranks.remove(rankName);
     }
 
-    public void updatePrestiges(PlayerStats playerStats, int prestiges)
-    {
+    public void updatePrestiges(PlayerStats playerStats, int prestiges) {
         RanksDB.updatePrestiges(playerStats.getUUID(), prestiges);
         playerStats.setPrestiges(prestiges);
     }
 
-    public void resetPlayersInRank(Rank rank)
-    {
+    public void resetPlayersInRank(Rank rank) {
         Rank defaultRank = Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank);
         HashMap<String, PlayerStats> players = Momentum.getStatsManager().getPlayerStats();
 
         // thread safety
-        synchronized (players)
-        {
+        synchronized (players) {
             for (PlayerStats playerStats : players.values())
-                // if in rank, reset them to default rank
-                if (playerStats != null && playerStats.getRank().equals(rank))
+            // if in rank, reset them to default rank
+            {
+                if (playerStats != null && playerStats.getRank().equals(rank)) {
                     playerStats.setRank(defaultRank);
+                }
+            }
         }
     }
 
-    public void doRankUp(Player player)
-    {
+    public void doRankUp(Player player) {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         String nextRank = playerStats.getRank().getNextRank();
@@ -83,8 +80,7 @@ public class RanksManager {
         Momentum.getStatsManager().runGGTimer();
     }
 
-    public void doPrestige(PlayerStats playerStats, int cost)
-    {
+    public void doPrestige(PlayerStats playerStats, int cost) {
         Player player = playerStats.getPlayer();
         Rank defaultRank = get(Momentum.getSettingsManager().default_rank);
         // update cache and database
@@ -96,8 +92,9 @@ public class RanksManager {
         // update prestige multiplier
         float prestigeMultiplier = Momentum.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
 
-        if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier)
+        if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier) {
             prestigeMultiplier = Momentum.getSettingsManager().max_prestige_multiplier;
+        }
 
         prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
         playerStats.setPrestigeMultiplier(prestigeMultiplier);
@@ -110,14 +107,15 @@ public class RanksManager {
 
         // add an s if its not one because im OCD with this
         String endingString = "time";
-        if (playerStats.getPrestiges() > 1)
+        if (playerStats.getPrestiges() > 1) {
             endingString += "s";
+        }
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has just &6&lPRESTIGED&7!" +
-                                                     " &7They have prestiged &6" +
-                                                     playerStats.getPrestiges() + " " + endingString + "!"));
+                                                " &7They have prestiged &6" +
+                                                playerStats.getPrestiges() + " " + endingString + "!"));
         Bukkit.broadcastMessage("");
         Momentum.getStatsManager().runGGTimer();
     }
@@ -126,29 +124,28 @@ public class RanksManager {
         return ranks;
     }
 
-    public Rank getNextRank(Rank current)
-    {
+    public Rank getNextRank(Rank current) {
         Rank rank = current;
 
-        if (!rank.isMaxRank())
+        if (!rank.isMaxRank()) {
             rank = get(rank.getNextRank());
+        }
 
         return rank;
     }
 
-    public boolean isPastOrAtRank(PlayerStats playerStats, Rank current)
-    {
-        if (playerStats != null && playerStats.getRank() != null)
-        {
+    public boolean isPastOrAtRank(PlayerStats playerStats, Rank current) {
+        if (playerStats != null && playerStats.getRank() != null) {
             // if they have prestiged already
-            if (playerStats.hasPrestiges())
+            if (playerStats.hasPrestiges()) {
                 return true;
+            }
 
             // keep recursively going through the ranks until we reach the end of the rank
-            while (current != null)
-            {
-                if (playerStats.getRank().equals(current))
+            while (current != null) {
+                if (playerStats.getRank().equals(current)) {
                     return true;
+                }
 
                 current = get(current.getNextRank());
             }
@@ -156,16 +153,16 @@ public class RanksManager {
         return false;
     }
 
-    public boolean isPastOrAtRank(PlayerStats playerStats, String currentString)
-    {
+    public boolean isPastOrAtRank(PlayerStats playerStats, String currentString) {
         return isPastOrAtRank(playerStats, get(currentString));
     }
 
-    public Rank getMaxRank()
-    {
-        for (Rank rank : ranks.values())
-            if (rank.isMaxRank())
+    public Rank getMaxRank() {
+        for (Rank rank : ranks.values()) {
+            if (rank.isMaxRank()) {
                 return rank;
+            }
+        }
 
         return null;
     }

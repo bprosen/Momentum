@@ -12,19 +12,26 @@ public class InfiniteReward {
     private String display;
     private InfiniteType type;
 
-    public InfiniteReward(InfiniteType type, int scoreNeeded, List<String> commands, String display)
-    {
+    public InfiniteReward(InfiniteType type, int scoreNeeded, List<String> commands, String display) {
         this.type = type;
         this.scoreNeeded = scoreNeeded;
         this.commands = commands;
         this.display = display;
     }
 
-    public int getScoreNeeded() { return scoreNeeded; }
+    public int getScoreNeeded() {
+        return scoreNeeded;
+    }
 
-    public List<String> getCommands() { return commands; }
+    public List<String> getCommands() {
+        return commands;
+    }
 
-    public String getDisplay() { return display; }
+    public String getDisplay() {
+        return display;
+    }
 
-    public boolean hasReward(PlayerStats playerStats) { return playerStats.getBestInfiniteScore(type) >= scoreNeeded; }
+    public boolean hasReward(PlayerStats playerStats) {
+        return playerStats.getBestInfiniteScore(type) >= scoreNeeded;
+    }
 }
