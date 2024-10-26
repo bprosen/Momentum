@@ -125,6 +125,10 @@ public class SquadManager {
 		squad.getSquadMembers().stream().filter(member -> !Arrays.asList(except).contains(member)).forEach(member -> member.sendMessage(Utils.translate(message)));
 	}
 
+	public void notifySqChatSpies(String message) {
+		inSquadChatSpy.forEach(member -> member.sendMessage(Utils.translate("&1[SqSpy]  " + message)));
+	}
+
 	public static boolean isLeader(PlayerStats member) {
 		Squad squad = member.getSquad();
 		return squad != null && squad.getSquadLeader().equals(member);

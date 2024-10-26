@@ -54,7 +54,7 @@ public class SquadCMD implements CommandExecutor {
 					noSquad(sender);
 				else {
 					player.sendMessage(Utils.translate("&9Squad Members:"));
-					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq " + member.getDisplayName())));
+					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq -" + member.getDisplayName())));
 				}
 
 				break;
@@ -229,6 +229,8 @@ public class SquadCMD implements CommandExecutor {
 					// notify first so failure messages send to individual players after
 					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas warped to " + level.getFormattedTitle());
 					squadManager.warpMembers(player);
+
+					squadManager.notifySqChatSpies(String.format("&3%s &9has warped their party to &3%s", player.getDisplayName(), level.getFormattedTitle()));
 				}
 
 				break;
