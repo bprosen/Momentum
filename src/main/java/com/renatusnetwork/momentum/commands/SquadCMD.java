@@ -132,7 +132,7 @@ public class SquadCMD implements CommandExecutor {
 					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas left the squad");
 					player.sendMessage(Utils.translate("&3You have left the squad"));
 					if (squad.count() == 1) {
-						SquadManager.notifyMembers(squad, "&9SqC &3The squad has been disbanded because all players left");
+						SquadManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
 						squadManager.disband(squad);
 					}
 				}
