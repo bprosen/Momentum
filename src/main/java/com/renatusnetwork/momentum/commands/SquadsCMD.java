@@ -3,7 +3,7 @@ package com.renatusnetwork.momentum.commands;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.squads.Squad;
-import com.renatusnetwork.momentum.data.squads.SquadManager;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
-public class SquadCMD implements CommandExecutor {
+public class SquadsCMD implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof ConsoleCommandSender) {
@@ -25,7 +25,7 @@ public class SquadCMD implements CommandExecutor {
 			return true;
 		}
 
-		SquadManager squadManager = Momentum.getSquadManager();
+		SquadsManager squadsManager = Momentum.getSquadsManager();
 		PlayerStats player = Momentum.getStatsManager().get((Player) sender);
 		Squad squad = player.getSquad();
 
@@ -34,10 +34,10 @@ public class SquadCMD implements CommandExecutor {
 			if (squad == null)
 				noSquad(sender);
 			else if (n == 0)
-				player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadManager.toggleSquadChat(player) ? "on" : "off")));
+				player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadsManager.toggleSquadChat(player) ? "on" : "off")));
 			else {
-				String msg = String.format("&9SqC &3%s &b%s", player.getDisplayName(), String.join(" ", Arrays.copyOfRange(args, 0, n)));
-				squadManager.sendMessage(player, msg, true);
+				String msg = String.format("&9SC &3%s &b%s", player.getDisplayName(), String.join(" ", Arrays.copyOfRange(args, 0, n)));
+				squadsManager.sendMessage(player, msg, true);
 			}
 			return true;
 		}
@@ -46,7 +46,8 @@ public class SquadCMD implements CommandExecutor {
 			return true;
 		}
 
-		// prechecks: s > 0, args[0] != null, args[0] != "help", label != "sqc"
+		// true conditions if continued:
+		// s > 0, args[0] != null, args[0] != "help", label != "sqc"
 
 		switch (args[0].toLowerCase()) {
 			case "list":
@@ -54,7 +55,7 @@ public class SquadCMD implements CommandExecutor {
 					noSquad(sender);
 				else {
 					player.sendMessage(Utils.translate("&9Squad Members:"));
-					squadManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq -" + member.getDisplayName())));
+					squadsManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq -" + member.getDisplayName())));
 				}
 
 				break;
@@ -64,10 +65,10 @@ public class SquadCMD implements CommandExecutor {
 					break;
 				}
 				else if (squad == null) {
-					squadManager.createSquad(player);
+					squadsManager.createSquad(player);
 					squad = player.getSquad();
 				}
-				else if (!SquadManager.isLeader(player)) {
+				else if (!SquadsManager.isLeader(player)) {
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 					break;
 				}
@@ -75,13 +76,13 @@ public class SquadCMD implements CommandExecutor {
 				PlayerStats invitee = Momentum.getStatsManager().getByName(args[1]);
 				if (invitee == null)
 					player.sendMessage(Utils.translate("&cThat player is not online!"));
-				else if (SquadManager.isMember(squad, invitee))
+				else if (SquadsManager.isMember(squad, invitee))
 					player.sendMessage(Utils.translate("&cThat player is already in the squad!"));
 				else if (squad.hasInvite(invitee))
 					player.sendMessage(Utils.translate("&cThat player has already been invited!"));
 				else {
-					squadManager.invite(player, invitee);
-					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas invited &3" + invitee.getDisplayName() + " &bto the squad");
+					squadsManager.invite(player, invitee);
+					SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas invited &3" + invitee.getDisplayName() + " &bto the squad");
 
 					TextComponent component = new TextComponent(TextComponent.fromLegacyText(Utils.translate("&3Run &b/squad accept " + player.getName() + " &3or &bClick here to accept")));
 					component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&9Click to accept!"))));
@@ -105,36 +106,34 @@ public class SquadCMD implements CommandExecutor {
 					player.sendMessage(Utils.translate("&cNo incoming invites from &4" + inviter.getName() + " &cwere found"));
 				else {
 					Squad newSquad = inviter.getSquad();
-					boolean sqChat = squadManager.isInSquadChat(player);
+					boolean sqChat = squadsManager.isInSquadChat(player);
 					if (squad != null) {
-						squadManager.leave(player, false); // make sure to leave current squad before joining a new one
-						SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas left the squad");
+						squadsManager.leave(player); // make sure to leave current squad before joining a new one
+						SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas left the squad");
 						player.sendMessage(Utils.translate("&3You have left the squad"));
 					}
 
-					squadManager.join(newSquad, player);
-					SquadManager.notifyMembers(newSquad, "&9SqC &3" + player.getDisplayName() + " &bhas joined the squad", player);
+					squadsManager.join(newSquad, player);
+					SquadsManager.notifyMembers(newSquad, "&9SC &3" + player.getDisplayName() + " &bhas joined the squad", player);
 					player.sendMessage(Utils.translate("&3You have joined the squad"));
 
 					// preserve squad chat if player leaves and rejoins/joins a new squad
 					if (sqChat)
-						squadManager.toggleSquadChat(player);
+						squadsManager.toggleSquadChat(player);
 				}
 
 				break;
 			case "leave":
 				if (squad == null)
 					noSquad(sender);
-				else if (SquadManager.isLeader(player))
+				else if (SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou must transfer squad ownership before leaving the squad!"));
 				else {
-					squadManager.leave(player, false);
-					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas left the squad");
+					squadsManager.leave(player);
+					SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas left the squad");
 					player.sendMessage(Utils.translate("&3You have left the squad"));
-					if (squad.count() == 1) {
-						SquadManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
-						squadManager.disband(squad);
-					}
+					if (squad.size() == 1)
+						SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
 				}
 
 				break;
@@ -143,17 +142,17 @@ public class SquadCMD implements CommandExecutor {
 					sendHelp(sender);
 				else if (squad == null)
 					noSquad(sender);
-				else if (!SquadManager.isLeader(player))
+				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
 					PlayerStats targetMember = Momentum.getStatsManager().getByName(args[1]);
-					if (targetMember == null || !SquadManager.isMember(squad, targetMember))
+					if (targetMember == null || !SquadsManager.isMember(squad, targetMember))
 						player.sendMessage(Utils.translate("&cThat player is not in the squad!"));
 					else if (targetMember.equals(player))
 						player.sendMessage(Utils.translate("&cYou cannot kick yourself!"));
 					else {
-						squadManager.kick(targetMember);
-						SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName()  + " &bhas kicked &3" + targetMember.getDisplayName() + " &bfrom the squad");
+						squadsManager.kick(targetMember);
+						SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName()  + " &bhas kicked &3" + targetMember.getDisplayName() + " &bfrom the squad");
 						targetMember.sendMessage(Utils.translate("&3You have been kicked from the squad"));
 					}
 				}
@@ -162,11 +161,11 @@ public class SquadCMD implements CommandExecutor {
 			case "disband":
 				if (squad == null)
 					noSquad(sender);
-				else if (!SquadManager.isLeader(player))
+				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
-					SquadManager.notifyMembers(squad, "&9SqC &3The squad has been disbanded");
-					squadManager.disband(squad);
+					SquadsManager.notifyMembers(squad, "&9SC &3The squad has been disbanded");
+					squadsManager.disband(squad);
 				}
 
 				break;
@@ -175,17 +174,17 @@ public class SquadCMD implements CommandExecutor {
 					sendHelp(sender);
 				else if (squad == null)
 					noSquad(sender);
-				else if (!SquadManager.isLeader(player))
+				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
 					PlayerStats targetMember = Momentum.getStatsManager().getByName(args[1]);
-					if (targetMember == null || !SquadManager.isMember(squad, targetMember))
+					if (targetMember == null || !SquadsManager.isMember(squad, targetMember))
 						player.sendMessage(Utils.translate("&cThat player is not in the squad!"));
 					else if (targetMember.equals(player))
 						player.sendMessage(Utils.translate("&cYou cannot promote yourself!"));
 					else {
-						squadManager.promote(targetMember);
-						SquadManager.notifyMembers(squad, "&9SqC &3" + targetMember.getDisplayName() + " &bhas been promoted to squad leader");
+						squadsManager.promote(targetMember);
+						SquadsManager.notifyMembers(squad, "&9SC &3" + targetMember.getDisplayName() + " &bhas been promoted to squad leader");
 					}
 				}
 
@@ -194,10 +193,10 @@ public class SquadCMD implements CommandExecutor {
 				if (squad == null)
 					noSquad(sender);
 				else if (n == 1)
-					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadManager.toggleSquadChat(player) ? "on" : "off")));
+					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadsManager.toggleSquadChat(player) ? "on" : "off")));
 				else {
-					String msg = String.format("&9SqC &3%s &b%s", player.getDisplayName(), String.join(" ", Arrays.copyOfRange(args, 1, n)));
-					squadManager.sendMessage(player, msg, true);
+					String msg = String.format("&9SC &3%s &b%s", player.getDisplayName(), String.join(" ", Arrays.copyOfRange(args, 1, n)));
+					squadsManager.sendMessage(player, msg, true);
 				}
 
 				break;
@@ -205,7 +204,7 @@ public class SquadCMD implements CommandExecutor {
 				if (!sender.hasPermission("momentum.admin"))
 					sendHelp(sender);
 				else
-					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad ChatSpy &b" + (squadManager.toggleSquadChatSpy(player) ? "on" : "off")));
+					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad ChatSpy &b" + (squadsManager.toggleSquadChatSpy(player) ? "on" : "off")));
 
 				break;
 			case "warp":
@@ -213,7 +212,7 @@ public class SquadCMD implements CommandExecutor {
 
 				if (squad == null)
 					noSquad(sender);
-				else if (!SquadManager.isLeader(player))
+				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else if (squad.hasWarpCooldown())
 					player.sendMessage(Utils.translate("&cWarp is on cooldown"));
@@ -227,10 +226,10 @@ public class SquadCMD implements CommandExecutor {
 					player.sendMessage("&cYou cannot warp to a race or event!");
 				else {
 					// notify first so failure messages send to individual players after
-					SquadManager.notifyMembers(squad, "&9SqC &3" + player.getDisplayName() + " &bhas warped to " + level.getFormattedTitle());
-					squadManager.warpMembers(player);
+					SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas warped to " + level.getFormattedTitle());
+					squadsManager.warpMembers(player);
 
-					squadManager.notifySqChatSpies(String.format("&3%s &9has warped their party to &3%s", player.getDisplayName(), level.getFormattedTitle()));
+					squadsManager.notifySqChatSpies(String.format("&3%s &9has warped their party to &3%s", player.getDisplayName(), level.getFormattedTitle()));
 				}
 
 				break;
@@ -244,21 +243,21 @@ public class SquadCMD implements CommandExecutor {
 	private void sendHelp(CommandSender sender) {
 		sender.sendMessage(Utils.translate("&9-- Help --"));
 		sender.sendMessage(Utils.translate("&9Command Aliases: &b[squad, sq]"));
-		sender.sendMessage(Utils.translate("&3/squad [help]  &bdisplays this menu"));
-		sender.sendMessage(Utils.translate("&3/squad list  &blists all players in squad"));
-		sender.sendMessage(Utils.translate("&3/squad invite <player>  &binvites player to squad (creates squad if not in one)"));
-		sender.sendMessage(Utils.translate("&3/squad accept <player>  &baccepts squad invite from player"));
-		sender.sendMessage(Utils.translate("&3/squad leave  &bleaves current squad"));
-		sender.sendMessage(Utils.translate("&3/squad kick <player>  &bkicks player from the squad"));
-		sender.sendMessage(Utils.translate("&3/squad disband  &bdisbands squad"));
-		sender.sendMessage(Utils.translate("&3/squad promote <player>  &btransfers ownership of squad to player"));
-		sender.sendMessage(Utils.translate("&3/squad chat  &btoggles squad chat"));
+		sender.sendMessage(Utils.translate("&3/squads [help]  &bdisplays this menu"));
+		sender.sendMessage(Utils.translate("&3/squads list  &blists all players in squad"));
+		sender.sendMessage(Utils.translate("&3/squads invite <player>  &binvites player to squad (creates squad if not in one)"));
+		sender.sendMessage(Utils.translate("&3/squads accept <player>  &baccepts squad invite from player"));
+		sender.sendMessage(Utils.translate("&3/squads leave  &bleaves current squad"));
+		sender.sendMessage(Utils.translate("&3/squads kick <player>  &bkicks player from the squad"));
+		sender.sendMessage(Utils.translate("&3/squads disband  &bdisbands squad"));
+		sender.sendMessage(Utils.translate("&3/squads promote <player>  &btransfers ownership of squad to player"));
+		sender.sendMessage(Utils.translate("&3/squads chat  &btoggles squad chat"));
 		sender.sendMessage(Utils.translate("   &9Aliases: &b[sqc]"));
-		sender.sendMessage(Utils.translate("&3/squad chat <message> &bsends message to squad chat"));
+		sender.sendMessage(Utils.translate("&3/squads chat <message> &bsends message to squad chat"));
 		sender.sendMessage(Utils.translate("   &9Aliases: &b[sqc <message>]"));
-		sender.sendMessage(Utils.translate("&3/squad warp  &bsends all players in squad to leader's level"));
+		sender.sendMessage(Utils.translate("&3/squads warp  &bsends all players in squad to leader's level"));
 		if (sender.hasPermission("momentum.admin"))
-			sender.sendMessage(Utils.translate("&3/squad chatspy  &btoggles squad chat spy"));
+			sender.sendMessage(Utils.translate("&3/squads chatspy  &btoggles squad chat spy"));
 		sender.sendMessage(Utils.translate("&9---------"));
 	}
 

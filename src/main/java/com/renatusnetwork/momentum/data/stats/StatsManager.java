@@ -23,7 +23,6 @@ import com.renatusnetwork.momentum.data.leaderboards.CoinsLBPosition;
 import com.renatusnetwork.momentum.data.leaderboards.GlobalPersonalLBPosition;
 import com.renatusnetwork.momentum.data.saves.SavesDB;
 import com.renatusnetwork.momentum.data.squads.Squad;
-import com.renatusnetwork.momentum.data.squads.SquadManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -43,8 +42,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
-import static com.renatusnetwork.momentum.data.squads.SquadManager.*;
 
 public class StatsManager {
 
@@ -946,10 +943,6 @@ public class StatsManager {
 
             Momentum.getLevelManager().regionLevelCheck(spectatorStats, loc);
         }
-    }
-
-    public void updateSquad(PlayerStats playerStats, @Nullable Squad newSquad) {
-        playerStats.updateSquad(newSquad);
     }
 
     public String createChatHover(PlayerStats playerStats)

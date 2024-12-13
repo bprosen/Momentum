@@ -38,7 +38,7 @@ public class Squad {
 	protected PlayerStats getSquadLeader() { return this.squadLeader; }
 	protected Set<PlayerStats> getSquadMembers() { return this.squadMembers; }
 
-	public int count() { return squadMembers.size(); }
+	public int size() { return squadMembers.size(); }
 
 	public boolean hasWarpCooldown() { return warpCooldown; }
 	protected void setWarpCooldown(boolean cooldown) { warpCooldown = cooldown; }

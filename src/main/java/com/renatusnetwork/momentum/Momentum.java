@@ -22,7 +22,7 @@ import com.renatusnetwork.momentum.data.races.RaceManager;
 import com.renatusnetwork.momentum.data.ranks.RanksManager;
 import com.renatusnetwork.momentum.data.saves.SavesManager;
 import com.renatusnetwork.momentum.data.elo.ELOTiersManager;
-import com.renatusnetwork.momentum.data.squads.SquadManager;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.gameplay.*;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.data.SettingsManager;
@@ -69,7 +69,7 @@ public class Momentum extends JavaPlugin {
     private static Placeholders placeholders;
     private static ELOTiersManager eloTiers;
     private static CommandSignManager cmdSigns;
-    private static SquadManager squadManager;
+    private static SquadsManager squadsManager;
     private static ViaAPI viaVersion;
 
     @Override
@@ -186,7 +186,7 @@ public class Momentum extends JavaPlugin {
         getCommand("elotier").setExecutor(new ELOTierCMD());
         getCommand("bank").setExecutor(new BankCMD());
         getCommand("commandsign").setExecutor(new CommandSignCMD());
-        getCommand("squad").setExecutor(new SquadCMD());
+        getCommand("squads").setExecutor(new SquadsCMD());
     }
 
     private static void load()
@@ -230,7 +230,7 @@ public class Momentum extends JavaPlugin {
         bank = new BankManager();
         blackmarket = new BlackMarketManager();
         cmdSigns = new CommandSignManager();
-        squadManager = new SquadManager();
+        squadsManager = new SquadsManager();
         viaVersion = Via.getAPI();
     }
 
@@ -295,7 +295,7 @@ public class Momentum extends JavaPlugin {
     public static ModifiersManager getModifiersManager() { return modifiers; }
     public static ELOTiersManager getELOTiersManager() { return eloTiers; }
     public static CommandSignManager getCommandSignManager() { return cmdSigns; }
-    public static SquadManager getSquadManager() { return squadManager; }
+    public static SquadsManager getSquadsManager() { return squadsManager; }
 
     public static ViaAPI getViaVersion() { return  viaVersion; }
 }

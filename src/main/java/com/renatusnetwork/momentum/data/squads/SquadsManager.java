@@ -8,18 +8,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class SquadManager {
+public class SquadsManager {
 	private final Set<PlayerStats> inSquadChat;
 	private final Set<PlayerStats> inSquadChatSpy;
+	private final Map<String, Squad> offlineCache; // squad members who go offline without leaving will be stored here for 1 minute
 
-	public SquadManager() {
+	public SquadsManager() {
 		this.inSquadChat = new HashSet<>();
 		this.inSquadChatSpy = new HashSet<>();
+		this.offlineCache = new HashMap<>();
 	}
 
 	public void createSquad(PlayerStats leader) {
 		Squad squad = Squad.Builder.create().setLeader(leader).build();
-		Momentum.getStatsManager().updateSquad(leader, squad);
+		leader.updateSquad(squad);
 	}
 
 	public void invite(PlayerStats inviter, PlayerStats invitee) {
@@ -33,7 +35,7 @@ public class SquadManager {
 					squad.removeInvite(invitee);
 					inviter.sendMessage(Utils.translate("&9" + invitee.getName() + " &3did not accept the squad invite in time"));
 					invitee.sendMessage(Utils.translate("&3You did not accept the squad invite in time"));
-					if (squad.count() == 1)
+					if (squad.size() == 1)
 						disband(squad);
 				}
 			}
@@ -43,19 +45,18 @@ public class SquadManager {
 	public void join(@NotNull Squad squad, PlayerStats newMember) {
 		squad.removeInvite(newMember); // remove invite after joining
 		squad.addMember(newMember);
-		Momentum.getStatsManager().updateSquad(newMember, squad);
+		newMember.updateSquad(squad);
 	}
 
-	public void leave(PlayerStats member, boolean disband) {
+	public void leave(PlayerStats member) {
 		Squad squad = member.getSquad();
 		inSquadChat.remove(member);
-		if (!disband) // avoid concurrent modification exception when disbanding
-			squad.removeMember(member);
-		Momentum.getStatsManager().updateSquad(member, null);
+		squad.removeMember(member);
+		member.updateSquad(null);
 	}
 
 	public void kick(PlayerStats member) {
-		leave(member, false);
+		leave(member);
 	}
 
 	public void promote(PlayerStats newLeader) {
@@ -63,7 +64,14 @@ public class SquadManager {
 	}
 
 	public void disband(Squad squad) {
-		squad.getSquadMembers().forEach(member -> leave(member, true));
+		for (PlayerStats member : squad.getSquadMembers()) {
+			inSquadChat.remove(member);
+			member.updateSquad(null);
+		}
+		Momentum.getPluginLogger().info(offlineCache.toString());
+		offlineCache.values().removeAll(Collections.singleton(squad)); // if the squad doesnt exist anymore, no need to keep cache for offline players
+		Momentum.getPluginLogger().info(offlineCache.toString());
+		squad = null;
 	}
 
 	public void warpMembers(PlayerStats leader) {
@@ -136,5 +144,17 @@ public class SquadManager {
 
 	public static boolean isMember(Squad squad, PlayerStats member) {
 		return squad.getSquadMembers().contains(member);
+	}
+
+	public void addOffline(String uuid, Squad squad) {
+		offlineCache.put(uuid, squad);
+	}
+
+	public Squad getOffline(String uuid) {
+		return offlineCache.get(uuid);
+	}
+
+	public void removeOffline(String uuid) {
+		offlineCache.remove(uuid);
 	}
 }

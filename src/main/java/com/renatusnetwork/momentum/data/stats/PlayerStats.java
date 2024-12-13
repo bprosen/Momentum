@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -1168,7 +1169,7 @@ public class PlayerStats
     public Squad getSquad() {
         return this.squad;
     }
-    public void updateSquad(Squad squad) {
+    public void updateSquad(@Nullable Squad squad) {
         this.squad = squad;
     }
 

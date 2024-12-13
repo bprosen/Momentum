@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.gameplay.listeners;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
@@ -10,7 +9,7 @@ import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.momentum.data.squads.Squad;
-import com.renatusnetwork.momentum.data.squads.SquadManager;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -18,14 +17,10 @@ import com.renatusnetwork.momentum.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import java.util.List;
@@ -38,6 +33,7 @@ public class JoinLeaveListener implements Listener
     {
         Player player = event.getPlayer();
         StatsManager statsManager = Momentum.getStatsManager();
+        SquadsManager squadsManager = Momentum.getSquadsManager();
 
         if (!player.hasPlayedBefore())
         {
@@ -123,6 +119,13 @@ public class JoinLeaveListener implements Listener
                     }
                 }
 
+                Squad squad = squadsManager.getOffline(finalPlayerStats.getUUID());
+                if (squad != null) {
+                    SquadsManager.notifyMembers(squad, "&9SC &3" + finalPlayerStats.getDisplayName() + " &bhas rejoined");
+                    squadsManager.join(squad, finalPlayerStats);
+                    squadsManager.removeOffline(finalPlayerStats.getUUID());
+                }
+
                 // mark player as finished loading
                 finalPlayerStats.loaded();
             }
@@ -142,7 +145,7 @@ public class JoinLeaveListener implements Listener
         InfiniteManager infiniteManager = Momentum.getInfiniteManager();
         ClansManager clansManager = Momentum.getClansManager();
         BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
-        SquadManager squadManager = Momentum.getSquadManager();
+        SquadsManager squadsManager = Momentum.getSquadsManager();
 
         // if left in spectator, remove it
         if (playerStats.isSpectating())
@@ -191,13 +194,27 @@ public class JoinLeaveListener implements Listener
 
         Squad squad = playerStats.getSquad();
         if (playerStats.getSquad() != null) {
-            if (SquadManager.isLeader(playerStats)) {
-                SquadManager.notifyMembers(squad, "&3The squad has been disbanded because the leader went offline");
-                squadManager.disband(squad);
+            if (SquadsManager.isLeader(playerStats)) {
+                SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because the leader went offline");
+                squadsManager.disband(squad);
             }
             else {
-                squadManager.leave(playerStats, false);
-                SquadManager.notifyMembers(squad, "&9SqC &3" + playerStats.getDisplayName() + " &bhas left the squad");
+                squadsManager.leave(playerStats);
+                if (squad.size() <= 1) {
+                    squadsManager.disband(squad);
+                    SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bhas disconnected! The squad has disbanded since all players left");
+                }
+                else {
+                    SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bhas disconnected! They have one minute to rejoin or they'll be removed from the squad");
+                    squadsManager.addOffline(playerStats.getUUID(), squad);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (squadsManager.getOffline(playerStats.getUUID()) != null)
+                                squadsManager.removeOffline(playerStats.getUUID());
+                        }
+                    }.runTaskLaterAsynchronously(Momentum.getPlugin(), 20 * 60); // 1 min
+                }
             }
         }
 

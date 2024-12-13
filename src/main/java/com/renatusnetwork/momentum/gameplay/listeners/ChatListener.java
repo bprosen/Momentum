@@ -3,7 +3,7 @@ package com.renatusnetwork.momentum.gameplay.listeners;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
-import com.renatusnetwork.momentum.data.squads.SquadManager;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -25,18 +25,18 @@ public class ChatListener implements Listener
         Player player = event.getPlayer();
         String msg = event.getMessage();
         ClansManager clansManager = Momentum.getClansManager();
-        SquadManager squadManager = Momentum.getSquadManager();
+        SquadsManager squadsManager = Momentum.getSquadsManager();
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         if (playerStats != null)
         {
             event.setCancelled(true);
 
-            if (squadManager.isInSquadChat(playerStats) && playerStats.getSquad() != null) {
+            if (squadsManager.isInSquadChat(playerStats) && playerStats.getSquad() != null) {
                 event.getRecipients().clear();
 
                 // SquadManager#sendMessage handles chatspy messages
-                squadManager.sendMessage(playerStats, "&9SqC &3" + playerStats.getDisplayName() + " &b" + msg, true);
+                squadsManager.sendMessage(playerStats, "&9SC &3" + playerStats.getDisplayName() + " &b" + msg, true);
                 Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " " + ChatColor.stripColor(msg));
             }
             // iterate through the smaller list first
