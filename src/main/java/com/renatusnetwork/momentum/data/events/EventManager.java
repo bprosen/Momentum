@@ -33,8 +33,7 @@ public class EventManager {
 
     private ArrayList<EventLBPosition> eventLB;
 
-    public EventManager()
-    {
+    public EventManager() {
         this.participants = new HashMap<>();
         this.eliminated = new HashSet<>();
         this.eventLB = new ArrayList<>(Momentum.getSettingsManager().max_event_leaderboard_size);
@@ -43,8 +42,7 @@ public class EventManager {
     }
 
     // method to start event
-    public void startEvent(Event event)
-    {
+    public void startEvent(Event event) {
         runningEvent = event;
         startTime = System.currentTimeMillis();
 
@@ -55,17 +53,16 @@ public class EventManager {
     }
 
     // method to end event
-    public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime)
-    {
+    public void endEvent(Player winner, boolean forceEnded, boolean ranOutOfTime) {
         PlayerStats playerStats = null;
-        if (winner != null)
+        if (winner != null) {
             playerStats = Momentum.getStatsManager().get(winner);
+        }
 
         ParkourEventEndEvent parkourEventEndEvent = new ParkourEventEndEvent(playerStats, runningEvent.getLevel().getReward());
         Bukkit.getPluginManager().callEvent(parkourEventEndEvent);
 
-        if (!parkourEventEndEvent.isCancelled())
-        {
+        if (!parkourEventEndEvent.isCancelled()) {
             this.winner = winner;
 
             // cancel schedulers first
@@ -78,34 +75,33 @@ public class EventManager {
             // clear eliminated list
             eliminated.clear();
 
-            if (winner != null)
-            {
+            if (winner != null) {
                 // give higher reward if prestiged
                 int prestiges = playerStats.getPrestiges();
                 int reward = parkourEventEndEvent.getReward();
 
-                if (playerStats.hasModifier(ModifierType.EVENT_BOOSTER))
-                {
+                if (playerStats.hasModifier(ModifierType.EVENT_BOOSTER)) {
                     Booster booster = (Booster) playerStats.getModifier(ModifierType.EVENT_BOOSTER);
                     reward *= booster.getMultiplier();
                 }
 
-                if (prestiges > 0 && reward > 0)
+                if (prestiges > 0 && reward > 0) {
                     reward *= playerStats.getPrestigeMultiplier();
+                }
 
                 Momentum.getStatsManager().addCoins(playerStats, reward);
                 Momentum.getStatsManager().runGGTimer();
-                
+
                 playerStats.getPlayer().sendMessage(Utils.translate("&7You have been rewarded " + Utils.getCoinFormat(runningEvent.getLevel().getReward(), reward) + " &eCoins"));
 
                 Momentum.getStatsManager().addEventWin(playerStats);
             }
 
-            if (forceEnded)
+            if (forceEnded) {
                 Bukkit.broadcastMessage(Utils.translate("&7A &b" + runningEvent.getFormattedName() + " &7Event has been force ended!"));
-            else if (ranOutOfTime)
+            } else if (ranOutOfTime) {
                 Bukkit.broadcastMessage(Utils.translate("&7A &b" + runningEvent.getFormattedName() + " &7Event has gone on too long! Nobody beat it in time :("));
-            else {
+            } else {
                 Bukkit.broadcastMessage("");
                 Bukkit.broadcastMessage(Utils.translate("&7A &b" + runningEvent.getFormattedName() + " &7Event has ended! &b&l" + winner.getDisplayName() + " &7has won!"));
                 Bukkit.broadcastMessage("");
@@ -123,8 +119,7 @@ public class EventManager {
             @Override
             public void run() {
                 // check if there is enough people online and an event isnt running
-                if (runningEvent == null && Bukkit.getOnlinePlayers().size() >= Momentum.getSettingsManager().min_players_online)
-                {
+                if (runningEvent == null && Bukkit.getOnlinePlayers().size() >= Momentum.getSettingsManager().min_players_online) {
 
                     // get random type from list
                     EventType[] eventTypes = EventType.values();
@@ -132,12 +127,10 @@ public class EventManager {
                     EventType eventType = eventTypes[ran.nextInt(eventTypes.length)];
                     List<Level> eventLevels = Momentum.getLevelManager().getEventLevelsFromType(eventType);
 
-                    if (!eventLevels.isEmpty())
-                    {
+                    if (!eventLevels.isEmpty()) {
                         Level eventLevel = eventLevels.get(ran.nextInt(eventLevels.size()));
 
-                        switch (eventType)
-                        {
+                        switch (eventType) {
                             case PVP:
                                 startEvent(new PvPEvent(eventLevel));
                                 break;
@@ -158,14 +151,12 @@ public class EventManager {
                 }
             }
         }.runTaskTimer(Momentum.getPlugin(), 20 * Momentum.getSettingsManager().check_next_event_delay,
-                20 * Momentum.getSettingsManager().check_next_event_delay);
+                       20 * Momentum.getSettingsManager().check_next_event_delay);
 
         // update global event wins every 3 mins
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 loadLeaderboard();
             }
         }.runTaskTimerAsynchronously(Momentum.getPlugin(), 20 * 10, 20 * 180);
@@ -177,8 +168,9 @@ public class EventManager {
             @Override
             public void run() {
 
-                if (runningEvent != null)
-                    endEvent(null,false, true);
+                if (runningEvent != null) {
+                    endEvent(null, false, true);
+                }
 
             }
         }.runTaskLater(Momentum.getPlugin(), 20 * Momentum.getSettingsManager().max_event_run_time);
@@ -191,16 +183,15 @@ public class EventManager {
 
                 // if the event is running and the end time will be in sync to when the reminder broadcast is, dont do it
                 if (runningEvent != null &&
-                   (endTimeMillis - (20 * 1000 * Momentum.getSettingsManager().event_reminder_delay)) < System.currentTimeMillis())
-
+                    (endTimeMillis - (20 * 1000 * Momentum.getSettingsManager().event_reminder_delay)) < System.currentTimeMillis()) {
                     broadcastComponent(Utils.translate("&7A &b" + runningEvent.getFormattedName() + " Event &7is still running! &cClick here to join!"));
+                }
             }
         }.runTaskTimer(Momentum.getPlugin(), 20 * Momentum.getSettingsManager().event_reminder_delay,
-                                           20 * Momentum.getSettingsManager().event_reminder_delay);
+                       20 * Momentum.getSettingsManager().event_reminder_delay);
     }
 
-    public void broadcastComponent(String message)
-    {
+    public void broadcastComponent(String message) {
         Bukkit.broadcastMessage("");
         Utils.broadcastClickableHoverableCMD(message, "&bClick to join!", "/event join");
         Bukkit.broadcastMessage("");
@@ -225,8 +216,7 @@ public class EventManager {
         return participants.containsKey(player.getName());
     }
 
-    public void addParticipant(Player player)
-    {
+    public void addParticipant(Player player) {
 
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
@@ -243,36 +233,36 @@ public class EventManager {
         playerStats.joinedEvent();
 
         // add to map
-        if (isAscentEvent())
+        if (isAscentEvent()) {
             ((AscentEvent) runningEvent).add(player);
-        else if (isMazeEvent())
+        } else if (isMazeEvent()) {
             ((MazeEvent) runningEvent).respawn(player);
-        else
+        } else {
             playerStats.teleport(runningEvent.getLevel().getStartLocation(), true);
+        }
 
         // remove active effects
         playerStats.clearPotionEffects();
     }
 
-    public void removeParticipant(Player player, boolean disconnected)
-    {
+    public void removeParticipant(Player player, boolean disconnected) {
         EventParticipant eventParticipant = get(player);
 
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-        if (!disconnected && eventParticipant.getOriginalLevel() != null)
-        {
+        if (!disconnected && eventParticipant.getOriginalLevel() != null) {
             Location location = playerStats.getCheckpoint(eventParticipant.getOriginalLevel());
 
             // reset the cache and teleport player back
-            if (location != null)
+            if (location != null) {
                 playerStats.setCurrentCheckpoint(location);
+            }
         }
 
         // if their original level is not null, then set it, if it is, do region lookup of their original location jic
-        if (eventParticipant.getOriginalLevel() != null)
+        if (eventParticipant.getOriginalLevel() != null) {
             playerStats.setLevel(eventParticipant.getOriginalLevel());
-        else {
+        } else {
             // region lookup here
             ProtectedRegion region = WorldGuard.getRegion(eventParticipant.getOriginalLocation());
             if (region != null) {
@@ -281,10 +271,11 @@ public class EventManager {
                 Level level = Momentum.getLevelManager().get(region.getId());
 
                 // make sure the area they are spawning in is a level
-                if (level != null)
+                if (level != null) {
                     playerStats.setLevel(level);
-                else
+                } else {
                     playerStats.resetLevel();
+                }
             } else {
                 playerStats.resetLevel();
             }
@@ -295,31 +286,35 @@ public class EventManager {
         Utils.applySlowness(player);
         player.setHealth(20.0);
 
-        if (isAscentEvent())
+        if (isAscentEvent()) {
             ((AscentEvent) runningEvent).remove(player);
+        }
 
-        if (!disconnected && winner != null)
+        if (!disconnected && winner != null) {
             playerStats.sendTitle("&c" + winner.getDisplayName() + " &7has won the &2&l" + runningEvent.getFormattedName() + " &7Event", "", 10, 80, 10);
+        }
 
         // set back if they came from elytra level
-        if (playerStats.inLevel() && playerStats.getLevel().isElytra())
+        if (playerStats.inLevel() && playerStats.getLevel().isElytra()) {
             Momentum.getStatsManager().toggleOnElytra(playerStats);
+        }
 
         participants.remove(player.getName());
     }
 
-    public void removeAllParticipants(boolean shutdown)
-    {
+    public void removeAllParticipants(boolean shutdown) {
 
         Set<EventParticipant> tempList = new HashSet<>();
 
         // create a DEEP copy of the list so no concurrent errors
-        for (EventParticipant eventParticipant : participants.values())
+        for (EventParticipant eventParticipant : participants.values()) {
             tempList.add(eventParticipant);
+        }
 
         // now remove so theres no concurrency problem
-        for (EventParticipant participant : tempList)
+        for (EventParticipant participant : tempList) {
             removeParticipant(participant.getPlayer(), shutdown);
+        }
 
         // null winner once all participants have been handled
         winner = null;
@@ -337,25 +332,20 @@ public class EventManager {
         eliminated.add(player.getName());
     }
 
-    public long getTimeLeftMillis()
-    {
+    public long getTimeLeftMillis() {
         return (startTime + (Momentum.getSettingsManager().max_event_run_time * 1000)) - System.currentTimeMillis();
     }
 
-    public void shutdown()
-    {
-        if (isEventRunning())
-        {
+    public void shutdown() {
+        if (isEventRunning()) {
             runningEvent.end();
             removeAllParticipants(true);
             runningEvent = null;
         }
     }
 
-    public void loadLeaderboard()
-    {
-        try
-        {
+    public void loadLeaderboard() {
+        try {
             ArrayList<EventLBPosition> leaderboard = eventLB;
             leaderboard.clear();
 
@@ -363,44 +353,42 @@ public class EventManager {
                     "players",
                     "uuid, name, event_wins",
                     "WHERE event_wins > 0" +
-                            " ORDER BY event_wins DESC" +
-                            " LIMIT " + Momentum.getSettingsManager().max_event_leaderboard_size);
+                    " ORDER BY event_wins DESC" +
+                    " LIMIT " + Momentum.getSettingsManager().max_event_leaderboard_size);
 
-            for (Map<String, String> winResult : winResults)
+            for (Map<String, String> winResult : winResults) {
                 leaderboard.add(
                         new EventLBPosition(
                                 winResult.get("uuid"), winResult.get("name"), Integer.parseInt(winResult.get("event_wins"))
                         ));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public ArrayList<EventLBPosition> getEventLeaderboard()
-    {
+    public ArrayList<EventLBPosition> getEventLeaderboard() {
         return eventLB;
     }
 
     // easy methods
-    public boolean isPvPEvent()
-    {
+    public boolean isPvPEvent() {
         return runningEvent instanceof PvPEvent;
     }
-    public boolean isRisingWaterEvent()
-    {
+
+    public boolean isRisingWaterEvent() {
         return runningEvent instanceof RisingWaterEvent;
     }
-    public boolean isFallingAnvilEvent()
-    {
+
+    public boolean isFallingAnvilEvent() {
         return runningEvent instanceof FallingAnvilEvent;
     }
 
-    public boolean isAscentEvent()
-    {
+    public boolean isAscentEvent() {
         return runningEvent instanceof AscentEvent;
     }
-    public boolean isMazeEvent()
-    {
+
+    public boolean isMazeEvent() {
         return runningEvent instanceof MazeEvent;
     }
 }

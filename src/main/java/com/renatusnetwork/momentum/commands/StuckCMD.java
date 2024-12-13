@@ -13,22 +13,18 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class StuckCMD implements CommandExecutor
-{
+public class StuckCMD implements CommandExecutor {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender instanceof Player)
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender instanceof Player) {
             Player player = (Player) sender;
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-            if (playerStats.inLevel())
-            {
+            if (playerStats.inLevel()) {
                 Level level = playerStats.getLevel();
 
-                if (level.hasStuckURL())
-                {
+                if (level.hasStuckURL()) {
                     BaseComponent[] test = TextComponent.fromLegacyText(Utils.translate(
                             "\n&8> &cClick &nhere&c to open the guide for " + level.getTitle() + "&8 <\n"
                     ));
@@ -39,12 +35,12 @@ public class StuckCMD implements CommandExecutor
 
                     // send component
                     player.spigot().sendMessage(component);
-                }
-                else
+                } else {
                     sender.sendMessage(Utils.translate("&cThis level does not have an available guide"));
-            }
-            else
+                }
+            } else {
                 sender.sendMessage(Utils.translate("&cYou are not in a level to be stuck in"));
+            }
         }
         return false;
     }

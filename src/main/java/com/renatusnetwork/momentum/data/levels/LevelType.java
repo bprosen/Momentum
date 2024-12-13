@@ -1,8 +1,7 @@
 package com.renatusnetwork.momentum.data.levels;
 
 
-public enum LevelType
-{
+public enum LevelType {
     NORMAL,
     RACE,
     DROPPER,

@@ -28,11 +28,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class PacketListener implements Listener
-{
+public class PacketListener implements Listener {
 
-    public static void loadListeners(Plugin plugin)
-    {
+    public static void loadListeners(Plugin plugin) {
         registerBlockListener(plugin);
         registerMoveListener(plugin);
     }
@@ -48,19 +46,18 @@ public class PacketListener implements Listener
                 PacketContainer packet = event.getPacket();
 
                 // use block change for right click, left click, etc
-                if (packet.getType() == PacketType.Play.Client.BLOCK_DIG || packet.getType() == PacketType.Play.Client.USE_ITEM)
-                {
+                if (packet.getType() == PacketType.Play.Client.BLOCK_DIG || packet.getType() == PacketType.Play.Client.USE_ITEM) {
 
                     Player player = event.getPlayer();
 
                     // make sure they are not temporary and in the right world
                     if (!event.isPlayerTemporary() &&
-                        player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-                    {
+                        player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
                         // if they are opped, and if they are bypassing plots, then ignore
-                        if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+                        if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
                             return;
+                        }
 
                         /*
                             This section of the code runs checks to find the location of the block packet sent
@@ -70,8 +67,7 @@ public class PacketListener implements Listener
                                 Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world));
 
                         // if it is a block place, adjust location to the block being placed, not what it is placed on
-                        if (packet.getType() == PacketType.Play.Client.USE_ITEM)
-                        {
+                        if (packet.getType() == PacketType.Play.Client.USE_ITEM) {
                             String direction = packet.getDirections().read(0).toString();
 
                             // adjust location
@@ -109,35 +105,29 @@ public class PacketListener implements Listener
 
                         // check if they have a plot,
                         // only way this does not get cancelled is if they are trusted or own it
-                        if (plot != null)
-                        {
+                        if (plot != null) {
                             // check if their plot is submitted
-                            if (plot.isSubmitted())
-                            {
+                            if (plot.isSubmitted()) {
                                 doCancel = true;
                                 reason = "&cYou cannot edit your plot when it has been submitted";
-                            // check if they are not trusted and not owner, then cancel
-                            }
-                            else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) && !plot.isTrusted(player.getUniqueId().toString()))
-                            {
+                                // check if they are not trusted and not owner, then cancel
+                            } else if (!plot.getOwnerName().equalsIgnoreCase(player.getName()) && !plot.isTrusted(player.getUniqueId().toString())) {
 
                                 doCancel = true;
                                 reason = "&cYou cannot do this here";
-                            // this will only continue if the block they edited is in the x and y of the bedrock spawn
+                                // this will only continue if the block they edited is in the x and y of the bedrock spawn
                             }
-                        // no nearest plot
-                        }
-                        else
-                        {
+                            // no nearest plot
+                        } else {
                             doCancel = true;
                             reason = "&cYou cannot do this here";
                         }
 
-                        if (doCancel)
-                        {
+                        if (doCancel) {
                             // if they are opped, tell them on being able to bypass
-                            if (player.isOp())
+                            if (player.isOp()) {
                                 reason += " &7You can bypass this with &c/plot bypass";
+                            }
 
                             player.sendMessage(Utils.translate(reason));
                             event.setCancelled(true);
@@ -160,12 +150,10 @@ public class PacketListener implements Listener
 
         // listen to move event asynchronously
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(
-                plugin, ListenerPriority.HIGHEST, PacketType.Play.Client.POSITION)
-        {
+                plugin, ListenerPriority.HIGHEST, PacketType.Play.Client.POSITION) {
 
             @Override
-            public void onPacketReceiving(PacketEvent event)
-            {
+            public void onPacketReceiving(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
                 Player player = event.getPlayer();
 
@@ -177,114 +165,98 @@ public class PacketListener implements Listener
                 PlayerStats playerStats = statsManager.get(player);
 
                 // null check and check for loaded jic
-                if (playerStats != null && playerStats.isLoaded())
-                {
+                if (playerStats != null && playerStats.isLoaded()) {
                     InfiniteManager infiniteManager = Momentum.getInfiniteManager();
                     LocationManager locationManager = Momentum.getLocationManager();
 
                     // if spectating
-                    if (playerStats.isSpectating())
-                    {
+                    if (playerStats.isSpectating()) {
                         PlayerStats beingSpectated = playerStats.getPlayerToSpectate();
 
                         if (beingSpectated != null && beingSpectated.getPlayer().isOnline() && beingSpectated.isSpectatable() &&
-                                !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-                        {
+                            !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
                             if (!beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) ||
                                 !Utils.isNearby(playerStats.getPlayer().getLocation(), beingSpectated.getPlayer().getLocation(), 30.0))
 
-                                // run in sync due to teleporting
-                                new BukkitRunnable()
-                                {
+                            // run in sync due to teleporting
+                            {
+                                new BukkitRunnable() {
                                     @Override
-                                    public void run()
-                                    {
+                                    public void run() {
                                         statsManager.spectateToPlayer(playerStats, beingSpectated, false);
                                     }
                                 }.runTask(Momentum.getPlugin());
-                        }
-                        else
-                        {
+                            }
+                        } else {
                             // run in sync due to teleporting
-                            new BukkitRunnable()
-                            {
+                            new BukkitRunnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     statsManager.resetSpectatorMode(playerStats);
                                 }
                             }.runTask(Momentum.getPlugin());
                         }
                     }
                     // if in infinite parkour
-                    else if (playerStats.isInInfinite())
-                    {
+                    else if (playerStats.isInInfinite()) {
                         Infinite infinite = infiniteManager.get(player.getName());
 
                         // respawn infinite pk if below current block
-                        if ((infinite.getFirstBlock().getLocation().getBlockY() - 3) > player.getLocation().getBlockY())
-                        {
+                        if ((infinite.getFirstBlock().getLocation().getBlockY() - 3) > player.getLocation().getBlockY()) {
                             // force sync
-                            new BukkitRunnable()
-                            {
+                            new BukkitRunnable() {
                                 @Override
-                                public void run()
-                                {
-                                    if (playerStats.isInInfinite()) infinite.respawn(); // conditional to avoid glitched tping on roof
+                                public void run() {
+                                    if (playerStats.isInInfinite()) {
+                                        infinite.respawn(); // conditional to avoid glitched tping on roof
+                                    }
                                 }
                             }.runTask(Momentum.getPlugin());
                         }
                         // if their loc
-                    }
-                    else if (!playerStats.inLevel())
-                    {
-                        if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.INFINITE))
+                    } else if (!playerStats.inLevel()) {
+                        if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.INFINITE)) {
                             infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), true);
-                        else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.ASCENDANCE))
-                        {
+                        } else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.ASCENDANCE)) {
                             Level level = Momentum.getLevelManager().get(Momentum.getSettingsManager().ascendance_hub_level);
 
                             if (level != null)
-                                // force sync
+                            // force sync
+                            {
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
                                         MenuItemAction.performLevelTeleport(playerStats, level); // Tp to ascendance hub
                                     }
                                 }.runTask(Momentum.getPlugin());
-                        }
-                        else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.BLACK_MARKET))
-                            new BukkitRunnable()
-                            {
+                            }
+                        } else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.BLACK_MARKET)) {
+                            new BukkitRunnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
 
                                     // only add if its running
-                                    if (blackMarketManager.isRunning())
+                                    if (blackMarketManager.isRunning()) {
                                         Momentum.getBlackMarketManager().playerJoined(playerStats);
+                                    }
                                 }
                             }.runTask(Momentum.getPlugin());
-                    }
-                    else if (playerStats.isPreviewingLevel())
-                    {
+                        }
+                    } else if (playerStats.isPreviewingLevel()) {
                         LevelPreview levelPreview = playerStats.getPreviewLevel();
 
-                        new BukkitRunnable()
-                        {
+                        new BukkitRunnable() {
                             @Override
-                            public void run()
-                            {
+                            public void run() {
                                 // only teleport if they go out of the area
-                                if (levelPreview.shouldTeleport(playerStats.getPlayer().getLocation()))
+                                if (levelPreview.shouldTeleport(playerStats.getPlayer().getLocation())) {
                                     levelPreview.teleport();
+                                }
                             }
                         }.runTask(Momentum.getPlugin());
-                    }
-                    else
-                    {
+                    } else {
                         Level level = playerStats.getLevel();
 
                         // run in sync due to teleporting
@@ -295,10 +267,11 @@ public class PacketListener implements Listener
                                 // if level is not null, it has a respawn y, and the y is greater than or equal to player y, respawn
                                 if (level != null && level.hasRespawnY() && level.getRespawnY() >= player.getLocation().getY()) {
                                     // teleport
-                                    if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
+                                    if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode()) {
                                         Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
-                                    else
+                                    } else {
                                         Momentum.getLevelManager().respawnPlayer(playerStats, level);
+                                    }
                                 }
                             }
                         }.runTask(plugin);

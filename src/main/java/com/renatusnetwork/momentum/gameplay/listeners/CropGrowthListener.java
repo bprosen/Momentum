@@ -10,7 +10,8 @@ public class CropGrowthListener implements Listener {
     // growth listener for stuff like cocoa beans
     @EventHandler
     public void onGrowth(BlockGrowEvent event) {
-        if (event.getBlock().getType() == Material.COCOA)
+        if (event.getBlock().getType() == Material.COCOA) {
             event.setCancelled(true);
+        }
     }
 }

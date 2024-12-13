@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class PlayerStats
-{
+public class PlayerStats {
+
     private boolean loaded;
     private Player player;
     private String uuid;
@@ -95,8 +95,7 @@ public class PlayerStats
     private Set<String> usedCommandSigns;
     private Squad squad;
 
-    public PlayerStats(Player player)
-    {
+    public PlayerStats(Player player) {
         this.player = player;
         this.uuid = player.getUniqueId().toString();
         this.name = player.getName();
@@ -120,20 +119,19 @@ public class PlayerStats
         this.infiniteBlock = Momentum.getSettingsManager().infinite_default_block;
         this.rank = Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank);
 
-        for (InfiniteType type : InfiniteType.values())
+        for (InfiniteType type : InfiniteType.values()) {
             bestInfiniteScores.put(type, 0); // arbitrary to be replaced when stats load
+        }
 
         this.sortingType = Momentum.getSettingsManager().default_level_sorting_type;
         this.levelStartTime = -1;
     }
 
-    public void loaded()
-    {
+    public void loaded() {
         this.loaded = true;
     }
 
-    public boolean isLoaded()
-    {
+    public boolean isLoaded() {
         return loaded;
     }
 
@@ -152,27 +150,22 @@ public class PlayerStats
         board.updateLines(lines);
     }
 
-    public void setELO(int elo)
-    {
+    public void setELO(int elo) {
         this.elo = elo;
     }
 
-    public int getELO()
-    {
+    public int getELO() {
         return elo;
     }
 
-    public void loadELOToXPBar()
-    {
+    public void loadELOToXPBar() {
         player.setLevel(elo); // set xp level as elo
 
-        if (eloTier != null)
-        {
+        if (eloTier != null) {
             ELOTier nextTier = eloTier.getNextELOTier();
 
             // if not at end, show progress
-            if (nextTier != null)
-            {
+            if (nextTier != null) {
                 // use the xp bar as a progress guage
                 int differenceTo = nextTier.getRequiredELO() - eloTier.getRequiredELO();
                 int differencePlayer = elo - eloTier.getRequiredELO();
@@ -181,41 +174,40 @@ public class PlayerStats
                 player.setExp(Math.min(0.99f, Math.max(ratio, 0f)));
             }
             // otherwise show xp bar as full
-            else
+            else {
                 player.setExp(0.99f);
+            }
         }
     }
 
-    public void setELOTier(ELOTier eloTier)
-    {
+    public void setELOTier(ELOTier eloTier) {
         this.eloTier = eloTier;
     }
 
-    public ELOTier getELOTier()
-    {
+    public ELOTier getELOTier() {
         return eloTier;
     }
 
-    public boolean hasELOTier() { return eloTier != null; }
+    public boolean hasELOTier() {
+        return eloTier != null;
+    }
 
-    public String getELOTierTitleWithLB()
-    {
+    public String getELOTierTitleWithLB() {
         String title = null;
 
-        if (eloTier != null)
-        {
+        if (eloTier != null) {
             title = eloTier.getTitle();
 
             ELOLBPosition elolbPosition = Momentum.getStatsManager().getELOLBPositionIfExists(name);
-            if (elolbPosition != null)
+            if (elolbPosition != null) {
                 title = "&5#&d&l" + elolbPosition.getPosition();
+            }
         }
 
         return title;
     }
 
-    public int calculateNewELO(PlayerStats opponent, ELOOutcomeTypes outcomeType)
-    {
+    public int calculateNewELO(PlayerStats opponent, ELOOutcomeTypes outcomeType) {
         double scoreOutcomeFactor = outcomeType == ELOOutcomeTypes.WIN ? 1.0 : 0.0;
 
         // expected outcome of the game
@@ -223,10 +215,11 @@ public class PlayerStats
 
         // adjusted k factor based on elo rating
         int kFactor = 16;
-        if (elo < 2000)
+        if (elo < 2000) {
             kFactor = 32;
-        else if (elo < 2400)
+        } else if (elo < 2400) {
             kFactor = 24;
+        }
 
         // calculate new elo rating
         return (int) Math.round(elo + kFactor * (scoreOutcomeFactor - expectedOutcome));
@@ -281,8 +274,7 @@ public class PlayerStats
         this.nightVision = nightVision;
     }
 
-    public void toggleNightVision()
-    {
+    public void toggleNightVision() {
         this.nightVision = !nightVision;
     }
 
@@ -310,8 +302,9 @@ public class PlayerStats
     }
 
     public void setCoins(int coins) {
-        if (coins < 0)
+        if (coins < 0) {
             coins = 0;
+        }
 
         this.coins = coins;
     }
@@ -324,48 +317,44 @@ public class PlayerStats
         this.coins -= coins;
 
         // no allowing negative numbers, NO DEBT
-        if (this.coins < 0)
+        if (this.coins < 0) {
             this.coins = 0;
+        }
     }
 
     //
     // Race Section
     //
-    public void startRace(RacePlayer race)
-    {
+    public void startRace(RacePlayer race) {
         this.race = race;
     }
 
-    public void resetRace()
-    {
+    public void resetRace() {
         this.race = null;
     }
 
-    public boolean inRace()
-    {
+    public boolean inRace() {
         return race != null;
     }
 
-    public void setRace(RacePlayer race)
-    {
+    public void setRace(RacePlayer race) {
         this.race = race;
     }
 
-    public RacePlayer getRace()
-    {
+    public RacePlayer getRace() {
         return race;
     }
 
-    public void endRace(RaceEndReason reason)
-    {
-        if (race != null)
+    public void endRace(RaceEndReason reason) {
+        if (race != null) {
             race.getRace().end(race, reason);
+        }
     }
 
-    public void endRace(RacePlayer winner, RaceEndReason reason)
-    {
-        if (race != null)
+    public void endRace(RacePlayer winner, RaceEndReason reason) {
+        if (race != null) {
             race.getRace().end(winner, reason);
+        }
     }
 
     public int getRaceWins() {
@@ -388,41 +377,38 @@ public class PlayerStats
         return raceWinRate;
     }
 
-    public void calcRaceWinRate()
-    {
-        if (raceLosses > 0)
+    public void calcRaceWinRate() {
+        if (raceLosses > 0) {
             raceWinRate = Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses, true, 1, 2));
-        else
+        } else {
             raceWinRate = raceWins;
+        }
     }
 
     //
     // Level Section
     //
-    public boolean hasAccessTo(Level level)
-    {
+    public boolean hasAccessTo(Level level) {
         return !((level.requiresBuying() && !hasBoughtLevel(level)) ||
-                (level.hasRequiredLevels() && !level.playerHasRequiredLevels(this)) ||
-                (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission())) ||
-                (level.needsRank() && !Momentum.getRanksManager().isPastOrAtRank(this, level.getRequiredRank())));
+                 (level.hasRequiredLevels() && !level.playerHasRequiredLevels(this)) ||
+                 (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission())) ||
+                 (level.needsRank() && !Momentum.getRanksManager().isPastOrAtRank(this, level.getRequiredRank())));
     }
 
-    public void setLevel(Level level)
-    {
+    public void setLevel(Level level) {
         // only continue if non null
-        if (level != null)
-        {
+        if (level != null) {
             SettingsManager settingsManager = Momentum.getSettingsManager();
 
             // if doesnt exist in inventory, add it
-            if (Utils.getItemStackIfExists(player, player.getInventory(), settingsManager.leave_title) == null)
+            if (Utils.getItemStackIfExists(player, player.getInventory(), settingsManager.leave_title) == null) {
                 Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
+            }
         }
         this.level = level;
     }
 
-    public void resetLevel()
-    {
+    public void resetLevel() {
         level = null;
         Utils.removeSpawnItemIfExists(player);
     }
@@ -435,16 +421,22 @@ public class PlayerStats
         return level != null;
     }
 
-    public boolean isPreviewingLevel() { return previewLevel != null; }
+    public boolean isPreviewingLevel() {
+        return previewLevel != null;
+    }
 
-    public LevelPreview getPreviewLevel() { return previewLevel; }
+    public LevelPreview getPreviewLevel() {
+        return previewLevel;
+    }
 
-    public void setPreviewLevel(LevelPreview previewLevel) { this.previewLevel = previewLevel; }
+    public void setPreviewLevel(LevelPreview previewLevel) {
+        this.previewLevel = previewLevel;
+    }
 
-    public void resetPreviewLevel()
-    {
-        if (previewLevel != null)
+    public void resetPreviewLevel() {
+        if (previewLevel != null) {
             previewLevel.reset();
+        }
 
         previewLevel = null;
     }
@@ -493,7 +485,9 @@ public class PlayerStats
         return levelStartTime;
     }
 
-    public boolean isLevelBeingTimed() { return levelStartTime > -1; }
+    public boolean isLevelBeingTimed() {
+        return levelStartTime > -1;
+    }
 
     public int getTotalLevelCompletions() {
         return totalLevelCompletions;
@@ -511,8 +505,7 @@ public class PlayerStats
         this.individualLevelsBeaten = individualLevelsBeaten;
     }
 
-    public void addIndividualLevelsBeaten()
-    {
+    public void addIndividualLevelsBeaten() {
         this.individualLevelsBeaten++;
     }
 
@@ -552,8 +545,7 @@ public class PlayerStats
         records.put(level, time);
     }
 
-    public long getRecord(Level level)
-    {
+    public long getRecord(Level level) {
         return records.get(level);
     }
 
@@ -743,8 +735,7 @@ public class PlayerStats
         this.failsToggled = failsToggled;
     }
 
-    public void toggleFailMode()
-    {
+    public void toggleFailMode() {
         this.failsToggled = !failsToggled;
     }
 
@@ -757,8 +748,9 @@ public class PlayerStats
     }
 
     public void addFail() {
-        if (failsToggled && !inInfinite && !inTutorial && !eventParticipant && previewLevel == null)
+        if (failsToggled && !inInfinite && !inTutorial && !eventParticipant && previewLevel == null) {
             fails++;
+        }
     }
 
     public void resetFails() {
@@ -777,12 +769,12 @@ public class PlayerStats
     public void setPracticeCheckpoint(Location checkpointLocation, boolean addToHistory) {
         currentPracticeCheckpoint = checkpointLocation;
 
-        if (addToHistory)
-        {
+        if (addToHistory) {
             practiceHistory.add(checkpointLocation);
 
-            if (practiceHistory.size() > Momentum.getSettingsManager().prac_history_size)
+            if (practiceHistory.size() > Momentum.getSettingsManager().prac_history_size) {
                 practiceHistory.remove(0);
+            }
         }
     }
 
@@ -800,13 +792,11 @@ public class PlayerStats
         return currentPracticeCheckpoint;
     }
 
-    public Location getPracticeCheckpointFromHistory(int index)
-    {
+    public Location getPracticeCheckpointFromHistory(int index) {
         return practiceHistory.size() > index ? practiceHistory.get(index) : null;
     }
 
-    public boolean isPracticeHistorySame(Location practiceCheckpoint)
-    {
+    public boolean isPracticeHistorySame(Location practiceCheckpoint) {
         return inPracticeMode() && currentPracticeCheckpoint.equals(practiceCheckpoint);
     }
 
@@ -897,25 +887,32 @@ public class PlayerStats
         saves.replace(level.getName(), location);
     }
 
-    public boolean hasAutoSave() { return autoSave; }
+    public boolean hasAutoSave() {
+        return autoSave;
+    }
 
-    public void setAutoSave(boolean autoSave) { this.autoSave = autoSave; }
+    public void setAutoSave(boolean autoSave) {
+        this.autoSave = autoSave;
+    }
 
-    public void toggleAutoSave() { this.autoSave = !autoSave; }
+    public void toggleAutoSave() {
+        this.autoSave = !autoSave;
+    }
 
     //
     // Completions Section
     //
-    public void levelCompletion(LevelCompletion levelCompletion)
-    {
+    public void levelCompletion(LevelCompletion levelCompletion) {
         String levelName = levelCompletion.getLevelName();
 
         if (levelName != null) {
-            if (!levelCompletions.containsKey(levelName))
+            if (!levelCompletions.containsKey(levelName)) {
                 levelCompletions.put(levelName, new HashSet<>());
+            }
 
-            if (levelCompletions.get(levelName) != null)
+            if (levelCompletions.get(levelName) != null) {
                 levelCompletions.get(levelName).add(levelCompletion);
+            }
         }
     }
 
@@ -930,48 +927,55 @@ public class PlayerStats
     public int getLevelCompletionsCount(Level level) {
         String levelName = level.getName();
 
-        if (levelCompletions.containsKey(levelName))
+        if (levelCompletions.containsKey(levelName)) {
             return levelCompletions.get(levelName).size();
+        }
 
         return 0;
     }
 
     // fastest completion
-    public LevelCompletion getQuickestCompletion(Level level)
-    {
+    public LevelCompletion getQuickestCompletion(Level level) {
         String levelName = level.getName();
         LevelCompletion fastestCompletion = null;
 
         if (levelCompletions.containsKey(levelName))
-            // loop through to find fastest completion
+        // loop through to find fastest completion
+        {
             for (LevelCompletion levelCompletion : levelCompletions.get(levelName))
-                // if not null and not including not timed levels, continue
+            // if not null and not including not timed levels, continue
+            {
                 if (levelCompletion != null &&
                     levelCompletion.wasTimed() &&
                     (fastestCompletion == null || (levelCompletion.getCompletionTimeElapsedMillis() < fastestCompletion.getCompletionTimeElapsedMillis()))
-                )
+                ) {
                     fastestCompletion = levelCompletion;
+                }
+            }
+        }
 
         return fastestCompletion;
     }
 
-    public void removeCompletion(String levelName, long timeTaken)
-    {
+    public void removeCompletion(String levelName, long timeTaken) {
         Set<LevelCompletion> completions = levelCompletions.get(levelName);
 
         LevelCompletion found = null;
 
-        if (completions != null)
-            for (LevelCompletion completion : completions)
-                if (completion.equals(name, levelName, timeTaken))
-                {
+        if (completions != null) {
+            for (LevelCompletion completion : completions) {
+                if (completion.equals(name, levelName, timeTaken)) {
                     found = completion;
                     break;
                 }
+            }
+        }
 
-        if (found != null)
+        if (found != null) {
             completions.remove(found);
+        }
     }
+
     //
     // Perks Section
     //
@@ -979,14 +983,17 @@ public class PlayerStats
         perks.add(perk);
     }
 
-    public boolean hasPerk(Perk perk)
-    {
+    public boolean hasPerk(Perk perk) {
         return perks.contains(perk);
     }
 
-    public int getGainedPerksCount() { return perks.size(); }
+    public int getGainedPerksCount() {
+        return perks.size();
+    }
 
-    public HashSet<Perk> getPerks() { return perks; }
+    public HashSet<Perk> getPerks() {
+        return perks;
+    }
 
     //
     // Event Section
@@ -1003,18 +1010,28 @@ public class PlayerStats
         eventParticipant = false;
     }
 
-    public void setEventWins(int eventWins) { this.eventWins = eventWins; }
+    public void setEventWins(int eventWins) {
+        this.eventWins = eventWins;
+    }
 
-    public void addEventWin() { eventWins++; }
+    public void addEventWin() {
+        eventWins++;
+    }
 
-    public int getEventWins() { return eventWins; }
+    public int getEventWins() {
+        return eventWins;
+    }
 
     //
     // Rated Levels Section
     //
-    public void setRatedLevelsCount(int ratedLevelsCount) { this.ratedLevelsCount = ratedLevelsCount; }
+    public void setRatedLevelsCount(int ratedLevelsCount) {
+        this.ratedLevelsCount = ratedLevelsCount;
+    }
 
-    public int getRatedLevelsCount() { return ratedLevelsCount; }
+    public int getRatedLevelsCount() {
+        return ratedLevelsCount;
+    }
 
     //
     // Plots Sections
@@ -1023,7 +1040,9 @@ public class PlayerStats
         this.bypassingPlots = bypassingPlots;
     }
 
-    public boolean isBypassingPlots() { return bypassingPlots; }
+    public boolean isBypassingPlots() {
+        return bypassingPlots;
+    }
 
     //
     // Grinding Section
@@ -1036,36 +1055,33 @@ public class PlayerStats
         grinding = !grinding;
     }
 
-    public void setGrinding(boolean grinding) { this.grinding = grinding; }
+    public void setGrinding(boolean grinding) {
+        this.grinding = grinding;
+    }
 
     //
     // Modifier Section
     //
-    public void addModifier(Modifier modifier)
-    {
+    public void addModifier(Modifier modifier) {
         // prevent same type (overwriting)
-        if (!hasModifier(modifier.getType()))
+        if (!hasModifier(modifier.getType())) {
             modifiers.put(modifier.getType(), modifier);
+        }
     }
 
-    public void removeModifier(Modifier modifier)
-    {
+    public void removeModifier(Modifier modifier) {
         modifiers.remove(modifier.getType());
     }
 
-    public boolean hasModifier(ModifierType modifierType)
-    {
+    public boolean hasModifier(ModifierType modifierType) {
         return modifiers.containsKey(modifierType);
     }
 
-    public boolean hasModifierByName(Modifier targetModifier)
-    {
+    public boolean hasModifierByName(Modifier targetModifier) {
         boolean result = false;
 
-        for (Modifier modifier : modifiers.values())
-        {
-            if (modifier.equals(targetModifier))
-            {
+        for (Modifier modifier : modifiers.values()) {
+            if (modifier.equals(targetModifier)) {
                 result = true;
                 break;
             }
@@ -1073,80 +1089,69 @@ public class PlayerStats
         return result;
     }
 
-    public Collection<Modifier> getModifiers()
-    {
+    public Collection<Modifier> getModifiers() {
         return modifiers.values();
     }
 
-    public void setModifiers(HashMap<ModifierType, Modifier> modifiers)
-    {
+    public void setModifiers(HashMap<ModifierType, Modifier> modifiers) {
         this.modifiers = modifiers;
     }
 
-    public Modifier getModifier(ModifierType modifierType)
-    {
+    public Modifier getModifier(ModifierType modifierType) {
         return modifiers.get(modifierType);
     }
 
     //
     // Bank
     //
-    public boolean hasBankBid(BankItemType type)
-    {
+    public boolean hasBankBid(BankItemType type) {
         return bids.containsKey(type);
     }
 
-    public BankBid getBankBid(BankItemType type)
-    {
+    public BankBid getBankBid(BankItemType type) {
         return bids.get(type);
     }
 
-    public int getBankBidAmount(BankItemType type)
-    {
+    public int getBankBidAmount(BankItemType type) {
         BankBid bid = bids.get(type);
         return bid != null ? bid.getBid() : 0;
     }
 
-    public void resetBankBids()
-    {
+    public void resetBankBids() {
         bids.clear();
     }
 
-    public long getLastBankBidMillis(BankItemType type)
-    {
+    public long getLastBankBidMillis(BankItemType type) {
         BankBid bid = bids.get(type);
         return bid != null ? bid.getLastBidDateMillis() : -1;
     }
 
-    public void setBankBid(BankItemType type, int bid)
-    {
-        if (hasBankBid(type))
+    public void setBankBid(BankItemType type, int bid) {
+        if (hasBankBid(type)) {
             bids.get(type).setBid(bid);
+        }
     }
 
-    public void setLastBidDateMillis(BankItemType type, long lastBidDateMillis)
-    {
-        if (hasBankBid(type))
+    public void setLastBidDateMillis(BankItemType type, long lastBidDateMillis) {
+        if (hasBankBid(type)) {
             bids.get(type).setLastBidDateMillis(lastBidDateMillis);
+        }
     }
 
-    public void updateBankBid(BankItemType type, int bid, long lastBidDateMillis)
-    {
-        if (hasBankBid(type))
-        {
+    public void updateBankBid(BankItemType type, int bid, long lastBidDateMillis) {
+        if (hasBankBid(type)) {
             BankBid bankBid = bids.get(type);
 
             bankBid.setBid(bid);
             bankBid.setLastBidDateMillis(lastBidDateMillis);
         }
     }
-    public void setBankBids(HashMap<BankItemType, BankBid> bids)
-    {
+
+    public void setBankBids(HashMap<BankItemType, BankBid> bids) {
         this.bids = bids;
     }
 
-    public void addBankBid(BankItemType type, int bid, long lastBidDateMillis)
-    {
+    public void addBankBid(BankItemType type, int bid, long lastBidDateMillis) {
         bids.put(type, new BankBid(bid, lastBidDateMillis));
     }
 
@@ -1180,28 +1185,30 @@ public class PlayerStats
 
         for (PotionEffect potionEffect : player.getActivePotionEffects())
 
-            // dont remove effect if its night vision, and they have it enabled
-            if (!(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION) && nightVision))
+        // dont remove effect if its night vision, and they have it enabled
+        {
+            if (!(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION) && nightVision)) {
                 player.removePotionEffect(potionEffect.getType());
+            }
+        }
     }
 
-    public boolean equals(PlayerStats playerStats)
-    {
+    public boolean equals(PlayerStats playerStats) {
         return playerStats.getName().equals(name);
     }
 
-    public void sendMessage(String message)
-    {
+    public void sendMessage(String message) {
         player.sendMessage(message);
     }
 
     public void teleport(Location location, boolean resetVelocity) {
         player.teleport(location);
-        if (resetVelocity) player.setVelocity(new Vector(0, 0, 0));
+        if (resetVelocity) {
+            player.setVelocity(new Vector(0, 0, 0));
+        }
     }
 
-    public void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut)
-    {
+    public void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         player.sendTitle(Utils.translate(title), Utils.translate(subTitle), fadeIn, stay, fadeOut);
     }
 }

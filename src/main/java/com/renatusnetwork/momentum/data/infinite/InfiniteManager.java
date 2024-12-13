@@ -29,8 +29,7 @@ public class InfiniteManager {
     private HashMap<InfiniteType, InfiniteLB> leaderboards;
     private HashMap<InfiniteType, InfiniteRewards> rewards;
 
-    public InfiniteManager()
-    {
+    public InfiniteManager() {
         this.participants = new HashMap<>();
 
         loadAllRewards();
@@ -38,8 +37,7 @@ public class InfiniteManager {
         initLeaderboards();
     }
 
-    public void initLeaderboards()
-    {
+    public void initLeaderboards() {
         this.leaderboards = new HashMap<>();
 
         leaderboards.put(InfiniteType.CLASSIC, new InfiniteLB(InfiniteType.CLASSIC));
@@ -48,8 +46,7 @@ public class InfiniteManager {
         leaderboards.put(InfiniteType.TIMED, new InfiniteLB(InfiniteType.TIMED));
     }
 
-    public void startScheduler()
-    {
+    public void startScheduler() {
 
         // update leaderboards every 3 minutes
         new BukkitRunnable() {
@@ -73,15 +70,15 @@ public class InfiniteManager {
             public void run() {
 
                 // if type is null or from portal, prevent getting in via spectator
-                if (type == null || playerStats.isInInfinite() || (fromPortal && playerStats.isSpectating()))
+                if (type == null || playerStats.isInInfinite() || (fromPortal && playerStats.isSpectating())) {
                     return;
+                }
 
                 Player player = playerStats.getPlayer();
 
                 Infinite infinite = null;
                 // create cache
-                switch (type)
-                {
+                switch (type) {
                     case CLASSIC:
                         infinite = new Classic(playerStats);
                         break;
@@ -98,8 +95,9 @@ public class InfiniteManager {
                 participants.put(player.getName(), infinite);
 
                 // if they are at spawn prior to teleport, change original loc to setting
-                if (fromPortal)
+                if (fromPortal) {
                     infinite.setOriginalLoc(Momentum.getLocationManager().get(Momentum.getSettingsManager().infinite_respawn_loc));
+                }
 
                 infinite.start(); // begin!
 
@@ -107,20 +105,16 @@ public class InfiniteManager {
         }.runTask(Momentum.getPlugin());
     }
 
-    public void endPK(Player player)
-    {
-        if (player != null)
-        {
+    public void endPK(Player player) {
+        if (player != null) {
             Infinite infinite = get(player.getName());
-            if (infinite != null)
-            {
+            if (infinite != null) {
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
                 InfiniteEndEvent event = new InfiniteEndEvent(playerStats, infinite.getScore());
                 Bukkit.getPluginManager().callEvent(event);
 
-                if (!event.isCancelled())
-                {
+                if (!event.isCancelled()) {
                     // end and reward player
                     infinite.end();
                     rewardPlayer(playerStats, infinite, event.getReward());
@@ -133,35 +127,30 @@ public class InfiniteManager {
         }
     }
 
-    public void changeType(PlayerStats playerStats, InfiniteType newType)
-    {
+    public void changeType(PlayerStats playerStats, InfiniteType newType) {
         playerStats.setInfiniteType(newType);
         StatsDB.updateInfiniteType(playerStats.getUUID(), newType);
     }
 
-    private void rewardPlayer(PlayerStats playerStats, Infinite infinite, int coinReward)
-    {
-        if (infinite != null)
-        {
+    private void rewardPlayer(PlayerStats playerStats, Infinite infinite, int coinReward) {
+        if (infinite != null) {
             Player player = playerStats.getPlayer();
             int score = infinite.getScore();
             InfiniteType infiniteType = playerStats.getInfiniteType();
 
-            if (score > playerStats.getBestInfiniteScore())
-            {
-                for (InfiniteReward reward : getApplicableRewards(infiniteType, playerStats.getBestInfiniteScore(), score))
-                {
+            if (score > playerStats.getBestInfiniteScore()) {
+                for (InfiniteReward reward : getApplicableRewards(infiniteType, playerStats.getBestInfiniteScore(), score)) {
                     // loop through and run commands of applicable rewards
                     player.sendMessage(Utils.translate("&7You received &d" + reward.getDisplay() + " &d(Score of " + Utils.formatNumber(reward.getScoreNeeded()) + ")"));
 
                     // run commands
-                    for (String command : reward.getCommands())
+                    for (String command : reward.getCommands()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+                    }
                 }
             }
 
-            if (playerStats.hasModifier(ModifierType.INFINITE_BOOSTER))
-            {
+            if (playerStats.hasModifier(ModifierType.INFINITE_BOOSTER)) {
                 Booster booster = (Booster) playerStats.getModifier(ModifierType.INFINITE_BOOSTER);
                 coinReward *= booster.getMultiplier();
             }
@@ -169,39 +158,37 @@ public class InfiniteManager {
             String rewardString = Utils.getCoinFormat(score, coinReward);
             String formattedType = StringUtils.capitalize(infiniteType.toString().toLowerCase());
 
-            if (playerStats.getBestInfiniteScore() < score)
-            {
+            if (playerStats.getBestInfiniteScore() < score) {
                 // if they are online
-                if (player.isOnline())
-                {
+                if (player.isOnline()) {
                     player.sendMessage(Utils.translate(
                             "&7You have beaten your previous &d" + formattedType + "&7 record of &d" +
-                                    Utils.formatNumber(playerStats.getBestInfiniteScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
-                                    "&7Awarded " + rewardString + " &eCoins"
+                            Utils.formatNumber(playerStats.getBestInfiniteScore()) + " &7with &d" + Utils.formatNumber(score) + "\n" +
+                            "&7Awarded " + rewardString + " &eCoins"
                     ));
                 }
 
                 Momentum.getStatsManager().updateInfiniteScore(playerStats, playerStats.getInfiniteType(), score);
-            }
-            else if (player.isOnline())
+            } else if (player.isOnline()) {
                 player.sendMessage(Utils.translate(
                         "&7You failed &d" + formattedType + "&7 at &d" + Utils.formatNumber(score) + " &5(Best is " + Utils.formatNumber(playerStats.getBestInfiniteScore()) + ")\n" +
-                                "&7Awarded &6" + rewardString + " &eCoins"
+                        "&7Awarded &6" + rewardString + " &eCoins"
                 ));
+            }
             // deposit reward from listener (default = score)
             Momentum.getStatsManager().addCoins(playerStats, coinReward);
         }
     }
 
-    public InfiniteRewards getRewards(InfiniteType type) { return rewards.get(type); }
+    public InfiniteRewards getRewards(InfiniteType type) {
+        return rewards.get(type);
+    }
 
-    public void loadAllRewards()
-    {
+    public void loadAllRewards() {
         rewards = new HashMap<>();
         int sizeRewards = 0;
 
-        for (InfiniteType type : InfiniteType.values())
-        {
+        for (InfiniteType type : InfiniteType.values()) {
             loadRewards(type);
             sizeRewards += rewards.get(type).size();
         }
@@ -209,22 +196,20 @@ public class InfiniteManager {
         Momentum.getPluginLogger().info("Infinite rewards loaded: " + sizeRewards);
     }
 
-    public void loadRewards(InfiniteType type)
-    {
+    public void loadRewards(InfiniteType type) {
         rewards.put(type, new InfiniteRewards(type));
     }
 
-    public List<InfiniteReward> getApplicableRewards(InfiniteType type, int oldBestScore, int newBestScore)
-    {
+    public List<InfiniteReward> getApplicableRewards(InfiniteType type, int oldBestScore, int newBestScore) {
         List<InfiniteReward> tempRewards = new ArrayList<>();
         InfiniteRewards infiniteRewards = rewards.get(type);
 
-        for (InfiniteReward reward : infiniteRewards.getRewards())
-        {
+        for (InfiniteReward reward : infiniteRewards.getRewards()) {
             int score = reward.getScoreNeeded();
             // if score is greater than old and less than or = to new, then add
-            if (score > oldBestScore && score <= newBestScore)
+            if (score > oldBestScore && score <= newBestScore) {
                 tempRewards.add(reward);
+            }
         }
         return tempRewards;
     }
@@ -237,8 +222,7 @@ public class InfiniteManager {
         participants.remove(playerName);
     }
 
-    public Location generateNextBlockLocation(Location oldLocation, Player player, Infinite infinite)
-    {
+    public Location generateNextBlockLocation(Location oldLocation, Player player, Infinite infinite) {
         SettingsManager settingsManager = Momentum.getSettingsManager();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -250,10 +234,11 @@ public class InfiniteManager {
         float newY = (float) oldLocation.getY() + random.nextInt(settingsManager.infinite_generation_y_min, settingsManager.infinite_generation_y_max + 1);
 
         // adjust the values if they are beyond the limits
-        if (newY > settingsManager.max_infinite_y)
+        if (newY > settingsManager.max_infinite_y) {
             newY--;
-        else if (newY < settingsManager.min_infinite_y)
+        } else if (newY < settingsManager.min_infinite_y) {
             newY++;
+        }
 
         float minModifier = 1.0f;
         float maxModifier = 1.0f;
@@ -261,16 +246,14 @@ public class InfiniteManager {
         boolean notZero = false;
 
         // if it is a +1
-        if (newY > oldLocation.getY())
-        {
+        if (newY > oldLocation.getY()) {
             minModifier = settingsManager.infinite_generation_positive_y_min;
             maxModifier = settingsManager.infinite_generation_positive_y_max;
             diff = settingsManager.infinite_generation_positive_y_diff;
             notZero = true;
         }
         // if it is a -1
-        else if (newY < oldLocation.getY())
-        {
+        else if (newY < oldLocation.getY()) {
             minModifier = settingsManager.infinite_generation_negative_y_min;
             maxModifier = settingsManager.infinite_generation_negative_y_max;
             diff = settingsManager.infinite_generation_negative_y_diff;
@@ -281,23 +264,21 @@ public class InfiniteManager {
         bound *= maxModifier;
 
         // if it was modified and either the difference is less than the min or the bound is <= min
-        if (notZero && (bound <= min || Math.abs(bound - min) < diff))
+        if (notZero && (bound <= min || Math.abs(bound - min) < diff)) {
             bound = min + diff;
+        }
 
         // get random distance modifier
         double distance = random.nextDouble(min, bound);
         double angle;
         Vector locationVector;
 
-        if (infinite.isOutsideBorder())
-        {
+        if (infinite.isOutsideBorder()) {
             // turn angle and return it
             angle = infinite.turnAngle();
             Location middle = Momentum.getLocationManager().get(Momentum.getSettingsManager().infinite_middle_loc);
             locationVector = oldLocation.toVector().subtract(middle.toVector()).setY(0).normalize();
-        }
-        else
-        {
+        } else {
             // get random angle
             angle = random.nextDouble(-Math.PI / settingsManager.infinite_angle_bound, Math.PI / settingsManager.infinite_angle_bound); // Adjust the range as needed
             locationVector = player.getLocation().getDirection().setY(0).normalize(); // ignore y;
@@ -314,21 +295,21 @@ public class InfiniteManager {
         Location newLocation = new Location(oldLocation.getWorld(), newX, newY, newZ);
 
         // if loc is outside border, continue
-        if (isOutsideBorder(newLocation))
-        {
+        if (isOutsideBorder(newLocation)) {
             // only enter border if they are outside of it!
-            if (!infinite.isOutsideBorder())
+            if (!infinite.isOutsideBorder()) {
                 infinite.enterBorder(angle);
+            }
         }
         // if their new loc is not outside border but they were outside, then exit
-        else if (infinite.isOutsideBorder())
+        else if (infinite.isOutsideBorder()) {
             infinite.exitBorder();
+        }
 
         return newLocation;
     }
 
-    public boolean isOutsideBorder(Location location)
-    {
+    public boolean isOutsideBorder(Location location) {
         int radiusX = Momentum.getSettingsManager().infinite_soft_border_radius_x;
         int radiusZ = Momentum.getSettingsManager().infinite_soft_border_radius_z;
         Location middle = Momentum.getLocationManager().get(Momentum.getSettingsManager().infinite_middle_loc);
@@ -343,29 +324,27 @@ public class InfiniteManager {
                 (middleZ - radiusZ) > location.getZ());
     }
 
-    public boolean isLocationEmpty(Location location)
-    {
+    public boolean isLocationEmpty(Location location) {
         boolean empty = true;
 
-        outer: for (Infinite infinite : participants.values())
-            for (Block block : infinite.getBlocks())
-            {
+        outer:
+        for (Infinite infinite : participants.values()) {
+            for (Block block : infinite.getBlocks()) {
                 Location blockLoc = block.getLocation();
                 // if equal, it is not empty!
                 if (blockLoc.getBlockX() == location.getBlockX() &&
                     blockLoc.getBlockY() == location.getBlockY() &&
-                    blockLoc.getBlockZ() == location.getBlockZ())
-                {
+                    blockLoc.getBlockZ() == location.getBlockZ()) {
                     empty = false;
                     break outer;
                 }
             }
+        }
 
         return empty;
     }
 
-    public Location findStartingLocation()
-    {
+    public Location findStartingLocation() {
         SettingsManager settingsManager = Momentum.getSettingsManager();
         LocationManager locationManager = Momentum.getLocationManager();
         Location middle = locationManager.get(Momentum.getSettingsManager().infinite_middle_loc);
@@ -381,22 +360,22 @@ public class InfiniteManager {
         );
 
         // check if the location will be in the way, if so, go again
-        if (!isLocationEmpty(foundLoc))
+        if (!isLocationEmpty(foundLoc)) {
             findStartingLocation();
-        else
+        } else {
             return foundLoc;
+        }
 
         return null;
     }
 
-    public void loadLeaderboards()
-    {
-        for (InfiniteLB lb : leaderboards.values())
+    public void loadLeaderboards() {
+        for (InfiniteLB lb : leaderboards.values()) {
             lb.loadLeaderboard();
+        }
     }
 
-    public void loadLeaderboard(InfiniteType infiniteType)
-    {
+    public void loadLeaderboard(InfiniteType infiniteType) {
         leaderboards.get(infiniteType).loadLeaderboard();
     }
 
@@ -405,7 +384,8 @@ public class InfiniteManager {
     }
 
     public void shutdown() {
-        for (Infinite infinite : participants.values())
+        for (Infinite infinite : participants.values()) {
             endPK(infinite.getPlayer());
+        }
     }
 }

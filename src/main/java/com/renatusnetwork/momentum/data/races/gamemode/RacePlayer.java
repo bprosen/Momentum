@@ -11,23 +11,21 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class RacePlayer
-{
+public class RacePlayer {
+
     private PlayerStats playerStats;
     private Race race;
     private Location originalLocation;
     private RacePlayer opponent;
     private boolean disabledPlayers;
 
-    public RacePlayer(PlayerStats playerStats, Race race, Location originalLocation)
-    {
+    public RacePlayer(PlayerStats playerStats, Race race, Location originalLocation) {
         this.playerStats = playerStats;
         this.race = race;
         this.originalLocation = originalLocation;
     }
 
-    public void start()
-    {
+    public void start() {
         StatsManager statsManager = Momentum.getStatsManager();
         // toggle off elytra
         statsManager.toggleOffElytra(playerStats);
@@ -36,8 +34,7 @@ public class RacePlayer
         Player player = playerStats.getPlayer();
 
         // hide player
-        if (!statsManager.containsHiddenPlayer(player))
-        {
+        if (!statsManager.containsHiddenPlayer(player)) {
             statsManager.togglePlayerHiderOn(player, false);
             disabledPlayers = true;
         }
@@ -48,23 +45,22 @@ public class RacePlayer
         playerStats.disableLevelStartTime();
         playerStats.teleport(raceLevel.getStartLocation(), false);
 
-        if (race.hasBet())
+        if (race.hasBet()) {
             statsManager.removeCoins(playerStats, getBet());
+        }
 
         // remove potion effects
         playerStats.clearPotionEffects();
 
         // freeze and do countdown
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             int runCycles = 0;
-            public void run()
-            {
+
+            public void run() {
                 // other left mid countdown
-                if (!playerStats.inRace())
+                if (!playerStats.inRace()) {
                     cancel();
-                else
-                {
+                } else {
                     Location spawnLocation = raceLevel.getStartLocation();
 
                     // race location variables
@@ -76,11 +72,11 @@ public class RacePlayer
                     double playerZ = playerStats.getPlayer().getLocation().getZ();
 
                     // teleport back if moved
-                    if (raceX != playerX || raceZ != playerZ)
+                    if (raceX != playerX || raceZ != playerZ) {
                         tpBack(playerStats, spawnLocation);
+                    }
 
-                    switch (runCycles)
-                    {
+                    switch (runCycles) {
                         case 0:
                             sendTitleAndPlaySound(playerStats, "&45");
                             break;
@@ -107,21 +103,20 @@ public class RacePlayer
         }.runTaskTimer(Momentum.getPlugin(), 1, 1);
     }
 
-    public void win()
-    {
+    public void win() {
         StatsManager statsManager = Momentum.getStatsManager();
 
         playerStats.resetRace();
         statsManager.updateRaceWins(playerStats, playerStats.getRaceWins() + 1);
 
-        if (hasBet())
+        if (hasBet()) {
             statsManager.addCoins(playerStats, (getBet() * 2));
+        }
 
         statsManager.calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.WIN);
     }
 
-    public void loss()
-    {
+    public void loss() {
         StatsManager statsManager = Momentum.getStatsManager();
 
         playerStats.resetRace();
@@ -129,39 +124,35 @@ public class RacePlayer
         statsManager.calculateNewELO(playerStats, opponent.getPlayerStats(), ELOOutcomeTypes.LOSS);
     }
 
-    public void resetLevelAndTeleport()
-    {
+    public void resetLevelAndTeleport() {
         playerStats.teleport(originalLocation, true);
         Utils.applySlowness(playerStats.getPlayer());
         Momentum.getLevelManager().setLevelInfoOnTeleport(playerStats, originalLocation);
     }
 
-    public Race getRace()
-    {
+    public Race getRace() {
         return race;
     }
 
-    private void sendTitleAndPlaySound(PlayerStats playerStats, String title)
-    {
+    private void sendTitleAndPlaySound(PlayerStats playerStats, String title) {
         Player player = playerStats.getPlayer();
 
         playerStats.sendTitle(title, "", 0, 15, 5);
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_HAT, 8F, 2F);
     }
 
-    public void sendEndTitle(PlayerStats winner)
-    {
+    public void sendEndTitle(PlayerStats winner) {
         String titleMessage = Utils.translate("&c" + winner.getDisplayName() + "&7 won the race");
         String subTitleMessage = Utils.translate("&7On &c" + getLevel().getTitle());
 
-        if (race.hasBet())
+        if (race.hasBet()) {
             subTitleMessage += "&7 for &6" + Utils.formatNumber(race.getBet()) + " &eCoins";
+        }
 
         playerStats.sendTitle(titleMessage, subTitleMessage, 10, 60, 10);
     }
 
-    private void tpBack(PlayerStats playerStats, Location location)
-    {
+    private void tpBack(PlayerStats playerStats, Location location) {
         Player player = playerStats.getPlayer();
 
         Location raceLoc = location.clone();
@@ -170,49 +161,44 @@ public class RacePlayer
         playerStats.teleport(raceLoc, true);
     }
 
-    public PlayerStats getPlayerStats()
-    {
+    public PlayerStats getPlayerStats() {
         return playerStats;
     }
 
-    public Level getLevel()
-    {
+    public Level getLevel() {
         return race.getLevel();
     }
 
-    public int getBet()
-    {
+    public int getBet() {
         return race.getBet();
     }
 
-    public boolean hasBet() { return race.hasBet(); }
+    public boolean hasBet() {
+        return race.hasBet();
+    }
 
-    public Location getOriginalLocation()
-    {
+    public Location getOriginalLocation() {
         return originalLocation;
     }
 
-    public void setOpponent(RacePlayer opponent)
-    {
+    public void setOpponent(RacePlayer opponent) {
         this.opponent = opponent;
     }
 
-    public RacePlayer getOpponent()
-    {
+    public RacePlayer getOpponent() {
         return opponent;
     }
 
-    public void resetPracAndCP()
-    {
+    public void resetPracAndCP() {
         Momentum.getStatsManager().resetPracticeDataOnly(playerStats);
         playerStats.resetCurrentCheckpoint();
     }
 
-    public void showPlayersIfDisabled()
-    {
+    public void showPlayersIfDisabled() {
         StatsManager statsManager = Momentum.getStatsManager();
 
-        if (disabledPlayers && statsManager.containsHiddenPlayer(playerStats.getPlayer()))
+        if (disabledPlayers && statsManager.containsHiddenPlayer(playerStats.getPlayer())) {
             statsManager.togglePlayerHiderOff(playerStats.getPlayer(), false);
+        }
     }
 }

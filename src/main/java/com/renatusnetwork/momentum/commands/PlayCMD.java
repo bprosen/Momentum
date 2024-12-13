@@ -10,23 +10,19 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
-public class PlayCMD implements CommandExecutor
-{
+public class PlayCMD implements CommandExecutor {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender instanceof Player)
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender instanceof Player) {
 
             Player player = (Player) sender;
 
-            if (a.length >= 1)
-            {
+            if (a.length >= 1) {
                 // allow ability to get from title or name
                 String levelName = a[0].toLowerCase();
 
-                if (a.length > 1)
-                {
+                if (a.length > 1) {
                     String[] split = Arrays.copyOfRange(a, 0, a.length);
                     levelName = String.join(" ", split);
                 }
@@ -35,14 +31,13 @@ public class PlayCMD implements CommandExecutor
                 Level level = Momentum.getLevelManager().getNameThenTitle(levelName);
 
                 // teleport to level if level is found
-                if (level != null)
+                if (level != null) {
                     Momentum.getLevelManager().teleportToLevel(Momentum.getStatsManager().get(player), level);
-                else
+                } else {
                     player.sendMessage(Utils.translate("&4" + levelName + " &cis not a level"));
+                }
 
-            }
-            else
-            {
+            } else {
                 player.sendMessage(Utils.translate("&cInvalid usage, do &4/play (levelName)"));
             }
         }

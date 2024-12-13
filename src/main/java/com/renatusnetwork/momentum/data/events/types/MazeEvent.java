@@ -5,17 +5,16 @@ import com.renatusnetwork.momentum.data.levels.Level;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MazeEvent extends Event
-{
+public class MazeEvent extends Event {
 
     private List<Location> respawnLocs;
     private Location exit;
 
-    public MazeEvent(Level level)
-    {
+    public MazeEvent(Level level) {
         super(level, "Maze");
 
         // load cache
@@ -26,14 +25,12 @@ public class MazeEvent extends Event
         exit.getBlock().setType(Material.IRON_PLATE);
     }
 
-    public void respawn(Player player)
-    {
+    public void respawn(Player player) {
         player.teleport(respawnLocs.get(ThreadLocalRandom.current().nextInt(respawnLocs.size())));
     }
 
     @Override
-    public void end()
-    {
+    public void end() {
         exit.getBlock().setType(Material.AIR); // remove the plate
     }
 }

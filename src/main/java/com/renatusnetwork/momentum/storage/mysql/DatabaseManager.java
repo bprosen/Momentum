@@ -43,8 +43,7 @@ public class DatabaseManager {
     public static final String COMMAND_SIGNS = "command_signs";
     public static final String USED_COMMAND_SIGNS = "used_command_signs";
 
-    public DatabaseManager(Plugin plugin)
-    {
+    public DatabaseManager(Plugin plugin) {
         connection = new DatabaseConnection();
         startScheduler(plugin);
     }
@@ -58,15 +57,12 @@ public class DatabaseManager {
         // run async random queue every 10 minutes to keep connection alive if nobody is online and no database activity
         new BukkitRunnable() {
             public void run() {
-                try (Connection connection = getConnection())
-                {
+                try (Connection connection = getConnection()) {
                     PreparedStatement statement = connection.prepareStatement(
                             "SELECT * FROM " + DatabaseManager.PLAYERS_TABLE + " WHERE UUID='s'");
                     statement.execute();
                     statement.close();
-                }
-                catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
@@ -77,16 +73,12 @@ public class DatabaseManager {
         return connection.get();
     }
 
-    public DatabaseMetaData getMeta()
-    {
+    public DatabaseMetaData getMeta() {
         DatabaseMetaData meta = null;
 
-        try (Connection connection = getConnection())
-        {
+        try (Connection connection = getConnection()) {
             meta = connection.getMetaData();
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 

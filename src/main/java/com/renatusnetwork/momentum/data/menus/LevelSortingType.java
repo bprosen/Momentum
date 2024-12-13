@@ -2,8 +2,7 @@ package com.renatusnetwork.momentum.data.menus;
 
 import org.apache.commons.lang.StringUtils;
 
-public enum LevelSortingType
-{
+public enum LevelSortingType {
     NEWEST,
     OLDEST,
     ALPHABETICAL,
@@ -14,11 +13,9 @@ public enum LevelSortingType
     LOWEST_RATING,
     HIGHEST_RATING;
 
-    public static LevelSortingType getNext(LevelSortingType type)
-    {
+    public static LevelSortingType getNext(LevelSortingType type) {
 
-        switch (type)
-        {
+        switch (type) {
             case NEWEST:
                 return OLDEST;
             case OLDEST:
@@ -42,13 +39,13 @@ public enum LevelSortingType
         return null;
     }
 
-    public static String toString(LevelSortingType type)
-    {
+    public static String toString(LevelSortingType type) {
         String[] split = type.toString().toLowerCase().split("_");
         String newString = "";
 
-        for (String splitString : split)
+        for (String splitString : split) {
             newString += StringUtils.capitalize(splitString) + " ";
+        }
 
         return newString.substring(0, newString.length() - 1);
     }

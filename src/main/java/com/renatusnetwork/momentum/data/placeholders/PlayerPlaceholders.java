@@ -6,20 +6,17 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.entity.Player;
 
-public class PlayerPlaceholders
-{
+public class PlayerPlaceholders {
+
     public static final String PLAYER_PREFIX = "player";
 
-    public static String processPlaceholder(Player player, String placeholder)
-    {
+    public static String processPlaceholder(Player player, String placeholder) {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         // per player placeholders
-        if (playerStats != null)
-        {
+        if (playerStats != null) {
             // all placeholders
-            switch (placeholder.toLowerCase())
-            {
+            switch (placeholder.toLowerCase()) {
                 case "records":
                     return Utils.formatNumber(playerStats.getNumRecords());
                 case "coins":

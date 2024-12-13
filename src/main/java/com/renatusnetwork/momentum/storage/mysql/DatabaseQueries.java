@@ -10,18 +10,14 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class DatabaseQueries
-{
+public class DatabaseQueries {
 
-    public static CompletableFuture<List<Map<String, String>>> getResultsAsync(String tableName, String selection, String trailingSQL, Object... parameters)
-    {
+    public static CompletableFuture<List<Map<String, String>>> getResultsAsync(String tableName, String selection, String trailingSQL, Object... parameters) {
         CompletableFuture<List<Map<String, String>>> future = new CompletableFuture<>();
 
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 future.complete(getResults(tableName, selection, trailingSQL, parameters));
             }
         }.runTaskAsynchronously(Momentum.getPlugin());
@@ -29,25 +25,24 @@ public class DatabaseQueries
         return future;
     }
 
-    public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL, Object... parameters)
-    {
+    public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL, Object... parameters) {
         List<Map<String, String>> finalResults = new ArrayList<>();
 
         String query = "SELECT " + selection + " FROM " + tableName;
-        if (!trailingSQL.isEmpty())
+        if (!trailingSQL.isEmpty()) {
             query += " " + trailingSQL;
+        }
 
-        try (Connection connection = Momentum.getDatabaseManager().getConnection())
-        {
+        try (Connection connection = Momentum.getDatabaseManager().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
 
             // secure
-            for (int i = 0; i < parameters.length; i++)
+            for (int i = 0; i < parameters.length; i++) {
                 statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
+            }
 
             ResultSet results = statement.executeQuery();
-            while (results.next())
-            {
+            while (results.next()) {
                 // parse results
                 ResultSetMetaData meta = results.getMetaData();
 
@@ -55,14 +50,13 @@ public class DatabaseQueries
 
                 int columns = meta.getColumnCount();
 
-                for (int i = 1; i <= columns; ++i)
+                for (int i = 1; i <= columns; ++i) {
                     resultMap.put(meta.getColumnName(i), results.getString(i));
+                }
 
                 finalResults.add(resultMap);
             }
-        }
-        catch (SQLException exception)
-        {
+        } catch (SQLException exception) {
             Momentum.getPluginLogger().info("Error in DatabaseQueries.getResults(" + tableName + ", " + trailingSQL + ")");
             Momentum.getPluginLogger().info("Query='" + query + "'");
             exception.printStackTrace();
@@ -71,29 +65,25 @@ public class DatabaseQueries
         return finalResults;
     }
 
-    public static Map<String, String> getResult(String tableName, String selection, String trailingSQL, Object... parameters)
-    {
+    public static Map<String, String> getResult(String tableName, String selection, String trailingSQL, Object... parameters) {
         // this is a use case where we are using a primary key to get a single result, just cleaner code
         List<Map<String, String>> results = getResults(tableName, selection, trailingSQL, parameters);
 
         return !results.isEmpty() ? results.get(0) : new HashMap<>();
     }
 
-    public static boolean runQuery(String sql, Object... parameters)
-    {
-        try (Connection connection = Momentum.getDatabaseManager().getConnection())
-        {
+    public static boolean runQuery(String sql, Object... parameters) {
+        try (Connection connection = Momentum.getDatabaseManager().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
 
             // secure
-            for (int i = 0; i < parameters.length; i++)
+            for (int i = 0; i < parameters.length; i++) {
                 statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
+            }
 
             statement.executeUpdate();
             return true;
-        }
-        catch (SQLException exception)
-        {
+        } catch (SQLException exception) {
             Momentum.getPluginLogger().severe("Failed to run query: " + sql);
             Momentum.getPluginLogger().severe("Params: " + Arrays.toString(parameters));
             exception.printStackTrace();
@@ -101,8 +91,7 @@ public class DatabaseQueries
         }
     }
 
-    public static void runAsyncQuery(String sql, Object... parameters)
-    {
+    public static void runAsyncQuery(String sql, Object... parameters) {
         new BukkitRunnable() {
             public void run() {
                 runQuery(sql, parameters);

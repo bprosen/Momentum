@@ -8,44 +8,39 @@ import com.renatusnetwork.momentum.data.modifiers.discounts.ShopDiscount;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class ModifiersManager
-{
+public class ModifiersManager {
 
     private HashMap<String, Modifier> modifiers;
 
-    public ModifiersManager()
-    {
+    public ModifiersManager() {
         this.modifiers = new HashMap<>();
     }
-    public void load()
-    {
+
+    public void load() {
         modifiers = ModifiersDB.getModifiers();
     }
 
-    public void create(String name, ModifierType type, String title, float modifierValue)
-    {
+    public void create(String name, ModifierType type, String title, float modifierValue) {
         Modifier modifier = createSubclass(name, type, title, modifierValue);
         modifiers.put(name, modifier);
 
-        if (modifier.isBooster())
+        if (modifier.isBooster()) {
             ModifiersDB.insertBoosterModifier(name, type, title, modifierValue);
-        else if (modifier.isDiscount())
+        } else if (modifier.isDiscount()) {
             ModifiersDB.insertDiscountModifier(name, type, title, modifierValue);
-        else if (modifier.isBonus())
+        } else if (modifier.isBonus()) {
             ModifiersDB.insertBonusModifier(name, type, title, (int) modifierValue);
+        }
     }
 
-    public void updateTitle(Modifier modifier, String title)
-    {
+    public void updateTitle(Modifier modifier, String title) {
         modifier.setTitle(title);
         ModifiersDB.updateTitle(modifier.getName(), title);
     }
 
-    public Modifier createSubclass(String name, ModifierType type, String title, float modifierValue)
-    {
+    public Modifier createSubclass(String name, ModifierType type, String title, float modifierValue) {
         // load all types!
-        switch (type)
-        {
+        switch (type) {
             case GG_BOOSTER:
                 return new GGBooster(ModifierType.GG_BOOSTER, name, title, modifierValue);
             case EVENT_BOOSTER:
@@ -69,15 +64,15 @@ public class ModifiersManager
         return null;
     }
 
-    public boolean exists(String name) { return modifiers.containsKey(name); }
+    public boolean exists(String name) {
+        return modifiers.containsKey(name);
+    }
 
-    public Modifier getModifier(String name)
-    {
+    public Modifier getModifier(String name) {
         return modifiers.get(name);
     }
 
-    public Collection<Modifier> getModifiers()
-    {
+    public Collection<Modifier> getModifiers() {
         return modifiers.values();
     }
 }

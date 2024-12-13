@@ -14,8 +14,9 @@ public class PracticeGoCMD implements CommandExecutor {
         if (sender instanceof Player) {
 
             Player player = (Player) sender;
-            if (a.length == 0)
+            if (a.length == 0) {
                 Momentum.getCheckpointManager().teleportToPracticeCheckpoint(Momentum.getStatsManager().get(player));
+            }
         }
         return false;
     }

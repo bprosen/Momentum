@@ -14,13 +14,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class FallingAnvilEvent extends Event implements SchedulerInterface
-{
+public class FallingAnvilEvent extends Event implements SchedulerInterface {
+
     private BukkitTask scheduler;
     private int delay;
 
-    public FallingAnvilEvent(Level level)
-    {
+    public FallingAnvilEvent(Level level) {
         super(level, "Falling Anvil");
         this.delay = Momentum.getSettingsManager().falling_anvil_event_task_delay;
 
@@ -28,22 +27,17 @@ public class FallingAnvilEvent extends Event implements SchedulerInterface
     }
 
     @Override
-    public void end()
-    {
+    public void end() {
         scheduler.cancel();
     }
 
     @Override
-    public void runScheduler()
-    {
+    public void runScheduler() {
         EventManager eventManager = Momentum.getEventManager();
-        scheduler = new BukkitRunnable()
-        {
+        scheduler = new BukkitRunnable() {
             @Override
-            public void run()
-            {
-                if (!eventManager.getParticipants().isEmpty())
-                {
+            public void run() {
+                if (!eventManager.getParticipants().isEmpty()) {
                     // variables for the region's bounds
                     BlockVector maxPoint = getRegion().getMaximumPoint().toBlockPoint();
                     BlockVector minPoint = getRegion().getMinimumPoint().toBlockPoint();
@@ -52,10 +46,8 @@ public class FallingAnvilEvent extends Event implements SchedulerInterface
                     int minZ = minPoint.getBlockZ();
                     int maxZ = maxPoint.getBlockZ();
 
-                    for (int i = minX; i <= maxX; i++)
-                    {
-                        for (int j = minZ; j <= maxZ; j++)
-                        {
+                    for (int i = minX; i <= maxX; i++) {
+                        for (int j = minZ; j <= maxZ; j++) {
                             // get percent from 0 to 101
                             double percent = ThreadLocalRandom.current().nextDouble(0, 101);
 
@@ -67,7 +59,7 @@ public class FallingAnvilEvent extends Event implements SchedulerInterface
                                         world,
                                         i,
                                         getLevel().getStartLocation().getBlockY() +
-                                                Momentum.getSettingsManager().anvil_spawn_y_above_start_y,
+                                        Momentum.getSettingsManager().anvil_spawn_y_above_start_y,
                                         j);
 
                                 ItemStack itemStack = new ItemStack(Material.ANVIL);
@@ -88,9 +80,9 @@ public class FallingAnvilEvent extends Event implements SchedulerInterface
     }
 
     @Override
-    public void cancel()
-    {
-        if (!scheduler.isCancelled())
+    public void cancel() {
+        if (!scheduler.isCancelled()) {
             scheduler.cancel();
+        }
     }
 }

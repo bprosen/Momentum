@@ -5,25 +5,20 @@ import com.renatusnetwork.momentum.data.bank.items.BankItem;
 import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.utils.Utils;
 
-public class BankPlaceholders
-{
+public class BankPlaceholders {
 
     public static final String BANK_PREFIX = "bank";
 
-    public static String processPlaceholder(String placeholder)
-    {
+    public static String processPlaceholder(String placeholder) {
         String[] split = placeholder.split("_");
 
-        if (split.length == 2)
-        {
-            try
-            {
+        if (split.length == 2) {
+            try {
                 // get type
                 BankItemType bankType = BankItemType.valueOf(split[0].toUpperCase());
                 BankItem item = Momentum.getBankManager().getItem(bankType);
 
-                switch (split[1].toLowerCase())
-                {
+                switch (split[1].toLowerCase()) {
                     // current holder
                     case "holder":
                         return item.getCurrentHolder();
@@ -34,9 +29,7 @@ public class BankPlaceholders
                     case "nextbid":
                         return Utils.formatNumber(item.getNextBid());
                 }
-            }
-            catch (IllegalArgumentException exception)
-            {
+            } catch (IllegalArgumentException exception) {
                 return "Invalid bank type";
             }
         }

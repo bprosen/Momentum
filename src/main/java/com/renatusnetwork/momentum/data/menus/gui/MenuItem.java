@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class MenuItem
-{
+public class MenuItem {
+
     private MenuPage menuPage;
     private int slot;
     private ItemStack item;
@@ -20,6 +20,7 @@ public class MenuItem
     private List<String> lore;
     private List<String> commands;
     private List<String> consoleCommands;
+
     public MenuItem(
             MenuPage menuPage,
             MenuPage openOtherMenu,
@@ -32,8 +33,7 @@ public class MenuItem
             List<String> commands,
             List<String> consoleCommands,
             boolean glow
-    )
-    {
+    ) {
         this.menuPage = menuPage;
         this.openOtherMenu = openOtherMenu;
         this.slot = slot;
@@ -47,24 +47,21 @@ public class MenuItem
         this.glow = glow;
     }
 
-    public MenuItem(MenuPage menuPage, int slot)
-    {
+    public MenuItem(MenuPage menuPage, int slot) {
         this.menuPage = menuPage;
         this.slot = slot;
 
         load(menuPage.getMenu(), menuPage, String.valueOf(slot));
     }
 
-    public MenuItem(MenuPage menuPage, int slot, String keyString)
-    {
+    public MenuItem(MenuPage menuPage, int slot, String keyString) {
         this.menuPage = menuPage;
         this.slot = slot;
 
         load(menuPage.getMenu(), menuPage, keyString);
     }
 
-    public void load(Menu menu, MenuPage menuPage, String keyString)
-    {
+    public void load(Menu menu, MenuPage menuPage, String keyString) {
         item = MenusYAML.getItem(menu.getName(), menuPage.getPageNumber(), keyString);
         title = MenusYAML.getItemTitle(menu.getName(), menuPage.getPageNumber(), keyString);
         type = MenusYAML.getItemType(menu.getName(), menuPage.getPageNumber(), keyString);
@@ -76,29 +73,37 @@ public class MenuItem
         openOtherMenu = MenusYAML.getOpenOtherMenu(menu.getName(), menuPage.getPageNumber(), keyString);
     }
 
-    public MenuPage getOpenMenu() { return openOtherMenu; }
+    public MenuPage getOpenMenu() {
+        return openOtherMenu;
+    }
 
-    public boolean hasOpenMenu() { return openOtherMenu != null; }
+    public boolean hasOpenMenu() {
+        return openOtherMenu != null;
+    }
 
-    public MenuItem clone(MenuPage newPage, int newSlot)
-    {
+    public MenuItem clone(MenuPage newPage, int newSlot) {
         return new MenuItem(newPage, openOtherMenu, newSlot, item, title, type, typeValue, lore, commands, consoleCommands, glow);
     }
 
-    public Menu getMenu()
-    {
+    public Menu getMenu() {
         return menuPage.getMenu();
     }
 
-    public void setPage(MenuPage menuPage) { this.menuPage = menuPage; }
+    public void setPage(MenuPage menuPage) {
+        this.menuPage = menuPage;
+    }
 
-    public MenuPage getPage() { return menuPage; }
+    public MenuPage getPage() {
+        return menuPage;
+    }
 
     public int getSlot() {
         return slot;
     }
 
-    public boolean isGlowing() { return glow; }
+    public boolean isGlowing() {
+        return glow;
+    }
 
     public ItemStack getItem() {
         return item;
@@ -108,13 +113,17 @@ public class MenuItem
         return type;
     }
 
-    public boolean isLevel() { return type.equalsIgnoreCase("level") || type.equalsIgnoreCase("race"); }
+    public boolean isLevel() {
+        return type.equalsIgnoreCase("level") || type.equalsIgnoreCase("race");
+    }
 
     public String getTypeValue() {
         return typeValue;
     }
 
-    public void setTypeValue(String newTypeValue) { typeValue = newTypeValue; }
+    public void setTypeValue(String newTypeValue) {
+        typeValue = newTypeValue;
+    }
 
     public String getFormattedTitle() {
         return ChatColor.translateAlternateColorCodes('&', title);
@@ -124,7 +133,9 @@ public class MenuItem
         return Utils.formatLore(lore);
     }
 
-    public boolean hasSpecificLore() { return !lore.isEmpty(); }
+    public boolean hasSpecificLore() {
+        return !lore.isEmpty();
+    }
 
     public List<String> getCommands() {
         return commands;

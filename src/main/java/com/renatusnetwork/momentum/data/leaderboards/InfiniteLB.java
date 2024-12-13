@@ -9,24 +9,21 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class InfiniteLB
-{
+public class InfiniteLB {
+
     private InfiniteType type;
     private ArrayList<InfiniteLBPosition> leaderboard;
 
-    public InfiniteLB(InfiniteType type)
-    {
+    public InfiniteLB(InfiniteType type) {
         this.type = type;
         this.leaderboard = new ArrayList<>(parseMaxSize());
         loadLeaderboard();
     }
 
-    private int parseMaxSize()
-    {
+    private int parseMaxSize() {
         SettingsManager settingsManager = Momentum.getSettingsManager();
 
-        switch (type)
-        {
+        switch (type) {
             case CLASSIC:
                 return settingsManager.infinite_classic_lb_size;
             case SPEEDRUN:
@@ -39,35 +36,27 @@ public class InfiniteLB
         return 10;
     }
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return size() == 0;
     }
 
-    public int size()
-    {
+    public int size() {
         return leaderboard.size();
     }
 
-    public InfiniteLBPosition getLeaderboardPosition(int position)
-    {
+    public InfiniteLBPosition getLeaderboardPosition(int position) {
         return leaderboard.get(position);
     }
 
-    public ArrayList<InfiniteLBPosition> getLeaderboardPositions()
-    {
+    public ArrayList<InfiniteLBPosition> getLeaderboardPositions() {
         return leaderboard;
     }
 
-    public void loadLeaderboard()
-    {
-        new BukkitRunnable()
-        {
+    public void loadLeaderboard() {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     leaderboard.clear();
 
                     String typeDBName = "infinite_" + type.toString().toLowerCase() + "_score";
@@ -76,19 +65,18 @@ public class InfiniteLB
                             DatabaseManager.PLAYERS_TABLE,
                             "uuid, name, " + typeDBName,
                             "WHERE " + typeDBName + " > 0" +
-                                    " ORDER BY " + typeDBName + " DESC" +
-                                    " LIMIT " + parseMaxSize());
+                            " ORDER BY " + typeDBName + " DESC" +
+                            " LIMIT " + parseMaxSize());
 
-                    for (Map<String, String> scoreResult : scoreResults)
+                    for (Map<String, String> scoreResult : scoreResults) {
                         leaderboard.add(
                                 new InfiniteLBPosition(
                                         scoreResult.get("uuid"),
                                         scoreResult.get("name"),
                                         Integer.parseInt(scoreResult.get(typeDBName)))
                         );
-                }
-                catch (Exception e)
-                {
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

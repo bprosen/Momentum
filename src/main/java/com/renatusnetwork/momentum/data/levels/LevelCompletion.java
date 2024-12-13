@@ -1,15 +1,14 @@
 package com.renatusnetwork.momentum.data.levels;
 
-public class LevelCompletion
-{
+public class LevelCompletion {
+
     private String name;
     private String uuid;
     private String levelName;
     private long timeOfCompletion;
     private long completionTimeElapsed; // time elapsed
 
-    public LevelCompletion(String levelName, String uuid, String name, long timeOfCompletion, long completionTimeElapsed)
-    {
+    public LevelCompletion(String levelName, String uuid, String name, long timeOfCompletion, long completionTimeElapsed) {
         this.levelName = levelName;
         this.uuid = uuid;
         this.name = name;
@@ -17,8 +16,7 @@ public class LevelCompletion
         this.completionTimeElapsed = completionTimeElapsed;
     }
 
-    public LevelCompletion(String levelName, String uuid, String name, long timeOfCompletion)
-    {
+    public LevelCompletion(String levelName, String uuid, String name, long timeOfCompletion) {
         this.levelName = levelName;
         this.uuid = uuid;
         this.name = name;
@@ -26,35 +24,43 @@ public class LevelCompletion
         this.completionTimeElapsed = -1;
     }
 
-    public String getLevelName() { return levelName; }
+    public String getLevelName() {
+        return levelName;
+    }
 
-    public boolean wasTimed() { return completionTimeElapsed >= 0; }
+    public boolean wasTimed() {
+        return completionTimeElapsed >= 0;
+    }
 
     public long getTimeOfCompletionMillis() {
         return timeOfCompletion;
     }
 
-    public double getTimeOfCompletionSeconds() { return timeOfCompletion / 1000d; }
+    public double getTimeOfCompletionSeconds() {
+        return timeOfCompletion / 1000d;
+    }
 
     public long getCompletionTimeElapsedMillis() {
         return completionTimeElapsed;
     }
 
-    public double getCompletionTimeElapsedSeconds() { return completionTimeElapsed / 1000d; }
+    public double getCompletionTimeElapsedSeconds() {
+        return completionTimeElapsed / 1000d;
+    }
 
     public String getName() {
         return name;
     }
 
-    public String getUUID() { return uuid; }
+    public String getUUID() {
+        return uuid;
+    }
 
-    public boolean equals(LevelCompletion other)
-    {
+    public boolean equals(LevelCompletion other) {
         return other.getUUID().equalsIgnoreCase(uuid) && other.getTimeOfCompletionMillis() == timeOfCompletion;
     }
 
-    public boolean equals(String playerName, String levelName, long timeTaken)
-    {
+    public boolean equals(String playerName, String levelName, long timeTaken) {
         return playerName.equalsIgnoreCase(name) && timeTaken == completionTimeElapsed;
     }
 }

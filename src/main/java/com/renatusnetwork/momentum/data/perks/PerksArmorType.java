@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.data.perks;
 
-public enum PerksArmorType
-{
+public enum PerksArmorType {
     HELMET,
     CHESTPLATE,
     LEGGINGS,

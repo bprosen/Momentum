@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.data.infinite.gamemode;
 
-public enum InfiniteType
-{
+public enum InfiniteType {
     CLASSIC,
     SPEEDRUN,
     TIMED,

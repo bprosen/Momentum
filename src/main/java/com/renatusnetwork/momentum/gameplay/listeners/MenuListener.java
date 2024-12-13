@@ -25,51 +25,49 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class MenuListener implements Listener
-{
+public class MenuListener implements Listener {
+
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event)
-    {
+    public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         InventoryHolder holder = event.getInventory().getHolder();
 
-        if (holder instanceof MenuHolder)
-        {
+        if (holder instanceof MenuHolder) {
             MenuHolder menuHolder = (MenuHolder) holder;
             Menu menu = menuHolder.getMenu();
 
-            if (menu != null)
-            {
+            if (menu != null) {
                 event.setCancelled(true);
                 ItemStack currentItem = event.getCurrentItem();
 
                 if (currentItem != null
                     && currentItem.getType() != Material.AIR
                     && currentItem.hasItemMeta()
-                    && currentItem.getItemMeta().hasDisplayName())
-                {
+                    && currentItem.getItemMeta().hasDisplayName()) {
                     PlayerStats playerStats = Momentum.getStatsManager().get(player);
                     MenuItem menuItem =
-                        menu.getMenuItem(playerStats,
-                            menuHolder.getMenuPage().getPageNumber(),
-                            event.getSlot()
-                        );
+                            menu.getMenuItem(playerStats,
+                                             menuHolder.getMenuPage().getPageNumber(),
+                                             event.getSlot()
+                            );
 
                     if (menuItem != null &&
-                            ((menuItem.getItem().getType() == currentItem.getType() ||
-                                    menuItem.getTypeValue().equalsIgnoreCase("featured") ||
-                                    menuItem.getTypeValue().startsWith("favorite-level")
-                            ) || Momentum.getLevelManager().isBuyingLevelMenu(player.getName()))) {
+                        ((menuItem.getItem().getType() == currentItem.getType() ||
+                          menuItem.getTypeValue().equalsIgnoreCase("featured") ||
+                          menuItem.getTypeValue().startsWith("favorite-level")
+                         ) || Momentum.getLevelManager().isBuyingLevelMenu(player.getName()))) {
                         boolean shiftClicked = event.isShiftClick();
 
-                        if (shiftClicked)
+                        if (shiftClicked) {
                             Momentum.getMenuManager().addShiftClicked(playerStats);
+                        }
 
                         MenuItemAction.perform(playerStats, menuItem);
                         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.1f, 2f);
 
-                        if (shiftClicked)
+                        if (shiftClicked) {
                             Momentum.getMenuManager().removeShiftClicked(playerStats);
+                        }
 
                     } else {
                         // submitted plots section
@@ -106,8 +104,7 @@ public class MenuListener implements Listener
     }
 
     @EventHandler
-    public void onMenuClose(InventoryCloseEvent event)
-    {
+    public void onMenuClose(InventoryCloseEvent event) {
         RaceManager raceManager = Momentum.getRaceManager();
         MenuManager menuManager = Momentum.getMenuManager();
         String name = event.getPlayer().getName();
@@ -118,16 +115,13 @@ public class MenuListener implements Listener
         // remove if present
         raceManager.removeChoosingRaceLevel(name);
 
-        new BukkitRunnable()
-        {
+        new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 Inventory openedInventory = event.getInventory();
                 Inventory nextInventory = event.getPlayer().getOpenInventory().getTopInventory();
 
-                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName()))
-                {
+                if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName())) {
                     LevelManager levelManager = Momentum.getLevelManager();
 
                     // remove buying
@@ -137,10 +131,10 @@ public class MenuListener implements Listener
                     CancelTasks cancelTasks = menuManager.getCancelTasks(name);
 
                     // if not null and contains, we need to cancel remaining tasks!
-                    if (cancelTasks != null && cancelTasks.getCancelledSlots() != null)
-                    {
-                        for (BukkitTask task : cancelTasks.getCancelledSlots())
+                    if (cancelTasks != null && cancelTasks.getCancelledSlots() != null) {
+                        for (BukkitTask task : cancelTasks.getCancelledSlots()) {
                             task.cancel();
+                        }
 
                         menuManager.removeCancelTasks(name); // remove
                     }
@@ -150,28 +144,23 @@ public class MenuListener implements Listener
     }
 
     @EventHandler
-    public void onMenuItemUse(PlayerInteractEvent event)
-    {
+    public void onMenuItemUse(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
         if (!player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world) &&
-           (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK ||
-            event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
-        {
+            (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK ||
+             event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
 
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-            if (playerStats.isLoaded())
-            {
-                if (!playerStats.isInTutorial())
-                {
+            if (playerStats.isLoaded()) {
+                if (!playerStats.isInTutorial()) {
                     Menu menu = Momentum.getMenuManager().getMenuFromSelectItem(player.getInventory().getItemInMainHand());
 
-                    if (menu != null)
+                    if (menu != null) {
                         Momentum.getMenuManager().openInventory(playerStats, menu.getName(), false);
-                }
-                else
-                {
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&cYou cannot do this while in the tutorial"));
                 }
             }

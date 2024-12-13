@@ -16,17 +16,16 @@ import java.util.UUID;
 public class SwordShieldCMD implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (!(sender instanceof Player))
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (!(sender instanceof Player)) {
             return true;
+        }
 
         Player player = (Player) sender;
         EventManager eventManager = Momentum.getEventManager();
 
         // if running and participant, cancel
-        if (!(eventManager.isEventRunning() && eventManager.isParticipant(player)))
-        {
+        if (!(eventManager.isEventRunning() && eventManager.isParticipant(player))) {
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
             SettingsManager settingsManager = Momentum.getSettingsManager();
 
@@ -36,29 +35,28 @@ public class SwordShieldCMD implements CommandExecutor {
             ItemStack shieldItem = Utils.getShieldIfExists(player);
             boolean removedShield = removeItem(player, shieldItem, settingsManager.shield_title);
 
-            if (!Utils.isInPre1_9(player))
-            {
-                if (!removedShield)
+            if (!Utils.isInPre1_9(player)) {
+                if (!removedShield) {
                     Utils.addShield(playerStats);
-            }
-            else if (!removedSword)
+                }
+            } else if (!removedSword) {
                 Utils.addSword(playerStats);
-        }
-        else
+            }
+        } else {
             player.sendMessage(Utils.translate("&cYou cannot do this"));
+        }
 
         return false;
     }
 
-    private boolean removeItem(Player player, ItemStack itemStack, String itemTitle)
-    {
+    private boolean removeItem(Player player, ItemStack itemStack, String itemTitle) {
         // take away item
-        if (itemStack != null)
-        {
-            if (Utils.isItemFromTitle(player.getInventory().getItemInOffHand(), itemTitle))
+        if (itemStack != null) {
+            if (Utils.isItemFromTitle(player.getInventory().getItemInOffHand(), itemTitle)) {
                 player.getInventory().setItemInOffHand(null);
-            else
+            } else {
                 player.getInventory().removeItem(itemStack);
+            }
 
             player.sendMessage(Utils.translate("&7You took away your " + itemTitle));
             return true;

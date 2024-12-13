@@ -46,8 +46,9 @@ public class Scoreboard {
     private static String getSpaces(int length) {
         String spaces = "";
 
-        for (int i = 1; i <= length; i++)
+        for (int i = 1; i <= length; i++) {
             spaces += " ";
+        }
 
         return spaces;
     }
@@ -59,27 +60,23 @@ public class Scoreboard {
         return padding > 0 ? getSpaces(padding / 2) + input : input;
     }
 
-    public static void displayScoreboards()
-    {
+    public static void displayScoreboards() {
         HashMap<String, PlayerStats> stats = Momentum.getStatsManager().getPlayerStats();
 
         // ensure thread safety
-        synchronized (stats)
-        {
-            for (PlayerStats playerStats : stats.values())
+        synchronized (stats) {
+            for (PlayerStats playerStats : stats.values()) {
                 displayScoreboard(playerStats);
+            }
         }
     }
 
-    private static void displayScoreboard(PlayerStats playerStats)
-    {
-        if (playerStats != null && playerStats.isLoaded() && playerStats.hasBoard())
-        {
+    private static void displayScoreboard(PlayerStats playerStats) {
+        if (playerStats != null && playerStats.isLoaded() && playerStats.hasBoard()) {
             List<String> board = new ArrayList<>();
             BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
 
-            if (playerStats.isInBlackMarket() && blackMarketManager.isRunning())
-            {
+            if (playerStats.isInBlackMarket() && blackMarketManager.isRunning()) {
                 playerStats.getBoard().updateTitle(Utils.translate("&8&lBlack Market"));
 
                 board.add(Utils.translate("&7"));
@@ -88,10 +85,8 @@ public class Scoreboard {
                 BlackMarketEvent blackMarketEvent = blackMarketManager.getRunningEvent();
 
                 // add bidding section
-                if (blackMarketEvent.isBiddingAllowed())
-                {
-                    if (blackMarketEvent.hasHighestBidder())
-                    {
+                if (blackMarketEvent.isBiddingAllowed()) {
+                    if (blackMarketEvent.hasHighestBidder()) {
                         board.add(Utils.translate("  &8&lBid &7" + Utils.formatNumber(blackMarketEvent.getHighestBid())));
                         board.add(Utils.translate("  &8&lHolder &7" + blackMarketEvent.getHighestBidder().getName()));
                     }
@@ -111,9 +106,7 @@ public class Scoreboard {
                 }
 
                 board.add(formatSpacing(Utils.translate("&crenatus.cc")));
-            }
-            else
-            {
+            } else {
                 playerStats.getBoard().updateTitle(Utils.translate("&c&lParkour"));
 
                 Level level = playerStats.getLevel();
@@ -125,21 +118,18 @@ public class Scoreboard {
                 board.add(coinBalance);
 
                 // if they have a rank, show it
-                if (playerStats.hasRank())
-                {
+                if (playerStats.hasRank()) {
                     String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getTitle());
                     board.add(rankString);
                 }
 
-                if (playerStats.hasELOTier())
-                {
+                if (playerStats.hasELOTier()) {
                     String eloString = Utils.translate("  &e&lELO &6" + playerStats.getELOTierTitleWithLB());
                     board.add(eloString);
                 }
 
                 // if they have a clan, show it
-                if (playerStats.inClan())
-                {
+                if (playerStats.inClan()) {
                     String clanString = Utils.translate("  &e&lClan &6" + playerStats.getClan().getTag());
                     board.add(clanString);
                 }
@@ -147,20 +137,19 @@ public class Scoreboard {
                 int fails = playerStats.getFails();
                 if (!playerStats.isInInfinite() && !playerStats.isEventParticipant() &&
                     !playerStats.isSpectating() && playerStats.inLevel() && !playerStats.getLevel().isAscendance() &&
-                    playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0)
+                    playerStats.inFailMode() && !playerStats.isInTutorial() && fails > 0) {
                     board.add(Utils.translate("  &e&lFails &6" + fails));
+                }
 
                 // spectator section of scoreboard
-                if (playerStats.isSpectating())
-                {
+                if (playerStats.isSpectating()) {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&c&lSpectating")));
                     board.add(formatSpacing(Utils.translate("&c" + playerStats.getPlayerToSpectate().getDisplayName())));
                     board.add(formatSpacing(Utils.translate("&c/spectate &7to exit")));
                 }
                 // infinite parkour section of scoreboard
-                else if (playerStats.isInInfinite())
-                {
+                else if (playerStats.isInInfinite()) {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&d" + StringUtils.capitalize(playerStats.getInfiniteType().toString().toLowerCase()) + " &5Infinite")));
 
@@ -174,17 +163,19 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate(currentScore <= bestScore ? "&7" + currentScoreFormatted : "&d" + currentScoreFormatted)));
 
                     double timeLeft = 0.0;
-                    if (infinite.isTimed())
+                    if (infinite.isTimed()) {
                         timeLeft = ((Timed) infinite).getTimeLeft();
-                    if (infinite.isSprint())
+                    }
+                    if (infinite.isSprint()) {
                         timeLeft = ((Sprint) infinite).getTimeLeft();
+                    }
 
-                    if (timeLeft > 0.0)
+                    if (timeLeft > 0.0) {
                         board.add(formatSpacing(Utils.translate("&7Time Left &d" + timeLeft)));
+                    }
                 }
                 // practice section of scoreboard
-                else if (playerStats.inPracticeMode())
-                {
+                else if (playerStats.inPracticeMode()) {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&e/prac history")));
                     board.add(formatSpacing(Utils.translate("&e/unprac &7to exit")));
@@ -199,8 +190,7 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&7f &6" + Utils.formatDecimal(facing, false, 1, 1))));
                 }
                 // race section of scoreboard
-                else if (playerStats.inRace())
-                {
+                else if (playerStats.inRace()) {
 
                     board.add(Utils.translate("&7"));
                     Player opponent = playerStats.getRace().getOpponent().getPlayerStats().getPlayer();
@@ -209,8 +199,7 @@ public class Scoreboard {
                     board.add(formatSpacing(Utils.translate("&6&lRace")));
                     board.add(formatSpacing(Utils.translate("&c" + opponent.getDisplayName())));
                     // add timer
-                    if (playerStats.getLevelStartTime() > 0)
-                    {
+                    if (playerStats.getLevelStartTime() > 0) {
                         long timeElapsed = System.currentTimeMillis() - playerStats.getLevelStartTime();
 
                         String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1));
@@ -223,8 +212,7 @@ public class Scoreboard {
                     board.add(Utils.translate("&aTheir ELO &2" + Utils.formatNumber(opponentStats.getELO())));
                 }
                 // event section of scoreboard
-                else if (playerStats.isEventParticipant())
-                {
+                else if (playerStats.isEventParticipant()) {
                     board.add(Utils.translate("&7"));
                     board.add(formatSpacing(Utils.translate("&2&l" + eventManager.getRunningEvent().getFormattedName())));
                     board.add(formatSpacing(Utils.translate("&6" + eventManager.getParticipants().size() + " &e&lPlaying")));
@@ -239,8 +227,7 @@ public class Scoreboard {
                     }
                 }
                 // level section of scoreboard
-                else if (level != null)
-                {
+                else if (level != null) {
 
                     board.add(Utils.translate("&7"));
 
@@ -271,14 +258,10 @@ public class Scoreboard {
                                 String timing = Utils.translate("&7" + TimeUtils.formatCompletionTimeTaken(timeElapsed, 1));
                                 board.add(formatSpacing(timing));
                             }
-                        }
-                        else if (playerStats.isPreviewingLevel())
-                        {
+                        } else if (playerStats.isPreviewingLevel()) {
                             board.add(formatSpacing(Utils.translate("&c&lPreview")));
                             board.add(formatSpacing(level.getFormattedTitle()));
-                        }
-                        else
-                        {
+                        } else {
                             // normal scoreboard
                             String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
                             BankManager bankManager = Momentum.getBankManager();
@@ -293,8 +276,7 @@ public class Scoreboard {
                             }
 
                             // if level has mastery and player is in mastery
-                            if (level.hasMastery() && playerStats.isAttemptingMastery())
-                            {
+                            if (level.hasMastery() && playerStats.isAttemptingMastery()) {
                                 board.add(formatSpacing(Utils.translate("&5&lMASTERY")));
                                 newReward *= level.getMasteryMultiplier();
                             }
@@ -303,8 +285,8 @@ public class Scoreboard {
                                 board.add(formatSpacing(Utils.translate("&c&lFEATURED")));
                                 newReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
                             } else if (bankManager.isJackpotRunning() &&
-                                    bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                                    !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
+                                       bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                                       !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
                                 Jackpot jackpot = bankManager.getJackpot();
                                 int bonus = jackpot.getBonus();
 
@@ -319,20 +301,22 @@ public class Scoreboard {
                                 board.add(formatSpacing(Utils.translate("&a&lJACKPOT")));
                             }
                             // modifier section
-                            else
-                            {
-                                if (playerStats.hasPrestiges() && level.hasReward())
+                            else {
+                                if (playerStats.hasPrestiges() && level.hasReward()) {
                                     newReward *= playerStats.getPrestigeMultiplier();
+                                }
 
                                 LevelManager levelManager = Momentum.getLevelManager();
 
                                 // set cooldown modifier last!
-                                if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getName()) && levelManager.getLevelCooldown(playerStats.getName()).getModifier() != 1.00)
+                                if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getName()) && levelManager.getLevelCooldown(playerStats.getName()).getModifier() != 1.00) {
                                     newReward *= levelManager.getLevelCooldown(playerStats.getName()).getModifier();
+                                }
                             }
 
-                            if (newReward != level.getReward())
+                            if (newReward != level.getReward()) {
                                 rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(newReward));
+                            }
 
                             board.add(formatSpacing(level.getFormattedTitle()));
                             board.add(formatSpacing(rewardString));
@@ -345,8 +329,9 @@ public class Scoreboard {
                             }
                         }
                         // grind mode on scoreboard
-                        if (playerStats.isGrinding())
+                        if (playerStats.isGrinding()) {
                             board.add(formatSpacing(Utils.translate("&aGrinding")));
+                        }
                     }
                 }
                 // add ip

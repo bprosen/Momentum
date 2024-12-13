@@ -12,9 +12,15 @@ public class RaceLBPosition {
         this.winRate = winRate;
     }
 
-    public String getName() { return playerName; }
+    public String getName() {
+        return playerName;
+    }
 
-    public int getWins() { return wins; }
+    public int getWins() {
+        return wins;
+    }
 
-    public float getWinRate() { return winRate; }
+    public float getWinRate() {
+        return winRate;
+    }
 }

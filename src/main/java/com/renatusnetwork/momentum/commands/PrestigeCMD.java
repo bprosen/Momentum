@@ -28,16 +28,13 @@ public class PrestigeCMD implements CommandExecutor {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
         RanksManager rankManager = Momentum.getRanksManager();
 
-        if (playerStats != null && playerStats.isLoaded())
-        {
+        if (playerStats != null && playerStats.isLoaded()) {
             // this means they are max rank
-            if (playerStats.getRank().isMaxRank())
-            {
+            if (playerStats.getRank().isMaxRank()) {
                 int prestiges = playerStats.getPrestiges();
                 int cost = Momentum.getSettingsManager().base_prestige_cost + (prestiges * Momentum.getSettingsManager().additional_cost_per_prestige);
 
-                if (!confirmMap.containsKey(player.getName()))
-                {
+                if (!confirmMap.containsKey(player.getName())) {
                     // otherwise, put them in and ask them to confirm within 5 seconds
                     player.sendMessage("");
                     player.sendMessage(Utils.translate("&cAre you sure you want to prestige? This will reset you to rank &f" + rankManager.get(Momentum.getSettingsManager().default_rank).getTitle()));
@@ -53,29 +50,25 @@ public class PrestigeCMD implements CommandExecutor {
                             }
                         }
                     }.runTaskLater(Momentum.getPlugin(), 20 * 10));
-                }
-                else if (playerStats.getCoins() >= cost)
-                {
+                } else if (playerStats.getCoins() >= cost) {
                     rankManager.doPrestige(playerStats, cost);
                     cancelTask(player);
-                }
-                else
-                {
+                } else {
                     player.sendMessage(Utils.translate("&cYou do not have &6" + Utils.formatNumber(cost) + " &eCoins&c!" +
-                            " You need &6" + Utils.formatNumber(cost - playerStats.getCoins()) + " &cmore &eCoins"));
+                                                       " You need &6" + Utils.formatNumber(cost - playerStats.getCoins()) + " &cmore &eCoins"));
                     cancelTask(player);
                 }
-            } else
+            } else {
                 player.sendMessage(Utils.translate("&cYou cannot do this yet!" +
-                                                        " You need to be Rank &4" + rankManager.getMaxRank().getTitle()));
-        }
-        else
+                                                   " You need to be Rank &4" + rankManager.getMaxRank().getTitle()));
+            }
+        } else {
             sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+        }
         return false;
     }
 
-    private void cancelTask(Player player)
-    {
+    private void cancelTask(Player player) {
         confirmMap.get(player.getName()).cancel();
         confirmMap.remove(player.getName());
     }

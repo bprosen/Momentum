@@ -10,15 +10,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class BlackMarketCMD implements CommandExecutor
-{
+public class BlackMarketCMD implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
         BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
 
-        if (sender instanceof Player && !sender.hasPermission("momentum.admin"))
+        if (sender instanceof Player && !sender.hasPermission("momentum.admin")) {
             sender.sendMessage(Utils.translate("&cYou do not have permission to do this"));
+        }
         //
         // /blackmarket load
         // /blackmarket start
@@ -26,51 +25,38 @@ public class BlackMarketCMD implements CommandExecutor
         // /blackmarket add (player)
         // /blackmarket help
         //
-        else if (a.length == 1 && a[0].equalsIgnoreCase("load"))
-        {
+        else if (a.length == 1 && a[0].equalsIgnoreCase("load")) {
             Momentum.getConfigManager().load("blackmarket");
             sender.sendMessage(Utils.translate("&7Loaded &8blackmarket.yml &7from disk"));
             blackMarketManager.load();
-        }
-        else if (a.length == 1 && a[0].equalsIgnoreCase("start"))
-        {
-            if (!Momentum.getBlackMarketManager().start())
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
+            if (!Momentum.getBlackMarketManager().start()) {
                 sender.sendMessage(Utils.translate("&cThe Black Market is currently running. Do &4/blackmarket end &cto stop"));
-        }
-        else if (a.length == 1 && a[0].equalsIgnoreCase("end"))
-        {
-            if (Momentum.getBlackMarketManager().forceEnd())
+            }
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("end")) {
+            if (Momentum.getBlackMarketManager().forceEnd()) {
                 sender.sendMessage(Utils.translate("&7You successfully force ended the &8&lBlack Market"));
-            else
+            } else {
                 sender.sendMessage(Utils.translate("&cThe Black Market is not currently running. Do &4/blackmarket start &cto start"));
-        }
-        else if (a.length == 2 && a[0].equalsIgnoreCase("add"))
-        {
+            }
+        } else if (a.length == 2 && a[0].equalsIgnoreCase("add")) {
             String playerName = a[1];
             Player player = Bukkit.getPlayer(playerName);
 
-            if (player != null)
-            {
+            if (player != null) {
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-                if (!playerStats.isSpectating())
-                {
+                if (!playerStats.isSpectating()) {
                     // add player
                     sender.sendMessage(Utils.translate("&7Added &c" + player.getName() + " &7to the &8&lBlack Market"));
                     blackMarketManager.playerJoined(Momentum.getStatsManager().get(player));
-                }
-                else
-                {
+                } else {
                     sender.sendMessage(Utils.translate("&cCannot add spectating player: &4" + playerName));
                 }
-            }
-            else
-            {
+            } else {
                 sender.sendMessage(Utils.translate("&c" + playerName + " is not online"));
             }
-        }
-        else
-        {
+        } else {
             sender.sendMessage(Utils.translate("&8&lBlackMarket Help"));
             sender.sendMessage(Utils.translate(" &8/blackmarket load  &7Loads Black Market data from config"));
             sender.sendMessage(Utils.translate(" &8/blackmarket start  &7Starts the Black Market if it is not already running"));

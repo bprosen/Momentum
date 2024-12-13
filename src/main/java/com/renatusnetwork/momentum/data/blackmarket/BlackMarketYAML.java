@@ -12,43 +12,37 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class BlackMarketYAML
-{
+public class BlackMarketYAML {
+
     private static FileConfiguration blackmarketConfig = Momentum.getConfigManager().get("blackmarket");
 
     private static void commit() {
         Momentum.getConfigManager().save("blackmarket");
     }
 
-    public static boolean isSection(String pathName)
-    {
+    public static boolean isSection(String pathName) {
         return blackmarketConfig.isConfigurationSection(pathName);
     }
 
-    public static boolean isSet(String pathName, String valuePath)
-    {
+    public static boolean isSet(String pathName, String valuePath) {
         return blackmarketConfig.isSet(pathName + "." + valuePath);
     }
 
-    public static String chooseBankItem()
-    {
+    public static String chooseBankItem() {
         List<String> keys = new ArrayList<>(blackmarketConfig.getConfigurationSection("items").getKeys(false));
 
         return keys.get(ThreadLocalRandom.current().nextInt(keys.size()));
     }
 
-    public static String getTitle(String name)
-    {
+    public static String getTitle(String name) {
         return blackmarketConfig.getString("items." + name + ".title");
     }
 
-    public static String getDescription(String name)
-    {
+    public static String getDescription(String name) {
         return blackmarketConfig.getString("items." + name + ".description");
     }
 
-    public static ItemStack getItem(String name)
-    {
+    public static ItemStack getItem(String name) {
         ItemStack item = new ItemStack(Material.matchMaterial(blackmarketConfig.getString("items." + name + ".item.material")));
         ItemMeta itemMeta = item.getItemMeta();
 
@@ -57,17 +51,18 @@ public class BlackMarketYAML
         List<String> tempLore = blackmarketConfig.getStringList("items." + name + ".item.title");
         List<String> lore = new ArrayList<>();
 
-        for (String loreString : tempLore)
+        for (String loreString : tempLore) {
             lore.add(Utils.translate(loreString));
+        }
 
         itemMeta.setLore(lore);
 
-        if (blackmarketConfig.isSet("items." + name + ".item.glow"))
-        {
+        if (blackmarketConfig.isSet("items." + name + ".item.glow")) {
             boolean glow = blackmarketConfig.getBoolean("items." + name + ".item.glow");
 
-            if (glow)
+            if (glow) {
                 Utils.addGlow(itemMeta);
+            }
         }
 
         item.setItemMeta(itemMeta);
@@ -75,28 +70,23 @@ public class BlackMarketYAML
         return item;
     }
 
-    public static int getStartingBid(String name)
-    {
+    public static int getStartingBid(String name) {
         return blackmarketConfig.getInt("items." + name + ".starting_bid");
     }
 
-    public static float getNextBidMultiplier(String name)
-    {
+    public static float getNextBidMultiplier(String name) {
         return (float) blackmarketConfig.getDouble("items." + name + ".next_bid_multiplier");
     }
 
-    public static Set<String> getItemNames()
-    {
+    public static Set<String> getItemNames() {
         return blackmarketConfig.getConfigurationSection("items").getKeys(false);
     }
 
-    public static List<String> getRewardCommands(String name)
-    {
+    public static List<String> getRewardCommands(String name) {
         return blackmarketConfig.getStringList("items." + name + ".reward_commands");
     }
 
-    public static List<String> getWinnerMessages(String name)
-    {
+    public static List<String> getWinnerMessages(String name) {
         return blackmarketConfig.getStringList("items." + name + ".messages_to_winner");
     }
 }

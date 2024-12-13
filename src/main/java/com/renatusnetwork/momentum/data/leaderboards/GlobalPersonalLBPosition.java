@@ -1,17 +1,20 @@
 package com.renatusnetwork.momentum.data.leaderboards;
 
-public class GlobalPersonalLBPosition
-{
+public class GlobalPersonalLBPosition {
+
     private String playerName;
     private int completions;
 
-    public GlobalPersonalLBPosition(String playerName, int completions)
-    {
+    public GlobalPersonalLBPosition(String playerName, int completions) {
         this.playerName = playerName;
         this.completions = completions;
     }
 
-    public double getCompletions() { return completions; }
+    public double getCompletions() {
+        return completions;
+    }
 
-    public String getName() { return playerName; }
+    public String getName() {
+        return playerName;
+    }
 }

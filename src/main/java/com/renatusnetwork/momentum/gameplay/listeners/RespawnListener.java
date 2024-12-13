@@ -13,7 +13,8 @@ public class RespawnListener implements Listener {
 
         Location spawn = Momentum.getLocationManager().getSpawnLocation();
 
-        if (spawn != null)
+        if (spawn != null) {
             event.setRespawnLocation(spawn);
+        }
     }
 }

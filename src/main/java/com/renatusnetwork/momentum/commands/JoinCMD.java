@@ -9,34 +9,29 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class JoinCMD implements CommandExecutor
-{
+public class JoinCMD implements CommandExecutor {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender instanceof Player)
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender instanceof Player) {
 
             Player player = (Player) sender;
-            if (a.length == 1)
-            {
+            if (a.length == 1) {
                 Player target = Bukkit.getPlayer(a[0]);
 
-                if (target != null)
-                {
+                if (target != null) {
                     PlayerStats playerStats = Momentum.getStatsManager().get(player);
                     PlayerStats targetStats = Momentum.getStatsManager().get(target);
 
-                    if (targetStats.inLevel())
+                    if (targetStats.inLevel()) {
                         Momentum.getLevelManager().teleportToLevel(playerStats, targetStats.getLevel());
-                    else
+                    } else {
                         player.sendMessage(Utils.translate("&4" + targetStats.getName() + " &cis not in a level"));
-                }
-                else
+                    }
+                } else {
                     player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
-            }
-            else
-            {
+                }
+            } else {
                 player.sendMessage(Utils.translate("&cInvalid usage, do &4/join (playerName)"));
             }
         }

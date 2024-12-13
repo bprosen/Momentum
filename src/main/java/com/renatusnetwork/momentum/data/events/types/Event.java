@@ -10,8 +10,7 @@ public abstract class Event {
     private ProtectedRegion region;
     private String formattedName;
 
-    public Event(Level level, String formattedName)
-    {
+    public Event(Level level, String formattedName) {
         this.formattedName = formattedName;
         this.level = level;
         this.region = WorldGuard.getRegion(level.getStartLocation());
@@ -19,14 +18,16 @@ public abstract class Event {
 
     public abstract void end();
 
-    public String getFormattedName()
-    {
+    public String getFormattedName() {
         return formattedName;
     }
+
     public Level getLevel() {
         return level;
     }
 
-    public ProtectedRegion getRegion() { return region; }
+    public ProtectedRegion getRegion() {
+        return region;
+    }
 }
 

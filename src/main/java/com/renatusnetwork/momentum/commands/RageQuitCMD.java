@@ -38,7 +38,7 @@ public class RageQuitCMD implements CommandExecutor {
                 List<String> randomMessages = Momentum.getSettingsManager().rage_quit_messages;
                 String randomMessage = Utils.translate(
                         randomMessages.get(random.nextInt(randomMessages.size()))
-                        .replace("%player%", player.getDisplayName()));
+                                .replace("%player%", player.getDisplayName()));
 
                 Utils.spawnFirework(player.getLocation(), Color.WHITE, Color.RED, true);
 
@@ -46,7 +46,7 @@ public class RageQuitCMD implements CommandExecutor {
                 Bukkit.broadcastMessage(randomMessage);
                 player.kickPlayer("Rage Quit :(");
 
-            // run confirm and buy
+                // run confirm and buy
             } else {
 
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
@@ -66,7 +66,7 @@ public class RageQuitCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&7You purchased &c/ragequit&7! Type it again to use it"));
                     } else {
                         player.sendMessage(Utils.translate("&7Are you sure you want to buy the &c/ragequit &7command?" +
-                                " Type &c/ragequit &7again to buy it for &6" + Utils.formatNumber(price) + " &eCoins"));
+                                                           " Type &c/ragequit &7again to buy it for &6" + Utils.formatNumber(price) + " &eCoins"));
 
                         confirmMap.put(player.getName(), new BukkitRunnable() {
                             public void run() {
@@ -82,7 +82,7 @@ public class RageQuitCMD implements CommandExecutor {
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou do not have enough coins buy the &c/ragequit &7command" +
-                            " &6(need " + Utils.formatNumber(price - balance) + " &eCoins)"));
+                                                       " &6(need " + Utils.formatNumber(price - balance) + " &eCoins)"));
                 }
             }
         }

@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.data.modifiers;
 
-public enum ModifierType
-{
+public enum ModifierType {
     CLAN_XP_BOOSTER,
     EVENT_BOOSTER,
     GG_BOOSTER,

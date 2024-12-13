@@ -25,12 +25,10 @@ public class SpawnCMD implements CommandExecutor {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
         LocationManager locationManager = Momentum.getLocationManager();
 
-        if (player.hasPermission("momentum.admin"))
-        {
-            if (a.length == 0)
+        if (player.hasPermission("momentum.admin")) {
+            if (a.length == 0) {
                 locationManager.teleportToSpawn(playerStats, player);
-            else if (a.length == 1)
-            {
+            } else if (a.length == 1) {
 
                 String victim = a[0];
                 Player victimPlayer = Bukkit.getPlayer(victim);
@@ -45,9 +43,9 @@ public class SpawnCMD implements CommandExecutor {
                 locationManager.teleportToSpawn(victimStats, victimPlayer);
                 player.sendMessage(Utils.translate("&cYou teleported &4" + victim + " &cto spawn"));
             }
-        }
-        else if (a.length == 0)
+        } else if (a.length == 0) {
             locationManager.teleportToSpawn(playerStats, player);
+        }
         return false;
     }
 }

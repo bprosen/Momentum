@@ -14,19 +14,17 @@ import org.bukkit.potion.PotionEffectType;
 
 public class NightVisionCMD implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
-        if (sender instanceof Player)
-        {
+        if (sender instanceof Player) {
             Player player = (Player) sender;
             StatsManager statsManager = Momentum.getStatsManager();
 
-            if (a.length == 0)
-            {
+            if (a.length == 0) {
                 PlayerStats playerStats = statsManager.get(player);
 
-                if (playerStats == null || !playerStats.isLoaded())
-                {
+                if (playerStats == null || !playerStats.isLoaded()) {
                     sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
                     return false;
                 }

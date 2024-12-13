@@ -8,10 +8,10 @@ import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
 import java.util.Arrays;
 
-public class BankCMD implements CommandExecutor
-{
+public class BankCMD implements CommandExecutor {
     // /bank reset
     // /bank item create (name)
     // /bank item title (title)
@@ -19,75 +19,59 @@ public class BankCMD implements CommandExecutor
     // /bank item type (type)
     // /bank item modifier (modifier)
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender.isOp())
-        {
-            if (a.length == 1 && a[0].equalsIgnoreCase("reset"))
-            {
-                if (!Momentum.getBankManager().resetBank())
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender.isOp()) {
+            if (a.length == 1 && a[0].equalsIgnoreCase("reset")) {
+                if (!Momentum.getBankManager().resetBank()) {
                     sender.sendMessage(Utils.translate("&cSomething went wrong trying to reset the bank"));
-            }
-            else
-            {
-                if (a.length > 1 && a[0].equalsIgnoreCase("item"))
-                {
+                }
+            } else {
+                if (a.length > 1 && a[0].equalsIgnoreCase("item")) {
                     String itemCMDType = a[1];
 
-                    if (a.length == 3 && itemCMDType.equalsIgnoreCase("create"))
-                    {
+                    if (a.length == 3 && itemCMDType.equalsIgnoreCase("create")) {
                         String itemName = a[2].toLowerCase();
 
                         BankDB.getItem(itemName).thenAccept(result -> {
-                           if (result.isEmpty())
-                           {
-                               BankDB.insertItem(itemName);
-                               sender.sendMessage(Utils.translate("&7You have created the item &c" + itemName));
-                           }
-                           else
-                               sender.sendMessage(Utils.translate("&4" + itemName + " &calready exists"));
+                            if (result.isEmpty()) {
+                                BankDB.insertItem(itemName);
+                                sender.sendMessage(Utils.translate("&7You have created the item &c" + itemName));
+                            } else {
+                                sender.sendMessage(Utils.translate("&4" + itemName + " &calready exists"));
+                            }
                         });
-                    }
-                    else if (a.length > 3 && itemCMDType.equalsIgnoreCase("title"))
-                    {
+                    } else if (a.length > 3 && itemCMDType.equalsIgnoreCase("title")) {
                         String itemName = a[2].toLowerCase();
                         String[] split = Arrays.copyOfRange(a, 3, a.length);
                         String title = String.join(" ", split);
 
                         BankDB.getItem(itemName).thenAccept(result -> {
-                            if (!result.isEmpty())
-                            {
+                            if (!result.isEmpty()) {
                                 BankDB.updateTitle(itemName, title);
                                 sender.sendMessage(Utils.translate("&7You have updated &c" + itemName + "&7's title to &c" + title));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&4" + itemName + " &cdoes not exist"));
+                            }
                         });
-                    }
-                    else if (a.length > 3 && itemCMDType.equalsIgnoreCase("description"))
-                    {
+                    } else if (a.length > 3 && itemCMDType.equalsIgnoreCase("description")) {
                         String itemName = a[2].toLowerCase();
                         String[] split = Arrays.copyOfRange(a, 3, a.length);
                         String description = String.join(" ", split);
 
                         BankDB.getItem(itemName).thenAccept(result -> {
-                            if (!result.isEmpty())
-                            {
+                            if (!result.isEmpty()) {
                                 BankDB.updateDescription(itemName, description);
                                 sender.sendMessage(Utils.translate("&7You have updated &c" + itemName + "&7's description to:"));
                                 sender.sendMessage(Utils.translate(description));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&4" + itemName + " &cdoes not exist"));
+                            }
                         });
-                    }
-                    else if (a.length == 4 && itemCMDType.equalsIgnoreCase("type"))
-                    {
+                    } else if (a.length == 4 && itemCMDType.equalsIgnoreCase("type")) {
                         String itemName = a[2].toLowerCase();
                         String bankItemType = a[3].toUpperCase();
 
-                        if (!Momentum.getBankManager().isType(bankItemType))
-                        {
+                        if (!Momentum.getBankManager().isType(bankItemType)) {
                             String typesString = Arrays.toString(BankItemType.values());
 
                             sender.sendMessage(Utils.translate(
@@ -99,49 +83,43 @@ public class BankCMD implements CommandExecutor
                         BankItemType type = BankItemType.valueOf(bankItemType);
 
                         BankDB.getItem(itemName).thenAccept(result -> {
-                            if (!result.isEmpty())
-                            {
+                            if (!result.isEmpty()) {
                                 BankDB.updateType(itemName, type);
                                 sender.sendMessage(Utils.translate("&7You have updated &c" + itemName + "&7's type to &4" + type.name()));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&4" + itemName + " &cdoes not exist"));
+                            }
                         });
-                    }
-                    else if (a.length == 4 && itemCMDType.equalsIgnoreCase("modifier"))
-                    {
+                    } else if (a.length == 4 && itemCMDType.equalsIgnoreCase("modifier")) {
                         String itemName = a[2].toLowerCase();
                         String modifierName = a[3];
                         Modifier modifier = Momentum.getModifiersManager().getModifier(modifierName);
 
-                        if (modifier == null)
-                        {
+                        if (modifier == null) {
                             sender.sendMessage(Utils.translate("&4" + modifierName + " &cis not a modifier"));
                             return false;
                         }
 
                         BankDB.getItem(itemName).thenAccept(result -> {
-                            if (!result.isEmpty())
-                            {
+                            if (!result.isEmpty()) {
                                 BankDB.updateModifier(itemName, modifier.getName());
                                 sender.sendMessage(Utils.translate("&7You have updated &c" + itemName + "&7's modifier to " + modifier.getTitle()));
-                            }
-                            else
+                            } else {
                                 sender.sendMessage(Utils.translate("&4" + itemName + " &cdoes not exist"));
+                            }
                         });
-                    }
-                    else
+                    } else {
                         sendHelp(sender);
-                }
-                else
+                    }
+                } else {
                     sendHelp(sender);
+                }
             }
         }
         return false;
     }
 
-    private void sendHelp(CommandSender sender)
-    {
+    private void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&4&lBank Help"));
         sender.sendMessage(Utils.translate("&c/bank reset  &7Resets the bank week"));
         sender.sendMessage(Utils.translate("&c/bank item create (name)  &7Creates a new bank item"));

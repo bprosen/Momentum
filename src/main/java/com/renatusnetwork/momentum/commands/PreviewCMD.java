@@ -7,18 +7,18 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class PreviewCMD implements CommandExecutor
-{
+public class PreviewCMD implements CommandExecutor {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
-        if (sender instanceof Player)
-        {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
+        if (sender instanceof Player) {
+
             Player player = (Player) sender;
-            if (a.length == 1 && a[0].equalsIgnoreCase("leave"))
+            if (a.length == 1 && a[0].equalsIgnoreCase("leave")) {
                 Momentum.getStatsManager().get(player).resetPreviewLevel();
-            else
+            } else {
                 sender.sendMessage(Utils.translate("&cInvalid arguments, try &4/preview leave"));
+            }
         }
         return false;
     }

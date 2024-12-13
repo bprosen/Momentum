@@ -17,8 +17,7 @@ public class SetSpawnCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        if (player.hasPermission("momentum.admin"))
-        {
+        if (player.hasPermission("momentum.admin")) {
             Momentum.getLocationManager().set("spawn", player.getLocation());
             Momentum.getLocationManager().reloadCachedLocations();
             player.sendMessage(Utils.translate("&7You have set spawn to your location"));

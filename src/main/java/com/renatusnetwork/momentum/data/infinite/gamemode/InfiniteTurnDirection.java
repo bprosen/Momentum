@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.data.infinite.gamemode;
 
-public enum InfiniteTurnDirection
-{
+public enum InfiniteTurnDirection {
     POSITIVE,
     NEGATIVE
 }

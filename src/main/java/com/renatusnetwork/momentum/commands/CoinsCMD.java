@@ -11,12 +11,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CoinsCMD implements CommandExecutor
-{
+public class CoinsCMD implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
         /*
             /coins - shows coins
             /coins set (playerName) (coins) - sets coins
@@ -27,30 +25,28 @@ public class CoinsCMD implements CommandExecutor
         StatsManager statsManager = Momentum.getStatsManager();
 
         // COINS
-        if (a.length == 1 && a[0].equalsIgnoreCase("top"))
+        if (a.length == 1 && a[0].equalsIgnoreCase("top")) {
             StatsCMD.printCoinsLB(sender);
-        else if (a.length == 1 && a[0].equalsIgnoreCase("total"))
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("total")) {
             sender.sendMessage(Utils.translate("&7Server total coins are &6" + Utils.formatNumber(Momentum.getStatsManager().getTotalCoins()) + " &eCoins"));
+        }
         // coins set
         else if (a.length == 3 && (
                 a[0].equalsIgnoreCase("set") ||
                 a[0].equalsIgnoreCase("add") ||
-                a[0].equalsIgnoreCase("remove")))
-        {
-            if (sender.hasPermission("momentum.admin"))
-            {
+                a[0].equalsIgnoreCase("remove"))) {
+            if (sender.hasPermission("momentum.admin")) {
                 // variable
                 String targetName = a[1];
                 int coins = Math.max(Integer.parseInt(a[2]), 0);
 
                 Player target = Bukkit.getPlayer(targetName);
 
-                if (a[0].equalsIgnoreCase("set"))
-                {
+                if (a[0].equalsIgnoreCase("set")) {
                     // if null, update in db
-                    if (target == null)
+                    if (target == null) {
                         StatsDB.updateCoinsName(targetName, coins);
-                    else
+                    } else
                     // otherwise cache and db
                     {
                         PlayerStats targetStats = statsManager.get(target);
@@ -59,18 +55,14 @@ public class CoinsCMD implements CommandExecutor
 
                     // msg
                     sender.sendMessage(Utils.translate("&7You have set &6" + targetName + " &eCoins &7to &6" + coins));
-                }
-                else if (a[0].equalsIgnoreCase("add"))
-                {
+                } else if (a[0].equalsIgnoreCase("add")) {
                     int total;
 
                     // if null, update in db
-                    if (target == null)
-                    {
+                    if (target == null) {
                         total = StatsDB.getCoinsFromName(targetName) + coins;
                         StatsDB.updateCoinsName(targetName, total);
-                    }
-                    else
+                    } else
                     // otherwise cache and db
                     {
                         PlayerStats targetStats = statsManager.get(target);
@@ -83,14 +75,11 @@ public class CoinsCMD implements CommandExecutor
                     sender.sendMessage(Utils.translate(
                             "&7You have added &6" + coins + " &eCoins &e(" + total + ") &7to &6" + targetName
                     ));
-                }
-                else if (a[0].equalsIgnoreCase("remove"))
-                {
+                } else if (a[0].equalsIgnoreCase("remove")) {
                     int total;
 
                     // if null, update in db
-                    if (target == null)
-                    {
+                    if (target == null) {
                         total = Math.max(StatsDB.getCoinsFromName(targetName) - coins, 0);
                         StatsDB.updateCoinsName(targetName, total);
                     } else
@@ -107,31 +96,20 @@ public class CoinsCMD implements CommandExecutor
                             "&7You have removed &6" + coins + " &eCoins &e(" + total + ") &7to &6" + targetName
                     ));
                 }
-            }
-            else
-            {
+            } else {
                 sender.sendMessage(Utils.translate("&cYou do not have permission"));
             }
-        }
-        else if (a.length <= 1)
-        {
-            if (a.length == 0)
-            {
+        } else if (a.length <= 1) {
+            if (a.length == 0) {
                 // only players
-                if (sender instanceof Player)
-                {
+                if (sender instanceof Player) {
                     Player player = (Player) sender;
                     player.sendMessage(Utils.translate("&7You have &6" + Utils.formatNumber(statsManager.get(player).getCoins()) + " &eCoins"));
-                }
-                else
-                {
+                } else {
                     sender.sendMessage("Console cannot do this");
                 }
-            }
-            else
-            {
-                if (!a[0].equalsIgnoreCase("help"))
-                {
+            } else {
+                if (!a[0].equalsIgnoreCase("help")) {
                     String playerName = a[0];
                     Player target = Bukkit.getPlayer(playerName);
 
@@ -139,40 +117,37 @@ public class CoinsCMD implements CommandExecutor
                     boolean exists = true;
 
                     // if null, update in db
-                    if (target == null)
-                    {
-                        if (StatsDB.isPlayerInDatabase(playerName))
+                    if (target == null) {
+                        if (StatsDB.isPlayerInDatabase(playerName)) {
                             coins = StatsDB.getCoinsFromName(playerName);
-                        else
+                        } else {
                             exists = false;
-                    }
-                    else
+                        }
+                    } else {
                         coins = statsManager.get(target).getCoins();
+                    }
 
-                    if (exists)
+                    if (exists) {
                         sender.sendMessage(Utils.translate("&e" + playerName + " &7has &6" + Utils.formatNumber(coins) + " &eCoins"));
-                    else
+                    } else {
                         sender.sendMessage(Utils.translate("&c" + playerName + " &7has not joined the server"));
-                }
-                else
+                    }
+                } else {
                     sendHelp(sender);
+                }
             }
-        }
-        else
-        {
+        } else {
             sendHelp(sender);
         }
         return false;
     }
 
-    private void sendHelp(CommandSender sender)
-    {
+    private void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&e/coins  &7Displays your coins"));
         sender.sendMessage(Utils.translate("&e/coins <IGN>  &7Displays someone else's coins"));
         sender.sendMessage(Utils.translate("&e/coins top  &7Displays the top 10 players with the most coins"));
 
-        if (sender.hasPermission("momentum.admin"))
-        {
+        if (sender.hasPermission("momentum.admin")) {
             sender.sendMessage(Utils.translate("&e/coins set <IGN> <coins>  &7Sets coins"));
             sender.sendMessage(Utils.translate("&e/coins add <IGN> <coins>  &7Add coins"));
             sender.sendMessage(Utils.translate("&e/coins remove <IGN> <coins>  &7Remove coins"));

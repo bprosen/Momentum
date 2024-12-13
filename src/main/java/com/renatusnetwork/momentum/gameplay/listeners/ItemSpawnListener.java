@@ -14,9 +14,9 @@ public class ItemSpawnListener implements Listener {
         if (Momentum.getEventManager().isEventRunning() &&
             Momentum.getEventManager().isFallingAnvilEvent() &&
             (event.getEntity() != null &&
-            event.getEntity().getItemStack() != null &&
-            event.getEntity().getItemStack().getType() == Material.ANVIL))
-
+             event.getEntity().getItemStack() != null &&
+             event.getEntity().getItemStack().getType() == Material.ANVIL)) {
             event.setCancelled(true);
+        }
     }
 }

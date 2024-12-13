@@ -4,8 +4,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class BlackMarketArtifact
-{
+public class BlackMarketArtifact {
+
     private String name;
     private String title;
     private String description;
@@ -15,8 +15,7 @@ public class BlackMarketArtifact
     private List<String> rewardCommands;
     private List<String> winnerMessages;
 
-    public BlackMarketArtifact(String name)
-    {
+    public BlackMarketArtifact(String name) {
         this.name = name;
         this.startingBid = BlackMarketYAML.getStartingBid(name);
         this.nextBidMultiplier = BlackMarketYAML.getNextBidMultiplier(name);
@@ -27,26 +26,31 @@ public class BlackMarketArtifact
         this.winnerMessages = BlackMarketYAML.getWinnerMessages(name);
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public ItemStack getItemStack() { return item; }
+    public ItemStack getItemStack() {
+        return item;
+    }
 
-    public int getStartingBid()
-    {
+    public int getStartingBid() {
         return startingBid;
     }
 
-    public float getNextBidMultiplier()
-    {
+    public float getNextBidMultiplier() {
         return nextBidMultiplier;
     }
 
-    public List<String> getRewardCommands() { return rewardCommands; }
+    public List<String> getRewardCommands() {
+        return rewardCommands;
+    }
 
-    public List<String> getWinnerMessages() { return winnerMessages; }
+    public List<String> getWinnerMessages() {
+        return winnerMessages;
+    }
 }

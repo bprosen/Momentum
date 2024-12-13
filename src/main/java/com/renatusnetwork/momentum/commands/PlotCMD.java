@@ -47,8 +47,9 @@ public class PlotCMD implements CommandExecutor {
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
                 boolean bypassingPlots = true;
 
-                if (playerStats.isBypassingPlots())
+                if (playerStats.isBypassingPlots()) {
                     bypassingPlots = false;
+                }
 
                 playerStats.setPlotBypassing(bypassingPlots);
                 player.sendMessage(Utils.translate("&7You have toggled &cPlot Bypassing &7to &c" + bypassingPlots));
@@ -73,7 +74,7 @@ public class PlotCMD implements CommandExecutor {
                             // otherwise, add timer and add to confirm map
                         } else {
                             player.sendMessage(Utils.translate("&7Are you someone with backend that will add this map?" +
-                                    " If so, type &c/plot submit accept " + plotOwner + " &7again"));
+                                                               " If so, type &c/plot submit accept " + plotOwner + " &7again"));
 
                             acceptPlotConfirm.put(player.getName(), new BukkitRunnable() {
                                 public void run() {
@@ -138,7 +139,7 @@ public class PlotCMD implements CommandExecutor {
                 if (a.length == 1) {
                     Plot plot = Momentum.getPlotsManager().get(player.getName());
                     clearPlot(plot, false, player);
-                // if 2 then its a target
+                    // if 2 then its a target
                 } else if (a.length == 2) {
                     Plot targetPlot = Momentum.getPlotsManager().get(a[1]);
                     clearPlot(targetPlot, true, player);
@@ -149,12 +150,12 @@ public class PlotCMD implements CommandExecutor {
                                          a[0].equalsIgnoreCase("add"))) {
 
                 trustPlayer(player, a);
-            // untrust from plot
+                // untrust from plot
             } else if (a.length == 2 && (a[0].equalsIgnoreCase("untrust") ||
                                          a[0].equalsIgnoreCase("remove"))) {
 
                 untrustPlayer(player, a);
-            // clear and delete their plot data
+                // clear and delete their plot data
             } else if (a.length >= 1 && a[0].equalsIgnoreCase("delete")) {
 
                 // if 1, then its themself
@@ -167,10 +168,10 @@ public class PlotCMD implements CommandExecutor {
                     deletePlot(targetPlot, true, player);
                 }
 
-            // submit your plot
+                // submit your plot
             } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
                 submitPlot(Momentum.getStatsManager().get(player));
-            // get info of current loc
+                // get info of current loc
             } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
                 plotInfo(player);
             } else if ((a.length == 1 && a[0].equalsIgnoreCase("help")) || a.length == 0) {
@@ -184,53 +185,53 @@ public class PlotCMD implements CommandExecutor {
           player commands section
          */
 
-        // send help
-        if (a.length == 0) {
-            sendHelp(sender);
-        // do create algorithm after
-        } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
-            createPlot(player);
-        // teleport to plot
-        } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") ||
-                                     a[0].equalsIgnoreCase("teleport") ||
-                                     a[0].equalsIgnoreCase("h"))) {
+            // send help
+            if (a.length == 0) {
+                sendHelp(sender);
+                // do create algorithm after
+            } else if (a.length == 1 && (a[0].equalsIgnoreCase("auto") || a[0].equalsIgnoreCase("create"))) {
+                createPlot(player);
+                // teleport to plot
+            } else if (a.length == 1 && (a[0].equalsIgnoreCase("home") ||
+                                         a[0].equalsIgnoreCase("teleport") ||
+                                         a[0].equalsIgnoreCase("h"))) {
 
-            plotHome(player);
-        // visit someone else
-        } else if (a.length == 2 && (a[0].equalsIgnoreCase("visit") ||
-                                     a[0].equalsIgnoreCase("v"))) {
+                plotHome(player);
+                // visit someone else
+            } else if (a.length == 2 && (a[0].equalsIgnoreCase("visit") ||
+                                         a[0].equalsIgnoreCase("v"))) {
 
-            visitPlot(player, a);
-        // clear stuff on plot
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
+                visitPlot(player, a);
+                // clear stuff on plot
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("clear")) {
 
-            Plot plot = Momentum.getPlotsManager().get(player.getName());
-            clearPlot(plot, false, player);
-        // trust on plot
-        } else if (a.length == 2 && (a[0].equalsIgnoreCase("trust") ||
-                                     a[0].equalsIgnoreCase("add"))) {
+                Plot plot = Momentum.getPlotsManager().get(player.getName());
+                clearPlot(plot, false, player);
+                // trust on plot
+            } else if (a.length == 2 && (a[0].equalsIgnoreCase("trust") ||
+                                         a[0].equalsIgnoreCase("add"))) {
 
-            trustPlayer(player, a);
-        // untrust from plot
-        } else if (a.length == 2 && (a[0].equalsIgnoreCase("untrust") ||
-                                     a[0].equalsIgnoreCase("remove"))) {
+                trustPlayer(player, a);
+                // untrust from plot
+            } else if (a.length == 2 && (a[0].equalsIgnoreCase("untrust") ||
+                                         a[0].equalsIgnoreCase("remove"))) {
 
-            untrustPlayer(player, a);
-        // clear and delete their plot data
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("delete")) {
-            Plot plot = Momentum.getPlotsManager().get(player.getName());
-            deletePlot(plot, false, player);
-        // submit your plot
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
-            submitPlot(Momentum.getStatsManager().get(player));
-        // get info of current loc
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
-            plotInfo(player);
-        } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
-            sendHelp(sender);
-        } else {
-            sendHelp(sender);
-        }
+                untrustPlayer(player, a);
+                // clear and delete their plot data
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("delete")) {
+                Plot plot = Momentum.getPlotsManager().get(player.getName());
+                deletePlot(plot, false, player);
+                // submit your plot
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("submit")) {
+                submitPlot(Momentum.getStatsManager().get(player));
+                // get info of current loc
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("info")) {
+                plotInfo(player);
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
+                sendHelp(sender);
+            } else {
+                sendHelp(sender);
+            }
         return false;
     }
 
@@ -238,22 +239,19 @@ public class PlotCMD implements CommandExecutor {
 
         PlayerStats playerStats = Momentum.getStatsManager().get(player.getUniqueId().toString());
 
-        if (checkConditions(playerStats))
-        {
-            if (!Momentum.getPlotsManager().exists(player.getName()))
-            {
+        if (checkConditions(playerStats)) {
+            if (!Momentum.getPlotsManager().exists(player.getName())) {
                 Rank minimumRank = Momentum.getRanksManager().get(Momentum.getSettingsManager().minimum_rank_for_plot_creation);
 
-                if (Momentum.getRanksManager().isPastOrAtRank(playerStats, minimumRank))
-                {
+                if (Momentum.getRanksManager().isPastOrAtRank(playerStats, minimumRank)) {
                     resetPlayerLevelData(playerStats);
                     Momentum.getPlotsManager().createPlot(playerStats);
-                }
-                else
+                } else {
                     player.sendMessage(Utils.translate("&7You must be at least &c" + minimumRank.getTitle() + " &7to create a &aPlot"));
-            }
-            else
+                }
+            } else {
                 player.sendMessage(Utils.translate("&cYou already have a plot"));
+            }
         }
     }
 
@@ -261,14 +259,16 @@ public class PlotCMD implements CommandExecutor {
 
         if (targetPlot != null) {
             Momentum.getPlotsManager().clearPlot(targetPlot, false);
-            if (!forceCleared)
+            if (!forceCleared) {
                 player.sendMessage(Utils.translate("&aYou cleared your plot! You may need to relog to remove any glitched client-side blocks you see"));
-            else
+            } else {
                 player.sendMessage(Utils.translate("&aYou cleared &2" + targetPlot.getOwnerName() + "&a's Plot"));
-        } else if (!forceCleared)
+            }
+        } else if (!forceCleared) {
             player.sendMessage(Utils.translate("&cYou do not have a Plot"));
-        else
+        } else {
             player.sendMessage(Utils.translate("&aThey do not have a Plot"));
+        }
     }
 
     private void deletePlot(Plot targetPlot, boolean forceCleared, Player player) {
@@ -280,25 +280,26 @@ public class PlotCMD implements CommandExecutor {
                 deletePlotConfirm.remove(player.getName());
 
                 Momentum.getPlotsManager().deletePlot(targetPlot);
-                if (!forceCleared)
+                if (!forceCleared) {
                     player.sendMessage(Utils.translate("&aYou deleted your plot!"));
-                else
+                } else {
                     player.sendMessage(Utils.translate("&aYou deleted &2" + targetPlot.getOwnerName() + "&a's Plot"));
+                }
 
                 // otherwise ask them to confirm it
             } else {
                 confirmPlayer(player);
                 player.sendMessage(Utils.translate("&cAre you sure? &7Type &c/plot delete &7again within 30 seconds to confirm"));
             }
-        } else if (!forceCleared)
+        } else if (!forceCleared) {
             player.sendMessage(Utils.translate("&cYou do not have a Plot"));
-        else
+        } else {
             player.sendMessage(Utils.translate("&aThey do not have a Plot"));
+        }
 
     }
 
-    private void untrustPlayer(Player player, String[] a)
-    {
+    private void untrustPlayer(Player player, String[] a) {
         Plot plot = Momentum.getPlotsManager().get(player.getName());
 
         // if you have plot
@@ -329,8 +330,7 @@ public class PlotCMD implements CommandExecutor {
         }.runTaskAsynchronously(Momentum.getPlugin());
     }
 
-    private void trustPlayer(Player player, String[] a)
-    {
+    private void trustPlayer(Player player, String[] a) {
         Plot plot = Momentum.getPlotsManager().get(player.getName());
 
         // if you have plot
@@ -393,38 +393,39 @@ public class PlotCMD implements CommandExecutor {
         }
     }
 
-    private void submitPlot(PlayerStats playerStats)
-    {
+    private void submitPlot(PlayerStats playerStats) {
         Player player = playerStats.getPlayer();
         Plot plot = Momentum.getPlotsManager().get(player.getName());
 
         // they have a plot
-        if (plot != null)
-        {
+        if (plot != null) {
             // already submitted
             if (!plot.isSubmitted())
-                // submit map!
+            // submit map!
+            {
                 Momentum.getMenuManager().openInventory(playerStats, "submit-plot", true);
-            else
+            } else {
                 player.sendMessage(Utils.translate("&cYou have already submitted your plot!"));
-        }
-        else
+            }
+        } else {
             player.sendMessage(Utils.translate("&cYou do not have a plot to submit!"));
+        }
     }
 
     private void plotInfo(Player player) {
         Plot plot = Momentum.getPlotsManager().getPlotInLocation(player.getLocation());
 
-        if (plot != null)
+        if (plot != null) {
             player.sendMessage(Utils.translate("&a" + plot.getOwnerName() + " &7owns this plot"));
-        else
+        } else {
             player.sendMessage(Utils.translate("&cYou are not in any plot currently"));
+        }
     }
 
-    private void resetPlayerLevelData(PlayerStats playerStats)
-    {
-        if (playerStats.inLevel())
+    private void resetPlayerLevelData(PlayerStats playerStats) {
+        if (playerStats.inLevel()) {
             Momentum.getStatsManager().leaveLevelAndReset(playerStats, true);
+        }
     }
 
     private void confirmPlayer(Player player) {
@@ -442,50 +443,42 @@ public class PlotCMD implements CommandExecutor {
     private boolean checkConditions(PlayerStats playerStats) {
         Player player = playerStats.getPlayer();
 
-        if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround())
-        {
+        if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround()) {
             player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
             return false;
         }
 
-        if (playerStats.inRace())
-        {
+        if (playerStats.inRace()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
             return false;
         }
 
-        if (playerStats.isInInfinite())
-        {
+        if (playerStats.isInInfinite()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in infinite"));
             return false;
         }
 
-        if (playerStats.isSpectating())
-        {
+        if (playerStats.isSpectating()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
             return false;
         }
 
-        if (playerStats.isEventParticipant())
-        {
+        if (playerStats.isEventParticipant()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
             return false;
         }
 
-        if (playerStats.isInBlackMarket())
-        {
+        if (playerStats.isInBlackMarket()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
             return false;
         }
 
-        if (playerStats.inPracticeMode())
-        {
+        if (playerStats.inPracticeMode()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
             return false;
         }
 
-        if (playerStats.isInTutorial())
-        {
+        if (playerStats.isInTutorial()) {
             player.sendMessage(Utils.translate("&cYou cannot do this while in tutorial"));
             return false;
         }
@@ -493,8 +486,7 @@ public class PlotCMD implements CommandExecutor {
         return true;
     }
 
-    private static void sendHelp(CommandSender sender)
-    {
+    private static void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&2&lPlots Help"));
         sender.sendMessage(Utils.translate("&a/plot create  &7Automatically create a plot"));
         sender.sendMessage(Utils.translate("&a/plot delete  &7Deletes your plot (confirm needed)"));
@@ -506,8 +498,7 @@ public class PlotCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/plot submit  &7Submit your plot"));
 
         // send admin commands if they have permission
-        if (sender.hasPermission("momentum.admin"))
-        {
+        if (sender.hasPermission("momentum.admin")) {
             sender.sendMessage(Utils.translate("&a/plot submit accept <player>  &7Accepts a submitted plot"));
             sender.sendMessage(Utils.translate("&a/plot submit deny <player> (Reason...)  &7Deny a player with reason (10 word max)"));
             sender.sendMessage(Utils.translate("&a/plot submit list  &7Open the submitted parkours GUI"));

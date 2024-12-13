@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 public class MomentumCMD implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (sender.isOp()) {

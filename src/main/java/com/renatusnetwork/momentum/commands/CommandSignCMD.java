@@ -15,117 +15,119 @@ import java.util.Collection;
 
 public class CommandSignCMD implements CommandExecutor {
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] a) {
-		if (a.length == 1) {
-			if (a[0].equalsIgnoreCase("list"))
-				showList(sender);
-			else
-				sendHelp(sender);
-			return true;
-		}
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] a) {
+        if (a.length == 1) {
+            if (a[0].equalsIgnoreCase("list")) {
+                showList(sender);
+            } else {
+                sendHelp(sender);
+            }
+            return true;
+        }
 
-		if (!sender.isOp()) {
-			sender.sendMessage(Utils.translate("&cInsufficient permissions"));
-			return true;
-		}
-		if (a.length < 2) {
-			sendHelp(sender);
-			return true;
-		}
+        if (!sender.isOp()) {
+            sender.sendMessage(Utils.translate("&cInsufficient permissions"));
+            return true;
+        }
+        if (a.length < 2) {
+            sendHelp(sender);
+            return true;
+        }
 
-		CommandSignManager csignManager = Momentum.getCommandSignManager();
-		String name = a[1];
+        CommandSignManager csignManager = Momentum.getCommandSignManager();
+        String name = a[1];
 
-		if (a[0].equalsIgnoreCase("create")) {
-			if (!(sender instanceof Player)) {
-				sender.sendMessage(Utils.translate("&cConsole cannot run this"));
-				return true;
-			}
-			if (a.length < 5) {
-				sendHelp(sender);
-				return true;
-			}
+        if (a[0].equalsIgnoreCase("create")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(Utils.translate("&cConsole cannot run this"));
+                return true;
+            }
+            if (a.length < 5) {
+                sendHelp(sender);
+                return true;
+            }
 
-			Player player = (Player) sender;
+            Player player = (Player) sender;
 
-			int x, y, z;
-			try {
-				x = Integer.parseInt(a[2]);
-				y = Integer.parseInt(a[3]);
-				z = Integer.parseInt(a[4]);
-			} catch (NumberFormatException ignore) {
-				sendHelp(sender);
-				return true;
-			}
+            int x, y, z;
+            try {
+                x = Integer.parseInt(a[2]);
+                y = Integer.parseInt(a[3]);
+                z = Integer.parseInt(a[4]);
+            } catch (NumberFormatException ignore) {
+                sendHelp(sender);
+                return true;
+            }
 
-			if (csignManager.commandSignExists(name)) {
-				sender.sendMessage(Utils.translate("&cCommand sign already exists with that name"));
-			} else if (csignManager.commandSignExists(new CmdSignLocation(player.getWorld(), x, y, z))) {
-				sender.sendMessage(Utils.translate("&cCommand sign already exists at that location"));
-			} else {
-				String cmd = String.join(" ", Arrays.copyOfRange(a, 5, a.length));
-				csignManager.addCommandSign(name, cmd, player.getWorld(), x, y, z);
-				sender.sendMessage(Utils.translate("&aSuccessfully created command sign at (" + x + ", " + y + ", " + z + ")"));
-			}
-		} else if (a[0].equalsIgnoreCase("delete")) {
-			if (!csignManager.commandSignExists(name)) {
-				sender.sendMessage(Utils.translate("&cCommand sign does not exist with that name"));
-			} else {
-				csignManager.deleteCommandSign(name);
-				sender.sendMessage(Utils.translate("&aSuccessfully deleted command sign &2" + name));
-			}
-		} else if (a[0].equalsIgnoreCase("modify")) {
-			if (!csignManager.commandSignExists(name)) {
-				sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
-				return true;
-			}
+            if (csignManager.commandSignExists(name)) {
+                sender.sendMessage(Utils.translate("&cCommand sign already exists with that name"));
+            } else if (csignManager.commandSignExists(new CmdSignLocation(player.getWorld(), x, y, z))) {
+                sender.sendMessage(Utils.translate("&cCommand sign already exists at that location"));
+            } else {
+                String cmd = String.join(" ", Arrays.copyOfRange(a, 5, a.length));
+                csignManager.addCommandSign(name, cmd, player.getWorld(), x, y, z);
+                sender.sendMessage(Utils.translate("&aSuccessfully created command sign at (" + x + ", " + y + ", " + z + ")"));
+            }
+        } else if (a[0].equalsIgnoreCase("delete")) {
+            if (!csignManager.commandSignExists(name)) {
+                sender.sendMessage(Utils.translate("&cCommand sign does not exist with that name"));
+            } else {
+                csignManager.deleteCommandSign(name);
+                sender.sendMessage(Utils.translate("&aSuccessfully deleted command sign &2" + name));
+            }
+        } else if (a[0].equalsIgnoreCase("modify")) {
+            if (!csignManager.commandSignExists(name)) {
+                sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
+                return true;
+            }
 
-			String cmd = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
-			csignManager.updateCommand(name, cmd);
-		} else if (a[0].equalsIgnoreCase("broadcast")) {
-			if (!csignManager.commandSignExists(name)) {
-				sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
-				return true;
-			}
-			csignManager.toggleBroadcast(name);
-			sender.sendMessage(Utils.translate("&7Toggled broadcast of &a" + name + "&7 to " + (csignManager.getCommandSign(name).isBroadcast() ? "&atrue" : "&cfalse")));
-		} else if (a[0].equalsIgnoreCase("title")) {
-			if (!csignManager.commandSignExists(name)) {
-				sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
-				return true;
-			}
+            String cmd = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
+            csignManager.updateCommand(name, cmd);
+        } else if (a[0].equalsIgnoreCase("broadcast")) {
+            if (!csignManager.commandSignExists(name)) {
+                sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
+                return true;
+            }
+            csignManager.toggleBroadcast(name);
+            sender.sendMessage(Utils.translate("&7Toggled broadcast of &a" + name + "&7 to " + (csignManager.getCommandSign(name).isBroadcast() ? "&atrue" : "&cfalse")));
+        } else if (a[0].equalsIgnoreCase("title")) {
+            if (!csignManager.commandSignExists(name)) {
+                sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
+                return true;
+            }
 
-			String title = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
-			csignManager.updateTitle(name, title);
-			sender.sendMessage(Utils.translate("&7Set title for &a" + name + "&7 to " + title));
-		} else
-			sendHelp(sender);
+            String title = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
+            csignManager.updateTitle(name, title);
+            sender.sendMessage(Utils.translate("&7Set title for &a" + name + "&7 to " + title));
+        } else {
+            sendHelp(sender);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private static void sendHelp(CommandSender sender) {
-		sender.sendMessage(Utils.translate("&2&lCommandSigns Help"));
-		sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this menu"));
-		sender.sendMessage(Utils.translate("&a/commandsign list  &7Shows list of all command signs"));
-		sender.sendMessage(Utils.translate("&a/commandsign create <name> <x> <y> <z> <command>  &7Creates uniquely named command sign at supplied integer coordinates"));
-		sender.sendMessage(Utils.translate("&a/commandsign delete <name>  &7Deletes the specified command sign"));
-		sender.sendMessage(Utils.translate("&a/commandsign modify <name> <command>  &7Updates a sign's command"));
-		sender.sendMessage(Utils.translate("&a/commandsign broadcast <name>  &7Toggles broadcast on a sign"));
-		sender.sendMessage(Utils.translate("&a/commandsign title <name> <title>  &7Sets sign title"));
-		sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this page"));
-	}
+    private static void sendHelp(CommandSender sender) {
+        sender.sendMessage(Utils.translate("&2&lCommandSigns Help"));
+        sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this menu"));
+        sender.sendMessage(Utils.translate("&a/commandsign list  &7Shows list of all command signs"));
+        sender.sendMessage(Utils.translate("&a/commandsign create <name> <x> <y> <z> <command>  &7Creates uniquely named command sign at supplied integer coordinates"));
+        sender.sendMessage(Utils.translate("&a/commandsign delete <name>  &7Deletes the specified command sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign modify <name> <command>  &7Updates a sign's command"));
+        sender.sendMessage(Utils.translate("&a/commandsign broadcast <name>  &7Toggles broadcast on a sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign title <name> <title>  &7Sets sign title"));
+        sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this page"));
+    }
 
-	private static void showList(CommandSender sender) {
-		sender.sendMessage(Utils.translate("&7Command Signs"));
+    private static void showList(CommandSender sender) {
+        sender.sendMessage(Utils.translate("&7Command Signs"));
 
-		Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
-		for (CommandSign csign : csigns) {
-			CmdSignLocation loc = csign.getLocation();
-			sender.sendMessage(Utils.translate("&a" + csign.getName() + ": " + loc.getWorld().getName() + " (" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() + ")"));
-			sender.sendMessage(Utils.translate("  &7Command: &2&o/" + csign.getCommand()));
-			sender.sendMessage(Utils.translate("  &7Broadcast: " + (csign.isBroadcast() ? "&atrue" : "&cfalse")));
-		}
-	}
+        Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
+        for (CommandSign csign : csigns) {
+            CmdSignLocation loc = csign.getLocation();
+            sender.sendMessage(Utils.translate("&a" + csign.getName() + ": " + loc.getWorld().getName() + " (" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() + ")"));
+            sender.sendMessage(Utils.translate("  &7Command: &2&o/" + csign.getCommand()));
+            sender.sendMessage(Utils.translate("  &7Broadcast: " + (csign.isBroadcast() ? "&atrue" : "&cfalse")));
+        }
+    }
 }

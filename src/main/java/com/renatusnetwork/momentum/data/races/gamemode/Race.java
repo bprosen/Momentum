@@ -9,8 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class Race
-{
+public class Race {
+
     private RacePlayer[] players;
     private Level level;
     private int bet;
@@ -23,14 +23,12 @@ public class Race
         startTimer();
     }
 
-    public void start()
-    {
+    public void start() {
         getPlayer1().start();
         getPlayer2().start();
     }
 
-    public void end(RacePlayer winner, RaceEndReason endReason)
-    {
+    public void end(RacePlayer winner, RaceEndReason endReason) {
         // get max timer and cancel right away
         maxTimer.cancel();
 
@@ -46,8 +44,7 @@ public class Race
 
         StatsManager statsManager = Momentum.getStatsManager();
 
-        if (endReason == RaceEndReason.FORFEIT || endReason == RaceEndReason.WON)
-        {
+        if (endReason == RaceEndReason.FORFEIT || endReason == RaceEndReason.WON) {
             // administer coins, and update data
             winner.win();
             winner.sendEndTitle(winnerStats);
@@ -59,26 +56,24 @@ public class Race
                     ")&7 beat &4" + loserStats.getDisplayName() + "&c (▼" + Utils.formatNumber(loserStats.getELO()) +
                     ")&7 on &c" + level.getTitle();
 
-            if (hasBet())
+            if (hasBet()) {
                 broadcast += "&7 for &6" + Utils.formatNumber(bet) + " &eCoins";
+            }
 
             Bukkit.broadcastMessage(Utils.translate(broadcast));
-            
-            if (endReason == RaceEndReason.FORFEIT)
-            {
+
+            if (endReason == RaceEndReason.FORFEIT) {
                 String message = "&cYour opponent forfeit the race, giving a win";
 
-                if (hasBet())
+                if (hasBet()) {
                     message += " &cand the &6" + Utils.formatNumber(bet) + " &eCoins &cbet";
+                }
 
                 winnerStats.sendMessage(Utils.translate(message));
             }
-        }
-        else if (endReason == RaceEndReason.SHUTDOWN || endReason == RaceEndReason.OUT_OF_TIME)
-        {
+        } else if (endReason == RaceEndReason.SHUTDOWN || endReason == RaceEndReason.OUT_OF_TIME) {
             // give back bet and do not touch stats
-            if (hasBet())
-            {
+            if (hasBet()) {
                 boolean isOutOfTime = endReason == RaceEndReason.OUT_OF_TIME;
 
                 statsManager.addCoins(winnerStats, getBet(), isOutOfTime);
@@ -88,8 +83,7 @@ public class Race
             winnerStats.resetRace();
             loserStats.resetRace();
 
-            if (endReason == RaceEndReason.OUT_OF_TIME)
-            {
+            if (endReason == RaceEndReason.OUT_OF_TIME) {
                 winnerStats.sendMessage(Utils.translate("&cYou ran out of time to complete the race"));
                 loserStats.sendMessage(Utils.translate("&cYou ran out of time to complete the race"));
             }
@@ -98,8 +92,7 @@ public class Race
         loser.resetLevelAndTeleport();
     }
 
-    private void initPlayers(PlayerStats playerStats1, PlayerStats playerStats2)
-    {
+    private void initPlayers(PlayerStats playerStats1, PlayerStats playerStats2) {
         RacePlayer racePlayer1 = new RacePlayer(playerStats1, this, playerStats1.getPlayer().getLocation());
         RacePlayer racePlayer2 = new RacePlayer(playerStats2, this, playerStats2.getPlayer().getLocation());
 
@@ -112,23 +105,18 @@ public class Race
         playerStats2.setRace(racePlayer2);
     }
 
-    private RacePlayer getPlayer1()
-    {
+    private RacePlayer getPlayer1() {
         return players[0];
     }
 
-    private RacePlayer getPlayer2()
-    {
+    private RacePlayer getPlayer2() {
         return players[1];
     }
 
-    private void startTimer()
-    {
-        maxTimer = new BukkitRunnable()
-        {
+    private void startTimer() {
+        maxTimer = new BukkitRunnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 end(getPlayer1(), RaceEndReason.OUT_OF_TIME);
             }
         }.runTaskLater(Momentum.getPlugin(), 20 * 60 * Momentum.getSettingsManager().max_race_time);
@@ -138,13 +126,11 @@ public class Race
         return bet > 0;
     }
 
-    public Level getLevel()
-    {
+    public Level getLevel() {
         return level;
     }
 
-    public int getBet()
-    {
+    public int getBet() {
         return bet;
     }
 }
