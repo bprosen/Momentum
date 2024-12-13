@@ -346,6 +346,10 @@ public class Momentum extends JavaPlugin {
         return cmdSigns;
     }
 
+    public static SquadsManager getSquadsManager() {
+        return squadsManager;
+    }
+
     public static ViaAPI getViaVersion() {
         return viaVersion;
     }
