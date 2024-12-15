@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class InteractListener implements Listener {
 
@@ -211,10 +211,15 @@ public class InteractListener implements Listener {
             if (playerStats != null && playerStats.isLoaded() && csign != null) {
                 if (!playerStats.hasCommandSign(csign.getName())) {
                     csignManager.useCommandSign(playerStats, csign.getName());
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), csign.getCommand().replaceAll("%player%", playerStats.getName()));
+
+                    // command parsing for multiple commands
+                    String cmd = csign.getCommand();
+                    for (String s : CommandSignManager.parseCommand(cmd)) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s.replaceAll("%player%", playerStats.getName()));
+                    }
 
                     if (csign.isBroadcast()) {
-                        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + "&7 claimed the sign " + csign.getTitle()));
+                        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + "&7 claimed the sign &2" + csign.getTitle()));
                     } else {
                         player.sendMessage(Utils.translate("&aYou have claimed this sign"));
                     }

@@ -4,6 +4,7 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.World;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandSignManager {
 
@@ -76,5 +77,13 @@ public class CommandSignManager {
 
     public Collection<CommandSign> getCommandSigns() {
         return cmdSigns.values();
+    }
+
+    // splits string at every ampersand character ('&') if and only if it is not escaped (preceded by a backslash) ('\')
+    // returns list with each entry being the argument split according to the above criteria
+    public static List<String> parseCommand(String cmd) {
+        // first regex: negative look behind, only matches ampersands preceded by a backslash
+        // second regex: positive look ahead, only matches backslashes followed by an ampersand
+        return Arrays.stream(cmd.split("(?<!\\\\)&")).filter(s -> !s.isEmpty()).map(s -> s.replaceAll("\\\\(?=&)", "")).collect(Collectors.toList());
     }
 }

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class CommandSignCMD implements CommandExecutor {
 
@@ -84,6 +85,7 @@ public class CommandSignCMD implements CommandExecutor {
 
             String cmd = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
             csignManager.updateCommand(name, cmd);
+            sender.sendMessage(Utils.translate("&aSuccessfully updated command(s) for &2" + name));
         } else if (a[0].equalsIgnoreCase("broadcast")) {
             if (!csignManager.commandSignExists(name)) {
                 sender.sendMessage(Utils.translate("&cNo command sign exists with name &4" + name));
@@ -99,7 +101,7 @@ public class CommandSignCMD implements CommandExecutor {
 
             String title = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
             csignManager.updateTitle(name, title);
-            sender.sendMessage(Utils.translate("&7Set title for &a" + name + "&7 to " + title));
+            sender.sendMessage(Utils.translate("&7Set title for &2" + name + "&7 to &a" + title));
         } else {
             sendHelp(sender);
         }
@@ -116,7 +118,6 @@ public class CommandSignCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/commandsign modify <name> <command>  &7Updates a sign's command"));
         sender.sendMessage(Utils.translate("&a/commandsign broadcast <name>  &7Toggles broadcast on a sign"));
         sender.sendMessage(Utils.translate("&a/commandsign title <name> <title>  &7Sets sign title"));
-        sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this page"));
     }
 
     private static void showList(CommandSender sender) {
@@ -125,8 +126,12 @@ public class CommandSignCMD implements CommandExecutor {
         Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
         for (CommandSign csign : csigns) {
             CmdSignLocation loc = csign.getLocation();
+            List<String> cmds = CommandSignManager.parseCommand(csign.getCommand());
             sender.sendMessage(Utils.translate("&a" + csign.getName() + ": " + loc.getWorld().getName() + " (" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() + ")"));
-            sender.sendMessage(Utils.translate("  &7Command: &2&o/" + csign.getCommand()));
+            sender.sendMessage(Utils.translate("  &7Command(s):"));
+            for (String s : cmds) {
+                sender.sendMessage(Utils.translate("    &2&o/") + s);
+            }
             sender.sendMessage(Utils.translate("  &7Broadcast: " + (csign.isBroadcast() ? "&atrue" : "&cfalse")));
         }
     }
