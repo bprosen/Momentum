@@ -113,9 +113,13 @@ public class CommandSignCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&2&lCommandSigns Help"));
         sender.sendMessage(Utils.translate("&a/commandsign help  &7Displays this menu"));
         sender.sendMessage(Utils.translate("&a/commandsign list  &7Shows list of all command signs"));
-        sender.sendMessage(Utils.translate("&a/commandsign create <name> <x> <y> <z> <command>  &7Creates uniquely named command sign at supplied integer coordinates"));
-        sender.sendMessage(Utils.translate("&a/commandsign delete <name>  &7Deletes the specified command sign"));
-        sender.sendMessage(Utils.translate("&a/commandsign modify <name> <command>  &7Updates a sign's command"));
+        sender.sendMessage(Utils.translate("&a/commandsign show <name>  &7Displays details of a command sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign create <name> <x> <y> <z> [command]  &7Creates uniquely named command sign at supplied integer coordinates"));
+        sender.sendMessage(Utils.translate("    &2&ooptional &2[command]  &7aAdds the singular command to the created command sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign delete <name> &7Deletes the specified command sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign modify <name> <index> <command>  &7Updates a sign's command at the specified index"));
+        sender.sendMessage(Utils.translate("&a/commandsign add <name> <command>  &7Adds a command to the command sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign remove <name> <index>  &7Removes the command at the specified index from the command sign"));
         sender.sendMessage(Utils.translate("&a/commandsign broadcast <name>  &7Toggles broadcast on a sign"));
         sender.sendMessage(Utils.translate("&a/commandsign title <name> <title>  &7Sets sign title"));
     }
@@ -126,11 +130,11 @@ public class CommandSignCMD implements CommandExecutor {
         Collection<CommandSign> csigns = Momentum.getCommandSignManager().getCommandSigns();
         for (CommandSign csign : csigns) {
             CmdSignLocation loc = csign.getLocation();
-            List<String> cmds = CommandSignManager.parseCommand(csign.getCommand());
+            List<String> cmds = csign.getCommands();
             sender.sendMessage(Utils.translate("&a" + csign.getName() + ": " + loc.getWorld().getName() + " (" + loc.getX() + ", " + loc.getY() + ", " + loc.getZ() + ")"));
             sender.sendMessage(Utils.translate("  &7Command(s):"));
-            for (String s : cmds) {
-                sender.sendMessage(Utils.translate("    &2&o/") + s);
+            for (int i = 0; i < cmds.size(); i++) {
+                sender.sendMessage(Utils.translate("    &2&o" + (i + 1) + ". /") + cmds.get(i));
             }
             sender.sendMessage(Utils.translate("  &7Broadcast: " + (csign.isBroadcast() ? "&atrue" : "&cfalse")));
         }

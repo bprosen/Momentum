@@ -75,6 +75,7 @@ public class TablesDB {
         createBankBids();
         createCommandSigns();
         createUsedCommandSigns();
+        createCommandSignsCommands();
     }
 
     private static void createKeys() {
@@ -103,6 +104,7 @@ public class TablesDB {
         createBankWeeksKeys();
         createBankBidsKeys();
         createUsedCommandSignsKeys();
+        createCommandSignsCommandsKeys();
     }
 
     private static void createPlayers() {
@@ -916,12 +918,13 @@ public class TablesDB {
                 "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS + "(" +
                 "name VARCHAR(20) NOT NULL, " +
                 "title VARCHAR(50) DEFAULT NULL, " +
-                "command VARCHAR(100) DEFAULT NULL, " +
+                // "command VARCHAR(100) DEFAULT NULL, " + // moved to a cmds db
                 "world VARCHAR(30) NOT NULL, " +
                 "x INT NOT NULL, " +
                 "y INT NOT NULL, " +
                 "z INT NOT NULL, " +
                 "broadcast BIT DEFAULT 0, " +
+                // primary keys
                 "PRIMARY KEY (name)" +
                 ")";
 
@@ -942,6 +945,18 @@ public class TablesDB {
         DatabaseQueries.runQuery(query);
     }
 
+    private static void createCommandSignsCommands() {
+        String query =
+                "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + "(" +
+                "name VARCHAR(20) NOT NULL, " +
+                "command VARCHAR(100) DEFAULT NULL, " +
+                // primary keys
+                "PRIMARY KEY (name)" +
+                ")";
+
+        DatabaseQueries.runQuery(query);
+    }
+
     private static void createUsedCommandSignsKeys() {
         String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.USED_COMMAND_SIGNS +
                                  "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_uuid_fk " +
@@ -949,6 +964,16 @@ public class TablesDB {
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
                                  "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_name_fk " +
+                                 "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (name) " +
+                                 "ON UPDATE CASCADE " +
+                                 "ON DELETE CASCADE";
+
+        DatabaseQueries.runQuery(foreignKeyQuery);
+    }
+
+    private static void createCommandSignsCommandsKeys() {
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.COMMAND_SIGNS_COMMANDS +
+                                 "ADD CONSTRAINT " + DatabaseManager.COMMAND_SIGNS_COMMANDS + "_name_fk " +
                                  "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (name) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";

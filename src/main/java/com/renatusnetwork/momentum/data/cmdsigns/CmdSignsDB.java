@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CmdSignsDB {
 
@@ -21,7 +22,13 @@ public class CmdSignsDB {
 
         for (Map<String, String> result : results) {
             String name = result.get("name");
-            String command = result.get("command");
+            // String command = result.get("command");
+            List<String> commands = DatabaseQueries.getResults(
+                    DatabaseManager.COMMAND_SIGNS_COMMANDS,
+                    "*",
+                    "WHERE name=?",
+                    name
+            ).stream().map(res -> res.get("command")).collect(Collectors.toList());
             String title = result.get("title");
             World world = Bukkit.getWorld(result.get("world"));
             int x = Integer.parseInt(result.get("x"));
@@ -29,7 +36,7 @@ public class CmdSignsDB {
             int z = Integer.parseInt(result.get("z"));
             boolean broadcast = Integer.parseInt(result.get("broadcast")) == 1;
 
-            temp.put(name, new CommandSign(name, title, command, new CmdSignLocation(world, x, y, z), broadcast));
+            temp.put(name, new CommandSign(name, title, commands, new CmdSignLocation(world, x, y, z), broadcast));
         }
 
         return temp;
@@ -76,10 +83,24 @@ public class CmdSignsDB {
         );
     }
 
-    public static void updateCommand(String name, String newCommand) {
+    public static void updateCommand(String name, String oldCommand, String newCommand) {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.COMMAND_SIGNS + " SET command=? WHERE name=?",
-                newCommand, name
+                "UPDATE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " SET command=? WHERE name=? AND command=?",
+                newCommand, name, oldCommand
+        );
+    }
+
+    public static void addCommand(String name, String command) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " (name, command) VALUES (?,?)",
+                name, command
+        );
+    }
+
+    public static void removeCommand(String name, String command) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " WHERE name=? AND command=?",
+                name, command
         );
     }
 

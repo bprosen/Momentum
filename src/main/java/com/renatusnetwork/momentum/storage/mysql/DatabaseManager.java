@@ -42,6 +42,7 @@ public class DatabaseManager {
     public static final String BANK_BIDS = "bank_bids";
     public static final String COMMAND_SIGNS = "command_signs";
     public static final String USED_COMMAND_SIGNS = "used_command_signs";
+    public static final String COMMAND_SIGNS_COMMANDS = "command_signs_commands";
 
     public DatabaseManager(Plugin plugin) {
         connection = new DatabaseConnection();

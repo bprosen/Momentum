@@ -27,7 +27,7 @@ public class CommandSignManager {
 
     public void addCommandSign(String name, String command, World world, int x, int y, int z) {
         CmdSignLocation loc = new CmdSignLocation(world, x, y, z);
-        CommandSign csign = new CommandSign(name, null, command, loc, false);
+        CommandSign csign = new CommandSign(name, null, Collections.singletonList(command), loc, false);
 
         cmdSigns.put(name, csign);
         locations.put(loc, csign);
@@ -62,9 +62,20 @@ public class CommandSignManager {
         return locations.containsKey(location);
     }
 
-    public void updateCommand(String name, String newCommand) {
-        cmdSigns.get(name).updateCommand(newCommand);
-        CmdSignsDB.updateCommand(name, newCommand);
+    public void updateCommand(String name, int index, String newCommand) {
+        String oldCommand = cmdSigns.get(name).getCommands().get(index);
+        cmdSigns.get(name).updateCommand(index, newCommand);
+        CmdSignsDB.updateCommand(name, oldCommand, newCommand);
+    }
+
+    public void addCommand(String name, String command) {
+        cmdSigns.get(name).addCommand(command);
+        CmdSignsDB.addCommand(name, command);
+    }
+
+    public void removeCommand(String name, int index) {
+        String cmd = cmdSigns.get(name).removeCommand(index);
+        CmdSignsDB.removeCommand(name, cmd);
     }
 
     public CommandSign getCommandSign(String name) {
@@ -77,13 +88,5 @@ public class CommandSignManager {
 
     public Collection<CommandSign> getCommandSigns() {
         return cmdSigns.values();
-    }
-
-    // splits string at every ampersand character ('&') if and only if it is not escaped (preceded by a backslash) ('\')
-    // returns list with each entry being the argument split according to the above criteria
-    public static List<String> parseCommand(String cmd) {
-        // first regex: negative look behind, only matches ampersands preceded by a backslash
-        // second regex: positive look ahead, only matches backslashes followed by an ampersand
-        return Arrays.stream(cmd.split("(?<!\\\\)&")).filter(s -> !s.isEmpty()).map(s -> s.replaceAll("\\\\(?=&)", "")).collect(Collectors.toList());
     }
 }

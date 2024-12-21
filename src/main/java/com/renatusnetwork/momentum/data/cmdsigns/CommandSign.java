@@ -1,17 +1,19 @@
 package com.renatusnetwork.momentum.data.cmdsigns;
 
+import java.util.List;
+
 public class CommandSign {
 
     private String name;
     private String title;
-    private String command;
+    private List<String> commands;
     private CmdSignLocation location;
     private boolean broadcast;
 
-    public CommandSign(String name, String title, String command, CmdSignLocation location, boolean broadcast) {
+    public CommandSign(String name, String title, List<String> commands, CmdSignLocation location, boolean broadcast) {
         this.name = name;
         this.title = title;
-        this.command = command;
+        this.commands = commands;
         this.location = location;
         this.broadcast = broadcast;
     }
@@ -24,12 +26,21 @@ public class CommandSign {
         return this.location;
     }
 
-    public String getCommand() {
-        return this.command;
+    public List<String> getCommands() {
+        return this.commands;
     }
 
-    public void updateCommand(String newCommand) {
-        this.command = newCommand;
+    public void updateCommand(int index, String newCommand) {
+        this.commands.set(index, newCommand);
+    }
+
+    public void addCommand(String newCommand) {
+        this.commands.add(newCommand);
+    }
+
+    // returns the command that was removed
+    public String removeCommand(int index) {
+        return this.commands.remove(index);
     }
 
     public boolean isBroadcast() {
