@@ -918,7 +918,6 @@ public class TablesDB {
                 "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS + "(" +
                 "name VARCHAR(20) NOT NULL, " +
                 "title VARCHAR(50) DEFAULT NULL, " +
-                // "command VARCHAR(100) DEFAULT NULL, " + // moved to a cmds db
                 "world VARCHAR(30) NOT NULL, " +
                 "x INT NOT NULL, " +
                 "y INT NOT NULL, " +

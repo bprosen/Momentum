@@ -22,13 +22,7 @@ public class CmdSignsDB {
 
         for (Map<String, String> result : results) {
             String name = result.get("name");
-            // String command = result.get("command");
-            List<String> commands = DatabaseQueries.getResults(
-                    DatabaseManager.COMMAND_SIGNS_COMMANDS,
-                    "*",
-                    "WHERE name=?",
-                    name
-            ).stream().map(res -> res.get("command")).collect(Collectors.toList());
+            List<String> commands = loadCommandSignCommands(name);
             String title = result.get("title");
             World world = Bukkit.getWorld(result.get("world"));
             int x = Integer.parseInt(result.get("x"));
@@ -53,6 +47,15 @@ public class CmdSignsDB {
         for (Map<String, String> result : results) {
             playerStats.addCommandSign(result.get("name"));
         }
+    }
+
+    private static List<String> loadCommandSignCommands(String name) {
+        return DatabaseQueries.getResults(
+                DatabaseManager.COMMAND_SIGNS_COMMANDS,
+                "*",
+                "WHERE name=?",
+                name
+        ).stream().map(res -> res.get("command")).collect(Collectors.toList());
     }
 
     public static void insertCommandSign(String name, String command, String world, int x, int y, int z) {
@@ -85,7 +88,7 @@ public class CmdSignsDB {
 
     public static void updateCommand(String name, String oldCommand, String newCommand) {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " SET command=? WHERE name=? AND command=?",
+                "UPDATE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " SET command=? WHERE name=? AND command=? LIMIT 1", // limit 1 for duplicate commands
                 newCommand, name, oldCommand
         );
     }
@@ -99,7 +102,7 @@ public class CmdSignsDB {
 
     public static void removeCommand(String name, String command) {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " WHERE name=? AND command=?",
+                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " WHERE name=? AND command=? LIMIT 1", // limit 1 for duplicate commands
                 name, command
         );
     }
