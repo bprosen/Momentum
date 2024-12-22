@@ -90,6 +90,11 @@ public class CommandSignManager {
         return true;
     }
 
+    public void clearCommands(String name) {
+        cmdSigns.get(name).clearCommands();
+        CmdSignsDB.removeAllCommands(name);
+    }
+
     public CommandSign getCommandSign(String name) {
         return cmdSigns.get(name);
     }

@@ -163,6 +163,12 @@ public class CommandSignCMD implements CommandExecutor {
                     return true;
                 }
 
+                if (a[2].equalsIgnoreCase("all")) {
+                    csignManager.clearCommands(name);
+                    sender.sendMessage(Utils.translate("&aSuccessfully removed all commands for &2" + name));
+                    break;
+                }
+
                 try {
                     index = Integer.parseInt(a[2]) - 1; // minus one since the displayed list in game is shifted to start at 1 instead of 0 for practicality
                 } catch (NumberFormatException ignore) {
@@ -191,7 +197,7 @@ public class CommandSignCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/commandsign delete <name> &7Deletes the specified command sign"));
         sender.sendMessage(Utils.translate("&a/commandsign modify <name> <index> <command>  &7Updates a sign's command at the specified index"));
         sender.sendMessage(Utils.translate("&a/commandsign add <name> <command>  &7Adds a command to the command sign"));
-        sender.sendMessage(Utils.translate("&a/commandsign remove <name> <index>  &7Removes the command at the specified index from the command sign"));
+        sender.sendMessage(Utils.translate("&a/commandsign remove <name> <index|all>  &7Removes the command at the specified index, or all commands, from the command sign"));
         sender.sendMessage(Utils.translate("&a/commandsign broadcast <name>  &7Toggles broadcast on a sign"));
         sender.sendMessage(Utils.translate("&a/commandsign title <name> <title>  &7Sets sign title"));
     }

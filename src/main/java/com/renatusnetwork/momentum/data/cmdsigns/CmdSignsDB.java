@@ -107,6 +107,13 @@ public class CmdSignsDB {
         );
     }
 
+    public static void removeAllCommands(String name) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " WHERE name=?",
+                name
+        );
+    }
+
     public static void toggleBroadcast(String name) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.COMMAND_SIGNS + " SET broadcast=NOT broadcast WHERE name=?", name

@@ -4,10 +4,10 @@ import java.util.List;
 
 public class CommandSign {
 
-    private String name;
+    private final String name;
     private String title;
-    private List<String> commands;
-    private CmdSignLocation location;
+    private final List<String> commands;
+    private final CmdSignLocation location;
     private boolean broadcast;
 
     public CommandSign(String name, String title, List<String> commands, CmdSignLocation location, boolean broadcast) {
@@ -41,6 +41,10 @@ public class CommandSign {
     // returns the command that was removed
     public String removeCommand(int index) {
         return this.commands.remove(index);
+    }
+
+    public void clearCommands() {
+        this.commands.clear();
     }
 
     public boolean isBroadcast() {
