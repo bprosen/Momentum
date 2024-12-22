@@ -212,9 +212,7 @@ public class InteractListener implements Listener {
                 if (!playerStats.hasCommandSign(csign.getName())) {
                     csignManager.useCommandSign(playerStats, csign.getName());
 
-                    // command parsing for multiple commands
-                    String cmd = csign.getCommand();
-                    for (String s : CommandSignManager.parseCommand(cmd)) {
+                    for (String s : csign.getCommands()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s.replaceAll("%player%", playerStats.getName()));
                     }
 
