@@ -27,7 +27,7 @@ public class CommandSignManager {
 
     public void addCommandSign(String name, String command, World world, int x, int y, int z) {
         CmdSignLocation loc = new CmdSignLocation(world, x, y, z);
-        CommandSign csign = new CommandSign(name, null, Collections.singletonList(command), loc, false);
+        CommandSign csign = new CommandSign(name, null, command == null ? new ArrayList<>() : Collections.singletonList(command), loc, false);
 
         cmdSigns.put(name, csign);
         locations.put(loc, csign);
@@ -62,10 +62,16 @@ public class CommandSignManager {
         return locations.containsKey(location);
     }
 
-    public void updateCommand(String name, int index, String newCommand) {
-        String oldCommand = cmdSigns.get(name).getCommands().get(index);
-        cmdSigns.get(name).updateCommand(index, newCommand);
+    // returns true if index is in bounds
+    public boolean updateCommand(String name, int index, String newCommand) {
+        CommandSign csign = cmdSigns.get(name);
+        if (index < 0 || index >= csign.getCommands().size()) {
+            return false;
+        }
+        String oldCommand = csign.getCommands().get(index);
+        csign.updateCommand(index, newCommand);
         CmdSignsDB.updateCommand(name, oldCommand, newCommand);
+        return true;
     }
 
     public void addCommand(String name, String command) {
@@ -73,9 +79,15 @@ public class CommandSignManager {
         CmdSignsDB.addCommand(name, command);
     }
 
-    public void removeCommand(String name, int index) {
+    // returns true if index is in bounds
+    public boolean removeCommand(String name, int index) {
+        CommandSign csign = cmdSigns.get(name);
+        if (index < 0 || index >= csign.getCommands().size()) {
+            return false;
+        }
         String cmd = cmdSigns.get(name).removeCommand(index);
         CmdSignsDB.removeCommand(name, cmd);
+        return true;
     }
 
     public CommandSign getCommandSign(String name) {
