@@ -55,7 +55,7 @@ public class SquadsCMD implements CommandExecutor {
 					noSquad(sender);
 				else {
 					player.sendMessage(Utils.translate("&9Squad Members:"));
-					squadsManager.getSquadMembers(squad).forEach(member -> player.sendMessage(Utils.translate("&9Sq -" + member.getDisplayName())));
+					squadsManager.getSquadMembers(squad).keySet().forEach(member -> player.sendMessage(Utils.translate("&9Sq -" + member.getDisplayName())));
 				}
 
 				break;
@@ -126,14 +126,19 @@ public class SquadsCMD implements CommandExecutor {
 			case "leave":
 				if (squad == null)
 					noSquad(sender);
-				else if (SquadsManager.isLeader(player))
-					player.sendMessage(Utils.translate("&cYou must transfer squad ownership before leaving the squad!"));
 				else {
+					boolean leader = SquadsManager.isLeader(player);
 					squadsManager.leave(player);
 					SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas left the squad");
 					player.sendMessage(Utils.translate("&3You have left the squad"));
-					if (squad.size() == 1)
+					if (squad.size() <= 1) {
 						SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
+						squadsManager.disband(squad);
+					} else if (leader) {
+						PlayerStats newLeader = squadsManager.getOldestMember(squad, player);
+						squadsManager.promote(newLeader);
+						SquadsManager.notifyMembers(squad, "&9SC " + newLeader.getDisplayName() + " &bhas been promoted to squad leader");
+					}
 				}
 
 				break;

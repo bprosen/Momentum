@@ -6,6 +6,7 @@ import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.*;
 
 public class SquadsManager {
@@ -64,19 +65,17 @@ public class SquadsManager {
 	}
 
 	public void disband(Squad squad) {
-		for (PlayerStats member : squad.getSquadMembers()) {
+		for (PlayerStats member : squad.getSquadMembers().keySet()) {
 			inSquadChat.remove(member);
 			member.updateSquad(null);
 		}
-		Momentum.getPluginLogger().info(offlineCache.toString());
+		squad.removeAllMembers();
 		offlineCache.values().removeAll(Collections.singleton(squad)); // if the squad doesnt exist anymore, no need to keep cache for offline players
-		Momentum.getPluginLogger().info(offlineCache.toString());
-		squad = null;
 	}
 
 	public void warpMembers(PlayerStats leader) {
 		Squad squad = leader.getSquad();
-		squad.getSquadMembers().stream().filter(member -> !member.equals(leader) && (!member.inLevel() || !leader.getLevel().equals(member.getLevel()))).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
+		squad.getSquadMembers().keySet().stream().filter(member -> !member.equals(leader) && (!member.inLevel() || !leader.getLevel().equals(member.getLevel()))).forEach(member -> Momentum.getLevelManager().teleportToLevel(member, leader.getLevel()));
 		squad.setWarpCooldown(true);
 		new BukkitRunnable() {
 			@Override
@@ -109,28 +108,28 @@ public class SquadsManager {
 		return inSquadChat.contains(member);
 	}
 
-	public Collection<PlayerStats> getSquadMembers(Squad squad) {
+	public Map<PlayerStats, Instant> getSquadMembers(Squad squad) {
 		return squad.getSquadMembers();
 	}
 
 	public void sendMessage(PlayerStats member, String message, boolean self) {
 		Squad squad = member.getSquad();
-		for (PlayerStats m : squad.getSquadMembers()) {
+		for (PlayerStats m : squad.getSquadMembers().keySet()) {
 			if (!self && m.equals(member))
 				continue;
 			m.sendMessage(Utils.translate(message));
 		}
 
 		// chat spy persists through relogs so player needs to be online
-		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getPlayer()) != null && !squad.getSquadMembers().contains(spy)).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message)));
+		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getPlayer()) != null && squad.getSquadMembers().get(spy) == null).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message))); //sqspy since sspy looks like social spy
 	}
 
 	public static void notifyMembers(Squad squad, String message) {
-		squad.getSquadMembers().forEach(member -> member.sendMessage(Utils.translate(message)));
+		squad.getSquadMembers().keySet().forEach(member -> member.sendMessage(Utils.translate(message)));
 	}
 
 	public static void notifyMembers(Squad squad, String message, PlayerStats... except) {
-		squad.getSquadMembers().stream().filter(member -> !Arrays.asList(except).contains(member)).forEach(member -> member.sendMessage(Utils.translate(message)));
+		squad.getSquadMembers().keySet().stream().filter(member -> !Arrays.asList(except).contains(member)).forEach(member -> member.sendMessage(Utils.translate(message)));
 	}
 
 	public void notifySqChatSpies(String message) {
@@ -143,7 +142,7 @@ public class SquadsManager {
 	}
 
 	public static boolean isMember(Squad squad, PlayerStats member) {
-		return squad.getSquadMembers().contains(member);
+		return squad.getSquadMembers().get(member) != null;
 	}
 
 	public void addOffline(String uuid, Squad squad) {
@@ -156,5 +155,33 @@ public class SquadsManager {
 
 	public void removeOffline(String uuid) {
 		offlineCache.remove(uuid);
+	}
+
+	public boolean hasOfflineCache(Squad squad) {
+		return offlineCache.containsValue(squad);
+	}
+
+	public PlayerStats getOldestMember(Squad squad, PlayerStats... exclude) {
+		List<PlayerStats> exceptions = Arrays.asList(exclude);
+		Map.Entry<PlayerStats, Instant> oldest = null;
+		for (Map.Entry<PlayerStats, Instant> e : squad.getSquadMembers().entrySet()) {
+			PlayerStats member = e.getKey();
+			if (exceptions.contains(member))
+				continue;
+
+			if (oldest == null) {
+				oldest = e;
+				continue;
+			}
+
+			Instant now = Instant.now();
+			Instant memberInstant = e.getValue();
+			if (now.compareTo(memberInstant) >= now.compareTo(oldest.getValue())) {
+				oldest = e;
+			}
+		}
+
+		// will return nullptr exception if exclude includes all squad members or if the squad is empty
+		return oldest.getKey();
 	}
 }
