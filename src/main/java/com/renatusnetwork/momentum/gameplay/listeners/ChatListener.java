@@ -35,11 +35,8 @@ public class ChatListener implements Listener {
 
                 // SquadManager#sendMessage handles chatspy messages
                 squadsManager.sendMessage(playerStats, "&9SC &3" + playerStats.getDisplayName() + " &b" + msg, true);
-                Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " " + ChatColor.stripColor(msg));
-            }
-            // iterate through the smaller list first
-
-            if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName())) {
+                Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " - " + ChatColor.stripColor(msg));
+            } else if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName())) { // iterate through the smaller list first
                 event.getRecipients().clear();
 
                 // cancel event, clear recipients, and send to clan members
