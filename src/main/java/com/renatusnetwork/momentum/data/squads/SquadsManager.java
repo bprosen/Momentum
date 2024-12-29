@@ -65,10 +65,10 @@ public class SquadsManager {
 	}
 
 	public void disband(Squad squad) {
-		for (PlayerStats member : squad.getSquadMembers().keySet()) {
+		squad.getSquadMembers().keySet().forEach(member -> {
 			inSquadChat.remove(member);
 			member.resetSquad();
-		}
+		});
 		squad.clearMembers();
 		offlineCache.values().removeAll(Collections.singleton(squad)); // if the squad doesnt exist anymore, no need to keep cache for offline players
 	}
@@ -114,11 +114,7 @@ public class SquadsManager {
 
 	public void sendMessage(PlayerStats member, String message, boolean self) {
 		Squad squad = member.getSquad();
-		for (PlayerStats m : squad.getSquadMembers().keySet()) {
-			if (!self && m.equals(member))
-				continue;
-			m.sendMessage(Utils.translate(message));
-		}
+		squad.getSquadMembers().keySet().stream().filter(m -> !self && m.equals(member)).forEach(m -> m.sendMessage(Utils.translate(message)));
 
 		// chat spy persists through relogs so player needs to be online
 		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getPlayer()) != null && squad.getSquadMembers().get(spy) == null).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message))); //sqspy since sspy looks like social spy
@@ -163,25 +159,9 @@ public class SquadsManager {
 
 	public PlayerStats getOldestMember(Squad squad, PlayerStats... exclude) {
 		Set<PlayerStats> exceptions = Sets.newHashSet(exclude);
-		Map.Entry<PlayerStats, Long> oldest = null;
-		for (Map.Entry<PlayerStats, Long> e : squad.getSquadMembers().entrySet()) {
-			PlayerStats member = e.getKey();
-			if (exceptions.contains(member))
-				continue;
-
-			if (oldest == null) {
-				oldest = e;
-				continue;
-			}
-
-			long oldestTime = oldest.getValue();
-			long memberTime = e.getValue();
-			if (memberTime - oldestTime <= 0) {
-				oldest = e;
-			}
-		}
-
-		// will return nullptr exception if exclude includes all squad members or if the squad is empty (which shouldnt happen)
-		return oldest.getKey();
+		Optional<Map.Entry<PlayerStats, Long>> opt = squad.getSquadMembers().entrySet().stream().filter(entry -> !exceptions.contains(entry.getKey())).reduce((e1, e2) -> e1.getValue() >= e2.getValue() ? e2 : e1);
+		// will never return null unless all squad members are excluded in the exclude parameter or there are no members in the squad
+		// which neither of these cases should ever happen
+		return opt.map(Map.Entry::getKey).orElse(null);
 	}
 }

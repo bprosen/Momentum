@@ -59,17 +59,13 @@ public class Squad {
 		}
 
 		public Builder addMembers(Set<PlayerStats> members) {
-			for (PlayerStats member : members) {
-				this.members.put(member, System.currentTimeMillis());
-			}
+			members.forEach(member -> this.members.put(member, System.currentTimeMillis()));
 			return this;
 		}
 
 		public Builder setMembers(Set<PlayerStats> members) {
 			this.members.clear();
-			for (PlayerStats member : members) {
-				this.members.put(member, System.currentTimeMillis());
-			}
+			members.forEach(member -> this.members.put(member, System.currentTimeMillis()));
 			return this;
 		}
 
