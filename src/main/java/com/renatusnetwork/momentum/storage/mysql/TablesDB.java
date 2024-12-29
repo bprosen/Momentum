@@ -950,7 +950,7 @@ public class TablesDB {
                 "name VARCHAR(20) NOT NULL, " +
                 "command VARCHAR(100) DEFAULT NULL, " +
                 // primary keys
-                "PRIMARY KEY (name)" +
+                "PRIMARY KEY (name, command)" +
                 ")";
 
         DatabaseQueries.runQuery(query);
