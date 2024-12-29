@@ -7,7 +7,6 @@ import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
 import java.util.*;
 
 public class SquadsManager {
@@ -70,7 +69,7 @@ public class SquadsManager {
 			inSquadChat.remove(member);
 			member.updateSquad(null);
 		}
-		squad.removeAllMembers();
+		squad.clearMembers();
 		offlineCache.values().removeAll(Collections.singleton(squad)); // if the squad doesnt exist anymore, no need to keep cache for offline players
 	}
 

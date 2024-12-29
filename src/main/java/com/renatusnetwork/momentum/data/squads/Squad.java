@@ -26,7 +26,7 @@ public class Squad {
 
 	protected void removeMember(PlayerStats member) { squadMembers.remove(member); }
 
-	protected void removeAllMembers() { squadMembers.clear(); }
+	protected void clearMembers() { squadMembers.clear(); }
 
 	protected void setLeader(PlayerStats newLeader) { this.squadLeader = newLeader; }
 
