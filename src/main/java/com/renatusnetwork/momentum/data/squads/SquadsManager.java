@@ -1,5 +1,6 @@
 package com.renatusnetwork.momentum.data.squads;
 
+import com.google.common.collect.Sets;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -108,7 +109,7 @@ public class SquadsManager {
 		return inSquadChat.contains(member);
 	}
 
-	public Map<PlayerStats, Instant> getSquadMembers(Squad squad) {
+	public Map<PlayerStats, Long> getSquadMembers(Squad squad) {
 		return squad.getSquadMembers();
 	}
 
@@ -162,9 +163,9 @@ public class SquadsManager {
 	}
 
 	public PlayerStats getOldestMember(Squad squad, PlayerStats... exclude) {
-		List<PlayerStats> exceptions = Arrays.asList(exclude);
-		Map.Entry<PlayerStats, Instant> oldest = null;
-		for (Map.Entry<PlayerStats, Instant> e : squad.getSquadMembers().entrySet()) {
+		Set<PlayerStats> exceptions = Sets.newHashSet(exclude);
+		Map.Entry<PlayerStats, Long> oldest = null;
+		for (Map.Entry<PlayerStats, Long> e : squad.getSquadMembers().entrySet()) {
 			PlayerStats member = e.getKey();
 			if (exceptions.contains(member))
 				continue;
@@ -174,14 +175,14 @@ public class SquadsManager {
 				continue;
 			}
 
-			Instant now = Instant.now();
-			Instant memberInstant = e.getValue();
-			if (now.compareTo(memberInstant) >= now.compareTo(oldest.getValue())) {
+			long oldestTime = oldest.getValue();
+			long memberTime = e.getValue();
+			if (memberTime - oldestTime <= 0) {
 				oldest = e;
 			}
 		}
 
-		// will return nullptr exception if exclude includes all squad members or if the squad is empty
+		// will return nullptr exception if exclude includes all squad members or if the squad is empty (which shouldnt happen)
 		return oldest.getKey();
 	}
 }

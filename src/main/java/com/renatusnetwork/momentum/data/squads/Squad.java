@@ -2,12 +2,11 @@ package com.renatusnetwork.momentum.data.squads;
 
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 
-import java.time.Instant;
 import java.util.*;
 
 public class Squad {
 	private PlayerStats squadLeader;
-	private final Map<PlayerStats, Instant> squadMembers; // includes squad leader
+	private final Map<PlayerStats, Long> squadMembers; // includes squad leader
 	private final Set<PlayerStats> outgoingInvites;
 	private boolean warpCooldown;
 
@@ -17,13 +16,13 @@ public class Squad {
 		this.outgoingInvites = new HashSet<>();
 	}
 
-	private Squad(PlayerStats leader, Map<PlayerStats, Instant> members) {
+	private Squad(PlayerStats leader, Map<PlayerStats, Long> members) {
 		this.squadLeader = leader;
 		this.squadMembers = members;
 		this.outgoingInvites = new HashSet<>();
 	}
 
-	protected void addMember(PlayerStats member) { squadMembers.put(member, Instant.now()); }
+	protected void addMember(PlayerStats member) { squadMembers.put(member, System.currentTimeMillis()); }
 
 	protected void removeMember(PlayerStats member) { squadMembers.remove(member); }
 
@@ -38,7 +37,7 @@ public class Squad {
 	protected void removeInvite(PlayerStats invitee) { outgoingInvites.remove(invitee); }
 
 	protected PlayerStats getSquadLeader() { return this.squadLeader; }
-	protected Map<PlayerStats, Instant> getSquadMembers() { return this.squadMembers; }
+	protected Map<PlayerStats, Long> getSquadMembers() { return this.squadMembers; }
 
 	public int size() { return squadMembers.size(); }
 
@@ -46,8 +45,8 @@ public class Squad {
 	protected void setWarpCooldown(boolean cooldown) { warpCooldown = cooldown; }
 
 	public static class Builder {
-		private PlayerStats leader = null;
-		private Map<PlayerStats, Instant> members = new HashMap<>();
+		private PlayerStats leader;
+		private final Map<PlayerStats, Long> members = new HashMap<>();
 
 		public static Builder create() {
 			return new Builder();
@@ -55,13 +54,13 @@ public class Squad {
 
 		public Builder setLeader(PlayerStats leader) {
 			this.leader = leader;
-			this.members.put(leader, Instant.now());
+			this.members.put(leader, System.currentTimeMillis());
 			return this;
 		}
 
 		public Builder addMembers(Set<PlayerStats> members) {
 			for (PlayerStats member : members) {
-				this.members.put(member, Instant.now());
+				this.members.put(member, System.currentTimeMillis());
 			}
 			return this;
 		}
@@ -69,13 +68,13 @@ public class Squad {
 		public Builder setMembers(Set<PlayerStats> members) {
 			this.members.clear();
 			for (PlayerStats member : members) {
-				this.members.put(member, Instant.now());
+				this.members.put(member, System.currentTimeMillis());
 			}
 			return this;
 		}
 
 		public Builder addMember(PlayerStats member) {
-			members.put(member, Instant.now());
+			members.put(member, System.currentTimeMillis());
 			return this;
 		}
 
