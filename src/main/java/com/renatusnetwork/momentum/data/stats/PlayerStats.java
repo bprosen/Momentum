@@ -1174,8 +1174,11 @@ public class PlayerStats {
     public Squad getSquad() {
         return this.squad;
     }
-    public void updateSquad(@Nullable Squad squad) {
+    public void updateSquad(Squad squad) {
         this.squad = squad;
+    }
+    public void resetSquad() {
+        this.squad = null;
     }
 
     //

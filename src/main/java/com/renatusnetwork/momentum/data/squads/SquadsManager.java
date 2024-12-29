@@ -53,7 +53,7 @@ public class SquadsManager {
 		Squad squad = member.getSquad();
 		inSquadChat.remove(member);
 		squad.removeMember(member);
-		member.updateSquad(null);
+		member.resetSquad();
 	}
 
 	public void kick(PlayerStats member) {
@@ -67,7 +67,7 @@ public class SquadsManager {
 	public void disband(Squad squad) {
 		for (PlayerStats member : squad.getSquadMembers().keySet()) {
 			inSquadChat.remove(member);
-			member.updateSquad(null);
+			member.resetSquad();
 		}
 		squad.clearMembers();
 		offlineCache.values().removeAll(Collections.singleton(squad)); // if the squad doesnt exist anymore, no need to keep cache for offline players
