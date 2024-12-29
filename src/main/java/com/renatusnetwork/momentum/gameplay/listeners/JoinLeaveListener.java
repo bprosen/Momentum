@@ -209,7 +209,7 @@ public class JoinLeaveListener implements Listener {
                 squadsManager.disband(squad);
             } else {
                 if (leader) {
-                    SquadsManager.notifyMembers(squad, "&3The squad leader, &9" + playerStats.getDisplayName() + ", &3has gone offline! They have one minute to rejoin before leadership changes");
+                    SquadsManager.notifyMembers(squad, "&3The squad leader, &9" + playerStats.getDisplayName() + "&3, has gone offline! They have one minute to rejoin before leadership changes");
                     new BukkitRunnable() {
                         @Override
                         public void run() {

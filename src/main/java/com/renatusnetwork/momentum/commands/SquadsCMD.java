@@ -171,7 +171,7 @@ public class SquadsCMD implements CommandExecutor {
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
-					SquadsManager.notifyMembers(squad, "&9SC &3The squad has been disbanded");
+					SquadsManager.notifyMembers(squad, "&3The squad has been disbanded");
 					squadsManager.disband(squad);
 				}
 
