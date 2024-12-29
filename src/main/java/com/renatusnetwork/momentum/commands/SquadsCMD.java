@@ -18,6 +18,8 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 
 public class SquadsCMD implements CommandExecutor {
+	private final String NO_SQUAD_MSG = Utils.translate("&cYou are not in a squad!");
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof ConsoleCommandSender) {
@@ -32,7 +34,7 @@ public class SquadsCMD implements CommandExecutor {
 		int n = args.length;
 		if (label.equalsIgnoreCase("sqc")) {
 			if (squad == null)
-				noSquad(sender);
+				sender.sendMessage(NO_SQUAD_MSG);
 			else if (n == 0)
 				player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadsManager.toggleSquadChat(player) ? "on" : "off")));
 			else {
@@ -52,7 +54,7 @@ public class SquadsCMD implements CommandExecutor {
 		switch (args[0].toLowerCase()) {
 			case "list":
 				if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else {
 					player.sendMessage(Utils.translate("&9Squad Members:"));
 					squadsManager.getSquadMembers(squad).keySet().forEach(member -> player.sendMessage(Utils.translate("&9Sq -" + member.getDisplayName())));
@@ -125,7 +127,7 @@ public class SquadsCMD implements CommandExecutor {
 				break;
 			case "leave":
 				if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else {
 					boolean leader = SquadsManager.isLeader(player);
 					squadsManager.leave(player);
@@ -146,7 +148,7 @@ public class SquadsCMD implements CommandExecutor {
 				if (n != 2)
 					sendHelp(sender);
 				else if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
@@ -165,7 +167,7 @@ public class SquadsCMD implements CommandExecutor {
 				break;
 			case "disband":
 				if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
@@ -178,7 +180,7 @@ public class SquadsCMD implements CommandExecutor {
 				if (n != 2)
 					sendHelp(sender);
 				else if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else {
@@ -196,7 +198,7 @@ public class SquadsCMD implements CommandExecutor {
 				break;
 			case "chat":
 				if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else if (n == 1)
 					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadsManager.toggleSquadChat(player) ? "on" : "off")));
 				else {
@@ -216,7 +218,7 @@ public class SquadsCMD implements CommandExecutor {
 				Level level = player.getLevel();
 
 				if (squad == null)
-					noSquad(sender);
+					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
 				else if (squad.hasWarpCooldown())
@@ -264,9 +266,5 @@ public class SquadsCMD implements CommandExecutor {
 		if (sender.hasPermission("momentum.admin"))
 			sender.sendMessage(Utils.translate("&3/squads chatspy  &btoggles squad chat spy"));
 		sender.sendMessage(Utils.translate("&9---------"));
-	}
-
-	private void noSquad(CommandSender sender) {
-		sender.sendMessage(Utils.translate("&cYou are not in a squad!"));
 	}
 }
