@@ -9,7 +9,7 @@ public class Squad {
 	private PlayerStats squadLeader;
 	private final Map<PlayerStats, Instant> squadMembers; // includes squad leader
 	private final Set<PlayerStats> outgoingInvites;
-	private boolean warpCooldown = false;
+	private boolean warpCooldown;
 
 	private Squad(PlayerStats leader) {
 		this.squadLeader = leader;
