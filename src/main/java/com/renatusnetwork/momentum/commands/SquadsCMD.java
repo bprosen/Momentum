@@ -248,8 +248,7 @@ public class SquadsCMD implements CommandExecutor {
 	}
 
 	private void sendHelp(CommandSender sender) {
-		sender.sendMessage(Utils.translate("&9-- Help --"));
-		sender.sendMessage(Utils.translate("&9Command Aliases: &b[squad, sq]"));
+		sender.sendMessage(Utils.translate("&9&lSquads Help"));
 		sender.sendMessage(Utils.translate("&3/squads [help]  &bdisplays this menu"));
 		sender.sendMessage(Utils.translate("&3/squads list  &blists all players in squad"));
 		sender.sendMessage(Utils.translate("&3/squads invite <player>  &binvites player to squad (creates squad if not in one)"));
@@ -259,12 +258,11 @@ public class SquadsCMD implements CommandExecutor {
 		sender.sendMessage(Utils.translate("&3/squads disband  &bdisbands squad"));
 		sender.sendMessage(Utils.translate("&3/squads promote <player>  &btransfers ownership of squad to player"));
 		sender.sendMessage(Utils.translate("&3/squads chat  &btoggles squad chat"));
-		sender.sendMessage(Utils.translate("   &9Aliases: &b[sqc]"));
-		sender.sendMessage(Utils.translate("&3/squads chat <message> &bsends message to squad chat"));
-		sender.sendMessage(Utils.translate("   &9Aliases: &b[sqc <message>]"));
+		sender.sendMessage(Utils.translate("&3/sqc  &btoggles squad chat"));
+		sender.sendMessage(Utils.translate("&3/squads chat <message>  &bsends message to squad chat"));
+		sender.sendMessage(Utils.translate("&3/sqc <message>  &bsends message to squad chat"));
 		sender.sendMessage(Utils.translate("&3/squads warp  &bsends all players in squad to leader's level"));
 		if (sender.hasPermission("momentum.admin"))
 			sender.sendMessage(Utils.translate("&3/squads chatspy  &btoggles squad chat spy"));
-		sender.sendMessage(Utils.translate("&9---------"));
 	}
 }
