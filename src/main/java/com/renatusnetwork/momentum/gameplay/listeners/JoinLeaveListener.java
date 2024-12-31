@@ -202,12 +202,35 @@ public class JoinLeaveListener implements Listener {
 
         Squad squad = playerStats.getSquad();
         if (playerStats.getSquad() != null) {
-            boolean leader = SquadsManager.isLeader(playerStats);
+            boolean leader = SquadsManager.isLeader(playerStats); // check if leader beforehand since players squad gets reset upon disconnecting
             squadsManager.leave(playerStats);
             squadsManager.addOffline(playerStats.getUUID(), squad);
             if (squad.size() == 0) { // everyone leaves
                 squadsManager.disband(squad);
             } else {
+                SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bhas disconnected! They have one minute to rejoin or they'll be removed from the squad");
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        // if this condition isnt met that means a) the player has rejoined or b) the squad is disbanded
+                        if (squadsManager.getOffline(playerStats.getUUID()) != null) {
+                            squadsManager.removeOffline(playerStats.getUUID());
+                            if (squad.size() <= 1 && !squadsManager.hasOfflineCache(squad)) {
+                                SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
+                                squadsManager.disband(squad);
+                            } else {
+                                if (leader) {
+                                    PlayerStats newLeader = squadsManager.getOldestMember(squad, playerStats);
+                                    squadsManager.promote(newLeader);
+                                    SquadsManager.notifyMembers(squad, "&9SC &3" + newLeader.getDisplayName() + " &bhas been promoted to squad leader");
+                                } else {
+                                    SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bdid not rejoin in time");
+                                }
+                            }
+                        }
+                    }
+                }.runTaskLaterAsynchronously(Momentum.getPlugin(), 20 * 60); // 1 min
+                /*
                 if (leader) {
                     SquadsManager.notifyMembers(squad, "&3The squad leader, &9" + playerStats.getDisplayName() + "&3, has gone offline! They have one minute to rejoin before leadership changes");
                     new BukkitRunnable() {
@@ -243,6 +266,7 @@ public class JoinLeaveListener implements Listener {
                         }
                     }.runTaskLaterAsynchronously(Momentum.getPlugin(), 20 * 60); // 1 min
                 }
+                */
             }
         }
 
