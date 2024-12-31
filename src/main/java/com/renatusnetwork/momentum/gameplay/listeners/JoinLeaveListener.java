@@ -201,7 +201,7 @@ public class JoinLeaveListener implements Listener {
         }
 
         Squad squad = playerStats.getSquad();
-        if (playerStats.getSquad() != null) {
+        if (playerStats.inSquad()) {
             boolean leader = SquadsManager.isLeader(playerStats); // check if leader beforehand since players squad gets reset upon disconnecting
             squadsManager.leave(playerStats);
             squadsManager.addOffline(playerStats.getUUID(), squad);

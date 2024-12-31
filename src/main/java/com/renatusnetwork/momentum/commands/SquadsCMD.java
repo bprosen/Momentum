@@ -33,7 +33,7 @@ public class SquadsCMD implements CommandExecutor {
 
 		int n = args.length;
 		if (label.equalsIgnoreCase("sqc")) {
-			if (squad == null)
+			if (!player.inSquad())
 				sender.sendMessage(NO_SQUAD_MSG);
 			else if (n == 0)
 				player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadsManager.toggleSquadChat(player) ? "on" : "off")));
@@ -66,7 +66,7 @@ public class SquadsCMD implements CommandExecutor {
 					sendHelp(sender);
 					break;
 				}
-				else if (squad == null) {
+				else if (!player.inSquad()) {
 					squadsManager.createSquad(player);
 					squad = player.getSquad();
 				}
@@ -104,12 +104,12 @@ public class SquadsCMD implements CommandExecutor {
 				PlayerStats inviter = Momentum.getStatsManager().getByName(args[1]);
 				if (inviter == null)
 					player.sendMessage(Utils.translate("&cThat player is not online!"));
-				else if (inviter.getSquad() == null || !inviter.getSquad().hasInvite(player))
+				else if (!inviter.inSquad() || !inviter.getSquad().hasInvite(player))
 					player.sendMessage(Utils.translate("&cNo incoming invites from &4" + inviter.getName() + " &cwere found"));
 				else {
 					Squad newSquad = inviter.getSquad();
 					boolean sqChat = squadsManager.isInSquadChat(player);
-					if (squad != null) {
+					if (player.inSquad()) {
 						squadsManager.leave(player); // make sure to leave current squad before joining a new one
 						SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas left the squad");
 						player.sendMessage(Utils.translate("&3You have left the squad"));
@@ -126,7 +126,7 @@ public class SquadsCMD implements CommandExecutor {
 
 				break;
 			case "leave":
-				if (squad == null)
+				if (!player.inSquad())
 					sender.sendMessage(NO_SQUAD_MSG);
 				else {
 					boolean leader = SquadsManager.isLeader(player);
@@ -147,7 +147,7 @@ public class SquadsCMD implements CommandExecutor {
 			case "kick":
 				if (n != 2)
 					sendHelp(sender);
-				else if (squad == null)
+				else if (!player.inSquad())
 					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
@@ -166,7 +166,7 @@ public class SquadsCMD implements CommandExecutor {
 
 				break;
 			case "disband":
-				if (squad == null)
+				if (!player.inSquad())
 					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
@@ -179,7 +179,7 @@ public class SquadsCMD implements CommandExecutor {
 			case "promote":
 				if (n != 2)
 					sendHelp(sender);
-				else if (squad == null)
+				else if (!player.inSquad())
 					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));
@@ -197,7 +197,7 @@ public class SquadsCMD implements CommandExecutor {
 
 				break;
 			case "chat":
-				if (squad == null)
+				if (!player.inSquad())
 					sender.sendMessage(NO_SQUAD_MSG);
 				else if (n == 1)
 					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad Chat &b" + (squadsManager.toggleSquadChat(player) ? "on" : "off")));
@@ -217,7 +217,7 @@ public class SquadsCMD implements CommandExecutor {
 			case "warp":
 				Level level = player.getLevel();
 
-				if (squad == null)
+				if (!player.inSquad())
 					sender.sendMessage(NO_SQUAD_MSG);
 				else if (!SquadsManager.isLeader(player))
 					player.sendMessage(Utils.translate("&cYou are not the squad leader!"));

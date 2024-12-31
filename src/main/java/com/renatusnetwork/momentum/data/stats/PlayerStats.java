@@ -1174,6 +1174,9 @@ public class PlayerStats {
     public Squad getSquad() {
         return this.squad;
     }
+    public boolean inSquad() {
+        return this.squad != null;
+    }
     public void updateSquad(Squad squad) {
         this.squad = squad;
     }
