@@ -116,7 +116,7 @@ public class SquadsManager {
 
 	public void sendMessage(PlayerStats member, String message, boolean self) {
 		Squad squad = member.getSquad();
-		squad.getSquadMembers().keySet().stream().filter(m -> !self && m.equals(member)).forEach(m -> m.sendMessage(Utils.translate(message)));
+		squad.getSquadMembers().keySet().stream().filter(m -> self || !m.equals(member)).forEach(m -> m.sendMessage(Utils.translate(message)));
 
 		// chat spy persists through relogs so player needs to be online
 		inSquadChatSpy.stream().filter(spy -> Momentum.getStatsManager().get(spy.getPlayer()) != null && squad.getSquadMembers().get(spy) == null).forEach(spy -> spy.sendMessage(Utils.translate("&1[SqSpy]  " + message))); //sqspy since sspy looks like social spy

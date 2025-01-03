@@ -30,7 +30,7 @@ public class ChatListener implements Listener {
         if (playerStats != null) {
             event.setCancelled(true);
 
-            if (squadsManager.isInSquadChat(playerStats) && playerStats.getSquad() != null) {
+            if (squadsManager.isInSquadChat(playerStats) && playerStats.inSquad()) {
                 event.getRecipients().clear();
 
                 // SquadManager#sendMessage handles chatspy messages
