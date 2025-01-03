@@ -30,11 +30,15 @@ public class Squad {
 
 	protected void setLeader(PlayerStats newLeader) { this.squadLeader = newLeader; }
 
+	protected void resetLeader() { this.squadLeader = null; }
+
 	public boolean hasInvite(PlayerStats invitee) { return outgoingInvites.contains(invitee); }
 
 	protected void addInvite(PlayerStats invitee) { outgoingInvites.add(invitee); }
 
 	protected void removeInvite(PlayerStats invitee) { outgoingInvites.remove(invitee); }
+
+	protected void clearInvites() { outgoingInvites.clear(); }
 
 	protected PlayerStats getSquadLeader() { return this.squadLeader; }
 	protected Map<PlayerStats, Long> getSquadMembers() { return this.squadMembers; }

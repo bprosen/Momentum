@@ -70,6 +70,8 @@ public class SquadsManager {
 			member.resetSquad();
 		});
 		squad.clearMembers();
+		squad.resetLeader();
+		squad.clearInvites();
 		offlineCache.values().removeAll(Collections.singleton(squad)); // if the squad doesnt exist anymore, no need to keep cache for offline players
 	}
 
