@@ -714,22 +714,12 @@ public class StatsManager {
 
     public void hidePlayer(Player player) {
         hiddenPlayers.add(player);
-
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (!online.isOp()) {
-                player.hidePlayer(Momentum.getPlugin(), online);
-            }
-        }
+        Bukkit.getOnlinePlayers().forEach(online -> player.hidePlayer(Momentum.getPlugin(), online));
     }
 
     public void showPlayer(Player player) {
         hiddenPlayers.remove(player);
-
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (!online.isOp()) {
-                player.showPlayer(Momentum.getPlugin(), online);
-            }
-        }
+        Bukkit.getOnlinePlayers().forEach(online -> player.showPlayer(Momentum.getPlugin(), online));
     }
 
     public boolean containsHiddenPlayer(Player player) {
@@ -737,9 +727,7 @@ public class StatsManager {
     }
 
     public void hideHiddenPlayersFromJoined(Player playerJoined) {
-        for (Player player : hiddenPlayers) {
-            player.hidePlayer(Momentum.getPlugin(), playerJoined);
-        }
+        hiddenPlayers.forEach(hiddenPlayer -> hiddenPlayer.hidePlayer(Momentum.getPlugin(), playerJoined));
     }
 
     public void togglePlayerHiderOff(Player player, boolean notify) {
