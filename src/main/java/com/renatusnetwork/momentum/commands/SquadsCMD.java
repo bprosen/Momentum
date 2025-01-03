@@ -230,7 +230,7 @@ public class SquadsCMD implements CommandExecutor {
 				else if (level.isAscendance())
 					player.sendMessage(Utils.translate("&cYou cannot warp to ascendance!"));
 				else if (level.isEventLevel() || level.isRaceLevel())
-					player.sendMessage("&cYou cannot warp to a race or event!");
+					player.sendMessage(Utils.translate("&cYou cannot warp to a race or event!"));
 				else {
 					// notify first so failure messages send to individual players after
 					SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas warped to " + level.getFormattedTitle());
