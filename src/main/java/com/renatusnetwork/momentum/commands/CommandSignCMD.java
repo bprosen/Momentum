@@ -107,8 +107,14 @@ public class CommandSignCMD implements CommandExecutor {
                     sendHelp(sender);
                     return true;
                 }
+
+                if (Utils.containsIgnoreCase(csignManager.getCommandSign(name).getCommands(), cmd)) {
+                    sender.sendMessage(Utils.translate("&cCommand already exists in command sign"));
+                    return true;
+                }
+
                 result = csignManager.updateCommand(name, index, cmd);
-                sender.sendMessage(result ? Utils.translate("&aSuccessfully updated command at index &2" + (index + 1) + " &afor &2" + name) : Utils.translate("&cindex &4" + (index + 1) + " &cdoes not exist for &4" + name));
+                sender.sendMessage(result ? Utils.translate("&aSuccessfully updated command at index &2" + (index + 1) + " &afor &2" + name) : Utils.translate("&cIndex &4" + (index + 1) + " &cdoes not exist for &4" + name));
                 break;
             case "broadcast":
                 if (!csignManager.commandSignExists(name)) {
@@ -146,6 +152,11 @@ public class CommandSignCMD implements CommandExecutor {
                 cmd = String.join(" ", Arrays.copyOfRange(a, 2, a.length));
                 if (cmd.isEmpty()) {
                     sendHelp(sender);
+                    return true;
+                }
+
+                if (Utils.containsIgnoreCase(csignManager.getCommandSign(name).getCommands(), cmd)) {
+                    sender.sendMessage(Utils.translate("&cCommand already exists in command sign"));
                     return true;
                 }
 

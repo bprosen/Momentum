@@ -452,4 +452,8 @@ public class Utils {
     public static void applySlowness(Player player   /* in ticks */) {
         player.addPotionEffect(PotionEffectType.SLOW.createEffect(20, 255));
     }
+
+    public static boolean containsIgnoreCase(List<String> strings, String match) { // non regex friendly
+        return strings.stream().anyMatch(s -> s.equalsIgnoreCase(match));
+    }
 }

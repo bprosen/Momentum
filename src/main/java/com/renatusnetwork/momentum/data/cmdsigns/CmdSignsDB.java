@@ -88,7 +88,7 @@ public class CmdSignsDB {
 
     public static void updateCommand(String name, String oldCommand, String newCommand) {
         DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " SET command=? WHERE name=? AND command=? LIMIT 1", // limit 1 for duplicate commands
+                "UPDATE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " SET command=? WHERE name=? AND command=?",
                 newCommand, name, oldCommand
         );
     }
@@ -102,7 +102,7 @@ public class CmdSignsDB {
 
     public static void removeCommand(String name, String command) {
         DatabaseQueries.runAsyncQuery(
-                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " WHERE name=? AND command=? LIMIT 1", // limit 1 for duplicate commands
+                "DELETE FROM " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " WHERE name=? AND command=?",
                 name, command
         );
     }
