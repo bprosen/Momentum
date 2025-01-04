@@ -1,7 +1,6 @@
 package com.renatusnetwork.momentum.gameplay.listeners;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
@@ -9,6 +8,8 @@ import com.renatusnetwork.momentum.data.infinite.InfiniteManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
+import com.renatusnetwork.momentum.data.squads.Squad;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -16,14 +17,10 @@ import com.renatusnetwork.momentum.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
@@ -36,6 +33,7 @@ public class JoinLeaveListener implements Listener {
     public void onJoin(PlayerSpawnLocationEvent event) {
         Player player = event.getPlayer();
         StatsManager statsManager = Momentum.getStatsManager();
+        SquadsManager squadsManager = Momentum.getSquadsManager();
 
         if (!player.hasPlayedBefore()) {
             Location spawn = Momentum.getLocationManager().getTutorialLocation();
@@ -122,6 +120,13 @@ public class JoinLeaveListener implements Listener {
                     }
                 }
 
+                Squad squad = squadsManager.getOffline(finalPlayerStats.getUUID());
+                if (squad != null) {
+                    SquadsManager.notifyMembers(squad, "&9SC &3" + finalPlayerStats.getDisplayName() + " &bhas rejoined");
+                    squadsManager.join(squad, finalPlayerStats);
+                    squadsManager.removeOffline(finalPlayerStats.getUUID());
+                }
+
                 // mark player as finished loading
                 finalPlayerStats.loaded();
             }
@@ -140,6 +145,7 @@ public class JoinLeaveListener implements Listener {
         InfiniteManager infiniteManager = Momentum.getInfiniteManager();
         ClansManager clansManager = Momentum.getClansManager();
         BlackMarketManager blackMarketManager = Momentum.getBlackMarketManager();
+        SquadsManager squadsManager = Momentum.getSquadsManager();
 
         // if left in spectator, remove it
         if (playerStats.isSpectating()) {
@@ -192,6 +198,39 @@ public class JoinLeaveListener implements Listener {
 
             // run reset logic
             playerStats.resetLevel();
+        }
+
+        Squad squad = playerStats.getSquad();
+        if (playerStats.inSquad()) {
+            boolean leader = SquadsManager.isLeader(playerStats); // check if leader beforehand since players squad gets reset upon disconnecting
+            squadsManager.leave(playerStats);
+            squadsManager.addOffline(playerStats.getUUID(), squad);
+            if (squad.size() == 0) { // everyone leaves
+                squadsManager.disband(squad);
+            } else {
+                SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bhas disconnected! They have one minute to rejoin or they'll be removed from the squad");
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        // if this condition isnt met that means a) the player has rejoined or b) the squad is disbanded
+                        if (squadsManager.getOffline(playerStats.getUUID()) != null) {
+                            squadsManager.removeOffline(playerStats.getUUID());
+                            if (squad.size() <= 1 && !squadsManager.hasOfflineCache(squad)) {
+                                SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
+                                squadsManager.disband(squad);
+                            } else {
+                                if (leader) {
+                                    PlayerStats newLeader = squadsManager.getOldestMember(squad, playerStats);
+                                    squadsManager.promote(newLeader);
+                                    SquadsManager.notifyMembers(squad, "&9SC &3" + newLeader.getDisplayName() + " &bhas been promoted to squad leader");
+                                } else {
+                                    SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bdid not rejoin in time");
+                                }
+                            }
+                        }
+                    }
+                }.runTaskLaterAsynchronously(Momentum.getPlugin(), 20 * 60); // 1 min
+            }
         }
 
         // toggle off elytra armor

@@ -3,6 +3,7 @@ package com.renatusnetwork.momentum.gameplay.listeners;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -23,13 +24,19 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
         String msg = event.getMessage();
         ClansManager clansManager = Momentum.getClansManager();
+        SquadsManager squadsManager = Momentum.getSquadsManager();
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         if (playerStats != null) {
             event.setCancelled(true);
 
-            // iterate through the smaller list first
-            if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName())) {
+            if (squadsManager.isInSquadChat(playerStats) && playerStats.inSquad()) {
+                event.getRecipients().clear();
+
+                // SquadManager#sendMessage handles chatspy messages
+                squadsManager.sendMessage(playerStats, "&9SC &3" + playerStats.getDisplayName() + " &b" + msg, true);
+                Momentum.getPluginLogger().info("Squad Chat: " + playerStats.getDisplayName() + " - " + ChatColor.stripColor(msg));
+            } else if (playerStats.getClan() != null && clansManager.isInClanChat(player.getName())) { // iterate through the smaller list first
                 event.getRecipients().clear();
 
                 // cancel event, clear recipients, and send to clan members

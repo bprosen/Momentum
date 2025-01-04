@@ -135,3 +135,6 @@ commands:
   commandsign:
     description: "Momentum command sign creation command"
     aliases: [csign]
+  squads:
+    description: "Momentum squads command"
+    aliases: [squad, sq, sqc]

@@ -18,6 +18,7 @@ import com.renatusnetwork.momentum.data.perks.Perk;
 import com.renatusnetwork.momentum.data.races.gamemode.RaceEndReason;
 import com.renatusnetwork.momentum.data.races.gamemode.RacePlayer;
 import com.renatusnetwork.momentum.data.ranks.Rank;
+import com.renatusnetwork.momentum.data.squads.Squad;
 import com.renatusnetwork.momentum.utils.Utils;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Location;
@@ -27,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -91,6 +93,7 @@ public class PlayerStats {
     private HashMap<BankItemType, BankBid> bids;
     private ArrayList<Level> favoriteLevels;
     private Set<String> usedCommandSigns;
+    private Squad squad;
 
     public PlayerStats(Player player) {
         this.player = player;
@@ -1166,6 +1169,19 @@ public class PlayerStats {
 
     public int getCommandSignSize() {
         return usedCommandSigns.size();
+    }
+
+    public Squad getSquad() {
+        return this.squad;
+    }
+    public boolean inSquad() {
+        return this.squad != null;
+    }
+    public void updateSquad(Squad squad) {
+        this.squad = squad;
+    }
+    public void resetSquad() {
+        this.squad = null;
     }
 
     //
