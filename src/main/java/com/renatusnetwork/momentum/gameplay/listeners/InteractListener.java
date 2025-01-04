@@ -212,9 +212,7 @@ public class InteractListener implements Listener {
                 if (!playerStats.hasCommandSign(csign.getName())) {
                     csignManager.useCommandSign(playerStats, csign.getName());
 
-                    for (String s : csign.getCommands()) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s.replaceAll("%player%", playerStats.getName()));
-                    }
+                    csign.getCommands().forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s.replaceAll("%player%", playerStats.getName())));
 
                     if (csign.isBroadcast()) {
                         Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + "&7 claimed the sign &2" + csign.getTitle()));

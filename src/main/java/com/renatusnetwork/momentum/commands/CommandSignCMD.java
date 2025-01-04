@@ -114,7 +114,7 @@ public class CommandSignCMD implements CommandExecutor {
                 }
 
                 result = csignManager.updateCommand(name, index, cmd);
-                sender.sendMessage(result ? Utils.translate("&aSuccessfully updated command at index &2" + (index + 1) + " &afor &2" + name) : Utils.translate("&cIndex &4" + (index + 1) + " &cdoes not exist for &4" + name));
+                sender.sendMessage(Utils.translate(result ? "&aSuccessfully updated command at index &2" + (index + 1) + " &afor &2" + name : Utils.translate("&cIndex &4" + (index + 1) + " &cdoes not exist for &4" + name)));
                 break;
             case "broadcast":
                 if (!csignManager.commandSignExists(name)) {
@@ -188,7 +188,7 @@ public class CommandSignCMD implements CommandExecutor {
                 }
 
                 result = csignManager.removeCommand(name, index);
-                sender.sendMessage(result ? Utils.translate("&aSuccessfully removed command at index &2" + (index + 1) + " &afor &2" + name) : Utils.translate("&cindex &4" + (index + 1) + " &cdoes not exist for &4" + name));
+                sender.sendMessage(Utils.translate(result ? "&aSuccessfully removed command at index &2" + (index + 1) + " &afor &2" + name : Utils.translate("&cindex &4" + (index + 1) + " &cdoes not exist for &4" + name)));
                 break;
             default:
                 sendHelp(sender);
