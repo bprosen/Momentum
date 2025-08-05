@@ -232,7 +232,7 @@ public class CommandSignCMD implements CommandExecutor {
     // probably redundant but nice to have in case the list command gets really long
     private static void showInfo(CommandSender sender, CommandSign csign) {
         sender.sendMessage(Utils.translate("&a" + csign.getName() + ":"));
-        sender.sendMessage(Utils.translate("  &7title: " + csign.getTitle()));
+        sender.sendMessage(Utils.translate("  &7Title: " + csign.getTitle()));
         sender.sendMessage(Utils.translate("  &7Location: &2&o" + csign.getLocation().toString()));
         sender.sendMessage(Utils.translate("  &7Commands:"));
         for (int i = 0; i < csign.getCommands().size(); i++) {
