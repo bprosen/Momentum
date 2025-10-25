@@ -208,7 +208,7 @@ public class JoinLeaveListener implements Listener {
             if (squad.size() == 0) { // everyone leaves
                 squadsManager.disband(squad);
             } else {
-                SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bhas disconnected! They have one minute to rejoin or they'll be removed from the squad");
+                SquadsManager.notifyMembers(squad, "&9SC &3" + playerStats.getDisplayName() + " &bhas disconnected! They have one minute to rejoin, or they'll be removed from the squad");
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -216,7 +216,7 @@ public class JoinLeaveListener implements Listener {
                         if (squadsManager.getOffline(playerStats.getUUID()) != null) {
                             squadsManager.removeOffline(playerStats.getUUID());
                             if (squad.size() <= 1 && !squadsManager.hasOfflineCache(squad)) {
-                                SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
+                                SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because no members remain");
                                 squadsManager.disband(squad);
                             } else {
                                 if (leader) {
