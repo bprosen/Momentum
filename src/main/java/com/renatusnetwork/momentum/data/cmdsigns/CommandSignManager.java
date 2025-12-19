@@ -4,6 +4,7 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.World;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandSignManager {
 
@@ -26,7 +27,7 @@ public class CommandSignManager {
 
     public void addCommandSign(String name, String command, World world, int x, int y, int z) {
         CmdSignLocation loc = new CmdSignLocation(world, x, y, z);
-        CommandSign csign = new CommandSign(name, null, command, loc, false);
+        CommandSign csign = new CommandSign(name, null, command == null ? new ArrayList<>() : new ArrayList<>(Collections.singletonList(command)), loc, false);
 
         cmdSigns.put(name, csign);
         locations.put(loc, csign);
@@ -61,9 +62,37 @@ public class CommandSignManager {
         return locations.containsKey(location);
     }
 
-    public void updateCommand(String name, String newCommand) {
-        cmdSigns.get(name).updateCommand(newCommand);
-        CmdSignsDB.updateCommand(name, newCommand);
+    // returns true if index is in bounds
+    public boolean updateCommand(String name, int index, String newCommand) {
+        CommandSign csign = cmdSigns.get(name);
+        if (index < 0 || index >= csign.getCommands().size()) {
+            return false;
+        }
+        String oldCommand = csign.getCommands().get(index);
+        csign.updateCommand(index, newCommand);
+        CmdSignsDB.updateCommand(name, oldCommand, newCommand);
+        return true;
+    }
+
+    public void addCommand(String name, String command) {
+        cmdSigns.get(name).addCommand(command);
+        CmdSignsDB.addCommand(name, command);
+    }
+
+    // returns true if index is in bounds
+    public boolean removeCommand(String name, int index) {
+        CommandSign csign = cmdSigns.get(name);
+        if (index < 0 || index >= csign.getCommands().size()) {
+            return false;
+        }
+        String cmd = cmdSigns.get(name).removeCommand(index);
+        CmdSignsDB.removeCommand(name, cmd);
+        return true;
+    }
+
+    public void clearCommands(String name) {
+        cmdSigns.get(name).clearCommands();
+        CmdSignsDB.removeAllCommands(name);
     }
 
     public CommandSign getCommandSign(String name) {

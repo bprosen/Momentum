@@ -53,6 +53,11 @@ public class CmdSignLocation {
     }
 
     @Override
+    public String toString() {
+        return String.format("%s(%d,%d,%d)", world.getName(), x, y, z);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(world.getName(), x, y, z);
     }
