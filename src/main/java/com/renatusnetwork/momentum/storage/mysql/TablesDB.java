@@ -948,7 +948,7 @@ public class TablesDB {
         String query =
                 "CREATE TABLE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + "(" +
                 "name VARCHAR(20) NOT NULL, " +
-                "command VARCHAR(100) DEFAULT NULL, " +
+                "command VARCHAR(100) NOT NULL, " +
                 // primary keys
                 "PRIMARY KEY (name, command)" +
                 ")";
