@@ -1,5 +1,6 @@
 package com.renatusnetwork.momentum.data.cmdsigns;
 
+import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.World;
 
@@ -18,6 +19,8 @@ public class CommandSignManager {
         for (CommandSign csign : cmdSigns.values()) {
             locations.put(csign.getLocation(), csign);
         }
+
+        Momentum.getPluginLogger().info("Command Signs loaded: " + cmdSigns.size());
     }
 
     public void useCommandSign(PlayerStats playerStats, String name) {
