@@ -12,18 +12,11 @@ max_offline_cache_size: 10
 elo:
   default_amount: 1000
   default_tier: silver-i
-bank:
-  min_lock_time: 10 # in minutes
-  max_lock_time: 45 # in minutes
-  radiant:
-    starting_total: 1000
-  brilliant:
-    starting_total: 5000
-  legendary:
-    starting_total: 15000
-  jackpot:
-    length: 1800 # in seconds
-  jackpot_force_remove_permission_cmd: "lp user %player% permission unset momentum.jackpot.force" # the command it should run when a player uses /jackpot force
+jackpot:
+  length: 1800 # in seconds
+  force_remove_permission_cmd: "lp user %player% permission unset momentum.jackpot.force" # the command it should run when a player uses /jackpot force
+  bonus_low_random_bound: 10
+  bonus_high_random_bound: 50
 minimum_pay_amount: 10
 blackmarket:
   start_time:

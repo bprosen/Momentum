@@ -44,13 +44,13 @@ public class BlackMarketManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Calendar bankCalendar = Momentum.getSettingsManager().black_market_reset_calendar;
+                Calendar startCalendar = Momentum.getSettingsManager().black_market_reset_calendar;
                 Calendar currentCalendar = Calendar.getInstance();
                 currentCalendar.setTime(new Date());
 
-                // if bankCalendar is BEFORE current, run blackmarket!
-                if (bankCalendar.get(Calendar.DAY_OF_WEEK) == currentCalendar.get(Calendar.DAY_OF_WEEK) &&
-                    bankCalendar.get(Calendar.HOUR_OF_DAY) == currentCalendar.get(Calendar.HOUR_OF_DAY)) {
+                // if startCalendar is BEFORE current, run blackmarket!
+                if (startCalendar.get(Calendar.DAY_OF_WEEK) == currentCalendar.get(Calendar.DAY_OF_WEEK) &&
+                    startCalendar.get(Calendar.HOUR_OF_DAY) == currentCalendar.get(Calendar.HOUR_OF_DAY)) {
                     start();
                 }
             }
@@ -211,16 +211,8 @@ public class BlackMarketManager {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    // run final jackpot 5 mins later
-                    Momentum.getBankManager().startJackpot();
-
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            // LOAD NEW BANK ITEMS!
-                            Momentum.getBankManager().resetBank();
-                        }
-                    }.runTaskLater(Momentum.getPlugin(), (20 * Momentum.getSettingsManager().jackpot_length) + 20 * 60 * 5); // jackpot length + 5 minutes
+                    // run another jackpot 5 mins later
+                    Momentum.getJackpotManager().startJackpot();
                 }
             }.runTaskLater(Momentum.getPlugin(), 20 * 60 * 5); // 5 mins later
         }

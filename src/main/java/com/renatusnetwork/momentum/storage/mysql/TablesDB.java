@@ -2,7 +2,6 @@ package com.renatusnetwork.momentum.storage.mysql;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
-import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.LevelType;
 import com.renatusnetwork.momentum.data.menus.LevelSortingType;
@@ -70,9 +69,6 @@ public class TablesDB {
         createLevelPotionEffects();
         createLevelRequiredLevels();
         createFavoriteLevels();
-        createBankItems();
-        createBankWeeks();
-        createBankBids();
         createCommandSigns();
         createUsedCommandSigns();
         createCommandSignsCommands();
@@ -100,9 +96,6 @@ public class TablesDB {
         createLevelPotionEffectsKeys();
         createLevelRequiredLevelsKeys();
         createFavoriteLevelsKeys();
-        createBankItemsKeys();
-        createBankWeeksKeys();
-        createBankBidsKeys();
         createUsedCommandSignsKeys();
         createCommandSignsCommandsKeys();
     }
@@ -811,102 +804,6 @@ public class TablesDB {
                                  "ON DELETE CASCADE, " +
                                  "ADD CONSTRAINT " + DatabaseManager.FAVORITE_LEVELS + "_level_name_fk " +
                                  "FOREIGN KEY(level_name) REFERENCES " + DatabaseManager.LEVELS_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-
-    private static void createBankWeeks() {
-        String query =
-                "CREATE TABLE " + DatabaseManager.BANK_WEEKS + "(" +
-                "week SMALLINT NOT NULL AUTO_INCREMENT, " +
-                "brilliant_item_name VARCHAR(20) NOT NULL, " +
-                "radiant_item_name VARCHAR(20) NOT NULL, " +
-                "legendary_item_name VARCHAR(20) NOT NULL, " +
-                "start_date BIGINT DEFAULT NULL, " +
-                "end_date BIGINT DEFAULT NULL, " +
-                // primary key
-                "PRIMARY KEY(week), " +
-                // constraints
-                "CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_non_negative CHECK (" +
-                "start_date > 0 AND " +
-                "end_date > 0" +
-                ")" +
-                ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createBankWeeksKeys() {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_WEEKS + " ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_brilliant_item_name_fk " +
-                                 "FOREIGN KEY(brilliant_item_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
-                                 "ON UPDATE CASCADE, " +
-                                 "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_radiant_item_name_fk " +
-                                 "FOREIGN KEY(radiant_item_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
-                                 "ON UPDATE CASCADE, " +
-                                 "ADD CONSTRAINT " + DatabaseManager.BANK_WEEKS + "_legendary_item_name_fk " +
-                                 "FOREIGN KEY(legendary_item_name) REFERENCES " + DatabaseManager.BANK_ITEMS + "(name) " +
-                                 "ON UPDATE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-    private static void createBankItems() {
-        String query =
-                "CREATE TABLE " + DatabaseManager.BANK_ITEMS + "(" +
-                "name VARCHAR(20) NOT NULL, " +
-                "title VARCHAR(30) DEFAULT NULL, " + // add room for colors
-                "description VARCHAR(200) DEFAULT NULL, " +
-                "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") DEFAULT NULL, " +
-                "modifier_name VARCHAR(20) DEFAULT NULL, " +
-                // primary key
-                "PRIMARY KEY(name)" +
-                ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-    private static void createBankItemsKeys() {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_ITEMS + " ADD CONSTRAINT " + DatabaseManager.BANK_ITEMS + "_modifier_name_fk " +
-                                 "FOREIGN KEY(modifier_name) REFERENCES " + DatabaseManager.MODIFIERS_TABLE + "(name) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE";
-
-        DatabaseQueries.runQuery(foreignKeyQuery);
-    }
-
-    private static void createBankBids() {
-        String query =
-                "CREATE TABLE " + DatabaseManager.BANK_BIDS + "(" +
-                "week SMALLINT NOT NULL, " +
-                "uuid CHAR(36) NOT NULL, " +
-                "bank_item_type ENUM(" + enumQuotations(BankItemType.values()) + ") NOT NULL, " +
-                "total_bid INT NOT NULL DEFAULT 0, " +
-                "last_bid_date BIGINT NOT NULL, " +
-                // primary key
-                "PRIMARY KEY(week, uuid, bank_item_type), " +
-                // indexes
-                "INDEX week_uuid_index(week, uuid), " +
-                // constraints
-                "CONSTRAINT " + DatabaseManager.BANK_BIDS + "_non_negative CHECK (" +
-                "total_bid >= 0 AND " +
-                "last_bid_date > 0" +
-                ")" +
-                ")";
-
-        DatabaseQueries.runQuery(query);
-    }
-
-
-    private static void createBankBidsKeys() {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.BANK_BIDS + " ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_week_fk " +
-                                 "FOREIGN KEY(week) REFERENCES " + DatabaseManager.BANK_WEEKS + "(week) " +
-                                 "ON UPDATE CASCADE " +
-                                 "ON DELETE CASCADE, " +
-                                 "ADD CONSTRAINT " + DatabaseManager.BANK_BIDS + "_uuid_fk " +
-                                 "FOREIGN KEY(uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + "(uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE";
 

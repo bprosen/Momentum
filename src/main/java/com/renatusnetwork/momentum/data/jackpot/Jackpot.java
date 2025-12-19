@@ -1,4 +1,4 @@
-package com.renatusnetwork.momentum.data.bank.items;
+package com.renatusnetwork.momentum.data.jackpot;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
@@ -70,9 +70,9 @@ public class Jackpot {
             @Override
             public void run() {
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
-                Bukkit.broadcastMessage(Utils.translate("&e&lBANK &6&lJACKPOT &e&lALERT"));
+                Bukkit.broadcastMessage(Utils.translate("&6&lJACKPOT &e&lALERT"));
                 Bukkit.broadcastMessage("");
-                Bukkit.broadcastMessage(Utils.translate("&7Complete &2" + level.getTitle() + "&7 for &6" + Utils.formatNumber(bonus) + " &d&lBONUS &e&lCOINS"));
+                Bukkit.broadcastMessage(Utils.translate("&7Complete &2" + level.getTitle() + "&7 for &6" + Utils.formatNumber(bonus) + " &7(" + bonus / level.getReward() + "x) &d&lBONUS &e&lCOINS"));
                 broadcastJoinComponent();
                 Bukkit.broadcastMessage(Utils.translate("&7There are &a" + (Math.round(millisLeft() / 1000f / 60f) + " minutes &7left to get the reward")));
                 Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));

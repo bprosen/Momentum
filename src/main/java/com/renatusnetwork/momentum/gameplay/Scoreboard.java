@@ -1,8 +1,6 @@
 package com.renatusnetwork.momentum.gameplay;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketEvent;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
@@ -10,6 +8,8 @@ import com.renatusnetwork.momentum.data.events.types.AscentEvent;
 import com.renatusnetwork.momentum.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.momentum.data.infinite.gamemode.Sprint;
 import com.renatusnetwork.momentum.data.infinite.gamemode.Timed;
+import com.renatusnetwork.momentum.data.jackpot.Jackpot;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.modifiers.ModifierType;
@@ -264,7 +264,7 @@ public class Scoreboard {
                         } else {
                             // normal scoreboard
                             String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
-                            BankManager bankManager = Momentum.getBankManager();
+                            JackpotManager jackpotManager = Momentum.getJackpotManager();
 
                             int newReward = level.getReward();
 
@@ -284,10 +284,10 @@ public class Scoreboard {
                             else if (level.isFeaturedLevel()) {
                                 board.add(formatSpacing(Utils.translate("&c&lFEATURED")));
                                 newReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
-                            } else if (bankManager.isJackpotRunning() &&
-                                       bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                                       !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
-                                Jackpot jackpot = bankManager.getJackpot();
+                            } else if (jackpotManager.isJackpotRunning() &&
+                                        jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                                       !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
+                                Jackpot jackpot = jackpotManager.getJackpot();
                                 int bonus = jackpot.getBonus();
 
                                 if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER)) {

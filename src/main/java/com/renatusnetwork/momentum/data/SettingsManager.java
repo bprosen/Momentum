@@ -105,11 +105,6 @@ public class SettingsManager {
     public HashMap<Integer, ItemStack> custom_join_inventory;
     public LinkedHashMap<Integer, Float> cooldown_modifiers;
     public Calendar cooldown_calendar;
-    public int radiant_starting_total;
-    public int brilliant_starting_total;
-    public int legendary_starting_total;
-    public int min_lock_time;
-    public int max_lock_time;
     public int jackpot_length;
     public int blackmarket_min_player_count;
     public Calendar black_market_reset_calendar;
@@ -118,6 +113,8 @@ public class SettingsManager {
     public String blackmarket_tp_loc;
     public String blackmarket_message_prefix;
     public String jackpot_force_remove_permission_cmd;
+    public int jackpot_bonus_low_random_bound;
+    public int jackpot_bonus_high_random_bound;
     public int sprint_starting_timer;
     public int sprint_max_timer;
     public float sprint_time_gain;
@@ -266,12 +263,6 @@ public class SettingsManager {
         meta.setDisplayName(Utils.translate(leave_title));
         leave_item.setItemMeta(meta);
 
-        radiant_starting_total = settings.getInt("bank.radiant.min_starting_bid");
-        brilliant_starting_total = settings.getInt("bank.brilliant.min_starting_bid");
-        legendary_starting_total = settings.getInt("bank.legendary.min_starting_bid");
-        jackpot_length = settings.getInt("bank.jackpot.length");
-        min_lock_time = settings.getInt("bank.min_lock_time");
-        max_lock_time = settings.getInt("bank.max_lock_time");
         minimum_pay_amount = settings.getInt("minimum_pay_amount");
         black_market_reset_calendar = Calendar.getInstance();
         String day = settings.getString("blackmarket.start_time.day");
@@ -298,7 +289,7 @@ public class SettingsManager {
                 black_market_reset_calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
                 break;
         }
-        black_market_reset_calendar.set(Calendar.HOUR_OF_DAY, settings.getInt("bank.reset_time.hour"));
+        black_market_reset_calendar.set(Calendar.HOUR_OF_DAY, settings.getInt("blackmarket.start_time.hour"));
 
         custom_join_inventory = new HashMap<>();
 
@@ -338,7 +329,10 @@ public class SettingsManager {
         infinite_middle_loc = settings.getString("infinite.infinite_middle_loc");
         infinite_respawn_loc = settings.getString("infinite.infinite_respawn_loc");
         blackmarket_message_prefix = settings.getString("blackmarket.message_prefix");
-        jackpot_force_remove_permission_cmd = settings.getString("bank.jackpot_force_remove_permission_cmd");
+        jackpot_force_remove_permission_cmd = settings.getString("jackpot.force_remove_permission_cmd");
+        jackpot_bonus_low_random_bound = settings.getInt("jackpot.bonus_low_random_bound");
+        jackpot_bonus_high_random_bound = settings.getInt("jackpot.bonus_high_random_bound");
+        jackpot_length = settings.getInt("jackpot.length");
         sprint_starting_timer = settings.getInt("infinite.sprint.starting_timer");
         sprint_max_timer = settings.getInt("infinite.sprint.max_timer");
         sprint_time_gain = settings.getInt("infinite.sprint.default_time_gain");

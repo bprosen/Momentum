@@ -31,8 +31,6 @@ public class Placeholders extends PlaceholderExpansion {
                 return LBPlaceholders.processPlaceholder(placeholderString);
             case GeneralPlaceholders.GENERAL_PREFIX:
                 return GeneralPlaceholders.processPlaceholder(placeholderString);
-            case BankPlaceholders.BANK_PREFIX:
-                return BankPlaceholders.processPlaceholder(placeholderString);
             case PlayerPlaceholders.PLAYER_PREFIX:
                 return PlayerPlaceholders.processPlaceholder(player, placeholderString);
             case RewardsPlaceholders.REWARDS_PREFIX:

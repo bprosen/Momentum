@@ -1,8 +1,8 @@
 package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.items.Jackpot;
+import com.renatusnetwork.momentum.data.jackpot.Jackpot;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.menus.MenuItemAction;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -23,11 +23,11 @@ public class JackpotCMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            BankManager bankManager = Momentum.getBankManager();
+            JackpotManager jackpotManager = Momentum.getJackpotManager();
 
             if (a.length == 1 && a[0].equalsIgnoreCase("play")) {
-                if (bankManager.isJackpotRunning()) {
-                    Jackpot jackpot = Momentum.getBankManager().getJackpot();
+                if (jackpotManager.isJackpotRunning()) {
+                    Jackpot jackpot = jackpotManager.getJackpot();
 
                     if (!jackpot.hasCompleted(player.getName()))
                     // tp to level
@@ -41,7 +41,7 @@ public class JackpotCMD implements CommandExecutor {
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("force") && player.hasPermission("momentum.jackpot.force")) {
                 // USED FOR BLACK MARKET!
-                if (!bankManager.isJackpotRunning()) {
+                if (!jackpotManager.isJackpotRunning()) {
                     if (!confirmMap.containsKey(player.getName())) {
                         // otherwise, put them in and ask them to confirm within 5 seconds
                         player.sendMessage("");
@@ -59,7 +59,7 @@ public class JackpotCMD implements CommandExecutor {
                         }.runTaskLater(Momentum.getPlugin(), 20 * 10));
                     } else {
                         confirmMap.get(player.getName()).cancel();
-                        bankManager.startJackpot();
+                        jackpotManager.startJackpot();
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Momentum.getSettingsManager().jackpot_force_remove_permission_cmd.replace("%player%", player.getName()));
                         confirmMap.remove(player.getName());
                     }
@@ -68,14 +68,14 @@ public class JackpotCMD implements CommandExecutor {
                 }
             } else if (player.hasPermission("momentum.admin")) {
                 if (a.length == 1 && a[0].equalsIgnoreCase("start")) {
-                    if (!bankManager.isJackpotRunning()) {
-                        bankManager.startJackpot();
+                    if (!jackpotManager.isJackpotRunning()) {
+                        jackpotManager.startJackpot();
                     } else {
                         player.sendMessage(Utils.translate("&cThere is already a jackpot running, do &4/jackpot end &cto stop it!"));
                     }
                 } else if (a.length == 1 && a[0].equalsIgnoreCase("end")) {
-                    if (bankManager.isJackpotRunning()) {
-                        bankManager.endJackpot();
+                    if (jackpotManager.isJackpotRunning()) {
+                        jackpotManager.endJackpot();
                     } else {
                         player.sendMessage(Utils.translate("&cThere is no jackpot running, do &4/jackpot start &cto start one!"));
                     }
@@ -90,8 +90,8 @@ public class JackpotCMD implements CommandExecutor {
                             if (!level.isFeaturedLevel() && !level.isAscendance() && !level.isRankUpLevel()) {
                                 int bonusAmount = Integer.parseInt(bonus);
 
-                                if (!bankManager.isJackpotRunning()) {
-                                    bankManager.chooseJackpot(level, bonusAmount);
+                                if (!jackpotManager.isJackpotRunning()) {
+                                    jackpotManager.chooseJackpot(level, bonusAmount);
                                 } else {
                                     player.sendMessage(Utils.translate("&cThere is already a jackpot running, do &4/jackpot end &cto stop it!"));
                                 }
@@ -117,8 +117,10 @@ public class JackpotCMD implements CommandExecutor {
     private void sendHelp(Player player) {
         player.sendMessage(Utils.translate("&2/jackpot play  &7Enters the currently running jackpot level"));
 
+        int low = Momentum.getSettingsManager().jackpot_bonus_low_random_bound;
+        int high = Momentum.getSettingsManager().jackpot_bonus_high_random_bound;
         if (player.hasPermission("momentum.admin")) {
-            player.sendMessage(Utils.translate("&2/jackpot start  &7Automatically chooses and starts a jackpot based off of bank's balance"));
+            player.sendMessage(Utils.translate("&2/jackpot start  &7Automatically chooses and starts a jackpot based off configured amount (" + low + "x to " + high + "x)"));
             player.sendMessage(Utils.translate("&2/jackpot end  &7Ends any currently running jackpot"));
             player.sendMessage(Utils.translate("&2/jackpot choose <level name> <bonus amount>  &7Chooses a jackpot from level and bonus amount"));
         }

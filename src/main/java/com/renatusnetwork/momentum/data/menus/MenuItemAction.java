@@ -3,10 +3,8 @@ package com.renatusnetwork.momentum.data.menus;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.LevelBuyEvent;
 import com.renatusnetwork.momentum.api.ShopBuyEvent;
-import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.items.BankItem;
-import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.levels.LevelPreview;
@@ -119,8 +117,6 @@ public class MenuItemAction {
             }
         } else if (itemType.equals("teleport")) {
             performTeleportItem(playerStats, menuItem);
-        } else if (itemType.equals("bank-bid")) {
-            performBankItem(playerStats, menuItem);
         } else if (menuItem.getOpenMenu() != null) // replacement for type open, since we define page numbers
         {
             performOpenItem(playerStats, menuItem);
@@ -202,18 +198,6 @@ public class MenuItemAction {
         }
 
         player.closeInventory();
-    }
-
-    private static void performBankItem(PlayerStats playerStats, MenuItem menuItem) {
-        BankItem item = Momentum.getBankManager().getItem(BankItemType.valueOf(menuItem.getTypeValue().toUpperCase()));
-
-        if (item != null) {
-            Momentum.getBankManager().bid(playerStats, item);
-        } else {
-            playerStats.sendMessage(Utils.translate("&cNo item exists for this"));
-        }
-
-        playerStats.getPlayer().closeInventory();
     }
 
     private static void performRandomRaceLevel(PlayerStats playerStats) {
@@ -392,13 +376,13 @@ public class MenuItemAction {
     private static void performLevelItem(Player player, MenuItem menuItem) {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
         Level level = Momentum.getLevelManager().get(menuItem.getTypeValue());
-        BankManager bankManager = Momentum.getBankManager();
+        JackpotManager jackpotManager = Momentum.getJackpotManager();
 
         if (level != null) {
             // go through price buying if not featured, non null item, has price and has not bought level, or not the jackpot level
             if (level.requiresBuying() &&
                 !level.isFeaturedLevel() &&
-                !(bankManager.isJackpotRunning() && bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
+                !(jackpotManager.isJackpotRunning() && jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level)) {
                 if (Momentum.getMenuManager().containsShiftClicked(playerStats)) {
                     performLevelPreview(playerStats, level);

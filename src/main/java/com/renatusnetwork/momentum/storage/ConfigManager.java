@@ -21,7 +21,6 @@ public class ConfigManager {
         initialize("config", plugin);
         initialize("menus", plugin);
         initialize("rewards", plugin);
-        initialize("bank", plugin);
         initialize("blackmarket", plugin);
     }
 
