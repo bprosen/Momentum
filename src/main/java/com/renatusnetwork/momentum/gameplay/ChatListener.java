@@ -68,8 +68,8 @@ public class ChatListener implements Listener
                 mainComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Momentum.getStatsManager().createChatHover(playerStats))));
                 mainComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/profile " + event.getPlayer().getName()));
 
-                // broadcast and log
-                Bukkit.spigot().broadcast(mainComponent);
+                // doing it this way instead of using Bukkit#broadcast ensures any previous filtering (e.g. ignored players) is preserved
+                event.getRecipients().forEach(p -> p.spigot().sendMessage(mainComponent));
                 Bukkit.getServer().getConsoleSender().sendMessage(mainComponent.toLegacyText());
 
                 // add to gg if they say it
