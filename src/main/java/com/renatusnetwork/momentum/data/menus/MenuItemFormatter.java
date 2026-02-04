@@ -1,14 +1,12 @@
 package com.renatusnetwork.momentum.data.menus;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.items.BankItem;
-import com.renatusnetwork.momentum.data.bank.items.BankItemType;
-import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClanMember;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.momentum.data.jackpot.Jackpot;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.momentum.data.levels.Level;
@@ -23,7 +21,6 @@ import com.renatusnetwork.momentum.data.perks.Perk;
 import com.renatusnetwork.momentum.data.levels.LevelCompletion;
 import com.renatusnetwork.momentum.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.momentum.data.ranks.Rank;
-import com.renatusnetwork.momentum.data.stats.BankBid;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -68,12 +65,6 @@ public class MenuItemFormatter {
 
         if (menuItem.getType().equals("perk")) {
             return getPerk(playerStats, menuItem);
-        }
-        if (menuItem.getType().equals("bank-bid")) {
-            return getBankItem(playerStats, menuItem);
-        }
-        if (menuItem.getType().equals("bank-info")) {
-            return getBankInfo(menuItem);
         }
         if (menuItem.hasOpenMenu() && !menuItem.getOpenMenu().getMenu().getName().equalsIgnoreCase(Momentum.getSettingsManager().main_menu_name)) {
             return enchantMenuItem(
@@ -276,84 +267,6 @@ public class MenuItemFormatter {
         return item;
     }
 
-    private static ItemStack getBankInfo(MenuItem menuItem) {
-        ItemStack item = new ItemStack(menuItem.getItem());
-        String typeValue = menuItem.getTypeValue();
-
-        BankItemType bankItemType = BankItemType.valueOf(typeValue.toUpperCase());
-        BankItem bankItem = Momentum.getBankManager().getItem(bankItemType);
-
-        if (bankItem != null) {
-            ItemMeta itemMeta = item.getItemMeta();
-
-            itemMeta.setDisplayName(Utils.translate(bankItem.getFormattedType() + " &d&lBank's Total"));
-            List<String> lore = new ArrayList<String>() {{
-                add(Utils.translate("&6" + Utils.formatNumber(bankItem.getTotalBalance()) + " &eCoins"));
-            }};
-            itemMeta.setLore(lore);
-
-            item.setItemMeta(itemMeta);
-        }
-
-        return item;
-    }
-
-    private static ItemStack getBankItem(PlayerStats playerStats, MenuItem menuItem) {
-        ItemStack item = new ItemStack(menuItem.getItem());
-        String typeValue = menuItem.getTypeValue();
-        ItemMeta itemMeta = item.getItemMeta();
-
-        BankItemType bankItemType = BankItemType.valueOf(typeValue.toUpperCase());
-        BankItem bankItem = Momentum.getBankManager().getItem(bankItemType);
-
-        if (bankItem != null) {
-            itemMeta.setDisplayName(Utils.translate(bankItem.getTitle()));
-
-            List<String> lore = new ArrayList<>();
-
-            if (bankItem.isLocked()) {
-                lore.add(Utils.translate("&4&lLOCKED &6" + TimeUtils.formatTimeWithSeconds(bankItem.getLockTimeRemaining())));
-            }
-
-            lore.add("");
-
-            lore.add(Utils.translate(bankItem.getTitle() + " &7Modifier"));
-            lore.add(Utils.translate(bankItem.getDescription()));
-
-            lore.add("");
-
-            if (!bankItem.hasCurrentHolder()) {
-                lore.add(Utils.translate("&7Current Holder &dNone"));
-            } else {
-                lore.add(Utils.translate("&7Current Holder &d" + bankItem.getCurrentHolder()));
-            }
-
-            int nextBid = bankItem.getNextBid();
-            BankBid bankBid = playerStats.getBankBid(bankItemType);
-
-            // next bid
-            if (bankBid != null) {
-                lore.add(Utils.translate("&7You have bid &6" + Utils.formatNumber(bankBid.getBid()) + " &eCoins"));
-            }
-
-            lore.add(Utils.translate("&7Next bid amount is &6" + Utils.formatNumber(nextBid) + " &eCoins"));
-
-            if (!bankItem.isCurrentHolder(playerStats)) {
-                lore.add(Utils.translate("&7Bid to get access for &6" + Momentum.getBankManager().calculateLockTime(playerStats, bankItemType) + " &7minutes"));
-            }
-
-            itemMeta.setLore(lore);
-        }
-
-        // if glowing, add glow effect
-        if (menuItem.isGlowing()) {
-            Utils.addGlow(itemMeta);
-        }
-
-        item.setItemMeta(itemMeta);
-        return item;
-    }
-
     //
     // Perk Section
     //
@@ -522,7 +435,7 @@ public class MenuItemFormatter {
             item = new ItemStack(item); // clone
             ItemMeta itemMeta = item.getItemMeta();
             String formattedTitle = level.getFormattedTitle();
-            BankManager bankManager = Momentum.getBankManager();
+            JackpotManager jackpotManager = Momentum.getJackpotManager();
 
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
@@ -536,14 +449,14 @@ public class MenuItemFormatter {
                     formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
                 }
                 // show jackpot info if is running and not completed
-                else if (bankManager.isJackpotRunning() && bankManager.getJackpot().getLevel().equals(level) && !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
+                else if (jackpotManager.isJackpotRunning() && jackpotManager.getJackpot().getLevel().equals(level) && !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
                     formattedTitle = Utils.translate("&a&lJACKPOT " + formattedTitle);
                 }
 
             if (choosingRaceLevel == null) {
                 // show they need to buy it and it is not the jackpot level if it is running
-                if (!(bankManager.isJackpotRunning() &&
-                      bankManager.getJackpot().getLevel().equals(level)) &&
+                if (!(jackpotManager.isJackpotRunning() &&
+                        jackpotManager.getJackpot().getLevel().equals(level)) &&
                     level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level) && !level.isFeaturedLevel()) {
 
                     int price = level.getPrice();
@@ -649,10 +562,10 @@ public class MenuItemFormatter {
                 newReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
             }
             // jackpot section
-            else if (bankManager.isJackpotRunning() &&
-                     bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                     !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
-                Jackpot jackpot = bankManager.getJackpot();
+            else if (jackpotManager.isJackpotRunning() &&
+                    jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                     !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
+                Jackpot jackpot = jackpotManager.getJackpot();
 
                 int bonus = jackpot.getBonus();
 

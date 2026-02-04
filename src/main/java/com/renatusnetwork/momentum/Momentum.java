@@ -3,13 +3,13 @@ package com.renatusnetwork.momentum;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.momentum.commands.*;
-import com.renatusnetwork.momentum.data.bank.BankManager;
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointManager;
 import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
 import com.renatusnetwork.momentum.data.infinite.InfiniteManager;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.levels.CompletionsDB;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.locations.LocationManager;
@@ -62,7 +62,7 @@ public class Momentum extends JavaPlugin {
     private static ProtocolManager protocol;
     private static EventManager events;
     private static InfiniteManager infinite;
-    private static BankManager bank;
+    private static JackpotManager jackpot;
     private static BlackMarketManager blackmarket;
     private static SavesManager saves;
     private static ModifiersManager modifiers;
@@ -182,7 +182,6 @@ public class Momentum extends JavaPlugin {
         getCommand("elo").setExecutor(new ELOCMD());
         getCommand("hotbar").setExecutor(new HotbarCMD());
         getCommand("elotier").setExecutor(new ELOTierCMD());
-        getCommand("bank").setExecutor(new BankCMD());
         getCommand("commandsign").setExecutor(new CommandSignCMD());
         getCommand("squads").setExecutor(new SquadsCMD());
     }
@@ -221,8 +220,8 @@ public class Momentum extends JavaPlugin {
         protocol = ProtocolLibrary.getProtocolManager();
         saves = new SavesManager();
         modifiers = new ModifiersManager();
+        jackpot = new JackpotManager();
         modifiers.load();
-        bank = new BankManager();
         blackmarket = new BlackMarketManager();
         cmdSigns = new CommandSignManager();
         squadsManager = new SquadsManager();
@@ -318,16 +317,14 @@ public class Momentum extends JavaPlugin {
         return infinite;
     }
 
+    public static JackpotManager getJackpotManager() { return jackpot; }
+
     public static ProtocolManager getProtocolManager() {
         return protocol;
     }
 
     public static SavesManager getSavesManager() {
         return saves;
-    }
-
-    public static BankManager getBankManager() {
-        return bank;
     }
 
     public static BlackMarketManager getBlackMarketManager() {

@@ -28,12 +28,6 @@ public class BlackMarketYAML {
         return blackmarketConfig.isSet(pathName + "." + valuePath);
     }
 
-    public static String chooseBankItem() {
-        List<String> keys = new ArrayList<>(blackmarketConfig.getConfigurationSection("items").getKeys(false));
-
-        return keys.get(ThreadLocalRandom.current().nextInt(keys.size()));
-    }
-
     public static String getTitle(String name) {
         return blackmarketConfig.getString("items." + name + ".title");
     }

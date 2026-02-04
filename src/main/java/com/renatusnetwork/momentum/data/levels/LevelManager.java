@@ -3,10 +3,10 @@ package com.renatusnetwork.momentum.data.levels;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.JackpotRewardEvent;
 import com.renatusnetwork.momentum.api.LevelCompletionEvent;
-import com.renatusnetwork.momentum.data.bank.BankManager;
-import com.renatusnetwork.momentum.data.bank.items.Jackpot;
 import com.renatusnetwork.momentum.data.events.EventManager;
 import com.renatusnetwork.momentum.data.events.types.EventType;
+import com.renatusnetwork.momentum.data.jackpot.Jackpot;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.momentum.data.leaderboards.RecordsLBPosition;
 import com.renatusnetwork.momentum.data.locations.LocationsDB;
@@ -977,7 +977,7 @@ public class LevelManager {
                 playerStats.addMasteryCompletion(level.getName());
                 Momentum.getStatsManager().leftMastery(playerStats);
             }
-            BankManager bankManager = Momentum.getBankManager();
+            JackpotManager jackpotManager = Momentum.getJackpotManager();
 
             // give higher reward if prestiged
             int reward = event.getReward();
@@ -997,10 +997,10 @@ public class LevelManager {
                 reward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
             }
             // jackpot section
-            else if (bankManager.isJackpotRunning() &&
-                     bankManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                     !bankManager.getJackpot().hasCompleted(playerStats.getName())) {
-                Jackpot jackpot = bankManager.getJackpot();
+            else if (jackpotManager.isJackpotRunning() &&
+                    jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                     !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
+                Jackpot jackpot = jackpotManager.getJackpot();
 
                 JackpotRewardEvent jackpotEvent = new JackpotRewardEvent(playerStats, jackpot.getLevel(), jackpot.getBonus());
                 Bukkit.getPluginManager().callEvent(jackpotEvent);

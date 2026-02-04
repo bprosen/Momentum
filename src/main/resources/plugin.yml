@@ -130,8 +130,6 @@ commands:
     description: "Momentum hotbar command"
   elotier:
     description: "Momentum ELO Tier command"
-  bank:
-    description: "Momentum Bank command"
   commandsign:
     description: "Momentum command sign creation command"
     aliases: [csign]

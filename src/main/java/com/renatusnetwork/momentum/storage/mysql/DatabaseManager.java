@@ -37,9 +37,6 @@ public class DatabaseManager {
     public static final String LEVEL_REQUIRED_LEVELS_TABLE = "level_required_levels";
     public static final String FAVORITE_LEVELS = "favorite_levels";
     public static final String ELO_TIERS = "elo_tiers";
-    public static final String BANK_ITEMS = "bank_items";
-    public static final String BANK_WEEKS = "bank_weeks";
-    public static final String BANK_BIDS = "bank_bids";
     public static final String COMMAND_SIGNS = "command_signs";
     public static final String USED_COMMAND_SIGNS = "used_command_signs";
     public static final String COMMAND_SIGNS_COMMANDS = "command_signs_commands";

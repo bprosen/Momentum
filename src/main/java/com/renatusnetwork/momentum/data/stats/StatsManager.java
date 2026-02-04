@@ -2,7 +2,6 @@ package com.renatusnetwork.momentum.data.stats;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.GGRewardEvent;
-import com.renatusnetwork.momentum.data.bank.items.BankItemType;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.cmdsigns.CmdSignsDB;
@@ -429,19 +428,6 @@ public class StatsManager {
     public void calculateNewELO(PlayerStats competitor, PlayerStats against, ELOOutcomeTypes outcome) {
         int newELO = competitor.calculateNewELO(against, outcome);
         updateELO(competitor, newELO);
-    }
-
-    public void updateBankBid(PlayerStats playerStats, BankItemType type, int bid) {
-        long bidDateMillis = System.currentTimeMillis();
-        int week = Momentum.getBankManager().getCurrentWeek();
-
-        if (playerStats.hasBankBid(type)) {
-            playerStats.updateBankBid(type, bid, bidDateMillis);
-            StatsDB.updateBankBid(playerStats.getUUID(), week, type, bid, bidDateMillis);
-        } else {
-            playerStats.addBankBid(type, bid, bidDateMillis);
-            StatsDB.insertBankBid(playerStats.getUUID(), week, type, bid, bidDateMillis);
-        }
     }
 
     public void updateCoins(PlayerStats playerStats, int coins) {
