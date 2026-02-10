@@ -5,6 +5,7 @@ import com.renatusnetwork.momentum.data.infinite.*;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.infinite.rewards.InfiniteReward;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +46,14 @@ public class InfiniteCMD implements CommandExecutor {
                     int score = Momentum.getStatsManager().get(target).getBestInfiniteScore(type);
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(score)));
                 } else {
-                    sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not online"));
+                    // sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not online"));
+                    int score = StatsDB.getPlayerInfiniteHighscore(a[2], type);
+                    if (score != -1) {
+                        sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(score)));
+                    }
+                    else {
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &ccould not be found"));
+                    }
                 }
                 // self
             } else if (a.length == 2) {
