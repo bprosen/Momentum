@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.infinite.*;
+import com.renatusnetwork.momentum.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.infinite.rewards.InfiniteReward;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
@@ -31,6 +32,14 @@ public class InfiniteCMD implements CommandExecutor {
 
         if (player.hasPermission("momentum.admin") && a.length == 1 && a[0].equalsIgnoreCase("modes")) {
             sendTypes(player);
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("quit")) {
+            if (!Momentum.getStatsManager().get(player).isInInfinite()) {
+                sender.sendMessage(Utils.translate("&cYou are not in infinite parkour!"));
+                return false;
+            }
+
+            infiniteManager.endPK(player);
+            sender.sendMessage(Utils.translate("&7You have successfully ended your current infinite session"));
         } else if (a.length >= 2 && a[0].equalsIgnoreCase("score")) {
             InfiniteType type = infiniteManager.getType(a[1].toUpperCase());
             if (type == null) {
@@ -195,7 +204,7 @@ public class InfiniteCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
         player.sendMessage(Utils.translate("&5/infinite score <type> [IGN]  &7Tells you the score of yourself/someone else"));
         player.sendMessage(Utils.translate("&5/infinite rewards <type>  &7Tells you a list of the rewards for the type and if you have them (crossed out)"));
-
+        player.sendMessage(Utils.translate("&5/infinite quit  &7Ends your current infinite session"));
 
         if (player.hasPermission("momentum.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <type> <score>  &7Set the type's score of someone"));
