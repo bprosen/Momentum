@@ -2,8 +2,11 @@ package com.renatusnetwork.momentum.data.elo;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 
-public class ELOTier {
+import java.util.Objects;
+
+public class ELOTier implements Comparable<ELOTier> {
 
     private String name;
     private String title;
@@ -61,5 +64,11 @@ public class ELOTier {
 
     public void setPreviousELOTier(String previousELOTier) {
         this.previousELOTier = previousELOTier;
+    }
+
+    // will return <0 if this tier comes before the argument tier
+    @Override
+    public int compareTo(@NotNull ELOTier tier) {
+        return Integer.compare(this.requiredELO, tier.requiredELO);
     }
 }

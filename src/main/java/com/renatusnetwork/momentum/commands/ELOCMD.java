@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
@@ -28,6 +29,8 @@ public class ELOCMD implements CommandExecutor {
                         int elo = Math.max(Integer.parseInt(a[2]), 0);
 
                         Momentum.getStatsManager().updateELOData(targetStats, elo);
+                        Momentum.getStatsManager().updateELOTier(targetStats, Momentum.getELOTiersManager().calculateELOTierDirectly(elo));
+                        targetStats.loadELOToXPBar();
                         player.sendMessage(Utils.translate("&7You have set &c" + targetStats.getDisplayName() + "&7's &aELO&7 to &2" + Utils.formatNumber(elo)));
                     } else {
                         player.sendMessage(Utils.translate("&4" + a[2] + " is not an integer"));

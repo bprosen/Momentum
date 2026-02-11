@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ELOTierCMD implements CommandExecutor {
     @Override
@@ -33,6 +34,16 @@ public class ELOTierCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&7You have created the ELO tier &c" + name));
                 } else {
                     sender.sendMessage(Utils.translate("&4" + name + " &calready exists"));
+                }
+            } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
+                sendELOTiers(sender);
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("tier")) {
+                PlayerStats playerStats = Momentum.getStatsManager().getByName(a[1]);
+                if (playerStats != null) {
+                    sender.sendMessage(Utils.translate(playerStats.getDisplayName() + " &7is " + playerStats.getELOTier().getFormattedTitle()));
+                }
+                else {
+                    sender.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
                 }
             } else if (a.length == 2 && a[0].equalsIgnoreCase("loadxpbar")) {
                 PlayerStats playerStats = Momentum.getStatsManager().getByName(a[1]);
@@ -93,6 +104,8 @@ public class ELOTierCMD implements CommandExecutor {
 
                         if (tier != null) {
                             Momentum.getStatsManager().updateELOTier(playerStats, tier);
+                            Momentum.getStatsManager().updateELOData(playerStats, tier.getRequiredELO());
+                            playerStats.loadELOToXPBar();
                             sender.sendMessage(Utils.translate("&7You have set &c" + playerStats.getName() + "&7's ELO tier to &a" + tier.getTitle()));
                         }
                     } else {
@@ -112,10 +125,19 @@ public class ELOTierCMD implements CommandExecutor {
         ELOTier eloTier = Momentum.getELOTiersManager().get(name);
 
         if (eloTier == null) {
-            sender.sendMessage(Utils.translate("&4" + name + " &cis not a ELO tier"));
+            sender.sendMessage(Utils.translate("&4" + name + " &cis not an ELO tier"));
         }
 
         return eloTier;
+    }
+
+    private void sendELOTiers(CommandSender sender) {
+        List<ELOTier> tiers = Momentum.getELOTiersManager().getAll();
+
+        for (ELOTier tier : tiers) {
+            ELOTier nextTier = tier.getNextELOTier();
+            sender.sendMessage(Utils.translate("&a- " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")" + (nextTier != null ? "  &7->  " + nextTier.getFormattedTitle() : "")));
+        }
     }
 
     private void sendHelp(CommandSender sender) {
@@ -127,6 +149,7 @@ public class ELOTierCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/elotier previous (name) (previousTier)  &7Sets a tier's previous name"));
         sender.sendMessage(Utils.translate("&a/elotier set (player) (name)  &7Set a player's tier"));
         sender.sendMessage(Utils.translate("&a/elotier loadxpbar (player)  &7Recalculates and loads new xp bar on ELO/ELO tier"));
+        sender.sendMessage(Utils.translate("&a/elotier list  &7Displays all ELO tiers"));
         sender.sendMessage(Utils.translate("&a/elotier help  &7Shows this page"));
     }
 }
