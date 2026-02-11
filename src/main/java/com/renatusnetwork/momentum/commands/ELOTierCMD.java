@@ -149,6 +149,7 @@ public class ELOTierCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/elotier previous (name) (previousTier)  &7Sets a tier's previous name"));
         sender.sendMessage(Utils.translate("&a/elotier set (player) (name)  &7Set a player's tier"));
         sender.sendMessage(Utils.translate("&a/elotier loadxpbar (player)  &7Recalculates and loads new xp bar on ELO/ELO tier"));
+        sender.sendMessage(Utils.translate("&a/elotier tier (player)  &7Displays the ELO tier of a player"));
         sender.sendMessage(Utils.translate("&a/elotier list  &7Displays all ELO tiers"));
         sender.sendMessage(Utils.translate("&a/elotier help  &7Shows this page"));
     }
