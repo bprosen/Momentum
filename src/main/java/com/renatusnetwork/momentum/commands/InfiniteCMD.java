@@ -39,7 +39,7 @@ public class InfiniteCMD implements CommandExecutor {
             }
 
             infiniteManager.endPK(player);
-            sender.sendMessage(Utils.translate("&7You have successfully ended your current infinite session"));
+            sender.sendMessage(Utils.translate("&7You have ended your infinite run"));
         } else if (a.length >= 2 && a[0].equalsIgnoreCase("score")) {
             InfiniteType type = infiniteManager.getType(a[1].toUpperCase());
             if (type == null) {
@@ -204,7 +204,7 @@ public class InfiniteCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
         player.sendMessage(Utils.translate("&5/infinite score <type> [IGN]  &7Tells you the score of yourself/someone else"));
         player.sendMessage(Utils.translate("&5/infinite rewards <type>  &7Tells you a list of the rewards for the type and if you have them (crossed out)"));
-        player.sendMessage(Utils.translate("&5/infinite quit  &7Ends your current infinite session"));
+        player.sendMessage(Utils.translate("&5/infinite quit  &7Ends your current infinite run"));
 
         if (player.hasPermission("momentum.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <type> <score>  &7Set the type's score of someone"));
