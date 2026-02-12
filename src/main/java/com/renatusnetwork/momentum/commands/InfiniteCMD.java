@@ -2,9 +2,11 @@ package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.infinite.*;
+import com.renatusnetwork.momentum.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.infinite.rewards.InfiniteReward;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -28,8 +30,24 @@ public class InfiniteCMD implements CommandExecutor {
         Player player = (Player) sender;
         InfiniteManager infiniteManager = Momentum.getInfiniteManager();
 
-        if (a.length >= 2 && a[0].equalsIgnoreCase("score")) {
-            InfiniteType type = InfiniteType.valueOf(a[1].toUpperCase());
+        if (player.hasPermission("momentum.admin") && a.length == 1 && a[0].equalsIgnoreCase("modes")) {
+            sendTypes(player);
+        } else if (a.length == 1 && a[0].equalsIgnoreCase("quit")) {
+            if (!Momentum.getStatsManager().get(player).isInInfinite()) {
+                sender.sendMessage(Utils.translate("&cYou are not in infinite parkour!"));
+                return false;
+            }
+
+            infiniteManager.endPK(player);
+            sender.sendMessage(Utils.translate("&7You have ended your infinite run"));
+        } else if (a.length >= 2 && a[0].equalsIgnoreCase("score")) {
+            InfiniteType type = infiniteManager.getType(a[1].toUpperCase());
+            if (type == null) {
+                player.sendMessage(Utils.translate("&cInvalid infinite type &4" + a[1].toUpperCase() + "&c!"));
+                sendTypes(player);
+                return true;
+            }
+
             // other target
             if (a.length == 3) {
                 Player target = Bukkit.getPlayer(a[2]);
@@ -37,7 +55,14 @@ public class InfiniteCMD implements CommandExecutor {
                     int score = Momentum.getStatsManager().get(target).getBestInfiniteScore(type);
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(score)));
                 } else {
-                    sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not online"));
+                    // sender.sendMessage(Utils.translate("&4" + a[2] + " &cis not online"));
+                    int score = StatsDB.getPlayerInfiniteHighscore(a[2], type);
+                    if (score != -1) {
+                        sender.sendMessage(Utils.translate("&c" + a[2] + " &7has a &c" + StringUtils.capitalize(type.toString().toLowerCase()) + " &7score of &6" + Utils.formatNumber(score)));
+                    }
+                    else {
+                        sender.sendMessage(Utils.translate("&4" + a[2] + " &ccould not be found"));
+                    }
                 }
                 // self
             } else if (a.length == 2) {
@@ -49,7 +74,13 @@ public class InfiniteCMD implements CommandExecutor {
             if (Utils.isInteger(a[3])) {
                 StatsManager statsManager = Momentum.getStatsManager();
 
-                InfiniteType type = InfiniteType.valueOf(a[2].toUpperCase());
+                InfiniteType type = infiniteManager.getType(a[2].toUpperCase());
+                if (type == null) {
+                    player.sendMessage(Utils.translate("&cInvalid infinite type &4" + a[2].toUpperCase() + "&c!"));
+                    sendTypes(player);
+                    return true;
+                }
+
                 PlayerStats playerStats = statsManager.getByName(a[1]);
                 int score = Integer.parseInt(a[3]);
 
@@ -70,14 +101,19 @@ public class InfiniteCMD implements CommandExecutor {
         } else if (player.hasPermission("momentum.admin") && (a.length == 3 && a[0].equalsIgnoreCase("mode"))) {
             String targetName = a[1];
             String mode = a[2];
-            InfiniteType infiniteType = InfiniteType.valueOf(mode.toUpperCase());
+            InfiniteType type = infiniteManager.getType(mode.toUpperCase());
+            if (type == null) {
+                player.sendMessage(Utils.translate("&cInvalid infinite type &4" + mode.toUpperCase() + "&c!"));
+                sendTypes(player);
+                return true;
+            }
 
             Player target = Bukkit.getPlayer(targetName);
 
             if (target != null) {
                 PlayerStats targetStats = Momentum.getStatsManager().get(target);
-                infiniteManager.changeType(targetStats, infiniteType);
-                player.sendMessage(Utils.translate("&7You changed &c" + targetName + "&7's infinite type to &4" + infiniteType));
+                infiniteManager.changeType(targetStats, type);
+                player.sendMessage(Utils.translate("&7You changed &c" + targetName + "&7's infinite type to &4" + type));
             } else {
                 player.sendMessage(Utils.translate("&4" + targetName + " &cis not online"));
             }
@@ -122,7 +158,12 @@ public class InfiniteCMD implements CommandExecutor {
             String typeName = a[1];
             try {
                 // get rewards
-                InfiniteType type = InfiniteType.valueOf(typeName.toUpperCase());
+                InfiniteType type = infiniteManager.getType(typeName.toUpperCase());
+                if (type == null) {
+                    player.sendMessage(Utils.translate("&cInvalid infinite type &4" + typeName.toUpperCase() + "&c!"));
+                    sendTypes(player);
+                    return true;
+                }
                 List<InfiniteReward> rewards = Momentum.getInfiniteManager().getRewards(type).getRewards();
 
                 player.sendMessage(Utils.translate("&d&l" + StringUtils.capitalize(typeName.toLowerCase()) + " &5&lInfinite Rewards"));
@@ -162,14 +203,24 @@ public class InfiniteCMD implements CommandExecutor {
     private void sendHelp(Player player) {
         player.sendMessage(Utils.translate("&5/infinite start  &7Starts Infinite Parkour"));
         player.sendMessage(Utils.translate("&5/infinite score <type> [IGN]  &7Tells you the score of yourself/someone else"));
-        player.sendMessage(Utils.translate("&5/infinite rewards <type> &7Tells you a list of the rewards for the type and if you have them (crossed out)"));
+        player.sendMessage(Utils.translate("&5/infinite rewards <type>  &7Tells you a list of the rewards for the type and if you have them (crossed out)"));
+        player.sendMessage(Utils.translate("&5/infinite quit  &7Ends your current infinite run"));
 
         if (player.hasPermission("momentum.admin")) {
             player.sendMessage(Utils.translate("&5/infinite setscore <IGN> <type> <score>  &7Set the type's score of someone"));
             player.sendMessage(Utils.translate("&5/infinite loadrewards  &7Loads rewards from rewards.yml"));
             player.sendMessage(Utils.translate("&5/infinite mode <IGN> <type>  &7Set the mode of a player"));
+            player.sendMessage(Utils.translate("&5/infinite modes  &7Lists the infinite modes"));
         }
 
         player.sendMessage(Utils.translate("&5/infinite help  &7Shows you this display"));
+    }
+
+    private void sendTypes(Player player) {
+        player.sendMessage(Utils.translate("&5Infinite Parkour Types"));
+        player.sendMessage(Utils.translate("&7CLASSIC"));
+        player.sendMessage(Utils.translate("&7SPEEDRUN"));
+        player.sendMessage(Utils.translate("&7TIMED"));
+        player.sendMessage(Utils.translate("&7SPRINT"));
     }
 }

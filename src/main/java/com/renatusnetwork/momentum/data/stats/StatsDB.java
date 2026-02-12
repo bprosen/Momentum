@@ -356,6 +356,33 @@ public class StatsDB {
         return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get("coins")) : 0;
     }
 
+    public static int getPlayerInfiniteHighscore(String playerName, InfiniteType type) {
+        String infiniteQuery = "";
+
+        switch (type) {
+            case CLASSIC:
+                infiniteQuery = "infinite_classic_score";
+                break;
+            case SPEEDRUN:
+                infiniteQuery = "infinite_speedrun_score";
+                break;
+            case SPRINT:
+                infiniteQuery = "infinite_sprint_score";
+                break;
+            case TIMED:
+                infiniteQuery = "infinite_timed_score";
+                break;
+        }
+
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
+                infiniteQuery,
+                " WHERE name=?", playerName
+        );
+
+        return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get(infiniteQuery)) : -1;
+    }
+
     public static boolean isPlayerInDatabase(String playerName) {
         Map<String, String> playerResult = DatabaseQueries.getResult(
                 DatabaseManager.PLAYERS_TABLE,

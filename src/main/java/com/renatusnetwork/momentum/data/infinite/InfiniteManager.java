@@ -369,6 +369,15 @@ public class InfiniteManager {
         return null;
     }
 
+    public InfiniteType getType(String type) {
+        try {
+            return InfiniteType.valueOf(type);
+        }
+        catch (IllegalArgumentException iae) {
+            return null;
+        }
+    }
+
     public void loadLeaderboards() {
         for (InfiniteLB lb : leaderboards.values()) {
             lb.loadLeaderboard();

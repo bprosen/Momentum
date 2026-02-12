@@ -1,6 +1,8 @@
 package com.renatusnetwork.momentum.data.elo;
 
-import java.util.HashMap;
+import com.renatusnetwork.momentum.Momentum;
+
+import java.util.*;
 
 public class ELOTiersManager {
 
@@ -37,5 +39,28 @@ public class ELOTiersManager {
     public void updatePreviousELOTier(ELOTier tier, String previousELOTier) {
         tier.setPreviousELOTier(previousELOTier);
         ELOTierDB.updatePreviousTier(tier.getName(), previousELOTier);
+    }
+
+    public ELOTier calculateELOTierDirectly(int elo) {
+        ELOTier tier = tiers.get(Momentum.getSettingsManager().default_elo_tier);
+        ELOTier next = tier.getNextELOTier();
+
+        // if for some reason the argument elo is lower than the lowest tier
+        if (elo <= tier.getRequiredELO()) {
+            return tier;
+        }
+
+        while (next != null) {
+            if (elo >= tier.getRequiredELO() && elo < next.getRequiredELO()) {
+                return tier;
+            }
+
+            tier = next;
+            next = tier.getNextELOTier();
+        }
+
+        // argument is higher than the highest tier
+        // or lower than the lowest tier
+        return tier;
     }
 }

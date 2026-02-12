@@ -190,7 +190,7 @@ public class StatsManager {
     }
 
     public PlayerStats get(Player player) {
-        return playerStatsUUID.get(player.getUniqueId().toString());
+        return player != null ? playerStatsUUID.get(player.getUniqueId().toString()) : null;
     }
 
     public PlayerStats get(String uuid) {

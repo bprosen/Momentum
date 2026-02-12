@@ -2,6 +2,9 @@ package com.renatusnetwork.momentum.data.elo;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.utils.Utils;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class ELOTier {
 

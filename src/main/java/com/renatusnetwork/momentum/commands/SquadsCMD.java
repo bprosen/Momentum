@@ -134,7 +134,7 @@ public class SquadsCMD implements CommandExecutor {
 					SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName() + " &bhas left the squad");
 					player.sendMessage(Utils.translate("&3You have left the squad"));
 					if (squad.size() <= 1) {
-						SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because all players left");
+						SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because no members remain");
 						squadsManager.disband(squad);
 					} else if (leader) {
 						PlayerStats newLeader = squadsManager.getOldestMember(squad, player);
@@ -161,6 +161,11 @@ public class SquadsCMD implements CommandExecutor {
 						squadsManager.kick(targetMember);
 						SquadsManager.notifyMembers(squad, "&9SC &3" + player.getDisplayName()  + " &bhas kicked &3" + targetMember.getDisplayName() + " &bfrom the squad");
 						targetMember.sendMessage(Utils.translate("&3You have been kicked from the squad"));
+
+						if (squad.size() <= 1 && !squadsManager.hasOfflineCache(squad)) {
+							SquadsManager.notifyMembers(squad, "&3The squad has been disbanded because no members remain");
+							squadsManager.disband(squad);
+						}
 					}
 				}
 
