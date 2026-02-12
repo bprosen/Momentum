@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class ELOTier implements Comparable<ELOTier> {
+public class ELOTier {
 
     private String name;
     private String title;
@@ -64,11 +64,5 @@ public class ELOTier implements Comparable<ELOTier> {
 
     public void setPreviousELOTier(String previousELOTier) {
         this.previousELOTier = previousELOTier;
-    }
-
-    // will return <0 if this tier comes before the argument tier
-    @Override
-    public int compareTo(@NotNull ELOTier tier) {
-        return Integer.compare(this.requiredELO, tier.requiredELO);
     }
 }

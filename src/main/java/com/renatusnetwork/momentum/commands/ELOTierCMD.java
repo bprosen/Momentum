@@ -132,12 +132,17 @@ public class ELOTierCMD implements CommandExecutor {
     }
 
     private void sendELOTiers(CommandSender sender) {
-        List<ELOTier> tiers = Momentum.getELOTiersManager().getAll();
+        ELOTier tier = Momentum.getELOTiersManager().get(Momentum.getSettingsManager().default_elo_tier);
+        ELOTier next = tier.getNextELOTier();
 
-        for (ELOTier tier : tiers) {
-            ELOTier nextTier = tier.getNextELOTier();
-            sender.sendMessage(Utils.translate("&a- " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")" + (nextTier != null ? "  &7->  " + nextTier.getFormattedTitle() : "")));
+        while (next != null) {
+            sender.sendMessage(Utils.translate("&a- " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")  &7->  " + next.getFormattedTitle()));
+
+            tier = next;
+            next = tier.getNextELOTier();
         }
+
+        sender.sendMessage(Utils.translate("&a- " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")"));
     }
 
     private void sendHelp(CommandSender sender) {
