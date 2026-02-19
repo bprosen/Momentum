@@ -8,10 +8,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.sql.*;
 import java.util.*;
+import java.util.logging.Level;
 
 public class PlotsDB {
-
+    /* unused
     public static List<String> getPlotCenters() {
 
         // get all plots from database
@@ -26,6 +28,7 @@ public class PlotsDB {
 
         return tempList;
     }
+    */
 
     public static List<String> getTrustedUUIDs(int plotID) {
         List<String> trustedUUIDs = new ArrayList<>();
@@ -53,11 +56,13 @@ public class PlotsDB {
                 "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=? AND trusted_uuid=?", plotID, trustedPlayerUUID);
     }
 
+    /* unused
     public static int getPlotID(Player player) {
         List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.PLOTS_TABLE, "id", "WHERE owner_uuid=?", player.getUniqueId().toString());
 
         return results.isEmpty() ? -1 : Integer.parseInt(results.get(0).get("id"));
     }
+    */
 
     public static void addPlot(PlayerStats playerStats, Location loc) {
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PLOTS_TABLE +
@@ -66,6 +71,7 @@ public class PlotsDB {
         );
     }
 
+    /* keep jic for development
     public static void removePlot(String uuid, boolean async) {
         if (async) {
             DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
@@ -73,7 +79,7 @@ public class PlotsDB {
             DatabaseQueries.runQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
         }
     }
-
+    */
 
     public static HashMap<String, Plot> loadPlots() {
 
@@ -130,25 +136,27 @@ public class PlotsDB {
                 playerName);
     }
 
-    public static Location[] getLastTwoPlotLocations() {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
+    public static Location getLastPLotLocation() {
+        Map<String, String> result = DatabaseQueries.getResult(
                 DatabaseManager.PLOTS_TABLE,
                 "center_x, center_z",
-                "ORDER BY id DESC LIMIT 2");
+                "ORDER BY id DESC LIMIT 1");
 
-        Location[] array = new Location[2];
-
-        int index = 0;
-        for (Map<String, String> result : results) {
-            array[index] = new Location(
-                    Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world),
-                    Double.parseDouble(result.get("center_x")),
-                    Momentum.getSettingsManager().player_submitted_plot_default_y,
-                    Double.parseDouble(result.get("center_z"))
-            );
-            index++;
+        if (result.isEmpty()) {
+            return null;
         }
 
-        return array;
+        return new Location(
+                Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world),
+                Double.parseDouble(result.get("center_x")),
+                Momentum.getSettingsManager().player_submitted_plot_default_y,
+                Double.parseDouble(result.get("center_z"))
+        );
     }
+
+    /* keep jic for development
+    public static void resetAutoIncrement() {
+        DatabaseQueries.runQuery("ALTER TABLE " + DatabaseManager.PLOTS_TABLE + " AUTO_INCREMENT = 1");
+    }
+    */
 }
