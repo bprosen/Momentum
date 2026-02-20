@@ -258,7 +258,7 @@ public class Utils {
     }
 
     public static String translate(String msg) {
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return msg != null ? ChatColor.translateAlternateColorCodes('&', msg) : null;
     }
 
     public static Color getColorFromString(String colorName) {

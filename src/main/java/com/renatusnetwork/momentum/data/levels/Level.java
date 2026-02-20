@@ -50,6 +50,7 @@ public class Level {
 
     public Level(String levelName, long creationMillis) {
         this.name = levelName;
+        this.title = "";
         this.ratings = new HashMap<>();
         this.requiredLevels = new ArrayList<>();
         this.potionEffects = new ArrayList<>();
