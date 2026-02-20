@@ -185,7 +185,7 @@ player_submitted:
   plot_buffer_width: 10
   minimum_rank_for_plot_creation: "novice-i"
 ranks:
-  default_rank: "I"
+  default_rank: "i"
 event:
   reminder_delay: 300
   max_run_time: 1800

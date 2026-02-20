@@ -77,7 +77,7 @@ public class db implements CommandExecutor {
                                 String name = results.getString("player_name");
                                 int coins = (int) results.getDouble("coins");
                                 int spectatable = results.getInt("spectatable");
-                                String rankIdTemp = String.valueOf(results.getInt("rank_id")); // will need to manually fix later
+                                String rankIdTemp = Momentum.getSettingsManager().default_rank;
                                 String clanTag = results.getString("clan_tag");
                                 int raceWins = results.getInt("race_wins");
                                 int raceLosses = results.getInt("race_losses");
