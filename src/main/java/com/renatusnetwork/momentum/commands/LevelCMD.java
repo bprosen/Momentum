@@ -696,7 +696,7 @@ public class LevelCMD implements CommandExecutor {
 
                 if (level != null) {
                     levelManager.toggleTC(level);
-                    sender.sendMessage(Utils.translate("&7You have turned " + level.getTitle() + "&7's cooldown toggle to &2" + level.hasCooldown()));
+                    sender.sendMessage(Utils.translate("&7You have turned " + level.getTitle() + "&7's cooldown toggle to &2" + level.isTCEnabled()));
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("pickfeatured")) {
                 levelManager.pickFeatured();

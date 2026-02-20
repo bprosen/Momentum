@@ -48,8 +48,14 @@ public class LevelListener implements Listener {
                         eventManager.addEliminated(player);
                         player.sendMessage(Utils.translate("&7You are &beliminated &7out of the event!"));
                     } else if (eventManager.isAscentEvent()) {
+                        AscentEvent ascentEvent = (AscentEvent) eventManager.getRunningEvent();
                         // level down
-                        ((AscentEvent) eventManager.getRunningEvent()).levelDown(player);
+                        if (ascentEvent.denyLevelUpOrDown(player)) {
+                            return;
+                        }
+                        ascentEvent.addAscentCooldown(player);
+
+                        ascentEvent.levelDown(player);
                     } else if (eventManager.isMazeEvent()) {
                         // respawn
                         ((MazeEvent) eventManager.getRunningEvent()).respawn(player);
@@ -136,7 +142,13 @@ public class LevelListener implements Listener {
                         if (eventManager.isAscentEvent())
                         // level up
                         {
-                            ((AscentEvent) eventManager.getRunningEvent()).levelUp(player);
+                            AscentEvent ascentEvent = (AscentEvent) eventManager.getRunningEvent();
+                            if (ascentEvent.denyLevelUpOrDown(player)) {
+                                return;
+                            }
+                            ascentEvent.addAscentCooldown(player);
+
+                            ascentEvent.levelUp(player);
                         } else if (eventManager.isMazeEvent())
                         // end event!
                         {

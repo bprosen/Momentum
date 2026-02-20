@@ -94,7 +94,10 @@ public class LocationManager {
 
             Location location = get(locationName);
             exists = location != null;
-            tempMap.put(num, location);
+
+            if (exists) {
+                tempMap.put(num, location);
+            }
 
             num++;
         }
@@ -120,7 +123,10 @@ public class LocationManager {
             if (locationName != null) {
                 Location location = get(locationName);
                 exists = location != null;
-                temp.add(location);
+
+                if (exists) {
+                    temp.add(location);
+                }
 
                 num++;
             }

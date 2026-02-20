@@ -2,6 +2,7 @@ package com.renatusnetwork.momentum.data.events.types;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
+import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -11,19 +12,30 @@ public class AscentEvent extends Event {
 
     private HashMap<Player, Integer> levels;
     private HashMap<Integer, Location> locations;
+    private HashMap<String, Long> ascentCooldown;
+
+    private long ASCENT_COOLDOWN = 1000;
 
     private final int DEFAULT_LEVEL = 1;
 
     public AscentEvent(Level level) {
         super(level, "Ascent");
 
+        this.ascentCooldown = new HashMap<>();
         this.levels = new HashMap<>();
         this.locations = Momentum.getLocationManager().getAscentLevelLocations(level.getName());
     }
 
     public void add(Player player) {
+        Location location = locations.get(DEFAULT_LEVEL);
+
+        if (location == null) {
+            player.sendMessage(Utils.translate("&cSomething went wrong"));
+            return;
+        }
+
         levels.put(player, DEFAULT_LEVEL); // default
-        player.teleport(locations.get(DEFAULT_LEVEL)); // tp
+        player.teleport(location); // tp
     }
 
     public void remove(Player player) {
@@ -63,10 +75,19 @@ public class AscentEvent extends Event {
         return locations.size();
     }
 
+    public void addAscentCooldown(Player player) {
+        ascentCooldown.put(player.getName(), System.currentTimeMillis());
+    }
+
+    public boolean denyLevelUpOrDown(Player player) {
+        return ascentCooldown.containsKey(player.getName()) && (ascentCooldown.get(player.getName()) + ASCENT_COOLDOWN) > System.currentTimeMillis();
+    }
+
     @Override
     public void end() {
         // clear
         levels.clear();
         locations.clear();
+        ascentCooldown.clear();
     }
 }
