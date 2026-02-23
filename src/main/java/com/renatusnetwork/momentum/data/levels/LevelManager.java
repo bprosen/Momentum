@@ -151,7 +151,14 @@ public class LevelManager {
 
     public void toggleNew(Level level) {
         level.toggleNew();
+        level.setLegacy(false);
         LevelsDB.updateNew(level.getName());
+    }
+
+    public void toggleLegacy(Level level) {
+        level.toggleLegacy();
+        level.setNew(false);
+        LevelsDB.updateLegacy(level.getName());
     }
 
     public void toggleTC(Level level) {

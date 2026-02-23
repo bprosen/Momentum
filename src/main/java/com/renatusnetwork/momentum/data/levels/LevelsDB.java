@@ -90,6 +90,7 @@ public class LevelsDB {
             level.setBroadcast(Integer.parseInt(result.get("broadcast")) == 1);
             level.setLiquidResetPlayer(Integer.parseInt(result.get("liquid_reset")) == 0); // default is 0!
             level.setNew(Integer.parseInt(result.get("new")) == 1);
+            level.setLegacy(Integer.parseInt(result.get("legacy")) == 1);
             level.setHasMastery(Integer.parseInt(result.get("has_mastery")) == 1);
             level.setTC(Integer.parseInt(result.get("tc")) == 1);
 
@@ -254,6 +255,12 @@ public class LevelsDB {
 
     public static void updateNew(String levelName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET new=NOT new WHERE name=?", levelName);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET legacy=0 WHERE name=?", levelName);
+    }
+
+    public static void updateLegacy(String levelName) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET legacy=NOT legacy WHERE name=?", levelName);
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.LEVELS_TABLE + " SET new=1 WHERE name=?", levelName);
     }
 
     public static void updateHasMastery(String levelName) {

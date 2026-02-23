@@ -447,6 +447,8 @@ public class MenuItemFormatter {
                 // add new if new level! but dont show new if featured (too messy)
                 if (level.isNew()) {
                     formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
+                } else if (level.isLegacy()) {
+                    formattedTitle = Utils.translate("&8&lLEGACY " + formattedTitle);
                 }
                 // show jackpot info if is running and not completed
                 else if (jackpotManager.isJackpotRunning() && jackpotManager.getJackpot().getLevel().equals(level) && !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
