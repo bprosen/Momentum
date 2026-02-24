@@ -384,6 +384,8 @@ public class LevelManager {
                         }
                     }
 
+                    levels.values().stream().filter(l -> !amountInLevel.containsKey(l)).forEach(l -> l.setPlayersInLevel(0));
+
                     // set in level amount
                     for (Map.Entry<Level, Integer> entry : amountInLevel.entrySet()) {
                         entry.getKey().setPlayersInLevel(entry.getValue());
