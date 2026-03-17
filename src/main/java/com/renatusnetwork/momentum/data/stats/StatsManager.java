@@ -805,6 +805,10 @@ public class StatsManager {
                 spectator.setFlying(true);
             }
 
+            // unobtrusive invis
+            spectator.removePotionEffect(PotionEffectType.INVISIBILITY); // remove before adding to refresh timer
+            spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 1, false, false));
+
             spectatorStats.sendTitle("&7Teleported to " + player.getDisplayName(), "&2/spectate &7 to exit", 10, 40, 10);
         }
     }
