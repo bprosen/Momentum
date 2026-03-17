@@ -5,7 +5,6 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.World;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommandSignManager {
 
@@ -28,13 +27,13 @@ public class CommandSignManager {
         CmdSignsDB.insertUsedCommandSign(playerStats.getUUID(), name);
     }
 
-    public void addCommandSign(String name, String command, World world, int x, int y, int z) {
+    public void addCommandSign(String name, World world, int x, int y, int z) {
         CmdSignLocation loc = new CmdSignLocation(world, x, y, z);
-        CommandSign csign = new CommandSign(name, null, command == null ? new ArrayList<>() : new ArrayList<>(Collections.singletonList(command)), loc, false);
+        CommandSign csign = new CommandSign(name, null, new ArrayList<>(), loc, false);
 
         cmdSigns.put(name, csign);
         locations.put(loc, csign);
-        CmdSignsDB.insertCommandSign(name, command, world.getName(), x, y, z);
+        CmdSignsDB.insertCommandSign(name, world.getName(), x, y, z);
     }
 
     public void deleteCommandSign(String name) {
