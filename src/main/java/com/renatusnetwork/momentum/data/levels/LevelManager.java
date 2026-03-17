@@ -371,6 +371,10 @@ public class LevelManager {
                 HashMap<String, PlayerStats> stats = Momentum.getStatsManager().getPlayerStats();
 
                 synchronized (stats) {
+                    for (Level level : levels.values()) {
+                        level.setPlayersInLevel(0);
+                    }
+
                     for (PlayerStats playerStats : stats.values()) {
                         Level level = playerStats.getLevel();
 
@@ -383,8 +387,6 @@ public class LevelManager {
                             }
                         }
                     }
-
-                    levels.values().stream().filter(l -> !amountInLevel.containsKey(l)).forEach(l -> l.setPlayersInLevel(0));
 
                     // set in level amount
                     for (Map.Entry<Level, Integer> entry : amountInLevel.entrySet()) {
