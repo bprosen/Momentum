@@ -266,6 +266,11 @@ public class StatsManager {
         }
     }
 
+    // simply remove from offline cache without loading stats
+    public void removeOffline(String uuid) {
+        offlineCache.remove(uuid);
+    }
+
     public PlayerStats add(Player player) {
         // ensure thread safety
         synchronized (playerStatsUUID) {

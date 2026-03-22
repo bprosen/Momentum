@@ -12,9 +12,7 @@ import com.renatusnetwork.momentum.data.modifiers.ModifierType;
 import com.renatusnetwork.momentum.data.ranks.Rank;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -452,6 +450,13 @@ public class StatsDB {
                 uuid, boughtLevel);
     }
 
+    public static void removeAllFavoriteLevels(String uuid) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.FAVORITE_LEVELS + " WHERE uuid=?",
+                uuid
+        );
+    }
+
     public static void addBoughtLevel(String uuid, String boughtLevel) {
         DatabaseQueries.runAsyncQuery(
                 "INSERT INTO " + DatabaseManager.LEVEL_PURCHASES_TABLE + " (uuid, level_name)" +
@@ -464,6 +469,13 @@ public class StatsDB {
         DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=? AND level_name=?",
                 uuid, boughtLevel);
+    }
+
+    public static void removeAllBoughtLevels(String uuid) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=?",
+                uuid
+        );
     }
 
     public static void removeBoughtLevelByName(String playerName, String boughtLevel) {
@@ -484,8 +496,12 @@ public class StatsDB {
         return !playerResult.isEmpty();
     }
 
-    public static void resetPlayerClan(String playerName) {
+    public static void resetPlayerClanByName(String playerName) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=NULL WHERE name=?", playerName);
+    }
+
+    public static void resetPlayerClanByUUID(String playerUUID) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=NULL WHERE uuid=?", playerUUID);
     }
 
     public static void updatePlayerClan(String uuid, String tag) {
@@ -525,6 +541,13 @@ public class StatsDB {
                 "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid=? AND modifier_name=?",
                 uuid, modifierName
                                      );
+    }
+
+    public static void removeAllModifiersFromPlayer(String playerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid=?",
+                playerUUID
+        );
     }
 
     public static void removeModifierName(String playerName, String modifierName) {

@@ -113,6 +113,16 @@ public class CompletionsDB {
         }
     }
 
+    public static void removeAllCompletionsFromPlayer(String playerUUID, boolean timedOnly, boolean async) {
+        String query = "DELETE FROM " + DatabaseManager.LEVEL_COMPLETIONS_TABLE + " WHERE uuid=?" + (timedOnly ? " AND time_taken IS NOT NULL" : "");
+
+        if (async) {
+            DatabaseQueries.runAsyncQuery(query, playerUUID);
+        } else {
+            DatabaseQueries.runQuery(query, playerUUID);
+        }
+    }
+
     public static boolean hasCompleted(String uuid, String levelName) {
         Map<String, String> playerResult = DatabaseQueries.getResult(DatabaseManager.LEVEL_COMPLETIONS_TABLE, "*",
                                                                      " WHERE uuid=? AND level_name=?", uuid, levelName);

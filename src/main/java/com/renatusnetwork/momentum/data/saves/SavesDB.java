@@ -63,6 +63,13 @@ public class SavesDB {
                 playerName, levelName);
     }
 
+    public static void removeAllSavesFromPlayer(String playerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_SAVES_TABLE + " WHERE uuid=?",
+                playerUUID
+        );
+    }
+
     public static void updateSave(String uuid, String levelName, Location newLocation) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.LEVEL_SAVES_TABLE +

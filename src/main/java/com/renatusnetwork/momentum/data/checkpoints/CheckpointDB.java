@@ -47,6 +47,13 @@ public class CheckpointDB {
         );
     }
 
+    public static void deleteAllCheckpointsFromPlayer(String playerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " WHERE uuid=?",
+                playerUUID
+        );
+    }
+
     public static void updateCheckpoint(PlayerStats playerStats, Location newLocation) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " SET world=?, x=?, y=?, z=? WHERE level_name=? AND uuid=?",

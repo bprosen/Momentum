@@ -23,7 +23,7 @@ public class PlotCMD implements CommandExecutor {
 
     private HashMap<String, BukkitTask> deletePlotConfirm = new HashMap<>();
     private HashMap<String, BukkitTask> acceptPlotConfirm = new HashMap<>();
-    private HashMap<String, BukkitTask> wipePlotsConfirm = new HashMap<>();
+    // private HashMap<String, BukkitTask> wipePlotsConfirm = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {

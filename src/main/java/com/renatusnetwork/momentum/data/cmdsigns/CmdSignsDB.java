@@ -86,6 +86,13 @@ public class CmdSignsDB {
         );
     }
 
+    public static void unuseAllCommandSigns(String uuid) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.USED_COMMAND_SIGNS + " WHERE uuid=?",
+                uuid
+        );
+    }
+
     public static void updateCommand(String name, String oldCommand, String newCommand) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " SET command=? WHERE name=? AND command=?",

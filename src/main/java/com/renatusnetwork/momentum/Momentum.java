@@ -184,6 +184,7 @@ public class Momentum extends JavaPlugin {
         getCommand("elotier").setExecutor(new ELOTierCMD());
         getCommand("commandsign").setExecutor(new CommandSignCMD());
         getCommand("squads").setExecutor(new SquadsCMD());
+        getCommand("reset").setExecutor(new ResetCMD());
     }
 
     private static void load() {
