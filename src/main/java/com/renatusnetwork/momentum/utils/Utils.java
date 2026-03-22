@@ -19,7 +19,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.slf4j.helpers.MessageFormatter;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -258,13 +257,8 @@ public class Utils {
         }
     }
 
-    public static String translate(String template, Object... params) {
-        if (template == null) {
-            return null;
-        }
-
-        String message = MessageFormatter.basicArrayFormat(template, params);
-        return ChatColor.translateAlternateColorCodes('&', message);
+    public static String translate(String msg) {
+        return msg != null ? ChatColor.translateAlternateColorCodes('&', msg) : null;
     }
 
     public static Color getColorFromString(String colorName) {
