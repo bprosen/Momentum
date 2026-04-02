@@ -806,7 +806,7 @@ public class LevelManager {
                 RanksManager ranksManager = Momentum.getRanksManager();
                 if (!(level.needsRank() && ranksManager.isPastOrAtRank(playerStats, level.getRequiredRank()))) {
                     if (!level.isEventLevel()) {
-                        if (!level.isRaceLevel()) {
+                        //if (!level.isRaceLevel()) {
                             if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
                                 boolean teleport = true;
 
@@ -826,9 +826,9 @@ public class LevelManager {
                             } else {
                                 player.sendMessage(Utils.translate("&cYou cannot teleport to a level from the plot world, do /spawn first"));
                             }
-                        } else {
-                            player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
-                        }
+                        //} else {
+                        //    player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
+                        //}
                     } else {
                         player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
                     }
