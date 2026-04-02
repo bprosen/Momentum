@@ -983,63 +983,22 @@ public class LevelManager {
             // Update player information
             playerStats.levelCompletion(levelCompletion);
 
-            // add mastery
-            if (completedMastery) {
-                playerStats.addMasteryCompletion(level.getName());
-                Momentum.getStatsManager().leftMastery(playerStats);
-            }
             JackpotManager jackpotManager = Momentum.getJackpotManager();
 
-            // give higher reward if prestiged
-            int reward = event.getReward();
+            int reward = calculateLevelRewardForPlayer(playerStats, level);
 
-            // level booster
-            if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER)) {
-                Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
-                reward *= booster.getMultiplier();
-            }
-
-            // if mastery, boost it
-            if (completedMastery) {
-                reward *= level.getMasteryMultiplier();
-            }
-            // if featured, set reward!
-            else if (level.isFeaturedLevel()) {
-                reward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
-            }
-            // jackpot section
-            else if (jackpotManager.isJackpotRunning() &&
+            if (jackpotManager.isJackpotRunning() &&
                     jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                     !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
+                    !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
                 Jackpot jackpot = jackpotManager.getJackpot();
 
                 JackpotRewardEvent jackpotEvent = new JackpotRewardEvent(playerStats, jackpot.getLevel(), jackpot.getBonus());
                 Bukkit.getPluginManager().callEvent(jackpotEvent);
 
                 if (!jackpotEvent.isCancelled()) {
-                    int bonus = jackpotEvent.getBonus();
-
-                    // jackpot booster
-                    if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER)) {
-                        Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
-                        bonus *= booster.getMultiplier();
-                    }
-
                     // add coins and add to completed, as well as broadcast completion
                     jackpot.addCompleted(player.getName());
                     jackpot.broadcastCompletion(player);
-                    reward += bonus;
-                }
-            }
-            // prestige/cooldown section
-            else {
-                if (playerStats.hasPrestiges() && level.hasReward()) {
-                    reward *= playerStats.getPrestigeMultiplier();
-                }
-
-                // set cooldown modifier last!
-                if (level.hasCooldown() && inCooldownMap(playerStats.getName())) {
-                    reward *= getLevelCooldown(playerStats.getName()).getModifier();
                 }
             }
 
@@ -1228,6 +1187,50 @@ public class LevelManager {
 
             CompletionsDB.insertCompletion(levelCompletion, completedMastery);
         }
+    }
+
+    // calculates level reward player WOULD get for the given level
+    public int calculateLevelRewardForPlayer(PlayerStats playerStats, Level level) {
+        int baseReward = level.getReward();
+        JackpotManager jackpotManager = Momentum.getJackpotManager();
+
+        // level booster
+        if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER)) {
+            Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
+            baseReward *= booster.getMultiplier();
+        }
+
+        // if mastery, boost it
+        if (level.hasMastery() && playerStats.isAttemptingMastery()) {
+            baseReward *= level.getMasteryMultiplier();
+        } else if (level.isFeaturedLevel()) { // if featured, set reward!
+            baseReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
+        } else if (jackpotManager.isJackpotRunning() &&
+                jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
+                !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) { // jackpot section
+            Jackpot jackpot = jackpotManager.getJackpot();
+
+            int bonus = jackpot.getBonus();
+
+            // jackpot booster
+            if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER)) {
+                Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
+                bonus *= booster.getMultiplier();
+            }
+
+            baseReward += bonus;
+        } else { // prestige/cooldown section
+            if (playerStats.hasPrestiges() && level.hasReward()) {
+                baseReward *= playerStats.getPrestigeMultiplier();
+            }
+
+            // set cooldown modifier last!
+            if (level.hasCooldown() && inCooldownMap(playerStats.getName())) {
+                baseReward *= getLevelCooldown(playerStats.getName()).getModifier();
+            }
+        }
+
+        return baseReward;
     }
 
     // Respawn player if checkpoint isn't there

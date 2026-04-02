@@ -551,45 +551,8 @@ public class MenuItemFormatter {
             }
 
             int oldReward = level.getReward();
-            int newReward = oldReward;
+            int newReward = Momentum.getLevelManager().calculateLevelRewardForPlayer(playerStats, level);
             LevelCooldown cooldown = null;
-
-            if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER)) {
-                // downcast and boost
-                Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
-                newReward *= booster.getMultiplier();
-            }
-
-            if (level.isFeaturedLevel()) {
-                newReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
-            }
-            // jackpot section
-            else if (jackpotManager.isJackpotRunning() &&
-                    jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
-                     !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
-                Jackpot jackpot = jackpotManager.getJackpot();
-
-                int bonus = jackpot.getBonus();
-
-                if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER)) {
-                    // downcast and boost
-                    Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
-                    bonus *= booster.getMultiplier();
-                }
-                newReward += bonus;
-            }
-            // only do these if jackpot is not running!
-            else {
-                if (playerStats.hasPrestiges() && level.hasReward()) {
-                    newReward *= playerStats.getPrestigeMultiplier();
-                }
-
-                // set cooldown modifier last!
-                if (level.hasCooldown() && Momentum.getLevelManager().inCooldownMap(playerStats.getName())) {
-                    cooldown = Momentum.getLevelManager().getLevelCooldown(playerStats.getName());
-                    newReward *= cooldown.getModifier();
-                }
-            }
 
             // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
             if (oldReward != newReward) {

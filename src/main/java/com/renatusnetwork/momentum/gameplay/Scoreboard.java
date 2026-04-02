@@ -266,56 +266,22 @@ public class Scoreboard {
                             String rewardString = Utils.translate("&6" + Utils.formatNumber(level.getReward()));
                             JackpotManager jackpotManager = Momentum.getJackpotManager();
 
-                            int newReward = level.getReward();
+                            int reward = Momentum.getLevelManager().calculateLevelRewardForPlayer(playerStats, level);
 
-                            // always modify level booster
-                            if (playerStats.hasModifier(ModifierType.LEVEL_BOOSTER)) {
-                                // downcast and boost
-                                Booster booster = (Booster) playerStats.getModifier(ModifierType.LEVEL_BOOSTER);
-                                newReward *= booster.getMultiplier();
-                            }
 
                             // if level has mastery and player is in mastery
                             if (level.hasMastery() && playerStats.isAttemptingMastery()) {
                                 board.add(formatSpacing(Utils.translate("&5&lMASTERY")));
-                                newReward *= level.getMasteryMultiplier();
-                            }
-                            // add title and adjust rewardstring if it is a featured level
-                            else if (level.isFeaturedLevel()) {
+                            } else if (level.isFeaturedLevel()) { // add title and adjust rewardstring if it is a featured level
                                 board.add(formatSpacing(Utils.translate("&c&lFEATURED")));
-                                newReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
                             } else if (jackpotManager.isJackpotRunning() &&
                                         jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName()) &&
                                        !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
-                                Jackpot jackpot = jackpotManager.getJackpot();
-                                int bonus = jackpot.getBonus();
-
-                                if (playerStats.hasModifier(ModifierType.JACKPOT_BOOSTER)) {
-                                    // downcast and boost
-                                    Booster booster = (Booster) playerStats.getModifier(ModifierType.JACKPOT_BOOSTER);
-                                    bonus *= booster.getMultiplier();
-                                }
-                                // add bonus multiplier
-                                newReward += bonus;
-
                                 board.add(formatSpacing(Utils.translate("&a&lJACKPOT")));
                             }
-                            // modifier section
-                            else {
-                                if (playerStats.hasPrestiges() && level.hasReward()) {
-                                    newReward *= playerStats.getPrestigeMultiplier();
-                                }
 
-                                LevelManager levelManager = Momentum.getLevelManager();
-
-                                // set cooldown modifier last!
-                                if (level.hasCooldown() && levelManager.inCooldownMap(playerStats.getName()) && levelManager.getLevelCooldown(playerStats.getName()).getModifier() != 1.00) {
-                                    newReward *= levelManager.getLevelCooldown(playerStats.getName()).getModifier();
-                                }
-                            }
-
-                            if (newReward != level.getReward()) {
-                                rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(newReward));
+                            if (reward != level.getReward()) {
+                                rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(reward));
                             }
 
                             board.add(formatSpacing(level.getFormattedTitle()));
