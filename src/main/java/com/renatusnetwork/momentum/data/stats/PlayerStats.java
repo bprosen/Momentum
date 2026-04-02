@@ -973,6 +973,10 @@ public class PlayerStats {
         }
     }
 
+    public void removeCompletions(String levelName) {
+        levelCompletions.remove(levelName);
+    }
+
     //
     // Perks Section
     //

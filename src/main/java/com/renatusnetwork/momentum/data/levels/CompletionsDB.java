@@ -262,6 +262,16 @@ public class CompletionsDB {
         return leaderboard;
     }
 
+    public static int getPlayerLevelCompletionsCount(String uuid, String levelName) {
+        Map<String, String> count = DatabaseQueries.getResult(
+                DatabaseManager.LEVEL_COMPLETIONS_TABLE, "COUNT(*) AS completions_count",
+                "WHERE uuid=? AND level_name=?",
+                uuid, levelName
+        );
+
+        return Integer.parseInt(count.get("completions_count"));
+    }
+
     public static boolean isFasterThanRecord(LevelCompletion levelCompletion) {
         Map<String, String> singleResult = DatabaseQueries.getResult(
                 DatabaseManager.LEVEL_COMPLETIONS_TABLE, "MIN(time_taken) AS fastest",

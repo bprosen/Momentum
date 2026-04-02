@@ -710,6 +710,10 @@ public class LevelManager {
         totalLevelCompletions--;
     }
 
+    public void removeTotalLevelCompletion(int count) {
+        totalLevelCompletions -= count;
+    }
+
 
     // top rated levels lb
     public void loadTopRatedLevelsLB() {
