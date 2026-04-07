@@ -27,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -407,7 +406,7 @@ public class PlayerStats {
 
     public void resetLevel() {
         level = null;
-        Utils.removeSpawnItemIfExists(player);
+        Utils.removeLeaveItem(player);
     }
 
     public Level getLevel() {

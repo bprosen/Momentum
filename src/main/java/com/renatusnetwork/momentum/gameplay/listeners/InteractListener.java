@@ -186,6 +186,8 @@ public class InteractListener implements Listener {
 
                             playerStats.sendMessage(Utils.translate(forfeitMessage));
                             playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+                        } else if (playerStats.isPreviewingLevel()) {
+                            playerStats.resetPreviewLevel();
                         } else {
                             Momentum.getLocationManager().teleportToSpawn(playerStats, player);
                         }

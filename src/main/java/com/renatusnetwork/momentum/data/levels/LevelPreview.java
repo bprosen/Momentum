@@ -33,5 +33,6 @@ public class LevelPreview {
 
     public void reset() {
         playerStats.teleport(oldLocation, true);
+        Utils.removeLeaveItem(playerStats.getPlayer());
     }
 }

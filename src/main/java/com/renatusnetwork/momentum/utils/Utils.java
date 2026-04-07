@@ -188,14 +188,14 @@ public class Utils {
         return getItemStackIfExists(inventory, settingsManager.prac_item);
     }
 
-    public static ItemStack getSpawnItemIfExists(Inventory inventory) {
+    public static ItemStack getLeaveItem(Inventory inventory) {
         SettingsManager settingsManager = Momentum.getSettingsManager();
         return getItemStackIfExists(inventory, settingsManager.leave_item);
     }
 
-    public static void removeSpawnItemIfExists(Player player) {
+    public static void removeLeaveItem(Player player) {
         PlayerInventory inventory = player.getInventory();
-        ItemStack itemStack = Utils.getSpawnItemIfExists(inventory);
+        ItemStack itemStack = Utils.getLeaveItem(inventory);
 
         // remove if not null
         if (itemStack != null) {
