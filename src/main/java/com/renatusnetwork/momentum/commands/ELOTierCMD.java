@@ -35,6 +35,18 @@ public class ELOTierCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&4" + name + " &calready exists"));
                 }
+            } else if (a.length == 2 && a[0].equalsIgnoreCase("delete")) {
+                String name = a[1].toLowerCase();
+
+                ELOTier tier = Momentum.getELOTiersManager().get(name);
+                if (tier == null) {
+                    sender.sendMessage(Utils.translate("&cELO tier &4" + name + " &cdoes not exist"));
+                } else if (name.equalsIgnoreCase(Momentum.getSettingsManager().default_elo_tier)) {
+                    sender.sendMessage(Utils.translate("&cCannot delete the default ELO tier. Change it in config before deleting it."));
+                } else {
+                    Momentum.getELOTiersManager().deleteELOTier(tier);
+                    sender.sendMessage(Utils.translate("&aSuccessfully removed &2" + name));
+                }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
                 sendELOTiers(sender);
             } else if (a.length == 2 && a[0].equalsIgnoreCase("tier")) {
@@ -136,18 +148,19 @@ public class ELOTierCMD implements CommandExecutor {
         ELOTier next = tier.getNextELOTier();
 
         while (next != null) {
-            sender.sendMessage(Utils.translate("&a- " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")  &7->  " + next.getFormattedTitle()));
+            sender.sendMessage(Utils.translate("&a- &7&o" + tier.getName() + "  " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")  &7->  " + next.getFormattedTitle()));
 
             tier = next;
             next = tier.getNextELOTier();
         }
 
-        sender.sendMessage(Utils.translate("&a- " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")"));
+        sender.sendMessage(Utils.translate("&a- &7&o" + tier.getName() + "  " + tier.getFormattedTitle() + " &a(" + tier.getRequiredELO() + ")"));
     }
 
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&2&lELO Tier Help"));
         sender.sendMessage(Utils.translate("&a/elotier create (name)  &7Creates an ELO tier"));
+        sender.sendMessage(Utils.translate("&a/elotier delete (name)  &7Deletes an ELO tier"));
         sender.sendMessage(Utils.translate("&a/elotier title (name) (title)  &7Sets a tier's title"));
         sender.sendMessage(Utils.translate("&a/elotier requiredelo (name) (requiredELO)  &7Sets a tier's required ELO"));
         sender.sendMessage(Utils.translate("&a/elotier next (name) (nextTier)  &7Sets a tier's next name"));
