@@ -37,7 +37,6 @@ public class Level {
     private boolean cooldown;
     private LevelType type;
     private boolean newLevel;
-    private boolean legacyLevel;
     private boolean hasMastery;
     private float masteryMultiplier;
     private boolean tc;
@@ -426,24 +425,12 @@ public class Level {
         return newLevel;
     }
 
-    public boolean isLegacy() {
-        return legacyLevel;
-    }
-
     public void toggleNew() {
         newLevel = !newLevel;
     }
 
-    public void toggleLegacy() {
-        legacyLevel = !legacyLevel;
-    }
-
     public void setNew(boolean isNew) {
         this.newLevel = isNew;
-    }
-
-    public void setLegacy(boolean isLegacy) {
-        this.legacyLevel = isLegacy;
     }
 
     public boolean hasMastery() {
@@ -539,6 +526,5 @@ public class Level {
     public boolean equals(String levelName) {
         return this.name.equalsIgnoreCase(levelName);
     }
-
 
 }

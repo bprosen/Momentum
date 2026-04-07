@@ -721,15 +721,6 @@ public class LevelCMD implements CommandExecutor {
                             "&7You have set the new level value of &c" + level.getTitle() + "&7 to &c" + level.isNew()
                     ));
                 }
-            } else if (a.length == 2 && a[0].equalsIgnoreCase("legacy")) {
-                Level level = getLevel(sender, a[1].toLowerCase());
-
-                if (level != null) {
-                    levelManager.toggleLegacy(level);
-                    sender.sendMessage(Utils.translate(
-                            "&7You have set the legacy level value of &c" + level.getTitle() + "&7 to &c" + level.isLegacy()
-                    ));
-                }
             } else if (a.length == 3 && a[0].equalsIgnoreCase("difficulty")) {
                 Level level = getLevel(sender, a[1].toLowerCase());
 
