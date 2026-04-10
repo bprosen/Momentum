@@ -176,6 +176,22 @@ public class LBPlaceholders {
                             }
                             break;
                         }
+                        case "mastery": {
+                            ArrayList<MasteryLBPosition> leaderboard = Momentum.getStatsManager().getMasteryLB();
+
+                            if (leaderboard.size() > posInt) {
+                                MasteryLBPosition masteryLbPosition = leaderboard.get(posInt);
+
+                                if (masteryLbPosition != null) {
+                                    if (value.equals("name")) {
+                                        return masteryLbPosition.getPlayerName();
+                                    } else if (value.equals("progress")) {
+                                        return Utils.formatNumber(masteryLbPosition.getMasteryCompletions()) + "/" + Utils.formatNumber(Momentum.getLevelManager().getNumMasteryLevels());
+                                    }
+                                }
+                            }
+                            break;
+                        }
                         default: {
                             Level level = Momentum.getLevelManager().get(type);
 
