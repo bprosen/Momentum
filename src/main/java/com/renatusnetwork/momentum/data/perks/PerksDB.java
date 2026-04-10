@@ -75,7 +75,7 @@ public class PerksDB {
         );
     }
 
-    public static void updateArmorGlow(String perkName, String armorPiece) {
+    public static void toggleArmorGlow(String perkName, String armorPiece) {
         DatabaseQueries.runAsyncQuery(
                 "UPDATE " + DatabaseManager.PERKS_ARMOR_TABLE + " SET glow=NOT glow WHERE perk_name=? AND armor_piece=?", perkName, armorPiece
         );

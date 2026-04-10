@@ -5,6 +5,7 @@ import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsDB;
+import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -102,28 +103,31 @@ public class PerkManager {
         ItemStack item = perk.getArmorPiece(type);
         ItemMeta itemMeta = item.getItemMeta();
 
-        itemMeta.setDisplayName(title);
+        itemMeta.setDisplayName(Utils.translate(title));
         item.setItemMeta(itemMeta);
 
         PerksDB.updateArmorTitle(perk.getName(), type.name(), title);
     }
 
-    public boolean updateArmorGlow(Perk perk, PerksArmorType type) {
+    public boolean toggleArmorGlow(Perk perk, PerksArmorType type) {
         ItemStack item = perk.getArmorPiece(type);
         ItemMeta itemMeta = item.getItemMeta();
 
-        boolean glow = itemMeta.hasEnchant(Enchantment.DURABILITY);
+        boolean isGlowing = itemMeta.hasEnchant(Enchantment.DURABILITY);
 
-        if (!glow) {
+        if (isGlowing) {
             itemMeta.removeEnchant(Enchantment.DURABILITY);
             itemMeta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+        } else {
+            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
         item.setItemMeta(itemMeta);
 
-        PerksDB.updateArmorGlow(perk.getName(), type.name());
+        PerksDB.toggleArmorGlow(perk.getName(), type.name());
 
-        return glow; // return the value of the glow
+        return !isGlowing; // return the value of the glow
     }
 
     public void updateArmorMaterial(Perk perk, PerksArmorType type, Material material) {

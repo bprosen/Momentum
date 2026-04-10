@@ -252,7 +252,7 @@ public class PerksCMD implements CommandExecutor {
                     if (type != null) {
                         // we can only update it if it exists
                         if (perk.hasArmorItem(type)) {
-                            boolean glow = perkManager.updateArmorGlow(perk, type); // get the result of the glow toggle for printing
+                            boolean glow = perkManager.toggleArmorGlow(perk, type); // get the result of the glow toggle for printing
                             sender.sendMessage(Utils.translate(
                                     "&7You have updated &c" + perkName + "&7's armor piece &c" + type.name() + "&7's glow to &c" + glow
                             ));
