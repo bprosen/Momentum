@@ -23,7 +23,7 @@ public class PlotCMD implements CommandExecutor {
 
     private HashMap<String, BukkitTask> deletePlotConfirm = new HashMap<>();
     private HashMap<String, BukkitTask> acceptPlotConfirm = new HashMap<>();
-    private HashMap<String, BukkitTask> wipePlotsConfirm = new HashMap<>();
+    // private HashMap<String, BukkitTask> wipePlotsConfirm = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
@@ -495,7 +495,6 @@ public class PlotCMD implements CommandExecutor {
     private static void sendHelp(CommandSender sender) {
         sender.sendMessage(Utils.translate("&2&lPlots Help"));
         sender.sendMessage(Utils.translate("&a/plot create  &7Automatically create a plot"));
-        sender.sendMessage(Utils.translate("&a/plot delete  &7Deletes your plot (confirm needed)"));
         sender.sendMessage(Utils.translate("&a/plot clear  &7Clears your plot but does not delete it"));
         sender.sendMessage(Utils.translate("&a/plot home  &7Teleports you to your plot"));
         sender.sendMessage(Utils.translate("&a/plot visit <player>  &7Visit another player's plot"));

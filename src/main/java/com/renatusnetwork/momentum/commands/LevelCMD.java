@@ -337,6 +337,68 @@ public class LevelCMD implements CommandExecutor {
                 } else {
                     sender.sendMessage(Utils.translate("&c" + a[2] + " &7is not an integer!"));
                 }
+            } else if (a.length == 3 && a[0].equalsIgnoreCase("delcompletions")) {
+                String playerName = a[1].toLowerCase();
+                String levelName = a[2].toLowerCase();
+                Level level = getLevel(sender, levelName);
+
+                String player_uuid = StatsDB.getUUIDByName(playerName);
+
+                if (player_uuid == null) {
+                    sender.sendMessage(Utils.translate("&cPlayer &4" + playerName + " &cnot found"));
+                    return true;
+                }
+
+                if (level != null) {
+                    List<LevelLBPosition> lb = level.getLeaderboard();
+                    int completions = CompletionsDB.getPlayerLevelCompletionsCount(player_uuid, level.getName());
+
+                    // run it in async!
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            CompletionsDB.removeCompletions(player_uuid, level.getName());
+
+                            level.setTotalCompletionsCount(level.getTotalCompletionsCount() - completions);
+                            level.setLeaderboard(CompletionsDB.getLeaderboard(levelName));
+                            levelManager.removeTotalLevelCompletion(completions);
+
+                            // if deleting record
+                            if (lb.get(0).getPlayerName().equalsIgnoreCase(playerName)) {
+                                List<LevelLBPosition> newLeaderboard = level.getLeaderboard();
+
+                                if (!newLeaderboard.isEmpty()) {
+                                    // if the new leaderboard is no longer empty, add record for new holder
+                                    LevelLBPosition newHolder = newLeaderboard.get(0);
+
+                                    // if it is a diff person, need to update their in game stats
+                                    if (!playerName.equalsIgnoreCase(newHolder.getPlayerName())) {
+                                        PlayerStats oldHolderStats = statsManager.get(player_uuid);
+                                        PlayerStats newHolderStats = statsManager.getByName(newHolder.getPlayerName());
+
+                                        if (oldHolderStats != null) {
+                                            oldHolderStats.removeRecord(level);
+                                        }
+
+                                        if (newHolderStats != null) {
+                                            newHolderStats.addRecord(level, newHolder.getTimeTaken());
+                                        }
+                                    }
+                                }
+                            }
+
+                            PlayerStats targetStats = Momentum.getStatsManager().get(player_uuid);
+
+                            if (targetStats != null) {
+                                targetStats.removeCompletions(level.getName());
+                            }
+
+                            sender.sendMessage(Utils.translate("&4" + playerName + "'s &ccompletions have been removed succesfully from &4" + levelName));
+                        }
+                    }.runTaskAsynchronously(Momentum.getPlugin());
+                } else {
+                    sender.sendMessage(Utils.translate("&c" + a[2] + " is not a level"));
+                }
             } else if (a.length == 3 && a[0].equalsIgnoreCase("respawny")) {
                 if (Utils.isInteger(a[2])) {
                     // get new y
@@ -696,7 +758,7 @@ public class LevelCMD implements CommandExecutor {
 
                 if (level != null) {
                     levelManager.toggleTC(level);
-                    sender.sendMessage(Utils.translate("&7You have turned " + level.getTitle() + "&7's cooldown toggle to &2" + level.isTCEnabled()));
+                    sender.sendMessage(Utils.translate("&7You have toggled TC for &c" + level.getTitle() + "&7 to &c" + level.isTCEnabled()));
                 }
             } else if (a.length == 1 && a[0].equalsIgnoreCase("pickfeatured")) {
                 levelManager.pickFeatured();
@@ -916,6 +978,7 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player"));
         sender.sendMessage(Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player"));
         sender.sendMessage(Utils.translate("&a/level new <level>  &7Toggles if the level is new (for menu and future updates)"));
+        sender.sendMessage(Utils.translate("&a/level legacy <level>  &7Toggles if the level is legacy (for menu and future updates)"));
         sender.sendMessage(Utils.translate("&a/level difficulty <level> <difficulty>  &7Sets the difficulty of the level"));
         sender.sendMessage(Utils.translate("&a/level cooldown <level>  &7Toggles if the level has a cooldown"));
         sender.sendMessage(Utils.translate("&a/level tc <level>  &7Toggles if the level uses TC blocks"));

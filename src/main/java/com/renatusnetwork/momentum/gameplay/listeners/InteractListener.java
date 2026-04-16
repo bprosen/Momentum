@@ -82,56 +82,60 @@ public class InteractListener implements Listener {
                         if (!playerStats.isEventParticipant()) {
                             if (!playerStats.isSpectating()) {
                                 if (!playerStats.isPreviewingLevel()) {
-                                    if (level != null) {
-                                        if (level.getStartLocation() != null) {
-                                            // gets if they have right clicked it already, if so, cancel the task and reset them
-                                            if (!resetConfirmMap.containsKey(player.getName())) {
-                                                // otherwise, put them in and ask them to confirm within 5 seconds
-                                                player.sendMessage(Utils.translate("&cAre you sure you want to reset? Right click again to confirm"));
+                                    if (!playerStats.inPracticeMode()) {
+                                        if (level != null) {
+                                            if (level.getStartLocation() != null) {
+                                                // gets if they have right clicked it already, if so, cancel the task and reset them
+                                                if (!resetConfirmMap.containsKey(player.getName())) {
+                                                    // otherwise, put them in and ask them to confirm within 5 seconds
+                                                    player.sendMessage(Utils.translate("&cAre you sure you want to reset? Right click again to confirm"));
 
-                                                resetConfirmMap.put(player.getName(), new BukkitRunnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        if (resetConfirmMap.containsKey(player.getName())) {
-                                                            resetConfirmMap.remove(player.getName());
-                                                            player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                                    resetConfirmMap.put(player.getName(), new BukkitRunnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            if (resetConfirmMap.containsKey(player.getName())) {
+                                                                resetConfirmMap.remove(player.getName());
+                                                                player.sendMessage(Utils.translate("&cYou did not confirm in time"));
+                                                            }
+                                                        }
+                                                    }.runTaskLater(Momentum.getPlugin(), 20 * 5));
+                                                } else {
+                                                    resetConfirmMap.get(player.getName()).cancel();
+
+                                                    Momentum.getCheckpointManager().deleteCheckpoint(playerStats, level);
+
+                                                    // statsManager.resetPracticeDataOnly(playerStats);
+                                                    playerStats.disableLevelStartTime();
+
+                                                    if (level.hasPotionEffects()) {
+
+                                                        playerStats.clearPotionEffects();
+
+                                                        // if has nv status, add nv
+                                                        if (playerStats.hasNightVision()) {
+                                                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                                                        }
+
+                                                        for (PotionEffect potionEffect : level.getPotionEffects()) {
+                                                            if (playerStats.hasNightVision() || potionEffect.getType() != PotionEffectType.NIGHT_VISION) {
+                                                                player.addPotionEffect(potionEffect);
+                                                            }
                                                         }
                                                     }
-                                                }.runTaskLater(Momentum.getPlugin(), 20 * 5));
-                                            } else {
-                                                resetConfirmMap.get(player.getName()).cancel();
+                                                    resetConfirmMap.remove(player.getName());
 
-                                                Momentum.getCheckpointManager().deleteCheckpoint(playerStats, level);
-
-                                                statsManager.resetPracticeDataOnly(playerStats);
-                                                playerStats.disableLevelStartTime();
-
-                                                if (level.hasPotionEffects()) {
-
-                                                    playerStats.clearPotionEffects();
-
-                                                    // if has nv status, add nv
-                                                    if (playerStats.hasNightVision()) {
-                                                        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-                                                    }
-
-                                                    for (PotionEffect potionEffect : level.getPotionEffects()) {
-                                                        if (playerStats.hasNightVision() || potionEffect.getType() != PotionEffectType.NIGHT_VISION) {
-                                                            player.addPotionEffect(potionEffect);
-                                                        }
-                                                    }
+                                                    playerStats.teleport(level.getStartLocation(), true);
+                                                    playerStats.resetFails();
+                                                    player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
                                                 }
-                                                resetConfirmMap.remove(player.getName());
-
-                                                playerStats.teleport(level.getStartLocation(), true);
-                                                playerStats.resetFails();
-                                                player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1f);
+                                            } else {
+                                                player.sendMessage(Utils.translate("&cYou cannot reset a level with no start location"));
                                             }
                                         } else {
-                                            player.sendMessage(Utils.translate("&cYou cannot reset a level with no start location"));
+                                            player.sendMessage(Utils.translate("&cYou are not in a level"));
                                         }
                                     } else {
-                                        player.sendMessage(Utils.translate("&cYou are not in a level"));
+                                        player.sendMessage(Utils.translate("&cYou cannot do this while in /prac"));
                                     }
                                 } else {
                                     player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
@@ -182,6 +186,8 @@ public class InteractListener implements Listener {
 
                             playerStats.sendMessage(Utils.translate(forfeitMessage));
                             playerStats.endRace(playerStats.getRace().getOpponent(), RaceEndReason.FORFEIT);
+                        } else if (playerStats.isPreviewingLevel()) {
+                            playerStats.resetPreviewLevel();
                         } else {
                             Momentum.getLocationManager().teleportToSpawn(playerStats, player);
                         }
@@ -215,7 +221,7 @@ public class InteractListener implements Listener {
                     csign.getCommands().forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replaceAll("%player%", playerStats.getName())));
 
                     if (csign.isBroadcast()) {
-                        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + "&7 claimed the sign &2" + csign.getTitle()));
+                        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + "&7 has claimed &2" + (csign.getTitle() == null ? csign.getName() : csign.getTitle())));
                     } else {
                         player.sendMessage(Utils.translate("&aYou have claimed this sign"));
                     }

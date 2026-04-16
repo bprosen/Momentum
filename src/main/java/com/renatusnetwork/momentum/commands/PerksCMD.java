@@ -252,7 +252,7 @@ public class PerksCMD implements CommandExecutor {
                     if (type != null) {
                         // we can only update it if it exists
                         if (perk.hasArmorItem(type)) {
-                            boolean glow = perkManager.updateArmorGlow(perk, type); // get the result of the glow toggle for printing
+                            boolean glow = perkManager.toggleArmorGlow(perk, type); // get the result of the glow toggle for printing
                             sender.sendMessage(Utils.translate(
                                     "&7You have updated &c" + perkName + "&7's armor piece &c" + type.name() + "&7's glow to &c" + glow
                             ));
@@ -501,7 +501,7 @@ public class PerksCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&e/perks requiredelotier (perkName) (eloTier)  &7Sets the required ELO tier for the perk"));
         sender.sendMessage(Utils.translate("&e/perks addcommand (perkName) (command)  &7Adds a command to a perk to give out on setting (command can be multiple words)"));
         sender.sendMessage(Utils.translate("&e/perks removecommand (perkName) (command)  &7Removes a command to a perk to give out on setting (command can be multiple words)"));
-        sender.sendMessage(Utils.translate("&e/perks commands (perkName)  &7Lists the commands for a perka"));
+        sender.sendMessage(Utils.translate("&e/perks commands (perkName)  &7Lists the commands for a perk"));
         sender.sendMessage(Utils.translate("&e/perks help  &7Displays this page"));
         sender.sendMessage(Utils.translate("&e/perks load  &7Loads from db"));
     }

@@ -41,6 +41,23 @@ public class ELOTiersManager {
         ELOTierDB.updatePreviousTier(tier.getName(), previousELOTier);
     }
 
+    public void deleteELOTier(ELOTier tier) {
+        ELOTier next = tier.getNextELOTier();
+        ELOTier prev = tier.getPreviousELOTier();
+
+        if (next != null && prev != null) {
+            prev.setNextELOTier(next.getName());
+            next.setPreviousELOTier(prev.getName());
+        } else if (next != null) {
+            next.setPreviousELOTier(null);
+        } else if (prev != null) {
+            prev.setNextELOTier(null);
+        }
+
+        tiers.remove(tier.getName());
+        ELOTierDB.deleteTier(tier.getName());
+    }
+
     public ELOTier calculateELOTierDirectly(int elo) {
         ELOTier tier = tiers.get(Momentum.getSettingsManager().default_elo_tier);
         ELOTier next = tier.getNextELOTier();

@@ -9,6 +9,7 @@ import com.renatusnetwork.momentum.data.elo.ELOOutcomeTypes;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.leaderboards.ELOLBPosition;
+import com.renatusnetwork.momentum.data.leaderboards.MasteryLBPosition;
 import com.renatusnetwork.momentum.data.levels.CompletionsDB;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.menus.LevelSortingType;
@@ -53,6 +54,7 @@ public class StatsManager {
     private ArrayList<GlobalPersonalLBPosition> globalPersonalCompletionsLB;
     private ArrayList<CoinsLBPosition> coinsLB;
     private ArrayList<ELOLBPosition> eloLB;
+    private ArrayList<MasteryLBPosition> masteryLB;
     private HashMap<String, ELOLBPosition> eloLBNames;
 
     private HashSet<String> saidGG;
@@ -71,6 +73,7 @@ public class StatsManager {
         this.globalPersonalCompletionsLB = new ArrayList<>(Momentum.getSettingsManager().max_global_personal_completions_leaderboard_size);
         this.coinsLB = new ArrayList<>(Momentum.getSettingsManager().max_coins_leaderboard_size);
         this.eloLB = new ArrayList<>(Momentum.getSettingsManager().elo_lb_size);
+        this.masteryLB = new ArrayList<>(Momentum.getSettingsManager().max_mastery_lb_size);
         this.eloLBNames = new HashMap<>(Momentum.getSettingsManager().elo_lb_size);
         this.hiddenPlayers = new HashSet<>();
         this.saidGG = new HashSet<>();
@@ -89,6 +92,7 @@ public class StatsManager {
                 loadCoinsLB();
                 loadTotalCoins();
                 loadELOLB();
+                loadMasteryLB();
             }
         }.runTaskTimerAsynchronously(plugin, 20 * 30, 20 * 180);
 
@@ -264,6 +268,11 @@ public class StatsManager {
             playerStatsUUID.put(playerStats.getUUID(), playerStats);
             playerStatsName.put(playerStats.getName().toLowerCase(), playerStats);
         }
+    }
+
+    // simply remove from offline cache without loading stats
+    public void removeOffline(String uuid) {
+        offlineCache.remove(uuid);
     }
 
     public PlayerStats add(Player player) {
@@ -621,12 +630,43 @@ public class StatsManager {
         }
     }
 
+    public void loadMasteryLB() {
+        try {
+            masteryLB.clear();
+
+            List<Map<String, String>> masteryCompletions = DatabaseQueries.getResults(
+                        DatabaseManager.LEVEL_COMPLETIONS_TABLE + " lc",
+                    "p.name, COUNT(*) AS total_mastery_completions",
+                    "JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON p.uuid=lc.uuid " +
+                            "WHERE lc.mastery=1 " +
+                            "GROUP BY p.name " +
+                            "ORDER BY total_mastery_completions " +
+                            "DESC LIMIT " + Momentum.getSettingsManager().max_mastery_lb_size
+            );
+
+            for (Map<String, String> masteryCompletion : masteryCompletions) {
+                int completions = Integer.parseInt(masteryCompletion.get("total_mastery_completions"));
+                String playerName = masteryCompletion.get("name");
+
+                if (completions > 0) {
+                    masteryLB.add(new MasteryLBPosition(playerName, completions));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public ArrayList<CoinsLBPosition> getCoinsLB() {
         return coinsLB;
     }
 
     public ArrayList<ELOLBPosition> getELOLB() {
         return eloLB;
+    }
+
+    public ArrayList<MasteryLBPosition> getMasteryLB() {
+        return masteryLB;
     }
 
     public ELOLBPosition getELOLBPositionIfExists(String playerName) {
@@ -804,6 +844,10 @@ public class StatsManager {
                 spectator.setAllowFlight(true);
                 spectator.setFlying(true);
             }
+
+            // unobtrusive invis
+            spectator.removePotionEffect(PotionEffectType.INVISIBILITY); // remove before adding to refresh timer
+            spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 1, false, false));
 
             spectatorStats.sendTitle("&7Teleported to " + player.getDisplayName(), "&2/spectate &7 to exit", 10, 40, 10);
         }

@@ -136,3 +136,5 @@ commands:
   squads:
     description: "Momentum squads command"
     aliases: [squad, sq, sqc]
+  reset:
+    description: "Momentum stats reset command"

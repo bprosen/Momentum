@@ -95,7 +95,7 @@ public class ClansManager {
 
     public void kickMember(Clan clan, String playerName) {
         clan.removeMember(playerName);
-        StatsDB.resetPlayerClan(playerName);
+        StatsDB.resetPlayerClanByName(playerName);
 
         PlayerStats victimStats = Momentum.getStatsManager().getByName(playerName);
 
@@ -276,7 +276,7 @@ public class ClansManager {
 
     public void leaveClan(Clan clan, PlayerStats playerStats) {
         // reset cache
-        StatsDB.resetPlayerClan(playerStats.getName());
+        StatsDB.resetPlayerClanByName(playerStats.getName());
         clan.removeMember(playerStats.getName());
 
         playerStats.resetClan();

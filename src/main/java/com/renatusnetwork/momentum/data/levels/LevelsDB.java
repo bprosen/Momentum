@@ -192,6 +192,13 @@ public class LevelsDB {
         return ratings;
     }
 
+    public static void removeAllLevelRatingsFromPlayer(String playerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_RATINGS_TABLE + " WHERE uuid=?",
+                playerUUID
+        );
+    }
+
     public static void insertLevel(String levelName, long creationMillis) {
         DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.LEVELS_TABLE + "(name, creation_date) VALUES (?,?)",
                                       levelName, creationMillis);

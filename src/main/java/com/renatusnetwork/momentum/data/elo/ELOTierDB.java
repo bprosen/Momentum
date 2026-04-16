@@ -43,4 +43,7 @@ public class ELOTierDB {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.ELO_TIERS + " SET previous_elo_tier=? WHERE name=?", previousTier, name);
     }
 
+    public static void deleteTier(String name) {
+        DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.ELO_TIERS + " WHERE name=?", name);
+    }
 }

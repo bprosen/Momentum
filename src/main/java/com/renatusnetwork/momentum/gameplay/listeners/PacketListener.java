@@ -215,6 +215,18 @@ public class PacketListener implements Listener {
                             }.runTask(Momentum.getPlugin());
                         }
                         // if their loc
+                    } else if (playerStats.isPreviewingLevel()) {
+                        LevelPreview levelPreview = playerStats.getPreviewLevel();
+
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                // only teleport if they go out of the area
+                                if (levelPreview.shouldTeleport(playerStats.getPlayer().getLocation())) {
+                                    levelPreview.teleport();
+                                }
+                            }
+                        }.runTask(Momentum.getPlugin());
                     } else if (!playerStats.inLevel()) {
                         if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.INFINITE)) {
                             infiniteManager.startPK(playerStats, playerStats.getInfiniteType(), true);
@@ -244,18 +256,6 @@ public class PacketListener implements Listener {
                                 }
                             }.runTask(Momentum.getPlugin());
                         }
-                    } else if (playerStats.isPreviewingLevel()) {
-                        LevelPreview levelPreview = playerStats.getPreviewLevel();
-
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                // only teleport if they go out of the area
-                                if (levelPreview.shouldTeleport(playerStats.getPlayer().getLocation())) {
-                                    levelPreview.teleport();
-                                }
-                            }
-                        }.runTask(Momentum.getPlugin());
                     } else {
                         Level level = playerStats.getLevel();
 

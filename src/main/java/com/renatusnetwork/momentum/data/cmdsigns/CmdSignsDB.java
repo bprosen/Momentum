@@ -58,10 +58,10 @@ public class CmdSignsDB {
         ).stream().map(res -> res.get("command")).collect(Collectors.toList());
     }
 
-    public static void insertCommandSign(String name, String command, String world, int x, int y, int z) {
+    public static void insertCommandSign(String name, String world, int x, int y, int z) {
         DatabaseQueries.runAsyncQuery(
-                "INSERT INTO " + DatabaseManager.COMMAND_SIGNS + " (name, command, world, x, y, z) VALUES (?,?,?,?,?,?)",
-                name, command, world, x, y, z
+                "INSERT INTO " + DatabaseManager.COMMAND_SIGNS + " (name, world, x, y, z) VALUES (?,?,?,?,?)",
+                name, world, x, y, z
         );
     }
 
@@ -83,6 +83,13 @@ public class CmdSignsDB {
         DatabaseQueries.runAsyncQuery(
                 "DELETE FROM " + DatabaseManager.USED_COMMAND_SIGNS + " WHERE uuid=? AND name=?",
                 uuid, name
+        );
+    }
+
+    public static void unuseAllCommandSigns(String uuid) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.USED_COMMAND_SIGNS + " WHERE uuid=?",
+                uuid
         );
     }
 

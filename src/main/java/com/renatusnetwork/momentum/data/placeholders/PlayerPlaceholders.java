@@ -29,6 +29,8 @@ public class PlayerPlaceholders {
                     return Utils.formatNumber(playerStats.getTotalLevelCompletions());
                 case "mastery_completions":
                     return Utils.formatNumber(playerStats.getNumMasteryCompletions());
+                case "mastery_progress":
+                    return Utils.formatNumber(playerStats.getNumMasteryCompletions()) + "/" + Utils.formatNumber(Momentum.getLevelManager().getNumMasteryLevels());
                 case "race_wins":
                     return Utils.formatNumber(playerStats.getRaceWins());
                 case "race_losses":

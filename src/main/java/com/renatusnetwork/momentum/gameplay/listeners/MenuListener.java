@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -113,7 +114,7 @@ public class MenuListener implements Listener {
         menuManager.removeChoosingRating(name);
 
         // remove if present
-        raceManager.removeChoosingRaceLevel(name);
+        // raceManager.removeChoosingRaceLevel(name);
 
         new BukkitRunnable() {
             @Override
@@ -121,11 +122,19 @@ public class MenuListener implements Listener {
                 Inventory openedInventory = event.getInventory();
                 Inventory nextInventory = event.getPlayer().getOpenInventory().getTopInventory();
 
+                String closedInvName = openedInventory.getName().replaceFirst("\\b[Pp][Gg]\\d+\\b", "");
+                String currentInvName = nextInventory.getName().replaceFirst("\\b[Pp][Gg]\\d+\\b", "");
+
+                if (!closedInvName.equalsIgnoreCase(currentInvName)) {
+                    raceManager.removeChoosingRaceLevel(name);
+                }
+
                 if (!openedInventory.getName().equalsIgnoreCase(nextInventory.getName())) {
                     LevelManager levelManager = Momentum.getLevelManager();
 
                     // remove buying
                     levelManager.removeBuyingLevel(name);
+
 
                     // cancelled tasks
                     CancelTasks cancelTasks = menuManager.getCancelTasks(name);

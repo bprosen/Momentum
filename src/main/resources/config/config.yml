@@ -281,6 +281,7 @@ leaderboard_max_size:
   top_rated: 10
   coins: 10
   records: 10
+  mastery: 10
   infinite:
     classic: 10
     sprint: 10

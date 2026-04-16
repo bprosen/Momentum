@@ -3,6 +3,7 @@ package com.renatusnetwork.momentum.data.menus;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.api.LevelBuyEvent;
 import com.renatusnetwork.momentum.api.ShopBuyEvent;
+import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.levels.Level;
@@ -385,7 +386,12 @@ public class MenuItemAction {
                 !(jackpotManager.isJackpotRunning() && jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
                 !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level)) {
                 if (Momentum.getMenuManager().containsShiftClicked(playerStats)) {
-                    performLevelPreview(playerStats, level);
+                    if (playerStats.isPreviewingLevel()) {
+                        playerStats.sendMessage(Utils.translate("&cYou are already previewing a level. Type &4/preview leave &cor use the &4Leave &citem before attempting to preview another level."));
+                        playerStats.getPlayer().closeInventory();
+                    } else {
+                        performLevelPreview(playerStats, level);
+                    }
                 } else {
                     performLevelBuying(playerStats, level, menuItem);
                 }
@@ -398,6 +404,7 @@ public class MenuItemAction {
     public static void performLevelPreview(PlayerStats playerStats, Level level) {
         Player player = playerStats.getPlayer();
         player.closeInventory();
+        SettingsManager settingsManager = Momentum.getSettingsManager();
 
         if (nonLevelTeleportConditions(playerStats)) {
             if (playerStats.inPracticeMode()) {
@@ -408,6 +415,10 @@ public class MenuItemAction {
             LevelPreview levelPreview = new LevelPreview(playerStats, level, player.getLocation());
             playerStats.setPreviewLevel(levelPreview);
             levelPreview.teleport();
+
+            if (Utils.getItemStackIfExists(player, player.getInventory(), settingsManager.leave_title) == null) {
+                Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
+            }
 
             player.sendMessage(Utils.translate(
                     "&7You are now previewing &c" + level.getTitle() + "&7, you can only move in a &6" + ((int) Momentum.getSettingsManager().preview_max_distance) + "&7 block radius"
