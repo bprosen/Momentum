@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/data/leaderboards/RaceLBPosition.java
 package com.renatusnetwork.momentum.data.leaderboards;
+========
+package com.renatusnetwork.momentum.data.races;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/data/races/RaceLBPosition.java
 
 public class RaceLBPosition {
 

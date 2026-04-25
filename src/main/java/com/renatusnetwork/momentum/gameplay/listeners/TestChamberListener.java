@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/TestChamberListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
+========
+package com.renatusnetwork.momentum.gameplay;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/TestChamberHandler.java
 
 
 import com.renatusnetwork.momentum.Momentum;

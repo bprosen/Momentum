@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/GlideListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
+========
+package com.renatusnetwork.momentum.gameplay;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/GlideListener.java
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
@@ -20,8 +24,13 @@ public class GlideListener implements Listener {
 
                 // if the level they are in is not an elytra level or their world is not the plot world, cancel it
                 if (event.isGliding() &&
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/GlideListener.java
                     (!player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world) &&
                      !(playerStats.inLevel() && playerStats.getLevel().isElytra()))) {
+========
+                   (!player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world) &&
+                   !(playerStats.inLevel() && playerStats.getLevel().isElytraLevel()))) {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/GlideListener.java
                     player.setGliding(false);
                     event.setCancelled(true);
                 }

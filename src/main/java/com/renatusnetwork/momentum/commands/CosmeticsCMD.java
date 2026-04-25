@@ -16,7 +16,13 @@ public class CosmeticsCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/commands/CosmeticsCMD.java
         Momentum.getMenuManager().openInventory(Momentum.getStatsManager().get(player), "cosmetics", true);
+========
+        if (player.hasPermission("momentum.admin"))
+            Bukkit.dispatchCommand(player, "loc set spawn");
+
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/commands/SetSpawnCMD.java
         return false;
     }
 }

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
+========
+package com.renatusnetwork.momentum.gameplay;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -8,17 +12,28 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.renatusnetwork.momentum.Momentum;
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
 import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.momentum.data.infinite.InfiniteManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelPreview;
+========
+import com.renatusnetwork.momentum.data.infinite.InfinitePK;
+import com.renatusnetwork.momentum.data.infinite.InfinitePKManager;
+import com.renatusnetwork.momentum.data.levels.Level;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
 import com.renatusnetwork.momentum.data.locations.LocationManager;
 import com.renatusnetwork.momentum.data.locations.PortalType;
 import com.renatusnetwork.momentum.data.menus.MenuItemAction;
 import com.renatusnetwork.momentum.data.plots.Plot;
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
+========
+import com.renatusnetwork.momentum.data.races.Race;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -55,7 +70,11 @@ public class PacketListener implements Listener {
                         player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
                         // if they are opped, and if they are bypassing plots, then ignore
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
                         if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
+========
+                        if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
                             return;
                         }
 
@@ -161,12 +180,21 @@ public class PacketListener implements Listener {
                 double playerY = packet.getDoubles().read(1);
                 double playerZ = packet.getDoubles().read(2);
 
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
                 StatsManager statsManager = Momentum.getStatsManager();
                 PlayerStats playerStats = statsManager.get(player);
 
                 // null check and check for loaded jic
                 if (playerStats != null && playerStats.isLoaded()) {
                     InfiniteManager infiniteManager = Momentum.getInfiniteManager();
+========
+                PlayerStats playerStats = Momentum.getStatsManager().get(player);
+
+                // null check jic
+                if (playerStats != null) {
+
+                    InfinitePKManager infinitePKManager = Momentum.getInfinitePKManager();
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
                     LocationManager locationManager = Momentum.getLocationManager();
 
                     // if spectating
@@ -174,13 +202,63 @@ public class PacketListener implements Listener {
                         PlayerStats beingSpectated = playerStats.getPlayerToSpectate();
 
                         if (beingSpectated != null && beingSpectated.getPlayer().isOnline() && beingSpectated.isSpectatable() &&
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
                             !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+========
+                                !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+                        {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
 
                             if (!beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) ||
                                 !Utils.isNearby(playerStats.getPlayer().getLocation(), beingSpectated.getPlayer().getLocation(), 30.0))
 
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
+========
+                                // run in sync due to teleporting
+                                new BukkitRunnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        SpectatorHandler.spectateToPlayer(playerStats.getPlayer(), beingSpectated.getPlayer(), false);
+                                    }
+                                }.runTask(Momentum.getPlugin());
+                        }
+                        else
+                        {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
                             // run in sync due to teleporting
                             {
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
+========
+                                @Override
+                                public void run()
+                                {
+                                    SpectatorHandler.removeSpectatorMode(playerStats);
+                                }
+                            }.runTask(Momentum.getPlugin());
+                        }
+                    }
+                    // if in infinite parkour
+                    else if (playerStats.isInInfinitePK())
+                    {
+                        InfinitePK infinitePK = infinitePKManager.get(player.getName());
+
+                        // end infinite pk if below current block
+                        if ((infinitePK.getCurrentBlockLoc().getBlockY() - 2) > player.getLocation().getBlockY())
+                            infinitePKManager.endPK(infinitePK.getPlayer(), false);
+                        // if their loc
+                    }
+                    else if (!playerStats.inLevel())
+                    {
+                        if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.INFINITE))
+                            infinitePKManager.startPK(playerStats, true);
+                        else if (locationManager.isNearPortal(playerX, playerY, playerZ, 1, PortalType.ASCENDANCE))
+                        {
+                            Level level = Momentum.getLevelManager().get(Momentum.getSettingsManager().ascendance_hub_level);
+                            if (level != null) {
+                                // force sync
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
@@ -267,11 +345,27 @@ public class PacketListener implements Listener {
                                 // if level is not null, it has a respawn y, and the y is greater than or equal to player y, respawn
                                 if (level != null && level.hasRespawnY() && level.getRespawnY() >= player.getLocation().getY()) {
                                     // teleport
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PacketListener.java
                                     if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode()) {
                                         Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                                     } else {
                                         Momentum.getLevelManager().respawnPlayer(playerStats, level);
                                     }
+========
+                                    if (playerStats.hasCurrentCheckpoint() || playerStats.inPracticeMode())
+                                        Momentum.getCheckpointManager().teleportToCP(playerStats);
+                                    else if (playerStats.inRace()) {
+                                        Race race = Momentum.getRaceManager().get(player);
+                                        if (race != null) {
+                                            if (race.isPlayer1(player))
+                                                race.getPlayer1().teleport(race.getRaceLevel().getRaceLocation1());
+                                                // swap tp to loc 2 if player 2
+                                            else
+                                                race.getPlayer2().teleport(race.getRaceLevel().getRaceLocation2());
+                                        }
+                                    } else
+                                        LevelHandler.respawnPlayer(playerStats, level);
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PacketListener.java
                                 }
                             }
                         }.runTask(plugin);

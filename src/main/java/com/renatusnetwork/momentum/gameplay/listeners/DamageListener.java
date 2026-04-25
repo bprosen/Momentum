@@ -1,7 +1,15 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/DamageListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.events.EventManager;
+========
+package com.renatusnetwork.momentum.gameplay;
+
+import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.events.EventManager;
+import com.renatusnetwork.momentum.data.events.EventType;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/DamageListener.java
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,18 +45,29 @@ public class DamageListener implements Listener {
                 event.setCancelled(true);
             }
             // for droppers
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/DamageListener.java
             else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+========
+            } else if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/DamageListener.java
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
                 if (playerStats.inLevel() && playerStats.getLevel().isDropper()) {
                     event.setCancelled(true);
 
                     // just in case we use checkpoints for droppers at some point
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/DamageListener.java
                     if (playerStats.hasCurrentCheckpoint()) {
                         Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
                     } else {
                         Momentum.getLevelManager().respawnPlayer(playerStats, playerStats.getLevel());
                     }
+========
+                    if (playerStats.hasCurrentCheckpoint())
+                        Momentum.getCheckpointManager().teleportToCP(playerStats);
+                    else
+                        LevelHandler.respawnPlayer(playerStats, playerStats.getLevel());
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/DamageListener.java
                 }
             }
         }

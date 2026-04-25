@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/SelectionListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
+========
+package com.renatusnetwork.momentum.gameplay;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/SelectionListener.java
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.plots.Plot;
@@ -30,7 +34,12 @@ public class SelectionListener {
         */
         if (event.getStage() == EditSession.Stage.BEFORE_HISTORY &&
             actor != null && actor.isPlayer() &&
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/SelectionListener.java
             event.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+========
+            event.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+        {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/SelectionListener.java
 
             // get bukkit player from name
             Player player = Bukkit.getPlayer(actor.getName());
@@ -38,7 +47,11 @@ public class SelectionListener {
             // only continue if not opped
             if (player != null) {
                 // if opped and bypassing plots, return
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/SelectionListener.java
                 if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
+========
+                if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/SelectionListener.java
                     return;
                 }
 
@@ -76,7 +89,11 @@ public class SelectionListener {
             player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
             // if opped and bypassing plots, return
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/SelectionListener.java
             if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
+========
+            if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/SelectionListener.java
                 return;
             }
 

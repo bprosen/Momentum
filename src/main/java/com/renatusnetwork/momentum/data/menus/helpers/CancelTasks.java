@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/data/menus/helpers/CancelTasks.java
 package com.renatusnetwork.momentum.data.menus.helpers;
+========
+package com.renatusnetwork.momentum.data.menus;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/data/menus/CancelTasks.java
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;

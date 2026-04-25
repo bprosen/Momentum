@@ -1,9 +1,16 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/ChatListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
+========
+package com.renatusnetwork.momentum.gameplay;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/ChatListener.java
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/ChatListener.java
 import com.renatusnetwork.momentum.data.squads.SquadsManager;
+========
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/ChatListener.java
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -24,7 +31,10 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
         String msg = event.getMessage();
         ClansManager clansManager = Momentum.getClansManager();
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/ChatListener.java
         SquadsManager squadsManager = Momentum.getSquadsManager();
+========
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/ChatListener.java
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
         if (playerStats != null) {
@@ -50,7 +60,12 @@ public class ChatListener implements Listener {
                     Player spyPlayer = Bukkit.getPlayer(spyPlayers);
 
                     // null check and make sure they will not be sent msgs from their own clan
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/ChatListener.java
                     if (spyPlayer != null) {
+========
+                    if (spyPlayer != null)
+                    {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/ChatListener.java
                         PlayerStats spyStats = Momentum.getStatsManager().get(spyPlayer);
                         Clan spyClan = spyStats.getClan();
 
@@ -69,14 +84,19 @@ public class ChatListener implements Listener {
                 mainComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Momentum.getStatsManager().createChatHover(playerStats))));
                 mainComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/profile " + event.getPlayer().getName()));
 
-                // broadcast and log
-                Bukkit.spigot().broadcast(mainComponent);
+                // doing it this way instead of using Bukkit#broadcast ensures any previous filtering (e.g. ignored players) is preserved
+                event.getRecipients().forEach(p -> p.spigot().sendMessage(mainComponent));
                 Bukkit.getServer().getConsoleSender().sendMessage(mainComponent.toLegacyText());
 
                 // add to gg if they say it
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/ChatListener.java
                 if (ChatColor.stripColor(msg).equalsIgnoreCase("gg")) {
                     Momentum.getStatsManager().addGG(playerStats);
                 }
+========
+                if (ChatColor.stripColor(msg).equalsIgnoreCase("gg"))
+                    Momentum.getStatsManager().addGG(playerStats);
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/ChatListener.java
             }
         }
     }

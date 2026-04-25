@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PlotLimitingListener.java
 package com.renatusnetwork.momentum.gameplay.listeners;
+========
+package com.renatusnetwork.momentum.gameplay;
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PlotLimitingListener.java
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.plots.Plot;
@@ -39,10 +43,18 @@ public class PlotLimitingListener implements Listener {
     private boolean cancel(Location loc, Player player) {
         boolean doCancel = false;
 
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PlotLimitingListener.java
         if (loc.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
 
             // Abrupt if found to be bypassing
             if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots()) {
+========
+        if (loc.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+        {
+
+            // Abrupt if found to be bypassing
+            if (player.isOp() && Momentum.getStatsManager().get(player).isBypassingPlots())
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PlotLimitingListener.java
                 return false;
             }
 
@@ -74,7 +86,12 @@ public class PlotLimitingListener implements Listener {
     public void onLiquidFlow(BlockFromToEvent event) {
         Location loc = event.getToBlock().getLocation();
 
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PlotLimitingListener.java
         if (loc.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+========
+        if (loc.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+        {
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PlotLimitingListener.java
             Plot plot = Momentum.getPlotsManager().getPlotInLocation(loc);
 
             // If not in a plot
@@ -87,7 +104,11 @@ public class PlotLimitingListener implements Listener {
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         // ZERO entity overloading
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PlotLimitingListener.java
         if (event.getLocation().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+========
+        if (event.getLocation().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PlotLimitingListener.java
             event.setCancelled(true);
         }
     }
@@ -95,7 +116,11 @@ public class PlotLimitingListener implements Listener {
     @EventHandler
     public void onDispenserDrop(BlockDispenseEvent event) {
         // ZERO dispenser overloading
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PlotLimitingListener.java
         if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+========
+        if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PlotLimitingListener.java
             event.setCancelled(true);
         }
     }
@@ -103,7 +128,11 @@ public class PlotLimitingListener implements Listener {
     @EventHandler
     public void onRedstone(BlockRedstoneEvent event) {
         // ZERO redstone overloading
+<<<<<<<< HEAD:src/main/java/com/renatusnetwork/momentum/gameplay/listeners/PlotLimitingListener.java
         if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+========
+        if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
+>>>>>>>> master:src/main/java/com/renatusnetwork/momentum/gameplay/PlotLimitingListener.java
             event.setNewCurrent(0);
         }
     }
