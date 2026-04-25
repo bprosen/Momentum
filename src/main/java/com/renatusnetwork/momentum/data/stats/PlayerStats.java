@@ -77,6 +77,7 @@ public class PlayerStats {
     private LevelSortingType sortingType;
     private int elo;
     private ELOTier eloTier;
+    private ItemStack sword;
     private FastBoard board;
 
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
@@ -1128,6 +1129,17 @@ public class PlayerStats {
     }
     public void resetSquad() {
         this.squad = null;
+    }
+
+    //
+    // Sword
+    //
+    public ItemStack getSword() {
+        return sword;
+    }
+
+    public void setSword(ItemStack sword) {
+        this.sword = sword;
     }
 
     //

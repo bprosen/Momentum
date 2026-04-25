@@ -1,7 +1,10 @@
 package com.renatusnetwork.momentum.data;
 
+import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.menus.LevelSortingType;
+import com.renatusnetwork.momentum.data.ranks.Rank;
+import com.renatusnetwork.momentum.data.stats.Sword;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -60,7 +63,7 @@ public class SettingsManager {
     public int rising_water_y_below_start_y;
     public int falling_anvil_event_task_delay;
     public int rising_water_event_task_delay;
-    public LinkedHashMap<Integer, ItemStack> setup_swords;
+    public List<Sword> setup_swords;
     public int sword_hotbar_slot;
     public String sword_title;
     public int shield_hotbar_slot;
@@ -200,14 +203,14 @@ public class SettingsManager {
         shield_hotbar_slot = settings.getInt("setup-shield.hotbar_slot");
         shield_title = Utils.translate(settings.getString("setup-shield.title"));
 
-        setup_swords = new LinkedHashMap<>(); // we want it in order!
+        setup_swords = new ArrayList<>(); // we want it in order!
 
-        ConfigurationSection section = settings.getConfigurationSection("setup-sword.prestiges");
+        ConfigurationSection section = settings.getConfigurationSection("setup-sword.swords");
         for (String key : section.getKeys(false)) {
             int keyInt = Integer.parseInt(key);
 
-            ItemStack sword = new ItemStack(Material.matchMaterial(section.getString(keyInt + ".type")));
-            ItemMeta meta = sword.getItemMeta();
+            ItemStack swordItem = new ItemStack(Material.matchMaterial(section.getString(keyInt + ".type")));
+            ItemMeta meta = swordItem.getItemMeta();
             meta.setDisplayName(sword_title);
 
             // set glow
@@ -215,9 +218,12 @@ public class SettingsManager {
                 Utils.addGlow(meta);
             }
 
-            sword.setItemMeta(meta);
+            swordItem.setItemMeta(meta);
 
-            setup_swords.put(keyInt, sword); // put in
+            int requiredPrestiges = section.getInt(keyInt + ".prestiges");
+            Rank requiredRank = Momentum.getRanksManager().get(section.getString(keyInt + ".rank"));
+
+            setup_swords.add(new Sword(swordItem, requiredPrestiges, requiredRank)); // put in
         }
 
         max_infinite_y = settings.getInt("infinite.max_y");
