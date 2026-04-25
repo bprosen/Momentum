@@ -18,14 +18,10 @@ public class ConfigManager {
     private Map<String, FileConfiguration> configs = new HashMap<>();
 
     public ConfigManager(Plugin plugin) {
-        initialize("settings", plugin);
-        initialize("levels", plugin);
-        initialize("locations", plugin);
+        initialize("config", plugin);
         initialize("menus", plugin);
-        initialize("perks", plugin);
-        initialize("ranks", plugin);
-        initialize("clans", plugin);
         initialize("rewards", plugin);
+        initialize("blackmarket", plugin);
     }
 
     private void initialize(String fileName, Plugin plugin) {
@@ -52,8 +48,8 @@ public class ConfigManager {
             OutputStream out = new FileOutputStream(file);
             byte[] buf = new byte[1024];
             int len;
-            while((len=in.read(buf))>0){
-                out.write(buf,0,len);
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
             }
             out.close();
             in.close();
@@ -63,10 +59,7 @@ public class ConfigManager {
     }
 
     public FileConfiguration get(String fileName) {
-        FileConfiguration fileConfig = configs.get(fileName);
-        if (fileConfig != null)
-            return fileConfig;
-        return null;
+        return configs.get(fileName);
     }
 
     public void load(String fileName) {

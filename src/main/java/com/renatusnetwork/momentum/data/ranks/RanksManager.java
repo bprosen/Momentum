@@ -2,7 +2,7 @@ package com.renatusnetwork.momentum.data.ranks;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
-import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -12,120 +12,55 @@ import java.util.*;
 
 public class RanksManager {
 
-    private static HashMap<String, Rank> rankList = new HashMap<>();
+    private static HashMap<String, Rank> ranks = new HashMap<>();
 
     public RanksManager() {
         load();
     }
 
     public void load() {
-        rankList = new HashMap<>();
+        ranks = RanksDB.loadRanks();
 
-        for (String rankName : RanksYAML.getNames())
-            load(rankName);
-
-        updatePlayers();
-        Momentum.getPluginLogger().info("Ranks loaded: " + rankList.size());
-    }
-
-    public void load(String rankName) {
-
-        boolean exists = exists(rankName);
-
-        if (!RanksYAML.exists(rankName) && exists)
-            remove(rankName);
-        else {
-            if (exists)
-                remove(rankName);
-
-            add(rankName);
-        }
+        Momentum.getPluginLogger().info("Ranks loaded: " + ranks.size());
     }
 
     public void add(String rankName) {
-        // get from YAML
-        String rankTitle = RanksYAML.getRankTitle(rankName);
-        String shortRankTitle = RanksYAML.getShortenedRankTitle(rankName);
-        int rankId = RanksYAML.getRankId(rankName);
-        double rankUpPrice = RanksYAML.getRankUpPrice(rankName);
-
-        Rank rank = new Rank(rankName, rankTitle, shortRankTitle, rankId, rankUpPrice);
-        rankList.put(rankName, rank);
-    }
-
-    public Rank get(int rankId) {
-        for (Rank rank : rankList.values())
-            if (rank.getRankId() == rankId)
-                return rank;
-
-        return null;
+        Rank rank = new Rank(rankName);
+        ranks.put(rankName, rank);
     }
 
     public Rank get(String rankName) {
-        return rankList.get(rankName);
+        return ranks.get(rankName);
     }
 
     public boolean exists(String rankName) {
         return (get(rankName) != null);
     }
 
-    public boolean exists(int rankId) {
-        return (get(rankId) != null);
-    }
-
     public Set<String> getNames() {
-        return rankList.keySet();
+        return ranks.keySet();
     }
 
     public void remove(String rankName) {
-        for (Iterator<Rank> iterator = rankList.values().iterator(); iterator.hasNext();) {
-            if (iterator.next().getRankName().equalsIgnoreCase(rankName)) {
-                RanksYAML.remove(iterator.getClass().getName());
-                iterator.remove();
-            }
-        }
+        ranks.remove(rankName);
+    }
+
+    public void updatePrestiges(PlayerStats playerStats, int prestiges) {
+        RanksDB.updatePrestiges(playerStats.getUUID(), prestiges);
+        playerStats.setPrestiges(prestiges);
     }
 
     public void resetPlayersInRank(Rank rank) {
+        Rank defaultRank = Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank);
+        HashMap<String, PlayerStats> players = Momentum.getStatsManager().getPlayerStats();
 
-        for (PlayerStats playerStats : Momentum.getStatsManager().getPlayerStats().values()) {
-            // if in rank, then delete from database and lower rank by 1
-            if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline() &&
-                playerStats.getRank().getRankId() == rank.getRankId()) {
-
-                for (int i = playerStats.getRank().getRankId() - 1; i >= 2; i--) {
-                    if (exists(i)) {
-                        playerStats.setRank(get(i));
-                        RanksDB.updateRank(playerStats.getPlayer().getUniqueId(), i);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    public void updatePlayers() {
-
-        // update online players ranks
-        for (PlayerStats playerStats : Momentum.getStatsManager().getPlayerStats().values()) {
-
-            if (playerStats != null && playerStats.isLoaded() && playerStats.getPlayer().isOnline()) {
-
-                List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                        "players",
-                        "rank_id",
-                        " WHERE uuid='" + playerStats.getUUID() + "'"
-                );
-
-                if (playerResults.size() > 0) {
-                    for (Map<String, String> playerResult : playerResults) {
-
-                        int rankID = Integer.parseInt(playerResult.get("rank_id"));
-                        Rank rank = Momentum.getRanksManager().get(rankID);
-
-                        if (rank != null)
-                            playerStats.setRank(rank);
-                    }
+        // thread safety
+        synchronized (players) {
+            for (PlayerStats playerStats : players.values())
+            // if in rank, reset them to default rank
+            {
+                if (playerStats != null && playerStats.getRank().equals(rank)) {
+                    playerStats.setRank(defaultRank);
                 }
             }
         }
@@ -134,88 +69,101 @@ public class RanksManager {
     public void doRankUp(Player player) {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-        Utils.teleportToSpawn(playerStats);
-        int newId = playerStats.getRank().getRankId() + 1;
-        Rank rank = get(newId);
+        String nextRank = playerStats.getRank().getNextRank();
+        Rank rank = get(nextRank);
         playerStats.setRank(rank);
-        playerStats.setRankUpStage(1);
-        RanksDB.updateRank(player.getUniqueId(), newId);
-        RanksDB.updateStage(player.getUniqueId(), 1);
+        StatsDB.updateRank(player.getUniqueId().toString(), nextRank);
         // play sound
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2f, 0f);
 
-        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getRankTitle()));
+        Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has ranked up to &c" + rank.getTitle()));
         Momentum.getStatsManager().runGGTimer();
     }
 
-    public void doPrestige(Player player) {
-        PlayerStats playerStats = Momentum.getStatsManager().get(player);
-        Rank defaultRank = get(1);
+    public void doPrestige(PlayerStats playerStats, int cost) {
+        Player player = playerStats.getPlayer();
+        Rank defaultRank = get(Momentum.getSettingsManager().default_rank);
         // update cache and database
         playerStats.setRank(defaultRank);
         playerStats.addPrestige();
 
+        Momentum.getStatsManager().removeCoins(playerStats, cost);
+
         // update prestige multiplier
         float prestigeMultiplier = Momentum.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
 
-        if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier)
+        if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier) {
             prestigeMultiplier = Momentum.getSettingsManager().max_prestige_multiplier;
+        }
 
         prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
         playerStats.setPrestigeMultiplier(prestigeMultiplier);
 
         // dont need to update stage as they will never hit stage 2 in max rank
-        RanksDB.updateRank(player.getUniqueId(), 1);
+        StatsDB.updateRank(player.getUniqueId().toString(), defaultRank.getName());
 
         // now add prestige db
-        RanksDB.updatePrestiges(player.getUniqueId(), playerStats.getPrestiges());
+        RanksDB.updatePrestiges(player.getUniqueId().toString(), playerStats.getPrestiges());
 
         // add an s if its not one because im OCD with this
         String endingString = "time";
-        if (playerStats.getPrestiges() > 1)
+        if (playerStats.getPrestiges() > 1) {
             endingString += "s";
+        }
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(Utils.translate("&c" + player.getDisplayName() + " &7has just &6&lPRESTIGED&7!" +
-                                                     " &7They have prestiged &6" +
-                                                     playerStats.getPrestiges() + " " + endingString + "!"));
+                                                " &7They have prestiged &6" +
+                                                playerStats.getPrestiges() + " " + endingString + "!"));
         Bukkit.broadcastMessage("");
         Momentum.getStatsManager().runGGTimer();
     }
 
-    public HashMap<String, Rank> getRankList() {
-        return rankList;
+    public HashMap<String, Rank> getRanks() {
+        return ranks;
     }
 
-    public boolean isMaxRank(Rank rank)
-    {
-        return rank.getRankId() == getMaxRank().getRankId();
-    }
-
-    public Rank getNextRank(Rank current)
-    {
+    public Rank getNextRank(Rank current) {
         Rank rank = current;
 
-        if (!isMaxRank(rank))
-            rank = get(current.getRankId() + 1);
+        if (!rank.isMaxRank()) {
+            rank = get(rank.getNextRank());
+        }
 
         return rank;
     }
 
-    public boolean isPastRank(PlayerStats playerStats, Rank current)
-    {
-        return playerStats.getPrestiges() != 0 || current.getRankId() < playerStats.getRank().getRankId();
+    public boolean isPastOrAtRank(PlayerStats playerStats, Rank current) {
+        if (playerStats != null && playerStats.getRank() != null) {
+            // if they have prestiged already
+            if (playerStats.hasPrestiges()) {
+                return true;
+            }
+
+            // keep recursively going through the ranks until we reach the end of the rank
+            while (current != null) {
+                if (playerStats.getRank().equals(current)) {
+                    return true;
+                }
+
+                current = get(current.getNextRank());
+            }
+        }
+        return false;
+    }
+
+    public boolean isPastOrAtRank(PlayerStats playerStats, String currentString) {
+        return isPastOrAtRank(playerStats, get(currentString));
     }
 
     public Rank getMaxRank() {
-
-        Rank currentMax = null;
-
-        for (Rank rank : rankList.values()) {
-            if (currentMax == null || currentMax.getRankId() < rank.getRankId())
-                currentMax = rank;
+        for (Rank rank : ranks.values()) {
+            if (rank.isMaxRank()) {
+                return rank;
+            }
         }
-        return currentMax;
+
+        return null;
     }
 }

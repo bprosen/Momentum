@@ -14,30 +14,23 @@ import org.bukkit.potion.PotionEffectType;
 
 public class NightVisionCMD implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (sender instanceof Player) {
-
             Player player = (Player) sender;
             StatsManager statsManager = Momentum.getStatsManager();
 
             if (a.length == 0) {
                 PlayerStats playerStats = statsManager.get(player);
 
-                if (!playerStats.hasNVStatus()) { // enable
-
-                    playerStats.setNVStatus(true);
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-                    sender.sendMessage(Utils.translate("&aYou have enabled Night Vision"));
-                } else { // disable
-
-                    player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-
-                    playerStats.setNVStatus(false);
-                    player.sendMessage(Utils.translate("&cYou have disabled Night Vision"));
+                if (playerStats == null || !playerStats.isLoaded()) {
+                    sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                    return false;
                 }
-                // update db
-                StatsDB.updatePlayerNightVision(playerStats);
+
+                statsManager.toggleNightVision(playerStats);
+                playerStats.sendMessage(Utils.translate("&7You have turned night vision " + (playerStats.hasNightVision() ? "&aOn" : "&cOff")));
             }
         }
         return true;

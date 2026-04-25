@@ -3,18 +3,20 @@ package com.renatusnetwork.momentum.data.stats;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
+import com.renatusnetwork.momentum.data.elo.ELOTiersManager;
+import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.Level;
-import com.renatusnetwork.momentum.data.perks.PerksDB;
+import com.renatusnetwork.momentum.data.menus.LevelSortingType;
+import com.renatusnetwork.momentum.data.modifiers.Modifier;
+import com.renatusnetwork.momentum.data.modifiers.ModifierType;
 import com.renatusnetwork.momentum.data.ranks.Rank;
+import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
-import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class StatsDB {
@@ -22,724 +24,572 @@ public class StatsDB {
     /*
      * Player Stats Section
      */
-    public static void loadPlayerStats(PlayerStats playerStats) {
-        loadPlayerID(playerStats);
-        loadCompletions(playerStats);
-        PerksDB.loadPerks(playerStats);
-        Momentum.getStatsManager().loadPerksGainedCount(playerStats);
-    }
+    public static void loadPlayerInformation(PlayerStats playerStats) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
+                "*",
+                "WHERE uuid=?", playerStats.getUUID());
 
-    private static void loadPlayerID(PlayerStats playerStats) {
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
-                "player_id, player_name, coins, spectatable, clan_id, rank_id, rankup_stage, rank_prestiges, infinitepk_score, level_completions, race_wins, race_losses, night_vision, grinding, records, event_wins, infinite_block, fail_mode",
-                " WHERE uuid='" + playerStats.getUUID() + "'"
-        );
-
-        if (playerResults.size() > 0) {
-            for (Map<String, String> playerResult : playerResults) {
-                ClansManager clansManager = Momentum.getClansManager();
-
-                playerStats.setPlayerID(Integer.parseInt(playerResult.get("player_id")));
-                int clanID = Integer.parseInt(playerResult.get("clan_id"));
-                String nameInDB = playerResult.get("player_name");
-
-                // update player names
-                if (!nameInDB.equals(playerStats.getPlayerName())) {
-                    updatePlayerName(playerStats, nameInDB);
-
-                    if (clanID > 0) {
-                        Clan clan = clansManager.get(clanID);
-                        // update name in cache
-                        Momentum.getClansManager().updatePlayerNameInClan(clan, nameInDB, playerStats.getPlayerName());
-                    }
-                    // update in db
-                    Momentum.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getPlayerName());
-                }
-
-                double coins = Double.parseDouble(playerResult.get("coins"));
-                playerStats.setCoins(coins);
-
-                int spectatable = Integer.parseInt(playerResult.get("spectatable"));
-                if (spectatable == 1)
-                    playerStats.setSpectatable(true);
-                else
-                    playerStats.setSpectatable(false);
-
-                if (clanID > 0) {
-                    Clan clan = clansManager.get(clanID);
-
-                    if (clan != null) {
-                        playerStats.setClan(clan);
-
-                        // notify members of joining
-                        String memberRole = "Member";
-                        if (playerStats.getClan().getOwner().getPlayerName().equalsIgnoreCase(playerStats.getPlayerName()))
-                            memberRole = "Owner";
-
-                        // Bukkit#getPlayer() is async safe :)
-                        clansManager.sendMessageToMembers(playerStats.getClan(),
-                                "&eClan " + memberRole + " &6" + playerStats.getPlayerName() + " &7joined",
-                                playerStats.getPlayerName());
-                    }
-                }
-
-                int rankID = Integer.parseInt(playerResult.get("rank_id"));
-                Rank rank = Momentum.getRanksManager().get(rankID);
-                if (rank != null)
-                    playerStats.setRank(rank);
-
-                int prestiges = Integer.parseInt(playerResult.get("rank_prestiges"));
-                playerStats.setPrestiges(prestiges);
-
-                // add +1 so it is normal stage 1/2 out of database
-                int rankUpStage = Integer.parseInt(playerResult.get("rankup_stage")) + 1;
-                playerStats.setRankUpStage(rankUpStage);
-
-                int infinitePKScore = Integer.parseInt(playerResult.get("infinitepk_score"));
-                playerStats.setInfinitePKScore(infinitePKScore);
-
-                // set total completions count
-                int completions = Integer.parseInt(playerResult.get("level_completions"));
-                playerStats.setTotalLevelCompletions(completions);
-
-                // set total race wins
-                int raceWins = Integer.parseInt(playerResult.get("race_wins"));
-                playerStats.setRaceWins(raceWins);
-
-                // set total race losses
-                int raceLosses = Integer.parseInt(playerResult.get("race_losses"));
-                playerStats.setRaceLosses(raceLosses);
-
-                // set night vision, 0 == false, 1 == true
-                int nightVision = Integer.parseInt(playerResult.get("night_vision"));
-                if (nightVision == 0)
-                    playerStats.setNVStatus(false);
-                else {
-                    playerStats.setNVStatus(true);
-
-                    // run sync potion add
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-                        }
-                    }.runTask(Momentum.getPlugin());
-                }
-
-                // get total count of how many levels they've rated
-                int ratedLevelsCount = Integer.parseInt(
-                        DatabaseQueries.getResults("ratings", "COUNT(*)",
-                                " WHERE player_name='" + playerStats.getPlayerName() + "'")
-                                .get(0).get("COUNT(*)"));
-                playerStats.setRatedLevelsCount(ratedLevelsCount);
-
-                // set race win rate
-                if (raceLosses > 0)
-                    playerStats.setRaceWinRate(Float.parseFloat(Utils.formatDecimal((double) raceWins / raceLosses)));
-                else
-                    playerStats.setRaceWinRate(raceWins);
-
-                // set multiplier percentage
-                if (playerStats.getPrestiges() > 0) {
-                    float prestigeMultiplier = Momentum.getSettingsManager().prestige_multiplier_per_prestige * playerStats.getPrestiges();
-
-                    if (prestigeMultiplier >= Momentum.getSettingsManager().max_prestige_multiplier)
-                        prestigeMultiplier = Momentum.getSettingsManager().max_prestige_multiplier;
-
-                    prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
-
-                    playerStats.setPrestigeMultiplier(prestigeMultiplier);
-                }
-
-                // Set to true if 1 (true)
-                if (Integer.parseInt(playerResult.get("grinding")) == 1)
-                    playerStats.toggleGrinding();
-
-                // set records
-                int records = Integer.parseInt(playerResult.get("records"));
-                playerStats.setRecords(records);
-
-                int eventWins = Integer.parseInt(playerResult.get("event_wins"));
-                playerStats.setEventWins(eventWins);
-
-                String infiniteBlock = playerResult.get("infinite_block");
-
-                // only set it if its non null or ""
-                if (infiniteBlock != null && !infiniteBlock.equals(""))
-                    playerStats.setInfiniteBlock(Material.matchMaterial(infiniteBlock));
-                else
-                    // default is quartz block otherwise
-                    playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
-
-                // set fail mode, 0 == false, 1 == true
-                int failsToggled = Integer.parseInt(playerResult.get("fail_mode"));
-                if (failsToggled == 0)
-                    playerStats.setFailMode(false);
-                else
-                    playerStats.setFailMode(true);
-
-                updateBoughtLevels(playerStats);
-            }
+        if (playerResult.isEmpty()) {
+            DatabaseQueries.runQuery(
+                    "INSERT INTO " + DatabaseManager.PLAYERS_TABLE + " (uuid, name) VALUES (?,?)",
+                    playerStats.getUUID(), playerStats.getName());
         } else {
-            insertPlayerID(playerStats);
-            loadPlayerStats(playerStats);
+            ClansManager clansManager = Momentum.getClansManager();
+
+            String nameInDB = playerResult.get("name");
+            Clan clan = clansManager.get(playerResult.get("clan"));
+
+            // update player names
+            if (!nameInDB.equals(playerStats.getName())) {
+                updateName(playerStats.getUUID(), playerStats.getName());
+
+                if (clan != null)
+                // update name in cache
+                {
+                    Momentum.getClansManager().updatePlayerNameInClan(clan, nameInDB, playerStats.getName());
+                }
+
+                // update in db
+                Momentum.getPlotsManager().updatePlayerNameInPlot(nameInDB, playerStats.getName());
+            }
+
+            playerStats.setCoins(Integer.parseInt(playerResult.get("coins")));
+            playerStats.setSpectatable(Integer.parseInt(playerResult.get("spectatable")) == 1);
+
+            String eloTier = playerResult.get("elo_tier");
+            ELOTiersManager eloTiersManager = Momentum.getELOTiersManager();
+
+            // set tier or translate if null
+            if (eloTier != null) {
+                playerStats.setELOTier(eloTiersManager.get(eloTier));
+            } else {
+                playerStats.setELOTier(eloTiersManager.get(Momentum.getSettingsManager().default_elo_tier));
+            }
+
+            String elo = playerResult.get("elo");
+            if (elo != null) {
+                playerStats.setELO(Integer.parseInt(elo));
+            } else {
+                playerStats.setELO(Momentum.getSettingsManager().default_elo);
+            }
+
+            playerStats.loadELOToXPBar();
+
+            if (clan != null) {
+                playerStats.setClan(clan);
+
+                // notify members of joining
+                String memberRole = "Member";
+                if (clan.isOwner(playerStats.getName())) {
+                    memberRole = "Owner";
+                }
+
+                // Bukkit#getPlayer() is async safe :)
+                clansManager.sendMessageToMembers(playerStats.getClan(),
+                                                  "&eClan " + memberRole + " &6" + playerStats.getName() + " &7joined",
+                                                  playerStats.getName());
+            }
+
+            String rankName = playerResult.get("rank_name");
+            Rank rank = Momentum.getRanksManager().get(rankName);
+            if (rank != null) {
+                playerStats.setRank(rank);
+            } else {
+                playerStats.setRank(Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank));
+            }
+
+            for (InfiniteType type : InfiniteType.values()) {
+                String typeString = "infinite_" + type.toString().toLowerCase() + "_score";
+                String scoreString = playerResult.get(typeString);
+
+                // set score
+                if (scoreString != null) {
+                    playerStats.setInfiniteScore(type, Integer.parseInt(scoreString));
+                }
+            }
+
+            playerStats.setNightVision(Integer.parseInt(playerResult.get("night_vision")) == 1);
+
+            // need to give them night vision
+            if (playerStats.hasNightVision())
+            // run sync potion add
+            {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                    }
+                }.runTask(Momentum.getPlugin());
+            }
+
+            // get total count of how many levels they've rated
+            playerStats.setRatedLevelsCount(getRatedLevelsCount(playerStats));
+            playerStats.setTotalLevelCompletions(getTotalCompletions(playerStats.getUUID()));
+            playerStats.setPrestiges(Integer.parseInt(playerResult.get("prestiges")));
+
+            // set multiplier percentage
+            if (playerStats.hasPrestiges()) {
+                float defaultMultiplier = Momentum.getSettingsManager().prestige_multiplier_per_prestige;
+
+                float prestigeMultiplier = defaultMultiplier * playerStats.getPrestiges();
+
+                if (prestigeMultiplier >= defaultMultiplier) {
+                    prestigeMultiplier = defaultMultiplier;
+                }
+
+                prestigeMultiplier = (float) (1.00 + (prestigeMultiplier / 100));
+
+                playerStats.setPrestigeMultiplier(prestigeMultiplier);
+            }
+
+            // lots of settings here
+            playerStats.setGrinding(Integer.parseInt(playerResult.get("grinding")) == 1);
+            playerStats.setEventWins(Integer.parseInt(playerResult.get("event_wins")));
+            playerStats.setFailMode(Integer.parseInt(playerResult.get("fail_mode")) == 1);
+            playerStats.setAttemptingRankup(Integer.parseInt(playerResult.get("attempting_rankup")) == 1);
+            playerStats.setAttemptingMastery(Integer.parseInt(playerResult.get("attempting_mastery")) == 1);
+            playerStats.setRaceWins(Integer.parseInt(playerResult.get("race_wins")));
+            playerStats.setRaceLosses(Integer.parseInt(playerResult.get("race_losses")));
+            playerStats.setAutoSave(Integer.parseInt(playerResult.get("auto_save")) == 1);
+
+            // we do a math.max since we can't divide by 0... so if they have never lost we divide by 1 not zero
+            playerStats.calcRaceWinRate();
+
+            String sortLevelsType = playerResult.get("menu_sort_levels_type");
+
+            // only set it if its non null
+            if (sortLevelsType != null) {
+                playerStats.setLevelSortingType(LevelSortingType.valueOf(sortLevelsType));
+            } else
+            // default is config based otherwise
+            {
+                playerStats.setLevelSortingType(Momentum.getSettingsManager().default_level_sorting_type);
+            }
+
+            String infiniteBlock = playerResult.get("infinite_block");
+
+            // only set it if its non null
+            if (infiniteBlock != null) {
+                playerStats.setInfiniteBlock(Material.matchMaterial(infiniteBlock));
+            } else
+            // default is quartz block otherwise
+            {
+                playerStats.setInfiniteBlock(Momentum.getSettingsManager().infinite_default_block);
+            }
+
+            String infiniteType = playerResult.get("infinite_type");
+            if (infiniteType != null) {
+                playerStats.setInfiniteType(InfiniteType.valueOf(infiniteType.toUpperCase()));
+            } else {
+                playerStats.setInfiniteType(Momentum.getSettingsManager().infinite_default_type);
+            }
         }
     }
 
-    public static int getTotalPlayers()
-    {
-        int total;
+    public static int getRatedLevelsCount(PlayerStats playerStats) {
 
-        List<Map<String, String>> results = DatabaseQueries.getResults("players", "COUNT(*) AS total", "");
-        total = Integer.parseInt(results.get(0).get("total"));
+        Map<String, String> result = DatabaseQueries.getResult(
+                DatabaseManager.LEVEL_RATINGS_TABLE, "COUNT(*) AS count",
+                "WHERE uuid=?", playerStats.getUUID());
 
-        return total;
+        return Integer.parseInt(result.get("count"));
     }
 
-    private static void insertPlayerID(PlayerStats playerStats) {
-        String query = "INSERT INTO players " +
-                "(uuid, player_name)" +
-                " VALUES " +
-                "('" +
-                playerStats.getUUID() + "', '" +
-                playerStats.getPlayerName() +
-                "')"
-                ;
+    public static int getTotalPlayers() {
+        Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLAYERS_TABLE, "COUNT(*) AS total", "");
 
-        Momentum.getDatabaseManager().runQuery(query);
+        return Integer.parseInt(result.get("total"));
+    }
+
+    public static int getTotalCompletions(String uuid) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.LEVEL_COMPLETIONS_TABLE,
+                "COUNT(*) AS total_completions",
+                "WHERE uuid=?", uuid
+                                                                    );
+
+        return Integer.parseInt(playerResult.get("total_completions"));
     }
 
     // this will update the player name all across the database
-    private static void updatePlayerName(PlayerStats playerStats, String oldName) {
+    public static void updateName(String uuid, String name) {
         // update in stats
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE players SET " +
-                "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_id=" + playerStats.getPlayerID());
-
-        // update in checkpoints
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE checkpoints SET " +
-                "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_name='" + oldName + "'");
-
-        // update in ratings
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE ratings SET " +
-                "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_name='" + oldName + "'");
-
-        // update in plots
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE plots SET " +
-                "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_name='" + oldName + "'");
-
-        // update in bought levels
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE bought_levels SET " +
-                "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_name='" + oldName + "'");
-
-        // update in saves
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE saves SET " +
-                "player_name='" + playerStats.getPlayerName() + "' " +
-                "WHERE player_name='" + oldName + "'");
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET name=? WHERE uuid=?", name, uuid);
     }
 
-    public static void updatePlayerSpectatable(PlayerStats playerStats) {
-        int spectatable = 0;
-
-        if (playerStats.isSpectatable())
-            spectatable = 1;
-
-        String query = "UPDATE players SET " +
-                "spectatable=" + spectatable + " " +
-                "WHERE player_id=" + playerStats.getPlayerID()
-                ;
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+    public static void updateEventWins(String uuid, int eventWins) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET event_wins=? WHERE uuid=?", eventWins, uuid);
     }
 
-    public static void updatePlayerNightVision(PlayerStats playerStats) {
-        int vision = 0;
-
-        if (playerStats.hasNVStatus())
-            vision = 1;
-
-        String query = "UPDATE players SET " +
-                "night_vision=" + vision + " " +
-                "WHERE player_id=" + playerStats.getPlayerID()
-                ;
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+    public static void updateELO(String uuid, int elo) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET elo=? WHERE uuid=?", elo, uuid);
     }
 
-    public static void updatePlayerGrinding(PlayerStats playerStats)
-    {
-        int grinding = 0;
-
-        if (playerStats.isGrinding())
-            grinding = 1;
-
-        String query = "UPDATE players SET " +
-                "grinding=" + grinding + " WHERE player_id=" + playerStats.getPlayerID();
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+    public static void updateMenuSortLevelsType(String uuid, LevelSortingType type) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET menu_sort_levels_type=? WHERE uuid=?", type.name(), uuid);
     }
 
-    public static void updateCoins(PlayerStats playerStats, double coins)
-    {
-        if (coins < 0)
+    public static void updateSpectatable(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET spectatable=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateFailMode(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET fail_mode=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateRaceLosses(String uuid, int losses) {
+        DatabaseQueries.runAsyncQuery("UPDATE players SET race_losses=? WHERE uuid=?", losses, uuid);
+    }
+
+    public static void updateRaceWins(String uuid, int wins) {
+        DatabaseQueries.runAsyncQuery("UPDATE players SET race_wins=? WHERE uuid=?", wins, uuid);
+    }
+
+    public static void updateNightVision(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET night_vision=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateAutoSave(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET auto_save=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateGrinding(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET grinding=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateAttemptingRankup(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_rankup=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateAttemptingMastery(String uuid, boolean value) {
+        int valueInt = value ? 1 : 0;
+
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET attempting_mastery=? WHERE uuid=?", valueInt, uuid
+                                     );
+    }
+
+    public static void updateCoins(String uuid, int coins, boolean async) {
+        if (coins < 0) {
             coins = 0;
+        }
 
-        String query = "UPDATE players SET coins=" + coins + " WHERE player_id=" + playerStats.getPlayerID();
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+        if (async) {
+            DatabaseQueries.runAsyncQuery(
+                    "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE uuid=?",
+                    coins, uuid
+                                         );
+        } else {
+            DatabaseQueries.runQuery(
+                    "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE uuid=?",
+                    coins, uuid
+                                    );
+        }
     }
 
-    public static void updateCoinsUUID(String UUID, double coins)
-    {
-        if (coins < 0)
+    public static void updateCoinsName(String playerName, int coins) {
+        if (coins < 0) {
             coins = 0;
+        }
 
-        String query = "UPDATE players SET coins=" + coins + " WHERE uuid='" + UUID + "'";
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET coins=? WHERE name=?",
+                coins, playerName
+                                     );
     }
 
-    public static void updateCoinsName(String playerName, double coins)
-    {
-        if (coins < 0)
-            coins = 0;
-
-        String query = "UPDATE players SET coins=" + coins + " WHERE player_name='" + playerName + "'";
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+    public static void updateInfiniteType(String uuid, InfiniteType newType) {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_type=? WHERE uuid=?",
+                newType.toString().toLowerCase(), uuid
+                                     );
     }
 
-    public static void updateRecordsName(String playerName, int records)
-    {
-        if (records < 0)
-            records = 0;
-
-        String query = "UPDATE players SET records=" + records + " WHERE player_name='" + playerName + "'";
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+    public static void updateRank(String uuid, String rank) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET rank_name=? WHERE uuid=?", rank, uuid);
     }
 
-    public static void addRecordsName(String playerName)
-    {
-        int records = StatsDB.getRecordsFromName(playerName);
-        updateRecordsName(playerName, records + 1);
-    }
-
-    public static void removeRecordsName(String playerName)
-    {
-        int records = StatsDB.getRecordsFromName(playerName);
-        updateRecordsName(playerName, records - 1);
-    }
-    public static int getRecordsFromName(String playerName)
-    {
-        int records = 0;
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
-                "records",
-                " WHERE player_name=?", playerName
-        );
-
-        for (Map<String, String> playerResult : playerResults)
-            records = Integer.parseInt(playerResult.get("records"));
-
-        return records;
-    }
-
-    public static double getCoinsFromName(String playerName)
-    {
-        double coins = 0;
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
+    public static int getCoinsFromName(String playerName) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
                 "coins",
-                " WHERE player_name=?", playerName
-        );
+                " WHERE name=?", playerName
+                                                                    );
 
-        for (Map<String, String> playerResult : playerResults)
-            coins = Double.parseDouble(playerResult.get("coins"));
-
-        return coins;
+        return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get("coins")) : 0;
     }
 
-    public static double getCoinsFromUUID(String UUID)
-    {
-        double coins = 0;
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
+    public static int getCoinsFromUUID(String UUID) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
                 "coins",
-                " WHERE uuid='" + UUID + "'"
+                " WHERE uuid=?", UUID
+                                                                    );
+
+        return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get("coins")) : 0;
+    }
+
+    public static int getPlayerInfiniteHighscore(String playerName, InfiniteType type) {
+        String infiniteQuery = "";
+
+        switch (type) {
+            case CLASSIC:
+                infiniteQuery = "infinite_classic_score";
+                break;
+            case SPEEDRUN:
+                infiniteQuery = "infinite_speedrun_score";
+                break;
+            case SPRINT:
+                infiniteQuery = "infinite_sprint_score";
+                break;
+            case TIMED:
+                infiniteQuery = "infinite_timed_score";
+                break;
+        }
+
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
+                infiniteQuery,
+                " WHERE name=?", playerName
         );
 
-        for (Map<String, String> playerResult : playerResults)
-            coins = Double.parseDouble(playerResult.get("coins"));
-
-        return coins;
+        return !playerResult.isEmpty() ? Integer.parseInt(playerResult.get(infiniteQuery)) : -1;
     }
 
     public static boolean isPlayerInDatabase(String playerName) {
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
                 "uuid",
-                " WHERE player_name=?", playerName
-        );
+                " WHERE name=?", playerName
+                                                                    );
 
-        return !playerResults.isEmpty();
+        return !playerResult.isEmpty();
     }
 
-    public static int getPlayerID(String playerName) {
+    public static String getUUIDByName(String playerName) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.PLAYERS_TABLE,
+                "uuid",
+                " WHERE name=?", playerName
+                                                                    );
 
-        int playerID = -1;
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "players",
-                "player_id",
-                " WHERE player_name=?", playerName
-        );
-
-        for (Map<String, String> playerResult : playerResults)
-            playerID = Integer.parseInt(playerResult.get("player_id"));
-
-        return playerID;
+        return playerResult.get("uuid");
     }
 
-    public static void updateBoughtLevels(PlayerStats playerStats)
-    {
-        if (playerStats != null)
-        {
+    public static void loadBoughtLevels(PlayerStats playerStats) {
+        if (playerStats != null) {
             HashSet<String> boughtLevels = new HashSet<>();
 
-            List<Map<String, String>> boughtResults = DatabaseQueries.getResults(
-                    "bought_levels",
+            List<Map<String, String>> purchasesResults = DatabaseQueries.getResults(
+                    DatabaseManager.LEVEL_PURCHASES_TABLE,
                     "level_name",
-                    "WHERE uuid='" + playerStats.getUUID() + "'"
-            );
+                    "WHERE uuid=?", playerStats.getUUID()
+                                                                                   );
 
-            for (Map<String, String> boughtResult : boughtResults)
+            for (Map<String, String> boughtResult : purchasesResults) {
                 boughtLevels.add(boughtResult.get("level_name"));
+            }
 
             playerStats.setBoughtLevels(boughtLevels);
         }
     }
 
-    public static void addBoughtLevel(String UUID, String playerName, String boughtLevel)
-    {
-        String query = "INSERT INTO bought_levels " +
-                "(uuid, player_name, level_name)" +
+    public static void loadFavoriteLevels(PlayerStats playerStats) {
+        if (playerStats != null) {
+            ArrayList<Level> favoriteLevels = new ArrayList<>();
+            List<Map<String, String>> purchasesResults = DatabaseQueries.getResults(
+                    DatabaseManager.FAVORITE_LEVELS,
+                    "level_name",
+                    "WHERE uuid=?", playerStats.getUUID()
+                                                                                   );
+
+            for (Map<String, String> boughtResult : purchasesResults) {
+                favoriteLevels.add(Momentum.getLevelManager().get(boughtResult.get("level_name")));
+            }
+
+            playerStats.setFavoriteLevels(favoriteLevels);
+        }
+    }
+
+    public static void addFavoriteLevel(String uuid, String boughtLevel) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.FAVORITE_LEVELS + " (uuid, level_name)" +
                 " VALUES " +
-                "('" +
-                UUID + "', '" +
-                playerName + "', '" +
-                boughtLevel +
-                "')"
-                ;
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+                "(?,?)",
+                uuid, boughtLevel);
     }
 
-    public static void addBoughtLevel(PlayerStats playerStats, String boughtLevel)
-    {
-        String query = "INSERT INTO bought_levels " +
-                "(uuid, player_name, level_name)" +
+    public static void removeFavoriteLevel(String uuid, String boughtLevel) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.FAVORITE_LEVELS + " WHERE uuid=? AND level_name=?",
+                uuid, boughtLevel);
+    }
+
+    public static void removeAllFavoriteLevels(String uuid) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.FAVORITE_LEVELS + " WHERE uuid=?",
+                uuid
+        );
+    }
+
+    public static void addBoughtLevel(String uuid, String boughtLevel) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.LEVEL_PURCHASES_TABLE + " (uuid, level_name)" +
                 " VALUES " +
-                "('" +
-                playerStats.getUUID() + "', '" +
-                playerStats.getPlayerName() + "', '" +
-                boughtLevel +
-                "')"
-        ;
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+                "(?,?)",
+                uuid, boughtLevel);
     }
 
-    public static void removeBoughtLevel(String playerName, String boughtLevel)
-    {
-        String query = "DELETE FROM bought_levels WHERE player_name=? AND level_name=?";
-
-        Momentum.getDatabaseManager().runAsyncQuery(query, playerName, boughtLevel);
+    public static void removeBoughtLevel(String uuid, String boughtLevel) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=? AND level_name=?",
+                uuid, boughtLevel);
     }
 
-    public static boolean hasBoughtLevel(String playerName, String boughtLevel)
-    {
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
-                "bought_levels",
+    public static void removeAllBoughtLevels(String uuid) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE + " WHERE uuid=?",
+                uuid
+        );
+    }
+
+    public static void removeBoughtLevelByName(String playerName, String boughtLevel) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_PURCHASES_TABLE +
+                " lp JOIN " + DatabaseManager.PLAYERS_TABLE +
+                " p ON p.uuid=lp.uuid WHERE p.name=? AND lp.level_name=?",
+                playerName, boughtLevel);
+    }
+
+    public static boolean hasBoughtLevel(String uuid, String boughtLevel) {
+        Map<String, String> playerResult = DatabaseQueries.getResult(
+                DatabaseManager.LEVEL_PURCHASES_TABLE,
                 "uuid",
-                " WHERE player_name=? AND level_name=?", playerName, boughtLevel
+                " WHERE uuid=? AND level_name=?", uuid, boughtLevel
+                                                                    );
+
+        return !playerResult.isEmpty();
+    }
+
+    public static void resetPlayerClanByName(String playerName) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=NULL WHERE name=?", playerName);
+    }
+
+    public static void resetPlayerClanByUUID(String playerUUID) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=NULL WHERE uuid=?", playerUUID);
+    }
+
+    public static void updatePlayerClan(String uuid, String tag) {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, uuid
+                                     );
+    }
+
+    public static void loadModifiers(PlayerStats playerStats) {
+        HashMap<ModifierType, Modifier> modifiers = new HashMap<>();
+
+        List<Map<String, String>> playerResults = DatabaseQueries.getResults(
+                DatabaseManager.PLAYER_MODIFIERS_TABLE + " pm",
+                "m.type AS type, pm.modifier_name AS modifier_name",
+                "JOIN " + DatabaseManager.MODIFIERS_TABLE + " m ON m.name=pm.modifier_name WHERE uuid=?",
+                playerStats.getUUID()
+                                                                            );
+
+        for (Map<String, String> playerResult : playerResults) {
+            String modifierName = playerResult.get("modifier_name");
+
+            modifiers.put(ModifierType.valueOf(playerResult.get("type").toUpperCase()), Momentum.getModifiersManager().getModifier(modifierName));
+        }
+
+        playerStats.setModifiers(modifiers);
+    }
+
+    public static void addModifier(String uuid, String modifierName) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " (uuid, modifier_name) VALUES(?,?)",
+                uuid, modifierName
+                                     );
+    }
+
+    public static void removeModifier(String uuid, String modifierName) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid=? AND modifier_name=?",
+                uuid, modifierName
+                                     );
+    }
+
+    public static void removeAllModifiersFromPlayer(String playerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid=?",
+                playerUUID
         );
-
-        return !playerResults.isEmpty();
     }
 
-    /*
-     * Completions Section
-     */
-    private static void loadCompletions(PlayerStats playerStats) {
-        List<Map<String, String>> completionsResults = DatabaseQueries.getResults(
-                "completions",
-                "level.level_name, " +
-                        "time_taken, " +
-                        "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
-                "JOIN levels level" +
-                        " ON level.level_id=completions.level_id" +
-                        " WHERE player_id=" + playerStats.getPlayerID()
-        );
-
-        for (Map<String, String> completionResult : completionsResults)
-            playerStats.levelCompletion(
-                    completionResult.get("level_name"),
-                    Long.parseLong(completionResult.get("date")),
-                    Long.parseLong(completionResult.get("time_taken"))
-            );
-
-        // get individual levels beaten by looping through list
-        int individualLevelsBeaten = 0;
-        for (Level level : Momentum.getLevelManager().getLevels().values())
-            if (playerStats.getLevelCompletionsCount(level.getName()) > 0)
-                individualLevelsBeaten++;
-
-        playerStats.setIndividualLevelsBeaten(individualLevelsBeaten);
+    public static void removeModifierName(String playerName, String modifierName) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLAYER_MODIFIERS_TABLE + " WHERE uuid IN (SELECT uuid FROM " + DatabaseManager.PLAYERS_TABLE + " " +
+                "WHERE name=?) AND modifier_name=?",
+                playerName, modifierName
+                                     );
     }
 
-    public static void insertCompletion(PlayerStats playerStats, Level level, LevelCompletion levelCompletion) {
+    public static void loadBoughtPerks(PlayerStats playerStats) {
+        List<Map<String, String>> perksResults = DatabaseQueries.getResults(
+                DatabaseManager.PERKS_BOUGHT_TABLE,
+                "perk_name",
+                "WHERE uuid=?", playerStats.getUUID());
 
-        Momentum.getDatabaseManager().runAsyncQuery(
-                "INSERT INTO completions " +
-                    "(player_id, level_id, time_taken, completion_date)" +
-                    " VALUES (" +
-                    playerStats.getPlayerID() + ", " +
-                    level.getID() + ", " +
-                    levelCompletion.getCompletionTimeElapsed() + ", " +
-                    "FROM_UNIXTIME(" + (levelCompletion.getTimeOfCompletion() / 1000) + ")" +
-                    ")"
-        );
-
-        Momentum.getDatabaseManager().runAsyncQuery("UPDATE players SET level_completions=" + playerStats.getTotalLevelCompletions() +
-                                                  " WHERE player_name='" + playerStats.getPlayerName() + "'");
-    }
-
-    public static int getTotalCompletions(String playerName) {
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults("players", "level_completions", " WHERE player_name=?", playerName);
-
-        for (Map<String, String> playerResult : playerResults)
-            return Integer.parseInt(playerResult.get("level_completions"));
-
-        return -1;
-    }
-
-    public static int getCompletionsFromLevel(String playerName, int levelID)
-    {
-        int playerID = getPlayerID(playerName);
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults("completions", "COUNT(*) AS total_level_completions",
-                " WHERE player_id=" + playerID + " AND level_id=" + levelID);
-
-        for (Map<String, String> playerResult : playerResults)
-            return Integer.parseInt(playerResult.get("total_level_completions"));
-
-        return -1;
-    }
-
-    public static void removeCompletions(int playerID, int levelID) {
-
-        String query = "DELETE FROM completions WHERE player_id=" + playerID + " AND level_id=" + levelID;
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
-    }
-
-    public static boolean hasCompleted(int playerID, int levelID) {
-
-        List<Map<String, String>> playerResults = DatabaseQueries.getResults("completions", "*",
-                                        " WHERE player_id=" + playerID + " AND level_id=" + levelID);
-
-        return !playerResults.isEmpty();
-    }
-
-    /*
-     * Leader Board Section
-     */
-    public static void loadTotalCompletions() {
-        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "completions",
-                "level.level_name, " +
-                        "COUNT(*) AS total_completions",
-                "JOIN levels level" +
-                        " ON level.level_id=completions.level_id" +
-                        " GROUP BY level_name"
-        );
-
-        for (Map<String, String> levelResult : levelsResults) {
-            Level level = Momentum.getLevelManager().get(levelResult.get("level_name"));
-
-            if (level != null)
-                level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
+        for (Map<String, String> perkResult : perksResults) {
+            playerStats.addPerk(
+                    Momentum.getPerkManager().get(perkResult.get("perk_name"))
+                               );
         }
     }
 
-    // can run complete async, only when all levels are loaded
-    public static void loadTotalCompletions(Level level) {
-
-        if (level != null) {
-            List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                    "completions",
-                    "COUNT(*) AS total_completions",
-                    " WHERE level_id='" + level.getID() + "'"
-            );
-
-            for (Map<String, String> levelResult : levelsResults)
-                level.setTotalCompletionsCount(Integer.parseInt(levelResult.get("total_completions")));
-        }
+    public static void addBoughtPerk(String playerUUID, String perkName) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.PERKS_BOUGHT_TABLE + " (uuid, perk_name) VALUES (?,?)", playerUUID, perkName
+                                     );
     }
 
-    public static void loadLeaderboards()
-    {
-        Momentum.getStatsManager().toggleLoadingLeaderboards(true);
-
-        ResultSet results = DatabaseQueries.getRawResults(
-                "SELECT c.level_id, l.level_name, p.player_name, c.time_taken, c.completion_date " +
-                "FROM (" +
-                "  SELECT *, ROW_NUMBER() OVER (PARTITION BY level_id ORDER BY time_taken) AS row_num" +
-                "  FROM (" +
-                "    SELECT level_id, player_id, MIN(time_taken) AS time_taken, MIN(completion_date) AS completion_date" +
-                "    FROM completions" +
-                "    WHERE time_taken > 0" +
-                "    GROUP BY level_id, player_id" +
-                "  ) AS grouped_completions" +
-                ") AS c " +
-                "JOIN players p ON c.player_id = p.player_id " +
-                "JOIN levels l ON c.level_id = l.level_id " +
-                "WHERE c.row_num <= 10 " +
-                "ORDER BY c.level_id, c.time_taken;"
-        );
-
-        if (results != null)
-        {
-            // default values
-            int currentID = -1;
-            Level currentLevel = null;
-            List<LevelCompletion> currentLB = new ArrayList<>();
-
-            try
-            {
-                while (results.next())
-                {
-                    int levelID = results.getInt("level_id");
-
-                    if (currentID != levelID)
-                    {
-                        // if not at the start (level is null), set LB
-                        if (currentLevel != null)
-                            currentLevel.setLeaderboardCache(currentLB);
-
-                        // initialize
-                        currentLB = new ArrayList<>();
-                        currentLevel = Momentum.getLevelManager().get(results.getString("level_name"));
-
-                        // adjust
-                        currentID = levelID;
-                    }
-
-                    // create completion
-                    LevelCompletion levelCompletion = new LevelCompletion(results.getLong("completion_date"), results.getLong("time_taken"));
-                    levelCompletion.setPlayerName(results.getString("player_name"));
-
-                    currentLB.add(levelCompletion);
-                }
-
-                // this makes it so the last level in the results will still get the leaderboard set
-                if (currentLevel != null)
-                    currentLevel.setLeaderboardCache(currentLB);
-            }
-            catch (SQLException exception)
-            {
-                exception.printStackTrace();
-            }
-
-            // sync records afterwards
-            syncRecords();
-        }
-        Momentum.getStatsManager().toggleLoadingLeaderboards(false);
+    public static void updateInfiniteBlock(String uuid, String material) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block=? WHERE uuid=?", material, uuid);
     }
 
-    public static void syncRecords()
-    {
-        HashMap<String, Integer> recordsMap = new HashMap<>();
-
-        for (Level level : Momentum.getLevelManager().getLevels().values())
-        {
-            if (!level.getLeaderboard().isEmpty())
-            {
-                String recordHolder = level.getLeaderboard().get(0).getPlayerName();
-
-                // add to map
-                if (recordsMap.containsKey(recordHolder))
-                    recordsMap.replace(recordHolder, recordsMap.get(recordHolder) + 1);
-                else
-                    recordsMap.put(recordHolder, 1);
-
-            }
-        }
-
-        if (!recordsMap.isEmpty())
-        {
-            // reset
-            Momentum.getDatabaseManager().runQuery("UPDATE players SET records=0");
-
-            for (Map.Entry<String, Integer> entry : recordsMap.entrySet())
-            {
-                PlayerStats playerStats = Momentum.getStatsManager().getByName(entry.getKey());
-
-                // if not null, use stats manager
-                if (playerStats != null)
-                    playerStats.setRecords(entry.getValue());
-
-                StatsDB.updateRecordsName(entry.getKey(), entry.getValue());
-            }
-            Momentum.getPluginLogger().info("Synced " + recordsMap.size() + " level records");
-        }
+    public static void resetInfiniteBlock(String uuid) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_block=NULL WHERE uuid=?", uuid);
     }
 
-    public static void loadLeaderboard(Level level) {
-        // Artificial limit of 500
-        List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "completions",
-                "player.player_name, " +
-                        "time_taken, " +
-                        "(UNIX_TIMESTAMP(completion_date) * 1000) AS date",
-                "JOIN players player" +
-                        " ON completions.player_id=player.player_id" +
-                        " WHERE level_id=" + level.getID() +
-                        " AND time_taken > 0" +
-                        " ORDER BY time_taken" +
-                        " ASC LIMIT 500"
-        );
+    public static void updateInfiniteScore(String uuid, InfiniteType type, int score) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET infinite_" + type.name().toLowerCase() + "_score=? WHERE uuid=?", score, uuid);
+    }
 
-        List<LevelCompletion> levelCompletions = new ArrayList<>();
-        Set<String> addedPlayers = new HashSet<>(); // used to avoid duplicate positions
-
-        for (Map<String, String> levelResult : levelsResults) {
-
-            if (levelCompletions.size() >= 10)
-                break;
-
-            String playerName = levelResult.get("player_name");
-
-            // if not added already, add to leaderboard
-            if (!addedPlayers.contains(playerName)) {
-                LevelCompletion levelCompletion = new LevelCompletion(
-                        Long.parseLong(levelResult.get("date")),
-                        Long.parseLong(levelResult.get("time_taken"))
-                );
-
-                levelCompletion.setPlayerName(playerName);
-                levelCompletions.add(levelCompletion);
-                addedPlayers.add(playerName);
-            }
-        }
-        level.setLeaderboardCache(levelCompletions);
+    public static void updateELOTier(String uuid, String eloTier) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET elo_tier=? WHERE uuid=?", eloTier, uuid);
     }
 }

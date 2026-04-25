@@ -3,33 +3,46 @@ package com.renatusnetwork.momentum;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.renatusnetwork.momentum.commands.*;
-import com.renatusnetwork.momentum.data.Placeholders;
+import com.renatusnetwork.momentum.data.blackmarket.BlackMarketManager;
 import com.renatusnetwork.momentum.data.clans.ClansManager;
 import com.renatusnetwork.momentum.data.checkpoints.CheckpointManager;
+import com.renatusnetwork.momentum.data.cmdsigns.CommandSignManager;
 import com.renatusnetwork.momentum.data.events.EventManager;
-import com.renatusnetwork.momentum.data.infinite.InfinitePKManager;
+import com.renatusnetwork.momentum.data.infinite.InfiniteManager;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
+import com.renatusnetwork.momentum.data.levels.CompletionsDB;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.locations.LocationManager;
 import com.renatusnetwork.momentum.data.menus.MenuManager;
+import com.renatusnetwork.momentum.data.modifiers.ModifiersManager;
 import com.renatusnetwork.momentum.data.perks.PerkManager;
+import com.renatusnetwork.momentum.data.placeholders.*;
 import com.renatusnetwork.momentum.data.plots.PlotsManager;
 import com.renatusnetwork.momentum.data.races.RaceManager;
 import com.renatusnetwork.momentum.data.ranks.RanksManager;
 import com.renatusnetwork.momentum.data.saves.SavesManager;
+import com.renatusnetwork.momentum.data.elo.ELOTiersManager;
+import com.renatusnetwork.momentum.data.squads.SquadsManager;
 import com.renatusnetwork.momentum.gameplay.*;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.data.SettingsManager;
+import com.renatusnetwork.momentum.gameplay.listeners.*;
 import com.renatusnetwork.momentum.storage.ConfigManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
+import com.renatusnetwork.momentum.storage.mysql.TablesDB;
 import com.renatusnetwork.momentum.utils.dependencies.ProtocolLib;
 import com.sk89q.worldedit.WorldEdit;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.logging.Logger;
 
-public class Momentum extends JavaPlugin
-{
+public class Momentum extends JavaPlugin {
+
     private static Plugin plugin;
     private static Logger logger;
 
@@ -48,19 +61,26 @@ public class Momentum extends JavaPlugin
     private static PlotsManager plots;
     private static ProtocolManager protocol;
     private static EventManager events;
-    private static InfinitePKManager infinite;
+    private static InfiniteManager infinite;
+    private static JackpotManager jackpot;
+    private static BlackMarketManager blackmarket;
     private static SavesManager saves;
+    private static ModifiersManager modifiers;
+    private static Placeholders placeholders;
+    private static ELOTiersManager eloTiers;
+    private static CommandSignManager cmdSigns;
+    private static SquadsManager squadsManager;
+    private static ViaAPI viaVersion;
 
     @Override
     public void onEnable() {
         plugin = this;
         logger = getLogger();
 
+        // load all classes
+        load();
         registerEvents();
         registerCommands();
-
-        // load all classes
-        loadClasses();
 
         // check before loading classes
         if (!ProtocolLib.setupProtocol()) {
@@ -70,17 +90,17 @@ public class Momentum extends JavaPlugin
         }
 
         // register placeholders
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
-            new Placeholders().register();
-        else
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            registerPlaceholders();
+        } else {
             getLogger().info("Placeholder not found, not able to initialize placeholders");
+        }
 
         // initialize packet listeners
         PacketListener.loadListeners(this);
 
         // start schedulers and any settings
         Scoreboard.startScheduler(plugin);
-        stats.addUnloadedPlayers();
 
         getLogger().info("Momentum Enabled");
     }
@@ -88,27 +108,15 @@ public class Momentum extends JavaPlugin
     @Override
     public void onDisable() {
         // save and do all shutdown methods
-        PracticeHandler.shutdown();
-        SpectatorHandler.shutdown();
-        infinite.shutdown();
-        events.shutdown();
-        races.shutdown();
-        levels.shutdown();
-
-        // close database and unload classes
-        database.close();
-        unloadClasses();
-
+        unload();
         getLogger().info("Momentum Disabled");
-
-        plugin = null;
     }
 
     private void registerEvents() {
         getServer().getPluginManager().registerEvents(new LevelListener(), this);
-        getServer().getPluginManager().registerEvents(new JoinLeaveHandler(), this);
+        getServer().getPluginManager().registerEvents(new JoinLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
-        getServer().getPluginManager().registerEvents(new TestChamberHandler(), this);
+        getServer().getPluginManager().registerEvents(new TestChamberListener(), this);
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new RespawnListener(), this);
         getServer().getPluginManager().registerEvents(new PacketListener(), this);
@@ -126,6 +134,8 @@ public class Momentum extends JavaPlugin
     }
 
     private void registerCommands() {
+        getCommand("db").setExecutor(new db());
+
         getCommand("practicego").setExecutor(new PracticeGoCMD());
         getCommand("level").setExecutor(new LevelCMD());
         getCommand("race").setExecutor(new RaceCMD());
@@ -137,7 +147,7 @@ public class Momentum extends JavaPlugin
         getCommand("spectate").setExecutor(new SpectateCMD());
         getCommand("clan").setExecutor(new ClanCMD());
         getCommand("momentum").setExecutor(new MomentumCMD());
-        getCommand("toggleplayers").setExecutor(new PlayerToggleCMD());
+        getCommand("players").setExecutor(new PlayerToggleCMD());
         getCommand("checkpoint").setExecutor(new CheckpointCMD());
         getCommand("spawn").setExecutor(new SpawnCMD());
         getCommand("practice").setExecutor(new PracticeCMD());
@@ -147,7 +157,7 @@ public class Momentum extends JavaPlugin
         getCommand("event").setExecutor(new EventCMD());
         getCommand("prestige").setExecutor(new PrestigeCMD());
         getCommand("rate").setExecutor(new RateCMD());
-        getCommand("sword").setExecutor(new SwordCMD());
+        getCommand("sword").setExecutor(new SwordShieldCMD());
         getCommand("infinite").setExecutor(new InfiniteCMD());
         getCommand("profile").setExecutor(new ProfileCMD());
         getCommand("cosmetics").setExecutor(new CosmeticsCMD());
@@ -161,82 +171,184 @@ public class Momentum extends JavaPlugin
         getCommand("join").setExecutor(new JoinCMD());
         getCommand("play").setExecutor(new PlayCMD());
         getCommand("save").setExecutor(new SaveCMD());
+        getCommand("jackpot").setExecutor(new JackpotCMD());
         getCommand("pay").setExecutor(new PayCMD());
+        getCommand("modifier").setExecutor(new ModifierCMD());
+        getCommand("blackmarket").setExecutor(new BlackMarketCMD());
+        getCommand("bid").setExecutor(new BidCMD());
+        getCommand("favorite").setExecutor(new FavoriteCMD());
+        getCommand("stuck").setExecutor(new StuckCMD());
+        getCommand("preview").setExecutor(new PreviewCMD());
+        getCommand("elo").setExecutor(new ELOCMD());
+        getCommand("hotbar").setExecutor(new HotbarCMD());
+        getCommand("elotier").setExecutor(new ELOTierCMD());
+        getCommand("commandsign").setExecutor(new CommandSignCMD());
+        getCommand("squads").setExecutor(new SquadsCMD());
+        getCommand("reset").setExecutor(new ResetCMD());
     }
 
-    private static void loadClasses() {
+    private static void load() {
         configs = new ConfigManager(plugin);
-        settings = new SettingsManager(configs.get("settings"));
+        settings = new SettingsManager(configs.get("config"));
+        database = new DatabaseManager(plugin);
+        TablesDB.initTables(); // needs to happen AFTER loading the manager
         locations = new LocationManager();
         checkpoint = new CheckpointManager();
-        database = new DatabaseManager(plugin);
+        eloTiers = new ELOTiersManager();
         stats = new StatsManager(plugin);
-        ranks = new RanksManager();
-        menus = new MenuManager();
         levels = new LevelManager(plugin);
-        perks = new PerkManager(plugin);
+        menus = new MenuManager();
+        menus.loadItems();
+        levels.loadLevelsInMenus(); // load after loading menus
+        levels.pickFeatured();
+        menus.loadConnectedMenus();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                CompletionsDB.loadLeaderboards(); // needs to happen AFTER loading the manager, in async to speedup start up
+                CompletionsDB.loadTotalAndUniqueAndAverageTimeCompletions();
+            }
+        }.runTaskAsynchronously(Momentum.getPlugin());
+
+        ranks = new RanksManager();
+        perks = new PerkManager();
         clans = new ClansManager(plugin);
         races = new RaceManager();
-        infinite = new InfinitePKManager();
+        infinite = new InfiniteManager();
         plots = new PlotsManager();
         events = new EventManager();
         protocol = ProtocolLibrary.getProtocolManager();
         saves = new SavesManager();
+        modifiers = new ModifiersManager();
+        jackpot = new JackpotManager();
+        modifiers.load();
+        blackmarket = new BlackMarketManager();
+        cmdSigns = new CommandSignManager();
+        squadsManager = new SquadsManager();
+        viaVersion = Via.getAPI();
     }
 
-    private static void unloadClasses() {
-        menus = null;
-        checkpoint = null;
-        clans = null;
-        stats = null;
-        perks = null;
-        levels = null;
-        ranks = null;
-        races = null;
-        infinite = null;
-        locations = null;
-        settings = null;
-        configs = null;
-        database = null;
-        plots = null;
-        protocol = null;
-        events = null;
-        saves = null;
+    private static void unload() {
+        infinite.shutdown();
+        events.shutdown();
+        blackmarket.shutdown();
+        stats.shutdown();
+
+        // close database and unload classes
+        database.close();
+
+        // unregister if not null
+        if (placeholders != null) {
+            placeholders.unregister();
+        }
     }
 
-    public static Plugin getPlugin() { return plugin; }
+    private static void registerPlaceholders() {
+        placeholders = new Placeholders();
+        placeholders.register();
+    }
+
+    public static Plugin getPlugin() {
+        return plugin;
+    }
+
     public static Logger getPluginLogger() {
         return logger;
     }
 
     // all manager methods
-    public static SettingsManager getSettingsManager() { return settings; }
+    public static SettingsManager getSettingsManager() {
+        return settings;
+    }
+
     public static DatabaseManager getDatabaseManager() {
         return database;
     }
+
     public static ConfigManager getConfigManager() {
         return configs;
     }
-    public static LocationManager getLocationManager() { return locations; }
+
+    public static LocationManager getLocationManager() {
+        return locations;
+    }
+
     public static LevelManager getLevelManager() {
         return levels;
     }
+
     public static PerkManager getPerkManager() {
         return perks;
     }
+
     public static MenuManager getMenuManager() {
         return menus;
     }
-    public static StatsManager getStatsManager() { return stats; }
+
+    public static StatsManager getStatsManager() {
+        return stats;
+    }
+
     public static ClansManager getClansManager() {
         return clans;
     }
-    public static CheckpointManager getCheckpointManager() { return checkpoint; }
-    public static RaceManager getRaceManager() { return races; }
-    public static RanksManager getRanksManager() { return ranks; }
-    public static PlotsManager getPlotsManager() { return plots; }
-    public static EventManager getEventManager() { return events; }
-    public static InfinitePKManager getInfinitePKManager() { return infinite; }
-    public static ProtocolManager getProtocolManager() { return protocol; }
-    public static SavesManager getSavesManager() { return saves; }
+
+    public static CheckpointManager getCheckpointManager() {
+        return checkpoint;
+    }
+
+    public static RaceManager getRaceManager() {
+        return races;
+    }
+
+    public static RanksManager getRanksManager() {
+        return ranks;
+    }
+
+    public static PlotsManager getPlotsManager() {
+        return plots;
+    }
+
+    public static EventManager getEventManager() {
+        return events;
+    }
+
+    public static InfiniteManager getInfiniteManager() {
+        return infinite;
+    }
+
+    public static JackpotManager getJackpotManager() { return jackpot; }
+
+    public static ProtocolManager getProtocolManager() {
+        return protocol;
+    }
+
+    public static SavesManager getSavesManager() {
+        return saves;
+    }
+
+    public static BlackMarketManager getBlackMarketManager() {
+        return blackmarket;
+    }
+
+    public static ModifiersManager getModifiersManager() {
+        return modifiers;
+    }
+
+    public static ELOTiersManager getELOTiersManager() {
+        return eloTiers;
+    }
+
+    public static CommandSignManager getCommandSignManager() {
+        return cmdSigns;
+    }
+
+    public static SquadsManager getSquadsManager() {
+        return squadsManager;
+    }
+
+    public static ViaAPI getViaVersion() {
+        return viaVersion;
+    }
 }

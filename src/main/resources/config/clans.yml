@@ -10,3 +10,13 @@ clans:
     xp-needed: 1000000
   '5':
     xp-needed: 10000000
+  '6':
+    xp-needed: 20000000
+  '7':
+    xp-needed: 30000000
+  '8':
+    xp-needed: 40000000
+  '9':
+    xp-needed: 50000000
+  '10':
+    xp-needed: 100000000

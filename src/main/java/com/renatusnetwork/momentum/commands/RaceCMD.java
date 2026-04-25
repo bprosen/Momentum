@@ -2,14 +2,17 @@ package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.menus.MenuManager;
+import com.renatusnetwork.momentum.data.races.RaceManager;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RaceCMD implements CommandExecutor {
 
@@ -24,42 +27,103 @@ public class RaceCMD implements CommandExecutor {
         MenuManager menuManager = Momentum.getMenuManager();
         StatsManager statsManager = Momentum.getStatsManager();
         PlayerStats playerStats = statsManager.get(player);
+        RaceManager raceManager = Momentum.getRaceManager();
 
         if (a.length == 0) {
             sendHelp(player);
         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
             sendHelp(player);
-        } else if (a.length == 1) {
-            Player target = Bukkit.getPlayer(a[0]);
+        } else if ((a.length == 1 || a.length == 2) && a[0].equalsIgnoreCase("random")) {
+            if (playerStats.isLoaded()) {
+                int bet = 0;
+                if (a.length == 2) {
+                    if (Utils.isInteger(a[1])) {
+                        bet = Integer.parseInt(a[1]);
+                    } else {
+                        sender.sendMessage(Utils.translate("&4" + a[1] + " &cis not a valid integer"));
+                        return false;
+                    }
+                }
 
-            if (target != null) {
-                // open menu if they meet requirements
-                if (meetsRaceConditions(Momentum.getStatsManager().get(player), Momentum.getStatsManager().get(target), false, -1.0))
-                    menuManager.openRaceLevelsGUI(player, target, -1.0);
+                Collection<PlayerStats> collection = Momentum.getStatsManager().getOnlinePlayers();
+                PlayerStats opponentStats;
+
+                synchronized (collection) {
+                    List<PlayerStats> list = new ArrayList<>();
+
+                    for (PlayerStats onlineStats : collection) {
+                        if (!onlineStats.equals(playerStats) && onlineStats.isLoaded()) {
+                            list.add(onlineStats);
+                        }
+                    }
+
+                    opponentStats = list.get(ThreadLocalRandom.current().nextInt(0, list.size()));
+                }
+
+                if (opponentStats != null) {
+                    // open menu if meets conditions
+                    raceManager.addChoosingRaceLevel(playerStats, opponentStats, bet);
+                    menuManager.openInventory(playerStats, "race_levels", true);
+                } else {
+                    sender.sendMessage(Utils.translate("&cCould not find an opponent"));
+                }
+            } else {
+                sender.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+            }
+        } else if (a.length == 1) {
+            PlayerStats targetStats = statsManager.getByName(a[0]);
+
+            if (targetStats != null) {
+                if (playerStats.isLoaded()) {
+                    if (!targetStats.equals(playerStats)) {
+                        // open menu if meets conditions
+                        raceManager.addChoosingRaceLevel(playerStats, targetStats, 0);
+                        menuManager.openInventory(playerStats, "race_levels", true);
+                    } else {
+                        player.sendMessage(Utils.translate("&cYou cannot race yourself"));
+                    }
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                }
             } else {
                 player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
             }
         } else if (a.length == 2 && a[0].equalsIgnoreCase("accept")) {
             PlayerStats targetStats = statsManager.getByName(a[1]);
 
-            if (targetStats != null) {
-                // accept race request
+            if (targetStats != null)
+            // accept race request
+            {
                 Momentum.getRaceManager().acceptRequest(playerStats, targetStats);
             } else {
                 player.sendMessage(Utils.translate("&4" + a[1] + " &cis not online"));
             }
         } else if (a.length == 2) {
             // send race request with bet
-            if (Utils.isDouble(a[1])) {
-                double betAmount = Double.parseDouble(a[1]);
-                Player target = Bukkit.getPlayer(a[0]);
+            if (Utils.isInteger(a[1])) {
+                int bet = Integer.parseInt(a[1]);
+                int minBet = Momentum.getSettingsManager().min_race_bet_amount;
 
-                if (target != null) {
-                    // open menu if meets conditions
-                    if (meetsRaceConditions(Momentum.getStatsManager().get(player), Momentum.getStatsManager().get(target), true, betAmount))
-                        menuManager.openRaceLevelsGUI(player, target, betAmount);
+                if (bet >= minBet) {
+                    PlayerStats targetStats = statsManager.getByName(a[0]);
+
+                    if (targetStats != null) {
+                        if (playerStats.isLoaded()) {
+                            if (!targetStats.equals(playerStats)) {
+                                // open menu if meets conditions
+                                raceManager.addChoosingRaceLevel(playerStats, targetStats, bet);
+                                menuManager.openInventory(playerStats, "race_levels", true);
+                            } else {
+                                player.sendMessage(Utils.translate("&cYou cannot race yourself"));
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                        }
+                    } else {
+                        player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
+                    }
                 } else {
-                    player.sendMessage(Utils.translate("&4" + a[0] + " &cis not online"));
+                    player.sendMessage(Utils.translate("&cYou cannot bet less than &6" + Utils.formatNumber(minBet) + " &eCoins"));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cThat is not a valid amount to bet!"));
@@ -71,69 +135,13 @@ public class RaceCMD implements CommandExecutor {
         return false;
     }
 
-    private boolean meetsRaceConditions(PlayerStats player1, PlayerStats player2, boolean bet, double betAmount) {
-
-        if (player1.inRace()) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while in a race"));
-            return false;
-        }
-
-        // if target is in race
-        if (player2.inRace()) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot send a request while &4" + player2.getPlayerName() + " &cis in a race"));
-            return false;
-        }
-
-        if (player1.getPlayerName().equalsIgnoreCase(player2.getPlayerName())) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot race yourself..."));
-            return false;
-        }
-
-        if (player1.isSpectating()) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in spectator"));
-            return false;
-        }
-
-        if (player1.inPracticeMode()) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
-            return false;
-        }
-
-        // make sure they have enough money for the bet
-        double victimBalance = player2.getCoins();
-        double senderBalance = player1.getCoins();
-
-        if (bet && senderBalance < betAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&7You do not have enough money for this bet!" +
-                    " Your Balance &4$" + senderBalance));
-            return false;
-        }
-
-        if (bet && victimBalance < betAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&c" + player2.getPlayer().getName() + " &7does not have enough to do this bet" +
-                    " - &cTheir Balance &4$" + victimBalance));
-            return false;
-        }
-
-        double minBetAmount = Momentum.getSettingsManager().min_race_bet_amount;
-        if (bet && betAmount < minBetAmount) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou cannot bet less than &4$" + minBetAmount));
-            return false;
-        }
-
-        if (Momentum.getRaceManager().getRequest(player1.getPlayer(), player2.getPlayer()) != null) {
-            player1.getPlayer().sendMessage(Utils.translate("&cYou have already sent a request to them!"));
-            return false;
-        }
-        // if they pass all these checks, return true!
-        return true;
-    }
-
     private void sendHelp(Player player) {
         player.sendMessage(Utils.translate("&4&lRace Command Help"));
-        player.sendMessage(Utils.translate("&c/race help &4- &7Displays this page"));
-        player.sendMessage(Utils.translate("&c/race (IGN) &4- &7Send race request without a bet"));
-        player.sendMessage(Utils.translate("&c/race (IGN) (Bet) &4- &7Send race request with a bet"));
-        player.sendMessage(Utils.translate("&c/race accept (IGN) &4- &7Accept pending race request"));
+        player.sendMessage(Utils.translate("&c/race help  &7Displays this page"));
+        player.sendMessage(Utils.translate("&c/race random  &7Races someone random"));
+        player.sendMessage(Utils.translate("&c/race random (Bet)  &7Races someone random with a bet"));
+        player.sendMessage(Utils.translate("&c/race (IGN)  &7Send race request without a bet"));
+        player.sendMessage(Utils.translate("&c/race (IGN) (Bet)  &7Send race request with a bet"));
+        player.sendMessage(Utils.translate("&c/race accept (IGN)  &7Accept pending race request"));
     }
 }

@@ -1,35 +1,34 @@
 package com.renatusnetwork.momentum.data.clans;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Clan {
 
-    private int ID;
     private String tag;
-    private int ownerID;
+    private String ownerUUID;
     private int clanLevel;
     private int clanXP;
-    private long totalGainedXP;
+    private long totalXP;
+    private int maxLevel;
+    private int maxMembers;
+    private HashMap<String, ClanMember> members;
+    private HashSet<String> invitedPlayerNames;
 
-    private List<ClanMember> members = new ArrayList<>(); // Does not include the owner
-    private List<String> invitedUUIDs = new ArrayList<>();
+    public Clan(String tag, String ownerUUID) {
+        this.tag = tag;
+        this.ownerUUID = ownerUUID;
+        this.members = new HashMap<>();
+        this.invitedPlayerNames = new HashSet<>();
+    }
 
-    public Clan(int clanID, String clanTag, int clanOwnerID, int clanLevel, int clanXP, long totalGainedXP) {
-        this.ID = clanID;
-        this.tag = clanTag;
-        this.ownerID = clanOwnerID;
+    public Clan(String tag, String ownerUUID, int clanLevel, int clanXP, long totalXP, int maxLevel, int maxMembers) {
+        this(tag, ownerUUID);
+
         this.clanLevel = clanLevel;
         this.clanXP = clanXP;
-        this.totalGainedXP = totalGainedXP;
-    }
-
-    public void setID(int clanID) {
-        this.ID = clanID;
-    }
-
-    public int getID() {
-        return ID;
+        this.totalXP = totalXP;
+        this.maxMembers = maxMembers;
+        this.maxLevel = maxLevel;
     }
 
     public void setTag(String tag) {
@@ -40,120 +39,115 @@ public class Clan {
         return tag;
     }
 
-    public int getLevel() { return clanLevel; }
+    public int getLevel() {
+        return clanLevel;
+    }
 
-    public int getXP() { return clanXP; }
+    public int getXP() {
+        return clanXP;
+    }
 
     public void resetXP() {
         clanXP = 0;
     }
 
-    public void setXP(int clanXP) { this.clanXP = clanXP; }
+    public void setXP(int clanXP) {
+        this.clanXP = clanXP;
+    }
 
-    public void setTotalGainedXP(long totalGainedXP) { this.totalGainedXP = totalGainedXP; }
+    public void setTotalXP(long totalXP) {
+        this.totalXP = totalXP;
+    }
 
-    public long getTotalGainedXP() { return totalGainedXP; }
+    public long getTotalXP() {
+        return totalXP;
+    }
 
-    public void addXP(long clanXP) { this.clanXP += clanXP; }
+    public void addXP(int clanXP) {
+        this.clanXP += clanXP;
+    }
 
     public boolean isMaxLevel() {
-        if (clanLevel >= ClansYAML.getMaxLevel())
-            return true;
-        return false;
+        return clanLevel == maxLevel;
+    }
+
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    public int getMaxMembers() {
+        return maxMembers;
+    }
+
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
+    }
+
+    public void setMaxMembers(int maxMembers) {
+        this.maxMembers = maxMembers;
     }
 
     public void setLevel(int level) {
         clanLevel = level;
     }
 
-    public void setClanOwnerID(int clanOwnerID) {
-        this.ownerID = clanOwnerID;
+    public void setClanOwnerUUID(String ownerUUID) {
+        this.ownerUUID = ownerUUID;
     }
 
-    public int getOwnerID() {
-        return ownerID;
+    public String getOwnerUUID() {
+        return this.ownerUUID;
     }
 
-    public ClanMember getMemberFromUUID(String UUID) {
-        for (ClanMember member : members)
-            if (member.getUUID().equals(UUID))
-                return member;
-
-        return null;
+    public boolean isMember(String playerName) {
+        return members.containsKey(playerName);
     }
 
-    public ClanMember getMemberFromName(String playerName) {
-        for (ClanMember member : members)
-            if (member.getPlayerName().equals(playerName))
-                return member;
-
-        return null;
+    public ClanMember getMember(String playerName) {
+        return members.get(playerName);
     }
 
     public ClanMember getOwner() {
-        for (ClanMember member : members)
-            if (member.getPlayerID() == ownerID)
-                return member;
-
-        return null;
+        return getMember(ownerUUID);
     }
 
-    public void promoteOwner(String UUID) {
-        ClanMember newOwner = getMemberFromUUID(UUID);
-
-        if (newOwner != null)
-            ownerID = newOwner.getPlayerID();
+    public boolean isOwner(String playerName) {
+        return getMember(ownerUUID).getName().equalsIgnoreCase(playerName);
     }
 
-    public void promoteOwnerFromName(String name) {
-        ClanMember newOwner = getMemberFromName(name);
-
-        if (newOwner != null)
-            ownerID = newOwner.getPlayerID();
-    }
-
-    public boolean isMember(String UUID) {
-        return getMemberFromUUID(UUID) != null;
+    public void setOwner(String ownerUUID) {
+        this.ownerUUID = ownerUUID;
     }
 
     public void addMember(ClanMember clanMember) {
-        if (!isMember(clanMember.getUUID()))
-            members.add(clanMember);
+        members.put(clanMember.getUUID(), clanMember);
     }
 
-    public void removeMemberFromUUID(String UUID) {
-        ClanMember clanMember = getMemberFromUUID(UUID);
-
-        if (clanMember != null)
-            members.remove(clanMember);
+    public void removeMember(String playerUUID) {
+        members.remove(playerUUID);
     }
 
-    public void removeMemberFromName(String playerName) {
-        ClanMember clanMember = getMemberFromName(playerName);
-
-        if (clanMember != null)
-            members.remove(clanMember);
+    public void addInvite(String playerName) {
+        invitedPlayerNames.add(playerName);
     }
 
-    public void addInvite(String UUID) {
-        if (!invitedUUIDs.contains(UUID))
-            invitedUUIDs.add(UUID);
+    public void removeInvite(String playerName) {
+        invitedPlayerNames.remove(playerName);
     }
 
-    public void removeInvite(String UUID) {
-        invitedUUIDs.remove(UUID);
+    public boolean isInvited(String playerName) {
+        return invitedPlayerNames.contains(playerName);
     }
 
-    public boolean isInvited(String UUID) {
-        return invitedUUIDs.contains(UUID);
+    public Collection<ClanMember> getMembers() {
+        return members.values();
     }
 
-    public List<ClanMember> getMembers() {
-        return members;
+    public int numMembers() {
+        return members.size();
     }
 
-    public boolean equals(Clan clan)
-    {
-        return this.getOwner().getPlayerName().equalsIgnoreCase(clan.getOwner().getPlayerName());
+    public boolean equals(Clan clan) {
+        return this.getOwner().getName().equalsIgnoreCase(clan.getOwner().getName());
     }
 }

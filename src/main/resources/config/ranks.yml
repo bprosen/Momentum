@@ -1,4 +1,61 @@
-rookie-i:
+i:
   id: 1
-  title: "&6Rookie I"
-  rankup-price: 4000
+  title: '&fI'
+  rankup_level: i
+ii:
+  title: '&7II'
+  id: 2
+  rankup_level: ii
+iii:
+  title: '&8III'
+  id: 3
+  rankup_level: iii
+iv:
+  title: '&1IV'
+  id: 4
+  rankup_level: iv
+v:
+  title: '&9V'
+  id: 5
+  rankup_level: v
+vi:
+  title: '&3VI'
+  id: 6
+  rankup_level: vi
+vii:
+  title: '&bVII'
+  id: 7
+  rankup_level: vii
+viii:
+  title: '&eVIII'
+  id: 8
+  rankup_level: viii
+ix:
+  title: '&6IX'
+  id: 9
+  rankup_level: ix
+x:
+  title: '&2X'
+  id: 10
+  rankup_level: x
+xi:
+  title: '&aXI'
+  id: 11
+  rankup_level: xi
+xii:
+  title: '&dXII'
+  id: 12
+  rankup_level: xii
+xiii:
+  title: '&5XIII'
+  id: 13
+  rankup_level: xiii
+xiv:
+  title: '&4XIV'
+  id: 14
+  rankup_level: xiv
+xv:
+  title: '&cXV'
+  id: 15
+  # everything below here doesnt matter, it is last rank
+  rankup_level: xiv

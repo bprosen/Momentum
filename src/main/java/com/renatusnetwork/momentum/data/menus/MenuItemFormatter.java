@@ -1,17 +1,34 @@
 package com.renatusnetwork.momentum.data.menus;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.clans.Clan;
+import com.renatusnetwork.momentum.data.clans.ClanMember;
+import com.renatusnetwork.momentum.data.elo.ELOTier;
+import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.momentum.data.jackpot.Jackpot;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
+import com.renatusnetwork.momentum.data.leaderboards.ELOLBPosition;
+import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.momentum.data.levels.Level;
+import com.renatusnetwork.momentum.data.levels.LevelCooldown;
+import com.renatusnetwork.momentum.data.levels.LevelManager;
+import com.renatusnetwork.momentum.data.menus.gui.Menu;
+import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
+import com.renatusnetwork.momentum.data.modifiers.ModifierType;
+import com.renatusnetwork.momentum.data.modifiers.boosters.Booster;
+import com.renatusnetwork.momentum.data.modifiers.discounts.Discount;
 import com.renatusnetwork.momentum.data.perks.Perk;
+import com.renatusnetwork.momentum.data.levels.LevelCompletion;
+import com.renatusnetwork.momentum.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.momentum.data.ranks.Rank;
-import com.renatusnetwork.momentum.data.ranks.RanksYAML;
-import com.renatusnetwork.momentum.data.stats.LevelCompletion;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
-import com.renatusnetwork.momentum.utils.Time;
+import com.renatusnetwork.momentum.utils.TimeUtils;
 import com.renatusnetwork.momentum.utils.Utils;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -21,37 +38,239 @@ import java.util.Set;
 
 public class MenuItemFormatter {
 
-    public static ItemStack format(Player player, PlayerStats playerStats, MenuItem menuItem) {
-        if (menuItem.getType().equals("level"))
-            return getLevel(playerStats, menuItem);
-        if (menuItem.getType().equals("perk"))
-            return getPerk(player, playerStats, menuItem);
-        if (menuItem.getType().equals("open"))
-            return enchantMenuItem(playerStats, menuItem, Momentum.getMenuManager().getMenu(menuItem.getTypeValue()));
-        if (menuItem.getType().equals("type")) {
-            // make coin rankup menu for /rankup if in stage 1
-            if (menuItem.getTypeValue().equals("coin-rankup"))
-                return getRankUp(playerStats, menuItem);
-            else if (menuItem.getTypeValue().equals("featured-level"))
-                return getFeaturedLevel(playerStats, menuItem);
-            // make levels for /rankup if in stage 2
-            else if (menuItem.getTypeValue().equals("rankup-level-1")
-                    || menuItem.getTypeValue().equals("rankup-level-2")
-                    || menuItem.getTypeValue().equals("rankup-level")) {
-
-                ItemStack levelItem = getRankUpLevel(playerStats, menuItem);
-                if (levelItem != null)
-                    return levelItem;
-            }
+    public static ItemStack format(PlayerStats playerStats, MenuItem menuItem) {
+        if (menuItem.getType().equals("race")) {
+            return getRaceLevel(playerStats, menuItem);
         }
+        if (menuItem.getType().equals("level")) {
+            if (menuItem.getTypeValue().equals("featured")) {
+                return getFeaturedLevel(playerStats, menuItem);
+            }
+
+            if (menuItem.getTypeValue().equals("rankup")) {
+                return getRankUpLevel(playerStats, menuItem);
+            }
+
+            if (menuItem.getTypeValue().startsWith("favorite-level")) {
+                int index = Integer.parseInt(menuItem.getTypeValue().split("favorite-level-")[1]) - 1;
+                Level favoriteLevel = playerStats.getFavoriteLevel(index);
+
+                if (favoriteLevel != null) {
+                    MenuItem foundItem = Momentum.getLevelManager().getMenuItemFromLevel(favoriteLevel);
+                    return getFavoriteLevel(playerStats, favoriteLevel, menuItem, foundItem.getItem());
+                }
+            }
+            return getLevel(playerStats, menuItem, menuItem.getItem());
+        }
+
+        if (menuItem.getType().equals("perk")) {
+            return getPerk(playerStats, menuItem);
+        }
+        if (menuItem.hasOpenMenu() && !menuItem.getOpenMenu().getMenu().getName().equalsIgnoreCase(Momentum.getSettingsManager().main_menu_name)) {
+            return enchantMenuItem(
+                    playerStats, menuItem,
+                    menuItem.getOpenMenu().getMenu());
+        }
+        if (menuItem.getType().equals("infinite-mode")) {
+            return getInfiniteMode(playerStats, menuItem);
+        }
+        if (menuItem.getType().equals("type") && menuItem.getTypeValue().equals("level-sorting")) {
+            return getSortingType(playerStats, menuItem);
+        }
+        if (menuItem.getType().equals("profile")) {
+            return getProfileStats(playerStats, menuItem);
+        }
+        if (menuItem.getType().equals("practice-history")) {
+            return getPracticeHistory(playerStats, menuItem);
+        }
+
         // Add in some '%player%' and such formatters for lore
         return menuItem.getItem();
+    }
+
+    private static ItemStack getProfileStats(PlayerStats playerStats, MenuItem menuItem) {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        ItemMeta itemMeta = item.getItemMeta();
+        List<String> newLore = new ArrayList<>();
+
+        switch (menuItem.getTypeValue()) {
+            case "clan": {
+                Clan clan = playerStats.getClan();
+
+                // if they have a clan, check for clan item
+                if (clan != null) {
+                    newLore.add("&7Clan &e" + clan.getTag());
+                    newLore.add("&7Level &e" + clan.getLevel());
+                    newLore.add("&7Total XP &e" + Utils.formatNumber(clan.getTotalXP()));
+                    newLore.add("&7Level XP &e" + Utils.formatNumber(clan.getXP()));
+                    newLore.add("");
+                    newLore.add("&7Members &e" + clan.numMembers());
+
+                    for (ClanMember clanMember : clan.getMembers()) {
+                        // make string for online/offline
+                        String onlineStatus = "&cOffline";
+                        if (Bukkit.getPlayer(clanMember.getName()) != null) {
+                            onlineStatus = "&aOnline";
+                        }
+
+                        String ownerStatus = "";
+                        if (clan.getOwner().equals(clanMember)) {
+                            ownerStatus = "&e(Owner)";
+                        }
+
+                        newLore.add("  &7" + clanMember.getName() + " " + onlineStatus + " " + ownerStatus);
+                    }
+                } else {
+                    newLore.add(Utils.translate("&7Not in a clan"));
+                }
+
+                break;
+            }
+            case "game": {
+                newLore.add("&7Hours &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 72000));
+                newLore.add("&7Jumps &c" + Utils.formatNumber(playerStats.getPlayer().getStatistic(Statistic.JUMP)));
+
+                newLore.add("&7ELO Tier &c" + playerStats.getELOTier().getTitle() + " &c(" + Utils.formatNumber(playerStats.getELO()) + ")");
+
+                ELOLBPosition elolbPosition = Momentum.getStatsManager().getELOLBPositionIfExists(playerStats.getName());
+                if (elolbPosition != null) {
+                    newLore.add("&7ELO Position &c#" + elolbPosition.getPosition());
+                }
+
+                newLore.add("&7Coins &c" + Utils.formatNumber(playerStats.getCoins()));
+                newLore.add("&7Perks/Total &c" + playerStats.getGainedPerksCount() + "/" + Momentum.getPerkManager().numPerks());
+                newLore.add("&7Rank &c" + playerStats.getRank().getTitle());
+                newLore.add("&7Prestige &c" + Utils.formatNumber(playerStats.getPrestiges()));
+                newLore.add("&7Best Classic Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.CLASSIC)));
+                newLore.add("&7Best Sprint Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPRINT)));
+                newLore.add("&7Best Speedrun Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.SPEEDRUN)));
+                newLore.add("&7Best Timed Infinite &c" + Utils.formatNumber(playerStats.getBestInfiniteScore(InfiniteType.TIMED)));
+                newLore.add("&7Race Wins &c" + Utils.formatNumber(playerStats.getRaceWins()));
+                newLore.add("&7Race Losses &c" + Utils.formatNumber(playerStats.getRaceLosses()));
+                newLore.add("&7Race Win Rate &c" + playerStats.getRaceWinRate());
+                newLore.add("&7Event Wins &c" + Utils.formatNumber(playerStats.getEventWins()));
+                newLore.add("&7Command Signs Claimed &c" + Utils.formatNumber(playerStats.getCommandSignSize()) + "/" + Momentum.getCommandSignManager().getCommandSigns().size());
+                break;
+            }
+            case "level": {
+                if (playerStats.hasFavoriteLevels()) {
+                    newLore.add("&7Favorite ");
+                    ArrayList<Level> favoriteLevels = playerStats.getFavoriteLevels();
+                    for (Level level : favoriteLevels) {
+                        newLore.add(" " + level.getTitle());
+                        newLore.add("  &7Completions &a" + Utils.formatNumber(playerStats.getLevelCompletionsCount(level)));
+
+                        LevelCompletion levelCompletion = playerStats.getQuickestCompletion(level);
+                        if (levelCompletion != null) {
+                            newLore.add("  &7Fastest &a" + TimeUtils.formatCompletionTimeTaken(levelCompletion.getCompletionTimeElapsedMillis(), 3));
+                        }
+                    }
+                } else {
+                    newLore.add("&7Favorite &cNone");
+                }
+
+                newLore.add("&7Records &e✦ &a" + Utils.formatNumber(playerStats.getNumRecords()));
+                newLore.add("&7Total Completions &a" + Utils.formatNumber(playerStats.getTotalLevelCompletions()));
+                newLore.add("&7Levels Completed/Total &a" + Utils.formatNumber(playerStats.getIndividualLevelsBeaten()) + "/" + Utils.formatNumber(Momentum.getLevelManager().numLevels()));
+                newLore.add("&7Mastery Levels Completed/Total &a" + Utils.formatNumber(playerStats.getNumMasteryCompletions()) + "/" + Utils.formatNumber(Momentum.getLevelManager().getNumMasteryLevels()));
+                newLore.add("&7Rated Levels &a" + Utils.formatNumber(playerStats.getRatedLevelsCount()));
+                break;
+            }
+        }
+        itemMeta.setLore(Utils.formatLore(newLore));
+        item.setItemMeta(itemMeta);
+
+        return item;
+    }
+
+    private static ItemStack getPracticeHistory(PlayerStats playerStats, MenuItem menuItem) {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        String typeValue = menuItem.getTypeValue();
+
+        if (Utils.isInteger(typeValue)) {
+            int index = Integer.parseInt(typeValue);
+            Location location = playerStats.getPracticeCheckpointFromHistory(index);
+
+            if (location != null) {
+                ItemMeta itemMeta = item.getItemMeta();
+                List<String> lore = new ArrayList<>();
+
+                itemMeta.setDisplayName(Utils.translate("&eClick to teleport to"));
+                lore.add(Utils.translate(" &7x &6" + Utils.formatDecimal(location.getX(), false, 3, 3)));
+                lore.add(Utils.translate(" &7z &6" + Utils.formatDecimal(location.getZ(), false, 3, 3)));
+                lore.add(Utils.translate(" &7f &6" + Utils.formatDecimal(Utils.translateYawToFacing(location.getYaw()), false, 3, 3)));
+
+                if (playerStats.isPracticeHistorySame(location)) {
+                    Utils.addGlow(itemMeta);
+                }
+
+                itemMeta.setLore(lore);
+                item.setItemMeta(itemMeta);
+                return item;
+            }
+        }
+
+        // set as nothing if doesn't exist
+        return new ItemStack(Material.AIR);
+    }
+
+    private static ItemStack getFavoriteLevel(PlayerStats playerStats, Level favoriteLevel, MenuItem menuItem, ItemStack newItem) {
+        // make it the featured in normal gui section too for consistency
+        if (Momentum.getLevelManager().getFeaturedLevel().equals(favoriteLevel)) {
+            return getFeaturedLevel(playerStats, menuItem);
+        } else {
+            return createLevelItem(playerStats, favoriteLevel, menuItem, newItem, null);
+        }
+    }
+
+    private static ItemStack getSortingType(PlayerStats playerStats, MenuItem menuItem) {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        ItemMeta itemMeta = item.getItemMeta();
+
+        itemMeta.setDisplayName(Utils.translate("&b&lSort By"));
+        List<String> lore = new ArrayList<>();
+        lore.add("");
+
+        for (LevelSortingType type : LevelSortingType.values()) {
+            if (type == playerStats.getLevelSortingType()) {
+                lore.add(" &7→ &b" + LevelSortingType.toString(type));
+            } else {
+                lore.add(" &7→ &8" + LevelSortingType.toString(type));
+            }
+        }
+
+        lore.add("");
+        lore.add("&7Click to switch");
+        itemMeta.setLore(Utils.formatLore(lore));
+
+        item.setItemMeta(itemMeta);
+
+        return item;
+    }
+
+    private static ItemStack getInfiniteMode(PlayerStats playerStats, MenuItem menuItem) {
+        ItemStack item = new ItemStack(menuItem.getItem());
+        ItemMeta itemMeta = item.getItemMeta();
+
+        String infiniteMode = StringUtils.capitalize(menuItem.getTypeValue().toLowerCase());
+
+        itemMeta.setDisplayName(menuItem.getFormattedTitle());
+
+        // glow if equal
+        if (playerStats != null && playerStats.getInfiniteType() != null && playerStats.getInfiniteType().toString().equalsIgnoreCase(infiniteMode)) {
+            Utils.addGlow(itemMeta);
+        }
+
+        itemMeta.setLore(menuItem.getFormattedLore());
+        item.setItemMeta(itemMeta);
+
+        return item;
     }
 
     //
     // Perk Section
     //
-    private static ItemStack getPerk(Player player, PlayerStats playerStats, MenuItem menuItem) {
+    private static ItemStack getPerk(PlayerStats playerStats, MenuItem menuItem) {
         ItemStack item = new ItemStack(menuItem.getItem());
         String perkName = menuItem.getTypeValue();
         Perk perk = Momentum.getPerkManager().get(perkName);
@@ -61,59 +280,55 @@ public class MenuItemFormatter {
 
             // if glowing, add glow effect
             if (menuItem.isGlowing()) {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                Utils.addGlow(itemMeta);
             }
 
             // Existing Lore Section
-            List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
+            List<String> itemLore = new ArrayList<>();
             itemMeta.setDisplayName(perk.getFormattedTitle());
+
+            int price = perk.getPrice();
+
+            if (playerStats.hasModifier(ModifierType.SHOP_DISCOUNT)) {
+                Discount discount = (Discount) playerStats.getModifier(ModifierType.SHOP_DISCOUNT);
+                price *= (1.00f - discount.getDiscount());
+            }
 
             // Ownership Status Section
             itemLore.add("");
-            if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
+            if (perk.hasAccess(playerStats)) {
                 itemLore.add(Utils.translate("&2You own this perk"));
-            else {
+            } else {
                 itemLore.add(Utils.translate("&cYou do not own this perk"));
 
-                // Click to Buy Section
-                if (perk.getPrice() > 0) {
-                    int playerBalance = (int) playerStats.getCoins();
-
-                    if (playerBalance > perk.getPrice())
-                        itemLore.add(Utils.translate("&7  Click to buy "));
-                    else {
-                        int requiredCoins = perk.getPrice() - playerBalance;
-
-                        itemLore.add(Utils.translate("&7  Requires &6" + Utils.formatNumber(requiredCoins) + " &7more &6Coins"));
-                    }
-                }
-            }
-
-            // if it has shortened custom lore, add it, otherwise do normal lore
-            if (perk.hasSetRequirementsLore()) {
                 itemLore.add("");
                 itemLore.add(Utils.translate("&7Requirements"));
 
-                // loop through if it has shortened lore and add it
-                for (String shortLore : perk.getSetRequirementsLore())
-                    itemLore.add(Utils.translate(shortLore));
-            } else {
-                // Level Requirements Section
-                List<String> requirements = perk.getRequirements();
-                if (requirements.size() > 0 || perk.getPrice() > 0) {
-                    itemLore.add("");
-                    itemLore.add(Utils.translate("&7Requirements"));
-
-                    for (String requirement : requirements) {
-                        Level level = Momentum.getLevelManager().get(requirement);
-
-                        if (level != null)
-                            itemLore.add(Utils.translate("&7 - " + level.getFormattedTitle()));
+                // if it has shortened custom lore, add it, otherwise do normal lore
+                if (menuItem.hasSpecificLore()) {
+                    itemLore.addAll(menuItem.getFormattedLore());
+                } else {
+                    // Level Requirements Section
+                    for (Level requirement : perk.getRequiredLevels()) {
+                        itemLore.add(Utils.translate(" " + requirement.getTitle()));
                     }
 
-                    if (perk.getPrice() > 0)
-                        itemLore.add(Utils.translate("&7 - Pay &6" + Utils.formatNumber(perk.getPrice()) + " Coins"));
+                    if (price > 0) {
+                        int playerBalance = playerStats.getCoins();
+
+                        if (playerBalance > price) {
+                            itemLore.add(Utils.translate("&a  Click to buy "));
+                        } else {
+                            itemLore.add(Utils.translate(
+                                    "&7 Requires " + Utils.getCoinFormat(perk.getPrice() - playerBalance, price - playerBalance) + " &7more &eCoins"
+                            ));
+                        }
+                    }
+
+                    ELOTier eloTier = perk.getRequiredELOTier();
+                    if (eloTier != null) {
+                        itemLore.add(Utils.translate("&7 ELO Tier " + eloTier.getTitle()));
+                    }
                 }
             }
 
@@ -125,157 +340,63 @@ public class MenuItemFormatter {
         return item;
     }
 
-    //
-    // Level + Rankup Section
-    //
-    private static ItemStack getRankUp(PlayerStats playerStats, MenuItem menuItem) {
-        ItemStack item = new ItemStack(menuItem.getItem());
-        Rank rank = playerStats.getRank();
+    private static ItemStack getRaceLevel(PlayerStats playerStats, MenuItem menuItem) {
+        String levelName = menuItem.getTypeValue();
+        Level level = Momentum.getLevelManager().get(levelName);
+        ItemStack item = menuItem.getItem();
 
-        if (rank != null) {
-            // Existing Lore Section
-            ItemMeta itemMeta = item.getItemMeta();
-            List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
-
-            itemMeta.setDisplayName(Utils.translate("&2Click to enter Stage 2 of Rankup"));
-            itemLore.add(Utils.translate("  &c&l" + rank.getRankTitle() + " &7-> &c&l" +
-                    Momentum.getRanksManager().get(rank.getRankId() + 1).getRankTitle()));
-            itemLore.add(Utils.translate("  &7Cost of Rankup to Stage 2 &6$" + Utils.formatNumber(rank.getRankUpPrice())));
-            itemMeta.setLore(itemLore);
-            item.setItemMeta(itemMeta);
-        }
-
-        return item;
+        return level != null && level.isRaceLevel() ? createLevelItem(playerStats, level, menuItem, item, Momentum.getRaceManager().getChoosingLevelData(playerStats.getName())) : item;
     }
 
-    private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem) {
-        ItemStack item = new ItemStack(menuItem.getItem());
+    private static ItemStack getLevel(PlayerStats playerStats, MenuItem menuItem, ItemStack item) {
         String levelName = menuItem.getTypeValue();
         Level level = Momentum.getLevelManager().get(levelName);
 
         if (level != null) {
             // make it the featured in normal gui section too for consistency
-            if (Momentum.getLevelManager().getFeaturedLevel().getName().equalsIgnoreCase(level.getName()))
+            if (Momentum.getLevelManager().getFeaturedLevel().equals(level)) {
                 return getFeaturedLevel(playerStats, menuItem);
-            else
-                return createLevelItem(playerStats, level, menuItem, item, false);
+            } else {
+                return createLevelItem(playerStats, level, menuItem, item, null);
+            }
         }
         return item;
     }
 
-    // create a slightly different level item for featured level in gui
     private static ItemStack getFeaturedLevel(PlayerStats playerStats, MenuItem menuItem) {
-        Level featuredLevel = Momentum.getLevelManager().getFeaturedLevel();
-        ItemStack levelItem = menuItem.getItem();
+        LevelManager levelManager = Momentum.getLevelManager();
+        MenuItem itemFromLevel = levelManager.getMenuItemFromLevel(levelManager.getFeaturedLevel());
 
-        if (featuredLevel != null) {
-            ItemMeta itemMeta = levelItem.getItemMeta();
-
-            // Existing Lore Section
-            List<String> itemLore = new ArrayList<>();
-
-            // Item Title Section
-            String formattedTitle = Utils.translate("&cFeatured &7- " + featuredLevel.getFormattedTitle());
-
-            // add new if new level!
-            if (featuredLevel.isNewLevel())
-                formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
-
-            if (featuredLevel.getPlayersInLevel() > 0)
-                formattedTitle += Utils.translate(" &7(" + featuredLevel.getPlayersInLevel() + " Playing)");
-
-            itemMeta.setDisplayName(formattedTitle);
-
-            // Click To Go and Reward Section
-            itemLore.add(Utils.translate("&7Click to go to " + featuredLevel.getFormattedTitle()
-                    .replace("&l", "").replace("&o", "")));
-
-            itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(featuredLevel.getReward()) +
-                                        "&r &6" + Utils.formatNumber(featuredLevel.getReward() *
-                                        Momentum.getSettingsManager().featured_level_reward_multiplier) +
-                                        " &6Coin &7Reward"));
-
-            if (featuredLevel.getTotalCompletionsCount() > 0)
-                itemLore.add(Utils.translate("  &6" + Utils.shortStyleNumber(featuredLevel.getTotalCompletionsCount()) + " &7Completions"));
-
-            // only show rating if above 5
-            if (featuredLevel.getRatingsCount() >= 5) {
-                itemLore.add(Utils.translate("  &6" + featuredLevel.getRating() + " &7Rating"));
-                itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(featuredLevel.getRatingsCount()) + " &7ratings"));
-            }
-
-            // Personal Level Stats Section
-            int levelCompletionsCount = playerStats.getLevelCompletionsCount(featuredLevel.getName());
-            if (levelCompletionsCount > 0) {
-                // add glow effect to all levels they have completed
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-                itemLore.add("");
-
-                String beatenMessage = Utils.translate("&7Beaten &2" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
-                if (levelCompletionsCount > 1)
-                    beatenMessage += "s";
-
-                itemLore.add(beatenMessage);
-
-                LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(featuredLevel.getName());
-                if (fastestCompletion != null) {
-                    itemLore.add(Utils.translate("&7 Best Personal Time"));
-
-                    double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
-                    long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
-
-                    itemLore.add(Utils.translate("  &2" + completionTime + "s"));
-
-                    // this makes it so it will not have " ago" if they just completed it
-                    String timeSinceString;
-                    if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
-                        timeSinceString = Utils.translate("   &7Just now");
-                    else
-                        timeSinceString = Utils.translate("   &7" + Time.elapsedShortened(timeSince, false) + "ago");
-
-                    itemLore.add(timeSinceString);
-                }
-            }
-
-            // Sections over
-            itemMeta.setLore(itemLore);
-            levelItem.setItemMeta(itemMeta);
-        }
-        return levelItem;
+        return createLevelItem(playerStats, levelManager.getFeaturedLevel(), menuItem, itemFromLevel.getItem(), null);
     }
 
     private static ItemStack enchantMenuItem(PlayerStats playerStats, MenuItem menuItem, Menu menu) {
         // get item and levels, clone so it can change properly
-        ItemStack item = menuItem.getItem().clone();
-        Set<Level> levelsInMenu = Momentum.getLevelManager().getLevelsFromMenu(menu);
+        ItemStack item = new ItemStack(menuItem.getItem());
+        Set<Level> levelsInMenu = Momentum.getMenuManager().getLevelsFromMenuDeep(menuItem.getMenu(), menu);
 
-        if (levelsInMenu != null && !levelsInMenu.isEmpty())
-        {
+        if (levelsInMenu != null && !levelsInMenu.isEmpty()) {
             int count = 0;
 
             // more optimized: start as true and if a level is not completed, toggle to false and break
             boolean enchant = true;
-            for (Level level : levelsInMenu)
-            {
-                if (playerStats.getLevelCompletionsCount(level.getName()) < 1)
+            for (Level level : levelsInMenu) {
+                if (!playerStats.hasCompleted(level)) {
                     enchant = false;
-                else
+                } else {
                     count++;
+                }
             }
-
 
             ItemMeta itemMeta = item.getItemMeta();
             itemMeta.setDisplayName(Utils.translate(
-                    itemMeta.getDisplayName() + " &7(&a" + (int) (((double) count / levelsInMenu.size()) * 100) + "%&7)"));
+                    itemMeta.getDisplayName() + "&a " + (int) (((double) count / levelsInMenu.size()) * 100) + "%"));
 
             // if enchanting, add durability and hide it for glow effect
-            if (enchant)
-            {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            if (enchant) {
+                Utils.addGlow(itemMeta);
             }
+
             item.setItemMeta(itemMeta);
         }
         return item;
@@ -284,166 +405,271 @@ public class MenuItemFormatter {
     private static ItemStack getRankUpLevel(PlayerStats playerStats, MenuItem menuItem) {
 
         ItemStack item = new ItemStack(menuItem.getItem());
-        String levelName = RanksYAML.getRankUpLevel(playerStats.getRank().getRankName(), menuItem.getTypeValue());
 
-        if (levelName != null) {
-            Level level = Momentum.getLevelManager().get(levelName);
+        if (playerStats.getRank() != null) {
+            if (playerStats.isLastRank()) {
+                // override itemstack
+                item = new ItemStack(Material.EXP_BOTTLE);
 
-            return createLevelItem(playerStats, level, menuItem, item, true);
+                // make simple item to tell them they need to do /prestige!
+                ItemMeta itemMeta = item.getItemMeta();
+                itemMeta.setDisplayName(Utils.translate("&6&lPrestige"));
+                itemMeta.setLore(new ArrayList<String>() {{
+                    add(Utils.translate("&cYou are now at the max rank"));
+                    add(Utils.translate("&cPrestige by doing &4/prestige &cin chat"));
+                }});
+
+                item.setItemMeta(itemMeta);
+
+                return item;
+            } else {
+                Level level = playerStats.getRank().getRankupLevel();
+                return createLevelItem(playerStats, level, menuItem, item, null);
+            }
         }
         return null;
     }
 
-    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item, boolean rankUpLevel) {
-
+    private static ItemStack createLevelItem(PlayerStats playerStats, Level level, MenuItem menuItem, ItemStack item, ChoosingLevel choosingRaceLevel) {
         if (level != null) {
-
+            item = new ItemStack(item); // clone
             ItemMeta itemMeta = item.getItemMeta();
             String formattedTitle = level.getFormattedTitle();
+            JackpotManager jackpotManager = Momentum.getJackpotManager();
 
             // Existing Lore Section
             List<String> itemLore = new ArrayList<>(menuItem.getFormattedLore());
 
-            // do not show all the below info if not a rankup level
-            if (!rankUpLevel) {
-
-                // add new if new level!
-                if (level.isNewLevel())
+            // add featured title
+            if (level.isFeaturedLevel()) {
+                formattedTitle = Utils.translate("&c&lFEATURED " + formattedTitle);
+            } else
+                // add new if new level! but dont show new if featured (too messy)
+                if (level.isNew()) {
                     formattedTitle = Utils.translate("&d&lNEW " + formattedTitle);
-
-                if (level.needsRank())
-                {
-                    if (!Momentum.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))
-                    {
-                        // show whats required
-                        Rank nextRank = Momentum.getRanksManager().getNextRank(level.getRequiredRank());
-                        itemLore.add(Utils.translate("&cRequires " + nextRank.getRankTitle()));
-                    }
                 }
-                // show they need to buy it
-                if (level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
-                {
-                    itemLore.add(Utils.translate("&7Click to buy " + level.getFormattedTitle() + " &7for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"));
+                // show jackpot info if is running and not completed
+                else if (jackpotManager.isJackpotRunning() && jackpotManager.getJackpot().getLevel().equals(level) && !jackpotManager.getJackpot().hasCompleted(playerStats.getName())) {
+                    formattedTitle = Utils.translate("&a&lJACKPOT " + formattedTitle);
+                }
+
+            if (choosingRaceLevel == null) {
+                // show they need to buy it and it is not the jackpot level if it is running
+                if (!(jackpotManager.isJackpotRunning() &&
+                        jackpotManager.getJackpot().getLevel().equals(level)) &&
+                    level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level) && !level.isFeaturedLevel()) {
+
+                    int price = level.getPrice();
+
+                    if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT)) {
+                        Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
+                        price *= (1.00f - discount.getDiscount());
+                    }
+
+                    itemLore.add(Utils.translate("&7Click to buy " + level.getTitle() + "&7 for " + Utils.getCoinFormat(level.getPrice(), price) + " &eCoins"));
+                    itemLore.add(Utils.translate("  &6Shift click to preview"));
                     itemLore.add(Utils.translate("&7You have &6" + Utils.formatNumber(playerStats.getCoins()) + " &eCoins"));
+                } else {
+                    Rank requiredRank = Momentum.getRanksManager().get(level.getRequiredRank());
+
+                    if (level.needsRank() && !Momentum.getRanksManager().isPastOrAtRank(playerStats, requiredRank)) {
+                        itemLore.add(Utils.translate("&cRequires rank " + requiredRank.getTitle()));
+                    } else if (playerStats.hasSave(level)) {
+                        itemLore.add(Utils.translate("&7Click to go to your &aSave"));
+                    } else if (playerStats.hasCheckpoint(level)) {
+                        itemLore.add(Utils.translate("&7Click to go to &eCheckpoint"));
+                    } else {
+                        itemLore.add(Utils.translate("&7Click to go to " + level.getTitle()));
+                    }
                 }
-                else
-                    itemLore.add(Utils.translate("&7Click to go to " + level.getFormattedTitle()));
+            } else {
+                PlayerStats opponentStats = choosingRaceLevel.getRequested();
 
-                // Item Title Section
-                if (level.getPlayersInLevel() > 0)
-                    formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
+                // display access if they do not have it
+                if (!playerStats.hasAccessTo(level)) {
+                    itemLore.add(Utils.translate("&cYou cannot race on &4" + level.getTitle()));
+                } else if (!opponentStats.hasAccessTo(level)) {
+                    itemLore.add(Utils.translate("&4" + opponentStats.getDisplayName() + "&c cannot race on &4" + level.getTitle()));
+                } else {
+                    itemLore.add(Utils.translate("&7Click to race &c" + opponentStats.getDisplayName() + "&7 on " + level.getTitle()));
 
-                if (level.getDifficulty() > -1) // has difficulty
-                {
-                    String difficultyStr = "  ";
-                    int difficulty = level.getDifficulty();
+                    if (choosingRaceLevel.hasBet()) {
+                        itemLore.add(Utils.translate("  &6" + Utils.formatNumber(choosingRaceLevel.getBet()) + "&e Coins &7Bet"));
+                    }
+                }
+            }
 
-                    // determine what color we need to utilize
-                    switch (difficulty)
-                    {
-                        case 10:
-                        case 9:
-                            difficultyStr += "&4";
-                            break;
-                        case 8:
-                        case 7:
-                            difficultyStr += "&c";
-                            break;
-                        case 6:
-                        case 5:
-                            difficultyStr += "&6";
-                            break;
-                        case 4:
-                        case 3:
-                            difficultyStr += "&e";
-                            break;
-                        case 2:
-                        case 1:
-                            difficultyStr += "&a";
-                            break;
+            // Item Title Section
+            if (level.getPlayersInLevel() > 0) {
+                formattedTitle += Utils.translate(" &7(" + level.getPlayersInLevel() + " Playing)");
+            }
+
+            if (level.hasDifficulty()) // has difficulty
+            {
+                String difficultyStr = "  ";
+                int difficulty = level.getDifficulty();
+
+                // determine what color we need to utilize
+                switch (difficulty) {
+                    case 10:
+                    case 9:
+                        difficultyStr += "&4";
+                        break;
+                    case 8:
+                    case 7:
+                        difficultyStr += "&c";
+                        break;
+                    case 6:
+                    case 5:
+                        difficultyStr += "&6";
+                        break;
+                    case 4:
+                    case 3:
+                        difficultyStr += "&e";
+                        break;
+                    case 2:
+                    case 1:
+                        difficultyStr += "&a";
+                        break;
+                }
+
+                boolean pastDifficulty = false;
+
+                // difficulty goes up to 10
+                for (int i = 1; i <= 10; i++) {
+                    // if not past, and we go past difficulty, change to gray
+                    if (!pastDifficulty && difficulty < i) {
+                        pastDifficulty = true;
+                        difficultyStr += "&f";
+                    }
+                    difficultyStr += "|";
+                }
+
+                itemLore.add(Utils.translate(difficultyStr + " &7Difficulty"));
+            }
+
+            int oldReward = level.getReward();
+            int newReward = Momentum.getLevelManager().calculateLevelRewardForPlayer(playerStats, level);
+            LevelCooldown cooldown = null;
+
+            // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
+            if (oldReward != newReward) {
+                itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(oldReward) + "&6 " + Utils.formatNumber(newReward) + "&e Coin &7Reward"));
+
+                // on cooldown!
+                if (cooldown != null && cooldown.getModifier() != 1.00f) {
+                    itemLore.add(Utils.translate("  &7On cooldown &6-" + ((int) ((1.00f - cooldown.getModifier()) * 100)) + "%"));
+                    itemLore.add(Utils.translate("    &7For &e" +
+                                                 TimeUtils.formatTime(Momentum.getSettingsManager().cooldown_calendar.getTimeInMillis() - System.currentTimeMillis())) // get date - current and format
+                    );
+                }
+            } else {
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(oldReward) + "&e Coin &7Reward"));
+            }
+
+
+            // only show rating if above 5
+            if (level.getRatingsCount() >= 5) {
+                int rating = level.getRating(playerStats.getName());
+
+                itemLore.add(Utils.translate("  &6" + level.getRating() + (rating > -1 ? " &e(" + rating + ")" : "") + " &7Rating"));
+                itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
+            }
+
+            if (level.getTotalCompletionsCount() > 0) {
+                itemLore.add("");
+                itemLore.add(Utils.translate("&7Completions"));
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Total"));
+                itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalUniqueCompletionsCount()) + " &7Unique"));
+
+                if (level.hasAverageTimeTaken()) {
+                    String time = "";
+                    long millisAverage = level.getAverageTimeTaken();
+
+                    int seconds = (int) (millisAverage / 1000);
+                    int minutes = seconds / 60;
+                    int hours = minutes / 60;
+
+                    if (hours > 0) {
+                        time += hours + "h ";
+                    }
+                    if (minutes > 0) {
+                        time += (minutes % 60) + "m ";
+                    }
+                    if (seconds > 0) {
+                        time += (seconds % 60) + "s";
                     }
 
-                    boolean pastDifficulty = false;
+                    itemLore.add(Utils.translate("  &6" + time + " &7Average"));
+                }
 
-                    // difficulty goes up to 10
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        // if not past, and we go past difficulty, change to gray
-                        if (!pastDifficulty && difficulty < i) {
-                            pastDifficulty = true;
-                            difficultyStr += "&f";
+                LevelLBPosition lbPosition = level.getRecordCompletion();
+                if (lbPosition != null) {
+                    itemLore.add(Utils.translate("  &6" + TimeUtils.formatCompletionTimeTaken(lbPosition.getTimeTaken(), 3) + " &7Fastest"));
+                    itemLore.add(Utils.translate("    &e" + lbPosition.getPlayerName()));
+                }
+            }
+
+            // Personal Level Stats Section
+            int levelCompletionsCount = playerStats.getLevelCompletionsCount(level);
+            if (levelCompletionsCount > 0) {
+                Utils.addGlow(itemMeta);
+
+                itemLore.add("");
+
+                String beatenMessage = "&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7time";
+                if (levelCompletionsCount > 1) {
+                    itemLore.add(Utils.translate(beatenMessage + "s"));
+                } else {
+                    itemLore.add(Utils.translate(beatenMessage));
+                }
+
+                LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level);
+                if (fastestCompletion != null) {
+                    // add record if there is one
+                    LevelLBPosition record = level.getRecordCompletion();
+                    String bestTimeValue = "  &6" + TimeUtils.formatCompletionTimeTaken(fastestCompletion.getCompletionTimeElapsedMillis(), 3);
+
+                    if (record != null) {
+                        // add number 1
+                        if (playerStats.hasRecord(level)) {
+                            bestTimeValue += " &e#1";
+                        } else {
+                            bestTimeValue += " &e+" + TimeUtils.formatCompletionTimeTaken(fastestCompletion.getCompletionTimeElapsedMillis() - record.getTimeTaken(), 3);
                         }
-                        difficultyStr += "|";
                     }
 
-                    itemLore.add(Utils.translate(difficultyStr + " &7Difficulty"));
+                    itemLore.add(Utils.translate(bestTimeValue));
+                    itemLore.add(Utils.translate("    &7" + TimeUtils.getDate(fastestCompletion.getTimeOfCompletionMillis())));
                 }
 
-                if (playerStats.getPrestiges() > 0 && level.getReward() > 0)
-                    itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(level.getReward()) + "&6 " +
-                            Utils.formatNumber(level.getReward() * playerStats.getPrestigeMultiplier()) + " Coin &7Reward"));
-                else
-                    itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getReward()) + " Coin &7Reward"));
-
-                if (level.getTotalCompletionsCount() > 0)
-                    itemLore.add(Utils.translate("  &6" + Utils.formatNumber(level.getTotalCompletionsCount()) + " &7Completions"));
-
-                // only show rating if above 5
-                if (level.getRatingsCount() >= 5) {
-                    itemLore.add(Utils.translate("  &6" + level.getRating() + " &7Rating"));
-                    itemLore.add(Utils.translate("    &7Out of &e" + Utils.formatNumber(level.getRatingsCount()) + " &7ratings"));
-                }
-
-                // Required Levels Section
-                if (level.getRequiredLevels().size() > 0) {
-                    itemLore.add("");
-                    itemLore.add(Utils.translate("&7Required Levels"));
-
-                    for (String requiredLevelName : level.getRequiredLevels()) {
-                        Level requiredLevel = Momentum.getLevelManager().get(requiredLevelName);
-
-                        if (requiredLevel != null)
-                            itemLore.add(Utils.translate("&7 - " + requiredLevel.getFormattedTitle()));
+                if (choosingRaceLevel == null && level.hasMastery()) {
+                    if (playerStats.hasMasteryCompletion(level)) {
+                        itemLore.add(Utils.translate("&7  Mastery &a✔"));
+                    } else {
+                        itemLore.add(Utils.translate("&7  Mastery &c✖ &6Shift click"));
+                        itemLore.add(Utils.translate("    &6" + Utils.formatNumber(level.getReward() * level.getMasteryMultiplier()) + " &eCoins &7" + level.getMasteryMultiplier() + "x"));
                     }
                 }
+            }
 
-                // Personal Level Stats Section
-                int levelCompletionsCount = playerStats.getLevelCompletionsCount(level.getName());
-                if (levelCompletionsCount > 0) {
-                    // add glow effect to all levels they have completed
-                    itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            // Required Levels Section, but only show it if not featured
+            if (choosingRaceLevel == null && level.hasRequiredLevels() && !level.isFeaturedLevel()) {
+                itemLore.add("");
+                itemLore.add(Utils.translate("&7Requires"));
 
-                    itemLore.add("");
+                for (String requiredLevelName : level.getRequiredLevels()) {
+                    Level requiredLevel = Momentum.getLevelManager().get(requiredLevelName);
 
-                    String beatenMessage = Utils.translate("&7Beaten &6" + Utils.formatNumber(levelCompletionsCount) + " &7Time");
-                    if (levelCompletionsCount > 1)
-                        beatenMessage += "s";
-
-                    itemLore.add(beatenMessage);
-
-                    LevelCompletion fastestCompletion = playerStats.getQuickestCompletion(level.getName());
-                    if (fastestCompletion != null) {
-                        double completionTime = ((double) fastestCompletion.getCompletionTimeElapsed()) / 1000;
-                        long timeSince = System.currentTimeMillis() - fastestCompletion.getTimeOfCompletion();
-
-                        itemLore.add(Utils.translate("&7  Best Time &6" + completionTime + "s"));
-
-                        // this makes it so it will not have " ago" if they just completed it
-                        String timeSinceString;
-                        if (Time.elapsedShortened(timeSince, false).equalsIgnoreCase(""))
-                            timeSinceString = Utils.translate("  &7Just now");
-                        else
-                            timeSinceString = Utils.translate("  &7" + Time.elapsedShortened(timeSince, false) + "ago");
-
-                        itemLore.add(timeSinceString);
+                    if (requiredLevel != null) {
+                        itemLore.add(Utils.translate("&7  " + requiredLevel.getTitle()));
                     }
                 }
             }
 
             // Sections over
             itemMeta.setDisplayName(formattedTitle);
-            itemMeta.setLore((itemLore));
+            itemMeta.setLore(itemLore);
             item.setItemMeta(itemMeta);
         }
         return item;

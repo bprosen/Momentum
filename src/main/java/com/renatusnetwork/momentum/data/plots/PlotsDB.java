@@ -1,205 +1,162 @@
 package com.renatusnetwork.momentum.data.plots;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
+import java.util.logging.Level;
 
 public class PlotsDB {
-
+    /* unused
     public static List<String> getPlotCenters() {
 
         // get all plots from database
         List<Map<String, String>> results = DatabaseQueries.getResults(
-                "plots",
-                "uuid, center_x, center_z", "");
+                DatabaseManager.PLOTS_TABLE,
+                "owner_uuid, center_x, center_z", "");
 
         List<String> tempList = new ArrayList<>();
-        for (Map<String, String> result : results)
+        for (Map<String, String> result : results) {
             tempList.add(result.get("center_x") + ":" + result.get("center_z"));
+        }
 
         return tempList;
     }
+    */
 
-    public static boolean hasPlot(String UUID) {
+    public static List<String> getTrustedUUIDs(int plotID) {
+        List<String> trustedUUIDs = new ArrayList<>();
+
         List<Map<String, String>> results = DatabaseQueries.getResults(
-                "plots",
-                "*", " WHERE uuid='" + UUID + "'");
+                DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE,
+                "trusted_uuid",
+                "WHERE plot_id=?", plotID);
 
-        return !results.isEmpty();
-    }
-
-    public static boolean hasPlotFromName(String playerName) {
-        List<Map<String, String>> results = DatabaseQueries.getResults(
-                "plots",
-                "*", " WHERE player_name=?", playerName);
-
-        return !results.isEmpty();
-    }
-
-    public static String getPlotCenter(String UUID) {
-        if (hasPlot(UUID)) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "plots",
-                    "center_x, center_z", " WHERE uuid='" + UUID + "'");
-
-            for (Map<String, String> result : results)
-                return result.get("center_x") + ":" + result.get("center_z");
+        for (Map<String, String> result : results) {
+            trustedUUIDs.add(result.get("trusted_uuid"));
         }
-        return null;
+
+        return trustedUUIDs;
     }
 
-    public static List<String> getTrustedPlayers(String UUID) {
-        List<String> trustedPlayers = new ArrayList<>();
-
-        if (hasPlot(UUID)) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "plots",
-                    "trusted_players", " WHERE uuid='" + UUID + "'");
-
-            for (Map<String, String> result : results) {
-
-                String[] split = result.get("trusted_players").split(":");
-
-                for (String playerName : split)
-                    trustedPlayers.add(playerName);
-            }
-        }
-        return trustedPlayers;
+    public static void addTrustedPlayer(int plotID, String trustedPlayerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " (plot_id, trusted_uuid) " +
+                "VALUES (?,?)", plotID, trustedPlayerUUID);
     }
 
-    public static void addTrustedPlayer(Player player, Player trustedPlayer) {
-
-        if (hasPlot(player.getUniqueId().toString())) {
-            List<String> trustedPlayers = getTrustedPlayers(player.getUniqueId().toString());
-
-            // add into acceptable string
-            String joinedString = trustedPlayer.getName();
-            for (String playerString : trustedPlayers)
-                joinedString += ":" + playerString;
-
-            Momentum.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players=? WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
-        }
+    public static void removeTrustedPlayer(int plotID, String trustedPlayerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.PLOTS_TRUSTED_PLAYERS_TABLE + " WHERE plot_id=? AND trusted_uuid=?", plotID, trustedPlayerUUID);
     }
 
-    public static void removeTrustedPlayer(Player player, Player trustedPlayer) {
+    /* unused
+    public static int getPlotID(Player player) {
+        List<Map<String, String>> results = DatabaseQueries.getResults(DatabaseManager.PLOTS_TABLE, "id", "WHERE owner_uuid=?", player.getUniqueId().toString());
 
-        if (hasPlot(player.getUniqueId().toString())) {
-            List<String> trustedPlayers = getTrustedPlayers(player.getUniqueId().toString());
-            trustedPlayers.remove(trustedPlayer.getName());
-
-            // add into acceptable string
-            String joinedString = null;
-            for (String playerString : trustedPlayers) {
-
-                // if they are last in list, do not add semicolon
-                if (trustedPlayers.get(trustedPlayers.size() - 1).equalsIgnoreCase(playerString))
-                    joinedString += playerString;
-                else
-                    joinedString += playerString + ":";
-            }
-
-            Momentum.getDatabaseManager().runAsyncQuery("UPDATE plots SET trusted_players=? WHERE uuid='" + player.getUniqueId().toString() + "'", joinedString);
-        }
+        return results.isEmpty() ? -1 : Integer.parseInt(results.get(0).get("id"));
     }
+    */
 
-    public static void addPlot(Player player, Location loc) {
-        Momentum.getDatabaseManager().runQuery("INSERT INTO plots " +
-                "(uuid, player_name, trusted_players, center_x, center_z, submitted)" +
-                " VALUES ('" +
-                player.getUniqueId().toString() + "','" +
-                player.getName() + "','" +
-                "','" +
-                loc.getBlockX() + "','" +
-                loc.getBlockZ() + "','" +
-                "false" +
-                "')"
+    public static void addPlot(PlayerStats playerStats, Location loc) {
+        DatabaseQueries.runAsyncQuery("INSERT INTO " + DatabaseManager.PLOTS_TABLE +
+                                      " (owner_uuid, center_x, center_z)" +
+                                      " VALUES (?,?,?)", playerStats.getUUID(), loc.getBlockX(), loc.getBlockZ()
         );
     }
 
-    public static void removePlot(String UUID) {
-        Momentum.getDatabaseManager().runAsyncQuery("DELETE FROM plots " +
-                "WHERE uuid='" + UUID + "'");
+    /* keep jic for development
+    public static void removePlot(String uuid, boolean async) {
+        if (async) {
+            DatabaseQueries.runAsyncQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
+        } else {
+            DatabaseQueries.runQuery("DELETE FROM " + DatabaseManager.PLOTS_TABLE + " WHERE owner_uuid=?", uuid);
+        }
     }
+    */
 
+    public static HashMap<String, Plot> loadPlots() {
 
-    public static List<String> getPlotOwnerUUIDs() {
-        // get all plots from database
+        // get all plots from database, join players table -> plots
         List<Map<String, String>> results = DatabaseQueries.getResults(
-                "plots",
-                "uuid", "");
+                DatabaseManager.PLAYERS_TABLE + " p",
+                "id, name, center_x, center_z, submitted, owner_uuid",
+                "JOIN " + DatabaseManager.PLOTS_TABLE + " pl ON p.uuid=pl.owner_uuid");
 
-        List<String> tempList = new ArrayList<>();
-        for (Map<String, String> result : results)
-            tempList.add(result.get("uuid"));
 
-        return tempList;
+        HashMap<String, Plot> tempMap = new HashMap<>();
+
+        // this is technically n more queries than doing one big join, but it is much more readable code plus this only runs once on boot
+        for (Map<String, String> result : results) {
+            int plotID = Integer.parseInt(result.get("id"));
+            String ownerUUID = result.get("owner_uuid");
+            String ownerName = result.get("name");
+            double centerX = Double.parseDouble(result.get("center_x"));
+            double centerZ = Double.parseDouble(result.get("center_z"));
+            boolean submitted = Integer.parseInt(result.get("submitted")) == 1;
+
+            // loc from database, 0.5 for center of block
+            Location loc = new Location(
+                    Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world),
+                    centerX + 0.5,
+                    Momentum.getSettingsManager().player_submitted_plot_default_y,
+                    centerZ + 0.5);
+
+            List<String> trustedUUIDs = getTrustedUUIDs(plotID);
+
+            tempMap.put(ownerName, new Plot(plotID, ownerName, ownerUUID, loc, trustedUUIDs, submitted));
+        }
+
+        return tempMap;
     }
 
-    public static String getPlotOwnerName(String UUID) {
-        if (hasPlot(UUID)) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "plots",
-                    "player_name", " WHERE uuid='" + UUID + "'");
+    public static int getCurrentMaxPlotID() {
+        Map<String, String> result = DatabaseQueries.getResult(DatabaseManager.PLOTS_TABLE, "MAX(id) AS last_id", "");
 
-            for (Map<String, String> result : results)
-                return result.get("player_name");
-        }
-        return null;
+        String lastID = result.get("last_id");
+        return lastID != null ? Integer.parseInt(lastID) : 0;
     }
 
-    public static boolean isSubmitted(String UUID) {
-        boolean submitted = false;
-
-        if (hasPlot(UUID)) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "plots",
-                    "submitted", " WHERE uuid='" + UUID + "'");
-
-            for (Map<String, String> result : results)
-                submitted = Boolean.parseBoolean(result.get("submitted"));
-        }
-        return submitted;
-    }
-
-    public static boolean isSubmittedFromName(String playerName) {
-        boolean submitted = false;
-
-        if (hasPlotFromName(playerName)) {
-            List<Map<String, String>> results = DatabaseQueries.getResults(
-                    "plots",
-                    "submitted", " WHERE player_name=?", playerName);
-
-            for (Map<String, String> result : results)
-                submitted = Boolean.parseBoolean(result.get("submitted"));
-        }
-        return submitted;
-    }
-
-    public static void toggleSubmitted(String UUID) {
-        if (hasPlot(UUID)) {
-            boolean currentlySubmitted = isSubmitted(UUID);
-            Momentum.getDatabaseManager().runAsyncQuery("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE UUID='" + UUID + "'");
-        }
+    public static void toggleSubmitted(String uuid) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLOTS_TABLE + " SET submitted=NOT submitted WHERE owner_uuid=?", uuid);
     }
 
     public static void toggleSubmittedFromName(String playerName) {
-        if (hasPlotFromName(playerName)) {
-            boolean currentlySubmitted = isSubmittedFromName(playerName);
-            Momentum.getDatabaseManager().runAsyncQuery("UPDATE plots SET submitted='" + !currentlySubmitted + "' WHERE player_name=?", playerName);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLOTS_TABLE + " p " +
+                "JOIN " + DatabaseManager.PLAYERS_TABLE + " pl ON p.owner_uuid=pl.uuid " +
+                "SET submitted=NOT submitted " +
+                "WHERE name=?",
+                playerName);
+    }
+
+    public static Location getLastPLotLocation() {
+        Map<String, String> result = DatabaseQueries.getResult(
+                DatabaseManager.PLOTS_TABLE,
+                "center_x, center_z",
+                "ORDER BY id DESC LIMIT 1");
+
+        if (result.isEmpty()) {
+            return null;
         }
+
+        return new Location(
+                Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world),
+                Double.parseDouble(result.get("center_x")),
+                Momentum.getSettingsManager().player_submitted_plot_default_y,
+                Double.parseDouble(result.get("center_z"))
+        );
     }
 
-    public static void updatePlayerName(String newPlayerName, String UUID) {
-        String query = "UPDATE plots SET " +
-                "player_name='" + newPlayerName + "' " +
-                "WHERE UUID='" + UUID + "'"
-                ;
-
-        Momentum.getDatabaseManager().runAsyncQuery(query);
+    /* keep jic for development
+    public static void resetAutoIncrement() {
+        DatabaseQueries.runQuery("ALTER TABLE " + DatabaseManager.PLOTS_TABLE + " AUTO_INCREMENT = 1");
     }
+    */
 }

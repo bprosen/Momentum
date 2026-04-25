@@ -1,75 +1,88 @@
 package com.renatusnetwork.momentum.data.levels;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.data.events.EventType;
-import com.renatusnetwork.momentum.data.ranks.Rank;
-import com.renatusnetwork.momentum.data.stats.LevelCompletion;
+import com.renatusnetwork.momentum.data.events.types.EventType;
+import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
-import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Level {
 
     private String name;
+    private long creationTime;
     private String title;
     private int reward;
     private int price;
     private float rating;
-    private int ratingsCount;
+    private long averageTimeTaken;
     private Location startLocation;
-    private Location respawnLocation;
-    private String message;
+    private Location completionLocation;
     private int maxCompletions;
-    private int playersInLevel = 0;
-    private boolean broadcastCompletion;
-    private String requiredPermissionNode = null;
-    private List<String> requiredLevels;
+    private int playersInLevel;
+    private boolean broadcast;
+    private String requiredPermission;
     private int respawnY;
-    private int ID = -1;
-    private int scoreModifier = 1;
-    private boolean isRankUpLevel = false;
-    private boolean liquidResetPlayer = true;
-    private boolean elytraLevel = false;
-    private boolean dropperLevel = false;
-    private boolean newLevel = false;
-    private boolean tcLevel = false;
-
-    private List<PotionEffect> potionEffects = new ArrayList<>();
-
-    private boolean raceLevel = false;
-
-    private boolean eventLevel = false;
-    private EventType eventType;
-
-    private Location raceLocation1 = null;
-    private Location raceLocation2 = null;
-    private Material raceLevelItemType;
-
-    private int totalCompletionsCount = 0;
-    private List<LevelCompletion> leaderboardCache = new ArrayList<>();
-    private List<String> commands = new ArrayList<>();
-
-    private Rank requiredRank;
-
-    private boolean ascendanceLevel = false;
-
+    private boolean liquidResetPlayer;
+    private int totalCompletions;
+    private int totalUniqueCompletions;
+    private String requiredRank;
     private int difficulty;
+    private boolean cooldown;
+    private LevelType type;
+    private boolean newLevel;
+    private boolean hasMastery;
+    private float masteryMultiplier;
+    private boolean tc;
+    private String stuckURL;
 
-    public Level(String levelName) {
+    private HashMap<String, Integer> ratings;
+    private List<String> requiredLevels;
+    private List<PotionEffect> potionEffects;
+    private List<LevelLBPosition> leaderboard;
+    private List<String> commands;
+
+    public Level(String levelName, long creationMillis) {
         this.name = levelName;
-        load();
+        this.title = "";
+        this.ratings = new HashMap<>();
+        this.requiredLevels = new ArrayList<>();
+        this.potionEffects = new ArrayList<>();
+        this.leaderboard = new ArrayList<>();
+        this.commands = new ArrayList<>();
+        this.liquidResetPlayer = true; // default is true
+        this.creationTime = creationMillis;
     }
 
-    public void setName(String name) { this.name = name; }
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCommands(List<String> commands) {
+        this.commands = commands;
+    }
+
+    public void setPotionEffects(List<PotionEffect> potionEffects) {
+        this.potionEffects = potionEffects;
+    }
+
+    public void setRatings(HashMap<String, Integer> ratings) {
+        this.ratings = ratings;
+    }
+
+    public void setRequiredLevels(List<String> requiredLevels) {
+        this.requiredLevels = requiredLevels;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;
@@ -77,6 +90,10 @@ public class Level {
 
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getFormattedTitle() {
@@ -91,81 +108,104 @@ public class Level {
         return reward;
     }
 
-    public int getPlayersInLevel() { return playersInLevel; }
+    public boolean hasReward() {
+        return reward > 0;
+    }
 
-    public void setPlayersInLevel(int playersInLevel) { this.playersInLevel = playersInLevel; }
+    public long getAverageTimeTaken() {
+        return this.averageTimeTaken;
+    }
+
+    public boolean hasAverageTimeTaken() {
+        return averageTimeTaken > 0;
+    }
+
+    public void setAverageTimeTaken(long averageTimeTaken) {
+        this.averageTimeTaken = averageTimeTaken;
+    }
+
+    public int getPlayersInLevel() {
+        return playersInLevel;
+    }
+
+    public void setPlayersInLevel(int playersInLevel) {
+        this.playersInLevel = playersInLevel;
+    }
 
     public Location getStartLocation() {
         return startLocation;
     }
 
-    public Location getRespawnLocation() {
-        return respawnLocation;
+    public void setStartLocation(Location startLocation) {
+        this.startLocation = startLocation;
     }
 
-    public String getMessage() {
-        return message;
+    public Location getCompletionLocation() {
+        return completionLocation;
     }
 
-    public void toggleLiquidReset() { liquidResetPlayer = !liquidResetPlayer; }
+    public void setCompletionLocation(Location completionLocation) {
+        this.completionLocation = completionLocation;
+    }
 
-    public boolean doesLiquidResetPlayer() { return liquidResetPlayer; }
+    public void toggleLiquidReset() {
+        liquidResetPlayer = !liquidResetPlayer;
+    }
 
-    public String getFormattedMessage(PlayerStats playerStats) {
-        if (message != null) {
-            String returnMessage = Utils.translate(message);
+    public boolean doesLiquidResetPlayer() {
+        return liquidResetPlayer;
+    }
 
-            returnMessage = returnMessage.replace("%title%", getFormattedTitle());
-
-            if (playerStats.getPrestiges() > 0)
-                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
-                        Utils.formatNumber(reward) + "&6 " +
-                        Utils.formatNumber(reward * playerStats.getPrestigeMultiplier())));
-            else if (isFeaturedLevel())
-                returnMessage = returnMessage.replace("%reward%", Utils.translate("&c&m" +
-                        Utils.formatNumber(reward) + "&6 " +
-                        Utils.formatNumber((reward * Momentum.getSettingsManager().featured_level_reward_multiplier))));
-            else
-                returnMessage = returnMessage.replace("%reward%", Utils.formatNumber(reward));
-
-            returnMessage = returnMessage.replace(
-                    "%completions%",
-                    Utils.shortStyleNumber(playerStats.getLevelCompletionsCount(name))
-            );
-
-            if (playerStats.inFailMode())
-                returnMessage += Utils.translate(" &7with &6" + playerStats.getFails() + " Fails");
-
-            return returnMessage;
-        }
-
-        return "";
+    public void setLiquidResetPlayer(boolean liquidResetPlayer) {
+        this.liquidResetPlayer = liquidResetPlayer;
     }
 
     public boolean hasPermissionNode() {
-        if (requiredPermissionNode != null)
-            return true;
-        return false;
+        return requiredPermission != null;
     }
 
-    public String getRequiredPermissionNode() {
-        return requiredPermissionNode;
+    public String getRequiredPermission() {
+        return requiredPermission;
+    }
+
+    public void setRequiredPermission(String requiredPermission) {
+        this.requiredPermission = requiredPermission;
     }
 
     public int getMaxCompletions() {
         return maxCompletions;
     }
 
-    public boolean getBroadcastCompletion() {
-        return broadcastCompletion;
+    public boolean hasMaxCompletions() {
+        return maxCompletions > 0;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setMaxCompletions(int maxCompletions) {
+        this.maxCompletions = maxCompletions;
     }
 
-    public int getID() {
-        return ID;
+    public boolean isBroadcasting() {
+        return broadcast;
+    }
+
+    public void toggleBroadcast() {
+        this.broadcast = !this.broadcast;
+    }
+
+    public void setBroadcast(boolean broadcast) {
+        this.broadcast = broadcast;
+    }
+
+    public String getStuckURL() {
+        return stuckURL;
+    }
+
+    public void setStuckURL(String stuckURL) {
+        this.stuckURL = stuckURL;
+    }
+
+    public boolean hasStuckURL() {
+        return stuckURL != null;
     }
 
     public void setRating(float rating) {
@@ -176,326 +216,177 @@ public class Level {
         return rating;
     }
 
-    public int getPrice() { return price; }
-
-    public void setPrice(int price) { this.price = price; }
-
-    public int getRatingsCount() { return ratingsCount; }
-
-    public void setRatingsCount(int ratingsCount) { this.ratingsCount = ratingsCount; }
-
-    public void addRatingAndCalc(int rating) {
-
-        // run new average = old average + (new rating + old average) / new count formula
-        double newAverageRating = this.rating + (rating - this.rating) / (ratingsCount + 1);
-        double newAmount = Double.valueOf(new BigDecimal(newAverageRating).toPlainString());
-        // this makes it seperate digits by commands and .2 means round decimal by 2 places
-        this.rating = Float.parseFloat(String.format("%,.2f", newAmount));
-        ratingsCount += 1;
+    public boolean hasRating() {
+        return rating > 0.0 && ratings.size() >= 5;
     }
 
-    public void removeRatingAndCalc(int rating) {
+    public int getPrice() {
+        return price;
+    }
 
-        if (ratingsCount - 1 <= 0) {
-            this.rating = 0.00f;
-            this.ratingsCount = 0;
+    public boolean requiresBuying() {
+        return price > 0;
+    }
 
-        } else {
-            // run new average = old average + (new rating + old average) / new count formula
-            double newAverageRating = this.rating + (rating - this.rating) / (ratingsCount - 1);
-            double newAmount = Double.valueOf(new BigDecimal(newAverageRating).toPlainString());
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public int getRatingsCount() {
+        return ratings.size();
+    }
+
+    public boolean hasRated(String playerName) {
+        return ratings.containsKey(playerName);
+    }
+
+    public int getRating(String playerName) {
+        return ratings.getOrDefault(playerName, -1);
+    }
+
+    public void addRating(String playerName, int rating) {
+        ratings.put(playerName, rating);
+        calcRating();
+    }
+
+    public void updateRating(String playerName, int newRating) {
+        ratings.replace(playerName, newRating);
+        calcRating();
+    }
+
+    public void removeRating(String playerName) {
+        ratings.remove(playerName);
+        calcRating();
+    }
+
+    public List<String> getUsersWhoRated(int rating) {
+        List<String> tempList = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : ratings.entrySet()) {
+            if (entry.getValue() == rating) {
+                tempList.add(entry.getKey());
+            }
+        }
+
+        return tempList;
+    }
+
+    public void calcRating() {
+        if (!ratings.isEmpty()) {
+            long sumRatings = 0;
+
+            for (Integer value : ratings.values()) {
+                sumRatings += value;
+            }
+
+            double newAverageRating = ((double) sumRatings) / ratings.size();
+
             // this makes it seperate digits by commands and .2 means round decimal by 2 places
-            this.rating = Float.parseFloat(String.format("%,.2f", newAmount));
-            ratingsCount -= 1;
+            rating = Float.parseFloat(Utils.formatDecimal(newAverageRating, false, 1, 2));
+        } else {
+            rating = 0.0f;
         }
     }
 
-    public List<String> getCommands() { return commands; }
+    public List<String> getCommands() {
+        return commands;
+    }
 
     public boolean hasCommands() {
         return !commands.isEmpty();
     }
 
-    public void setTotalCompletionsCount(int count) {
-        totalCompletionsCount = count;
+    public void setTotalCompletionsCount(int totalCompletions) {
+        this.totalCompletions = totalCompletions;
+    }
+
+    public void addTotalCompletionsCount() {
+        this.totalCompletions++;
     }
 
     public int getTotalCompletionsCount() {
-        return totalCompletionsCount;
+        return totalCompletions;
+    }
+
+    public int getTotalUniqueCompletionsCount() {
+        return totalUniqueCompletions;
+    }
+
+    public void setTotalUniqueCompletionsCount(int totalUniqueCompletions) {
+        this.totalUniqueCompletions = totalUniqueCompletions;
+    }
+
+    public void addTotalUniqueCompletionsCount() {
+        this.totalCompletions++;
     }
 
     public boolean isRankUpLevel() {
-        return isRankUpLevel;
+        return type == LevelType.RANKUP;
     }
 
-    public boolean isEventLevel() { return eventLevel; }
+    public boolean isEventLevel() {
+        return type == LevelType.EVENT_ASCENT ||
+               type == LevelType.EVENT_MAZE ||
+               type == LevelType.EVENT_PVP ||
+               type == LevelType.EVENT_FALLING_ANVIL ||
+               type == LevelType.EVENT_RISING_WATER;
+    }
 
-    public int getDifficulty() { return difficulty; }
+    public void setLevelType(LevelType levelType) {
+        this.type = levelType;
+    }
+
+    public boolean hasDifficulty() {
+        return difficulty > 0;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
 
     public EventType getEventType() {
-        EventType event = null;
-
-        if (eventLevel)
-            event = eventType;
-
-        return event;
-    }
-
-    public void setRankUpLevel(boolean isRankupLevel) {
-        this.isRankUpLevel = isRankupLevel;
-    }
-
-    public void sortNewCompletion(LevelCompletion levelCompletion) {
-        List<LevelCompletion> newLeaderboard = new ArrayList<>(leaderboardCache);
-
-        if (newLeaderboard.size() > 0)
-        {
-            newLeaderboard.add(levelCompletion);
-
-            boolean done = false;
-            int currentIndex = newLeaderboard.size() - 1;
-
-            // working from the tail iteration
-            while (!done)
-            {
-                int nextIndex = currentIndex - 1;
-
-                // if next is negative and current is less than next (higher lb position), swap!
-                if (nextIndex >= 0 &&
-                    newLeaderboard.get(nextIndex).getCompletionTimeElapsed() > newLeaderboard.get(currentIndex).getCompletionTimeElapsed())
-                {
-                    // swap
-                    LevelCompletion temp = newLeaderboard.get(nextIndex);
-
-                    newLeaderboard.set(nextIndex, newLeaderboard.get(currentIndex));
-                    newLeaderboard.set(currentIndex, temp);
-                }
-                else
-                {
-                    done = true;
-                }
-                currentIndex--;
-            }
-
-            // Trimming potential #11 datapoint
-            if (newLeaderboard.size() > 10)
-                newLeaderboard.remove(10);
-        } else
-            newLeaderboard.add(0, levelCompletion);
-
-        leaderboardCache = newLeaderboard;
-    }
-
-    public void addCompletion(String playerName, LevelCompletion levelCompletion) {
-        if (totalCompletionsCount < 0)
-            totalCompletionsCount = 0;
-
-        boolean alreadyFirstPlace = false;
-        boolean firstCompletion = false;
-        boolean validCompletion = false;
-
-        totalCompletionsCount += 1;
-
-        if (levelCompletion.getCompletionTimeElapsed() <= 0.0)
-            return;
-
-        if (!Momentum.getStatsManager().isLoadingLeaderboards())
-        {
-            if (!leaderboardCache.isEmpty())
-            {
-                // Compare completion against scoreboard
-                if (leaderboardCache.size() < 10 ||
-                        leaderboardCache.get(leaderboardCache.size() - 1).getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                {
-                    LevelCompletion firstPlace = leaderboardCache.get(0);
-
-                    // check for first place
-                    if (firstPlace.getPlayerName().equalsIgnoreCase(playerName) && firstPlace.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                    {
-                        leaderboardCache.remove(firstPlace);
-                        alreadyFirstPlace = true;
-                    }
-                    // otherwise, search for where it is
-                    else
-                    {
-                        LevelCompletion completionToRemove = null;
-                        boolean completionSlower = false;
-
-                        for (LevelCompletion completion : leaderboardCache)
-                        {
-                            if (completion.getPlayerName().equalsIgnoreCase(playerName))
-                                if (completion.getCompletionTimeElapsed() > levelCompletion.getCompletionTimeElapsed())
-                                    completionToRemove = completion;
-                                else
-                                    completionSlower = true;
-                        }
-                        if (completionToRemove != null)
-                            leaderboardCache.remove(completionToRemove);
-                        else if (completionSlower)
-                            return;
-                    }
-                    sortNewCompletion(levelCompletion);
-                    validCompletion = true;
-                }
-            }
-            else
-            {
-                leaderboardCache.add(levelCompletion);
-                firstCompletion = true;
-            }
-            // only do record mod if it is a valid or first completion
-            if (validCompletion || firstCompletion)
-                doRecordModification(levelCompletion, alreadyFirstPlace, firstCompletion);
+        // simple switch case
+        switch (type) {
+            case EVENT_ASCENT:
+                return EventType.ASCENT;
+            case EVENT_MAZE:
+                return EventType.MAZE;
+            case EVENT_PVP:
+                return EventType.PVP;
+            case EVENT_FALLING_ANVIL:
+                return EventType.FALLING_ANVIL;
+            case EVENT_RISING_WATER:
+                return EventType.RISING_WATER;
         }
+        return null;
     }
 
-    public void doRecordModification(LevelCompletion levelCompletion, boolean alreadyFirstPlace, boolean firstCompletion)
-    {
-        String brokenRecord = "&e✦ &d&lRECORD BROKEN &e✦";
-
-        // if first completion, make it record set
-        if (firstCompletion)
-            brokenRecord = "&e✦ &d&lRECORD SET &e✦";
-
-        // broadcast when record is beaten
-        if (leaderboardCache.get(0).getPlayerName().equalsIgnoreCase(levelCompletion.getPlayerName()))
-        {
-            double completionTime = ((double) levelCompletion.getCompletionTimeElapsed()) / 1000;
-
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(Utils.translate(brokenRecord));
-            Bukkit.broadcastMessage(Utils.translate("&d" + levelCompletion.getPlayerName() +
-                    " &7has the new &8" + getFormattedTitle() +
-                    " &7record with &a" + completionTime + "s"));
-            Bukkit.broadcastMessage("");
-
-            Momentum.getLevelManager().doRecordBreakingFirework(respawnLocation);
-            if (!alreadyFirstPlace)
-            {
-                // update new #1 records
-                PlayerStats playerStats = Momentum.getStatsManager().getByName(levelCompletion.getPlayerName());
-
-                if (playerStats != null)
-                    Momentum.getStatsManager().addRecord(playerStats, playerStats.getRecords());
-                else
-                {
-                    new BukkitRunnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            StatsDB.addRecordsName(levelCompletion.getPlayerName());
-                        }
-                    }.runTaskAsynchronously(Momentum.getPlugin());
-                }
-
-                // if more than 1, remove
-                if (leaderboardCache.size() > 1)
-                {
-                    LevelCompletion previousRecord = leaderboardCache.get(1);
-
-                    PlayerStats previousStats = Momentum.getStatsManager().getByName(previousRecord.getPlayerName());
-
-                    if (previousStats != null)
-                        Momentum.getStatsManager().removeRecord(previousStats, previousStats.getRecords());
-                    else
-                    {
-                        new BukkitRunnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                StatsDB.removeRecordsName(previousRecord.getPlayerName());
-                            }
-                        }.runTaskAsynchronously(Momentum.getPlugin());
-                    }
-                }
-            }
-            // do gg run
-            Momentum.getStatsManager().runGGTimer();
-        }
+    public boolean hasCooldown() {
+        return cooldown;
     }
 
-    public void setScoreModifier(int scoreModifier) {
-        this.scoreModifier = scoreModifier;
+    public void toggleCooldown() {
+        cooldown = !cooldown;
     }
 
-    public int getScoreModifier() {
-        return scoreModifier;
+    public void setCooldown(boolean cooldown) {
+        this.cooldown = cooldown;
     }
 
-    private void load() {
-        if (LevelsYAML.exists(name)) {
-
-            if (LevelsYAML.isSet(name, "title"))
-                title = LevelsYAML.getTitle(name);
-            else
-                title = name;
-
-            String startLocationName = name + "-spawn";
-            if (Momentum.getLocationManager().exists(startLocationName))
-                startLocation = Momentum.getLocationManager().get(startLocationName);
-            else
-                startLocation = Momentum.getLocationManager().get("spawn");
-
-            String respawnLocationName = name + "-completion";
-            if (Momentum.getLocationManager().exists(respawnLocationName))
-                respawnLocation = Momentum.getLocationManager().get(respawnLocationName);
-            else
-                respawnLocation = Momentum.getLocationManager().get("spawn");
-
-            if (LevelsYAML.isSet(name, "message"))
-                message = LevelsYAML.getMessage(name);
-            else
-                message = Momentum.getSettingsManager().levels_message_completion;
-
-            // this acts as a boolean for races
-            if (LevelsYAML.isSection(name, "race")) {
-                // this checks if player1 and player2 has locations
-                raceLevel = true;
-
-                if (LevelsYAML.isSet(name, "race.player1_loc") &&
-                    LevelsYAML.isSet(name, "race.player2_loc")) {
-
-                    raceLocation1 = LevelsYAML.getPlayerRaceLocation("player1", name);
-                    raceLocation2 = LevelsYAML.getPlayerRaceLocation("player2", name);
-                }
-
-                if (LevelsYAML.isSet(name, "race.menu_item"))
-                    raceLevelItemType = LevelsYAML.getRaceMenuItemType(name);
-            }
-
-            if (LevelsYAML.isSet(name, "event")) {
-                eventLevel = true;
-                eventType = LevelsYAML.getEventType(name);
-            }
-
-            isRankUpLevel = LevelsYAML.getRankUpLevelSwitch(name);
-            maxCompletions = LevelsYAML.getMaxCompletions(name);
-            broadcastCompletion = LevelsYAML.getBroadcastSetting(name);
-            requiredLevels = LevelsYAML.getRequiredLevels(name);
-            potionEffects = LevelsYAML.getPotionEffects(name);
-            commands = LevelsYAML.getCommands(name);
-            liquidResetPlayer = LevelsYAML.getLiquidResetSetting(name);
-            requiredPermissionNode = LevelsYAML.getRequiredPermissionNode(name);
-            respawnY = LevelsYAML.getRespawnY(name);
-            elytraLevel = LevelsYAML.isElytraLevel(name);
-            dropperLevel = LevelsYAML.isDropperLevel(name);
-            tcLevel = LevelsYAML.isTCLevel(name);
-            ascendanceLevel = LevelsYAML.isAscendanceLevel(name);
-            price = LevelsYAML.getPrice(name);
-            newLevel = LevelsYAML.getNewLevel(name);
-            requiredRank = LevelsYAML.getRankRequired(name);
-            difficulty = LevelsYAML.getDifficulty(name);
-        }
+    public boolean needsRank() {
+        return requiredRank != null;
     }
 
-    public boolean needsRank() { return requiredRank != null; }
+    public String getRequiredRank() {
+        return requiredRank;
+    }
 
-    public Rank getRequiredRank() { return requiredRank; }
-
-    public void setLeaderboardCache(List<LevelCompletion> levelCompletions) {
-        leaderboardCache = levelCompletions;
+    public void setRequiredRank(String requiredRank) {
+        this.requiredRank = requiredRank;
     }
 
     public boolean hasRespawnY() {
@@ -506,63 +397,134 @@ public class Level {
         return respawnY;
     }
 
-    public boolean isElytraLevel() { return elytraLevel; }
+    public void setRespawnY(int respawnY) {
+        this.respawnY = respawnY;
+    }
 
-    public boolean isDropperLevel() { return dropperLevel; }
+    public boolean isElytra() {
+        return type == LevelType.ELYTRA;
+    }
 
-    public boolean isTCLevel() { return tcLevel; }
+    public boolean isDropper() {
+        return type == LevelType.DROPPER;
+    }
 
-    public boolean isNewLevel() { return newLevel; }
+    public boolean isTCEnabled() {
+        return tc;
+    }
 
-    public void toggleNewLevel() { newLevel = !newLevel; }
+    public void toggleTC() {
+        tc = !tc;
+    }
 
-    public boolean isAscendanceLevel() { return ascendanceLevel; }
+    public void setTC(boolean tc) {
+        this.tc = tc;
+    }
 
-    public List<LevelCompletion> getLeaderboard() {
-        return leaderboardCache;
+    public boolean isNew() {
+        return newLevel;
+    }
+
+    public void toggleNew() {
+        newLevel = !newLevel;
+    }
+
+    public void setNew(boolean isNew) {
+        this.newLevel = isNew;
+    }
+
+    public boolean hasMastery() {
+        return hasMastery;
+    }
+
+    public void toggleHasMastery() {
+        hasMastery = !hasMastery;
+    }
+
+    public void setHasMastery(boolean hasMastery) {
+        this.hasMastery = hasMastery;
+    }
+
+    public float getMasteryMultiplier() {
+        return masteryMultiplier;
+    }
+
+    public void setMasteryMultiplier(float masteryMultiplier) {
+        this.masteryMultiplier = masteryMultiplier;
+    }
+
+    public boolean isAscendance() {
+        return type == LevelType.ASCENDANCE;
+    }
+
+    public List<LevelLBPosition> getLeaderboard() {
+        return leaderboard;
+    }
+
+    public boolean hasLeaderboard() {
+        return !leaderboard.isEmpty();
+    }
+
+    public void setLeaderboard(List<LevelLBPosition> leaderboard) {
+        this.leaderboard = leaderboard;
+    }
+
+    public LevelLBPosition getRecordCompletion() {
+        return !leaderboard.isEmpty() ? leaderboard.get(0) : null;
+    }
+
+    public boolean isRequiredLevel(String levelName) {
+        return requiredLevels.contains(levelName);
+    }
+
+    public boolean hasRequiredLevels() {
+        return !requiredLevels.isEmpty();
     }
 
     public List<String> getRequiredLevels() {
         return requiredLevels;
     }
 
+    public void addRequiredLevel(String levelName) {
+        requiredLevels.add(levelName);
+    }
+
+    public void removeRequiredLevel(String levelName) {
+        requiredLevels.remove(levelName);
+    }
+
+    public boolean hasPotionEffects() {
+        return !potionEffects.isEmpty();
+    }
+
     public List<PotionEffect> getPotionEffects() {
         return potionEffects;
     }
 
-    public Location getRaceLocation1() {
-        return raceLocation1;
-    }
-
-    public Location getRaceLocation2() {
-        return raceLocation2;
-    }
-
     public boolean isRaceLevel() {
-        return raceLevel;
+        return type == LevelType.RACE;
     }
 
     public boolean isFeaturedLevel() {
-        if (name.equalsIgnoreCase(Momentum.getLevelManager().getFeaturedLevel().getName()))
-            return true;
-        return false;
+        return name.equalsIgnoreCase(Momentum.getLevelManager().getFeaturedLevel().getName());
     }
 
-    public boolean hasValidRaceLocations() {
-        if (LevelsYAML.isSet(name, "race.player1-loc") && LevelsYAML.isSet(name, "race.player2-loc"))
-            return true;
-        return false;
-    }
-
-    public Material getRaceLevelMenuItemType() {
-        return raceLevelItemType;
-    }
-
-    public boolean hasRequiredLevels(PlayerStats playerStats) {
-        for (String levelName : requiredLevels)
-            if (playerStats.getLevelCompletionsCount(levelName) < 1)
+    public boolean playerHasRequiredLevels(PlayerStats playerStats) {
+        for (String levelName : requiredLevels) {
+            if (!playerStats.hasCompleted(levelName)) {
                 return false;
+            }
+        }
 
         return true;
     }
+
+    public boolean equals(Level level) {
+        return this.name.equalsIgnoreCase(level.getName());
+    }
+
+    public boolean equals(String levelName) {
+        return this.name.equalsIgnoreCase(levelName);
+    }
+
 }

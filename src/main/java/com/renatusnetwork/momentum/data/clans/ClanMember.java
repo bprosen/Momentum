@@ -2,27 +2,28 @@ package com.renatusnetwork.momentum.data.clans;
 
 public class ClanMember {
 
-    private int playerID;
-    private String UUID;
-    private String playerName;
+    private String uuid;
+    private String name;
 
-    public ClanMember(int playerID, String UUID, String playerName) {
-        this.playerID = playerID;
-        this.UUID = UUID;
-        this.playerName = playerName;
-    }
-
-    public int getPlayerID() {
-        return playerID;
+    public ClanMember(String uuid, String name) {
+        this.uuid = uuid;
+        this.name = name;
     }
 
     public String getUUID() {
-        return UUID;
+        return uuid;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public String getName() {
+        return name;
     }
 
-    public void setPlayerName(String playerName) { this.playerName = playerName; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean equals(ClanMember other) {
+        return this.uuid.equals(other.getUUID());
+    }
+
 }

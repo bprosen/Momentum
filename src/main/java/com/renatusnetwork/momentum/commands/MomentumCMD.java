@@ -8,12 +8,13 @@ import org.bukkit.command.CommandSender;
 
 public class MomentumCMD implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (sender.isOp()) {
-            Momentum.getConfigManager().load("settings");
-            Momentum.getSettingsManager().load(Momentum.getConfigManager().get("settings"));
-            sender.sendMessage("Loaded settings.yml from disk");
+            Momentum.getConfigManager().load("config");
+            Momentum.getSettingsManager().load(Momentum.getConfigManager().get("config"));
+            sender.sendMessage("Loaded config.yml from disk");
         } else {
             sender.sendMessage(Utils.translate("&cYou do not have permission to use this command"));
         }

@@ -1,0 +1,289 @@
+# Settings yaml
+
+database:
+  host: ""
+  port:
+  database: ""
+  username: ""
+  password: ""
+
+main_world: "parkour"
+max_offline_cache_size: 10
+elo:
+  default_amount: 1000
+  default_tier: silver-i
+jackpot:
+  length: 1800 # in seconds
+  force_remove_permission_cmd: "lp user %player% permission unset momentum.jackpot.force" # the command it should run when a player uses /jackpot force
+  bonus_low_random_bound: 10
+  bonus_high_random_bound: 50
+minimum_pay_amount: 10
+blackmarket:
+  start_time:
+    day: sunday
+    hour: 15
+  item_spawn_location: "black_market-item-spawn"
+  tp_location: "black_market-spawn"
+  seconds_before_ending_from_no_bids: 30 # time of which it will take of no bidding to end the black market
+  min_player_count: 3
+  message_prefix: "&8&lThe Merchant &7→"
+gg:
+  default_timer_in_seconds: 10
+  default_coin_reward: 10
+levels:
+  max_favorite: 5
+  featured_level_reward_multiplier: 1.50
+  tutorial_level: tutorial
+  max_rating: 5
+  min_rating: 0
+  max_difficulty: 10
+  min_difficulty: 1
+  min_mastery_multiplier: 1.00
+  max_mastery_multiplier: 4.00
+  preview_max_distance: 25.0
+cooldowns:
+  reset_time: "3:15"
+  modifiers:
+    '3':
+      modifier: 0.25
+    '5':
+      modifier: 0.50
+    '7':
+      modifier: 0.75
+    '9':
+      modifier: 0.90
+
+join_inventory:
+  '0':
+    item:
+      material: SKULL_ITEM
+      type: 3
+      title: "&aYour Profile"
+      lore:
+        - '&7Click me to view your own profile'
+  '4':
+    item:
+      material: PRISMARINE_CRYSTALS
+      title: '&b&lParkour &7Levels'
+      lore:
+        - '&7Right click to open up'
+        - ' &7the &bParkour &7Levels menu'
+  '8':
+    item:
+      material: REDSTONE_TORCH_ON
+      title: '&7Players » &aEnabled'
+  '5':
+    item:
+      material: GOLD_PLATE
+      title: '&eLast Checkpoint'
+      lore:
+        - '&7Right click to teleport'
+        - ' &7to your last checkpoint'
+  '3':
+    item:
+      material: WOOD_DOOR
+      title: '&cReset'
+      lore:
+        - '&7Right click to reset'
+        - ' &7your current level progress'
+ascendance:
+  realm_world: "ascendant_realm"
+  hub_level: "ascendantrealm"
+# It will check if that line contains 'Click Here', or whatever is defined
+signs:
+  first_line: "Click Here"
+  second_line:
+    completion: "To redeem"
+    spawn: "To return to"
+setup-sword:
+  prestiges:
+    '0':
+      type: WOOD_SWORD
+      enchanted: false
+    '1':
+      type: STONE_SWORD
+      enchanted: false
+    '2':
+      type: IRON_SWORD
+      enchanted: false
+    '3':
+      type: GOLD_SWORD
+      enchanted: false
+    '4':
+      type: DIAMOND_SWORD
+      enchanted: false
+    '5':
+      type: WOOD_SWORD
+      glow: true
+    '6':
+      type: STONE_SWORD
+      glow: true
+    '7':
+      type: IRON_SWORD
+      glow: true
+    '8':
+      type: GOLD_SWORD
+      glow: true
+    '9':
+      type: DIAMOND_SWORD
+      glow: true
+  title: "&cSetup Sword"
+  hotbar_slot: 1
+setup-shield:
+  title: "&cSetup Shield"
+  hotbar_slot: 1
+practice-plate:
+  type: IRON_PLATE
+  title: "&6Practice Checkpoint"
+  hotbar_slot: 2
+leave-item:
+  type: REDSTONE
+  title: "&cLeave"
+  hotbar_slot: 6
+clans:
+  max_members: 10
+  max_level: 10
+  split_reward_min_needed: 300
+  price:
+    create: 10000
+    tag: 1000
+  tag_length:
+    min: 4
+    max: 6
+  clan_xp_calc:
+    level-reward-needed: 100
+    min-percent: 10
+    max-percent: 25
+  blocked_clan_names:
+    - ""
+  levels:
+    # XP Needed to level up
+    '1':
+      xp-needed: 1000
+    '2':
+      xp-needed: 10000
+    '3':
+      xp-needed: 100000
+    '4':
+      xp-needed: 1000000
+    '5':
+      xp-needed: 10000000
+    '6':
+      xp-needed: 20000000
+    '7':
+      xp-needed: 30000000
+    '8':
+      xp-needed: 40000000
+    '9':
+      xp-needed: 50000000
+    '10':
+      xp-needed: 100000000
+player_submitted:
+  world: ""
+  plot_width: 75
+  plot_default_y: 64
+  plot_buffer_width: 10
+  minimum_rank_for_plot_creation: "novice-i"
+ranks:
+  default_rank: "i"
+event:
+  reminder_delay: 300
+  max_run_time: 1800
+  check_next_event_delay: 7200
+  min_players_online: 5
+  anvil_spawn_percentage: 0.9
+  anvil_spawn_y_above_start_y: 40
+  rising_water_y_below_start_y: 10
+  task_delay:
+    pvp: 5
+    half_heart: 15
+    rising_water: 100
+infinite:
+  default_block: "QUARTZ_BLOCK"
+  default_type: "CLASSIC"
+  soft_border_radius_x: 100
+  soft_border_radius_z: 100
+  max_y: 240
+  min_y: 200
+  starting_y: 220
+  infinite_respawn_loc: "infinite-respawn"
+  infinite_middle_loc: "infinite-middle"
+  sprint:
+    starting_timer: 30
+    max_timer: 60
+    default_time_gain: 1.0 # 1 second
+    time_reduction_factors:
+      '100':
+        reduction: 0.2
+      '200':
+        reduction: 0.2
+      '300':
+        reduction: 0.2
+      '400':
+        reduction: 0.2
+      '500':
+        reduction: 0.1
+  timed:
+    timer: 60
+  generation:
+    angle_bound: 5 # means it will choose a random angle betweeen -(Math.PI / angle_bound) and (Math.PI / angle_bound)
+    distance_min: 3.2
+    distance_bound: 4.85
+    y_min: -1
+    y_max: 1
+    positive_y:
+      min_modifier: 0.75
+      max_modifier: 0.45
+      minimum_difference: 0.5
+    negative_y:
+      min_modifier: 0.75
+      max_modifier: 0.45
+      minimum_difference: 1.0
+    angle_outside_border_min: 4
+    angle_outside_border_max: 6
+prestiges:
+  max_multiplier: 30
+  multiplier_per_prestige: 10
+  base_prestige_cost: 1000000
+  additional_cost_per_prestige: 1000000
+races:
+  min_bet_amount: 100
+  max_time: 10
+rage_quit:
+  price: 10000
+  messages:
+    - "&6&l%player% &7slipped on a pickle and &c&lRage Quit"
+    - "&6&l%player% &7lost a 1v1 with a cow and &c&lRage Quit"
+    - "&6&l%player% &7slipped on kiot's apple and &c&lRage Quit"
+    - "&6&l%player% &7lost chess in 2 turns and &c&lRage Quit"
+    - "&6&l%player% &7found a pack of wolves and &c&lRage Quit"
+    - "&6&l%player% &7failed at the last jump and &c&lRage Quit"
+    - "&6&l%player% &7tripped and &c&lRage Quit"
+    - "&6&l%player% &7fell on a spike and &c&lRage Quit"
+    - "&6&l%player% &7drank too much BBQ sauce and &c&lRage Quit"
+    - "&6&l%player% &7respectfully &c&l&oRage Quit"
+    - "&6&l%player% &7bought &c/ragequit &7to &c&lRage Quit"
+    - "&6&l%player% &7went for a swim in syrup and &c&lRage Quit"
+    - "&6&l%player% &7failed their test and &c&lRage Quit"
+    - "&6&l%player% &7missed their bedtime and &c&lRage Quit"
+    - "&6&l%player% &7got the great idea to &c&lRage Quit"
+menu:
+  default_level_sorting: NEWEST
+  main_menu_name: "parkour_levels"
+leaderboard_max_size:
+  levels: 10
+  races: 10
+  clans: 10
+  elo: 25
+  event: 10
+  player_completions: 10
+  global_completions: 10
+  top_rated: 10
+  coins: 10
+  records: 10
+  mastery: 10
+  infinite:
+    classic: 10
+    sprint: 10
+    speedrun: 10
+    timed: 10

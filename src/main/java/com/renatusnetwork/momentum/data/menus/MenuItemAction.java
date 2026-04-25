@@ -1,22 +1,33 @@
 package com.renatusnetwork.momentum.data.menus;
 
-import com.connorlinfoot.titleapi.TitleAPI;
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.api.LevelBuyEvent;
+import com.renatusnetwork.momentum.api.ShopBuyEvent;
+import com.renatusnetwork.momentum.data.SettingsManager;
+import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
+import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.levels.LevelManager;
-import com.renatusnetwork.momentum.data.levels.RatingDB;
+import com.renatusnetwork.momentum.data.levels.LevelPreview;
+import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
+import com.renatusnetwork.momentum.data.menus.gui.MenuPage;
+import com.renatusnetwork.momentum.data.menus.helpers.CancelTasks;
+import com.renatusnetwork.momentum.data.menus.helpers.MenuHolder;
+import com.renatusnetwork.momentum.data.modifiers.ModifierType;
+import com.renatusnetwork.momentum.data.modifiers.discounts.Discount;
 import com.renatusnetwork.momentum.data.perks.Perk;
 import com.renatusnetwork.momentum.data.plots.Plot;
 import com.renatusnetwork.momentum.data.plots.PlotsDB;
+import com.renatusnetwork.momentum.data.races.gamemode.ChoosingLevel;
 import com.renatusnetwork.momentum.data.ranks.Rank;
-import com.renatusnetwork.momentum.data.ranks.RanksDB;
-import com.renatusnetwork.momentum.data.ranks.RanksYAML;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsDB;
-import com.renatusnetwork.momentum.gameplay.PracticeHandler;
+import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import com.renatusnetwork.momentum.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.wesjd.anvilgui.AnvilGUI;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -27,6 +38,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MenuItemAction {
@@ -37,96 +49,193 @@ public class MenuItemAction {
         boolean armorCommand = false;
 
         // loop through to see if there is a chest setarmor
-        if (!commands.isEmpty())
-            for (String cmd : commands)
+        if (!commands.isEmpty()) {
+            for (String cmd : commands) {
                 if (cmd.startsWith("setarmor chest")) {
                     armorCommand = true;
                     break;
                 }
+            }
+        }
+
         // if so, check if they are in elytra level
-        if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytraLevel()) {
+        if (armorCommand && playerStats != null && playerStats.getLevel() != null && playerStats.getLevel().isElytra()) {
             player.sendMessage(Utils.translate("&cYou cannot change your armor in an Elytra level"));
         } else {
 
-            for (String command : commands)
+            for (String command : commands) {
                 player.performCommand(command.replace("%player%", player.getName()));
+            }
 
-            for (String command : consoleCommands)
+            for (String command : consoleCommands) {
                 Bukkit.dispatchCommand(
                         Momentum.getPlugin().getServer().getConsoleSender(),
                         command.replace("%player%", player.getName())
                 );
+            }
         }
         player.closeInventory();
     }
 
-    public static void perform(Player player, MenuItem menuItem) {
+    public static void perform(PlayerStats playerStats, MenuItem menuItem) {
+        Player player = playerStats.getPlayer();
         String itemType = menuItem.getType();
+        boolean choosingRace = Momentum.getRaceManager().containsChoosingRaceLevel(playerStats.getName());
 
-        if (itemType.equals("perk"))
-            performPerkItem(player, menuItem);
-        else if (itemType.equals("level"))
-            performLevelItem(player, menuItem);
-        else if (itemType.equals("teleport"))
-            performTeleportItem(player, menuItem);
-        else if (itemType.equals("open"))
-            // if it is rankup gui, do special method for it
-            if (menuItem.getTypeValue().equals("rankup"))
-                performRankupOpen(player, menuItem);
-            else
-                performOpenItem(player, menuItem);
-        else if (itemType.equals("rate"))
-            performLevelRate(player, menuItem);
-        else if (itemType.equals("type")) {
-
-            // certain conditions of types for rankup
-            String typeValue = menuItem.getTypeValue();
-            if (typeValue.equals("coin-rankup"))
-                performRankupItem(player);
-            else if (typeValue.equals("rankup-level-1")
-                    || typeValue.equals("rankup-level-2")
-                    || typeValue.equals("rankup-level"))
-                performLevelRankUpItem(player, menuItem);
-            else if (typeValue.equals("submit-plot"))
-                performPlotSubmission(player);
-            // dont need to get from stats and can skip performLevelItem
-            else if (typeValue.equals("featured-level"))
-                performLevelTeleport(Momentum.getStatsManager().get(player), player, Momentum.getLevelManager().getFeaturedLevel());
-            else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
-                     typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite"))
-                performCosmeticsClear(player, typeValue, menuItem);
-            else if (typeValue.equals("random-level"))
-                performRandomLevel(Momentum.getStatsManager().get(player));
-            else if (typeValue.equals("exit"))
+        if (itemType.equals("race")) {
+            if (choosingRace) {
+                if (menuItem.getTypeValue().equals("random")) {
+                    performRandomRaceLevel(playerStats);
+                } else {
+                    performRaceItem(playerStats, menuItem.getTypeValue());
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou do not have a pending race request"));
                 player.closeInventory();
-        } else if (menuItem.hasCommands())
+            }
+        } else if (itemType.equals("perk")) {
+            performPerkItem(player, menuItem);
+        } else if (itemType.equals("level")) {
+            if (menuItem.getTypeValue().equals("featured")) {
+                Level level = Momentum.getLevelManager().getFeaturedLevel();
+                performLevelTeleport(playerStats, level);
+            } else if (menuItem.getTypeValue().equals("rankup")) {
+                // only allow this if they are not at the last rank!
+                if (!playerStats.isLastRank()) {
+                    performLevelTeleport(playerStats, playerStats.getRank().getRankupLevel());
+                }
+            } else if (menuItem.getTypeValue().equals("random")) {
+                performRandomLevel(playerStats);
+            } else if (menuItem.getTypeValue().startsWith("favorite-level")) {
+                int index = Integer.parseInt(menuItem.getTypeValue().split("favorite-level-")[1]) - 1;
+                Level favoriteLevel = playerStats.getFavoriteLevel(index);
+
+                if (favoriteLevel != null) {
+                    performLevelTeleport(playerStats, favoriteLevel);
+                }
+            } else {
+                performLevelItem(player, menuItem);
+            }
+        } else if (itemType.equals("teleport")) {
+            performTeleportItem(playerStats, menuItem);
+        } else if (menuItem.getOpenMenu() != null) // replacement for type open, since we define page numbers
+        {
+            performOpenItem(playerStats, menuItem);
+        } else if (itemType.equals("rate")) {
+            performLevelRate(playerStats, menuItem);
+        } else if (itemType.equals("infinite-mode")) {
+            performInfiniteModeChange(playerStats, menuItem);
+        } else if (itemType.equals("practice-history")) {
+            performPracticeHistory(playerStats, menuItem);
+        } else if (itemType.equals("type")) {
+            // certain conditions
+            String typeValue = menuItem.getTypeValue();
+            if (typeValue.equals("submit-plot")) {
+                performPlotSubmission(player);
+            } else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
+                       typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite")) {
+                performCosmeticsClear(player, typeValue, menuItem);
+            } else if (typeValue.equals("level-sorting") && !Momentum.getLevelManager().isBuyingLevelMenu(player.getName())) // do not allow switching sorting if buying
+            {
+                performLevelSort(playerStats, menuItem.getPage());
+            } else if (typeValue.equals("level-search")) {
+                performOpenLevelSearch(playerStats);
+            } else if (typeValue.equals("exit")) {
+                player.closeInventory();
+            }
+        } else if (menuItem.hasCommands()) {
             runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+        }
     }
 
-    private static void performRandomLevel(PlayerStats playerStats)
-    {
+    private static void performPracticeHistory(PlayerStats playerStats, MenuItem menuItem) {
+        String typeValue = menuItem.getTypeValue();
+        if (Utils.isInteger(typeValue)) {
+            int index = Integer.parseInt(typeValue);
+            Location location = playerStats.getPracticeCheckpointFromHistory(index);
+
+            if (location != null) {
+                playerStats.getPlayer().closeInventory();
+
+                playerStats.setPracticeCheckpoint(location, false);
+                playerStats.teleport(location, true);
+            }
+        }
+    }
+
+    private static void performRaceItem(PlayerStats playerStats, String levelName) {
+        Level level = Momentum.getLevelManager().get(levelName);
+
+        if (level.isRaceLevel()) {
+            ChoosingLevel choosingLevel = Momentum.getRaceManager().getChoosingLevelData(playerStats.getName());
+            PlayerStats requested = choosingLevel.getRequested();
+
+            if (!playerStats.hasAccessTo(level)) {
+                playerStats.sendMessage(Utils.translate("&cYou cannot race on &4" + level.getTitle()));
+            } else if (!requested.hasAccessTo(level)) {
+                playerStats.sendMessage(Utils.translate("&4" + requested.getDisplayName() + "&c cannot race on &4" + level.getTitle()));
+            } else {
+                Momentum.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), level, choosingLevel.getBet());
+            }
+
+            playerStats.getPlayer().closeInventory();
+        }
+    }
+
+    private static void performLevelSort(PlayerStats playerStats, MenuPage menuPage) {
+        Momentum.getStatsManager().updateMenuSortLevelsType(playerStats, LevelSortingType.getNext(playerStats.getLevelSortingType()));
+        Momentum.getMenuManager().updateInventory(playerStats, playerStats.getPlayer().getOpenInventory(), menuPage);
+    }
+
+    private static void performInfiniteModeChange(PlayerStats playerStats, MenuItem menuItem) {
+        String formatted = StringUtils.capitalize(menuItem.getTypeValue().toLowerCase());
+        Player player = playerStats.getPlayer();
+
+        if (!playerStats.getInfiniteType().toString().equalsIgnoreCase(formatted)) {
+            Momentum.getInfiniteManager().changeType(playerStats, InfiniteType.valueOf(formatted.toUpperCase()));
+            player.sendMessage(Utils.translate("&7You changed your &5Infinite &7mode to &d" + formatted));
+        } else {
+            player.sendMessage(Utils.translate("&7You are already in the &5Infinite &7mode &d" + formatted));
+        }
+
+        player.closeInventory();
+    }
+
+    private static void performRandomRaceLevel(PlayerStats playerStats) {
+        ChoosingLevel choosingLevel = Momentum.getRaceManager().getChoosingLevelData(playerStats.getName());
+
+        List<Level> raceLevels = Momentum.getLevelManager().getRaceLevels();
+        ArrayList<Level> chosenLevels = new ArrayList<>();
+
+        for (Level level : raceLevels) {
+            // cover all conditions that can stop a player from entering a level
+            if (playerStats.hasAccessTo(level) && choosingLevel.getRequested().hasAccessTo(level)) {
+                chosenLevels.add(level);
+            }
+        }
+        // tp them to randomly chosen level
+        Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
+
+        Momentum.getRaceManager().sendRequest(choosingLevel.getSender(), choosingLevel.getRequested(), chosenLevel, choosingLevel.getBet());
+
+        playerStats.getPlayer().closeInventory();
+    }
+
+    private static void performRandomLevel(PlayerStats playerStats) {
         Set<Level> menuLevels = Momentum.getLevelManager().getLevelsInAllMenus();
         ArrayList<Level> chosenLevels = new ArrayList<>();
 
         for (Level level : menuLevels)
+        // cover all conditions that can stop a player from entering a level
         {
-            boolean addLevel = true;
-
-            // cover all conditions that can stop a player from entering a level
-            if (((level.getPrice() > 0 && !playerStats.hasBoughtLevel(level.getName())) ||
-                (!level.getRequiredLevels().isEmpty() && !level.hasRequiredLevels(playerStats)) ||
-                (level.hasPermissionNode() && !playerStats.getPlayer().hasPermission(level.getRequiredPermissionNode())) ||
-                (level.needsRank() && !Momentum.getRanksManager().isPastRank(playerStats, level.getRequiredRank()))) && !level.isFeaturedLevel())
-                addLevel = false;
-
-            // make sure we do not add the level they are already in
-            if (addLevel && !(playerStats.inLevel() && playerStats.getLevel().getName().equalsIgnoreCase(level.getName())))
+            if (playerStats.hasAccessTo(level)) {
                 chosenLevels.add(level);
+            }
         }
 
         // tp them to randomly chosen level
         Level chosenLevel = chosenLevels.get(ThreadLocalRandom.current().nextInt(chosenLevels.size()));
-        performLevelTeleport(playerStats, playerStats.getPlayer(), chosenLevel);
+        performLevelTeleport(playerStats, chosenLevel); // enforce no shift clicking
     }
 
     private static void performCosmeticsClear(Player player, String clearType, MenuItem menuItem) {
@@ -151,92 +260,50 @@ public class MenuItemAction {
                 player.sendMessage(Utils.translate("&cYou have cleared your current nick"));
 
                 // run clear cmds
-                if (menuItem.hasCommands())
+                if (menuItem.hasCommands()) {
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                }
                 break;
             case "cleartrail":
                 player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou have cleared your current trail"));
 
                 // run clear cmds
-                if (menuItem.hasCommands())
+                if (menuItem.hasCommands()) {
                     runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                }
                 break;
             case "clearinfinite":
                 player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou have cleared your current infinite block"));
 
-                PlayerStats playerStats = Momentum.getStatsManager().get(player);
-                playerStats.setInfiniteBlock(Material.QUARTZ_BLOCK);
-
-                Momentum.getDatabaseManager().runAsyncQuery("UPDATE players SET infinite_block='' WHERE uuid='" + playerStats.getUUID() + "'");
+                Momentum.getStatsManager().resetInfiniteBlock(Momentum.getStatsManager().get(player));
                 break;
         }
     }
-    private static void performRankupOpen(Player player, MenuItem menuItem) {
 
-        PlayerStats playerStats = Momentum.getStatsManager().get(player);
+    private static void performLevelRate(PlayerStats playerStats, MenuItem menuItem) {
+        Player player = playerStats.getPlayer();
+        Level level = Momentum.getMenuManager().getChoosingRating(playerStats);
 
-        if (playerStats.isLastRank()) {
-            player.closeInventory();
-            player.sendMessage(Utils.translate("&cYou are at last rank!"));
-            return;
-        }
-
-        String menuName = null;
-        if (playerStats.getRankUpStage() == 1)
-            menuName = "coin-rankup";
-            // stage 2, meaning level rankup part
-        else if (playerStats.getRankUpStage() == 2) {
-            // get if it is a single level style rankup (expert and up)
-            if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
-                menuName = "single-level-rankup";
-            else
-                menuName = "double-level-rankup";
-        }
-
-        if (menuName != null) {
-            Menu menu = Momentum.getMenuManager().getMenu(menuName);
-
-            if (menu != null) {
-                int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
-
-                Inventory inventory = Momentum.getMenuManager().getInventory(menu.getName(), pageNumber);
-
-                if (inventory != null) {
-                    player.closeInventory();
-                    player.openInventory(inventory);
-                    Momentum.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
-                }
-            }
-        }
-    }
-
-    private static void performLevelRate(Player player, MenuItem menuItem) {
-
-        // strip title since title will be "Rate (levelName)"
-        String levelTitle = ChatColor.stripColor(player.getOpenInventory().getTopInventory().getTitle()).split("Rate ")[1];
         player.closeInventory();
 
-        if (Utils.isInteger(menuItem.getTypeValue())) {
-            Level level = Momentum.getLevelManager().getFromTitle(levelTitle);
+        if (level != null) {
+            int rating = Integer.parseInt(menuItem.getTypeValue());
 
-            if (level != null) {
-                int rating = Integer.parseInt(menuItem.getTypeValue());
-
-                if (rating >= 0 && rating <= 5) {
-
-                    level.addRatingAndCalc(rating);
-                    RatingDB.addRating(player, level, rating);
-                    player.sendMessage(Utils.translate("&7You rated &c" + level.getFormattedTitle() + " &7a &6" + rating + "&7! Thank you for rating!"));
+            if (rating >= 0 && rating <= 5) {
+                if (level.hasRated(player.getName())) {
+                    Momentum.getLevelManager().updateRating(player, level, rating);
+                    player.sendMessage(Utils.translate("&7You updated your rating for &c" + level.getTitle() + "&7 to a &6" + rating + "&7! Thank you for rating!"));
                 } else {
-                    player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
+                    Momentum.getLevelManager().addRating(player, level, rating);
+                    player.sendMessage(Utils.translate("&7You rated &c" + level.getTitle() + "&7 a &6" + rating + "&7! Thank you for rating!"));
                 }
             } else {
-                player.sendMessage(Utils.translate("&cSomething went wrong with level &4" + levelTitle + "&c, does it exist?"));
+                player.sendMessage(Utils.translate("&cYour rating has to be anywhere from 0 to 5!"));
             }
         } else {
-            player.sendMessage(Utils.translate("&cSomething went wrong, try again?"));
+            player.sendMessage(Utils.translate("&cSomething went wrong with level, does it exist?"));
         }
     }
 
@@ -253,7 +320,7 @@ public class MenuItemAction {
 
                 player.sendMessage("");
                 player.sendMessage(Utils.translate("&7You have &6submitted &7your plot! Please wait until an" +
-                                    " &6Administrator &7gets a chance to look at it. Thank you for submitting."));
+                                                   " &6Administrator &7gets a chance to look at it. Thank you for submitting."));
                 player.sendMessage("");
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot submit a plot you already submitted"));
@@ -269,98 +336,137 @@ public class MenuItemAction {
         if (perk != null) {
             PlayerStats playerStats = Momentum.getStatsManager().get(player);
 
-            // bypass if opped
-            if (perk.hasRequiredPermissions(player) || perk.hasRequirements(playerStats, player))
-            {
+            // bypass if have access (opped too)
+            if (perk.hasAccess(playerStats)) {
                 player.closeInventory();
                 Momentum.getPerkManager().setPerk(perk, playerStats);
+                runPerkCommands(perk, playerStats);
 
-                // if has commands, run them
-                if (menuItem.hasCommands())
-                    runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+            } else if (perk.requiresBuying()) {
+                ShopBuyEvent event = new ShopBuyEvent(playerStats, perk);
+                Bukkit.getPluginManager().callEvent(event);
 
-            }
-            else if (!playerStats.hasPerk(perk.getName()) && perk.getPrice() > 0)
-            {
-                int playerBalance = (int) playerStats.getCoins();
+                if (!event.isCancelled()) {
+                    int playerBalance = playerStats.getCoins();
+                    int price = event.getPrice();
 
-                if (playerBalance >= perk.getPrice())
-                {
-                    Momentum.getStatsManager().removeCoins(playerStats, perk.getPrice());
-                    Momentum.getPerkManager().bought(playerStats, perk);
-                    Momentum.getMenuManager().updateInventory(player, player.getOpenInventory());
+                    if (playerStats.hasModifier(ModifierType.SHOP_DISCOUNT)) {
+                        Discount discount = (Discount) playerStats.getModifier(ModifierType.SHOP_DISCOUNT);
+                        price *= (1.00f - discount.getDiscount());
+                    }
 
-                    // if has commands, run them
-                    if (menuItem.hasCommands())
-                        runCommands(player, menuItem.getCommands(), menuItem.getConsoleCommands());
+                    if (playerBalance >= price) {
+                        Momentum.getStatsManager().removeCoins(playerStats, price);
+                        Momentum.getPerkManager().bought(playerStats, perk);
+                        Momentum.getMenuManager().updateInventory(playerStats, player.getOpenInventory(), menuItem.getPage());
+                        runPerkCommands(perk, playerStats);
+                    }
                 }
             }
         }
     }
 
-    private static void performLevelRankUpItem(Player player, MenuItem menuItem) {
+    private static void runPerkCommands(Perk perk, PlayerStats playerStats) {
+        HashSet<String> commands = perk.getCommands();
 
-        PlayerStats playerStats = Momentum.getStatsManager().get(player);
-        String rankName = playerStats.getRank().getRankName();
-        String levelType = menuItem.getTypeValue();
-        String levelName = RanksYAML.getRankUpLevel(rankName, levelType);
-
-        if (levelName != null) {
-            Level level = Momentum.getLevelManager().get(levelName);
-            if (level != null)
-                performLevelTeleport(playerStats, player, level);
+        for (String command : commands) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", playerStats.getName()));
         }
     }
 
     private static void performLevelItem(Player player, MenuItem menuItem) {
         PlayerStats playerStats = Momentum.getStatsManager().get(player);
         Level level = Momentum.getLevelManager().get(menuItem.getTypeValue());
+        JackpotManager jackpotManager = Momentum.getJackpotManager();
 
-        if (level != null)
-        {
-            // go through price buying if not featured, non null item, has price and has not bought level
-            if (!level.isFeaturedLevel() &&
-                menuItem != null && level.getPrice() > 0 &&
-                !playerStats.hasBoughtLevel(level.getName()) && playerStats.getLevelCompletionsCount(level.getName()) <= 0)
-                performLevelBuying(playerStats, player, level, menuItem);
-            else
-                performLevelTeleport(playerStats, player, level);
+        if (level != null) {
+            // go through price buying if not featured, non null item, has price and has not bought level, or not the jackpot level
+            if (level.requiresBuying() &&
+                !level.isFeaturedLevel() &&
+                !(jackpotManager.isJackpotRunning() && jackpotManager.getJackpot().getLevelName().equalsIgnoreCase(level.getName())) &&
+                !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level)) {
+                if (Momentum.getMenuManager().containsShiftClicked(playerStats)) {
+                    if (playerStats.isPreviewingLevel()) {
+                        playerStats.sendMessage(Utils.translate("&cYou are already previewing a level. Type &4/preview leave &cor use the &4Leave &citem before attempting to preview another level."));
+                        playerStats.getPlayer().closeInventory();
+                    } else {
+                        performLevelPreview(playerStats, level);
+                    }
+                } else {
+                    performLevelBuying(playerStats, level, menuItem);
+                }
+            } else {
+                performLevelTeleport(playerStats, level);
+            }
         }
     }
 
-    public static void performLevelBuying(PlayerStats playerStats, Player player, Level level, MenuItem menuItem)
-    {
-        MenuManager menuManager = Momentum.getMenuManager();
-        String menuName = menuItem.getMenuName();
-        LevelManager levelManager = Momentum.getLevelManager();
+    public static void performLevelPreview(PlayerStats playerStats, Level level) {
+        Player player = playerStats.getPlayer();
+        player.closeInventory();
+        SettingsManager settingsManager = Momentum.getSettingsManager();
 
-        if (!levelManager.isBuyingLevel(player.getName(), level))
-        {
-            double coins = playerStats.getCoins();
+        if (nonLevelTeleportConditions(playerStats)) {
+            if (playerStats.inPracticeMode()) {
+                Momentum.getStatsManager().resetPracticeMode(playerStats, false);
+            }
+
+            // add preview and teleport
+            LevelPreview levelPreview = new LevelPreview(playerStats, level, player.getLocation());
+            playerStats.setPreviewLevel(levelPreview);
+            levelPreview.teleport();
+
+            if (Utils.getItemStackIfExists(player, player.getInventory(), settingsManager.leave_title) == null) {
+                Utils.addItemToHotbar(settingsManager.leave_item, player.getInventory(), settingsManager.leave_hotbar_slot);
+            }
+
+            player.sendMessage(Utils.translate(
+                    "&7You are now previewing &c" + level.getTitle() + "&7, you can only move in a &6" + ((int) Momentum.getSettingsManager().preview_max_distance) + "&7 block radius"
+            ));
+            player.sendMessage(Utils.translate("&7You can leave at any point by typing &6/spawn&7, &6/preview leave &7or use the &cLeave &7item"));
+        }
+    }
+
+    public static void performLevelBuying(PlayerStats playerStats, Level level, MenuItem menuItem) {
+        MenuManager menuManager = Momentum.getMenuManager();
+        LevelManager levelManager = Momentum.getLevelManager();
+        Player player = playerStats.getPlayer();
+
+        if (!levelManager.isBuyingLevel(player.getName(), level)) {
+            int coins = playerStats.getCoins();
             int total = levelManager.getTotalBuyingLevelsCost(player.getName());
+            int price = level.getPrice();
+
+            int oldTotal = total;
+            int oldPrice = price;
+
+            if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT)) {
+                Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
+                total *= (1.00f - discount.getDiscount());
+                price *= (1.00f - discount.getDiscount());
+            }
+
             Inventory openInventory = player.getOpenInventory().getTopInventory();
 
-            if (coins >= total + level.getPrice())
-            {
+            if (coins >= total + price) {
                 ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 5);
                 ItemMeta itemMeta = itemStack.getItemMeta();
 
                 itemMeta.setDisplayName(Utils.translate(
-                        "&cClick to confirm &a" + level.getFormattedTitle() + " &cfor &6" + Utils.formatNumber(level.getPrice()) + " &eCoins"
+                        "&cClick to confirm &a" + level.getTitle() + "&c for " + Utils.getCoinFormat(oldPrice, price) + " &eCoins"
                 ));
 
-                List<String> loreString = new ArrayList<String>() {{
-                    add(Utils.translate(" &7This will also confirm all other selected purchases"));
-                    add(Utils.translate(" &7For a total of &6" + Utils.formatNumber(total + level.getPrice()) + " &eCoins"));
-                }};
+                List<String> loreString = new ArrayList<>();
+                loreString.add(Utils.translate(" &7This will also confirm all other selected purchases"));
+                loreString.add(Utils.translate(" &7For a total of " + Utils.getCoinFormat(oldTotal + oldPrice, total + price) + " &eCoins"));
+
                 List<Integer> slots = levelManager.getBuyingLevelsSlots(player.getName());
 
-                Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                Inventory newInventory = menuManager.createInventory(menuItem.getPage(), openInventory.getSize(), openInventory.getTitle());
                 newInventory.setContents(openInventory.getContents()); // set contents
 
                 // update current bought lore
-                for (int slot : slots)
-                {
+                for (int slot : slots) {
                     ItemStack boughtItem = openInventory.getItem(slot);
                     ItemMeta boughtMeta = boughtItem.getItemMeta();
 
@@ -382,21 +488,19 @@ public class MenuItemAction {
 
                 // set last edited
                 CancelTasks cancelTask = menuManager.getCancelTasks(player.getName());
-                if (cancelTask != null)
+                if (cancelTask != null) {
                     cancelTask.setLastEditedInventory(newInventory);
-            }
-            else
-            {
+                }
+            } else {
                 boolean alreadyExists = menuManager.hasCancelledItem(player.getName(), menuItem.getSlot());
 
-                if (!alreadyExists)
-                {
+                if (!alreadyExists) {
                     // this is where it creates a item telling them they cannot buy this!
                     ItemStack itemStack = new ItemStack(Material.STAINED_CLAY, 1, (short) 14);
                     ItemMeta itemMeta = itemStack.getItemMeta();
-                    itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getFormattedTitle()));
+                    itemMeta.setDisplayName(Utils.translate("&cNot enough coins to buy " + level.getTitle()));
 
-                    int remaining = (int) ((total + level.getPrice()) - coins);
+                    int remaining = (int) ((total + price) - coins);
 
                     itemMeta.setLore(new ArrayList<String>() {{
                         add(Utils.translate(" &7You need &6" + Utils.formatNumber(remaining) + " &7more &eCoins"));
@@ -406,195 +510,249 @@ public class MenuItemAction {
 
                     ItemStack preCancelItem = openInventory.getItem(menuItem.getSlot());
 
-                    Inventory newInventory = Bukkit.createInventory(null, openInventory.getSize(), openInventory.getTitle());
+                    Inventory newInventory = menuManager.createInventory(menuItem.getPage(), openInventory.getSize(), openInventory.getTitle());
                     newInventory.setContents(openInventory.getContents()); // set contents
                     newInventory.setItem(menuItem.getSlot(), itemStack);
 
                     player.openInventory(newInventory);
 
                     menuManager.addActiveCancel(player.getName(), newInventory, menuItem.getSlot(), preCancelItem,
-                            // reset item after 5 seconds
-                            new BukkitRunnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    if (player != null && menuManager.hasCancelTasks(player.getName()) && player.getOpenInventory() != null &&
-                                            player.getOpenInventory().getTopInventory().getName().equalsIgnoreCase(openInventory.getName()))
-                                    {
-                                        CancelTasks cancelled = menuManager.getCancelTasks(player.getName());
+                                                // reset item after 5 seconds
+                                                new BukkitRunnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if (player != null && menuManager.hasCancelTasks(player.getName()) && player.getOpenInventory() != null &&
+                                                            player.getOpenInventory().getTopInventory().getName().equalsIgnoreCase(openInventory.getName())) {
+                                                            CancelTasks cancelled = menuManager.getCancelTasks(player.getName());
 
-                                        // if any left, cancel and remove the rest
-                                        if (cancelled != null)
-                                        {
-                                            Inventory lastEditedInventory = cancelled.getLastEditedInventory();
+                                                            // if any left, cancel and remove the rest
+                                                            if (cancelled != null) {
+                                                                Inventory lastEditedInventory = cancelled.getLastEditedInventory();
 
-                                            Inventory revertInventory = Bukkit.createInventory(null, lastEditedInventory.getSize(), lastEditedInventory.getTitle());
-                                            revertInventory.setContents(lastEditedInventory.getContents()); // set contents
+                                                                Inventory revertInventory = menuManager.createInventory(menuItem.getPage(), lastEditedInventory.getSize(), lastEditedInventory.getTitle());
+                                                                revertInventory.setContents(lastEditedInventory.getContents()); // set contents
 
-                                            // cancel tasks
-                                            for (BukkitTask task : cancelled.getCancelledSlots())
-                                                task.cancel();
+                                                                // cancel tasks
+                                                                for (BukkitTask task : cancelled.getCancelledSlots()) {
+                                                                    task.cancel();
+                                                                }
 
-                                            // restore inventory
-                                            for (Map.Entry<Integer, ItemStack> entry : cancelled.getBeforeCancelItems().entrySet())
-                                                revertInventory.setItem(entry.getKey(), entry.getValue());
+                                                                // restore inventory
+                                                                for (Map.Entry<Integer, ItemStack> entry : cancelled.getBeforeCancelItems().entrySet()) {
+                                                                    revertInventory.setItem(entry.getKey(), entry.getValue());
+                                                                }
 
-                                            // open reverted inventory
-                                            player.openInventory(revertInventory);
-                                        }
-
-                                    }
-                                    menuManager.removeCancelTasks(player.getName());
-                                }
-                            }.runTaskLater(Momentum.getPlugin(), 20 * 5)
+                                                                // open reverted inventory
+                                                                player.openInventory(revertInventory);
+                                                            }
+                                                        }
+                                                        menuManager.removeCancelTasks(player.getName());
+                                                    }
+                                                }.runTaskLater(Momentum.getPlugin(), 20 * 5)
                     );
                 }
             }
-        }
-        else
-        {
+        } else {
             // where the levels are bought
             Collection<Level> levels = levelManager.getBuyingLevels(player.getName()).values();
             int totalCoins = levelManager.getTotalBuyingLevelsCost(player.getName());
 
-            // add to db/cache
-            for (Level boughtLevels : levels)
-            {
-                StatsDB.addBoughtLevel(playerStats, boughtLevels.getName());
-                playerStats.buyLevel(boughtLevels.getName());
-            }
-            Momentum.getStatsManager().removeCoins(playerStats, totalCoins); // remove all coins
+            LevelBuyEvent event = new LevelBuyEvent(playerStats, levels, totalCoins);
+            Bukkit.getPluginManager().callEvent(event);
 
-            // do not teleport if bought more than one!
-            if (levels.size() > 1)
-            {
+            if (!event.isCancelled()) {
+                totalCoins = event.getTotalPrice();
+
+                // modifier discount
+                if (playerStats.hasModifier(ModifierType.LEVEL_DISCOUNT)) {
+                    Discount discount = (Discount) playerStats.getModifier(ModifierType.LEVEL_DISCOUNT);
+                    totalCoins *= (1.00f - discount.getDiscount());
+                }
+
+                // add to db/cache
+                for (Level boughtLevels : levels) {
+                    StatsDB.addBoughtLevel(playerStats.getUUID(), boughtLevels.getName());
+                    playerStats.buyLevel(boughtLevels);
+                }
+                Momentum.getStatsManager().removeCoins(playerStats, totalCoins); // remove all coins
+
+                // do not teleport if bought more than one!
+                if (levels.size() > 1)
                 // update and open inventory
-                Inventory inventory = Momentum.getMenuManager().getInventory(menuName, menuItem.getPageNumber());
-                player.openInventory(inventory);
-                Momentum.getMenuManager().updateInventory(player, player.getOpenInventory(), menuName, menuItem.getPageNumber());
-            }
-            else
-            {
-                // teleport if only one
-                performLevelTeleport(playerStats, player, level);
+                {
+                    menuManager.openInventory(playerStats, player, menuItem.getMenu().getName(), menuItem.getPage().getPageNumber(), false);
+                } else {
+                    // teleport if only one
+                    performLevelTeleport(playerStats, level);
+                }
             }
         }
     }
 
-    public static void performLevelTeleport(PlayerStats playerStats, Player player, Level level) {
-        if (!playerStats.inRace())
-        {
-            if (!playerStats.isSpectating())
-            {
-                if (!playerStats.isEventParticipant())
-                {
-                    if (!playerStats.isInInfinitePK())
-                    {
-                        if (level.hasRequiredLevels(playerStats))
-                        {
-                            player.closeInventory();
+    public static void performLevelTeleport(PlayerStats playerStats, Level level) {
+        Player player = playerStats.getPlayer();
+        StatsManager statsManager = Momentum.getStatsManager();
+        player.closeInventory();
 
-                            // if the level has perm node, and player does not have perm node
-                            if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermissionNode())) {
-                                player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
-                                return;
-                            }
+        boolean enteringMasteryOfSameLevel = false;
+        boolean shiftClicked = Momentum.getMenuManager().containsShiftClicked(playerStats);
 
-                            // if player is in level and their level is the level they clicked on, cancel
-                            if (playerStats.inLevel() && level.getName().equalsIgnoreCase(playerStats.getLevel().getName())) {
-                                player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
-                                return;
-                            }
+        if (nonLevelTeleportConditions(playerStats)) {
+            if (level.playerHasRequiredLevels(playerStats)) {
+                // if the level has perm node, and player does not have perm node
+                if (level.hasPermissionNode() && !player.hasPermission(level.getRequiredPermission())) {
+                    player.sendMessage(Utils.translate("&cYou do not have permission to enter this level"));
+                    return;
+                }
 
-                            if (level.needsRank())
-                            {
-                                Rank rank = level.getRequiredRank();
+                // if theyre entering/leaving the same level from mastery or not
+                if (playerStats.inLevel() && level.equals(playerStats.getLevel())) {
+                    if (!playerStats.isAttemptingMastery()) {
+                        if (!shiftClicked || playerStats.hasMasteryCompletion(level)) {
+                            player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                            return;
+                        }
+                        enteringMasteryOfSameLevel = true;
+                    } else {
+                        player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                        return;
+                    }
+                }
 
-                                if (!Momentum.getRanksManager().isPastRank(playerStats, rank))
-                                {
-                                    Rank nextRank = Momentum.getRanksManager().getNextRank(rank);
-                                    player.sendMessage(Utils.translate("&cYou need to be " + nextRank.getRankTitle() + " &cto play this level"));
-                                    return;
-                                }
-                            }
+                if (level.needsRank()) {
+                    Rank rank = Momentum.getRanksManager().get(level.getRequiredRank());
 
-                            playerStats.clearPotionEffects();
+                    if (!Momentum.getRanksManager().isPastOrAtRank(playerStats, rank)) {
+                        player.sendMessage(Utils.translate("&cYou need to be rank " + rank.getTitle() + " &cto play this level"));
+                        return;
+                    }
+                }
 
-                            // toggle off if saved
-                            Momentum.getStatsManager().toggleOffElytra(playerStats);
+                if (playerStats.inLevel() && playerStats.hasAutoSave() && !playerStats.getPlayer().isOnGround()) {
+                    player.sendMessage(Utils.translate("&cYou cannot leave the level while in midair with auto-save enabled"));
+                    return;
+                }
 
-                            playerStats.resetCurrentCheckpoint(); // reset
+                // perform leave level steps if theyre not toggling mastery of same level
+                if (!enteringMasteryOfSameLevel) {
+                    statsManager.leaveLevelAndReset(playerStats, true);
+                }
+                // autosave so when entering mastery progress gets saved from non-mastery attempt
+                else {
+                    if (playerStats.hasAutoSave()) {
+                        Momentum.getSavesManager().autoSave(playerStats);
+                    }
+                    playerStats.resetCurrentCheckpoint();
+                    statsManager.resetPracticeDataOnly(playerStats);
+                }
 
-                            // if in practice mode
-                            PracticeHandler.resetDataOnly(playerStats);
 
-                            Location save = playerStats.getSave(level.getName());
-                            Location spawn = playerStats.getCheckpoint(level.getName());
-                            if (spawn != null) {
-                                playerStats.setCurrentCheckpoint(spawn);
+                Rank rank = playerStats.getRank();
+                if (rank != null) {
+                    Level rankupLevel = rank.getRankupLevel();
 
-                                // only tp if dont have a save
-                                if (save == null)
-                                {
-                                    Momentum.getCheckpointManager().teleportToCP(playerStats);
-                                    player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
-                                }
-                            // tp to start if no save
-                            } else if (save == null) {
-                                player.teleport(level.getStartLocation());
-                                player.sendMessage(Utils.translate("&7You were teleported to the beginning of "
-                                        + level.getFormattedTitle()));
-                            }
+                    // this is a case where if they click the rankup button, OR click the level from replayable that WOULD be their rankup level, make them enter rankup
+                    if (level.isRankUpLevel() && rankupLevel != null && rankupLevel.getName().equalsIgnoreCase(level.getName())) {
+                        statsManager.enteredRankup(playerStats);
+                    }
+                }
 
-                            // if they have a save
-                            if (save != null)
-                            {
-                                Momentum.getSavesManager().loadSave(playerStats, save, level);
-                                player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getFormattedTitle()));
-                                player.sendMessage(Utils.translate("&7Your save has been deleted, use &a/save &7again to save your location"));
-                            }
+                if (Momentum.getMenuManager().containsShiftClicked(playerStats) &&
+                    level.hasMastery() &&
+                    playerStats.hasCompleted(level) &&
+                    !playerStats.hasMasteryCompletion(level)) {
+                    statsManager.enteredMastery(playerStats);
+                }
 
-                            playerStats.setLevel(level);
-                            playerStats.disableLevelStartTime();
-                            playerStats.resetFails();
+                boolean tpToStart = false;
 
-                            if (!level.getPotionEffects().isEmpty()) {
-                                for (PotionEffect potionEffect : level.getPotionEffects())
-                                    player.addPotionEffect(potionEffect);
-                            }
+                if (!playerStats.isAttemptingMastery()) {
+                    Location save = playerStats.getSave(level);
+                    Location spawn = playerStats.getCheckpoint(level);
 
-                            if (level.isElytraLevel())
-                                Momentum.getStatsManager().toggleOnElytra(playerStats);
+                    if (spawn != null) {
+                        playerStats.setCurrentCheckpoint(spawn);
 
-                            TitleAPI.sendTitle(
-                                    player, 10, 40, 10,
-                                    "",
-                                    level.getFormattedTitle()
-                            );
+                        // only tp if dont have a save
+                        if (save == null) {
+                            Momentum.getCheckpointManager().teleportToCheckpoint(playerStats);
+                            player.sendMessage(Utils.translate("&eYou have been teleported to your last saved checkpoint"));
+                        }
+                        // tp to start if no save
+                    } else if (save == null) {
+                        tpToStart = true;
+                    }
+
+                    // if they have a save and are not attempting mastery
+                    if (save != null) {
+                        Momentum.getSavesManager().teleportAndRemoveSave(playerStats, level, save);
+                        player.sendMessage(Utils.translate("&7You have been teleport to your save for &c" + level.getTitle()));
+                    }
+                } else {
+                    tpToStart = true;
+                }
+
+                if (tpToStart) {
+                    playerStats.teleport(level.getStartLocation(), true);
+
+                    player.sendMessage(Utils.translate("&7You were teleported to the start of " + level.getTitle()));
+
+                    if (playerStats.isAttemptingMastery()) {
+                        player.sendMessage(Utils.translate("&7This is a &5&lMastery &7attempt, you will get &e" + level.getMasteryMultiplier() + "x &7more &eCoins &7for completing"));
+                        player.sendMessage(Utils.translate("&c&nCheckpoints and /practice is disabled!"));
+                    }
+                }
+
+                playerStats.disableLevelStartTime();
+                playerStats.resetFails();
+                if (!enteringMasteryOfSameLevel) {
+                    playerStats.setLevel(level);
+
+                    for (PotionEffect potionEffect : level.getPotionEffects()) {
+                        player.addPotionEffect(potionEffect);
+                    }
+
+                    if (level.isElytra()) {
+                        Momentum.getStatsManager().toggleOnElytra(playerStats);
+                    }
+
+                    playerStats.sendTitle("", level.getFormattedTitle(), 10, 40, 10);
+                }
+            } else {
+                player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
+            }
+        }
+    }
+
+    private static boolean nonLevelTeleportConditions(PlayerStats playerStats) {
+        Player player = playerStats.getPlayer();
+
+        if (!playerStats.inRace()) {
+            if (!playerStats.isSpectating()) {
+                if (!playerStats.isEventParticipant()) {
+                    if (!playerStats.isInInfinite()) {
+                        if (!playerStats.isInBlackMarket()) {
+                            return true;
                         } else {
-                            player.closeInventory();
-                            player.sendMessage(Utils.translate("&cYou do not have the required levels for this level"));
+                            player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
                         }
                     } else {
-                        player.closeInventory();
                         player.sendMessage(Utils.translate("&cYou cannot enter a level while in infinite parkour"));
                     }
                 } else {
-                    player.closeInventory();
                     player.sendMessage(Utils.translate("&cYou cannot enter a level while in an event"));
                 }
             } else {
-                player.closeInventory();
                 player.sendMessage(Utils.translate("&cYou cannot enter a level while spectating"));
             }
         } else {
-            player.closeInventory();
             player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
         }
+
+        return false;
     }
 
-    private static void performTeleportItem(Player player, MenuItem menuItem) {
+    private static void performTeleportItem(PlayerStats playerStats, MenuItem menuItem) {
         Location location = Momentum.getLocationManager().get(menuItem.getTypeValue());
 
         // null check
@@ -606,67 +764,84 @@ public class MenuItemAction {
                 Level level = Momentum.getLevelManager().get(region.getId());
 
                 // make sure the area they are spawning in is a level
-                if (level != null)
-                    performLevelTeleport(Momentum.getStatsManager().get(player), player, level);
-            }
-        }
-    }
-
-    private static void performOpenItem(Player player, MenuItem menuItem) {
-        Menu menu = Momentum.getMenuManager().getMenuFromStartingChars(menuItem.getTypeValue());
-
-        if (menu != null) {
-            int pageNumber = Utils.getTrailingInt(menuItem.getTypeValue());
-
-            Inventory inventory = Momentum.getMenuManager().getInventory(menu.getName(), pageNumber);
-
-            if (inventory != null) {
-                player.closeInventory();
-                player.openInventory(inventory);
-                Momentum.getMenuManager().updateInventory(player, player.getOpenInventory(), menu.getName(), pageNumber);
-            }
-        }
-    }
-
-    private static void performRankupItem(Player player) {
-
-        PlayerStats playerStats = Momentum.getStatsManager().get(player);
-        double playerBalance = playerStats.getCoins();
-
-        if (playerBalance >= playerStats.getRank().getRankUpPrice()) {
-            player.closeInventory();
-            // remove amount
-            Momentum.getStatsManager().removeCoins(playerStats, playerStats.getRank().getRankUpPrice());
-            // change to next stage
-            RanksDB.updateStage(player.getUniqueId(), 2);
-            playerStats.setRankUpStage(2);
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 8F, 2F);
-
-            String menuName;
-            // open level menu
-            if (RanksYAML.isSingleLevelRankup(playerStats.getRank().getRankName()))
-                menuName = "single-level-rankup";
-            else
-                menuName = "double-level-rankup";
-
-            MenuManager menuManager = Momentum.getMenuManager();
-
-            if (menuManager.exists(menuName)) {
-
-                Inventory inventory = menuManager.getInventory(menuName, 1);
-                if (inventory != null) {
-                    player.closeInventory();
-                    player.openInventory(inventory);
-                    menuManager.updateInventory(player, player.getOpenInventory(), menuName, 1);
-                } else {
-                    player.sendMessage(Utils.translate("&cError loading the inventory"));
+                if (level != null) {
+                    performLevelTeleport(playerStats, level);
                 }
             }
-        } else {
-            player.sendMessage(Utils.translate("&cYou do not have enough money for this rankup"));
-            player.sendMessage(Utils.translate("  &7You need &4$" +
-                    Utils.formatNumber(playerStats.getRank().getRankUpPrice() - playerBalance) + " &7more!"));
-            player.closeInventory();
         }
+    }
+
+    private static void performOpenItem(PlayerStats playerStats, MenuItem menuItem) {
+        MenuPage menuPage = menuItem.getOpenMenu();
+
+        if (menuPage != null) {
+            Momentum.getMenuManager().openInventory(playerStats, playerStats.getPlayer(), menuPage.getMenu().getName(), menuPage.getPageNumber(), false);
+        }
+    }
+
+    private static void performOpenLevelSearch(PlayerStats playerStats) {
+        AnvilGUI.Builder builder = new AnvilGUI.Builder();
+
+        ItemStack barrierItems = new ItemStack(Material.BARRIER);
+        ItemMeta barrierMeta = barrierItems.getItemMeta();
+        barrierMeta.setDisplayName(Utils.translate("Search level"));
+        barrierMeta.setLore(new ArrayList<String>() {{
+            add(Utils.translate("&cInput must be at least 3 characters"));
+            add(Utils.translate("&cSimilar levels are shown if no match is found"));
+        }});
+
+        barrierItems.setItemMeta(barrierMeta);
+
+        builder.plugin(Momentum.getPlugin())
+                .itemLeft(barrierItems)
+                .itemRight(barrierItems)
+                .itemOutput(new ItemStack(Material.BOOK_AND_QUILL))
+                .onClickAsync((slot, result) -> CompletableFuture.supplyAsync(() -> {
+                    String levelText = result.getText();
+                    ArrayList<MenuItem> menuItems = Momentum.getLevelManager().searchMenuLevelsIgnoreCase(levelText);
+
+                    if (
+                            slot != AnvilGUI.Slot.OUTPUT ||
+                            levelText.isEmpty() ||
+                            levelText.equalsIgnoreCase("Search level") ||
+                            menuItems.isEmpty()
+                    ) {
+                        return Collections.emptyList();
+                    }
+
+                    return Arrays.asList(AnvilGUI.ResponseAction.close(), AnvilGUI.ResponseAction.run(() -> {
+                        Inventory openInventory;
+
+                        if (menuItems.size() == 1) {
+                            Momentum.getMenuManager().openInventory(playerStats, "search_levels_single", false);
+
+                            openInventory = playerStats.getPlayer().getOpenInventory().getTopInventory();
+                            MenuHolder holder = (MenuHolder) openInventory.getHolder();
+                            MenuPage page = holder.getMenuPage();
+                            MenuItem item = menuItems.get(0).clone(page, 13);
+                            page.setItem(item);
+
+                            openInventory.setItem(13, MenuItemFormatter.format(playerStats, item));
+                        } else {
+                            Momentum.getMenuManager().openInventory(playerStats, "search_levels_multiple", false);
+                            openInventory = playerStats.getPlayer().getOpenInventory().getTopInventory();
+                            MenuHolder holder = (MenuHolder) openInventory.getHolder();
+                            MenuPage page = holder.getMenuPage();
+
+                            for (int i = 10; i < 17; i++) {
+                                int invSlotIndex = i - 10;
+                                if (invSlotIndex < menuItems.size()) {
+                                    MenuItem item = menuItems.get(invSlotIndex).clone(page, i);
+                                    page.setItem(item);
+
+                                    openInventory.setItem(i, MenuItemFormatter.format(playerStats, item));
+                                } else {
+                                    openInventory.setItem(i, null);
+                                }
+                            }
+                        }
+                    }));
+                }))
+                .open(playerStats.getPlayer());
     }
 }

@@ -1,79 +1,109 @@
 package com.renatusnetwork.momentum.data.plots;
 
 import com.renatusnetwork.momentum.Momentum;
-import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
+import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class PlotsManager {
 
-    private HashMap<String, Plot> plotList = new HashMap<>();
+    private HashMap<String, Plot> plotList;
+
+    // no more deletion so this cached value will always be in sync with the id in the database
+    private int currentMaxPlotID;
+    private int currentRing;
+    private int currentIndex;
+    private Location lastPlotLocation;
 
     public PlotsManager() {
+        this.plotList = new HashMap<>();
         load();
     }
 
     public void load() {
-        // loop through and add to cache
-        for (String uuidString : PlotsDB.getPlotOwnerUUIDs()) {
+        plotList = PlotsDB.loadPlots();
 
-            String playerName = PlotsDB.getPlotOwnerName(uuidString);
-            String locString = PlotsDB.getPlotCenter(uuidString);
-            String[] locSplit = locString.split(":");
+        loadLastPlotFromDB();
 
-            // get offline player object and update in db if their name changed
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuidString));
-            if (!offlinePlayer.getName().equalsIgnoreCase(playerName)) {
-                PlotsDB.updatePlayerName(offlinePlayer.getName(), uuidString);
-                playerName = offlinePlayer.getName();
-            }
-
-            // loc from database, 0.5 for center of block
-            Location loc = new Location(Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world),
-                    Double.parseDouble(locSplit[0]) + 0.5, Momentum.getSettingsManager().player_submitted_plot_default_y,
-                    Double.parseDouble(locSplit[1]) + 0.5);
-
-            add(playerName, uuidString, loc);
-        }
-        Momentum.getPluginLogger().info("Plots Loaded: " + plotList.size());
+        Momentum.getPluginLogger().info("Plots loaded: " + plotList.size());
     }
+
+    public void loadLastPlotFromDB() {
+        this.lastPlotLocation = PlotsDB.getLastPLotLocation();
+        this.currentMaxPlotID = PlotsDB.getCurrentMaxPlotID();
+
+        // if there is no last plot or the last plot is the origin then keep the defaults
+        if (lastPlotLocation == null || (lastPlotLocation.getBlockX() == 0 && lastPlotLocation.getBlockZ() == 0)) {
+            return;
+        }
+
+        // calculate current ring from how far the last plot location is from the origin
+        this.currentRing = (int) Math.max(Math.abs(lastPlotLocation.getX()), Math.abs(lastPlotLocation.getZ())) / (Momentum.getSettingsManager().player_submitted_plot_buffer_width + Momentum.getSettingsManager().player_submitted_plot_width);
+
+        // the current index within a ring starting at 0 from the bottom right corner going clockwise around the ring
+        // is always in the range [0, 8 * currentRing)
+        // so, the current index in a ring is given by subtracting from the max id (guaranteed to be the last inserted plot)
+        // the sum of all the plot locations before it which is given by
+        // 2 + 8 * (sum of all natural numbers up to currentRing - 1)
+        // using the arithmetic series formula yields
+        // 4 * currentRing * (currentRing - 1) + 2
+        this.currentIndex = currentMaxPlotID - (4 * currentRing * (currentRing - 1) + 2);
+    }
+
+    /* keep jic for development
+    public Location getLastPlotLocation() {
+        return lastPlotLocation;
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public int getCurrentMaxPlotID() {
+        return currentMaxPlotID;
+    }
+
+    public int getCurrentRing() {
+        return currentRing;
+    }
+    */
+
     // player param version
     public void add(Player player) {
-        Plot plot = new Plot(player, player.getLocation());
-        plotList.put(player.getName(), plot);
+        plotList.put(player.getName(), new Plot(currentMaxPlotID, player, player.getLocation()));
     }
 
-    // string ver
-    public void add(String playerName, String playerUUID, Location spawnLoc) {
-        Plot plot = new Plot(playerName, playerUUID, spawnLoc);
-        plotList.put(playerName, plot);
+    public Plot get(String name) {
+        return plotList.get(name);
     }
-    public Plot get(String playerName) {
-        return plotList.get(playerName);
+
+    public Plot getIgnoreCase(String name) {
+        for (Map.Entry<String, Plot> entry : plotList.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(name)) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
     }
 
     public boolean exists(String playerName) {
-        return (get(playerName) != null);
+        return get(playerName) != null;
     }
 
     public HashMap<String, Plot> getPlots() {
         return plotList;
-    }
-
-    public void remove(String playerName) {
-        if (exists(playerName))
-            plotList.remove(playerName);
     }
 
     // this needs to be a list due to #get(int)
@@ -81,68 +111,113 @@ public class PlotsManager {
         List<Plot> tempList = new ArrayList<>();
 
         for (Plot plot : plotList.values()) {
-            if (plot.isSubmitted())
+            if (plot.isSubmitted()) {
                 tempList.add(plot);
+            }
         }
         return tempList;
     }
 
     // creation algorithm
-    public void createPlot(Player player) {
+    public void createPlot(PlayerStats playerStats) {
+        Location creationLoc;
+        Player player = playerStats.getPlayer();
 
-        // run algorithm in async
-        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Momentum.getPlugin(), () -> {
+        creationLoc = getNextFreePlotLocation();
 
-        String result = findNextFreePlot(player.getUniqueId().toString());
+        creationLoc.setYaw(player.getLocation().getYaw());
+        creationLoc.setPitch(player.getLocation().getPitch());
 
-        // run teleport and creation in sync
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Momentum.getPlugin(), () -> {
-            if (result != null && !result.equalsIgnoreCase("")) {
+        // set bedrock -1 where they teleport
+        creationLoc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
+        buildOutline(creationLoc);
 
-                // if they have a plot
-                if (result.equalsIgnoreCase("hasPlot")) {
-                    player.sendMessage(Utils.translate("&cYou already have a plot!"));
-                    return;
-                }
+        playerStats.teleport(creationLoc.clone().add(0.5, 0, 0.5), false);
 
-                String[] split = result.split(":");
-                // teleport to found plot!
+        // add data
+        PlotsDB.addPlot(playerStats, creationLoc);
+        currentMaxPlotID++;
+        lastPlotLocation = creationLoc;
 
-                Location loc = new Location(Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world),
-                        Double.parseDouble(split[0]), Momentum.getSettingsManager().player_submitted_plot_default_y,
-                        Double.parseDouble(split[1]), player.getLocation().getYaw(), player.getLocation().getPitch());
-
-                // set bedrock -1 where they teleport
-                loc.clone().subtract(0, 1, 0).getBlock().setType(Material.BEDROCK);
-
-                player.teleport(loc.clone().add(0.5, 0, 0.5));
-                // add data
-                PlotsDB.addPlot(player, loc);
-                add(player);
-                player.sendMessage(Utils.translate("&7Your &a&lPlot &7has been created!" +
-                                                        " &7Type &a/plot home &7to get back!"));
-                }
-            });
-        });
+        add(player);
+        player.sendMessage(Utils.translate("&7Your &aPlot &7has been created! &7Type &a/plot home &7to get back!"));
     }
 
-    public void deletePlot(Plot plot) {
+    public Location getNextFreePlotLocation() {
+        int plotWidthAndBuffer = Momentum.getSettingsManager().player_submitted_plot_buffer_width + Momentum.getSettingsManager().player_submitted_plot_width;
+        int plotDefaultY = Momentum.getSettingsManager().player_submitted_plot_default_y;
+        int currentRingRadius = currentRing * plotWidthAndBuffer;
 
-        Player owner = Bukkit.getPlayer(plot.getOwnerName());
-        // if they are in plot world, teleport them
-        if (owner != null && owner.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world))
-            owner.teleport(Momentum.getLocationManager().getLobbyLocation());
+        if (lastPlotLocation == null) {
+            return new Location(Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world), 0, plotDefaultY, 0);
+        }
 
-        // clear plot!
-        clearPlot(plot, true);
+        // this condition is to re-sync the current ring with the actual next free location (ring 1)
+        // when creating the very 2nd plot
+        if (currentRing == 0) {
+            currentRing++;
+            currentIndex = 0;
+            return new Location(lastPlotLocation.getWorld(), plotWidthAndBuffer, plotDefaultY, plotWidthAndBuffer);
+        }
 
-        // remove from cache and teleport to spawn
-        plotList.remove(owner.getName());
-        PlotsDB.removePlot(plot.getOwnerUUID());
+        // if the last plot location is 1 plot location before the first in the ring then reset to next ring
+        if (currentIndex == 8 * currentRing - 1) {
+            currentRing++;
+            currentIndex = 0;
+            return new Location(lastPlotLocation.getWorld(), currentRingRadius + plotWidthAndBuffer, plotDefaultY, currentRingRadius + plotWidthAndBuffer);
+        }
+
+        Location nextFreePlotLocation = lastPlotLocation.clone();
+
+        // given the index in the ring, the side or "section" in which the index lies is used to calculate direction
+        // 0 < index <= 2 * side * currentRing => side = index / ( 2 * currentRing)
+        // the side is either 0, 1, 2, or 3 corresponding to west, north, east, south in a spiraling pattern along the ring
+        int side = currentIndex / (2 * currentRing);
+
+        // the most significant bit of the side gives the axis
+        // 0 for x, 1 for z
+        int axis = side & 0b01;
+
+        // the least significant bit of the side gives the direction within the axis (+ or -)
+        int sign = 2 * ((side >> 1) & 0b01) - 1;
+
+        // e.g. 0 = 0b00 gives -x axis
+        //      3 = 0b11 gives +z axis
+
+        currentIndex++;
+
+        nextFreePlotLocation.add(plotWidthAndBuffer * (1 - axis) * sign, 0, plotWidthAndBuffer * axis * sign);
+        return nextFreePlotLocation;
     }
 
-    public void clearPlot(Plot plot, boolean deletePlot) {
+    /* keep jic for development
+    public void deleteAllPlots() {
+        // PlotsDB.deleteAllPlots();
+        for (Plot plot : this.plotList.values()) {
+            clearPlot(plot);
+            PlotsDB.removePlot(plot.getOwnerUUID(), false);
+        }
 
+        PlotsDB.resetAutoIncrement();
+        plotList.clear();
+        this.currentRing = 0;
+        this.currentIndex = 0;
+        this.currentMaxPlotID = 0;
+        this.lastPlotLocation = null;
+    }
+    */
+
+    public void addTrusted(Plot plot, String playerUUID) {
+        plot.addTrusted(playerUUID);
+        PlotsDB.addTrustedPlayer(plot.getPlotID(), playerUUID);
+    }
+
+    public void removeTrusted(Plot plot, String playerUUID) {
+        plot.removeTrusted(playerUUID);
+        PlotsDB.removeTrustedPlayer(plot.getPlotID(), playerUUID);
+    }
+
+    public void clearPlot(Plot plot) {
         WorldEdit api = WorldEdit.getInstance();
 
         if (api != null) {
@@ -168,12 +243,8 @@ public class PlotsManager {
                 editSession.setFastMode(true);
                 editSession.setBlocks(selection, new BaseBlock(Material.AIR.getId()));
                 editSession.flushQueue();
-
-                // if plot isnt being deleted then regen the bedrock
-                if (!deletePlot) {
-                    editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
-                    editSession.flushQueue();
-                }
+                editSession.setBlock(spawnVector, new BaseBlock(Material.BEDROCK.getId()));
+                editSession.flushQueue();
                 editSession.setFastMode(false);
             } catch (MaxChangedBlocksException e) {
                 e.printStackTrace();
@@ -181,107 +252,46 @@ public class PlotsManager {
         } else {
             Momentum.getPluginLogger().info("WorldEdit API found null in clearPlot");
         }
+
+        buildOutline(plot.getSpawnLoc());
     }
 
-    /*
-      This method works in complete async and operates in an infinite (biggest int) loop.
-      It will start at 0 + half plot width, 0 + half plot width then keeps track of which way it
-      is going so it can check if there is a plot to the right of it based on direction. If there is no
-      plot to the right, it turns right otherwise if there is a plot to the right, it moves forward.
-     */
-    private String findNextFreePlot(String playerUUID) {
+    public void buildOutline(Location creationLocation) {
+        WorldEdit api = WorldEdit.getInstance();
 
-        int max = Integer.MAX_VALUE;
-        // add buffer so plots will not touch eachother
-        int plotWidth = Momentum.getSettingsManager().player_submitted_plot_width
-                        + Momentum.getSettingsManager().player_submitted_plot_buffer_width;
+        if (api != null) {
+            int plotWidth = Momentum.getSettingsManager().player_submitted_plot_width;
+            int plotDefaultY = Momentum.getSettingsManager().player_submitted_plot_default_y;
 
+            double pos1X = (creationLocation.getBlockX() - (plotWidth / 2));
+            double pos2X = (creationLocation.getBlockX() + (plotWidth / 2));
+            double pos1Z = (creationLocation.getBlockZ() - (plotWidth / 2));
+            double pos2Z = (creationLocation.getBlockZ() + (plotWidth / 2));
 
-        List<String> plots = PlotsDB.getPlotCenters();
-        if (!plots.isEmpty()) {
+            LocalWorld world = new BukkitWorld(Bukkit.getWorld(Momentum.getSettingsManager().player_submitted_world));
 
-            List<String> checkedLocs = new ArrayList<>();
-            // so plots do not hug eachother
-            int x = (plotWidth / 2);
-            int z = (plotWidth / 2);
-            int direction = 1; // direction, 1 = north, 2 = east, 3 = south, 4 = west
+            Vector pos1 = new Vector(pos1X, plotDefaultY - 1, pos1Z);
+            Vector pos2 = new Vector(pos2X, plotDefaultY - 1, pos2Z);
 
-            for (int i = 0; i < max; i++) {
+            CuboidRegion selection = new CuboidRegion(world, pos1, pos2);
 
-                // check if current x and z are a plot center
-                List<Map<String, String>> results = DatabaseQueries.getResults(
-                        "plots",
-                        "uuid, center_x, center_z",
-                        " WHERE uuid='" + playerUUID + "'");
+            try {
+                EditSession editSession = api.getEditSessionFactory().getEditSession(world, -1);
+                editSession.setFastMode(true);
+                editSession.makeWalls(selection, new BlockPattern(Material.BEDROCK.getId()));
+                editSession.flushQueue();
 
-                if (results.isEmpty()) {
-                    boolean isPlot = false;
-
-                    for (String plotString : plots) {
-                        String[] split = plotString.split(":");
-                        int plotX = Integer.parseInt(split[0]);
-                        int plotZ = Integer.parseInt(split[1]);
-
-                        // check if the x and z coords exist in database
-                        if (plotX == x && plotZ == z) {
-                            isPlot = true;
-                            break;
-                        }
-                    }
-                    // if is a plot, keep going in algorithm
-                    if (isPlot) {
-                        switch (direction) {
-                            // north
-                            case 1:
-                                if (checkedLocs.contains((x + plotWidth) + ":" + z))
-                                    z -= plotWidth;
-                                else
-                                    x += plotWidth;
-                            // east
-                            case 2:
-                                if (checkedLocs.contains(x + ":" + (z + plotWidth)))
-                                    x += plotWidth;
-                                else
-                                    z += plotWidth;
-                            // south
-                            case 3:
-                                if (checkedLocs.contains((x - plotWidth) + ":" + z))
-                                    z += plotWidth;
-                                else
-                                    x -= plotWidth;
-                            // west
-                            case 4:
-                                if (checkedLocs.contains(x + ":" + (z - plotWidth)))
-                                    x -= plotWidth;
-                                else
-                                    z -= plotWidth;
-                        }
-                        if (direction % 4 > 0)
-                            direction++;
-                        else
-                            direction = 1;
-
-                        // add to checked locs
-                        checkedLocs.add(x + ":" + z);
-                    // create plot
-                    } else {
-                        return x + ":" + z;
-                    }
-                // already has plot
-                } else {
-                    return "hasPlot";
-                }
+                editSession.setFastMode(false);
+            } catch (WorldEditException e) {
+                e.printStackTrace();
             }
-        // first plot
         } else {
-            return (plotWidth / 2) + ":" + (plotWidth / 2);
+            Momentum.getPluginLogger().info("WorldEdit API found null in clearPlot");
         }
-        return null;
     }
 
     // get nearest plot from location
     public Plot getPlotInLocation(Location loc) {
-
         Plot nearestPlot = null;
         for (Plot plot : plotList.values()) {
             if (blockInPlot(loc, plot)) {
@@ -306,14 +316,11 @@ public class PlotsManager {
     }
 
     public boolean blockInPlot(Location loc, Plot plot) {
-
         int maxX = plot.getSpawnLoc().getBlockX() + (Momentum.getSettingsManager().player_submitted_plot_width / 2);
         int maxZ = plot.getSpawnLoc().getBlockZ() + (Momentum.getSettingsManager().player_submitted_plot_width / 2);
         int minX = plot.getSpawnLoc().getBlockX() - (Momentum.getSettingsManager().player_submitted_plot_width / 2);
         int minZ = plot.getSpawnLoc().getBlockZ() - (Momentum.getSettingsManager().player_submitted_plot_width / 2);
 
-        if (loc.getBlockX() <= maxX && loc.getBlockX() >= minX && loc.getBlockZ() <= maxZ && loc.getBlockZ() >= minZ)
-            return true;
-        return false;
+        return loc.getBlockX() <= maxX && loc.getBlockX() >= minX && loc.getBlockZ() <= maxZ && loc.getBlockZ() >= minZ;
     }
 }

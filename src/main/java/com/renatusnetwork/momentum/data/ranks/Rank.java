@@ -1,34 +1,59 @@
 package com.renatusnetwork.momentum.data.ranks;
 
+import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.levels.Level;
+
 public class Rank {
 
-    private String rankName;
-    private int rankId;
-    private double rankUpPrice;
-    private String rankTitle;
-    private String shortRankTitle;
+    private String name;
+    private String title;
+    private Level rankupLevel;
+    private String nextRank;
 
-    public Rank(String rankName, String rankTitle, String shortRankTitle, int rankId, double rankUpPrice) {
-        this.rankName = rankName;
-        this.rankTitle = rankTitle;
-        this.shortRankTitle = shortRankTitle;
-        this.rankId = rankId;
-        this.rankUpPrice = rankUpPrice;
+    public Rank(String name) {
+        this.name = name;
     }
 
-    public String getRankName() {
-        return rankName;
+    public Rank(String name, String title, String rankupLevel, String nextRank) {
+        this.name = name;
+        this.title = title;
+        this.rankupLevel = Momentum.getLevelManager().get(rankupLevel);
+        this.nextRank = nextRank;
     }
 
-    public int getRankId() {
-        return rankId;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public double getRankUpPrice() {
-        return rankUpPrice;
+    public void setRankupLevel(Level level) {
+        this.rankupLevel = level;
     }
 
-    public String getRankTitle() { return rankTitle; }
+    public void setNextRank(String nextRank) {
+        this.nextRank = nextRank;
+    }
 
-    public String getShortRankTitle() { return shortRankTitle; }
+    public String getNextRank() {
+        return nextRank;
+    }
+
+    public Level getRankupLevel() {
+        return rankupLevel;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean equals(Rank other) {
+        return this.name.equalsIgnoreCase(other.getName());
+    }
+
+    public boolean isMaxRank() {
+        return nextRank == null;
+    }
 }

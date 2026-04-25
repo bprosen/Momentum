@@ -1,7 +1,7 @@
 package com.renatusnetwork.momentum.data.locations;
 
-public enum PortalType
-{
+public enum PortalType {
     INFINITE,
-    ASCENDANCE
+    ASCENDANCE,
+    BLACK_MARKET
 }

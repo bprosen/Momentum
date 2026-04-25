@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.commands;
 
-import org.bukkit.Bukkit;
+import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,8 +17,11 @@ public class SetSpawnCMD implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        if (player.hasPermission("momentum.admin"))
-            Bukkit.dispatchCommand(player, "loc set spawn");
+        if (player.hasPermission("momentum.admin")) {
+            Momentum.getLocationManager().set("spawn", player.getLocation());
+            Momentum.getLocationManager().reloadCachedLocations();
+            player.sendMessage(Utils.translate("&7You have set spawn to your location"));
+        }
 
         return false;
     }

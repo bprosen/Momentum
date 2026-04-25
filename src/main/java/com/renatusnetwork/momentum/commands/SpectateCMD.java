@@ -2,8 +2,7 @@ package com.renatusnetwork.momentum.commands;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
-import com.renatusnetwork.momentum.data.stats.StatsDB;
-import com.renatusnetwork.momentum.gameplay.SpectatorHandler;
+import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,105 +13,115 @@ import org.bukkit.entity.Player;
 
 public class SpectateCMD implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (sender.hasPermission("momentum.donator")) {
-
-                PlayerStats spectatorStats = Momentum.getStatsManager().get(player);
+                StatsManager statsManager = Momentum.getStatsManager();
+                PlayerStats spectatorStats = statsManager.get(player);
 
                 if (spectatorStats != null) {
                     if (a.length > 0) {
                         if (a.length == 1 && a[0].equalsIgnoreCase("toggle")) {
-                            if (spectatorStats.isSpectatable())
+                            if (spectatorStats.isSpectatable()) {
+                                statsManager.updateSpectatable(spectatorStats, false);
                                 sender.sendMessage(Utils.translate("&7You can no longer be spectated"));
-                            else
+                            } else {
+                                statsManager.updateSpectatable(spectatorStats, true);
                                 sender.sendMessage(Utils.translate("&7You can now be spectated"));
-
-                            spectatorStats.setSpectatable(!spectatorStats.isSpectatable());
-                            StatsDB.updatePlayerSpectatable(spectatorStats);
+                            }
                         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
                             sendHelp(sender);
-                        // spectate to player
+                            // spectate to player
                         } else if (a.length == 1) {
                             PlayerStats playerStats = Momentum.getStatsManager().getByName(a[0]);
 
-                            if (playerStats != null && playerStats.getPlayer().isOnline()) {
-                                if (!player.getName().equalsIgnoreCase(playerStats.getPlayer().getName())) {
-                                    if (playerStats.isSpectatable()) {
-                                        if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
-                                            if (!spectatorStats.inPracticeMode()) {
-                                                if (!spectatorStats.inRace()) {
-                                                    if (!spectatorStats.isEventParticipant()) {
-                                                        if (!player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
-                                                            if (!spectatorStats.isInInfinitePK()) {
-                                                                if (player.isOnGround()) {
+                            if (playerStats == null || !playerStats.isLoaded()) {
+                                player.sendMessage(Utils.translate("&4" + a[0] + "&c is not online or stats are not loaded yet"));
+                                return false;
+                            }
 
-                                                                    Location location = player.getLocation().clone();
-                                                                    if (location.add(0, 1, 0).getBlock().getType() == Material.AIR)
-                                                                    {
-                                                                        boolean initialSpectate = true;
-                                                                        if (spectatorStats.isSpectating()) {
-                                                                            initialSpectate = false;
+                            if (player.getName().equalsIgnoreCase(playerStats.getName())) {
+                                player.sendMessage(Utils.translate("&cYou cannot spectate yourself"));
+                                return false;
+                            }
 
-                                                                            /*
-                                                                             if they are already spectating and the person they
-                                                                             are spectating are who they are trying to spectate again, cancel
-                                                                             */
-                                                                            if (spectatorStats.getPlayerToSpectate().getPlayerName()
-                                                                                    .equalsIgnoreCase(playerStats.getPlayerName())) {
+                            if (!playerStats.isSpectatable()) {
+                                player.sendMessage(Utils.translate("&cThat player cannot be spectated"));
+                                return false;
+                            }
 
-                                                                                player.sendMessage(Utils.translate(
-                                                                                        "&cYou cannot spectate the same person you are spectating"));
-                                                                                return true;
-                                                                            }
-                                                                        }
+                            if (playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+                                player.sendMessage(Utils.translate("&cYou cannot spectate players that are in the plot world"));
+                                return false;
+                            }
 
-                                                                        // enable spectator mode
-                                                                        SpectatorHandler.setSpectatorMode(spectatorStats, playerStats, initialSpectate);
+                            if (spectatorStats.inPracticeMode()) {
+                                player.sendMessage(Utils.translate("&cYou cannot enter spectator mode while in /prac"));
+                                return false;
+                            }
 
-                                                                        playerStats.getPlayer().sendMessage(Utils.translate("&2" +
-                                                                                spectatorStats.getPlayerName() + " &7began to spectate you"));
-                                                                    }
-                                                                    else
-                                                                        player.sendMessage(Utils.translate("&cYou cannot spectate while in a block"));
-                                                                }
-                                                                else
-                                                                {
-                                                                    player.sendMessage(Utils.translate("&cYou cannot use spectate while in the air"));
-                                                                }
-                                                            } else {
-                                                                player.sendMessage(Utils.translate("&cYou cannot spectate while in infinite parkour"));
-                                                            }
-                                                        } else {
-                                                            player.sendMessage(Utils.translate("&cYou cannot spectate in the plot world"));
-                                                        }
-                                                    } else {
-                                                        player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
-                                                    }
-                                                } else {
-                                                    player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
-                                                }
-                                            } else {
-                                                player.sendMessage(Utils.translate("&cYou cannot enter spectator mode while in /prac"));
-                                            }
-                                        } else {
-                                            sender.sendMessage(Utils.translate("&cYou cannot spectate players that are in the plot world"));
-                                        }
-                                    } else {
-                                        sender.sendMessage(Utils.translate("&cThat player cannot be spectated"));
+                            if (!spectatorStats.isLoaded()) {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while loading your stats"));
+                                return false;
+                            }
+
+                            if (spectatorStats.inRace()) {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in a race"));
+                                return false;
+                            }
+
+                            if (spectatorStats.isEventParticipant()) {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in an event"));
+                                return false;
+                            }
+
+                            if (player.getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+                                player.sendMessage(Utils.translate("&cYou cannot spectate in the plot world"));
+                                return false;
+                            }
+
+                            if (spectatorStats.isInInfinite()) {
+                                player.sendMessage(Utils.translate("&cYou cannot spectate while in infinite parkour"));
+                                return false;
+                            }
+
+                            if (playerStats.isInBlackMarket()) {
+                                player.sendMessage(Utils.translate("&cYou cannot do this while in the Black Market"));
+                                return false;
+                            }
+
+                            if (!player.isOnGround()) {
+                                player.sendMessage(Utils.translate("&cYou cannot use spectate while in the air"));
+                                return false;
+                            }
+
+                            Location location = player.getLocation().clone();
+                            if (location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
+                                boolean initialSpectate = true;
+                                if (spectatorStats.isSpectating()) {
+                                    initialSpectate = false;
+
+                                    /*
+                                     if they are already spectating and the person they
+                                     are spectating are who they are trying to spectate again, cancel
+                                     */
+                                    if (spectatorStats.getPlayerToSpectate().equals(playerStats)) {
+                                        player.sendMessage(Utils.translate("&cYou cannot spectate the same person you are spectating"));
+                                        return true;
                                     }
-                                } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot spectate yourself"));
                                 }
-                            } else {
-                                sender.sendMessage(Utils.translate("&cThere is no player online named &4" + a[0]));
+
+                                // enable spectator mode
+                                statsManager.setSpectatorMode(spectatorStats, playerStats, initialSpectate);
+                                playerStats.sendMessage(Utils.translate("&2" + spectatorStats.getDisplayName() + " &7began to spectate you"));
                             }
                         }
-                    // if they just run /spectate
+                        // if they just run /spectate
                     } else if (spectatorStats.isSpectating()) {
-                        SpectatorHandler.removeSpectatorMode(spectatorStats);
+                        statsManager.resetSpectatorMode(spectatorStats);
                     } else {
                         sendHelp(sender);
                     }
@@ -120,7 +129,7 @@ public class SpectateCMD implements CommandExecutor {
                     sender.sendMessage(Utils.translate("&cError loading your data"));
                 }
             } else {
-                sender.sendMessage(Utils.translate("&cOnly Donators can use spectate mode"));
+                sender.sendMessage(Utils.translate("&cOnly players with &aMilites &cor higher can use spectate mode"));
             }
         } else {
             sender.sendMessage(Utils.translate("&cOnly players can run this command"));
@@ -128,19 +137,10 @@ public class SpectateCMD implements CommandExecutor {
         return true;
     }
 
-    private static void sendHelp(CommandSender sender) {
-        sender.sendMessage(getHelp("player"));
-        sender.sendMessage(getHelp("toggle"));
-        sender.sendMessage(getHelp("help"));
-    }
-
-    private static String getHelp(String cmd) {
-        if (cmd.equalsIgnoreCase("player"))
-            return Utils.translate("&2/spectate <player>  &7Spectates a player");
-        else if (cmd.equalsIgnoreCase("toggle"))
-            return Utils.translate("&2/spectate toggle  &7Toggles if you can be spectated");
-        else if (cmd.equalsIgnoreCase("help"))
-            return Utils.translate("&2/spectate help  &7Display this page");
-        return "";
+    private void sendHelp(CommandSender sender) {
+        sender.sendMessage(Utils.translate("&a&lSpectator Help"));
+        sender.sendMessage(Utils.translate("&2/spectate (player)  &7Spectates a player"));
+        sender.sendMessage(Utils.translate("&2/spectate toggle  &7Toggles if you can be spectated"));
+        sender.sendMessage(Utils.translate("&2/spectate help  &7Display this page"));
     }
 }

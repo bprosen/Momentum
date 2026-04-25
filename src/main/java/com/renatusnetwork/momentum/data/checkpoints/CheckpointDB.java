@@ -3,6 +3,7 @@ package com.renatusnetwork.momentum.data.checkpoints;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.storage.mysql.DatabaseManager;
 import com.renatusnetwork.momentum.storage.mysql.DatabaseQueries;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,33 +13,69 @@ import java.util.Map;
 
 public class CheckpointDB {
 
-    public static void loadCheckpoints(PlayerStats playerStats)
-    {
+    public static void loadCheckpoints(PlayerStats playerStats) {
         List<Map<String, String>> levelsResults = DatabaseQueries.getResults(
-                "checkpoints",
+                DatabaseManager.LEVEL_CHECKPOINTS_TABLE,
                 "*",
-                "WHERE UUID='" + playerStats.getUUID() + "'"
+                "WHERE uuid=?", playerStats.getUUID()
         );
 
         // if they have a checkpoint, load it
-        if (!levelsResults.isEmpty())
-        {
-            for (Map<String, String> levelResult : levelsResults)
-            {
-                // get player name, world name and level
-                String playerName = levelResult.get("player_name");
-                String worldName = levelResult.get("world");
-                Level level = Momentum.getLevelManager().get(levelResult.get("level_name"));
+        for (Map<String, String> levelResult : levelsResults) {
+            // get player name, world name and level
+            String worldName = levelResult.get("world");
+            Level level = Momentum.getLevelManager().get(levelResult.get("level_name"));
 
+            if (level != null) {
                 // x, y, z
                 int x = Integer.parseInt(levelResult.get("x"));
                 int y = Integer.parseInt(levelResult.get("y"));
                 int z = Integer.parseInt(levelResult.get("z"));
 
                 // add to hashmap
-                if (playerName != null && worldName != null && level != null)
-                    playerStats.addCheckpoint(level.getName(), new Location(Bukkit.getWorld(worldName), x, y, z));
+                playerStats.addCheckpoint(level, new Location(Bukkit.getWorld(worldName), x, y, z));
             }
         }
+    }
+
+    public static void deleteCheckpointFromName(String playerName, String levelName) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE lc FROM " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE +
+                " lc JOIN " + DatabaseManager.PLAYERS_TABLE + " p ON lc.uuid=p.uuid WHERE p.name=? AND lc.level_name=?",
+                playerName,
+                levelName
+        );
+    }
+
+    public static void deleteAllCheckpointsFromPlayer(String playerUUID) {
+        DatabaseQueries.runAsyncQuery(
+                "DELETE FROM " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " WHERE uuid=?",
+                playerUUID
+        );
+    }
+
+    public static void updateCheckpoint(PlayerStats playerStats, Location newLocation) {
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " SET world=?, x=?, y=?, z=? WHERE level_name=? AND uuid=?",
+                newLocation.getWorld().getName(),
+                newLocation.getBlockX(),
+                newLocation.getBlockY(),
+                newLocation.getBlockZ(),
+                playerStats.getLevel().getName(),
+                playerStats.getUUID());
+    }
+
+    public static void insertCheckpoint(PlayerStats playerStats, Location location) {
+        DatabaseQueries.runAsyncQuery(
+                "INSERT INTO " + DatabaseManager.LEVEL_CHECKPOINTS_TABLE + " " +
+                "(uuid, level_name, world, x, y, z)" +
+                " VALUES (?,?,?,?,?,?)",
+                playerStats.getUUID(),
+                playerStats.getLevel().getName(),
+                location.getWorld().getName(),
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ()
+        );
     }
 }

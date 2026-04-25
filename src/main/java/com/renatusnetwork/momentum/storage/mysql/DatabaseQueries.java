@@ -1,78 +1,101 @@
 package com.renatusnetwork.momentum.storage.mysql;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.utils.TimeUtils;
+import com.renatusnetwork.momentum.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class DatabaseQueries {
 
-    // Data parsing
-    private static Map<String, String> resultSetToMap(ResultSet resultSet) {
-        try {
-            ResultSetMetaData md = resultSet.getMetaData();
-            Map<String, String> results = new HashMap<>();
+    public static CompletableFuture<List<Map<String, String>>> getResultsAsync(String tableName, String selection, String trailingSQL, Object... parameters) {
+        CompletableFuture<List<Map<String, String>>> future = new CompletableFuture<>();
 
-            int columns = md.getColumnCount();
-            for (int i = 1; i <= columns; ++i)
-                results.put(md.getColumnName(i), resultSet.getString(i));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                future.complete(getResults(tableName, selection, trailingSQL, parameters));
+            }
+        }.runTaskAsynchronously(Momentum.getPlugin());
 
-            return results;
-        } catch (SQLException exception) {
-            Momentum.getPluginLogger().severe("ERROR: Occurred within DatabaseQueries.resultSetTomap()");
-            Momentum.getPluginLogger().severe("ERROR:   printing StackTrace=");
-            exception.printStackTrace();
-        }
-
-        return null;
+        return future;
     }
 
     public static List<Map<String, String>> getResults(String tableName, String selection, String trailingSQL, Object... parameters) {
         List<Map<String, String>> finalResults = new ArrayList<>();
 
         String query = "SELECT " + selection + " FROM " + tableName;
-        if (!trailingSQL.isEmpty())
-            query = query + " " + trailingSQL;
+        if (!trailingSQL.isEmpty()) {
+            query += " " + trailingSQL;
+        }
 
-        try {
-            PreparedStatement statement = Momentum.getDatabaseManager().get().get().prepareStatement(query);
+        try (Connection connection = Momentum.getDatabaseManager().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
 
             // secure
-            for (int i = 0; i < parameters.length; i++)
+            for (int i = 0; i < parameters.length; i++) {
                 statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
+            }
 
             ResultSet results = statement.executeQuery();
+            while (results.next()) {
+                // parse results
+                ResultSetMetaData meta = results.getMetaData();
 
-            while (results.next())
-                finalResults.add(resultSetToMap(results));
+                HashMap<String, String> resultMap = new HashMap<>();
+
+                int columns = meta.getColumnCount();
+
+                for (int i = 1; i <= columns; ++i) {
+                    resultMap.put(meta.getColumnName(i), results.getString(i));
+                }
+
+                finalResults.add(resultMap);
+            }
         } catch (SQLException exception) {
-            Momentum.getPluginLogger().severe(
-                    "ERROR: Occurred within DatabaseQueries.getResults(" + tableName + ", " + trailingSQL + ")"
-            );
-            Momentum.getPluginLogger().severe("ERROR:  query='" + query + "'");
-            Momentum.getPluginLogger().severe("ERROR:   exception=" + exception.getLocalizedMessage());
+            Momentum.getPluginLogger().info("Error in DatabaseQueries.getResults(" + tableName + ", " + trailingSQL + ")");
+            Momentum.getPluginLogger().info("Query='" + query + "'");
+            exception.printStackTrace();
         }
 
         return finalResults;
     }
 
-    public static ResultSet getRawResults(String query)
-    {
-        try {
-            PreparedStatement statement = Momentum.getDatabaseManager().get().get().prepareStatement(query);
-            return statement.executeQuery();
+    public static Map<String, String> getResult(String tableName, String selection, String trailingSQL, Object... parameters) {
+        // this is a use case where we are using a primary key to get a single result, just cleaner code
+        List<Map<String, String>> results = getResults(tableName, selection, trailingSQL, parameters);
 
+        return !results.isEmpty() ? results.get(0) : new HashMap<>();
+    }
+
+    public static boolean runQuery(String sql, Object... parameters) {
+        try (Connection connection = Momentum.getDatabaseManager().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            // secure
+            for (int i = 0; i < parameters.length; i++) {
+                statement.setObject(i + 1, parameters[i]); // who knows why it starts at 1
+            }
+
+            statement.executeUpdate();
+            return true;
         } catch (SQLException exception) {
-            Momentum.getPluginLogger().severe(
-                    "ERROR: Occurred within DatabaseQueries.getRawResults(" + query + ")"
-            );
-            Momentum.getPluginLogger().severe("ERROR:  query='" + query + "'");
-            Momentum.getPluginLogger().severe("ERROR:   exception=" + exception.getLocalizedMessage());
+            Momentum.getPluginLogger().severe("Failed to run query: " + sql);
+            Momentum.getPluginLogger().severe("Params: " + Arrays.toString(parameters));
+            exception.printStackTrace();
+            return false;
         }
+    }
 
-        return null;
+    public static void runAsyncQuery(String sql, Object... parameters) {
+        new BukkitRunnable() {
+            public void run() {
+                runQuery(sql, parameters);
+            }
+        }.runTaskAsynchronously(Momentum.getPlugin());
     }
 }

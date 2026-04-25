@@ -5,13 +5,10 @@ import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -41,43 +38,20 @@ public class RageQuitCMD implements CommandExecutor {
                 List<String> randomMessages = Momentum.getSettingsManager().rage_quit_messages;
                 String randomMessage = Utils.translate(
                         randomMessages.get(random.nextInt(randomMessages.size()))
-                        .replace("%player%", player.getDisplayName()));
+                                .replace("%player%", player.getDisplayName()));
 
-                // build firework
-                Firework firework = player.getWorld().spawn(player.getLocation(), Firework.class);
-                FireworkMeta meta = firework.getFireworkMeta();
-
-                meta.clearEffects();
-
-                // build the firework and then set the new one
-                FireworkEffect effect = FireworkEffect.builder()
-                        .flicker(true)
-                        .trail(true)
-                        .with(FireworkEffect.Type.BURST)
-                        .withColor(Color.WHITE)
-                        .withFade(Color.RED)
-                        .build();
-
-                meta.addEffect(effect);
-                firework.setFireworkMeta(meta);
-
-                // detonate 0.5 later
-                new BukkitRunnable() {
-                    public void run() {
-                        firework.detonate();
-                    }
-                }.runTaskLater(Momentum.getPlugin(), 10);
+                Utils.spawnFirework(player.getLocation(), Color.WHITE, Color.RED, true);
 
                 // broadcast and kick
                 Bukkit.broadcastMessage(randomMessage);
                 player.kickPlayer("Rage Quit :(");
 
-            // run confirm and buy
+                // run confirm and buy
             } else {
 
                 PlayerStats playerStats = Momentum.getStatsManager().get(player);
-                double price = Momentum.getSettingsManager().rage_quit_price;
-                double balance = playerStats.getCoins();
+                int price = Momentum.getSettingsManager().rage_quit_price;
+                int balance = playerStats.getCoins();
 
                 // can buy it
                 if (balance >= price) {
@@ -92,7 +66,7 @@ public class RageQuitCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&7You purchased &c/ragequit&7! Type it again to use it"));
                     } else {
                         player.sendMessage(Utils.translate("&7Are you sure you want to buy the &c/ragequit &7command?" +
-                                " Type &c/ragequit &7again to buy it for &6$" + Utils.formatNumber(price)));
+                                                           " Type &c/ragequit &7again to buy it for &6" + Utils.formatNumber(price) + " &eCoins"));
 
                         confirmMap.put(player.getName(), new BukkitRunnable() {
                             public void run() {
@@ -108,7 +82,7 @@ public class RageQuitCMD implements CommandExecutor {
                     }
                 } else {
                     player.sendMessage(Utils.translate("&cYou do not have enough coins buy the &c/ragequit &7command" +
-                            " &6($" + Utils.formatNumber(price - balance) + " more)"));
+                                                       " &6(need " + Utils.formatNumber(price - balance) + " &eCoins)"));
                 }
             }
         }
