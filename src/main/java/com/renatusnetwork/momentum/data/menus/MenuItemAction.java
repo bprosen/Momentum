@@ -132,7 +132,7 @@ public class MenuItemAction {
             String typeValue = menuItem.getTypeValue();
             if (typeValue.equals("submit-plot")) {
                 performPlotSubmission(player);
-            } else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") ||
+            } else if (typeValue.equals("clearhat") || typeValue.equals("cleararmor") || typeValue.equals("clearbadge") ||
                        typeValue.equals("cleartrail") || typeValue.equals("clearnick") || typeValue.equals("clearinfinite")) {
                 performCosmeticsClear(player, typeValue, menuItem);
             } else if (typeValue.equals("level-sorting") && !Momentum.getLevelManager().isBuyingLevelMenu(player.getName())) // do not allow switching sorting if buying
@@ -278,6 +278,10 @@ public class MenuItemAction {
                 player.sendMessage(Utils.translate("&cYou have cleared your current infinite block"));
 
                 Momentum.getStatsManager().resetInfiniteBlock(Momentum.getStatsManager().get(player));
+                break;
+            case "clearbadge":
+                player.closeInventory();
+                player.sendMessage(Utils.translate("&cYou have cleared your current badge"));
                 break;
         }
     }

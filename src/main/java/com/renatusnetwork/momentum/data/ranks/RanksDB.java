@@ -17,10 +17,11 @@ public class RanksDB {
         for (Map<String, String> result : results) {
             String rankName = result.get("name");
             String rankTitle = result.get("title");
+            String shortenedTitle = result.get("shortened_title");
             String rankUpLevel = result.get("rankup_level");
             String nextRank = result.get("next_rank");
 
-            tempMap.put(rankName, new Rank(rankName, rankTitle, rankUpLevel, nextRank));
+            tempMap.put(rankName, new Rank(rankName, rankTitle, shortenedTitle, rankUpLevel, nextRank));
         }
 
         return tempMap;
@@ -46,6 +47,10 @@ public class RanksDB {
 
     public static void updateTitle(String rankName, String title) {
         DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET title=? WHERE name=?", title, rankName);
+    }
+
+    public static void updateShortenedTitle(String rankName, String shortenedTitle) {
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.RANKS_TABLE + " SET shortened_title=? WHERE name=?", shortenedTitle, rankName);
     }
 
     public static void updateRankupLevel(String rankName, String rankupLevel) {

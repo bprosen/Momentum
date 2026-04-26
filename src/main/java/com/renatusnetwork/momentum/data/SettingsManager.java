@@ -155,6 +155,7 @@ public class SettingsManager {
     public int levels_lb_size;
     public int prac_history_size;
     public int max_mastery_lb_size;
+    public int default_coins;
 
     public SettingsManager(FileConfiguration settings) {
         cooldown_calendar = Calendar.getInstance();
@@ -413,5 +414,6 @@ public class SettingsManager {
         levels_lb_size = settings.getInt("leaderboard_max_size.levels");
         prac_history_size = settings.getInt("practice_history_size");
         max_mastery_lb_size = settings.getInt("leaderboard_max_size.mastery");
+        default_coins = settings.getInt("default_coins");
     }
 }

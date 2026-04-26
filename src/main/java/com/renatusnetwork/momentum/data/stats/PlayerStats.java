@@ -82,7 +82,7 @@ public class PlayerStats {
     private HashMap<String, Set<LevelCompletion>> levelCompletions;
     private HashSet<String> masteryCompletions;
     private HashMap<Level, Long> records;
-    private HashSet<Perk> perks;
+    private HashSet<String> perks;
     private HashMap<String, Location> checkpoints;
     private HashSet<String> boughtLevels;
     private HashMap<String, Location> saves;
@@ -111,15 +111,19 @@ public class PlayerStats {
         this.practiceHistory = new ArrayList<>();
         this.usedCommandSigns = new HashSet<>();
 
+        SettingsManager settingsManager = Momentum.getSettingsManager();
+
         // default for now, if they are not a new player the mysql db loading will adjust these
-        this.infiniteBlock = Momentum.getSettingsManager().infinite_default_block;
-        this.rank = Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank);
+        this.infiniteBlock = settingsManager.infinite_default_block;
+        this.rank = Momentum.getRanksManager().get(settingsManager.default_rank);
+        this.eloTier = Momentum.getELOTiersManager().get(settingsManager.default_elo_tier);
+        this.elo = settingsManager.default_elo;
 
         for (InfiniteType type : InfiniteType.values()) {
             bestInfiniteScores.put(type, 0); // arbitrary to be replaced when stats load
         }
 
-        this.sortingType = Momentum.getSettingsManager().default_level_sorting_type;
+        this.sortingType = settingsManager.default_level_sorting_type;
         this.levelStartTime = -1;
     }
 
@@ -980,19 +984,15 @@ public class PlayerStats {
     // Perks Section
     //
     public void addPerk(Perk perk) {
-        perks.add(perk);
+        perks.add(perk.getName());
     }
 
     public boolean hasPerk(Perk perk) {
-        return perks.contains(perk);
+        return perks.contains(perk.getName());
     }
 
     public int getGainedPerksCount() {
         return perks.size();
-    }
-
-    public HashSet<Perk> getPerks() {
-        return perks;
     }
 
     //

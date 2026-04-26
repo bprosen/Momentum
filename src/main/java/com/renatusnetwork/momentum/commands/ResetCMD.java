@@ -21,27 +21,15 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ResetCMD implements CommandExecutor {
-    /*
-     * /reset <player> <stat>
-     * possible stats to reset:
-     * - ALL (resets EVERYTHING)
-     * - coins
-     * - records (timed completions)
-     * - completions (by extension resets records)
-     * - saves & checkpoints
-     * - rank (non-donor rank)
-     * - clan stats
-     * - purchased levels
-     * - ingame stats (total jumps, infinite highscore, etc.)
-     * - modifiers
-     * - elo
-     */
+
+    private static final int CONFIRM_TIMEOUT_SECONDS = 3;
 
     private final Map<ResetInfo, BukkitTask> resetConfirmMap = new HashMap<>();
-    private static final Map<ResettableStat, Resetter> statResetters = new HashMap<>();
+
+    private static final Map<ResettableStat, Resetter> STAT_RESETTERS = new HashMap<>();
 
     static {
-        statResetters.put(ResettableStat.ALL, playerUUID -> {
+        STAT_RESETTERS.put(ResettableStat.ALL, playerUUID -> {
             resetCoins(playerUUID);
             resetAllCompletions(playerUUID);
             resetSavesAndCheckpoints(playerUUID);
@@ -54,17 +42,17 @@ public class ResetCMD implements CommandExecutor {
             resetUsedCommandSigns(playerUUID);
         });
 
-        statResetters.put(ResettableStat.COINS, ResetCMD::resetCoins);
-        statResetters.put(ResettableStat.TIMED_COMPLETIONS, ResetCMD::resetTimedCompletions);
-        statResetters.put(ResettableStat.ALL_COMPLETIONS, ResetCMD::resetAllCompletions);
-        statResetters.put(ResettableStat.SAVES_AND_CHECKPOINTS, ResetCMD::resetSavesAndCheckpoints);
-        statResetters.put(ResettableStat.PARKOUR_RANK, ResetCMD::resetParkourRank);
-        statResetters.put(ResettableStat.CLAN_MEMBERSHIP, ResetCMD::resetClanMembership);
-        statResetters.put(ResettableStat.PURCHASED_LEVELS, ResetCMD::resetPurchasedLevels);
-        statResetters.put(ResettableStat.INGAME_STATS, ResetCMD::resetInGameStats);
-        statResetters.put(ResettableStat.MODIFIERS, ResetCMD::resetModifiers);
-        statResetters.put(ResettableStat.ELO, ResetCMD::resetELO);
-        statResetters.put(ResettableStat.USED_COMMAND_SIGNS, ResetCMD::resetUsedCommandSigns);
+        STAT_RESETTERS.put(ResettableStat.COINS,               ResetCMD::resetCoins);
+        STAT_RESETTERS.put(ResettableStat.TIMED_COMPLETIONS,   ResetCMD::resetTimedCompletions);
+        STAT_RESETTERS.put(ResettableStat.ALL_COMPLETIONS,     ResetCMD::resetAllCompletions);
+        STAT_RESETTERS.put(ResettableStat.SAVES_AND_CHECKPOINTS, ResetCMD::resetSavesAndCheckpoints);
+        STAT_RESETTERS.put(ResettableStat.PARKOUR_RANK,        ResetCMD::resetParkourRank);
+        STAT_RESETTERS.put(ResettableStat.CLAN_MEMBERSHIP,     ResetCMD::resetClanMembership);
+        STAT_RESETTERS.put(ResettableStat.PURCHASED_LEVELS,    ResetCMD::resetPurchasedLevels);
+        STAT_RESETTERS.put(ResettableStat.INGAME_STATS,        ResetCMD::resetInGameStats);
+        STAT_RESETTERS.put(ResettableStat.MODIFIERS,           ResetCMD::resetModifiers);
+        STAT_RESETTERS.put(ResettableStat.ELO,                 ResetCMD::resetELO);
+        STAT_RESETTERS.put(ResettableStat.USED_COMMAND_SIGNS,  ResetCMD::resetUsedCommandSigns);
     }
 
     @Override
@@ -80,16 +68,15 @@ public class ResetCMD implements CommandExecutor {
         }
 
         String playerName = args[0].toLowerCase();
-        String stat = args[1];
         String playerUUID = StatsDB.getUUIDByName(playerName);
-
-        if (Momentum.getStatsManager().get(playerUUID) != null) {
-            sender.sendMessage(Utils.translate("&cYou can only reset the stats of an offline player"));
-            return true;
-        }
 
         if (playerUUID == null) {
             sender.sendMessage(Utils.translate(String.format("&cPlayer &4%s &cwas not found", playerName)));
+            return true;
+        }
+
+        if (Momentum.getStatsManager().get(playerUUID) != null) {
+            sender.sendMessage(Utils.translate("&cYou can only reset the stats of an offline player"));
             return true;
         }
 
@@ -97,59 +84,68 @@ public class ResetCMD implements CommandExecutor {
             Momentum.getStatsManager().removeOffline(playerUUID);
         }
 
-        ResettableStat statToReset;
-
-        try {
-            statToReset = ResettableStat.valueOf(stat.toUpperCase());
-        } catch (IllegalArgumentException iae) {
-            sender.sendMessage(Utils.translate(String.format("&cPlayer stat &4%s &cis not a valid stat", stat)));
+        ResettableStat statToReset = parseStatSafely(sender, args[1]);
+        if (statToReset == null) {
             return true;
         }
 
         if (!confirm(sender, playerUUID, playerName, statToReset)) {
-            sender.sendMessage(Utils.translate(String.format("&6Are you sure you want to reset stat &4%s &6for player &4%s&6? Type the command again to confirm.", statToReset.name(), playerName)));
+            sender.sendMessage(Utils.translate(String.format(
+                    "&6Are you sure you want to reset stat &4%s &6for player &4%s&6? Type the command again to confirm.",
+                    statToReset.name(), playerName)));
             return true;
         }
 
-        statResetters.get(statToReset).execute(playerUUID);
-
-        sender.sendMessage(Utils.translate(String.format("&aSuccessfuly reset stat &2%s &afor player &2%s", statToReset.name(), playerName)));
+        STAT_RESETTERS.get(statToReset).execute(playerUUID);
+        sender.sendMessage(Utils.translate(String.format(
+                "&aSuccessfully reset stat &2%s &afor player &2%s",
+                statToReset.name(), playerName)));
 
         return true;
     }
 
-    public enum ResettableStat {
-        ALL("Resets ALL stats for a player"),
-        COINS("Sets a player's coins to 0"),
-        TIMED_COMPLETIONS("Resets all timed level completions for a player"),
-        ALL_COMPLETIONS("Resets all level completions for a player"),
-        SAVES_AND_CHECKPOINTS("Resets all saves and checkpoints within all levels for a player"),
-        PARKOUR_RANK("Sets the rank of a player to " + Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank).getTitle()),
-        CLAN_MEMBERSHIP("Forcefully kicks a player from their clan"),
-        PURCHASED_LEVELS("Resets all purchased levels for a player"),
-        INGAME_STATS("Resets all in-game stats for a player"),
-        MODIFIERS("Resets all modifiers for a player"),
-        ELO("Sets the ELO of a player to " + Momentum.getSettingsManager().default_elo + ", and their ELO tier to " + Momentum.getELOTiersManager().get(Momentum.getSettingsManager().default_elo_tier).getTitle()),
-        USED_COMMAND_SIGNS("Resets all used command signs for a player");
-
-        final String description;
-
-        ResettableStat(String description) {
-            this.description = description;
-        }
-
-        public String getDescription() {
-            return this.description;
+    private ResettableStat parseStatSafely(CommandSender sender, String stat) {
+        try {
+            return ResettableStat.valueOf(stat.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage(Utils.translate(String.format("&cPlayer stat &4%s &cis not a valid stat", stat)));
+            return null;
         }
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(Utils.translate(Utils.translate("&4&lReset Help")));
-
+        sender.sendMessage(Utils.translate("&4&lReset Help"));
         for (ResettableStat stat : ResettableStat.values()) {
             sender.sendMessage(Utils.translate("&4/reset <player> " + stat.name() + "  &c" + stat.getDescription()));
         }
     }
+
+    private boolean confirm(CommandSender sender, String playerUUID, String playerName, ResettableStat stat) {
+        ResetInfo resetInfo = new ResetInfo(sender.getName(), playerUUID, stat);
+
+        BukkitTask existing = resetConfirmMap.remove(resetInfo);
+        if (existing != null) {
+            existing.cancel();
+            return true;
+        }
+
+        BukkitTask task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                resetConfirmMap.remove(resetInfo);
+                sender.sendMessage(Utils.translate(String.format(
+                        "&cYou did not confirm in time to reset stat &4%s &cfor player &4%s",
+                        stat.name(), playerName)));
+            }
+        }.runTaskLater(Momentum.getPlugin(), 20L * CONFIRM_TIMEOUT_SECONDS);
+
+        resetConfirmMap.put(resetInfo, task);
+        return false;
+    }
+
+    // ---------------------------------------------------------------------------
+    // Reset implementations
+    // ---------------------------------------------------------------------------
 
     private static void resetCoins(String playerUUID) {
         StatsDB.updateCoins(playerUUID, 0, true);
@@ -187,15 +183,10 @@ public class ResetCMD implements CommandExecutor {
 
         StatsDB.updateRaceLosses(playerUUID, 0);
         StatsDB.updateRaceWins(playerUUID, 0);
-
         StatsDB.updateEventWins(playerUUID, 0);
-
         RanksDB.updatePrestiges(playerUUID, 0);
-
         StatsDB.resetInfiniteBlock(playerUUID);
-
         LevelsDB.removeAllLevelRatingsFromPlayer(playerUUID);
-
         StatsDB.removeAllFavoriteLevels(playerUUID);
     }
 
@@ -212,54 +203,75 @@ public class ResetCMD implements CommandExecutor {
         CmdSignsDB.unuseAllCommandSigns(playerUUID);
     }
 
+    // ---------------------------------------------------------------------------
+    // Inner types
+    // ---------------------------------------------------------------------------
 
-    private boolean confirm(CommandSender sender, String playerUUIDToReset, String playerNameToReset, ResettableStat statToReset) {
-        ResetInfo resetInfo = new ResetInfo(sender.getName(), playerUUIDToReset, statToReset);
+    public enum ResettableStat {
+        ALL("Resets ALL stats for a player"),
+        COINS("Sets a player's coins to 0"),
+        TIMED_COMPLETIONS("Resets all timed level completions for a player"),
+        ALL_COMPLETIONS("Resets all level completions for a player"),
+        SAVES_AND_CHECKPOINTS("Resets all saves and checkpoints within all levels for a player"),
+        PARKOUR_RANK {
+            @Override
+            public String getDescription() {
+                return "Sets the rank of a player to " +
+                        Momentum.getRanksManager().get(Momentum.getSettingsManager().default_rank).getTitle();
+            }
+        },
+        CLAN_MEMBERSHIP("Forcefully kicks a player from their clan"),
+        PURCHASED_LEVELS("Resets all purchased levels for a player"),
+        INGAME_STATS("Resets all in-game stats for a player"),
+        MODIFIERS("Resets all modifiers for a player"),
+        ELO {
+            @Override
+            public String getDescription() {
+                return "Sets the ELO of a player to " + Momentum.getSettingsManager().default_elo +
+                        ", and their ELO tier to " +
+                        Momentum.getELOTiersManager().get(Momentum.getSettingsManager().default_elo_tier).getTitle();
+            }
+        },
+        USED_COMMAND_SIGNS("Resets all used command signs for a player");
 
-        BukkitTask task;
-        if ((task = resetConfirmMap.remove(resetInfo)) != null) {
-            task.cancel();
-            return true;
+        private final String description;
+
+        ResettableStat(String description) {
+            this.description = description;
         }
 
-        resetConfirmMap.put(resetInfo, new BukkitRunnable() {
-            @Override
-            public void run() {
-                resetConfirmMap.remove(resetInfo);
-                sender.sendMessage(Utils.translate(String.format("&cYou did not confirm in time to reset stat &4%s &cfor player &4%s", statToReset, playerNameToReset)));
-            }
-        }.runTaskLater(Momentum.getPlugin(), 20 * 3));
+        ResettableStat() {
+            this.description = null;
+        }
 
-        return false;
+        public String getDescription() {
+            return description;
+        }
     }
 
     private static class ResetInfo {
-        public final String commandSender;
-        public final String playerUUIDToReset;
-        public final ResettableStat statToReset;
+        private final String commandSender;
+        private final String playerUUID;
+        private final ResettableStat stat;
 
-        public ResetInfo(String commandSender, String playerUUIDToReset, ResettableStat statToReset) {
+        ResetInfo(String commandSender, String playerUUID, ResettableStat stat) {
             this.commandSender = commandSender;
-            this.playerUUIDToReset = playerUUIDToReset;
-            this.statToReset = statToReset;
+            this.playerUUID = playerUUID;
+            this.stat = stat;
         }
 
         @Override
         public boolean equals(Object other) {
-            ResetInfo resetInfo;
-            if (!(other instanceof ResetInfo)) {
-                return false;
-            }
-
-            resetInfo = (ResetInfo) other;
-            return commandSender.equals(resetInfo.commandSender) &&
-                    playerUUIDToReset.equals(resetInfo.playerUUIDToReset) &&
-                    statToReset == resetInfo.statToReset;
+            if (!(other instanceof ResetInfo)) return false;
+            ResetInfo o = (ResetInfo) other;
+            return commandSender.equals(o.commandSender) &&
+                    playerUUID.equals(o.playerUUID) &&
+                    stat == o.stat;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(commandSender, playerUUIDToReset, statToReset);
+            return Objects.hash(commandSender, playerUUID, stat);
         }
     }
 

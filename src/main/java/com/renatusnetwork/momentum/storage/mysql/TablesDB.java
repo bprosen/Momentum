@@ -439,7 +439,8 @@ public class TablesDB {
     private static void createRanks() {
         String query = "CREATE TABLE " + DatabaseManager.RANKS_TABLE + "(" +
                        "name VARCHAR(10) NOT NULL, " +
-                       "title VARCHAR(20) DEFAULT NULL, " + // allow space for color codes
+                       "title VARCHAR(50) DEFAULT NULL, " + // allow space for color codes
+                       "shortened_title VARCHAR(20) DEFAULT NULL, " + // allow space for color codes
                        "rankup_level VARCHAR(20) DEFAULT NULL, " +
                        "next_rank VARCHAR(10) DEFAULT NULL, " +
                        // keys
@@ -854,8 +855,8 @@ public class TablesDB {
     }
 
     private static void createUsedCommandSignsKeys() {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.USED_COMMAND_SIGNS +
-                                 "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS + "_uuid_fk " +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.USED_COMMAND_SIGNS + " " +
+                                 "ADD CONSTRAINT " + DatabaseManager.USED_COMMAND_SIGNS +  "_uuid_fk " +
                                  "FOREIGN KEY (uuid) REFERENCES " + DatabaseManager.PLAYERS_TABLE + " (uuid) " +
                                  "ON UPDATE CASCADE " +
                                  "ON DELETE CASCADE, " +
@@ -868,7 +869,7 @@ public class TablesDB {
     }
 
     private static void createCommandSignsCommandsKeys() {
-        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.COMMAND_SIGNS_COMMANDS +
+        String foreignKeyQuery = "ALTER TABLE " + DatabaseManager.COMMAND_SIGNS_COMMANDS + " " +
                                  "ADD CONSTRAINT " + DatabaseManager.COMMAND_SIGNS_COMMANDS + "_name_fk " +
                                  "FOREIGN KEY (name) REFERENCES " + DatabaseManager.COMMAND_SIGNS + " (name) " +
                                  "ON UPDATE CASCADE " +

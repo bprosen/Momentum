@@ -34,6 +34,7 @@ public class StatsDB {
             DatabaseQueries.runQuery(
                     "INSERT INTO " + DatabaseManager.PLAYERS_TABLE + " (uuid, name) VALUES (?,?)",
                     playerStats.getUUID(), playerStats.getName());
+            Momentum.getStatsManager().addCoins(playerStats, Momentum.getSettingsManager().default_coins);
         } else {
             ClansManager clansManager = Momentum.getClansManager();
 

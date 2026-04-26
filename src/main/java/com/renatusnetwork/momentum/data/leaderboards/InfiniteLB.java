@@ -45,7 +45,7 @@ public class InfiniteLB {
     }
 
     public InfiniteLBPosition getLeaderboardPosition(int position) {
-        return leaderboard.get(position);
+        return position >= 0 && position < leaderboard.size() ? leaderboard.get(position) : null;
     }
 
     public ArrayList<InfiniteLBPosition> getLeaderboardPositions() {

@@ -56,7 +56,7 @@ public class PerksCMD implements CommandExecutor {
                     perkManager.create(perkName);
                     sender.sendMessage(Utils.translate("&7You have created the perk &a" + perkName));
                 } else {
-                    sender.sendMessage(Utils.translate("&4" + perkName + " &cis not a perk"));
+                    sender.sendMessage(Utils.translate("&4" + perkName + " &cis a perk"));
                 }
 
             } else if (a.length == 2 && a[0].equalsIgnoreCase("remove")) {

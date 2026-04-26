@@ -9,6 +9,7 @@ database:
 
 main_world: "parkour"
 max_offline_cache_size: 10
+default_coins: 5000
 elo:
   default_amount: 1000
   default_tier: silver-i

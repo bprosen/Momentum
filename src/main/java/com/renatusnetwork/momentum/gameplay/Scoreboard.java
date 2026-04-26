@@ -119,7 +119,7 @@ public class Scoreboard {
 
                 // if they have a rank, show it
                 if (playerStats.hasRank()) {
-                    String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getTitle());
+                    String rankString = Utils.translate("  &e&lRank &6" + playerStats.getRank().getShortenedTitle());
                     board.add(rankString);
                 }
 
@@ -241,7 +241,7 @@ public class Scoreboard {
 
                             if (nextRank != null) {
                                 board.add(Utils.translate("  &c&lRankup"));
-                                board.add(Utils.translate("  &a" + rank.getTitle() + " &7-> &a" + nextRank.getTitle()));
+                                board.add(Utils.translate("  &a" + rank.getShortenedTitle() + " &7-> &a" + nextRank.getShortenedTitle()));
                             }
                         }
                     } else {

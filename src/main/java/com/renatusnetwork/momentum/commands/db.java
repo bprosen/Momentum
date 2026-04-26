@@ -62,6 +62,7 @@ public class db implements CommandExecutor {
                             Momentum.getPluginLogger().info("Temporarily disabling foreign key checks");
                             DatabaseQueries.runQuery("SET foreign_key_checks = 0");
 
+                            ResultSet results;
                             /*
                                 Migration handling players table
                              */
@@ -70,7 +71,7 @@ public class db implements CommandExecutor {
                             String playersQuery = "SELECT * FROM players LEFT JOIN clans ON clans.clan_id=players.clan_id";
 
                             PreparedStatement statement = connection.prepareStatement(playersQuery);
-                            ResultSet results = statement.executeQuery();
+                            results = statement.executeQuery();
                             int playersCount = 0;
                             while (results.next()) {
                                 String uuid = results.getString("uuid");
@@ -94,9 +95,9 @@ public class db implements CommandExecutor {
 
                                 DatabaseQueries.runQuery(
                                         "INSERT INTO " + DatabaseManager.PLAYERS_TABLE + " " +
-                                        "(uuid, name, coins, spectatable, rank_name, clan, race_wins, race_losses, night_vision, grinding, infinite_block, fail_mode, event_wins) VALUES " +
-                                        "(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                                        uuid, name, coins, spectatable, rankIdTemp, clanTag, raceWins, raceLosses, nightVision, grinding, infiniteBlock, failMode, eventWins
+                                        "(uuid, name) VALUES " +
+                                        "(?,?)",
+                                        uuid, name
                                 );
                                 playersCount++;
                             }
@@ -291,7 +292,7 @@ public class db implements CommandExecutor {
                                 levelCount++;
                             }
 
-                            String ratingsQuery = "SELECT * FROM ratings r JOIN levels l ON l.level_id=r.level_id";
+                            /*String ratingsQuery = "SELECT * FROM ratings r JOIN levels l ON l.level_id=r.level_id";
 
                             PreparedStatement ratingsStatement = connection.prepareStatement(ratingsQuery);
                             results = ratingsStatement.executeQuery();
@@ -302,9 +303,9 @@ public class db implements CommandExecutor {
                                         results.getString("level_name"),
                                         results.getInt("rating")
                                 );
-                            }
+                            }*/
 
-                            String checkpointsQuery = "SELECT * FROM checkpoints";
+                            String checkpointsQuery = "SELECT * FROM checkpoints WHERE level_name='parthenon' OR level_name='heras-1' OR level_name='heras-2' OR level_name='pantheon'";
 
                             PreparedStatement checkpointStatement = connection.prepareStatement(checkpointsQuery);
                             results = checkpointStatement.executeQuery();
@@ -320,7 +321,7 @@ public class db implements CommandExecutor {
                                 );
                             }
 
-                            String purchasesTable = "SELECT * FROM bought_levels";
+                            /*String purchasesTable = "SELECT * FROM bought_levels";
 
                             PreparedStatement purchasesStatement = connection.prepareStatement(purchasesTable);
                             results = purchasesStatement.executeQuery();
@@ -330,9 +331,9 @@ public class db implements CommandExecutor {
                                         results.getString("uuid"),
                                         results.getString("level_name")
                                 );
-                            }
+                            }*/
 
-                            String savesTable = "SELECT * FROM saves";
+                            String savesTable = "SELECT * FROM saves WHERE level_name='parthenon' OR level_name='heras-1' OR level_name='heras-2' OR level_name='pantheon'";
 
                             PreparedStatement savesStatement = connection.prepareStatement(savesTable);
                             results = savesStatement.executeQuery();
@@ -357,7 +358,7 @@ public class db implements CommandExecutor {
                                 Migration handling level completions
                              */
                             Momentum.getPluginLogger().info("Attempting migration of completions table");
-                            String completionsQuery = "SELECT *, (UNIX_TIMESTAMP(completion_date) * 1000) AS date FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id";
+                            String completionsQuery = "SELECT *, (UNIX_TIMESTAMP(completion_date) * 1000) AS date FROM completions c JOIN players p ON p.player_id=c.player_id JOIN levels l ON l.level_id=c.level_id WHERE level_name='parthenon' OR level_name='heras-1' OR level_name='heras-2' OR level_name='pantheon'";
 
                             int completionCounter = 0;
 
@@ -407,7 +408,7 @@ public class db implements CommandExecutor {
                             /*
                                 Clans migration system
                              */
-                            Momentum.getPluginLogger().info("Attempting migration of clans table");
+                            /*Momentum.getPluginLogger().info("Attempting migration of clans table");
 
                             String clansTable = "SELECT * FROM clans c JOIN players p ON p.player_id=c.owner_player_id";
                             int clanCounter = 0;
@@ -424,7 +425,7 @@ public class db implements CommandExecutor {
                                 );
                                 clanCounter++;
                             }
-                            sender.sendMessage(Utils.translate("&cMigrated " + clanCounter + " clans"));
+                            sender.sendMessage(Utils.translate("&cMigrated " + clanCounter + " clans"));*/
 
                             /*
                                 Plots migration system
@@ -621,7 +622,7 @@ public class db implements CommandExecutor {
         String username = settings.getString(dbPath + ".username");
         String password = settings.getString(dbPath + ".password");
 
-        String url = "jdbc:mysql://localhost:3306/parkour_dev_stats?autoReconnect=true&allowMultiQueries=true&useSSL=false";
+        String url = "jdbc:mysql://localhost:3306/renatusnetwork_parkour_playerstats?autoReconnect=true&allowMultiQueries=true&useSSL=false";
 
         try {
             Class.forName("com.mysql.jdbc.Driver");

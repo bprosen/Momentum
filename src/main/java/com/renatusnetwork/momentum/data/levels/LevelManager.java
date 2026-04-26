@@ -797,36 +797,38 @@ public class LevelManager {
             // since ascendance is a free-roam map...
             if (!level.isAscendance()) {
                 RanksManager ranksManager = Momentum.getRanksManager();
-                if (!(level.needsRank() && ranksManager.isPastOrAtRank(playerStats, level.getRequiredRank()))) {
-                    if (!level.isEventLevel()) {
-                        //if (!level.isRaceLevel()) {
-                            if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
-                                boolean teleport = true;
 
-                                // not all levels have a price, so do a boolean switch
-                                if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level)) {
-                                    teleport = false;
-                                    player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
-                                    player.sendMessage(Utils.translate(
-                                            "&7Type &c/level buy " + ChatColor.stripColor(level.getTitle()) + "&7 for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins &7to buy " + level.getTitle())
-                                    );
-                                }
-
-                                // if still allowed, tp them!
-                                if (teleport) {
-                                    MenuItemAction.performLevelTeleport(playerStats, level);
-                                }
-                            } else {
-                                player.sendMessage(Utils.translate("&cYou cannot teleport to a level from the plot world, do /spawn first"));
-                            }
-                        //} else {
-                        //    player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
-                        //}
-                    } else {
-                        player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
-                    }
-                } else {
+                if (level.needsRank() && !ranksManager.isPastOrAtRank(playerStats, level.getRequiredRank())) {
                     player.sendMessage(Utils.translate("&cYou cannot teleport to a level you do not have the rank to"));
+                    return;
+                }
+
+                if (!level.isEventLevel()) {
+                    //if (!level.isRaceLevel()) {
+                        if (!playerStats.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+                            boolean teleport = true;
+
+                            // not all levels have a price, so do a boolean switch
+                            if (level.requiresBuying() && !playerStats.hasBoughtLevel(level) && !playerStats.hasCompleted(level)) {
+                                teleport = false;
+                                player.sendMessage(Utils.translate("&7You first need to buy &c" + level.getTitle() + "&7 before teleporting to it"));
+                                player.sendMessage(Utils.translate(
+                                        "&7Type &c/level buy " + ChatColor.stripColor(level.getTitle()) + "&7 for &6" + Utils.formatNumber(level.getPrice()) + " &eCoins &7to buy " + level.getTitle())
+                                );
+                            }
+
+                            // if still allowed, tp them!
+                            if (teleport) {
+                                MenuItemAction.performLevelTeleport(playerStats, level);
+                            }
+                        } else {
+                            player.sendMessage(Utils.translate("&cYou cannot teleport to a level from the plot world, do /spawn first"));
+                        }
+                    //} else {
+                    //    player.sendMessage(Utils.translate("&cYou cannot teleport to a Race level"));
+                    //}
+                } else {
+                    player.sendMessage(Utils.translate("&cYou cannot teleport to an Event level"));
                 }
             } else {
                 player.sendMessage(Utils.translate("&cYou cannot teleport to an Ascendance level"));

@@ -84,6 +84,22 @@ public class RankCMD implements CommandExecutor {
                 } else {
                     player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
                 }
+            } else if (a.length >= 2 && a[0].equalsIgnoreCase("shortenedtitle")) {
+                String rankName = a[1].toLowerCase();
+                Rank rank = ranksManager.get(rankName);
+
+                if (rank != null) {
+                    String[] split = Arrays.copyOfRange(a, 2, a.length);
+                    String shortenedTitle = String.join(" ", split);
+
+                    // update in db
+                    RanksDB.updateShortenedTitle(rankName, shortenedTitle);
+                    // update object
+                    rank.setShortenedTitle(shortenedTitle);
+                    player.sendMessage(Utils.translate("&7Set &c" + rankName + "&7's shortened title to &c" + shortenedTitle));
+                } else {
+                    player.sendMessage(Utils.translate("&4" + rankName + " &cdoes not exist"));
+                }
             } else if (a.length == 3 && a[0].equalsIgnoreCase("rankuplevel")) {
                 String rankName = a[1].toLowerCase();
                 Rank rank = ranksManager.get(rankName);
@@ -230,6 +246,7 @@ public class RankCMD implements CommandExecutor {
         player.sendMessage(Utils.translate("&c/ranks load  &7Reloads ranks"));
         player.sendMessage(Utils.translate("&c/ranks create <rankName>  &7Create a rank"));
         player.sendMessage(Utils.translate("&c/ranks title <rankName> <title>  &7Set's a ranks title (can have spaces)"));
+        player.sendMessage(Utils.translate("&c/ranks shortenedtitle <rankName> <shortened title>  &7Set's a ranks shortened title for scoreboard (can have spaces)"));
         player.sendMessage(Utils.translate("&c/ranks rankuplevel <rankName> <rankupLevel>  &7Set a rank's rankup level"));
         player.sendMessage(Utils.translate("&c/ranks nextrank <rankName> <nextRank>  &7Sets a rank's next rank"));
         player.sendMessage(Utils.translate("&c/ranks remove <rankName>  &7Removes a rank and sets players in that rank to default"));
