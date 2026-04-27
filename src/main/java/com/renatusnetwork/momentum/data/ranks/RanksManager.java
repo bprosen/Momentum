@@ -1,6 +1,7 @@
 package com.renatusnetwork.momentum.data.ranks;
 
 import com.renatusnetwork.momentum.Momentum;
+import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
@@ -13,6 +14,7 @@ import java.util.*;
 public class RanksManager {
 
     private static HashMap<String, Rank> ranks = new HashMap<>();
+    private static HashMap<String, Rank> levelsToRank = new HashMap<>();
 
     public RanksManager() {
         load();
@@ -21,6 +23,13 @@ public class RanksManager {
     public void load() {
         ranks = RanksDB.loadRanks();
 
+        for (Rank rank : ranks.values()) {
+            Level rankupLevel = rank.getRankupLevel();
+
+            if (rankupLevel != null) {
+                levelsToRank.put(rankupLevel.getName(), rank);
+            }
+        }
         Momentum.getPluginLogger().info("Ranks loaded: " + ranks.size());
     }
 
@@ -31,6 +40,10 @@ public class RanksManager {
 
     public Rank get(String rankName) {
         return ranks.get(rankName);
+    }
+
+    public Rank getFromLevelName(String levelName) {
+        return levelsToRank.get(levelName);
     }
 
     public boolean exists(String rankName) {

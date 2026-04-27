@@ -49,6 +49,10 @@ public class ClansManager {
 
         // update owner stats
         clan.addMember(new ClanMember(owner.getUUID(), owner.getName()));
+        clan.setMaxMembers(5);
+        clan.setMaxLevel(5);
+        clan.setLevel(1);
+
         owner.setClan(clan);
         StatsDB.updatePlayerClan(owner.getUUID(), clan.getTag());
     }

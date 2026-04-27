@@ -117,12 +117,22 @@ public class Menu {
                             } else if (sortingType == LevelSortingType.ALPHABETICAL &&
                                        ChatColor.stripColor(currentLevel.getFormattedTitle()).compareToIgnoreCase(ChatColor.stripColor(max.getFormattedTitle())) < 0.0) {
                                 max = currentLevel;
-                            } else if (sortingType == LevelSortingType.EASIEST &&
-                                       currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() <= max.getDifficulty())) {
-                                max = currentLevel;
-                            } else if (sortingType == LevelSortingType.HARDEST &&
-                                       currentLevel.hasDifficulty() && (!max.hasDifficulty() || currentLevel.getDifficulty() > max.getDifficulty())) {
-                                max = currentLevel;
+                            } else if (sortingType == LevelSortingType.EASIEST && currentLevel.hasDifficulty()) {
+                                if (!max.hasDifficulty()) {
+                                    max = currentLevel;
+                                } else if (currentLevel.getDifficulty() == max.getDifficulty() && currentLevel.getReward() < max.getReward()) {
+                                    max = currentLevel;
+                                } else if (currentLevel.getDifficulty() < max.getDifficulty()) {
+                                    max = currentLevel;
+                                }
+                            } else if (sortingType == LevelSortingType.HARDEST && currentLevel.hasDifficulty()) {
+                                if (!max.hasDifficulty()) {
+                                    max = currentLevel;
+                                } else if (currentLevel.getDifficulty() == max.getDifficulty() && currentLevel.getReward() > max.getReward()) {
+                                    max = currentLevel;
+                                } else if (currentLevel.getDifficulty() > max.getDifficulty()) {
+                                    max = currentLevel;
+                                }
                             } else if (sortingType == LevelSortingType.HIGHEST_REWARD && currentLevel.getReward() > max.getReward()) {
                                 max = currentLevel;
                             } else if (sortingType == LevelSortingType.LOWEST_REWARD && currentLevel.getReward() < max.getReward()) {

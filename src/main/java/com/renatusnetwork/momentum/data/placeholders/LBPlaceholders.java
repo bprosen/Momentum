@@ -2,12 +2,15 @@ package com.renatusnetwork.momentum.data.placeholders;
 
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.clans.Clan;
+import com.renatusnetwork.momentum.data.clans.ClanMember;
 import com.renatusnetwork.momentum.data.leaderboards.*;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
 import com.renatusnetwork.momentum.data.levels.Level;
+import com.renatusnetwork.momentum.data.levels.LevelCompletion;
 import com.renatusnetwork.momentum.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LBPlaceholders {
 
@@ -72,7 +75,12 @@ public class LBPlaceholders {
                                     } else if (value.equals("name")) {
                                         return clan.getTag();
                                     } else if (value.equals("owner")) {
-                                        return clan.getOwner().getName();
+                                        ClanMember clanOwner = clan.getOwner();
+
+                                        if (clanOwner == null) {
+                                            return "";
+                                        }
+                                        return clanOwner.getName();
                                     }
                                 }
                             }
@@ -198,11 +206,12 @@ public class LBPlaceholders {
                             // stats type!
                             if (level != null) {
                                 if (!Momentum.getLevelManager().isLoadingLeaderboards()) {
-                                    if (level.getLeaderboard().isEmpty()) {
-                                        return "N/A";
+                                    List<LevelLBPosition> leaderboard = level.getLeaderboard();
+                                    if (leaderboard.isEmpty() || leaderboard.size() <= posInt) {
+                                        return "";
                                     }
 
-                                    LevelLBPosition completion = level.getLeaderboard().get(posInt);
+                                    LevelLBPosition completion = leaderboard.get(posInt);
 
                                     // return name or value
                                     if (value.equals("name")) {

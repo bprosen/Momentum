@@ -284,7 +284,15 @@ public class Scoreboard {
                                 rewardString = Utils.translate("&c&m" + Utils.formatNumber(level.getReward()) + "&6 " + Utils.formatNumber(reward));
                             }
 
-                            board.add(formatSpacing(level.getFormattedTitle()));
+                            String title = level.getFormattedTitle();
+                            if (level.isRankUpLevel()) {
+                                Rank rankupLevel = Momentum.getRanksManager().getFromLevelName(level.getName());
+                                if (rankupLevel != null) {
+                                    title = Utils.translate(rankupLevel.getShortenedTitle());
+                                }
+                            }
+
+                            board.add(formatSpacing(title));
                             board.add(formatSpacing(rewardString));
 
                             if (playerStats.getLevelStartTime() > 0) {

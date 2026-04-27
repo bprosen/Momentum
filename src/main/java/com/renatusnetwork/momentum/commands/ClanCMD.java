@@ -449,7 +449,7 @@ public class ClanCMD implements CommandExecutor {
                                 // if they are invited
                                 if (targetClan.isInvited(player.getName())) {
                                     if (targetClan.numMembers() < targetClan.getMaxMembers()) {
-                                        clansManager.addMember(targetClan, targetStats);
+                                        clansManager.addMember(targetClan, playerStats);
                                         sendClanMessage(targetClan, "&6" + player.getName() + " &ehas joined your clan!", false, player);
                                         player.sendMessage(Utils.translate("&eYou joined the &6&lClan &c" + targetClan.getTag()));
                                     } else {

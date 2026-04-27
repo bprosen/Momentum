@@ -215,6 +215,16 @@ public class InteractListener implements Listener {
             CommandSign csign = csignManager.getCommandSign(new CmdSignLocation(event.getClickedBlock().getLocation()));
 
             if (playerStats != null && playerStats.isLoaded() && csign != null) {
+                if (playerStats.inPracticeMode()) {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in practice mode"));
+                    return;
+                }
+
+                if (playerStats.isSpectating()) {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while in spectating"));
+                    return;
+                }
+
                 if (!playerStats.hasCommandSign(csign.getName())) {
                     csignManager.useCommandSign(playerStats, csign.getName());
 

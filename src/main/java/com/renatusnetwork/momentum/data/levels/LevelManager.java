@@ -974,6 +974,10 @@ public class LevelManager {
 
             addCompletion(playerStats, level, levelCompletion); // Update totalLevelCompletionsCount
 
+            if (completedMastery) {
+                playerStats.addMasteryCompletion(level.getName());
+            }
+
             // run commands if there is any
             for (String commandString : level.getCommands()) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandString.replace("%player%", player.getName()));
