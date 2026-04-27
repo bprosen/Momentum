@@ -5,6 +5,7 @@ import com.renatusnetwork.momentum.data.levels.Level;
 import com.renatusnetwork.momentum.utils.Utils;
 import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class JackpotManager {
     private Jackpot currentJackpot;
+    private BukkitTask endTask;
 
     public JackpotManager() {
         runScheduler();
@@ -48,6 +50,14 @@ public class JackpotManager {
 
             currentJackpot = new Jackpot(level, bonus);
             currentJackpot.start(); // begin jackpot
+
+            endTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    endJackpot();
+                }
+            }.runTaskLater(Momentum.getPlugin(), 20 * Momentum.getSettingsManager().jackpot_length);
+
             Utils.playSound(Sound.BLOCK_NOTE_PLING);
         } else {
             Momentum.getPluginLogger().info("Tried to start Jackpot with one already running");
@@ -73,6 +83,10 @@ public class JackpotManager {
 
     public void endJackpot() {
         if (currentJackpot != null) {
+            if (endTask != null && endTask.isCancelled()) {
+                endTask.cancel();
+            }
+
             currentJackpot.end();
             currentJackpot = null;
         } else {
