@@ -5,6 +5,7 @@ import com.renatusnetwork.momentum.data.checkpoints.CheckpointDB;
 import com.renatusnetwork.momentum.data.events.EventManager;
 import com.renatusnetwork.momentum.data.events.types.AscentEvent;
 import com.renatusnetwork.momentum.data.events.types.MazeEvent;
+import com.renatusnetwork.momentum.data.events.types.PvPEvent;
 import com.renatusnetwork.momentum.data.events.types.RisingWaterEvent;
 import com.renatusnetwork.momentum.data.infinite.gamemode.Infinite;
 import com.renatusnetwork.momentum.data.levels.Level;
@@ -59,6 +60,12 @@ public class LevelListener implements Listener {
                     } else if (eventManager.isMazeEvent()) {
                         // respawn
                         ((MazeEvent) eventManager.getRunningEvent()).respawn(player);
+                    } else {
+                        Level eventLevel = eventManager.getRunningEvent().getLevel();
+
+                        if (eventLevel.doesLiquidResetPlayer()) {
+                            Momentum.getLevelManager().respawnPlayer(playerStats, eventLevel);
+                        }
                     }
                 } else if (!playerStats.isSpectating()) {
                     Level level = playerStats.getLevel();
