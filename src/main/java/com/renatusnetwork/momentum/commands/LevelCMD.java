@@ -978,7 +978,6 @@ public class LevelCMD implements CommandExecutor {
         sender.sendMessage(Utils.translate("&a/level addboughtlevel <player> <level>  &7Add bought level to player"));
         sender.sendMessage(Utils.translate("&a/level removeboughtlevel <player> <level>  &7Remove bought level from player"));
         sender.sendMessage(Utils.translate("&a/level new <level>  &7Toggles if the level is new (for menu and future updates)"));
-        sender.sendMessage(Utils.translate("&a/level legacy <level>  &7Toggles if the level is legacy (for menu and future updates)"));
         sender.sendMessage(Utils.translate("&a/level difficulty <level> <difficulty>  &7Sets the difficulty of the level"));
         sender.sendMessage(Utils.translate("&a/level cooldown <level>  &7Toggles if the level has a cooldown"));
         sender.sendMessage(Utils.translate("&a/level tc <level>  &7Toggles if the level uses TC blocks"));
