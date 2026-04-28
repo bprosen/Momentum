@@ -113,7 +113,7 @@ public class InteractListener implements Listener {
 
                                                         // if has nv status, add nv
                                                         if (playerStats.hasNightVision()) {
-                                                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                                                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
                                                         }
 
                                                         for (PotionEffect potionEffect : level.getPotionEffects()) {

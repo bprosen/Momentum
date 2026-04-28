@@ -119,7 +119,7 @@ public class StatsDB {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                        playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
                     }
                 }.runTask(Momentum.getPlugin());
             }
