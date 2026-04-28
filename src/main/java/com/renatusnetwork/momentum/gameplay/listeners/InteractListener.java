@@ -220,8 +220,13 @@ public class InteractListener implements Listener {
                     return;
                 }
 
+                if (playerStats.isPreviewingLevel()) {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
+                    return;
+                }
+
                 if (playerStats.isSpectating()) {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while in spectating"));
+                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
                     return;
                 }
 
