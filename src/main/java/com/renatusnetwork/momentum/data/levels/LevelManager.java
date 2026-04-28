@@ -1204,7 +1204,7 @@ public class LevelManager {
         }
 
         // if mastery, boost it
-        if (level.hasMastery() && playerStats.isAttemptingMastery()) {
+        if (level.hasMastery() && playerStats.isAttemptingMastery() && playerStats.getLevel().getName().equals(level.getName())) {
             baseReward *= level.getMasteryMultiplier();
         } else if (level.isFeaturedLevel()) { // if featured, set reward!
             baseReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
@@ -1273,9 +1273,17 @@ public class LevelManager {
                     Momentum.getStatsManager().toggleOnElytra(playerStats);
                 }
 
+                if (playerStats.isAttemptingMastery()) {
+                    if (!(newLevel.hasMastery() &&
+                        playerStats.hasCompleted(newLevel) &&
+                        !playerStats.hasMasteryCompletion(newLevel))) {
+                        Momentum.getStatsManager().leftMastery(playerStats);
+                    }
+                }
+
                 playerStats.setLevel(newLevel);
 
-                if (playerStats.hasCheckpoint(newLevel)) {
+                if (playerStats.hasCheckpoint(newLevel) && !playerStats.isAttemptingMastery()) {
                     playerStats.setCurrentCheckpoint(playerStats.getCheckpoint(newLevel));
                 }
             } else {

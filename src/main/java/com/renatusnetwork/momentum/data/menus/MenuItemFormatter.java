@@ -552,6 +552,10 @@ public class MenuItemFormatter {
             int newReward = Momentum.getLevelManager().calculateLevelRewardForPlayer(playerStats, level);
             LevelCooldown cooldown = null;
 
+            if (!jackpotManager.isJackpotRunning() && level.hasCooldown() && Momentum.getLevelManager().inCooldownMap(playerStats.getName())) {
+                cooldown = Momentum.getLevelManager().getLevelCooldown(playerStats.getName());
+            }
+
             // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
             if (oldReward != newReward) {
                 itemLore.add(Utils.translate("  &c&m" + Utils.formatNumber(oldReward) + "&6 " + Utils.formatNumber(newReward) + "&e Coin &7Reward"));
