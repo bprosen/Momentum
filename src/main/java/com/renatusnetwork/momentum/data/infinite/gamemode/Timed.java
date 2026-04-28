@@ -3,10 +3,12 @@ package com.renatusnetwork.momentum.data.infinite.gamemode;
 import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 public class Timed extends Infinite {
 
     private long endMillis;
+    private BukkitTask task;
 
     public Timed(PlayerStats playerStats) {
         super(playerStats, 2);
@@ -26,10 +28,14 @@ public class Timed extends Infinite {
 
     public void end() {
         super.end();
+
+        if (task != null) {
+            task.cancel();
+        }
     }
 
     private void startTimer() {
-        new BukkitRunnable() {
+        task = new BukkitRunnable() {
             @Override
             public void run() {
                 Momentum.getInfiniteManager().endPK(getPlayer()); // end when time is up
