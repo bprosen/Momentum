@@ -50,6 +50,8 @@ public class DamageListener implements Listener {
                         Momentum.getLevelManager().respawnPlayer(playerStats, playerStats.getLevel());
                     }
                 }
+            } else if (event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR) {
+                event.setCancelled(true);
             }
         }
     }
