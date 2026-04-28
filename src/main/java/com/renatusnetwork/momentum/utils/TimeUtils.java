@@ -1,8 +1,10 @@
 package com.renatusnetwork.momentum.utils;
 
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class TimeUtils {
@@ -10,6 +12,8 @@ public class TimeUtils {
     private static String formatCompletionTimeNoSeconds(long milliseconds) {
         long minutes = milliseconds / 60000;
         long hours = minutes / 60;
+
+        minutes %= 60;
 
         String hourString = "";
         String minuteString = "";
@@ -39,6 +43,7 @@ public class TimeUtils {
         String secondsString = String.valueOf((int) seconds);
         if (decimalPlaces > 0) {
             DecimalFormat format = new DecimalFormat("#.#");
+            format.setRoundingMode(RoundingMode.DOWN);
             format.setMaximumFractionDigits(decimalPlaces);
             format.setMinimumFractionDigits(1);
 
