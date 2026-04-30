@@ -10,7 +10,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class ELOTierCMD implements CommandExecutor {
     @Override
@@ -47,8 +46,6 @@ public class ELOTierCMD implements CommandExecutor {
                     Momentum.getELOTiersManager().deleteELOTier(tier);
                     sender.sendMessage(Utils.translate("&aSuccessfully removed &2" + name));
                 }
-            } else if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
-                sendELOTiers(sender);
             } else if (a.length == 2 && a[0].equalsIgnoreCase("tier")) {
                 PlayerStats playerStats = Momentum.getStatsManager().getByName(a[1]);
                 if (playerStats != null) {
@@ -130,6 +127,11 @@ public class ELOTierCMD implements CommandExecutor {
                 sendHelp(sender);
             }
         }
+
+        if (a.length == 1 && a[0].equalsIgnoreCase("list")) {
+            sendELOTiers(sender);
+        }
+
         return false;
     }
 
