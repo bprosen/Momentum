@@ -211,7 +211,7 @@ public class SquadsCMD implements CommandExecutor {
 
 				break;
 			case "chatspy":
-				if (!sender.hasPermission("momentum.admin")) {
+				if (!sender.hasPermission("momentum.staff")) {
 					sendHelp(sender);
 				} else {
 					player.sendMessage(Utils.translate("&3You have toggled &9&lSquad ChatSpy &b" + (squadsManager.toggleSquadChatSpy(player) ? "on" : "off")));
@@ -268,7 +268,7 @@ public class SquadsCMD implements CommandExecutor {
 		sender.sendMessage(Utils.translate("&3/squads chat <message>  &bsends message to squad chat"));
 		sender.sendMessage(Utils.translate("&3/sqc <message>  &bsends message to squad chat"));
 		sender.sendMessage(Utils.translate("&3/squads warp  &bsends all players in squad to leader's level"));
-		if (sender.hasPermission("momentum.admin")) {
+		if (sender.hasPermission("momentum.staff")) {
 			sender.sendMessage(Utils.translate("&3/squads chatspy  &btoggles squad chat spy"));
 		}
 	}

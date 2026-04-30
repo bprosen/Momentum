@@ -5,7 +5,6 @@ import com.renatusnetwork.momentum.data.clans.Clan;
 import com.renatusnetwork.momentum.data.clans.ClanMember;
 import com.renatusnetwork.momentum.data.elo.ELOTier;
 import com.renatusnetwork.momentum.data.infinite.gamemode.InfiniteType;
-import com.renatusnetwork.momentum.data.jackpot.Jackpot;
 import com.renatusnetwork.momentum.data.jackpot.JackpotManager;
 import com.renatusnetwork.momentum.data.leaderboards.ELOLBPosition;
 import com.renatusnetwork.momentum.data.leaderboards.LevelLBPosition;
@@ -15,7 +14,6 @@ import com.renatusnetwork.momentum.data.levels.LevelManager;
 import com.renatusnetwork.momentum.data.menus.gui.Menu;
 import com.renatusnetwork.momentum.data.menus.gui.MenuItem;
 import com.renatusnetwork.momentum.data.modifiers.ModifierType;
-import com.renatusnetwork.momentum.data.modifiers.boosters.Booster;
 import com.renatusnetwork.momentum.data.modifiers.discounts.Discount;
 import com.renatusnetwork.momentum.data.perks.Perk;
 import com.renatusnetwork.momentum.data.levels.LevelCompletion;
@@ -104,7 +102,7 @@ public class MenuItemFormatter {
                     newLore.add("&7Total XP &e" + Utils.formatNumber(clan.getTotalXP()));
                     newLore.add("&7Level XP &e" + Utils.formatNumber(clan.getXP()));
                     newLore.add("");
-                    newLore.add("&7Members &e" + clan.numMembers());
+                    newLore.add("&7Members &e" + clan.memberCount());
 
                     for (ClanMember clanMember : clan.getMembers()) {
                         // make string for online/offline
@@ -551,6 +549,10 @@ public class MenuItemFormatter {
             int oldReward = level.getReward();
             int newReward = Momentum.getLevelManager().calculateLevelRewardForPlayer(playerStats, level);
             LevelCooldown cooldown = null;
+
+            if (!jackpotManager.isJackpotRunning() && level.hasCooldown() && Momentum.getLevelManager().inCooldownMap(playerStats.getName())) {
+                cooldown = Momentum.getLevelManager().getLevelCooldown(playerStats.getName());
+            }
 
             // set modified, extra check for times of when max prestige = +25% and cooldown = -25%
             if (oldReward != newReward) {

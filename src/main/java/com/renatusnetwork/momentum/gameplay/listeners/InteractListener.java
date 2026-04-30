@@ -113,7 +113,7 @@ public class InteractListener implements Listener {
 
                                                         // if has nv status, add nv
                                                         if (playerStats.hasNightVision()) {
-                                                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                                                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
                                                         }
 
                                                         for (PotionEffect potionEffect : level.getPotionEffects()) {
@@ -220,8 +220,13 @@ public class InteractListener implements Listener {
                     return;
                 }
 
+                if (playerStats.isPreviewingLevel()) {
+                    player.sendMessage(Utils.translate("&cYou cannot do this while previewing a level"));
+                    return;
+                }
+
                 if (playerStats.isSpectating()) {
-                    player.sendMessage(Utils.translate("&cYou cannot do this while in spectating"));
+                    player.sendMessage(Utils.translate("&cYou cannot do this while spectating"));
                     return;
                 }
 

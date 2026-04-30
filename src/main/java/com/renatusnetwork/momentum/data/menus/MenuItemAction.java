@@ -613,7 +613,7 @@ public class MenuItemAction {
                 if (playerStats.inLevel() && level.equals(playerStats.getLevel())) {
                     if (!playerStats.isAttemptingMastery()) {
                         if (!shiftClicked || playerStats.hasMasteryCompletion(level)) {
-                            player.sendMessage(Utils.translate("&cUse the door to reset the level you are already in"));
+                            player.sendMessage(Utils.translate("&cUse the blaze powder to reset the level you are already in"));
                             return;
                         }
                         enteringMasteryOfSameLevel = true;

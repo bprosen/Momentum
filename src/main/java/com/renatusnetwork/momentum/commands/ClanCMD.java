@@ -4,7 +4,12 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.clans.*;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
+import com.renatusnetwork.momentum.data.stats.StatsManager;
 import com.renatusnetwork.momentum.utils.Utils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -21,6 +26,7 @@ public class ClanCMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] a) {
 
         ClansManager clansManager = Momentum.getClansManager();
+        StatsManager statsManager = Momentum.getStatsManager();
 
         if (a.length > 0) {
             if (a.length == 3 && a[0].equalsIgnoreCase("setmaxlevel")) {
@@ -29,7 +35,7 @@ public class ClanCMD implements CommandExecutor {
                     if (Utils.isInteger(a[2])) {
                         int newMaxLevel = Integer.parseInt(a[2]);
 
-                        Clan targetClan = Momentum.getClansManager().getIgnoreCase(clanName);
+                        Clan targetClan = Momentum.getClansManager().get(clanName);
                         if (targetClan != null) {
                             // make sure it is not negative level
                             clansManager.updateMaxLevel(targetClan, newMaxLevel);
@@ -50,7 +56,7 @@ public class ClanCMD implements CommandExecutor {
                     if (Utils.isInteger(a[2])) {
                         int newMaxMembers = Integer.parseInt(a[2]);
 
-                        Clan targetClan = Momentum.getClansManager().getIgnoreCase(clanName);
+                        Clan targetClan = Momentum.getClansManager().get(clanName);
                         if (targetClan != null) {
                             int memberCount = targetClan.getMembers().size();
                             if (memberCount <= newMaxMembers) {
@@ -134,7 +140,7 @@ public class ClanCMD implements CommandExecutor {
                         return true;
                     }
                 } else {
-                    targetClan = Momentum.getClansManager().getIgnoreCase(a[1]);
+                    targetClan = Momentum.getClansManager().get(a[1]);
                 }
 
                 if (targetClan != null) {
@@ -187,7 +193,7 @@ public class ClanCMD implements CommandExecutor {
                         if (Utils.isInteger(a[2])) {
                             int newXP = Integer.parseInt(a[2]);
 
-                            Clan targetClan = Momentum.getClansManager().getIgnoreCase(clanName);
+                            Clan targetClan = Momentum.getClansManager().get(clanName);
                             if (targetClan != null) {
                                 // make sure it is not negative xp
                                 if (newXP > 0) {
@@ -213,7 +219,7 @@ public class ClanCMD implements CommandExecutor {
                         if (Utils.isLong(a[2])) {
                             long newXP = Long.parseLong(a[2]);
 
-                            Clan targetClan = Momentum.getClansManager().getIgnoreCase(clanName);
+                            Clan targetClan = Momentum.getClansManager().get(clanName);
                             if (targetClan != null) {
                                 // make sure it is not negative xp
                                 if (newXP > 0) {
@@ -238,7 +244,7 @@ public class ClanCMD implements CommandExecutor {
                         if (Utils.isInteger(a[2])) {
                             int newLevel = Integer.parseInt(a[2]);
 
-                            Clan targetClan = Momentum.getClansManager().getIgnoreCase(clanName);
+                            Clan targetClan = Momentum.getClansManager().get(clanName);
                             if (targetClan != null) {
                                 // make sure it is actually a level, we cannot set beyond whats upgradable
                                 if (Momentum.getSettingsManager().clan_level_xp_required.containsKey(newLevel)) {
@@ -346,27 +352,24 @@ public class ClanCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("setowner")) {
-                    Clan targetClan = Momentum.getClansManager().getFromMember(a[1]);
+                    String targetName = a[1];
+                    String targetUUID = StatsDB.getUUIDByName(targetName.toLowerCase());
 
                     if (clan != null) {
-                        if (targetClan != null) {
-                            // if in same clan
-                            if (targetClan.equals(clan)) {
-                                if (clan.isOwner(player.getName())) {
-                                    clansManager.updateClanOwner(clan, targetClan.getMember(a[1]).getUUID());
+                        // if in same clan
+                        if (clan.isMember(targetUUID)) {
+                            if (clan.isOwner(player.getName())) {
+                                clansManager.updateClanOwner(clan, targetUUID);
 
-                                    sendClanMessage(clan,
-                                                    "&6" + a[1] + " &ehas been promoted to &6&lClan Owner &eby &6" +
-                                                    player.getName(), true, player
-                                    );
-                                } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot switch clan owners if you are not owner"));
-                                }
+                                sendClanMessage(clan,
+                                                "&6" + a[1] + " &ehas been promoted to &6&lClan Owner &eby &6" +
+                                                player.getName(), true, player
+                                );
                             } else {
-                                player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + a[1]));
+                                player.sendMessage(Utils.translate("&cYou cannot switch clan owners if you are not owner"));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not in a clan"));
+                            player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + a[1]));
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
@@ -384,16 +387,18 @@ public class ClanCMD implements CommandExecutor {
                                     if (!clan.isInvited(targetStats.getName())) {
                                         int maxMembers = clan.getMaxMembers();
 
-                                        if (clan.numMembers() < maxMembers) {
+                                        if (clan.memberCount() < maxMembers) {
                                             // add an invite
                                             targetStats.sendMessage(Utils.translate(
                                                     "&6&l" + player.getName() + " &ehas sent you an " +
                                                     "invitation to their &6&lClan &c" + clan.getTag()
                                             ));
-                                            targetStats.sendMessage(Utils.translate(
-                                                    "   &7Type &e/clan accept " + player.getName() + " " +
-                                                    "&7within &c30 seconds &7to accept"
-                                            ));
+
+                                            TextComponent component = new TextComponent(TextComponent.fromLegacyText(Utils.translate("   &7Click here or type &e/clan accept " + player.getName() + " " + "&7within &c30 seconds &7to accept")));
+                                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&eClick to accept!"))));
+                                            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan accept " + player.getName()));
+
+                                            targetStats.getPlayer().spigot().sendMessage(component);
 
                                             player.sendMessage(Utils.translate(
                                                     "&eYou sent a &6&lClan Invite &eto &6" + targetStats.getName() + " " +
@@ -448,7 +453,7 @@ public class ClanCMD implements CommandExecutor {
                             if (targetClan != null) {
                                 // if they are invited
                                 if (targetClan.isInvited(player.getName())) {
-                                    if (targetClan.numMembers() < targetClan.getMaxMembers()) {
+                                    if (targetClan.memberCount() < targetClan.getMaxMembers()) {
                                         clansManager.addMember(targetClan, playerStats);
                                         sendClanMessage(targetClan, "&6" + player.getName() + " &ehas joined your clan!", false, player);
                                         player.sendMessage(Utils.translate("&eYou joined the &6&lClan &c" + targetClan.getTag()));
@@ -478,17 +483,13 @@ public class ClanCMD implements CommandExecutor {
 
                             // make sure they are not trying to kick themselves
                             if (!targetName.equalsIgnoreCase(player.getName())) {
-                                Clan targetClan = Momentum.getClansManager().getFromMember(targetName);
+                                String targetUUID = StatsDB.getUUIDByName(targetName.toLowerCase());
 
                                 // if they do not have a clan stored in cache
-                                if (targetClan != null) {
+                                if (clan.isMember(targetUUID)) {
                                     // make sure they are kicking from the same clan
-                                    if (targetClan.equals(clan)) {
-                                        sendClanMessage(clan, "&6" + targetName + " &ehas been removed from the clan", true, player);
-                                        clansManager.kickMember(clan, targetName);
-                                    } else {
-                                        player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + targetName));
-                                    }
+                                    sendClanMessage(clan, "&6" + targetName + " &ehas been removed from the clan", true, player);
+                                    clansManager.kickMember(clan, targetUUID);
                                 } else {
                                     player.sendMessage(Utils.translate("&4" + targetName + " &cis not in your clan"));
                                 }
@@ -518,7 +519,7 @@ public class ClanCMD implements CommandExecutor {
                     // leave if in a clan
                     if (clan != null) {
                         // if they are only one in their clan
-                        if (clan.numMembers() == 1) {
+                        if (clan.memberCount() == 1) {
                             clansManager.deleteClan(clan, false);
                             player.sendMessage(Utils.translate("&eYou have left your clan"));
                         } else if (!clan.isOwner(player.getName())) {
@@ -533,7 +534,7 @@ public class ClanCMD implements CommandExecutor {
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("delete")) {
                     if (player.hasPermission("momentum.admin")) {
-                        Clan targetClan = clansManager.getIgnoreCase(a[1]);
+                        Clan targetClan = clansManager.get(a[1]);
 
                         if (targetClan != null) {
                             // remove from cache and db

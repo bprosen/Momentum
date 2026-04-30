@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -450,7 +451,7 @@ public class Utils {
     }
 
     public static void applySlowness(Player player   /* in ticks */) {
-        player.addPotionEffect(PotionEffectType.SLOW.createEffect(20, 255));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 255, false, false));
     }
 
     public static boolean containsIgnoreCase(List<String> strings, String match) { // non regex friendly

@@ -44,8 +44,7 @@ public class ClansManager {
         Clan clan = new Clan(tag, owner.getUUID());
 
         // add to cache and db
-        add(clan);
-        ClansDB.insert(clan);
+        clans.put(tag.toLowerCase(), clan);
 
         // update owner stats
         clan.addMember(new ClanMember(owner.getUUID(), owner.getName()));
@@ -54,20 +53,19 @@ public class ClansManager {
         clan.setLevel(1);
 
         owner.setClan(clan);
-        StatsDB.updatePlayerClan(owner.getUUID(), clan.getTag());
-    }
 
-    public void add(Clan clan) {
-        clans.put(clan.getTag(), clan);
+        ClansDB.insert(clan);
+        StatsDB.updatePlayerClan(owner.getUUID(), clan.getTag());
     }
 
     public void updateClanTag(Clan clan, String newTag) {
         // update in data
-        clans.remove(clan.getTag());
-        clans.put(clan.getTag(), clan);
+        String oldTag = clan.getTag();
+        clans.remove(oldTag);
         clan.setTag(newTag);
+        clans.put(newTag, clan);
 
-        ClansDB.updateTag(clan.getTag(), newTag);
+        ClansDB.updateTag(oldTag, newTag);
     }
 
     public void updateTotalXP(Clan clan, long totalXP) {
@@ -93,15 +91,15 @@ public class ClansManager {
     public void addMember(Clan clan, PlayerStats playerStats) {
         clan.addMember(new ClanMember(playerStats.getUUID(), playerStats.getName()));
         playerStats.setClan(clan);
-        StatsDB.updatePlayerClan(playerStats.getUUID(), clan.getTag());
         clan.removeInvite(playerStats.getName());
+        StatsDB.updatePlayerClan(playerStats.getUUID(), clan.getTag());
     }
 
-    public void kickMember(Clan clan, String playerName) {
-        clan.removeMember(playerName);
-        StatsDB.resetPlayerClanByName(playerName);
+    public void kickMember(Clan clan, String playerUUID) {
+        clan.removeMember(playerUUID);
+        StatsDB.resetPlayerClanByUUID(playerUUID);
 
-        PlayerStats victimStats = Momentum.getStatsManager().getByName(playerName);
+        PlayerStats victimStats = Momentum.getStatsManager().get(playerUUID);
 
         if (victimStats != null) {
             victimStats.resetClan();
@@ -121,28 +119,8 @@ public class ClansManager {
         return false;
     }
 
-    public Clan getFromMember(String memberName) {
-        for (Clan clan : clans.values()) {
-            if (clan.isMember(memberName)) {
-                return clan;
-            }
-        }
-
-        return null;
-    }
-
     public Clan get(String clanTag) {
-        return clans.get(clanTag);
-    }
-
-    public Clan getIgnoreCase(String clanTag) {
-        for (Clan clan : clans.values()) {
-            if (clan.getTag().equalsIgnoreCase(clanTag)) {
-                return clan;
-            }
-        }
-
-        return null;
+        return clans.get(clanTag.toLowerCase());
     }
 
     public void updatePlayerNameInClan(Clan clan, String oldName, String newName) {

@@ -119,7 +119,7 @@ public class StatsDB {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
+                        playerStats.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
                     }
                 }.runTask(Momentum.getPlugin());
             }
@@ -506,9 +506,7 @@ public class StatsDB {
     }
 
     public static void updatePlayerClan(String uuid, String tag) {
-        DatabaseQueries.runAsyncQuery(
-                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, uuid
-                                     );
+        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, uuid);
     }
 
     public static void loadModifiers(PlayerStats playerStats) {

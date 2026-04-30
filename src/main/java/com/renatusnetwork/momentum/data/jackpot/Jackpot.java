@@ -18,12 +18,11 @@ public class Jackpot {
     private long endMillis;
 
     private BukkitTask reminderTask;
-    private BukkitTask endTask;
 
     public Jackpot(Level level, int bonus) {
         this.level = level;
         this.bonus = bonus;
-        this.endMillis = System.currentTimeMillis() + 1800000; // 30 mins
+        this.endMillis = System.currentTimeMillis() + (Momentum.getSettingsManager().jackpot_length * 1000); // jackpot length in seconds converted to milliseconds
 
         completed = new HashSet<>();
     }
@@ -36,10 +35,6 @@ public class Jackpot {
         // cancel reminder
         if (reminderTask != null) {
             reminderTask.cancel();
-        }
-
-        if (endTask != null) {
-            endTask.cancel();
         }
 
         Bukkit.broadcastMessage(Utils.translate("&2&m----------------------------------------"));
@@ -59,13 +54,6 @@ public class Jackpot {
     }
 
     private void runSchedulers() {
-        endTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                end();
-            }
-        }.runTaskLater(Momentum.getPlugin(), 20 * Momentum.getSettingsManager().jackpot_length);
-
         reminderTask = new BukkitRunnable() {
             @Override
             public void run() {
