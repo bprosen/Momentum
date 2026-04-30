@@ -506,7 +506,9 @@ public class StatsDB {
     }
 
     public static void updatePlayerClan(String uuid, String tag) {
-        DatabaseQueries.runAsyncQuery("UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, uuid);
+        DatabaseQueries.runAsyncQuery(
+                "UPDATE " + DatabaseManager.PLAYERS_TABLE + " SET clan=? WHERE uuid=?", tag, uuid
+                                     );
     }
 
     public static void loadModifiers(PlayerStats playerStats) {

@@ -11,8 +11,8 @@ public class Clan {
     private long totalXP;
     private int maxLevel;
     private int maxMembers;
-    private final HashMap<String, ClanMember> members;
-    private final HashSet<String> invitedPlayerNames;
+    private HashMap<String, ClanMember> members;
+    private HashSet<String> invitedPlayerNames;
 
     public Clan(String tag, String ownerUUID) {
         this.tag = tag;
@@ -99,12 +99,12 @@ public class Clan {
         return this.ownerUUID;
     }
 
-    public boolean isMember(String playerUUID) {
-        return members.containsKey(playerUUID);
+    public boolean isMember(String playerName) {
+        return members.containsKey(playerName);
     }
 
-    public ClanMember getMember(String playerUUID) {
-        return members.get(playerUUID);
+    public ClanMember getMember(String playerName) {
+        return members.get(playerName);
     }
 
     public ClanMember getOwner() {
@@ -143,7 +143,7 @@ public class Clan {
         return members.values();
     }
 
-    public int memberCount() {
+    public int numMembers() {
         return members.size();
     }
 
