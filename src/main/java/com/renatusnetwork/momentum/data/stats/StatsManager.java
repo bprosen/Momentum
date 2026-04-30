@@ -837,6 +837,11 @@ public class StatsManager {
         Player player = playerStats.getPlayer();
 
         if (player.isOnline() && spectator.isOnline()) {
+            // unobtrusive invis
+            // set invis BOFORE teleporting because of lag
+            spectator.removePotionEffect(PotionEffectType.INVISIBILITY); // remove before adding to refresh timer
+            spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 1, false, false));
+
             spectatorStats.teleport(player.getLocation(), false);
 
             // this is done AFTER teleport to override some world changes that can happen
@@ -844,10 +849,6 @@ public class StatsManager {
                 spectator.setAllowFlight(true);
                 spectator.setFlying(true);
             }
-
-            // unobtrusive invis
-            spectator.removePotionEffect(PotionEffectType.INVISIBILITY); // remove before adding to refresh timer
-            spectator.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 1, false, false));
 
             spectatorStats.sendTitle("&7Teleported to " + player.getDisplayName(), "&2/spectate &7 to exit", 10, 40, 10);
         }

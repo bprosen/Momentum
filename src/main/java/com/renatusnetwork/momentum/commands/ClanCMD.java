@@ -4,7 +4,11 @@ import com.renatusnetwork.momentum.Momentum;
 import com.renatusnetwork.momentum.data.SettingsManager;
 import com.renatusnetwork.momentum.data.clans.*;
 import com.renatusnetwork.momentum.data.stats.PlayerStats;
+import com.renatusnetwork.momentum.data.stats.StatsDB;
 import com.renatusnetwork.momentum.utils.Utils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -346,27 +350,24 @@ public class ClanCMD implements CommandExecutor {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
                     }
                 } else if (a.length == 2 && a[0].equalsIgnoreCase("setowner")) {
-                    Clan targetClan = Momentum.getClansManager().getFromMember(a[1]);
+                    String targetName = a[1];
+                    String targetUUID = StatsDB.getUUIDByName(targetName.toLowerCase());
 
                     if (clan != null) {
-                        if (targetClan != null) {
-                            // if in same clan
-                            if (targetClan.equals(clan)) {
-                                if (clan.isOwner(player.getName())) {
-                                    clansManager.updateClanOwner(clan, targetClan.getMember(a[1]).getUUID());
+                        // if in same clan
+                        if (clan.isMember(targetUUID)) {
+                            if (clan.isOwner(player.getName())) {
+                                clansManager.updateClanOwner(clan, targetUUID);
 
-                                    sendClanMessage(clan,
-                                                    "&6" + a[1] + " &ehas been promoted to &6&lClan Owner &eby &6" +
-                                                    player.getName(), true, player
-                                    );
-                                } else {
-                                    player.sendMessage(Utils.translate("&cYou cannot switch clan owners if you are not owner"));
-                                }
+                                sendClanMessage(clan,
+                                        "&6" + a[1] + " &ehas been promoted to &6&lClan Owner &eby &6" +
+                                                player.getName(), true, player
+                                );
                             } else {
-                                player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + a[1]));
+                                player.sendMessage(Utils.translate("&cYou cannot switch clan owners if you are not owner"));
                             }
                         } else {
-                            player.sendMessage(Utils.translate("&4" + a[1] + " &cis not in a clan"));
+                            player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + a[1]));
                         }
                     } else {
                         player.sendMessage(Utils.translate("&cYou are not in a clan"));
@@ -390,10 +391,12 @@ public class ClanCMD implements CommandExecutor {
                                                     "&6&l" + player.getName() + " &ehas sent you an " +
                                                     "invitation to their &6&lClan &c" + clan.getTag()
                                             ));
-                                            targetStats.sendMessage(Utils.translate(
-                                                    "   &7Type &e/clan accept " + player.getName() + " " +
-                                                    "&7within &c30 seconds &7to accept"
-                                            ));
+
+                                            TextComponent component = new TextComponent(TextComponent.fromLegacyText(Utils.translate("   &7Click here or type &e/clan accept " + player.getName() + " " + "&7within &c30 seconds &7to accept")));
+                                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Utils.translate("&eClick to accept!"))));
+                                            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clan accept " + player.getName()));
+
+                                            targetStats.getPlayer().spigot().sendMessage(component);
 
                                             player.sendMessage(Utils.translate(
                                                     "&eYou sent a &6&lClan Invite &eto &6" + targetStats.getName() + " " +
@@ -478,17 +481,13 @@ public class ClanCMD implements CommandExecutor {
 
                             // make sure they are not trying to kick themselves
                             if (!targetName.equalsIgnoreCase(player.getName())) {
-                                Clan targetClan = Momentum.getClansManager().getFromMember(targetName);
+                                String targetUUID = StatsDB.getUUIDByName(targetName.toLowerCase());
 
                                 // if they do not have a clan stored in cache
-                                if (targetClan != null) {
+                                if (clan.isMember(targetUUID)) {
                                     // make sure they are kicking from the same clan
-                                    if (targetClan.equals(clan)) {
-                                        sendClanMessage(clan, "&6" + targetName + " &ehas been removed from the clan", true, player);
-                                        clansManager.kickMember(clan, targetName);
-                                    } else {
-                                        player.sendMessage(Utils.translate("&cYou are not in the same clan as &4" + targetName));
-                                    }
+                                    sendClanMessage(clan, "&6" + targetName + " &ehas been removed from the clan", true, player);
+                                    clansManager.kickMember(clan, targetUUID);
                                 } else {
                                     player.sendMessage(Utils.translate("&4" + targetName + " &cis not in your clan"));
                                 }

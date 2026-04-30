@@ -63,11 +63,12 @@ public class ClansManager {
 
     public void updateClanTag(Clan clan, String newTag) {
         // update in data
-        clans.remove(clan.getTag());
-        clans.put(clan.getTag(), clan);
+        String oldTag = clan.getTag();
+        clans.remove(oldTag);
+        clans.put(newTag, clan);
         clan.setTag(newTag);
 
-        ClansDB.updateTag(clan.getTag(), newTag);
+        ClansDB.updateTag(oldTag, newTag);
     }
 
     public void updateTotalXP(Clan clan, long totalXP) {
@@ -97,11 +98,11 @@ public class ClansManager {
         clan.removeInvite(playerStats.getName());
     }
 
-    public void kickMember(Clan clan, String playerName) {
-        clan.removeMember(playerName);
-        StatsDB.resetPlayerClanByName(playerName);
+    public void kickMember(Clan clan, String playerUUID) {
+        clan.removeMember(playerUUID);
+        StatsDB.resetPlayerClanByUUID(playerUUID);
 
-        PlayerStats victimStats = Momentum.getStatsManager().getByName(playerName);
+        PlayerStats victimStats = Momentum.getStatsManager().get(playerUUID);
 
         if (victimStats != null) {
             victimStats.resetClan();
@@ -119,16 +120,6 @@ public class ClansManager {
             }
         }
         return false;
-    }
-
-    public Clan getFromMember(String memberName) {
-        for (Clan clan : clans.values()) {
-            if (clan.isMember(memberName)) {
-                return clan;
-            }
-        }
-
-        return null;
     }
 
     public Clan get(String clanTag) {

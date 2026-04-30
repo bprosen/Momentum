@@ -1204,7 +1204,7 @@ public class LevelManager {
         }
 
         // if mastery, boost it
-        if (level.hasMastery() && playerStats.isAttemptingMastery() && playerStats.getLevel().getName().equals(level.getName())) {
+        if (level.hasMastery() && playerStats.isAttemptingMastery() && playerStats.inLevel() && playerStats.getLevel().getName().equals(level.getName())) {
             baseReward *= level.getMasteryMultiplier();
         } else if (level.isFeaturedLevel()) { // if featured, set reward!
             baseReward *= Momentum.getSettingsManager().featured_level_reward_multiplier;
