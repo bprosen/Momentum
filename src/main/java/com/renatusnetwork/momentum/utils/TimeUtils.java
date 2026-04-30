@@ -4,7 +4,6 @@ import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class TimeUtils {
@@ -22,7 +21,9 @@ public class TimeUtils {
             hourString = hours + ":";
         }
 
-        if (minutes > 0) {
+        if (minutes == 0 && hours > 0) {
+            minuteString = "00";
+        } else if (minutes > 0) {
             minuteString = minutes < 10 && hours > 0 ? "0" + minutes : String.valueOf(minutes);
         }
 
