@@ -411,7 +411,6 @@ public class PlayerStats {
     public void resetLevel() {
         level = null;
         attemptingMastery = false;
-        attemptingRankup = false;
         Utils.removeLeaveItem(player);
     }
 
