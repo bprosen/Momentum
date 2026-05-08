@@ -33,6 +33,8 @@ public class RaceCMD implements CommandExecutor {
             sendHelp(player);
         } else if (a.length == 1 && a[0].equalsIgnoreCase("help")) {
             sendHelp(player);
+        } else if (playerStats.isAttemptingMastery()) {
+            playerStats.sendMessage(Utils.translate("&cYou cannot race while attempting mastery!"));
         } else if ((a.length == 1 || a.length == 2) && a[0].equalsIgnoreCase("random")) {
             if (playerStats.isLoaded()) {
                 int bet = 0;

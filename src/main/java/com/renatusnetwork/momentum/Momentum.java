@@ -185,6 +185,7 @@ public class Momentum extends JavaPlugin {
         getCommand("commandsign").setExecutor(new CommandSignCMD());
         getCommand("squads").setExecutor(new SquadsCMD());
         getCommand("reset").setExecutor(new ResetCMD());
+        getCommand("coords").setExecutor(new CoordsCMD());
     }
 
     private static void load() {

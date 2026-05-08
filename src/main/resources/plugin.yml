@@ -138,3 +138,5 @@ commands:
     aliases: [squad, sq, sqc]
   reset:
     description: "Momentum stats reset command"
+  coords:
+    description: "Momentum coords command"

@@ -29,6 +29,7 @@ import com.renatusnetwork.momentum.utils.Utils;
 import com.renatusnetwork.momentum.utils.dependencies.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -686,7 +687,7 @@ public class StatsManager {
             playerStats.setChestplateSavedFromElytra(null);
             // remove elytra if was in level
         } else if (playerStats.inLevel() && playerStats.getLevel().isElytra()) {
-            playerStats.getPlayer().getInventory().setChestplate(null);
+            Utils.removeElytra(playerStats);
         }
     }
 

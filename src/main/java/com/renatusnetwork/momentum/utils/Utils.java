@@ -457,4 +457,11 @@ public class Utils {
     public static boolean containsIgnoreCase(List<String> strings, String match) { // non regex friendly
         return strings.stream().anyMatch(s -> s.equalsIgnoreCase(match));
     }
+
+    public static void removeElytra(PlayerStats playerStats) {
+        PlayerInventory inv = playerStats.getPlayer().getInventory();
+
+        inv.remove(Material.ELYTRA);
+        inv.setChestplate(null);
+    }
 }

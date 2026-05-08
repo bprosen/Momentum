@@ -98,6 +98,16 @@ public class SpectateCMD implements CommandExecutor {
                                 return false;
                             }
 
+                            if (playerStats.isSpectating()) {
+                                player.sendMessage(Utils.translate("&cYou cannot spectate a spectator"));
+                                return false;
+                            }
+
+                            if (spectatorStats.isAttemptingMastery()) {
+                                player.sendMessage(Utils.translate("&cYou cannot spectate while attempting mastery"));
+                                return false;
+                            }
+
                             Location location = player.getLocation().clone();
                             if (location.add(0, 1, 0).getBlock().getType() == Material.AIR) {
                                 boolean initialSpectate = true;

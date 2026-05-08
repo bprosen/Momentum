@@ -174,7 +174,8 @@ public class PacketListener implements Listener {
                         PlayerStats beingSpectated = playerStats.getPlayerToSpectate();
 
                         if (beingSpectated != null && beingSpectated.getPlayer().isOnline() && beingSpectated.isSpectatable() &&
-                            !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world)) {
+                            !beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(Momentum.getSettingsManager().player_submitted_world) &&
+                            !beingSpectated.isSpectating()) {
 
                             if (!beingSpectated.getPlayer().getWorld().getName().equalsIgnoreCase(playerStats.getPlayer().getWorld().getName()) ||
                                 !Utils.isNearby(playerStats.getPlayer().getLocation(), beingSpectated.getPlayer().getLocation(), 30.0))
