@@ -1288,6 +1288,7 @@ public class LevelManager {
                 }
             } else {
                 playerStats.resetLevel();
+                Momentum.getStatsManager().leftMastery(playerStats);
             }
         }
     }
